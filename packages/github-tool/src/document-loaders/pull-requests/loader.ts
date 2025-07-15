@@ -2,191 +2,189 @@ import type { Document, DocumentLoader } from "@giselle-sdk/rag";
 import { DocumentLoaderError } from "@giselle-sdk/rag";
 import type { Octokit } from "@octokit/core";
 import { RequestError } from "@octokit/request-error";
+import type { Client } from "urql";
+import { graphql } from "../../client";
+import type { GitHubAuthConfig } from "../../types";
+import {
+	type Comment,
+	createCacheKey,
+	diffsCache,
+	type FileMetadata,
+	type PullRequestInfo,
+	pullRequestCache,
+} from "./cache";
+import { GetPullRequestInfoQuery } from "./queries";
 import type {
 	GitHubPullRequestMetadata,
 	GitHubPullRequestsLoaderConfig,
 } from "./types";
 
-// Internal types for API responses
 type PullRequestListItem = {
 	number: number;
 };
 
-type PullRequestDetail = {
-	title: string;
-	body: string | null;
-	merged: boolean;
-	merged_at: string | null;
-};
-
-type IssueComment = {
-	id: number;
-	body: string;
-	user: {
-		type: string;
-	} | null;
-};
-
-type PullRequestFile = {
-	filename: string;
-	patch?: string;
-};
-
-const DEFAULT_DIFF_IGNORE_FILE_PATTERNS = [
-	"*.lock",
-	"pnpm-lock.yaml",
-	"package-lock.json",
-	"yarn.lock",
-	"*.png",
-	"*.jpg",
-	"*.jpeg",
-	"*.gif",
-	"*.svg",
-	"*.ico",
-	"*.pdf",
-	"*.zip",
-	"*.tar",
-	"*.gz",
-	"*.woff",
-	"*.woff2",
-	"*.ttf",
-	"*.eot",
-	"*.bin",
-	"*.exe",
-	"*.dll",
-	"*.so",
-	"*.dylib",
-	"*.wasm",
-];
-
-/**
- * Creates a GitHub Pull Requests loader for document extraction
- * Only processes merged pull requests (immutable content for vector search)
- *
- * @example
- * ```typescript
- * // Basic usage
- * const loader = createGitHubPullRequestsLoader(octokit, {
- *   owner: "giselles-ai",
- *   repo: "giselle",
- * });
- *
- * // With custom configuration
- * const loader = createGitHubPullRequestsLoader(octokit, {
- *   owner: "giselles-ai",
- *   repo: "giselle",
- *   perPage: 100,    // Fetch 100 PRs per page
- *   maxPages: 10,    // Process up to 1000 PRs
- *
- *   // Filter options
- *   skipGeneratedFiles: true,    // Skip auto-generated files
- *   skipBotComments: true,       // Skip bot noise
- *   maxDiffSize: 1024 * 50,      // 50KB limit per file
- *   maxCommentLength: 1024 * 10, // 10KB limit per comment
- *   skipFiles: [
- *     // These patterns will be added to the default diff ignore patterns
- *     // (which includes images, executables, archives, and lock files)
- *     "*.generated.ts",
- *     "*.pb.go",
- *     "schema.graphql",
- *   ],
- * });
- * ```
- */
-
-/**
- * Check if file should be ignored for diff processing
- * Uses glob-like pattern matching to exclude unwanted files from diff documents
- */
-function shouldIgnoreFile(
-	file: PullRequestFile,
-	skipPatterns: string[],
-): boolean {
-	// Pattern matching to filter out unwanted files
-	return skipPatterns.some((pattern) => {
-		if (pattern.startsWith("*.")) {
-			// Handle *.ext patterns
-			return file.filename.endsWith(pattern.slice(1));
-		}
-		// Handle exact filename matches
-		return file.filename === pattern || file.filename.endsWith(pattern);
-	});
-}
-
-/**
- * Heuristic detection for generated files based on filename patterns
- * This is not from GitHub API but follows common conventions
- */
-function isLikelyGeneratedFile(filename: string): boolean {
-	const generatedPatterns = [
-		// Common generated file patterns
-		/\.generated\./i,
-		/\.gen\./i,
-		/^generated\//i,
-		/\/generated\//i,
-		/\.min\./i,
-		/\.bundle\./i,
-		/dist\//i,
-		/build\//i,
-		/\.pb\./i, // Protocol Buffers
-		/\.g\./i, // Various code generators
-
-		// Specific files
-		/^package-lock\.json$/,
-		/^pnpm-lock\.yaml$/,
-		/^yarn\.lock$/,
-		/\.lock$/,
-
-		// Common build outputs
-		/\.(map|d\.ts|js\.map)$/,
-		/\.tsbuildinfo$/,
-	];
-
-	return generatedPatterns.some((pattern) => pattern.test(filename));
-}
-
-// Cache for PR data to avoid duplicate API calls
-const prCache = new Map<
-	string,
-	{
-		pr?: PullRequestDetail;
-		comments?: IssueComment[];
-		files?: PullRequestFile[];
-		timestamp: number;
-	}
->();
-
-const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
-
 export function createGitHubPullRequestsLoader(
 	octokit: Octokit,
 	config: GitHubPullRequestsLoaderConfig,
+	authConfig: GitHubAuthConfig,
 ): DocumentLoader<GitHubPullRequestMetadata> {
-	// Extract all config values
 	const {
-		// Repository
 		owner,
 		repo,
-
-		// Pagination (optimized for vector search)
 		perPage = 100,
 		maxPages = 10,
-
-		// Processing options
-		maxDiffSize = 1024 * 1024,
-		maxCommentLength = 1024 * 10,
-		skipFiles = [],
-		skipBotComments = true,
-		skipGeneratedFiles = false,
+		maxContentLength = 1024 * 8, // 8KB limit per content (diff/comment)
 	} = config;
 
-	// Merge user-provided skipFiles with default diff ignore patterns
-	const mergedSkipFiles = [...DEFAULT_DIFF_IGNORE_FILE_PATTERNS, ...skipFiles];
+	let graphqlClient: Client | null = null;
+
+	async function getGraphQLClient(): Promise<Client> {
+		if (!graphqlClient) {
+			graphqlClient = await graphql(authConfig);
+		}
+		return graphqlClient;
+	}
+
+	async function fetchPullRequestInfo(
+		prNumber: number,
+	): Promise<PullRequestInfo> {
+		const client = await getGraphQLClient();
+		const result = await client.query(GetPullRequestInfoQuery, {
+			owner,
+			repo,
+			number: prNumber,
+			commentLimit: 100, // GitHub GraphQL API maximum
+		});
+
+		if (result.error) {
+			throw new Error(`GraphQL error: ${result.error.message}`);
+		}
+
+		const pr = result.data?.repository?.pullRequest;
+		if (!pr) {
+			throw new Error(`Pull request #${prNumber} not found`);
+		}
+
+		// Extract file metadata
+		const files = new Map<string, FileMetadata>();
+		const headCommit = pr.headCommit.nodes?.[0]?.commit;
+		const entries = headCommit?.tree?.entries || [];
+		for (const entry of entries) {
+			const blob = entry.object?.__typename === "Blob" ? entry.object : null;
+			// Only include Blob entries (actual files, not directories or submodules)
+			if (blob) {
+				files.set(entry.path || "", {
+					isGenerated: entry.isGenerated,
+					isBinary: blob.isBinary ?? false,
+					byteSize: blob.byteSize,
+					extension: entry.extension ?? undefined,
+					language: entry.language?.name ?? undefined,
+					lineCount: entry.lineCount ?? undefined,
+				});
+			}
+		}
+
+		// Extract comments
+		// Note: Using 'last: 100' to get the most recent comments (newest first).
+		// If hasPreviousPage is true, older comments will be missed.
+		// This is acceptable for vector search where recent comments are typically
+		// more relevant than older ones.
+		const comments: Comment[] = [];
+		const commentNodes = pr.comments?.nodes || [];
+		for (const comment of commentNodes) {
+			if (comment?.body) {
+				comments.push({
+					id: comment.id,
+					body: comment.body,
+					authorType: comment.author?.__typename || "Unknown",
+				});
+			}
+		}
+
+		return {
+			title: pr.title,
+			body: pr.body,
+			merged: pr.merged,
+			mergedAt: pr.mergedAt,
+			files,
+			comments,
+		};
+	}
+
+	function getPullRequestInfo(prNumber: number): Promise<PullRequestInfo> {
+		const cacheKey = createCacheKey(owner, repo, prNumber);
+
+		const existingPromise = pullRequestCache.get(cacheKey);
+		if (existingPromise) {
+			return existingPromise;
+		}
+
+		const promise = new Promise<PullRequestInfo>((resolve, reject) => {
+			fetchPullRequestInfo(prNumber).then(resolve).catch(reject);
+		});
+
+		pullRequestCache.set(cacheKey, promise);
+
+		promise.catch(() => {
+			pullRequestCache.delete(cacheKey);
+		});
+
+		return promise;
+	}
+
+	async function fetchDiffs(prNumber: number): Promise<Map<string, string>> {
+		const response = await octokit.request(
+			"GET /repos/{owner}/{repo}/pulls/{pull_number}",
+			{
+				owner,
+				repo,
+				pull_number: prNumber,
+				headers: {
+					accept: "application/vnd.github.v3.diff",
+				},
+			},
+		);
+
+		const diffText = response.data as unknown as string;
+		const fileDiffs = new Map<string, string>();
+
+		const fileChunks = diffText.split(/^diff --git /m).slice(1);
+
+		for (const chunk of fileChunks) {
+			const filenameMatch = chunk.match(/^a\/(.+?) b\//);
+			if (!filenameMatch) continue;
+
+			const filename = filenameMatch[1];
+			fileDiffs.set(filename, `diff --git ${chunk}`);
+		}
+
+		return fileDiffs;
+	}
+
+	function getDiffs(prNumber: number): Promise<Map<string, string>> {
+		const cacheKey = createCacheKey(owner, repo, prNumber);
+
+		const existingPromise = diffsCache.get(cacheKey);
+		if (existingPromise) {
+			return existingPromise;
+		}
+
+		const promise = new Promise<Map<string, string>>((resolve, reject) => {
+			fetchDiffs(prNumber).then(resolve).catch(reject);
+		});
+
+		diffsCache.set(cacheKey, promise);
+
+		promise.catch(() => {
+			diffsCache.delete(cacheKey);
+		});
+
+		return promise;
+	}
 
 	const loadMetadata =
 		async function* (): AsyncIterable<GitHubPullRequestMetadata> {
 			// Fetch closed pull requests (to get merged ones)
-			// Always use "created" and "desc" for consistent ordering
 			const pullRequests = await fetchAllPullRequests(octokit, owner, repo, {
 				state: "closed",
 				sort: "created",
@@ -196,111 +194,58 @@ export function createGitHubPullRequestsLoader(
 			});
 
 			for (const pr of pullRequests) {
-				const cacheKey = `${owner}/${repo}/${pr.number}`;
-
 				try {
-					// Always skip non-merged PRs (only process merged PRs)
-					const prDetail = await getCachedPullRequest(
-						octokit,
-						owner,
-						repo,
-						pr.number,
-						cacheKey,
-					);
-					if (!prDetail.merged || !prDetail.merged_at) {
+					const prInfo = await getPullRequestInfo(pr.number);
+
+					if (!prInfo.merged || !prInfo.mergedAt) {
 						continue;
 					}
 
-					// 1. Title + Body document
+					// Title + Body document
 					yield {
 						owner,
 						repo,
 						pr_number: pr.number,
 						content_type: "title_body",
 						content_id: "title_body",
-						merged_at: prDetail.merged_at,
+						merged_at: prInfo.mergedAt,
 					};
 
-					// 2. Comments documents
-					try {
-						const comments = await getCachedComments(
-							octokit,
+					// Comments documents
+					for (const comment of prInfo.comments) {
+						if (comment.authorType === "Bot") {
+							continue;
+						}
+
+						if (comment.body.length > maxContentLength) {
+							continue;
+						}
+
+						yield {
 							owner,
 							repo,
-							pr.number,
-							cacheKey,
-						);
-
-						for (const comment of comments) {
-							if (skipBotComments && comment.user?.type === "Bot") {
-								continue;
-							}
-
-							if (!comment.body || comment.body.length > maxCommentLength) {
-								continue;
-							}
-
-							yield {
-								owner,
-								repo,
-								pr_number: pr.number,
-								content_type: "comment",
-								content_id: comment.id.toString(),
-								merged_at: prDetail.merged_at,
-							};
-						}
-					} catch (error) {
-						console.error(
-							`Failed to process comments for PR #${pr.number}:`,
-							error,
-						);
+							pr_number: pr.number,
+							content_type: "comment",
+							content_id: comment.id,
+							merged_at: prInfo.mergedAt,
+						};
 					}
 
-					// 3. File diffs documents
-					try {
-						const files = await getCachedFiles(
-							octokit,
+					// File diffs documents
+					for (const [filepath, fileInfo] of prInfo.files) {
+						// Skip if file is generated or binary
+						if (fileInfo.isGenerated || fileInfo.isBinary) {
+							continue;
+						}
+
+						yield {
 							owner,
 							repo,
-							pr.number,
-							cacheKey,
-						);
-
-						for (const file of files) {
-							// Skip files based on ignore patterns
-							if (shouldIgnoreFile(file, mergedSkipFiles)) {
-								continue;
-							}
-
-							// Skip likely generated files if enabled
-							if (skipGeneratedFiles && isLikelyGeneratedFile(file.filename)) {
-								continue;
-							}
-
-							// Skip files without patch (no diff content)
-							if (!file.patch) {
-								continue;
-							}
-
-							// Check diff size limit for text files
-							if (file.patch && file.patch.length > maxDiffSize) {
-								continue;
-							}
-
-							yield {
-								owner,
-								repo,
-								pr_number: pr.number,
-								content_type: "diff",
-								content_id: file.filename,
-								merged_at: prDetail.merged_at,
-							};
-						}
-					} catch (error) {
-						console.error(
-							`Failed to process files for PR #${pr.number}:`,
-							error,
-						);
+							pr_number: pr.number,
+							content_type: "diff",
+							content_id: filepath,
+							merged_at: prInfo.mergedAt,
+						};
 					}
 				} catch (error) {
 					console.error(`Failed to process PR #${pr.number}:`, error);
@@ -312,49 +257,27 @@ export function createGitHubPullRequestsLoader(
 		metadata: GitHubPullRequestMetadata,
 	): Promise<Document<GitHubPullRequestMetadata> | null> => {
 		const { pr_number, content_type, content_id } = metadata;
-		const cacheKey = `${owner}/${repo}/${pr_number}`;
 
 		try {
 			switch (content_type) {
 				case "title_body": {
-					const pr = await getCachedPullRequest(
-						octokit,
-						owner,
-						repo,
-						pr_number,
-						cacheKey,
-					);
-					const content = `${pr.title}\n\n${pr.body || ""}`;
+					const prInfo = await getPullRequestInfo(pr_number);
+					const content = `${prInfo.title}\n\n${prInfo.body || ""}`;
 
 					return {
 						content,
 						metadata: {
 							...metadata,
-							// Ensure merged_at is consistent
-							merged_at: pr.merged_at || metadata.merged_at,
+							merged_at: prInfo.mergedAt || metadata.merged_at,
 						},
 					};
 				}
 
 				case "comment": {
-					const pr = await getCachedPullRequest(
-						octokit,
-						owner,
-						repo,
-						pr_number,
-						cacheKey,
-					);
+					const prInfo = await getPullRequestInfo(pr_number);
+					const comment = prInfo.comments.find((c) => c.id === content_id);
 
-					const comments = await getCachedComments(
-						octokit,
-						owner,
-						repo,
-						pr_number,
-						cacheKey,
-					);
-					const comment = comments.find((c) => c.id.toString() === content_id);
-
-					if (!comment || !comment.body) {
+					if (!comment) {
 						return null;
 					}
 
@@ -362,40 +285,30 @@ export function createGitHubPullRequestsLoader(
 						content: comment.body,
 						metadata: {
 							...metadata,
-							merged_at: pr.merged_at || metadata.merged_at,
+							merged_at: prInfo.mergedAt || metadata.merged_at,
 						},
 					};
 				}
 
 				case "diff": {
-					const pr = await getCachedPullRequest(
-						octokit,
-						owner,
-						repo,
-						pr_number,
-						cacheKey,
-					);
+					// Get PR info for merged_at metadata
+					const prInfo = await getPullRequestInfo(pr_number);
 
-					const files = await getCachedFiles(
-						octokit,
-						owner,
-						repo,
-						pr_number,
-						cacheKey,
-					);
-					const file = files.find((f) => f.filename === content_id);
+					// Get the actual diff content
+					const diffs = await getDiffs(pr_number);
+					const diff = diffs.get(content_id);
 
-					if (!file || shouldIgnoreFile(file, mergedSkipFiles) || !file.patch) {
+					if (!diff) {
 						return null;
 					}
 
-					const content = `File: ${file.filename}\n\n${file.patch}`;
+					const content = `File: ${content_id}\n\n${diff}`;
 
 					return {
 						content,
 						metadata: {
 							...metadata,
-							merged_at: pr.merged_at || metadata.merged_at,
+							merged_at: prInfo.mergedAt || metadata.merged_at,
 						},
 					};
 				}
@@ -410,82 +323,6 @@ export function createGitHubPullRequestsLoader(
 	};
 
 	return { loadMetadata, loadDocument };
-}
-
-// Cache helper functions
-async function getCachedPullRequest(
-	octokit: Octokit,
-	owner: string,
-	repo: string,
-	prNumber: number,
-	cacheKey: string,
-): Promise<PullRequestDetail> {
-	const cached = prCache.get(cacheKey);
-	const now = Date.now();
-
-	if (cached?.pr && now - cached.timestamp < CACHE_TTL) {
-		return cached.pr;
-	}
-
-	const pr = await fetchPullRequest(octokit, owner, repo, prNumber);
-
-	prCache.set(cacheKey, {
-		...cached,
-		pr,
-		timestamp: now,
-	});
-
-	return pr;
-}
-
-async function getCachedComments(
-	octokit: Octokit,
-	owner: string,
-	repo: string,
-	prNumber: number,
-	cacheKey: string,
-): Promise<IssueComment[]> {
-	const cached = prCache.get(cacheKey);
-	const now = Date.now();
-
-	if (cached?.comments && now - cached.timestamp < CACHE_TTL) {
-		return cached.comments;
-	}
-
-	const comments = await fetchIssueComments(octokit, owner, repo, prNumber);
-
-	prCache.set(cacheKey, {
-		...(cached || {}),
-		comments,
-		timestamp: now,
-	});
-
-	return comments;
-}
-
-async function getCachedFiles(
-	octokit: Octokit,
-	owner: string,
-	repo: string,
-	prNumber: number,
-	cacheKey: string,
-): Promise<PullRequestFile[]> {
-	const cached = prCache.get(cacheKey);
-	const now = Date.now();
-
-	if (cached?.files && now - cached.timestamp < CACHE_TTL) {
-		return cached.files;
-	}
-
-	const files = await fetchPullRequestFiles(octokit, owner, repo, prNumber);
-
-	prCache.set(cacheKey, {
-		...(cached || {}),
-		files,
-		timestamp: now,
-	});
-
-	return files;
 }
 
 /**
@@ -624,121 +461,4 @@ async function fetchAllPullRequests(
 	}
 
 	return pullRequests;
-}
-
-async function fetchPullRequest(
-	octokit: Octokit,
-	owner: string,
-	repo: string,
-	prNumber: number,
-): Promise<PullRequestDetail> {
-	const { data } = await executeWithRetry(
-		() =>
-			octokit.request("GET /repos/{owner}/{repo}/pulls/{pull_number}", {
-				owner,
-				repo,
-				pull_number: prNumber,
-			}),
-		"Pull Request",
-		`${owner}/${repo}/pulls/${prNumber}`,
-	);
-
-	return {
-		title: data.title,
-		body: data.body,
-		merged: data.merged ?? false,
-		merged_at: data.merged_at,
-	};
-}
-
-async function fetchIssueComments(
-	octokit: Octokit,
-	owner: string,
-	repo: string,
-	prNumber: number,
-): Promise<IssueComment[]> {
-	const comments: IssueComment[] = [];
-	let page = 1;
-
-	while (true) {
-		const { data } = await executeWithRetry(
-			() =>
-				octokit.request(
-					"GET /repos/{owner}/{repo}/issues/{issue_number}/comments",
-					{
-						owner,
-						repo,
-						issue_number: prNumber,
-						per_page: 100,
-						page,
-					},
-				),
-			"Issue Comments",
-			`${owner}/${repo}/issues/${prNumber}/comments`,
-		);
-
-		if (data.length === 0) {
-			break;
-		}
-
-		comments.push(
-			...data.map((comment) => ({
-				id: comment.id,
-				body: comment.body ?? "",
-				user: comment.user ? { type: comment.user.type } : null,
-			})),
-		);
-
-		if (data.length < 100) {
-			break;
-		}
-
-		page++;
-	}
-
-	return comments;
-}
-
-async function fetchPullRequestFiles(
-	octokit: Octokit,
-	owner: string,
-	repo: string,
-	prNumber: number,
-): Promise<PullRequestFile[]> {
-	const files: PullRequestFile[] = [];
-	let page = 1;
-
-	while (true) {
-		const { data } = await executeWithRetry(
-			() =>
-				octokit.request("GET /repos/{owner}/{repo}/pulls/{pull_number}/files", {
-					owner,
-					repo,
-					pull_number: prNumber,
-					per_page: 100,
-					page,
-				}),
-			"Pull Request Files",
-			`${owner}/${repo}/pulls/${prNumber}/files`,
-		);
-
-		if (data.length === 0) {
-			break;
-		}
-
-		files.push(
-			...data.map((file) => ({
-				filename: file.filename,
-				patch: file.patch,
-			})),
-		);
-
-		if (data.length < 100) {
-			break;
-		}
-
-		page++;
-	}
-
-	return files;
 }

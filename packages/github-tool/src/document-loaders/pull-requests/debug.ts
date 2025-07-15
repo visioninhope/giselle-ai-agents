@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import { Octokit } from "@octokit/core";
+import type { GitHubAuthConfig } from "../../types.js";
 import { createGitHubPullRequestsLoader } from "./loader.js";
 
 async function testLoader() {
@@ -20,24 +21,28 @@ async function testLoader() {
 
 	try {
 		const octokit = new Octokit({ auth: token });
+		const authConfig: GitHubAuthConfig = {
+			strategy: "personal-access-token",
+			personalAccessToken: token,
+		};
 
 		// Create loader (only processes merged PRs)
-		const loader = createGitHubPullRequestsLoader(octokit, {
-			// Repository
-			owner,
-			repo,
+		const loader = createGitHubPullRequestsLoader(
+			octokit,
+			{
+				// Repository
+				owner,
+				repo,
 
-			// Pagination
-			perPage: 3, // Small number for testing
-			maxPages: 3,
+				// Pagination
+				perPage: 3, // Small number for testing
+				maxPages: 3,
 
-			// Processing options
-			maxDiffSize: 1024 * 10, // 10KB limit for testing
-			maxCommentLength: 1024 * 2, // 2KB limit for testing
-			skipBotComments: true,
-			skipGeneratedFiles: true,
-			skipFiles: [],
-		});
+				// Processing options
+				maxContentLength: 1024 * 5, // 5KB limit for testing
+			},
+			authConfig,
+		);
 
 		console.log("🔍 Loading metadata...");
 		const metadataList = [];
@@ -116,12 +121,14 @@ async function testLoader() {
 			}
 		}
 
-		// Test diff documents and binary detection
+		// Test diff documents and GitHub's binary/generated detection
 		const diffDocs = metadataList
 			.filter((m) => m.content_type === "diff")
 			.slice(0, 5);
 		if (diffDocs.length > 0) {
-			console.log("\n🔹 Diff Documents (testing binary detection):");
+			console.log(
+				"\n🔹 Diff Documents (testing GitHub's binary/generated detection):",
+			);
 			for (const metadata of diffDocs) {
 				const doc = await loader.loadDocument(metadata);
 				if (doc) {
@@ -138,7 +145,7 @@ async function testLoader() {
 					console.log(
 						`  ✗ PR #${metadata.pr_number}, File: ${metadata.content_id}`,
 					);
-					console.log(`    Skipped (binary/generated/no patch)`);
+					console.log(`    Skipped (GitHub detected as binary/generated)`);
 				}
 			}
 		}

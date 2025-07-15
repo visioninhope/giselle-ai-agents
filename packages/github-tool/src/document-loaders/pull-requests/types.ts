@@ -19,8 +19,6 @@ export type GitHubPullRequestMetadata = {
 
 /**
  * Configuration for GitHub Pull Requests loader
- *
- * Only processes merged pull requests for vector search
  */
 export type GitHubPullRequestsLoaderConfig = {
 	owner: string;
@@ -30,9 +28,5 @@ export type GitHubPullRequestsLoaderConfig = {
 	maxPages?: number;
 
 	// Processing options
-	maxDiffSize?: number;
-	maxCommentLength?: number;
-	skipFiles?: string[];
-	skipBotComments?: boolean;
-	skipGeneratedFiles?: boolean;
+	maxContentLength?: number;
 };
