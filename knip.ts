@@ -86,7 +86,6 @@ const config: KnipConfig = {
 	biome: false,
 	rules: {
 		types: "off",
-		binaries: "off",
 	},
 	workspaces: {
 		"apps/playground": {
@@ -114,7 +113,7 @@ const config: KnipConfig = {
 			ignore: ["src/chunker/__fixtures__/code-sample.ts"],
 		},
 	},
-	ignore: ["turbo/generators/config.ts"],
+	ignore: ["turbo/generators/config.ts", ".github/**"],
 };
 
 export default config;
