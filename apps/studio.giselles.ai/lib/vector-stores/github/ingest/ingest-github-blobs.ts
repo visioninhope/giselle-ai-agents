@@ -1,6 +1,6 @@
 import {
-	createGitHubBlobDownloadLoader,
-	createGitHubBlobLoader,
+	createGitHubArchiveLoader,
+	createGitHubTreeLoader,
 } from "@giselle-sdk/github-tool";
 import { createPipeline } from "@giselle-sdk/rag";
 import type { Octokit } from "@octokit/core";
@@ -25,10 +25,10 @@ export async function ingestGitHubBlobs(params: {
 	);
 
 	const githubLoader = isInitialIngest
-		? createGitHubBlobDownloadLoader(params.octokitClient, params.source, {
+		? createGitHubArchiveLoader(params.octokitClient, params.source, {
 				maxBlobSize: 1 * 1024 * 1024,
 			})
-		: createGitHubBlobLoader(params.octokitClient, params.source, {
+		: createGitHubTreeLoader(params.octokitClient, params.source, {
 				maxBlobSize: 1 * 1024 * 1024,
 			});
 	const chunkStore = createGitHubBlobChunkStore(repositoryIndexDbId);

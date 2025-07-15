@@ -10,20 +10,20 @@ type GitHubBlobMetadata = {
 	path: string;
 };
 
-type GitHubBlobLoaderParams = {
+type GitHubTreeLoaderParams = {
 	owner: string;
 	repo: string;
 	commitSha: string;
 };
 
-type GitHubBlobLoaderOptions = {
+type GitHubTreeLoaderOptions = {
 	maxBlobSize?: number;
 };
 
-export function createGitHubBlobLoader(
+export function createGitHubTreeLoader(
 	octokit: Octokit,
-	params: GitHubBlobLoaderParams,
-	options: GitHubBlobLoaderOptions = {},
+	params: GitHubTreeLoaderParams,
+	options: GitHubTreeLoaderOptions = {},
 ): DocumentLoader<GitHubBlobMetadata> {
 	const { maxBlobSize = 1024 * 1024 } = options;
 
