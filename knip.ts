@@ -86,7 +86,6 @@ const config: KnipConfig = {
 	biome: false,
 	rules: {
 		types: "off",
-		binaries: "off",
 	},
 	workspaces: {
 		"apps/playground": {
