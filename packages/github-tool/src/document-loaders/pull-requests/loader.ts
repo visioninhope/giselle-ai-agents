@@ -2,67 +2,14 @@ import type { Document, DocumentLoader } from "@giselle-sdk/rag";
 import { DocumentLoaderError } from "@giselle-sdk/rag";
 import type { Octokit } from "@octokit/core";
 import { RequestError } from "@octokit/request-error";
-
-type GithubPullRequestContentType = "title_body" | "comment" | "diff";
-
-/**
- * Metadata for GitHub Pull Request documents
- * Each PR generates separate documents for title+body, comments, and diffs
- */
-export type GitHubPullRequestMetadata = {
-	owner: string;
-	repo: string;
-	pr_number: number;
-	content_type: GithubPullRequestContentType;
-	content_id: string; // comment ID or file path, "title_body" for title+body
-	// Version tracking fields
-	updated_at: string;
-	head_sha: string;
-};
-
-// https://docs.github.com/ja/rest/pulls/pulls?apiVersion=2022-11-28#list-pull-requests--parameters
-export type GitHubPullRequestsLoaderConfig = {
-	// Required: Repository identification
-	owner: string;
-	repo: string;
-
-	// Query parameters (what to fetch)
-	state?: "open" | "closed" | "all";
-	sort?: "created" | "updated" | "popularity" | "long-running";
-	direction?: "asc" | "desc";
-	perPage?: number;
-	maxPages?: number;
-	mergedOnly?: boolean;
-
-	// Processing options (how to process)
-	maxDiffSize?: number;
-	maxCommentLength?: number;
-	skipFiles?: string[];
-	skipBotComments?: boolean;
-	skipGeneratedFiles?: boolean;
-};
-
-// Backward compatibility
-export type GitHubPullRequestsLoaderParams = Pick<
+import type {
+	GitHubPullRequestMetadata,
 	GitHubPullRequestsLoaderConfig,
-	| "owner"
-	| "repo"
-	| "state"
-	| "sort"
-	| "direction"
-	| "perPage"
-	| "maxPages"
-	| "mergedOnly"
->;
-
-export type GitHubPullRequestsLoaderOptions = Pick<
-	GitHubPullRequestsLoaderConfig,
-	| "maxDiffSize"
-	| "maxCommentLength"
-	| "skipFiles"
-	| "skipBotComments"
-	| "skipGeneratedFiles"
->;
+	IssueComment,
+	PullRequestDetail,
+	PullRequestFile,
+	PullRequestListItem,
+} from "./types";
 
 const DEFAULT_SKIP_FILES = [
 	".lock",
@@ -93,6 +40,7 @@ const DEFAULT_SKIP_FILES = [
 
 /**
  * Creates a GitHub Pull Requests loader for document extraction
+ * Only processes merged pull requests (immutable content for vector search)
  *
  * @example
  * ```typescript
@@ -102,21 +50,14 @@ const DEFAULT_SKIP_FILES = [
  *   repo: "giselle",
  * });
  *
- * // Vector search optimized configuration
+ * // With custom configuration
  * const loader = createGitHubPullRequestsLoader(octokit, {
- *   // Repository
  *   owner: "giselles-ai",
  *   repo: "giselle",
+ *   perPage: 100,    // Fetch 100 PRs per page
+ *   maxPages: 10,    // Process up to 1000 PRs
  *
- *   // Query: Get historical context
- *   state: "closed",      // Include merged PRs
- *   sort: "created",      // Chronological order
- *   direction: "asc",     // Oldest first (preserve history)
- *   mergedOnly: true,     // Quality: only reviewed & merged code
- *   perPage: 100,         // Efficient batching
- *   maxPages: 10,         // Limit: 1000 PRs max
- *
- *   // Processing: Filter noise
+ *   // Filter options
  *   skipGeneratedFiles: true,    // Skip auto-generated files
  *   skipBotComments: true,       // Skip bot noise
  *   maxDiffSize: 1024 * 50,      // 50KB limit per file
@@ -186,53 +127,19 @@ const prCache = new Map<
 
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
-// New unified API (recommended)
 export function createGitHubPullRequestsLoader(
 	octokit: Octokit,
 	config: GitHubPullRequestsLoaderConfig,
-): DocumentLoader<GitHubPullRequestMetadata>;
-
-// Legacy API (backward compatibility)
-export function createGitHubPullRequestsLoader(
-	octokit: Octokit,
-	params: GitHubPullRequestsLoaderParams,
-	options?: GitHubPullRequestsLoaderOptions,
-): DocumentLoader<GitHubPullRequestMetadata>;
-
-// Implementation
-export function createGitHubPullRequestsLoader(
-	octokit: Octokit,
-	configOrParams:
-		| GitHubPullRequestsLoaderConfig
-		| GitHubPullRequestsLoaderParams,
-	options?: GitHubPullRequestsLoaderOptions,
 ): DocumentLoader<GitHubPullRequestMetadata> {
-	// Normalize to unified config
-	let config: GitHubPullRequestsLoaderConfig;
-
-	if (options !== undefined) {
-		// Legacy API: merge params and options
-		config = {
-			...configOrParams,
-			...options,
-		} as GitHubPullRequestsLoaderConfig;
-	} else {
-		// New API: use config directly
-		config = configOrParams as GitHubPullRequestsLoaderConfig;
-	}
 	// Extract all config values
 	const {
 		// Repository
 		owner,
 		repo,
 
-		// Query parameters
-		state = "all",
-		sort = "created",
-		direction = "desc",
-		perPage = 30,
+		// Pagination (optimized for vector search)
+		perPage = 100,
 		maxPages = 10,
-		mergedOnly = false,
 
 		// Processing options
 		maxDiffSize = 1024 * 1024,
@@ -247,11 +154,12 @@ export function createGitHubPullRequestsLoader(
 
 	const loadMetadata =
 		async function* (): AsyncIterable<GitHubPullRequestMetadata> {
-			// Fetch all pull requests - lightweight, only basic metadata
+			// Fetch closed pull requests (to get merged ones)
+			// Always use "created" and "desc" for consistent ordering
 			const pullRequests = await fetchAllPullRequests(octokit, owner, repo, {
-				state,
-				sort,
-				direction,
+				state: "closed",
+				sort: "created",
+				direction: "desc",
 				perPage,
 				maxPages,
 			});
@@ -260,19 +168,16 @@ export function createGitHubPullRequestsLoader(
 				const cacheKey = `${owner}/${repo}/${pr.number}`;
 
 				try {
-					// Skip non-merged PRs if mergedOnly is true
-					if (mergedOnly) {
-						// Need to fetch PR details to check if merged
-						const prDetail = await getCachedPullRequest(
-							octokit,
-							owner,
-							repo,
-							pr.number,
-							cacheKey,
-						);
-						if (!prDetail.merged) {
-							continue;
-						}
+					// Always skip non-merged PRs (only process merged PRs)
+					const prDetail = await getCachedPullRequest(
+						octokit,
+						owner,
+						repo,
+						pr.number,
+						cacheKey,
+					);
+					if (!prDetail.merged || !prDetail.merged_at) {
+						continue;
 					}
 
 					// 1. Title + Body document
@@ -282,8 +187,7 @@ export function createGitHubPullRequestsLoader(
 						pr_number: pr.number,
 						content_type: "title_body",
 						content_id: "title_body",
-						updated_at: pr.updated_at,
-						head_sha: pr.head.sha,
+						merged_at: prDetail.merged_at,
 					};
 
 					// 2. Comments documents
@@ -311,8 +215,7 @@ export function createGitHubPullRequestsLoader(
 								pr_number: pr.number,
 								content_type: "comment",
 								content_id: comment.id.toString(),
-								updated_at: pr.updated_at,
-								head_sha: pr.head.sha,
+								merged_at: prDetail.merged_at,
 							};
 						}
 					} catch (error) {
@@ -359,8 +262,7 @@ export function createGitHubPullRequestsLoader(
 								pr_number: pr.number,
 								content_type: "diff",
 								content_id: file.filename,
-								updated_at: pr.updated_at,
-								head_sha: pr.head.sha,
+								merged_at: prDetail.merged_at,
 							};
 						}
 					} catch (error) {
@@ -397,15 +299,13 @@ export function createGitHubPullRequestsLoader(
 						content,
 						metadata: {
 							...metadata,
-							// Update with latest version info
-							updated_at: pr.updated_at,
-							head_sha: pr.head?.sha ?? "",
+							// Ensure merged_at is consistent
+							merged_at: pr.merged_at || metadata.merged_at,
 						},
 					};
 				}
 
 				case "comment": {
-					// Get PR details first to ensure we have head_sha
 					const pr = await getCachedPullRequest(
 						octokit,
 						owner,
@@ -431,14 +331,12 @@ export function createGitHubPullRequestsLoader(
 						content: comment.body,
 						metadata: {
 							...metadata,
-							updated_at: pr.updated_at,
-							head_sha: pr.head?.sha ?? "",
+							merged_at: pr.merged_at || metadata.merged_at,
 						},
 					};
 				}
 
 				case "diff": {
-					// Get PR details first to ensure we have head_sha
 					const pr = await getCachedPullRequest(
 						octokit,
 						owner,
@@ -466,8 +364,7 @@ export function createGitHubPullRequestsLoader(
 						content,
 						metadata: {
 							...metadata,
-							updated_at: pr.updated_at,
-							head_sha: pr.head?.sha ?? "",
+							merged_at: pr.merged_at || metadata.merged_at,
 						},
 					};
 				}
@@ -645,52 +542,6 @@ async function executeWithRetry<T>(
 	}
 }
 
-// Type definitions
-type PullRequestListItem = {
-	title: string;
-	number: number;
-	updated_at: string;
-	head: {
-		sha: string;
-	};
-};
-
-type PullRequestDetail = {
-	title: string;
-	body: string | null;
-	number: number;
-	state: string;
-	merged: boolean;
-	created_at: string;
-	updated_at: string;
-	head: {
-		sha: string;
-	};
-};
-
-type IssueComment = {
-	id: number;
-	body: string;
-	user: {
-		login: string;
-		type: string;
-	} | null;
-};
-
-type PullRequestFile = {
-	sha: string;
-	filename: string;
-	status: string;
-	additions: number;
-	deletions: number;
-	changes: number;
-	blob_url: string;
-	raw_url: string;
-	contents_url: string;
-	patch?: string;
-	previous_filename?: string;
-};
-
 // API fetch functions
 async function fetchAllPullRequests(
 	octokit: Octokit,
@@ -730,12 +581,7 @@ async function fetchAllPullRequests(
 		// Extract only essential fields for lightweight metadata
 		pullRequests.push(
 			...data.map((pr) => ({
-				title: pr.title,
 				number: pr.number,
-				updated_at: pr.updated_at,
-				head: {
-					sha: pr.head.sha,
-				},
 			})),
 		);
 
@@ -769,14 +615,8 @@ async function fetchPullRequest(
 	return {
 		title: data.title,
 		body: data.body,
-		number: data.number,
-		state: data.state,
 		merged: data.merged ?? false,
-		created_at: data.created_at,
-		updated_at: data.updated_at,
-		head: {
-			sha: data.head.sha,
-		},
+		merged_at: data.merged_at,
 	};
 }
 
@@ -814,7 +654,7 @@ async function fetchIssueComments(
 			...data.map((comment) => ({
 				id: comment.id,
 				body: comment.body ?? "",
-				user: comment.user,
+				user: comment.user ? { type: comment.user.type } : null,
 			})),
 		);
 
@@ -857,17 +697,8 @@ async function fetchPullRequestFiles(
 
 		files.push(
 			...data.map((file) => ({
-				sha: file.sha,
 				filename: file.filename,
-				status: file.status,
-				additions: file.additions,
-				deletions: file.deletions,
-				changes: file.changes,
-				blob_url: file.blob_url,
-				raw_url: file.raw_url,
-				contents_url: file.contents_url,
 				patch: file.patch,
-				previous_filename: file.previous_filename,
 			})),
 		);
 
