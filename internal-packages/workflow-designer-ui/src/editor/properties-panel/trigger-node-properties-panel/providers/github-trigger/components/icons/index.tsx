@@ -6,7 +6,7 @@ interface IconProps {
 	title?: string;
 }
 
-function IssueCreatedIcon({
+export function IssueCreatedIcon({
 	className = "text-white",
 	size = 18,
 	title = "Issue Created",
@@ -53,7 +53,7 @@ function IssueCreatedIcon({
 	);
 }
 
-function IssueClosedIcon({
+export function IssueClosedIcon({
 	className = "text-white",
 	size = 18,
 	title = "Issue Closed",
@@ -82,7 +82,7 @@ function IssueClosedIcon({
 	);
 }
 
-function IssueCommentCreatedIcon({
+export function IssueCommentCreatedIcon({
 	className = "text-white",
 	size = 18,
 	title = "Issue Comment Created",
@@ -116,7 +116,7 @@ function IssueCommentCreatedIcon({
 	);
 }
 
-function PullRequestCommentCreatedIcon({
+export function PullRequestCommentCreatedIcon({
 	className = "text-white",
 	size = 18,
 	title = "Pull Request Comment Created",
@@ -150,7 +150,7 @@ function PullRequestCommentCreatedIcon({
 	);
 }
 
-function PullRequestReviewCommentCreatedIcon({
+export function PullRequestReviewCommentCreatedIcon({
 	className = "text-white",
 	size = 18,
 	title = "Pull Request Review Comment Created",
@@ -180,7 +180,7 @@ function PullRequestReviewCommentCreatedIcon({
 	);
 }
 
-function PullRequestOpenedIcon({
+export function PullRequestOpenedIcon({
 	className = "text-white",
 	size = 18,
 	title = "Pull Request Opened",
@@ -210,7 +210,7 @@ function PullRequestOpenedIcon({
 	);
 }
 
-function PullRequestReadyForReviewIcon({
+export function PullRequestReadyForReviewIcon({
 	className = "text-white",
 	size = 18,
 	title = "Pull Request Ready For Review",
@@ -240,7 +240,7 @@ function PullRequestReadyForReviewIcon({
 	);
 }
 
-function PullRequestClosedIcon({
+export function PullRequestClosedIcon({
 	className = "text-white",
 	size = 18,
 	title = "Pull Request Closed",
