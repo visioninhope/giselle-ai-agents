@@ -13,20 +13,20 @@ export type GitHubBlobMetadata = {
 	path: string;
 };
 
-export type GitHubBlobDownloadLoaderParams = {
+export type GitHubArchiveLoaderParams = {
 	owner: string;
 	repo: string;
 	commitSha: string;
 };
 
-export type GitHubBlobDownloadLoaderOptions = {
+export type GitHubArchiveLoaderOptions = {
 	maxBlobSize?: number;
 };
 
-export function createGitHubBlobDownloadLoader(
+export function createGitHubArchiveLoader(
 	octokit: Octokit,
-	params: GitHubBlobDownloadLoaderParams,
-	options: GitHubBlobDownloadLoaderOptions = {},
+	params: GitHubArchiveLoaderParams,
+	options: GitHubArchiveLoaderOptions = {},
 ): DocumentLoader<GitHubBlobMetadata> {
 	const { maxBlobSize = 1024 * 1024 } = options;
 	const { owner, repo, commitSha } = params;
