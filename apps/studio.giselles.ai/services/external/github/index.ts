@@ -1,7 +1,6 @@
 export {
 	buildAppInstallationClient,
 	gitHubAppInstallURL,
-	
 } from "./app";
 export {
 	buildGitHubUserClient,

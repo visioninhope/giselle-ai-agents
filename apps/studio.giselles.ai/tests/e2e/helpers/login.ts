@@ -27,6 +27,6 @@ export async function performLogin(
 	}
 }
 
-async function navigateToLoginPage(page: Page, baseUrl: string) {
+export async function navigateToLoginPage(page: Page, baseUrl: string) {
 	await page.goto(`${baseUrl}/login`);
 }

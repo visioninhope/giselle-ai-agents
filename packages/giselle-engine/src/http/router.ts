@@ -438,9 +438,7 @@ export const createJsonRouters = {
 		}),
 } as const;
 
-const jsonRouterPaths = Object.keys(
-	createJsonRouters,
-) as JsonRouterPaths[];
+const jsonRouterPaths = Object.keys(createJsonRouters) as JsonRouterPaths[];
 
 // Export the types at module level
 export type JsonRouterPaths = keyof typeof createJsonRouters;

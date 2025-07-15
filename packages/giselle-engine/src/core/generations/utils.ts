@@ -585,10 +585,7 @@ async function buildGenerationMessageForImageGeneration(
 	];
 }
 
-function generatedImagePath(
-	generationId: GenerationId,
-	filename: string,
-) {
+function generatedImagePath(generationId: GenerationId, filename: string) {
 	return `generations/${generationId}/generated-images/${filename}`;
 }
 

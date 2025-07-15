@@ -129,9 +129,7 @@ async function withCountMeasurement<T>(
 	return withMeasurement(logger, operation, measurement, measurementStartTime);
 }
 
-async function withTokenMeasurement<
-	T extends { usage: LanguageModelUsage },
->(
+async function withTokenMeasurement<T extends { usage: LanguageModelUsage }>(
 	logger: OtelLoggerWrapper,
 	operation: () => Promise<T>,
 	model: LanguageModelV1,

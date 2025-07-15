@@ -1,5 +1,3 @@
-;
-;
 
 import type { TextGenerationNode, ToolSet } from "@giselle-sdk/data-type";
 import { DatabaseIcon } from "lucide-react";
