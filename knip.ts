@@ -87,7 +87,6 @@ const config: KnipConfig = {
 	rules: {
 		types: "off",
 		binaries: "off",
-		unlisted: "off",
 	},
 	workspaces: {
 		"apps/playground": {
