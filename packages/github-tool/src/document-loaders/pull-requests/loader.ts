@@ -5,11 +5,32 @@ import { RequestError } from "@octokit/request-error";
 import type {
 	GitHubPullRequestMetadata,
 	GitHubPullRequestsLoaderConfig,
-	IssueComment,
-	PullRequestDetail,
-	PullRequestFile,
-	PullRequestListItem,
 } from "./types";
+
+// Internal types for API responses
+type PullRequestListItem = {
+	number: number;
+};
+
+type PullRequestDetail = {
+	title: string;
+	body: string | null;
+	merged: boolean;
+	merged_at: string | null;
+};
+
+type IssueComment = {
+	id: number;
+	body: string;
+	user: {
+		type: string;
+	} | null;
+};
+
+type PullRequestFile = {
+	filename: string;
+	patch?: string;
+};
 
 const DEFAULT_SKIP_FILES = [
 	".lock",

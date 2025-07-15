@@ -17,8 +17,11 @@ export type GitHubPullRequestMetadata = {
 	merged_at: string;
 };
 
-// Configuration for GitHub Pull Requests loader
-// Only processes merged pull requests for vector search
+/**
+ * Configuration for GitHub Pull Requests loader
+ *
+ * Only processes merged pull requests for vector search
+ */
 export type GitHubPullRequestsLoaderConfig = {
 	owner: string;
 	repo: string;
@@ -32,29 +35,4 @@ export type GitHubPullRequestsLoaderConfig = {
 	skipFiles?: string[];
 	skipBotComments?: boolean;
 	skipGeneratedFiles?: boolean;
-};
-
-// Internal types for API responses
-export type PullRequestListItem = {
-	number: number;
-};
-
-export type PullRequestDetail = {
-	title: string;
-	body: string | null;
-	merged: boolean;
-	merged_at: string | null;
-};
-
-export type IssueComment = {
-	id: number;
-	body: string;
-	user: {
-		type: string;
-	} | null;
-};
-
-export type PullRequestFile = {
-	filename: string;
-	patch?: string;
 };
