@@ -91,13 +91,13 @@ const config: KnipConfig = {
 		types: "off",
 		binaries: "off",
 		unlisted: "off",
-		devDependencies: "off",
 	},
 	workspaces: {
 		"apps/playground": {
 			ignoreDependencies: [
 				...(playgroundAppConfig.serverExternalPackages ?? []),
 				...nextPredefinedExternalPackages,
+				"tailwindcss",
 			],
 		},
 		"apps/studio.giselles.ai": {
@@ -106,6 +106,12 @@ const config: KnipConfig = {
 				...(studioAppConfig.serverExternalPackages ?? []),
 				...nextPredefinedExternalPackages,
 			],
+		},
+		"internal-packages/ui": {
+			ignoreDependencies: ["tailwindcss"],
+		},
+		"internal-packages/workflow-designer-ui": {
+			ignoreDependencies: ["tailwindcss"],
 		},
 		"packages/rag": {
 			ignore: ["src/chunker/__fixtures__/code-sample.ts"],
