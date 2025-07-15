@@ -13,7 +13,7 @@ const clickableTextVariant = cva(
 		},
 	},
 );
-export interface ClickableTextProps
+interface ClickableTextProps
 	extends React.ButtonHTMLAttributes<HTMLButtonElement>,
 		VariantProps<typeof clickableTextVariant> {
 	asChild?: boolean;

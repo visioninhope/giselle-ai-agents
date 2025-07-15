@@ -3,7 +3,7 @@ import type { ActionBase } from "../base";
 
 export const provider = "web-search" as const;
 
-export interface WebSearchActionBase extends ActionBase {
+interface WebSearchActionBase extends ActionBase {
 	provider: typeof provider;
 }
 

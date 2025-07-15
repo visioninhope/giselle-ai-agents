@@ -1,6 +1,6 @@
 import { GitHubIcon } from "../../../icons";
 
-export interface GitHubRepositoryBadgeProps {
+interface GitHubRepositoryBadgeProps {
 	owner: string;
 	repo: string;
 }

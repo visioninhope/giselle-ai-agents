@@ -2,7 +2,7 @@ import { z } from "zod";
 import type { TriggerBase } from "../base";
 
 export const provider = "github" as const;
-export interface GitHubTrigger extends TriggerBase {
+interface GitHubTrigger extends TriggerBase {
 	provider: typeof provider;
 }
 

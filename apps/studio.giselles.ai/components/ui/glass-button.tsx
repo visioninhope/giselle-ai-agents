@@ -24,7 +24,7 @@ const glassButtonVariants = cva(
 	},
 );
 
-export interface GlassButtonProps
+interface GlassButtonProps
 	extends React.ButtonHTMLAttributes<HTMLButtonElement>,
 		VariantProps<typeof glassButtonVariants> {
 	asChild?: boolean;

@@ -9,7 +9,7 @@ interface NodeBase {
 	selected: boolean;
 }
 
-export interface Position {
+interface Position {
 	x: number;
 	y: number;
 }
@@ -37,7 +37,7 @@ export interface TextGeneration extends Action {
 interface WebSearchActionContent extends ActionContentBase {
 	type: "webSearch";
 }
-export interface WebSearch extends Action {
+interface WebSearch extends Action {
 	content: WebSearchActionContent;
 }
 type ActionContent = TextGenerateActionContent | WebSearchActionContent;
@@ -51,7 +51,7 @@ interface VariableContentBase {
 	type: string;
 }
 
-export interface TextContent extends VariableContentBase {
+interface TextContent extends VariableContentBase {
 	type: "text";
 	text: string;
 }
@@ -84,18 +84,18 @@ interface FailedFileData extends FileDataBase {
 	status: "failed";
 }
 
-export type FileData =
+type FileData =
 	| UploadingFileData
 	| ProcessingFileData
 	| CompletedFileData
 	| FailedFileData;
 
 /** @deprecated */
-export interface FileContent extends VariableContentBase {
+interface FileContent extends VariableContentBase {
 	type: "file";
 	data?: FileData | null | undefined;
 }
-export interface FilesContent extends VariableContentBase {
+interface FilesContent extends VariableContentBase {
 	type: "files";
 	data: FileData[];
 }
@@ -113,7 +113,7 @@ export interface Files extends Variable {
 }
 
 export type NodeHandleId = `ndh_${string}`;
-export interface NodeHandle {
+interface NodeHandle {
 	id: NodeHandleId;
 	label: string;
 }
@@ -121,7 +121,7 @@ export interface NodeHandle {
 export type Node = Action | Variable;
 
 export type ConnectionId = `cnnc_${string}`;
-export interface Connection {
+interface Connection {
 	id: ConnectionId;
 	sourceNodeId: NodeId;
 	sourceNodeHandleId?: NodeHandleId;
@@ -138,7 +138,7 @@ interface ArtifactBase {
 	creatorNodeId: NodeId;
 	object: ArtifactObjectBase;
 }
-export interface GeneratedArtifact extends ArtifactBase {
+interface GeneratedArtifact extends ArtifactBase {
 	type: "generatedArtifact";
 	createdAt: number;
 }
@@ -150,7 +150,7 @@ interface ArtifactObjectBase {
 	type: string;
 }
 
-export interface TextArtifactObject extends ArtifactObjectBase {
+interface TextArtifactObject extends ArtifactObjectBase {
 	type: "text";
 	title: string;
 	content: string;
@@ -159,13 +159,13 @@ export interface TextArtifactObject extends ArtifactObjectBase {
 		description: string;
 	};
 }
-export interface TextArtifact extends GeneratedArtifact {
+interface TextArtifact extends GeneratedArtifact {
 	object: TextArtifactObject;
 }
 interface TextStreamArtifact extends StreamAtrifact {
 	object: TextArtifactObject;
 }
-export type Artifact = TextArtifact | TextStreamArtifact;
+type Artifact = TextArtifact | TextStreamArtifact;
 
 export type GraphId = `grph_${string}`;
 type GraphVersion =
@@ -208,7 +208,7 @@ interface MoveTool extends ToolBase {
 	category: "move";
 	action: "move";
 }
-export type Tool =
+type Tool =
 	| AddTextNodeTool
 	| AddFileNodeTool
 	| AddTextGenerationNodeTool
@@ -217,13 +217,13 @@ export type Tool =
 export type FlowId = `flw_${string}`;
 
 export type StepId = `stp_${string}`;
-export interface Step {
+interface Step {
 	id: StepId;
 	nodeId: NodeId;
 	variableNodeIds: NodeId[];
 }
 export type JobId = `jb_${string}`;
-export interface Job {
+interface Job {
 	id: JobId;
 	steps: Step[];
 }
@@ -253,13 +253,13 @@ interface RunningStepExecution extends StepExecutionBase {
 	runStartedAt: number;
 }
 
-export interface CompletedStepExecution extends StepExecutionBase {
+interface CompletedStepExecution extends StepExecutionBase {
 	status: "completed";
 	runStartedAt: number;
 	durationMs: number;
 }
 
-export interface FailedStepExecution extends StepExecutionBase {
+interface FailedStepExecution extends StepExecutionBase {
 	status: "failed";
 	runStartedAt: number;
 	durationMs: number;
@@ -270,7 +270,7 @@ interface SkippedStepExecution extends StepExecutionBase {
 	status: "skipped";
 }
 
-export type StepExecution =
+type StepExecution =
 	| PendingStepExecution
 	| RunningStepExecution
 	| CompletedStepExecution
@@ -291,17 +291,17 @@ interface RunningJobExecution extends JobExecutionBase {
 	status: "running";
 	runStartedAt: number;
 }
-export interface CompletedJobExecution extends JobExecutionBase {
+interface CompletedJobExecution extends JobExecutionBase {
 	status: "completed";
 	runStartedAt: number;
 	durationMs: number;
 }
-export interface FailedJobExecution extends JobExecutionBase {
+interface FailedJobExecution extends JobExecutionBase {
 	status: "failed";
 	runStartedAt: number;
 	durationMs: number;
 }
-export interface SkippedJobExecution extends JobExecutionBase {
+interface SkippedJobExecution extends JobExecutionBase {
 	status: "skipped";
 }
 export type JobExecution =
@@ -324,25 +324,25 @@ interface RunningExecution extends ExecutionBase {
 	status: "running";
 	runStartedAt: number;
 }
-export interface CompletedExecution extends ExecutionBase {
+interface CompletedExecution extends ExecutionBase {
 	status: "completed";
 	runStartedAt: number;
 	durationMs: number;
 	resultArtifact: Artifact;
 }
-export interface FailedExecution extends ExecutionBase {
+interface FailedExecution extends ExecutionBase {
 	status: "failed";
 	runStartedAt: number;
 	durationMs: number;
 }
-export type Execution =
+type Execution =
 	| PendingExecution
 	| RunningExecution
 	| CompletedExecution
 	| FailedExecution;
 
 export type ExecutionSnapshotId = `excs_${string}`;
-export interface ExecutionSnapshot {
+interface ExecutionSnapshot {
 	id: ExecutionSnapshotId;
 	execution: Execution;
 	nodes: Node[];
@@ -350,7 +350,7 @@ export interface ExecutionSnapshot {
 	flow: Flow;
 }
 
-export interface ExecutionIndex {
+interface ExecutionIndex {
 	executionId: ExecutionId;
 	blobUrl: string;
 	completedAt: number;
@@ -362,7 +362,7 @@ export interface GitHubEventNodeMapping {
 	nodeId: NodeId;
 }
 
-export type ExecuteActionReturnValue =
+type ExecuteActionReturnValue =
 	| TextArtifactObject
 	| StreamableValue<TextArtifactObject, unknown>;
 

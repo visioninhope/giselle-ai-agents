@@ -84,7 +84,7 @@ export async function getGitHubIntegrationState(
 	};
 }
 
-export type GitHubIntegrationState = (
+type GitHubIntegrationState = (
 	| GitHubIntegrationUnauthorizedState
 	| GitHubIntegrationInvalidCredentialState
 	| GitHubIntegrationNotInstalledState
@@ -93,11 +93,11 @@ export type GitHubIntegrationState = (
 ) &
 	GitHubIntegrationSettingState;
 
-export type GitHubIntegrationSettingState = {
+type GitHubIntegrationSettingState = {
 	setting?: GitHubIntegrationSetting;
 };
 
-export type GitHubIntegrationSetting = Omit<
+type GitHubIntegrationSetting = Omit<
 	typeof githubIntegrationSettings.$inferSelect,
 	"dbId" | "agentDbId"
 >;
@@ -110,6 +110,6 @@ interface CreateGitHubIntegrationSettingError {
 	result: "error";
 	message: string;
 }
-export type CreateGitHubIntegrationSettingResult =
+type CreateGitHubIntegrationSettingResult =
 	| CreateGitHubIntegrationSettingSuccess
 	| CreateGitHubIntegrationSettingError;

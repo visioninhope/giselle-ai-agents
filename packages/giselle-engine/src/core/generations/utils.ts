@@ -29,12 +29,12 @@ import type { Storage } from "unstorage";
 import type { GiselleStorage } from "../experimental_storage";
 import type { GiselleEngineContext } from "../types";
 
-export interface GeneratedImageData {
+interface GeneratedImageData {
 	uint8Array: Uint8Array;
 	base64: string;
 }
 
-export interface FileIndex {
+interface FileIndex {
 	nodeId: NodeId;
 	start: number;
 	end: number;
