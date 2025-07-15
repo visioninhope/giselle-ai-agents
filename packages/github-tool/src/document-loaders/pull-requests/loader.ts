@@ -32,31 +32,31 @@ type PullRequestFile = {
 	patch?: string;
 };
 
-const DEFAULT_SKIP_FILES = [
-	".lock",
+const DEFAULT_DIFF_IGNORE_FILE_PATTERNS = [
+	"*.lock",
 	"pnpm-lock.yaml",
 	"package-lock.json",
 	"yarn.lock",
-	".png",
-	".jpg",
-	".jpeg",
-	".gif",
-	".svg",
-	".ico",
-	".pdf",
-	".zip",
-	".tar",
-	".gz",
-	".woff",
-	".woff2",
-	".ttf",
-	".eot",
-	".bin",
-	".exe",
-	".dll",
-	".so",
-	".dylib",
-	".wasm",
+	"*.png",
+	"*.jpg",
+	"*.jpeg",
+	"*.gif",
+	"*.svg",
+	"*.ico",
+	"*.pdf",
+	"*.zip",
+	"*.tar",
+	"*.gz",
+	"*.woff",
+	"*.woff2",
+	"*.ttf",
+	"*.eot",
+	"*.bin",
+	"*.exe",
+	"*.dll",
+	"*.so",
+	"*.dylib",
+	"*.wasm",
 ];
 
 /**
@@ -84,10 +84,10 @@ const DEFAULT_SKIP_FILES = [
  *   maxDiffSize: 1024 * 50,      // 50KB limit per file
  *   maxCommentLength: 1024 * 10, // 10KB limit per comment
  *   skipFiles: [
- *     // These patterns will be added to the default skip list
- *     // (which includes common binaries, images, and lock files)
- *     ".generated.ts",
- *     ".pb.go",
+ *     // These patterns will be added to the default diff ignore patterns
+ *     // (which includes images, executables, archives, and lock files)
+ *     "*.generated.ts",
+ *     "*.pb.go",
  *     "schema.graphql",
  *   ],
  * });
@@ -95,12 +95,22 @@ const DEFAULT_SKIP_FILES = [
  */
 
 /**
- * Binary file detection using only file extension analysis
- * This is the most reliable and documented approach for detecting binary files
+ * Check if file should be ignored for diff processing
+ * Uses glob-like pattern matching to exclude unwanted files from diff documents
  */
-function isBinaryFile(file: PullRequestFile, skipFiles: string[]): boolean {
-	// File extension analysis - the only reliable and documented approach
-	return skipFiles.some((ext) => file.filename.endsWith(ext));
+function shouldIgnoreFile(
+	file: PullRequestFile,
+	skipPatterns: string[],
+): boolean {
+	// Pattern matching to filter out unwanted files
+	return skipPatterns.some((pattern) => {
+		if (pattern.startsWith("*.")) {
+			// Handle *.ext patterns
+			return file.filename.endsWith(pattern.slice(1));
+		}
+		// Handle exact filename matches
+		return file.filename === pattern || file.filename.endsWith(pattern);
+	});
 }
 
 /**
@@ -170,8 +180,8 @@ export function createGitHubPullRequestsLoader(
 		skipGeneratedFiles = false,
 	} = config;
 
-	// Merge user-provided skipFiles with defaults
-	const mergedSkipFiles = [...DEFAULT_SKIP_FILES, ...skipFiles];
+	// Merge user-provided skipFiles with default diff ignore patterns
+	const mergedSkipFiles = [...DEFAULT_DIFF_IGNORE_FILE_PATTERNS, ...skipFiles];
 
 	const loadMetadata =
 		async function* (): AsyncIterable<GitHubPullRequestMetadata> {
@@ -257,8 +267,8 @@ export function createGitHubPullRequestsLoader(
 						);
 
 						for (const file of files) {
-							// Skip binary files based on file extension
-							if (isBinaryFile(file, mergedSkipFiles)) {
+							// Skip files based on ignore patterns
+							if (shouldIgnoreFile(file, mergedSkipFiles)) {
 								continue;
 							}
 
@@ -375,7 +385,7 @@ export function createGitHubPullRequestsLoader(
 					);
 					const file = files.find((f) => f.filename === content_id);
 
-					if (!file || isBinaryFile(file, mergedSkipFiles) || !file.patch) {
+					if (!file || shouldIgnoreFile(file, mergedSkipFiles) || !file.patch) {
 						return null;
 					}
 
