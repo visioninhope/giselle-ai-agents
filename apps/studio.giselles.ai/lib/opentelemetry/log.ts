@@ -13,7 +13,7 @@ const logExporter = new OTLPLogExporter({
 
 export const logRecordProcessor = new BatchLogRecordProcessor(logExporter);
 
-const captureError = (
+const _captureError = (
 	logger: OtelLoggerWrapper,
 	error: unknown,
 	message: string,

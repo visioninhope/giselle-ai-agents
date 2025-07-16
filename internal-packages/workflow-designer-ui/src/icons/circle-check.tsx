@@ -1,6 +1,6 @@
 import type { SVGProps } from "react";
 
-function CircleCheckIcon(_: SVGProps<SVGSVGElement>) {
+function _CircleCheckIcon(_: SVGProps<SVGSVGElement>) {
 	return (
 		<svg
 			width="20"

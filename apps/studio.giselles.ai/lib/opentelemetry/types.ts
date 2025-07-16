@@ -12,11 +12,6 @@ const UnimplementedServiceName = {
 	Unknown: "unknown", // for type safety
 };
 
-type ExternalServiceName =
-	// Name of the service to which agent requests
-	| (typeof ExternalServiceName)[keyof typeof ExternalServiceName]
-	| (typeof UnimplementedServiceName)[keyof typeof UnimplementedServiceName];
-
 const BaseMetricsSchema = z.object({
 	duration: z.number().min(0), // Time taken for text generation in milliseconds
 	measurementScope: z.number(), // ID of the plan usage contract to which the requester belongs
@@ -28,10 +23,6 @@ const TokenBasedService = {
 	Google: ExternalServiceName.Google,
 	OpenAI: ExternalServiceName.OpenAI,
 } as const;
-
-type TokenBasedServiceName =
-	| (typeof TokenBasedService)[keyof typeof TokenBasedService]
-	| (typeof UnimplementedServiceName)[keyof typeof UnimplementedServiceName];
 
 const TokenConsumedSchema = BaseMetricsSchema.extend({
 	externalServiceName: z.union([

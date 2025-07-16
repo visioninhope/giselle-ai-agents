@@ -1,6 +1,6 @@
 import type { FC, SVGProps } from "react";
 
-const PanelOpenIcon: FC<SVGProps<SVGSVGElement>> = (props) => (
+const _PanelOpenIcon: FC<SVGProps<SVGSVGElement>> = (props) => (
 	<svg
 		width="24"
 		height="24"

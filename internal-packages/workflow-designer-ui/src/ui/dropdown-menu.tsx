@@ -6,9 +6,9 @@ export const DropdownMenu = DropdownMenuPrimitive.Root;
 
 export const DropdownMenuTrigger = DropdownMenuPrimitive.Trigger;
 
-const DropdownMenuGroup = DropdownMenuPrimitive.Group;
+const _DropdownMenuGroup = DropdownMenuPrimitive.Group;
 
-const DropdownMenuPortal = DropdownMenuPrimitive.Portal;
+const _DropdownMenuPortal = DropdownMenuPrimitive.Portal;
 
 export const DropdownMenuRadioGroup = DropdownMenuPrimitive.RadioGroup;
 

@@ -8,7 +8,7 @@ import {
 	ProTag,
 } from "../components";
 
-function ModelProviderGroup({
+function _ModelProviderGroup({
 	provider,
 	models,
 	onModelSelect,

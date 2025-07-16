@@ -354,9 +354,6 @@ importers:
       '@octokit/core':
         specifier: 'catalog:'
         version: 7.0.2
-      '@octokit/request-error':
-        specifier: 'catalog:'
-        version: 7.0.0
       '@opentelemetry/api':
         specifier: 1.9.0
         version: 1.9.0
@@ -384,9 +381,6 @@ importers:
       '@opentelemetry/sdk-trace-base':
         specifier: 1.30.1
         version: 1.30.1(@opentelemetry/api@1.9.0)
-      '@opentelemetry/semantic-conventions':
-        specifier: 1.28.0
-        version: 1.28.0
       '@paralleldrive/cuid2':
         specifier: 2.2.2
         version: 2.2.2
@@ -438,9 +432,6 @@ importers:
       '@vercel/edge-config':
         specifier: 'catalog:'
         version: 1.4.0(@opentelemetry/api@1.9.0)
-      '@vercel/functions':
-        specifier: 1.5.0
-        version: 1.5.0(@aws-sdk/credential-provider-web-identity@3.840.0)
       '@vercel/otel':
         specifier: 1.10.0
         version: 1.10.0(@opentelemetry/api-logs@0.57.1)(@opentelemetry/api@1.9.0)(@opentelemetry/instrumentation@0.57.2(@opentelemetry/api@1.9.0))(@opentelemetry/resources@1.30.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-logs@0.57.1(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-metrics@1.24.1(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))
@@ -4842,15 +4833,6 @@ packages:
       '@opentelemetry/api': ^1.7.0
     peerDependenciesMeta:
       '@opentelemetry/api':
-        optional: true
-
-  '@vercel/functions@1.5.0':
-    resolution: {integrity: sha512-ub3ptVeOsx8UPgiTv9+rpQJqmF7VG8QIzguBZo0E0VRAyJliB8bt1ooB9Wrh3333dKzMNS8NMe3iFtf6OPUP3A==}
-    engines: {node: '>= 16'}
-    peerDependencies:
-      '@aws-sdk/credential-provider-web-identity': '*'
-    peerDependenciesMeta:
-      '@aws-sdk/credential-provider-web-identity':
         optional: true
 
   '@vercel/otel@1.10.0':
@@ -12373,10 +12355,6 @@ snapshots:
       '@vercel/edge-config-fs': 0.1.0
     optionalDependencies:
       '@opentelemetry/api': 1.9.0
-
-  '@vercel/functions@1.5.0(@aws-sdk/credential-provider-web-identity@3.840.0)':
-    optionalDependencies:
-      '@aws-sdk/credential-provider-web-identity': 3.840.0
 
   '@vercel/otel@1.10.0(@opentelemetry/api-logs@0.57.1)(@opentelemetry/api@1.9.0)(@opentelemetry/instrumentation@0.57.2(@opentelemetry/api@1.9.0))(@opentelemetry/resources@1.30.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-logs@0.57.1(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-metrics@1.24.1(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))':
     dependencies:
