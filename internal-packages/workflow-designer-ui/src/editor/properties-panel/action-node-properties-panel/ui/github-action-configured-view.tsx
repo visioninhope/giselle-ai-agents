@@ -1,14 +1,13 @@
 import { Button } from "@giselle-internal/ui/button";
 import { DropdownMenu } from "@giselle-internal/ui/dropdown-menu";
-import {
-	type ConnectionId,
-	type GitHubActionCommandConfiguredState,
-	type Input,
-	isTextGenerationNode,
-	isTextNode,
-	type Node,
-	type NodeId,
-	type OutputId,
+import type {
+	ConnectionId,
+	GitHubActionCommandConfiguredState,
+	Input,
+	Node,
+	NodeId,
+	NodeLike,
+	OutputId,
 } from "@giselle-sdk/data-type";
 import { githubActionIdToLabel } from "@giselle-sdk/flow";
 import {
@@ -18,13 +17,23 @@ import {
 	useWorkflowDesigner,
 } from "@giselle-sdk/giselle-engine/react";
 import clsx from "clsx/lite";
-import { TrashIcon, TriangleAlert } from "lucide-react";
+import { PlusIcon, TriangleAlert, XIcon } from "lucide-react";
 import { DropdownMenu as RadixDropdownMenu } from "radix-ui";
 import { useCallback, useMemo } from "react";
 import useSWR from "swr";
-import { NodeIcon } from "../../../../icons/node";
 import { GitHubRepositoryBlock } from "../../trigger-node-properties-panel/ui";
 import { type InputWithConnectedOutput, useConnectedInputs } from "../lib";
+
+function getNodeContentType(node: Node | NodeLike): string {
+	switch (node.type) {
+		case "operation":
+			return node.content.type;
+		case "variable":
+			return node.content.type;
+		default:
+			return "unknown";
+	}
+}
 
 export function GitHubActionConfiguredView({
 	nodeId,
@@ -62,10 +71,10 @@ export function GitHubActionConfiguredView({
 	);
 
 	return (
-		<div className="flex flex-col gap-[17px] p-0">
+		<div className="flex flex-col gap-[16px] p-0 px-1 overflow-y-auto">
 			<div className="space-y-[4px]">
-				<p className="text-[14px] py-[1.5px] text-white-400">Repository</p>
-				<div className="px-[12px] pt-[6px]">
+				<p className="text-[14px] py-[1.5px] text-[#F7F9FD]">Repository</p>
+				<div className="px-[4px] pt-[6px]">
 					{isLoading || data === undefined ? (
 						<p>Loading...</p>
 					) : (
@@ -78,58 +87,58 @@ export function GitHubActionConfiguredView({
 			</div>
 
 			<div className="space-y-[4px]">
-				<p className="text-[14px] py-[1.5px] text-white-400">Event Type</p>
-				<div className="px-[16px] py-[9px] w-full bg-transparent text-[14px]">
+				<p className="text-[14px] py-[1.5px] text-[#F7F9FD]">Event Type</p>
+				<div className="px-[4px] py-0 w-full bg-transparent text-[14px] flex items-center">
 					{githubActionIdToLabel(state.commandId)}
 				</div>
 			</div>
 
 			<div className="space-y-[4px]">
-				<p className="text-[14px] py-[1.5px] text-white-400">Parameter</p>
-				<div className="px-[16px] py-[9px] w-full bg-transparent text-[14px]">
-					<ul className="w-full border-collapse divide-y divide-black-400">
+				<p className="text-[14px] py-[1.5px] text-[#F7F9FD]">Input Parameter</p>
+				<div className="px-[4px] py-0 w-full bg-transparent text-[14px]">
+					<ul className="w-full flex flex-col gap-[12px]">
 						{connectedInputs.map((input) => (
-							<li key={input.id} className="py-[12px]">
+							<li key={input.id}>
 								<div className=" flex items-center justify-between">
-									<div className="flex items-center gap-[4px]">
-										<p className="text-[16px]">{input.label}</p>
-										{input.isRequired ? (
-											<span
-												className={clsx(
-													"px-2 py-0.5 rounded text-[12px]",
-													input.connectedOutput === undefined
-														? "bg-error-900/30 text-error-900 border border-error-900/30"
-														: "text-green-900",
-												)}
-											>
-												Required
-											</span>
-										) : (
-											<span className="px-2 py-0.5 rounded text-xs bg-slate-800 text-slate-400">
-												Optional
+									<div className="flex items-center gap-[8px]">
+										<span className="text-[14px]">{input.label}</span>
+										{input.isRequired && !input.connectedOutput && (
+											<span className="bg-red-900/20 text-red-900 text-[12px] font-medium px-[6px] py-[1px] rounded-full">
+												required
 											</span>
 										)}
 									</div>
 									{input.connectedOutput ? (
-										<div className="group flex items-center border border-black-400 px-[12px] py-[8px] rounded-[4px] gap-[6px] justify-between w-[300px]">
-											<div className="flex items-center gap-[6px] whitespace-nowrap overflow-x-hidden flex-1 min-w-[0px]">
-												<NodeIcon
-													node={input.connectedOutput.node}
-													className="size-[14px] shrink-0"
-												/>
-												<p className="truncate">
-													{defaultName(input.connectedOutput.node)} /{" "}
-													{input.connectedOutput.label}
-												</p>
-											</div>
+										<div
+											className={clsx(
+												"group inline-flex items-center border px-[4px] py-[2px] rounded-[4px] transition-colors text-[12px] gap-[4px]",
+												"data-[content-type=textGeneration]:bg-primary-900/20 data-[content-type=textGeneration]:border-primary-900/40 data-[content-type=textGeneration]:text-primary-900",
+												"data-[content-type=github]:bg-github-node-1/20 data-[content-type=github]:border-github-node-1/40 data-[content-type=github]:text-github-node-1",
+												"data-[content-type=text]:bg-node-plaintext-900/20 data-[content-type=text]:border-node-plaintext-900/40 data-[content-type=text]:text-node-plaintext-900",
+												"data-[content-type=file]:bg-node-data-900/20 data-[content-type=file]:border-node-data-900/40 data-[content-type=file]:text-node-data-900",
+												"data-[content-type=webPage]:bg-node-data-900/20 data-[content-type=webPage]:border-node-data-900/40 data-[content-type=webPage]:text-node-data-900",
+												"data-[content-type=action]:bg-action-node-1/20 data-[content-type=action]:border-action-node-1/40 data-[content-type=action]:text-action-node-1",
+												"data-[content-type=trigger]:bg-trigger-node-1/20 data-[content-type=trigger]:border-trigger-node-1/40 data-[content-type=trigger]:text-trigger-node-1",
+												"data-[content-type=query]:bg-query-node-1/20 data-[content-type=query]:border-query-node-1/40 data-[content-type=query]:text-query-node-1",
+												"data-[content-type=imageGeneration]:bg-image-generation-node-1/20 data-[content-type=imageGeneration]:border-image-generation-node-1/40 data-[content-type=imageGeneration]:text-image-generation-node-1",
+												"border-transparent",
+											)}
+											data-content-type={getNodeContentType(
+												input.connectedOutput.node,
+											)}
+										>
+											<span className="truncate">
+												{defaultName(input.connectedOutput.node as Node)} /{" "}
+												{input.connectedOutput.label}
+											</span>
 											<button
 												type="button"
-												className="hidden group-hover:block px-[4px] h-[20px] bg-transparent hover:bg-white-900/20 rounded-[4px] transition-colors mr-[2px] flex-shrink-0 cursor-pointer"
+												className="opacity-60 hover:opacity-100 transition-opacity"
 												onClick={handleClickRemoveButton(
 													input.connectedOutput.connectionId,
 												)}
 											>
-												<TrashIcon className="size-[16px] stroke-current stroke-[1px] " />
+												<XIcon className="size-[10px]" />
 											</button>
 										</div>
 									) : (
@@ -168,7 +177,7 @@ function SelectOutputPopover({
 	nodeId: NodeId;
 	input: InputWithConnectedOutput;
 }) {
-	const { data } = useWorkflowDesigner();
+	const { data, addConnection, isSupportedConnection } = useWorkflowDesigner();
 
 	const node = useMemo(
 		() => data.nodes.find((n) => n.id === nodeId),
@@ -176,29 +185,79 @@ function SelectOutputPopover({
 	);
 
 	const groupedOutputs = useMemo(() => {
+		const textGeneratorNodes: OutputWithDetails[] = [];
 		const textNodes: OutputWithDetails[] = [];
-		const generatedNodes: OutputWithDetails[] = [];
+		const fileNodes: OutputWithDetails[] = [];
+		const actionNodes: OutputWithDetails[] = [];
+		const triggerNodes: OutputWithDetails[] = [];
+		const githubNodes: OutputWithDetails[] = [];
+		const otherNodes: OutputWithDetails[] = [];
 
-		for (const node of data.nodes) {
-			if (node.id === nodeId) {
+		if (node === undefined) {
+			return [];
+		}
+
+		for (const currentNode of data.nodes) {
+			if (currentNode.id === nodeId) {
 				continue;
 			}
-			for (const output of node.outputs) {
-				if (isTextGenerationNode(node)) {
-					generatedNodes.push({ ...output, node });
-				} else if (isTextNode(node)) {
-					textNodes.push({ ...output, node });
+
+			// Check if this node can connect to our action node
+			const { canConnect } = isSupportedConnection(currentNode, node);
+			if (!canConnect) {
+				continue; // Skip unsupported connections
+			}
+
+			for (const output of currentNode.outputs) {
+				const outputWithDetails = { ...output, node: currentNode as Node };
+
+				// Categorize by node type
+				if (currentNode.type === "operation") {
+					switch (currentNode.content.type) {
+						case "textGeneration":
+							textGeneratorNodes.push(outputWithDetails);
+							break;
+						case "action":
+							actionNodes.push(outputWithDetails);
+							break;
+						case "trigger":
+							triggerNodes.push(outputWithDetails);
+							break;
+						default:
+							otherNodes.push(outputWithDetails);
+							break;
+					}
+				} else if (currentNode.type === "variable") {
+					switch (currentNode.content.type) {
+						case "text":
+							textNodes.push(outputWithDetails);
+							break;
+						case "file":
+							fileNodes.push(outputWithDetails);
+							break;
+						case "github":
+							githubNodes.push(outputWithDetails);
+							break;
+						default:
+							otherNodes.push(outputWithDetails);
+							break;
+					}
+				} else {
+					otherNodes.push(outputWithDetails);
 				}
 			}
 		}
 
 		return [
-			{ label: "Generated Content", nodes: generatedNodes },
+			{ label: "Text Generator", nodes: textGeneratorNodes },
+			{ label: "Action", nodes: actionNodes },
+			{ label: "Trigger", nodes: triggerNodes },
 			{ label: "Text", nodes: textNodes },
+			{ label: "File", nodes: fileNodes },
+			{ label: "GitHub", nodes: githubNodes },
+			{ label: "Other", nodes: otherNodes },
 		].filter((group) => group.nodes.length > 0);
-	}, [data.nodes, nodeId]);
-
-	const { addConnection } = useWorkflowDesigner();
+	}, [data.nodes, nodeId, node, isSupportedConnection]);
 
 	const handleSelectOutput = useCallback(
 		(outputNode: Node, outputId: OutputId) => {
@@ -219,7 +278,11 @@ function SelectOutputPopover({
 	if (layoutV2) {
 		return (
 			<DropdownMenu
-				trigger={<Button>Select Source</Button>}
+				trigger={
+					<Button leftIcon={<PlusIcon className="size-[12px]" />}>
+						Select Source
+					</Button>
+				}
 				items={groupedOutputs.map((groupedOutput) => ({
 					groupId: groupedOutput.label,
 					groupLabel: groupedOutput.label,
@@ -245,12 +308,13 @@ function SelectOutputPopover({
 					"transition-colors",
 				)}
 			>
-				Select Source
+				<PlusIcon className="size-[12px]" />
+				<p>Select Source</p>
 			</RadixDropdownMenu.Trigger>
 			<RadixDropdownMenu.Portal>
 				<RadixDropdownMenu.Content
 					className={clsx(
-						"relative w-[300px] py-[8px]",
+						"relative w-[300px] max-h-[250px] py-[8px]",
 						"rounded-[8px] border-[1px] bg-black-900/60 backdrop-blur-[8px]",
 						"shadow-[-2px_-1px_0px_0px_rgba(0,0,0,0.1),1px_1px_8px_0px_rgba(0,0,0,0.25)]",
 					)}
@@ -262,15 +326,15 @@ function SelectOutputPopover({
 							"from-[hsl(232,_36%,_72%)]/40 to-[hsl(218,_58%,_21%)]/90",
 						)}
 					/>
-					<div className="relative max-h-[300px] flex flex-col">
-						<div className="grow flex flex-col pb-[8px] gap-[8px] overflow-y-auto min-h-0">
+					<div className="relative flex flex-col max-h-[230px]">
+						<div className="flex flex-col pb-[8px] gap-[8px] overflow-y-auto">
 							{groupedOutputs.map((groupedOutput) =>
 								groupedOutput.nodes.length === 0 ? null : (
 									<RadixDropdownMenu.Group
 										className="flex flex-col px-[8px]"
 										key={groupedOutput.label}
 									>
-										<RadixDropdownMenu.Label className="py-[4px] px-[8px] text-black-400 text-[10px] font-[700]">
+										<RadixDropdownMenu.Label className="py-[4px] px-[8px] text-[#505D7B] text-[10px] font-[700]">
 											{groupedOutput.label}
 										</RadixDropdownMenu.Label>
 										{groupedOutput.nodes.map((output) => (

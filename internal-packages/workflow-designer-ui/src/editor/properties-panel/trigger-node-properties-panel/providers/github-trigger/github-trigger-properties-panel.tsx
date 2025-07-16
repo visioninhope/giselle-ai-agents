@@ -140,6 +140,28 @@ function Installed({
 		"github.issue.created",
 	);
 
+	// Helper function to create callsign events
+	const createCallsignEvent = (
+		eventId: GitHubTriggerEventId,
+		formData: FormData,
+	): GitHubFlowTriggerEvent => {
+		const callsign = formData.get("callsign");
+		if (typeof callsign !== "string" || callsign.length === 0) {
+			throw new Error("Unexpected request");
+		}
+		return {
+			id: eventId,
+			conditions: { callsign },
+		} as GitHubFlowTriggerEvent;
+	};
+
+	// Events that require callsign
+	const CALLSIGN_EVENTS = [
+		"github.issue_comment.created",
+		"github.pull_request_comment.created",
+		"github.pull_request_review_comment.created",
+	] as const;
+
 	const handleSubmit = useCallback<FormEventHandler<HTMLFormElement>>(
 		(e) => {
 			e.preventDefault();
@@ -151,59 +173,13 @@ function Installed({
 			let event: GitHubFlowTriggerEvent | undefined;
 			const formData = new FormData(e.currentTarget);
 
-			switch (eventId) {
-				case "github.issue.created":
-				case "github.issue.closed":
-				case "github.pull_request.ready_for_review":
-				case "github.pull_request.closed":
-				case "github.pull_request.opened":
-					event = {
-						id: eventId,
-					};
-					break;
-				case "github.issue_comment.created": {
-					const callsign = formData.get("callsign");
-					if (typeof callsign !== "string" || callsign.length === 0) {
-						throw new Error("Unexpected request");
-					}
-					event = {
-						id: "github.issue_comment.created",
-						conditions: {
-							callsign,
-						},
-					};
-					break;
-				}
-				case "github.pull_request_comment.created": {
-					const callsign = formData.get("callsign");
-					if (typeof callsign !== "string" || callsign.length === 0) {
-						throw new Error("Unexpected request");
-					}
-					event = {
-						id: "github.pull_request_comment.created",
-						conditions: {
-							callsign,
-						},
-					};
-					break;
-				}
-				case "github.pull_request_review_comment.created": {
-					const callsign = formData.get("callsign");
-					if (typeof callsign !== "string" || callsign.length === 0) {
-						throw new Error("Unexpected request");
-					}
-					event = {
-						id: "github.pull_request_review_comment.created",
-						conditions: {
-							callsign,
-						},
-					};
-					break;
-				}
-				default: {
-					const _exhaustiveCheck: never = eventId;
-					throw new Error(`Unhandled eventId: ${_exhaustiveCheck}`);
-				}
+			// Create event based on whether it requires callsign
+			if (
+				(CALLSIGN_EVENTS as readonly GitHubTriggerEventId[]).includes(eventId)
+			) {
+				event = createCallsignEvent(eventId, formData);
+			} else {
+				event = createTriggerEvent(eventId);
 			}
 
 			if (event === undefined) {

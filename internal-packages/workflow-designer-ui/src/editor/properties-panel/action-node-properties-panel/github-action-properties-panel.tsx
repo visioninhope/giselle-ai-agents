@@ -10,31 +10,85 @@ import {
 	useIntegration,
 	useWorkflowDesigner,
 } from "@giselle-sdk/giselle-engine/react";
-import {
-	type FormEventHandler,
-	useCallback,
-	useEffect,
-	useRef,
-	useState,
-	useTransition,
-} from "react";
+import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import { GitHubIcon, SpinnerIcon } from "../../../icons";
+// Import icons from GitHub trigger components
 import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "../../../ui/select";
+	IssueCommentCreatedIcon,
+	IssueCreatedIcon,
+	PullRequestCommentCreatedIcon,
+	PullRequestReviewCommentCreatedIcon,
+} from "../trigger-node-properties-panel/providers/github-trigger/components/icons";
 import { GitHubRepositoryBlock } from "../trigger-node-properties-panel/ui";
-import {
-	ResizableSection,
-	ResizableSectionGroup,
-	ResizableSectionHandle,
-	SelectRepository,
-} from "../ui";
+import { SelectRepository } from "../ui";
 import { GenerationPanel } from "./generation-panel";
 import { GitHubActionConfiguredView } from "./ui/github-action-configured-view";
+
+// Default icon for actions without specific icons
+const DefaultActionIcon = ({
+	size = 18,
+	className = "text-white",
+}: {
+	size?: number;
+	className?: string;
+}) => (
+	<svg
+		width={size}
+		height={size}
+		viewBox="0 0 24 24"
+		fill="none"
+		xmlns="http://www.w3.org/2000/svg"
+		className={className}
+		aria-label="GitHub Action"
+	>
+		<title>GitHub Action</title>
+		<path
+			d="M12 2L15.09 8.26L22 9L17 14L18.18 21L12 17.77L5.82 21L7 14L2 9L8.91 8.26L12 2Z"
+			fill="currentColor"
+		/>
+	</svg>
+);
+
+// Arrow right icon for action buttons
+const ArrowRightIcon = () => (
+	<svg
+		width="16"
+		height="16"
+		viewBox="0 0 16 16"
+		fill="none"
+		xmlns="http://www.w3.org/2000/svg"
+		className="text-white-400 group-hover:text-white-300 transition-colors"
+	>
+		<title>Arrow Right</title>
+		<path
+			d="M6 4L10 8L6 12"
+			stroke="currentColor"
+			strokeWidth="1.5"
+			strokeLinecap="round"
+			strokeLinejoin="round"
+		/>
+	</svg>
+);
+
+// Map action IDs to their corresponding icons
+const getActionIcon = (actionId: string) => {
+	const iconProps = { size: 18, className: "text-white" };
+
+	switch (actionId) {
+		case "github.create.issue":
+			return <IssueCreatedIcon {...iconProps} />;
+		case "github.create.issueComment":
+			return <IssueCommentCreatedIcon {...iconProps} />;
+		case "github.create.pullRequestComment":
+			return <PullRequestCommentCreatedIcon {...iconProps} />;
+		case "github.reply.pullRequestReviewComment":
+			return <PullRequestReviewCommentCreatedIcon {...iconProps} />;
+		case "github.get.discussion":
+			return <DefaultActionIcon {...iconProps} />;
+		default:
+			return <DefaultActionIcon {...iconProps} />;
+	}
+};
 
 export function GitHubActionPropertiesPanel({ node }: { node: ActionNode }) {
 	const { value } = useIntegration();
@@ -46,23 +100,16 @@ export function GitHubActionPropertiesPanel({ node }: { node: ActionNode }) {
 
 	if (node.content.command.state.status === "configured") {
 		return (
-			<ResizableSectionGroup>
-				<ResizableSection title="Configuration" defaultSize={50} minSize={20}>
-					<div className="p-4">
-						<GitHubActionConfiguredView
-							state={node.content.command.state}
-							nodeId={node.id}
-							inputs={node.inputs}
-						/>
-					</div>
-				</ResizableSection>
-				<ResizableSectionHandle />
-				<ResizableSection title="Generation" defaultSize={50}>
-					<div className="p-4">
-						<GenerationPanel node={node} />
-					</div>
-				</ResizableSection>
-			</ResizableSectionGroup>
+			<div className="flex flex-col h-full">
+				<GitHubActionConfiguredView
+					state={node.content.command.state}
+					nodeId={node.id}
+					inputs={node.inputs}
+				/>
+				<div className="p-4">
+					<GenerationPanel node={node} />
+				</div>
+			</div>
 		);
 	}
 
@@ -278,17 +325,11 @@ function Installed({
 		state: "select-repository",
 	});
 	const { updateNodeData } = useWorkflowDesigner();
-	const handleSubmit = useCallback<FormEventHandler<HTMLFormElement>>(
-		(e) => {
-			e.preventDefault();
+
+	const handleActionSelect = useCallback(
+		(commandId: string) => {
 			if (step.state !== "select-action") {
 				throw new Error("Unexpected state");
-			}
-			const formData = new FormData(e.currentTarget);
-
-			const commandId = formData.get("commandId");
-			if (typeof commandId !== "string" || commandId.length === 0) {
-				throw new Error("Unexpected request");
 			}
 
 			/** @todo remove type assertion */
@@ -339,7 +380,7 @@ function Installed({
 
 	return (
 		<div className="flex flex-col gap-[16px] px-[16px]">
-			<p className="text-[18px]">Set Up GitHub Action</p>
+			<p className="text-[14px] py-[1.5px] text-[#F7F9FD]">Organization</p>
 			{step.state === "select-repository" && (
 				<SelectRepository
 					installations={installations}
@@ -356,37 +397,37 @@ function Installed({
 				/>
 			)}
 			{step.state === "select-action" && (
-				<form
-					className="w-full flex flex-col gap-[16px]"
-					onSubmit={handleSubmit}
-				>
+				<div className="w-full flex flex-col gap-[16px]">
 					<GitHubRepositoryBlock owner={step.owner} repo={step.repo} />
-					<p className="text-[14px]">Choose what action you want to perform.</p>
-					<fieldset className="flex flex-col gap-[4px]">
-						<Select
-							name="commandId"
-							defaultValue={githubActions["github.create.issue"].command.id}
-						>
-							<SelectTrigger>
-								<SelectValue placeholder="Select an command" />
-							</SelectTrigger>
-							<SelectContent>
-								{Object.entries(githubActions).map(([id, githubAction]) => (
-									<SelectItem key={id} value={id}>
-										{githubAction.command.label}
-									</SelectItem>
-								))}
-							</SelectContent>
-						</Select>
-					</fieldset>
-
-					<button
-						type="submit"
-						className="h-[28px] rounded-[8px] bg-white-800 text-[14px] cursor-pointer text-black-800 font-[700] px-[16px] font-accent disabled:opacity-50"
-					>
-						Set Up Action
-					</button>
-				</form>
+					<div className="flex flex-col gap-[4px] flex-1 overflow-hidden">
+						<p className="text-[14px] py-[1.5px] text-[#F7F9FD]">Action Type</p>
+						<div className="flex flex-col gap-[16px] overflow-y-auto pr-2 pl-0 pt-[8px] custom-scrollbar flex-1">
+							{Object.entries(githubActions).map(([id, githubAction]) => (
+								<button
+									key={id}
+									type="button"
+									className="flex items-center py-[12px] px-[8px] rounded-lg group w-full h-[48px]"
+									onClick={() => handleActionSelect(id)}
+								>
+									<div className="flex items-center min-w-0 flex-1">
+										<div className="p-2 rounded-lg mr-3 bg-white/10 group-hover:bg-white/20 transition-colors flex-shrink-0 flex items-center justify-center">
+											{getActionIcon(id)}
+										</div>
+										<div className="flex flex-col text-left overflow-hidden min-w-0">
+											<span className="text-white-800 font-medium text-[14px] truncate">
+												{githubAction.command.label}
+											</span>
+											<span className="text-white-400 text-[12px] truncate group-hover:text-white-300 transition-colors pr-6">
+												{`Perform ${githubAction.command.label.toLowerCase()} action`}
+											</span>
+										</div>
+									</div>
+									<ArrowRightIcon />
+								</button>
+							))}
+						</div>
+					</div>
+				</div>
 			)}
 		</div>
 	);

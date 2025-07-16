@@ -17,6 +17,41 @@ import {
 } from "../../providers/github-trigger/components/icons";
 import { GitHubRepositoryBlock } from "../";
 
+// Icon mapping for GitHub trigger events
+const EVENT_ICON_MAP = {
+	"github.issue.created": IssueCreatedIcon,
+	"github.issue.closed": IssueClosedIcon,
+	"github.issue_comment.created": IssueCommentCreatedIcon,
+	"github.pull_request_comment.created": PullRequestCommentCreatedIcon,
+	"github.pull_request_review_comment.created":
+		PullRequestReviewCommentCreatedIcon,
+	"github.pull_request.opened": PullRequestOpenedIcon,
+	"github.pull_request.ready_for_review": PullRequestReadyForReviewIcon,
+	"github.pull_request.closed": PullRequestClosedIcon,
+} as const;
+
+// Default icon for unknown events
+const DefaultEventIcon = ({
+	size = 18,
+	className = "text-white",
+}: {
+	size?: number;
+	className?: string;
+}) => (
+	<svg
+		width={size}
+		height={size}
+		viewBox="0 0 24 24"
+		fill="none"
+		xmlns="http://www.w3.org/2000/svg"
+		className={className}
+		aria-label="GitHub trigger"
+	>
+		<title>GitHub trigger</title>
+		<path d="M0 24H24V0H0V24Z" fill="currentColor" />
+	</svg>
+);
+
 export function GitHubTriggerConfiguredView({
 	flowTriggerId,
 }: {
@@ -137,62 +172,14 @@ export function GitHubTriggerConfiguredView({
 				<p className="text-[14px] py-[1.5px] text-[#F7F9FD]">Event Type</p>
 				<div className="px-[4px] py-0 w-full bg-transparent text-[14px] flex items-center">
 					<div className="pr-0 p-2 rounded-lg flex-shrink-0 flex items-center justify-center">
-						{data.trigger.configuration.event.id === "github.issue.created" && (
-							<IssueCreatedIcon size={18} className="text-white" />
-						)}
-						{data.trigger.configuration.event.id === "github.issue.closed" && (
-							<IssueClosedIcon size={18} className="text-white" />
-						)}
-						{data.trigger.configuration.event.id ===
-							"github.issue_comment.created" && (
-							<IssueCommentCreatedIcon size={18} className="text-white" />
-						)}
-						{data.trigger.configuration.event.id ===
-							"github.pull_request_comment.created" && (
-							<PullRequestCommentCreatedIcon size={18} className="text-white" />
-						)}
-						{data.trigger.configuration.event.id ===
-							"github.pull_request_review_comment.created" && (
-							<PullRequestReviewCommentCreatedIcon
-								size={18}
-								className="text-white"
-							/>
-						)}
-						{data.trigger.configuration.event.id ===
-							"github.pull_request.opened" && (
-							<PullRequestOpenedIcon size={18} className="text-white" />
-						)}
-						{data.trigger.configuration.event.id ===
-							"github.pull_request.ready_for_review" && (
-							<PullRequestReadyForReviewIcon size={18} className="text-white" />
-						)}
-						{data.trigger.configuration.event.id ===
-							"github.pull_request.closed" && (
-							<PullRequestClosedIcon size={18} className="text-white" />
-						)}
-						{![
-							"github.issue.created",
-							"github.issue.closed",
-							"github.issue_comment.created",
-							"github.pull_request_comment.created",
-							"github.pull_request_review_comment.created",
-							"github.pull_request.opened",
-							"github.pull_request.ready_for_review",
-							"github.pull_request.closed",
-						].includes(data.trigger.configuration.event.id) && (
-							<svg
-								width="18"
-								height="18"
-								viewBox="0 0 24 24"
-								fill="none"
-								xmlns="http://www.w3.org/2000/svg"
-								className="text-white"
-								aria-label="GitHub trigger"
-							>
-								<title>GitHub trigger</title>
-								<path d="M0 24H24V0H0V24Z" fill="currentColor" />
-							</svg>
-						)}
+						{(() => {
+							const IconComponent =
+								EVENT_ICON_MAP[
+									data.trigger.configuration.event
+										.id as keyof typeof EVENT_ICON_MAP
+								] || DefaultEventIcon;
+							return <IconComponent size={18} className="text-white" />;
+						})()}
 					</div>
 					<span className="pl-2">
 						{githubTriggerIdToLabel(data.trigger.configuration.event.id)}
