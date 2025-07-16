@@ -20,7 +20,7 @@ export type PullRequestDetails = {
 	files: Map<string, FileMetadata>;
 };
 
-export type CacheKey = `${string}/${string}/${number}`;
+type CacheKey = `${string}/${string}/${number}`;
 
 export const prDetailsCache = new Map<number, Promise<PullRequestDetails>>();
 export const diffsCache = new Map<CacheKey, Promise<Map<string, string>>>();

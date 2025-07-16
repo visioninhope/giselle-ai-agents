@@ -7,10 +7,6 @@ import {
 	GetPullRequestsMetadataQuery,
 } from "./queries";
 
-export type PullRequestListItem = {
-	number: number;
-};
-
 export type FetchContext = {
 	client: Client;
 	owner: string;
