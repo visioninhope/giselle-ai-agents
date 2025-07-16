@@ -27,26 +27,6 @@ export const developerFlag = flag<boolean>({
 	],
 });
 
-export const githubToolsFlag = flag<boolean>({
-	key: "github-tools",
-	async decide() {
-		if (process.env.NODE_ENV === "development") {
-			return takeLocalEnv("GITHUB_TOOLS_FLAG");
-		}
-		const edgeConfig = await get(`flag__${this.key}`);
-		if (edgeConfig === undefined) {
-			return true;
-		}
-		return edgeConfig === true || edgeConfig === "true";
-	},
-	description: "Enable GitHub Tools",
-	defaultValue: false,
-	options: [
-		{ value: false, label: "disable" },
-		{ value: true, label: "Enable" },
-	],
-});
-
 export const webSearchActionFlag = flag<boolean>({
 	key: "web-search-action",
 	decide() {

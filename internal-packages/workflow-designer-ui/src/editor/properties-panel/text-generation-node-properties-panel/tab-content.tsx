@@ -34,7 +34,6 @@ interface TextGenerationTabContentProps {
 	updateNodeData: <T extends Node>(node: T, data: Partial<T>) => void;
 	data: Workspace;
 	deleteConnection: (connectionId: `cnnc-${string}`) => void;
-	githubTools: boolean;
 }
 
 export function TextGenerationTabContent({
@@ -45,7 +44,6 @@ export function TextGenerationTabContent({
 	updateNodeData,
 	data,
 	deleteConnection,
-	githubTools,
 }: TextGenerationTabContentProps) {
 	return (
 		<Tabs.Root
@@ -65,7 +63,7 @@ export function TextGenerationTabContent({
 			>
 				<Tabs.Trigger value="prompt">Prompt</Tabs.Trigger>
 				<Tabs.Trigger value="model">Model</Tabs.Trigger>
-				{githubTools && <Tabs.Trigger value="tools">Tools</Tabs.Trigger>}
+				<Tabs.Trigger value="tools">Tools</Tabs.Trigger>
 			</Tabs.List>
 			<Tabs.Content
 				value="prompt"
