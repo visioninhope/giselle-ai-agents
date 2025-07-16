@@ -107,20 +107,20 @@ export function createGitHubPullRequestsLoader(
 					yield {
 						owner,
 						repo,
-						pr_number: pr.number,
-						content_type: "title_body",
-						content_id: "title_body",
-						merged_at: pr.mergedAt,
+						prNumber: pr.number,
+						contentType: "title_body",
+						contentId: "title_body",
+						mergedAt: pr.mergedAt,
 					};
 
 					for (const commentId of pr.commentIds) {
 						yield {
 							owner,
 							repo,
-							pr_number: pr.number,
-							content_type: "comment",
-							content_id: commentId,
-							merged_at: pr.mergedAt,
+							prNumber: pr.number,
+							contentType: "comment",
+							contentId: commentId,
+							mergedAt: pr.mergedAt,
 						};
 					}
 
@@ -128,10 +128,10 @@ export function createGitHubPullRequestsLoader(
 						yield {
 							owner,
 							repo,
-							pr_number: pr.number,
-							content_type: "diff",
-							content_id: filepath,
-							merged_at: pr.mergedAt,
+							prNumber: pr.number,
+							contentType: "diff",
+							contentId: filepath,
+							mergedAt: pr.mergedAt,
 						};
 					}
 				}
@@ -145,7 +145,11 @@ export function createGitHubPullRequestsLoader(
 	const loadDocument = async (
 		metadata: GitHubPullRequestMetadata,
 	): Promise<Document<GitHubPullRequestMetadata> | null> => {
-		const { pr_number, content_type, content_id } = metadata;
+		const {
+			prNumber: pr_number,
+			contentType: content_type,
+			contentId: content_id,
+		} = metadata;
 
 		try {
 			switch (content_type) {

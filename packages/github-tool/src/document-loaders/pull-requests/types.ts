@@ -11,10 +11,10 @@ type GithubPullRequestContentType = "title_body" | "comment" | "diff";
 export type GitHubPullRequestMetadata = {
 	owner: string;
 	repo: string;
-	pr_number: number;
-	content_type: GithubPullRequestContentType;
-	content_id: string; // comment ID or file path, "title_body" for title+body
-	merged_at: string;
+	prNumber: number;
+	contentType: GithubPullRequestContentType;
+	contentId: string; // comment ID or file path, "title_body" for title+body
+	mergedAt: string;
 };
 
 /**
