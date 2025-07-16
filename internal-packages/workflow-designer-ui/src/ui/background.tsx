@@ -200,6 +200,7 @@ export function Background() {
 			const verticalLines = Math.floor(screenWidth / gridSize) + 1;
 
 			// Draw grid lines first
+			// biome-ignore lint/correctness/useHookAtTopLevel: This is not a React hook, but a WebGL API https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/useProgram
 			gl.useProgram(lineProgram);
 			gl.uniform2f(lineResolutionUniformLocation, canvas.width, canvas.height);
 			gl.bindBuffer(gl.ARRAY_BUFFER, linePositionBuffer);
@@ -245,6 +246,7 @@ export function Background() {
 			gl.drawArrays(gl.LINES, 0, verticalLinePoints.length / 2);
 
 			// Now draw dots on top
+			// biome-ignore lint/correctness/useHookAtTopLevel: This is not a React hook, but a WebGL API https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/useProgram
 			gl.useProgram(dotProgram);
 			gl.uniform2f(dotResolutionUniformLocation, canvas.width, canvas.height);
 			gl.uniform1f(dotPixelRatioUniformLocation, pixelRatio);

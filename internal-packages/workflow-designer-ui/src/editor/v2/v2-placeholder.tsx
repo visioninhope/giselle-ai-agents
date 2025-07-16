@@ -81,8 +81,8 @@ export function V2Placeholder({
 						onLeftPanelClose={handleLeftPanelClose}
 					/>
 				)}
+				<KeyboardShortcuts />
 			</RootProvider>
-			<KeyboardShortcuts />
 			<WorkspaceTour
 				steps={tourSteps}
 				isOpen={isTourOpen}

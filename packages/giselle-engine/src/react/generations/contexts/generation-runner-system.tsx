@@ -317,7 +317,7 @@ export function GenerationRunnerSystemProvider({
 			generationListener.current[generationId] = generation;
 			return generation;
 		},
-		[client],
+		[client, experimental_storage],
 	);
 	const updateGenerationStatusToComplete = useCallback(
 		async (generationId: GenerationId) => {
@@ -339,7 +339,7 @@ export function GenerationRunnerSystemProvider({
 			generationListener.current[generationId] = completedGeneration;
 			return completedGeneration;
 		},
-		[client],
+		[client, experimental_storage],
 	);
 
 	const updateGenerationStatusToFailure = useCallback(
@@ -362,7 +362,7 @@ export function GenerationRunnerSystemProvider({
 			generationListener.current[generationId] = failedGeneration;
 			return failedGeneration;
 		},
-		[client],
+		[client, experimental_storage],
 	);
 
 	const addStopHandler = useCallback(
@@ -402,7 +402,7 @@ export function GenerationRunnerSystemProvider({
 				cancelledAt: Date.now(),
 			} as CancelledGeneration;
 		},
-		[client],
+		[client, experimental_storage],
 	);
 
 	return (

@@ -243,7 +243,7 @@ export function WebPageNodePropertiesPanel({ node }: { node: WebPageNode }) {
 				});
 			}
 		},
-		[updateNodeDataContent, node, client, data.id],
+		[updateNodeDataContent, node, client, data.id, experimental_storage],
 	);
 
 	return (

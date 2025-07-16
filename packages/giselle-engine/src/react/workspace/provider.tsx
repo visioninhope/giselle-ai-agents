@@ -56,7 +56,7 @@ export function WorkspaceProvider({
 			.then((workspace) => {
 				setWorkspace(workspace);
 			});
-	}, [workspaceId, client]);
+	}, [workspaceId, client, featureFlag?.experimental_storage]);
 	if (workspace === undefined) {
 		return null;
 	}

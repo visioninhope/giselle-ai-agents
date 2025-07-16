@@ -75,7 +75,7 @@ export function RunButton() {
 			return true;
 		});
 		return [...triggerNodes, ...startingOperationNodes];
-	}, [data.nodes]);
+	}, [data.nodes, data.connections]);
 
 	const startOperationFlow = useCallback(
 		async (startingNode: OperationNode) => {

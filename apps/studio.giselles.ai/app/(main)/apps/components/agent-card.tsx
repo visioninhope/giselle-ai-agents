@@ -40,10 +40,6 @@ export function AgentCard({ agent }: AgentCardProps) {
 		card.style.setProperty("--mouse-y", `${e.clientY - rect.top}px`);
 	};
 
-	if (!agent.workspaceId) {
-		return null;
-	}
-
 	const _color = getDeterministicColor(agent.id);
 
 	const [relativeTime, setRelativeTime] = useState("");
@@ -58,6 +54,10 @@ export function AgentCard({ agent }: AgentCardProps) {
 		const id = setInterval(update, 60_000);
 		return () => clearInterval(id);
 	}, [agent.updatedAt]);
+
+	if (!agent.workspaceId) {
+		return null;
+	}
 
 	return (
 		<section

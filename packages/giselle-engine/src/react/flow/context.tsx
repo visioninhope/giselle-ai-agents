@@ -195,7 +195,7 @@ export function WorkflowDesignerProvider({
 				await uploader();
 			}
 		},
-		[updateNodeDataContent, client, data.id],
+		[updateNodeDataContent, client, data.id, experimental_storage],
 	);
 
 	const removeFile = useCallback(
@@ -207,7 +207,7 @@ export function WorkflowDesignerProvider({
 			});
 			dispatch({ type: "NO_OP" });
 		},
-		[client, data.id, dispatch],
+		[client, data.id, dispatch, experimental_storage],
 	);
 
 	const propertiesPanelHelper = usePropertiesPanel();

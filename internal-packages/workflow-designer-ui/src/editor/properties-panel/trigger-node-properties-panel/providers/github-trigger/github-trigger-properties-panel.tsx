@@ -141,19 +141,22 @@ function Installed({
 	);
 
 	// Helper function to create callsign events
-	const createCallsignEvent = (
-		eventId: GitHubTriggerEventId,
-		formData: FormData,
-	): GitHubFlowTriggerEvent => {
-		const callsign = formData.get("callsign");
-		if (typeof callsign !== "string" || callsign.length === 0) {
-			throw new Error("Unexpected request");
-		}
-		return {
-			id: eventId,
-			conditions: { callsign },
-		} as GitHubFlowTriggerEvent;
-	};
+	const createCallsignEvent = useCallback(
+		(
+			eventId: GitHubTriggerEventId,
+			formData: FormData,
+		): GitHubFlowTriggerEvent => {
+			const callsign = formData.get("callsign");
+			if (typeof callsign !== "string" || callsign.length === 0) {
+				throw new Error("Unexpected request");
+			}
+			return {
+				id: eventId,
+				conditions: { callsign },
+			} as GitHubFlowTriggerEvent;
+		},
+		[],
+	);
 
 	// Events that require callsign
 	const CALLSIGN_EVENTS = [
@@ -238,6 +241,8 @@ function Installed({
 			step,
 			eventId,
 			experimental_storage,
+			CALLSIGN_EVENTS,
+			createCallsignEvent,
 		],
 	);
 
