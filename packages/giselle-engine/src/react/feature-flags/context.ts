@@ -5,7 +5,6 @@ export interface FeatureFlagContextValue {
 	sidemenu: boolean;
 	githubTools: boolean;
 	webSearchAction: boolean;
-	layoutV2: boolean;
 	layoutV3: boolean;
 	experimental_storage: boolean;
 	stage: boolean;
