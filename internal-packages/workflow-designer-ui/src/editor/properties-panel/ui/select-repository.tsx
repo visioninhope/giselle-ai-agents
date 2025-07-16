@@ -195,7 +195,7 @@ export function SelectRepository({
 								<button
 									key={repo.node_id}
 									type="button"
-									className="group relative rounded-[12px] overflow-hidden px-[16px] py-[12px] w-full bg-white/[0.02] backdrop-blur-[8px] border-[0.5px] border-white/8 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),inset_0_-1px_1px_rgba(255,255,255,0.2)] hover:border-white/12 transition-colors duration-200 cursor-pointer text-left"
+									className="group relative rounded-[12px] overflow-hidden px-[16px] py-[12px] w-full border-[0.5px] border-white/8 shadow-[inset_0_1px_0_rgba(255,255,255,0.25),inset_0_-1px_0_rgba(255,255,255,0.15)] hover:border-white/12 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.35),inset_0_-1px_0_rgba(255,255,255,0.2)] transition-all duration-200 cursor-pointer text-left"
 									onClick={() => {
 										onSelectRepository({
 											installationId: selectedInstallationId,
