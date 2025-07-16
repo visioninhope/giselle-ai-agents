@@ -13,19 +13,11 @@ import {
 
 const ignoredTags = ["INPUT", "TEXTAREA", "SELECT"];
 
-function useToolbarSafe() {
-	try {
-		return useToolbar();
-	} catch {
-		return null;
-	}
-}
-
 export function KeyboardShortcuts() {
 	const { data, copyNode } = useWorkflowDesigner();
 	const duplicateNode = useDuplicateNode();
 	const [copiedNode, setCopiedNode] = useState<NodeLike | null>(null);
-	const toolbar = useToolbarSafe();
+	const toolbar = useToolbar();
 
 	useEffect(() => {
 		const handleKeyDown = (event: KeyboardEvent) => {
