@@ -2,7 +2,6 @@ import { createContext, useContext } from "react";
 
 export interface FeatureFlagContextValue {
 	runV3: boolean;
-	sidemenu: boolean;
 	githubTools: boolean;
 	webSearchAction: boolean;
 	layoutV3: boolean;

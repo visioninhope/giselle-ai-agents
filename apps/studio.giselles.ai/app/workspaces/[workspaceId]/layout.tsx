@@ -8,7 +8,6 @@ import {
 	githubToolsFlag,
 	layoutV3Flag,
 	runV3Flag,
-	sidemenuFlag,
 	stageFlag,
 	webSearchActionFlag,
 } from "@/flags";
@@ -44,7 +43,6 @@ export default async function Layout({
 	const usageLimits = await getUsageLimitsForTeam(currentTeam);
 	const gitHubVectorStores = await getGitHubVectorStores(currentTeam.dbId);
 	const runV3 = await runV3Flag();
-	const sidemenu = await sidemenuFlag();
 	const githubTools = await githubToolsFlag();
 	const webSearchAction = await webSearchActionFlag();
 	const layoutV3 = await layoutV3Flag();
@@ -77,7 +75,6 @@ export default async function Layout({
 			}}
 			featureFlag={{
 				runV3,
-				sidemenu,
 				githubTools,
 				webSearchAction,
 				layoutV3,

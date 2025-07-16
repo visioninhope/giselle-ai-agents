@@ -15,7 +15,6 @@ export default async function Layout({
 			workspaceId={workspaceId}
 			featureFlag={{
 				runV3: true,
-				sidemenu: true,
 				githubTools: true,
 				webSearchAction: false,
 				layoutV3: true,
