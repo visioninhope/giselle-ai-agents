@@ -5,7 +5,6 @@ import type { ReactNode } from "react";
 import { db, flowTriggers } from "@/drizzle";
 import {
 	experimental_storageFlag,
-	githubToolsFlag,
 	layoutV3Flag,
 	runV3Flag,
 	stageFlag,
@@ -43,7 +42,6 @@ export default async function Layout({
 	const usageLimits = await getUsageLimitsForTeam(currentTeam);
 	const gitHubVectorStores = await getGitHubVectorStores(currentTeam.dbId);
 	const runV3 = await runV3Flag();
-	const githubTools = await githubToolsFlag();
 	const webSearchAction = await webSearchActionFlag();
 	const layoutV3 = await layoutV3Flag();
 	const experimental_storage = await experimental_storageFlag();
@@ -75,7 +73,6 @@ export default async function Layout({
 			}}
 			featureFlag={{
 				runV3,
-				githubTools,
 				webSearchAction,
 				layoutV3,
 				experimental_storage,
