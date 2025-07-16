@@ -1,5 +1,3 @@
-import type { StreamableValue } from "ai/rsc";
-
 export type NodeId = `nd_${string}`;
 interface NodeBase {
 	id: NodeId;
@@ -36,9 +34,6 @@ export interface TextGeneration extends Action {
 }
 interface WebSearchActionContent extends ActionContentBase {
 	type: "webSearch";
-}
-interface WebSearch extends Action {
-	content: WebSearchActionContent;
 }
 type ActionContent = TextGenerateActionContent | WebSearchActionContent;
 
@@ -187,41 +182,7 @@ export interface Graph {
 	executionIndexes: ExecutionIndex[];
 }
 
-interface ToolBase {
-	category: string;
-	action: string;
-}
-
-interface AddTextNodeTool extends ToolBase {
-	category: "edit";
-	action: "addTextNode";
-}
-interface AddFileNodeTool extends ToolBase {
-	category: "edit";
-	action: "addFileNode";
-}
-interface AddTextGenerationNodeTool extends ToolBase {
-	category: "edit";
-	action: "addTextGenerationNode";
-}
-interface MoveTool extends ToolBase {
-	category: "move";
-	action: "move";
-}
-type Tool =
-	| AddTextNodeTool
-	| AddFileNodeTool
-	| AddTextGenerationNodeTool
-	| MoveTool;
-
-export type FlowId = `flw_${string}`;
-
 export type StepId = `stp_${string}`;
-interface Step {
-	id: StepId;
-	nodeId: NodeId;
-	variableNodeIds: NodeId[];
-}
 export type JobId = `jb_${string}`;
 interface Job {
 	id: JobId;
@@ -311,44 +272,8 @@ export type JobExecution =
 	| FailedJobExecution
 	| SkippedJobExecution;
 export type ExecutionId = `exct_${string}`;
-interface ExecutionBase {
-	id: ExecutionId;
-	flowId?: FlowId;
-	jobExecutions: JobExecution[];
-	artifacts: Artifact[];
-}
-interface PendingExecution extends ExecutionBase {
-	status: "pending";
-}
-interface RunningExecution extends ExecutionBase {
-	status: "running";
-	runStartedAt: number;
-}
-interface CompletedExecution extends ExecutionBase {
-	status: "completed";
-	runStartedAt: number;
-	durationMs: number;
-	resultArtifact: Artifact;
-}
-interface FailedExecution extends ExecutionBase {
-	status: "failed";
-	runStartedAt: number;
-	durationMs: number;
-}
-type Execution =
-	| PendingExecution
-	| RunningExecution
-	| CompletedExecution
-	| FailedExecution;
 
 export type ExecutionSnapshotId = `excs_${string}`;
-interface ExecutionSnapshot {
-	id: ExecutionSnapshotId;
-	execution: Execution;
-	nodes: Node[];
-	connections: Connection[];
-	flow: Flow;
-}
 
 interface ExecutionIndex {
 	executionId: ExecutionId;
@@ -361,9 +286,5 @@ export interface GitHubEventNodeMapping {
 	event: string;
 	nodeId: NodeId;
 }
-
-type ExecuteActionReturnValue =
-	| TextArtifactObject
-	| StreamableValue<TextArtifactObject, unknown>;
 
 export type GitHubRepositoryIndexId = `gthbi_${string}`;
