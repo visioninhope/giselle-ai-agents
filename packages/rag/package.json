@@ -8,7 +8,7 @@
 		"build": "tsup",
 		"check-types": "tsc --noEmit",
 		"dev": "tsup --watch",
-		"test": "vitest",
+		"test": "vitest run",
 		"format": "biome check --write ."
 	},
 	"dependencies": {

@@ -5,15 +5,15 @@ Keep every implementation as small and obvious as possible.
 - Remove dead code early — `pnpm tidy` scans the repo for unused files/deps and lets you delete them in one command.
 - Before adding a dependency, ask, “Can we do this with what we already have?”
 
-# Workflow
-**MANDATORY**: After every code change, you MUST immediately run these commands in order:
+# REQUIRED COMMANDS AFTER CODE CHANGES
+**IMMEDIATE ACTION REQUIRED: After using `edit_file` tool:**
 
-1. `pnpm format`
-2. `pnpm tidy`
-3. `pnpm check-types`
-4. `pnpm test`
+1. Run `pnpm format`
+2. Run `pnpm tidy`
+3. Run `pnpm check-types`
+4. Run `pnpm test`
 
-**DO NOT consider any code change complete until all four commands pass successfully.**
+**These commands are part of the `edit_file` operation itself.**
 
 (CI also runs these steps; your PR will fail if any step fails.)
 
