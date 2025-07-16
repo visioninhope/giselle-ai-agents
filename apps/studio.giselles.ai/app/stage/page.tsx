@@ -106,10 +106,17 @@ export default async function StagePage() {
 			if (node === undefined) {
 				continue;
 			}
+			const flowTrigger = await giselleEngine.getTrigger({
+				flowTriggerId: tmpFlowTrigger.sdkFlowTriggerId,
+			});
+			if (flowTrigger === undefined) {
+				continue;
+			}
 			flowTriggers.push({
 				id: tmpFlowTrigger.sdkFlowTriggerId,
 				teamId: team.id,
 				label: node.name ?? defaultName(node),
+				sdkData: flowTrigger,
 			});
 		}
 	}

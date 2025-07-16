@@ -1,7 +1,7 @@
 "use client";
 
 import { Select } from "@giselle-internal/ui/select";
-import type { FlowTriggerId } from "@giselle-sdk/data-type";
+import type { FlowTrigger, FlowTriggerId } from "@giselle-sdk/data-type";
 import type { InferSelectModel } from "drizzle-orm";
 import { useState } from "react";
 import type { teams } from "@/drizzle";
@@ -16,6 +16,7 @@ export interface FlowTriggerUIItem {
 	id: FlowTriggerId;
 	teamId: TeamId;
 	label: string;
+	sdkData: FlowTrigger;
 }
 
 interface FlowSelectProps {
