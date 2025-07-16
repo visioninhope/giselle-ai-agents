@@ -19,12 +19,13 @@ export interface FlowTriggerUIItem {
 	sdkData: FlowTrigger;
 }
 
-interface FlowSelectProps {
+export function FlowSelect({
+	teamOptions,
+	flowTriggers,
+}: {
 	teamOptions: TeamOption[];
 	flowTriggers: FlowTriggerUIItem[];
-}
-
-export function FlowSelect({ teamOptions, flowTriggers }: FlowSelectProps) {
+}) {
 	const [selectedTeamId, setSelectedTeamId] = useState<TeamId | undefined>();
 
 	const filteredFlowTriggers = flowTriggers.filter(
