@@ -1,5 +1,4 @@
 import { Button } from "@giselle-internal/ui/button";
-import { Select } from "@giselle-internal/ui/select";
 import {
 	Table,
 	TableBody,
@@ -8,17 +7,18 @@ import {
 	TableHeader,
 	TableRow,
 } from "@giselle-internal/ui/table";
-import type { InferSelectModel } from "drizzle-orm";
-import { Mic } from "lucide-react";
+import {
+	isTriggerNode,
+	type Workspace,
+	type WorkspaceId,
+} from "@giselle-sdk/data-type";
+import { defaultName } from "@giselle-sdk/giselle-engine";
 import { notFound } from "next/navigation";
-import { db, type flowTriggers as flowTriggersSchema } from "@/drizzle";
-import { stageFlag } from "@/flags";
+import { db } from "@/drizzle";
+import { experimental_storageFlag, stageFlag } from "@/flags";
 import { fetchUserTeams } from "@/services/teams";
-
-const flowOptions = [
-	{ id: "flow", label: "flow" },
-	{ id: "alt", label: "alt" },
-];
+import { giselleEngine } from "../giselle-engine";
+import { FlowSelect, type FlowTriggerUIItem } from "./flow-select";
 
 const tasks = [
 	{
@@ -76,49 +76,49 @@ export default async function StagePage() {
 	if (!enableStage) {
 		return notFound();
 	}
+	const experimental_storage = await experimental_storageFlag();
 	const teams = await fetchUserTeams();
 	const teamOptions = teams.map((team) => ({ id: team.id, label: team.name }));
-	let flowTriggers: Array<InferSelectModel<typeof flowTriggersSchema>> = [];
+	const flowTriggers: Array<FlowTriggerUIItem> = [];
+	for (const team of teams) {
+		const tmpFlowTriggers = await db.query.flowTriggers.findMany({
+			where: (flowTriggers, { eq }) => eq(flowTriggers.teamDbId, team.dbId),
+		});
+		const workspaceMap: Map<WorkspaceId, Workspace> = new Map();
+		for (const tmpFlowTrigger of tmpFlowTriggers) {
+			if (!workspaceMap.has(tmpFlowTrigger.sdkWorkspaceId)) {
+				const tmpWorkspace = await giselleEngine.getWorkspace(
+					tmpFlowTrigger.sdkWorkspaceId,
+					experimental_storage,
+				);
+				workspaceMap.set(tmpFlowTrigger.sdkWorkspaceId, tmpWorkspace);
+			}
+			const workspace = workspaceMap.get(tmpFlowTrigger.sdkWorkspaceId);
+			if (workspace === undefined) {
+				continue;
+			}
+			const node = workspace.nodes.find(
+				(node) =>
+					isTriggerNode(node) &&
+					node.content.state.status === "configured" &&
+					node.content.state.flowTriggerId === tmpFlowTrigger.sdkFlowTriggerId,
+			);
+			if (node === undefined) {
+				continue;
+			}
+			flowTriggers.push({
+				id: tmpFlowTrigger.sdkFlowTriggerId,
+				teamId: team.id,
+				label: node.name ?? defaultName(node),
+			});
+		}
+	}
 	return (
 		<div className="p-[24px] space-y-6">
 			<div className="text-center text-[24px] font-sans text-white-100">
 				What are we perform next ?
 			</div>
-			<div className="flex items-center gap-2 justify-center">
-				<Select
-					id="team"
-					placeholder="Select team"
-					options={teamOptions}
-					renderOption={(o) => o.label}
-					widthClassName="w-[150px]"
-					onValueChange={async (value) => {
-						"use server";
-						const team = await db.query.teams.findFirst({
-							where: (teams, { eq }) => eq(teams.id, value),
-						});
-						if (team === undefined) {
-							throw new Error("Team not found");
-						}
-						flowTriggers = await db.query.flowTriggers.findMany({
-							where: (flowTriggers, { eq }) =>
-								eq(flowTriggers.teamDbId, team.dbId),
-						});
-					}}
-				/>
-				<Select
-					id="flow"
-					placeholder="Select flow"
-					options={flowTriggers.map((flowTrigger) => ({
-						id: flowTrigger.sdkFlowTriggerId,
-						label: flowTrigger.sdkFlowTriggerId,
-					}))}
-					renderOption={(o) => o.label}
-					widthClassName="w-[120px]"
-				/>
-				<Button variant="glass" size="large" aria-label="voice">
-					<Mic className="size-4" />
-				</Button>
-			</div>
+			<FlowSelect teamOptions={teamOptions} flowTriggers={flowTriggers} />
 			<div className="max-w-[800px] mx-auto">
 				<div className="relative">
 					<textarea
