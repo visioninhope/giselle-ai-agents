@@ -1,6 +1,5 @@
 import type { TextGenerationNode } from "@giselle-sdk/data-type";
 import {
-	useFeatureFlag,
 	useNodeGenerations,
 	useWorkflowDesigner,
 } from "@giselle-sdk/giselle-engine/react";
@@ -90,7 +89,6 @@ export function TextGenerationNodePropertiesPanel({
 		: jsonOrText;
 	const noWhitespaceText = text?.replace(/[\s\u3000]+/g, "");
 	const disabled = usageLimitsReached || !noWhitespaceText;
-	const { githubTools } = useFeatureFlag();
 
 	return (
 		<PropertiesPanelRoot>
@@ -158,7 +156,6 @@ export function TextGenerationNodePropertiesPanel({
 								updateNodeData={updateNodeData}
 								data={data}
 								deleteConnection={deleteConnection}
-								githubTools={githubTools}
 							/>
 						</PropertiesPanelContent>
 					</Panel>
