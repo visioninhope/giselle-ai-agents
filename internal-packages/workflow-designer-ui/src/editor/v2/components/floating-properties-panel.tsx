@@ -154,13 +154,10 @@ export function FloatingPropertiesPanel({
 							{/* Content */}
 							<div
 								className={clsx(
-									"h-full overflow-hidden relative z-10 px-2 pb-2 backdrop-blur-xl bg-white/10 rounded-lg border border-white/10",
+									"h-full overflow-hidden relative z-10 px-2 pb-2",
 									position === "right" ? "pl-3" : "pr-3",
 								)}
 							>
-								{/* Top gradient line */}
-								<div className="absolute -z-10 top-0 left-4 right-4 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
-
 								{children}
 							</div>
 						</div>
