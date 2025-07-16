@@ -1,9 +1,7 @@
 import { graphql as gql } from "./graphql";
 
 export * from "./discussions";
-export * from "./document-loaders/blobs/archive-loader";
-export * from "./document-loaders/blobs/tree-loader";
-export * from "./document-loaders/pull-requests";
+export * from "./document-loaders";
 export * from "./errors";
 export * from "./installtion";
 export * from "./issues";
