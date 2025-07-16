@@ -1,4 +1,3 @@
-import { Button } from "@giselle-internal/ui/button";
 import {
 	Table,
 	TableBody,
@@ -18,7 +17,7 @@ import { db } from "@/drizzle";
 import { experimental_storageFlag, stageFlag } from "@/flags";
 import { fetchUserTeams } from "@/services/teams";
 import { giselleEngine } from "../giselle-engine";
-import { FlowSelect, type FlowTriggerUIItem } from "./flow-select";
+import { type FlowTriggerUIItem, Form } from "./form";
 
 const tasks = [
 	{
@@ -106,10 +105,17 @@ export default async function StagePage() {
 			if (node === undefined) {
 				continue;
 			}
+			const flowTrigger = await giselleEngine.getTrigger({
+				flowTriggerId: tmpFlowTrigger.sdkFlowTriggerId,
+			});
+			if (flowTrigger === undefined) {
+				continue;
+			}
 			flowTriggers.push({
 				id: tmpFlowTrigger.sdkFlowTriggerId,
 				teamId: team.id,
 				label: node.name ?? defaultName(node),
+				sdkData: flowTrigger,
 			});
 		}
 	}
@@ -118,20 +124,18 @@ export default async function StagePage() {
 			<div className="text-center text-[24px] font-sans text-white-100">
 				What are we perform next ?
 			</div>
-			<FlowSelect teamOptions={teamOptions} flowTriggers={flowTriggers} />
-			<div className="max-w-[800px] mx-auto">
-				<div className="relative">
-					<textarea
-						className="w-full h-40 border border-border bg-editor-background rounded-[4px] p-4 text-[14px] text-text resize-none outline-none"
-						placeholder="Describe a task"
-					/>
-					<div className="absolute bottom-2 right-2">
-						<Button variant="solid" size="large">
-							Start
-						</Button>
-					</div>
-				</div>
-			</div>
+			<Form
+				teamOptions={teamOptions}
+				flowTriggers={flowTriggers}
+				performStageAction={async () => {
+					"use server";
+
+					await new Promise((resolve) => setTimeout(resolve, 1000));
+					console.log("todo");
+					await new Promise((resolve) => setTimeout(resolve, 1000));
+					console.log("implement next pr");
+				}}
+			/>
 			<div className="max-w-[900px] mx-auto space-y-2">
 				<div className="flex items-center justify-between px-1">
 					<h2 className="text-[16px] font-sans text-white-100">Tasks</h2>
