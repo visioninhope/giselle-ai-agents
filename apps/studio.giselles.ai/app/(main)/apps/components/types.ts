@@ -19,10 +19,3 @@ export type Position = {
 	x: number;
 	y: number;
 };
-
-type LightTrackingConfig = {
-	radius: number;
-	fadeInDuration: number;
-	fadeOutDuration: number;
-	trackingDuration: number;
-};

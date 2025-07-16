@@ -34,12 +34,6 @@ interface GeneratedImageData {
 	base64: string;
 }
 
-interface FileIndex {
-	nodeId: NodeId;
-	start: number;
-	end: number;
-}
-
 export async function buildMessageObject(
 	node: OperationNode,
 	contextNodes: Node[],
@@ -432,29 +426,6 @@ function getFilesDescription(
 		return `${getOrdinal(currentCount + 1)} ~ ${getOrdinal(currentCount + newFilesCount)} attached files`;
 	}
 	return `${getOrdinal(currentCount + 1)} attached file`;
-}
-
-async function getRedirectedUrlAndTitle(url: string) {
-	// Make the request with fetch and set redirect to 'follow'
-	const response = await fetch(url, {
-		redirect: "follow", // This automatically follows redirects
-	});
-
-	// Get the final URL after redirects
-	const finalUrl = response.url;
-
-	// Get the HTML content
-	const html = await response.text();
-
-	// Extract title using a simple regex pattern
-	const titleMatch = html.match(/<title[^>]*>(.*?)<\/title>/i);
-	const title = titleMatch ? titleMatch[1].trim() : "No title found";
-
-	return {
-		originalUrl: url,
-		redirectedUrl: finalUrl,
-		title: title,
-	};
 }
 
 async function buildGenerationMessageForImageGeneration(

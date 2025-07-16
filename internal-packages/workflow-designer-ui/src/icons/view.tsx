@@ -1,7 +1,7 @@
 import clsx from "clsx/lite";
 import type { SVGProps } from "react";
 
-function ViewIcon({ className, ...props }: SVGProps<SVGSVGElement>) {
+function _ViewIcon({ className, ...props }: SVGProps<SVGSVGElement>) {
 	return (
 		<svg
 			width="18"

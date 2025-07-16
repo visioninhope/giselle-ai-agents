@@ -1,6 +1,6 @@
 import type { FC, SVGProps } from "react";
 
-const TextsIcon: FC<SVGProps<SVGSVGElement>> = (props) => (
+const _TextsIcon: FC<SVGProps<SVGSVGElement>> = (props) => (
 	<svg
 		width="18"
 		height="19"

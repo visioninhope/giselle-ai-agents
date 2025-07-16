@@ -27,7 +27,7 @@ export const CSS_VARS = {
 	radius: "--r",
 } as const;
 
-export const Z_INDEX = {
+const _Z_INDEX = {
 	darkLayer: 30,
 	lightLayer: 40,
 } as const;

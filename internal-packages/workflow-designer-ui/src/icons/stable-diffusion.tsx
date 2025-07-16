@@ -1,7 +1,7 @@
 import clsx from "clsx/lite";
 import type { SVGProps } from "react";
 
-function StableDiffusionColorIcon({
+function _StableDiffusionColorIcon({
 	className,
 	...props
 }: SVGProps<SVGSVGElement>) {

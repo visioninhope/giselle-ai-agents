@@ -101,15 +101,3 @@ type GitHubIntegrationSetting = Omit<
 	typeof githubIntegrationSettings.$inferSelect,
 	"dbId" | "agentDbId"
 >;
-
-interface CreateGitHubIntegrationSettingSuccess {
-	result: "success";
-	setting: GitHubIntegrationSetting;
-}
-interface CreateGitHubIntegrationSettingError {
-	result: "error";
-	message: string;
-}
-type CreateGitHubIntegrationSettingResult =
-	| CreateGitHubIntegrationSettingSuccess
-	| CreateGitHubIntegrationSettingError;

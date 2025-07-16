@@ -171,7 +171,7 @@ function updateNodeWithTrigger(
  * Handles the complete trigger configuration process
  * Combines creating the configuration, making the API call, and updating the node
  */
-async function configureTriggerAndUpdateNode(
+async function _configureTriggerAndUpdateNode(
 	client: {
 		configureTrigger: (options: {
 			trigger: FlowTrigger;
