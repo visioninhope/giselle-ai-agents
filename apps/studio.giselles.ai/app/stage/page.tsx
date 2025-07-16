@@ -126,19 +126,6 @@ export default async function StagePage() {
 				What are we perform next ?
 			</div>
 			<Form teamOptions={teamOptions} flowTriggers={flowTriggers} />
-			<div className="max-w-[800px] mx-auto">
-				<div className="relative">
-					<textarea
-						className="w-full h-40 border border-border bg-editor-background rounded-[4px] p-4 text-[14px] text-text resize-none outline-none"
-						placeholder="Describe a task"
-					/>
-					<div className="absolute bottom-2 right-2">
-						<Button variant="solid" size="large">
-							Start
-						</Button>
-					</div>
-				</div>
-			</div>
 			<div className="max-w-[900px] mx-auto space-y-2">
 				<div className="flex items-center justify-between px-1">
 					<h2 className="text-[16px] font-sans text-white-100">Tasks</h2>
