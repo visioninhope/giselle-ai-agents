@@ -1,10 +1,5 @@
 import type { FlowTriggerId, WorkspaceId } from "@giselle-sdk/data-type";
-import type {
-	FlowId,
-	GitHubEventNodeMapping,
-	GitHubIntegrationSettingId,
-	GitHubRepositoryIndexId,
-} from "@giselles-ai/types";
+import type { GitHubRepositoryIndexId } from "@giselles-ai/types";
 import { relations } from "drizzle-orm";
 import {
 	boolean,
@@ -22,10 +17,6 @@ import {
 } from "drizzle-orm/pg-core";
 import type { Stripe } from "stripe";
 import type { AgentId } from "@/services/agents/types";
-import type {
-	GitHubNextAction,
-	GitHubTriggerEvent,
-} from "@/services/external/github/types";
 import type { TeamId } from "@/services/teams/types";
 
 export const subscriptions = pgTable("subscriptions", {
@@ -150,22 +141,21 @@ export const oauthCredentials = pgTable(
 	],
 );
 
+/** @deprecated */
 export const githubIntegrationSettings = pgTable(
 	"github_integration_settings",
 	{
-		id: text("id").$type<GitHubIntegrationSettingId>().notNull().unique(),
+		id: text("id").notNull().unique(),
 		agentDbId: integer("agent_db_id")
 			.notNull()
 			.references(() => agents.dbId),
 		dbId: serial("db_id").primaryKey(),
 		repositoryFullName: text("repository_full_name").notNull(),
 		callSign: text("call_sign").notNull(),
-		event: text("event").$type<GitHubTriggerEvent>().notNull(),
-		flowId: text("flow_id").$type<FlowId>().notNull(),
-		eventNodeMappings: jsonb("event_node_mappings")
-			.$type<GitHubEventNodeMapping[]>()
-			.notNull(),
-		nextAction: text("next_action").$type<GitHubNextAction>().notNull(),
+		event: text("event").notNull(),
+		flowId: text("flow_id").notNull(),
+		eventNodeMappings: jsonb("event_node_mappings").notNull(),
+		nextAction: text("next_action").notNull(),
 	},
 );
 
