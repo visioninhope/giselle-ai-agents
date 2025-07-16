@@ -8,8 +8,10 @@ import {
 	TableHeader,
 	TableRow,
 } from "@giselle-internal/ui/table";
+import type { InferSelectModel } from "drizzle-orm";
 import { Mic } from "lucide-react";
 import { notFound } from "next/navigation";
+import { db, type flowTriggers as flowTriggersSchema } from "@/drizzle";
 import { stageFlag } from "@/flags";
 import { fetchUserTeams } from "@/services/teams";
 
@@ -76,6 +78,7 @@ export default async function StagePage() {
 	}
 	const teams = await fetchUserTeams();
 	const teamOptions = teams.map((team) => ({ id: team.id, label: team.name }));
+	let flowTriggers: Array<InferSelectModel<typeof flowTriggersSchema>> = [];
 	return (
 		<div className="p-[24px] space-y-6">
 			<div className="text-center text-[24px] font-sans text-white-100">
@@ -88,11 +91,27 @@ export default async function StagePage() {
 					options={teamOptions}
 					renderOption={(o) => o.label}
 					widthClassName="w-[150px]"
+					onValueChange={async (value) => {
+						"use server";
+						const team = await db.query.teams.findFirst({
+							where: (teams, { eq }) => eq(teams.id, value),
+						});
+						if (team === undefined) {
+							throw new Error("Team not found");
+						}
+						flowTriggers = await db.query.flowTriggers.findMany({
+							where: (flowTriggers, { eq }) =>
+								eq(flowTriggers.teamDbId, team.dbId),
+						});
+					}}
 				/>
 				<Select
 					id="flow"
 					placeholder="Select flow"
-					options={flowOptions}
+					options={flowTriggers.map((flowTrigger) => ({
+						id: flowTrigger.sdkFlowTriggerId,
+						label: flowTrigger.sdkFlowTriggerId,
+					}))}
 					renderOption={(o) => o.label}
 					widthClassName="w-[120px]"
 				/>
