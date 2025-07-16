@@ -2,16 +2,18 @@
 Keep every implementation as small and obvious as possible.
 - Prefer the simplest data structures and APIs that work.
 - Avoid needless abstractions; refactor only when duplication hurts.
-- Remove dead code early — `pnpm prune` scans the repo for unused files/deps and lets you delete them in one command.
+- Remove dead code early — `pnpm tidy` scans the repo for unused files/deps and lets you delete them in one command.
 - Before adding a dependency, ask, “Can we do this with what we already have?”
 
 # Workflow
-After every code change, run:
+**MANDATORY**: After every code change, you MUST immediately run these commands in order:
 
-- `pnpm format`
-- `pnpm prune`
-- `pnpm check-types`
-- `pnpm test`
+1. `pnpm format`
+2. `pnpm tidy`
+3. `pnpm check-types`
+4. `pnpm test`
+
+**DO NOT consider any code change complete until all four commands pass successfully.**
 
 (CI also runs these steps; your PR will fail if any step fails.)
 
