@@ -1,49 +1,72 @@
 import { graphql } from "../../graphql";
 
-export const GetPullRequestInfoQuery = graphql(`
-	query GetPullRequestInfo(
+export const GetPullRequestsMetadataQuery = graphql(`
+	query GetPullRequestsMetadata(
+		$owner: String!
+		$repo: String!
+		$first: Int!
+		$after: String
+	) {
+		repository(owner: $owner, name: $repo) {
+			pullRequests(
+				states: MERGED
+				first: $first
+				after: $after
+				orderBy: { field: CREATED_AT, direction: DESC }
+			) {
+				nodes {
+					number
+					mergedAt
+					comments(last: 100) {
+						nodes {
+							id
+							author {
+								__typename
+							}
+						}
+					}
+					files(first: 100) {
+						nodes {
+							path
+						}
+					}
+				}
+				pageInfo {
+					hasNextPage
+					endCursor
+				}
+			}
+		}
+	}
+`);
+
+export const GetPullRequestDetailsQuery = graphql(`
+	query GetPullRequestDetails(
 		$owner: String!
 		$repo: String!
 		$number: Int!
-		$commentLimit: Int = 100
 	) {
 		repository(owner: $owner, name: $repo) {
 			pullRequest(number: $number) {
 				title
 				body
-				merged
-				mergedAt
-				comments(last: $commentLimit) {
+				comments(last: 100) {
 					nodes {
 						id
 						body
 						author {
 							__typename
-							... on Bot {
-								login
-							}
-							... on User {
-								login
-							}
 						}
-					}
-					pageInfo {
-						hasPreviousPage
-						startCursor
 					}
 				}
 				headCommit: commits(last: 1) {
 					nodes {
 						commit {
-							oid
 							tree {
 								entries {
 									path
 									isGenerated
 									extension
-									language {
-										name
-									}
 									lineCount
 									object {
 										... on Blob {

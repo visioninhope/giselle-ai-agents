@@ -1,4 +1,8 @@
-import type { Document, DocumentLoader } from "@giselle-sdk/rag";
+import {
+	type Document,
+	type DocumentLoader,
+	DocumentLoaderError,
+} from "@giselle-sdk/rag";
 import type { Octokit } from "@octokit/core";
 import type { Client } from "urql";
 import { graphql } from "../../client";
@@ -6,21 +10,22 @@ import type { GitHubAuthConfig } from "../../types";
 import {
 	createCacheKey,
 	diffsCache,
-	type PullRequestInfo,
-	pullRequestCache,
+	type PullRequestDetails,
+	prDetailsCache,
 } from "./cache";
 import {
 	type DiffFetchContext,
 	type FetchContext,
-	fetchAllPullRequests,
 	fetchDiffs,
-	fetchPullRequestInfo,
-	type PullRequestListContext,
+	fetchPullRequestDetails,
+	fetchPullRequestsMetadata,
 } from "./fetchers";
 import type {
 	GitHubPullRequestMetadata,
 	GitHubPullRequestsLoaderConfig,
 } from "./types";
+
+const GRAPHQL_BATCH_SIZE = 50; // GitHub GraphQL API optimal batch size
 
 export function createGitHubPullRequestsLoader(
 	octokit: Octokit,
@@ -44,25 +49,22 @@ export function createGitHubPullRequestsLoader(
 		return graphqlClient;
 	}
 
-	function getPullRequestInfo(prNumber: number): Promise<PullRequestInfo> {
-		const cacheKey = createCacheKey(owner, repo, prNumber);
-
-		const existingPromise = pullRequestCache.get(cacheKey);
-		if (existingPromise) {
-			return existingPromise;
+	function getPullRequestDetails(
+		prNumber: number,
+	): Promise<PullRequestDetails> {
+		const cached = prDetailsCache.get(prNumber);
+		if (cached) {
+			return cached;
 		}
 
-		const promise = getGraphQLClient().then((client) => {
+		const promise = (async () => {
+			const client = await getGraphQLClient();
 			const ctx: FetchContext = { client, owner, repo };
-			return fetchPullRequestInfo(ctx, prNumber);
-		});
+			return fetchPullRequestDetails(ctx, prNumber);
+		})();
 
-		pullRequestCache.set(cacheKey, promise);
-
-		promise.catch(() => {
-			pullRequestCache.delete(cacheKey);
-		});
-
+		prDetailsCache.set(prNumber, promise);
+		promise.catch(() => prDetailsCache.delete(prNumber));
 		return promise;
 	}
 
@@ -74,89 +76,69 @@ export function createGitHubPullRequestsLoader(
 			return existingPromise;
 		}
 
-		const promise = Promise.resolve().then(() => {
+		const promise = (() => {
 			const ctx: DiffFetchContext = { octokit, owner, repo };
 			return fetchDiffs(ctx, prNumber);
-		});
+		})();
 
 		diffsCache.set(cacheKey, promise);
-
 		promise.catch(() => {
 			diffsCache.delete(cacheKey);
 		});
-
 		return promise;
 	}
 
 	const loadMetadata =
 		async function* (): AsyncIterable<GitHubPullRequestMetadata> {
-			// Fetch closed pull requests (to get merged ones)
-			const ctx: PullRequestListContext = { octokit, owner, repo };
-			const pullRequests = await fetchAllPullRequests(ctx, {
-				state: "closed",
-				sort: "created",
-				direction: "desc",
-				perPage,
-				maxPages,
-			});
+			const client = await getGraphQLClient();
+			const ctx: FetchContext = { client, owner, repo };
+			let cursor: string | null = null;
+			let pageCount = 0;
 
-			for (const pr of pullRequests) {
-				try {
-					const prInfo = await getPullRequestInfo(pr.number);
+			while (pageCount < maxPages) {
+				const result = await fetchPullRequestsMetadata(ctx, {
+					first: Math.min(perPage, GRAPHQL_BATCH_SIZE),
+					after: cursor,
+				});
 
-					if (!prInfo.merged || !prInfo.mergedAt) {
-						continue;
-					}
+				for (const pr of result.pullRequests) {
+					if (!pr.mergedAt) continue;
 
-					// Title + Body document
 					yield {
 						owner,
 						repo,
 						pr_number: pr.number,
 						content_type: "title_body",
 						content_id: "title_body",
-						merged_at: prInfo.mergedAt,
+						merged_at: pr.mergedAt,
 					};
 
-					// Comments documents
-					for (const comment of prInfo.comments) {
-						if (comment.authorType === "Bot") {
-							continue;
-						}
-
-						if (comment.body.length > maxContentLength) {
-							continue;
-						}
-
+					for (const commentId of pr.commentIds) {
 						yield {
 							owner,
 							repo,
 							pr_number: pr.number,
 							content_type: "comment",
-							content_id: comment.id,
-							merged_at: prInfo.mergedAt,
+							content_id: commentId,
+							merged_at: pr.mergedAt,
 						};
 					}
 
-					// File diffs documents
-					for (const [filepath, fileInfo] of prInfo.files) {
-						// Skip if file is generated or definitely binary
-						if (fileInfo.isGenerated || fileInfo.isBinary === true) {
-							continue;
-						}
-
+					for (const filepath of pr.filePaths) {
 						yield {
 							owner,
 							repo,
 							pr_number: pr.number,
 							content_type: "diff",
 							content_id: filepath,
-							merged_at: prInfo.mergedAt,
+							merged_at: pr.mergedAt,
 						};
 					}
-				} catch (error) {
-					console.error(`Failed to process PR #${pr.number}:`, error);
 				}
+
+				if (!result.pageInfo.hasNextPage) break;
+				cursor = result.pageInfo.endCursor;
+				pageCount++;
 			}
 		};
 
@@ -168,40 +150,39 @@ export function createGitHubPullRequestsLoader(
 		try {
 			switch (content_type) {
 				case "title_body": {
-					const prInfo = await getPullRequestInfo(pr_number);
-					const content = `${prInfo.title}\n\n${prInfo.body || ""}`;
-
+					const details = await getPullRequestDetails(pr_number);
 					return {
-						content,
-						metadata: {
-							...metadata,
-							merged_at: prInfo.mergedAt || metadata.merged_at,
-						},
+						content: `${details.title}\n\n${details.body || ""}`,
+						metadata,
 					};
 				}
 
 				case "comment": {
-					const prInfo = await getPullRequestInfo(pr_number);
-					const comment = prInfo.comments.find((c) => c.id === content_id);
+					const details = await getPullRequestDetails(pr_number);
+					const comment = details.comments.find((c) => c.id === content_id);
 
-					if (!comment) {
+					if (
+						!comment ||
+						comment.authorType === "Bot" ||
+						comment.body.length > maxContentLength
+					) {
 						return null;
 					}
 
 					return {
 						content: comment.body,
-						metadata: {
-							...metadata,
-							merged_at: prInfo.mergedAt || metadata.merged_at,
-						},
+						metadata,
 					};
 				}
 
 				case "diff": {
-					// Get PR info for merged_at metadata
-					const prInfo = await getPullRequestInfo(pr_number);
+					const details = await getPullRequestDetails(pr_number);
+					const fileMetadata = details.files.get(content_id);
 
-					// Get the actual diff content
+					if (fileMetadata?.isGenerated || fileMetadata?.isBinary === true) {
+						return null;
+					}
+
 					const diffs = await getDiffs(pr_number);
 					const diff = diffs.get(content_id);
 
@@ -209,14 +190,9 @@ export function createGitHubPullRequestsLoader(
 						return null;
 					}
 
-					const content = `File: ${content_id}\n\n${diff}`;
-
 					return {
-						content,
-						metadata: {
-							...metadata,
-							merged_at: prInfo.mergedAt || metadata.merged_at,
-						},
+						content: `File: ${content_id}\n\n${diff}`,
+						metadata,
 					};
 				}
 
@@ -224,8 +200,40 @@ export function createGitHubPullRequestsLoader(
 					return null;
 			}
 		} catch (error) {
-			console.error(`Failed to load document for metadata:`, metadata, error);
-			return null;
+			console.error(`Failed to load document for PR #${pr_number}:`, error);
+
+			if (error instanceof Error) {
+				// If the error is already a DocumentLoaderError, re-throw it
+				if (error instanceof DocumentLoaderError) {
+					throw error;
+				}
+
+				throw DocumentLoaderError.fetchError(
+					"github",
+					`loading ${content_type} for PR ${owner}/${repo}#${pr_number}`,
+					error,
+					{
+						owner,
+						repo,
+						pr_number,
+						content_type,
+						content_id,
+					},
+				);
+			}
+
+			throw DocumentLoaderError.fetchError(
+				"github",
+				`loading ${content_type} for PR ${owner}/${repo}#${pr_number}`,
+				new Error(String(error)),
+				{
+					owner,
+					repo,
+					pr_number,
+					content_type,
+					content_id,
+				},
+			);
 		}
 	};
 

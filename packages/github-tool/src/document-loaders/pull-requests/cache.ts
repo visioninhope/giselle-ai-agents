@@ -13,18 +13,16 @@ export type FileMetadata = {
 	lineCount: number | null;
 };
 
-export type PullRequestInfo = {
+export type PullRequestDetails = {
 	title: string;
 	body: string | null;
-	merged: boolean;
-	mergedAt: string | null;
-	files: Map<string, FileMetadata>;
 	comments: Comment[];
+	files: Map<string, FileMetadata>;
 };
 
 export type CacheKey = `${string}/${string}/${number}`;
 
-export const pullRequestCache = new Map<CacheKey, Promise<PullRequestInfo>>();
+export const prDetailsCache = new Map<number, Promise<PullRequestDetails>>();
 export const diffsCache = new Map<CacheKey, Promise<Map<string, string>>>();
 
 export function createCacheKey(

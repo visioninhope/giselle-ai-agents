@@ -2,8 +2,11 @@ import { DocumentLoaderError } from "@giselle-sdk/rag";
 import type { Octokit } from "@octokit/core";
 import { RequestError } from "@octokit/request-error";
 import type { Client } from "urql";
-import type { Comment, FileMetadata, PullRequestInfo } from "./cache";
-import { GetPullRequestInfoQuery } from "./queries";
+import type { Comment, FileMetadata, PullRequestDetails } from "./cache";
+import {
+	GetPullRequestDetailsQuery,
+	GetPullRequestsMetadataQuery,
+} from "./queries";
 
 export type PullRequestListItem = {
 	number: number;
@@ -14,79 +17,6 @@ export type FetchContext = {
 	owner: string;
 	repo: string;
 };
-
-export async function fetchPullRequestInfo(
-	ctx: FetchContext,
-	prNumber: number,
-): Promise<PullRequestInfo> {
-	const result = await ctx.client.query(GetPullRequestInfoQuery, {
-		owner: ctx.owner,
-		repo: ctx.repo,
-		number: prNumber,
-		commentLimit: 100, // GitHub GraphQL API maximum
-	});
-
-	if (result.error) {
-		throw new Error(`GraphQL error: ${result.error.message}`);
-	}
-	const pr = result.data?.repository?.pullRequest;
-	if (!pr) {
-		throw new Error(`Pull request #${prNumber} not found`);
-	}
-
-	// Extract file metadata
-	const files = new Map<string, FileMetadata>();
-	const headCommit = pr.headCommit.nodes?.[0]?.commit;
-	if (headCommit?.tree) {
-		const entries = headCommit.tree.entries || [];
-		for (const entry of entries) {
-			if (entry.object?.__typename === "Blob" && entry.path) {
-				const blob = entry.object;
-				files.set(entry.path, {
-					isGenerated: entry.isGenerated,
-					isBinary: blob.isBinary,
-					byteSize: blob.byteSize,
-					extension: entry.extension,
-					language: entry.language?.name ?? null,
-					lineCount: entry.lineCount,
-				});
-			}
-		}
-	}
-
-	// Extract comments
-	// Using 'last: 100' to get the most recent comments (newest first).
-	// If hasPreviousPage is true, older comments will be missed.
-	// This is acceptable for vector search where recent comments are typically
-	// more relevant than older ones.
-	if (pr.comments.pageInfo.hasPreviousPage) {
-		console.warn(
-			`Pull request ${ctx.owner}/${ctx.repo}/pull/${prNumber} has more than 100 comments.`,
-		);
-	}
-
-	const comments: Comment[] = [];
-	const commentNodes = pr.comments.nodes || [];
-	for (const comment of commentNodes) {
-		if (comment == null) {
-			continue;
-		}
-		comments.push({
-			id: comment.id,
-			body: comment.body,
-			authorType: comment.author?.__typename || "Unknown",
-		});
-	}
-
-	return {
-		title: pr.title,
-		body: pr.body,
-		merged: pr.merged,
-		mergedAt: pr.mergedAt,
-		files,
-		comments,
-	};
-}
 
 export type DiffFetchContext = {
 	octokit: Octokit;
@@ -129,64 +59,10 @@ export async function fetchDiffs(
 	return fileDiffs;
 }
 
-export type PullRequestListContext = {
-	octokit: Octokit;
-	owner: string;
-	repo: string;
-};
-
-export async function fetchAllPullRequests(
-	ctx: PullRequestListContext,
-	options: {
-		state: "open" | "closed" | "all";
-		sort: "created" | "updated" | "popularity" | "long-running";
-		direction: "asc" | "desc";
-		perPage: number;
-		maxPages: number;
-	},
-): Promise<PullRequestListItem[]> {
-	const pullRequests: PullRequestListItem[] = [];
-	let page = 1;
-
-	while (page <= options.maxPages) {
-		const { data } = await executeRestRequest(
-			() =>
-				ctx.octokit.request("GET /repos/{owner}/{repo}/pulls", {
-					owner: ctx.owner,
-					repo: ctx.repo,
-					state: options.state,
-					sort: options.sort,
-					direction: options.direction,
-					per_page: options.perPage,
-					page,
-				}),
-			"Pull Requests",
-			`${ctx.owner}/${ctx.repo}/pulls`,
-		);
-
-		if (data.length === 0) {
-			break;
-		}
-
-		// Extract only essential fields for lightweight metadata
-		pullRequests.push(
-			...data.map((pr) => ({
-				number: pr.number,
-			})),
-		);
-
-		if (data.length < options.perPage) {
-			break;
-		}
-
-		page++;
-	}
-
-	return pullRequests;
-}
-
 /**
  * Execute a GitHub REST API request with retry logic and error handling
+ *
+ * TODO: Other document loaders will use this, so we should move it to a shared location
  */
 async function executeRestRequest<T>(
 	operation: () => Promise<T>,
@@ -268,4 +144,129 @@ async function executeRestRequest<T>(
 		// Re-throw any other errors
 		throw error;
 	}
+}
+
+export async function fetchPullRequestsMetadata(
+	ctx: FetchContext,
+	options: {
+		first: number;
+		after?: string | null;
+	},
+): Promise<{
+	pullRequests: Array<{
+		number: number;
+		mergedAt: string | null;
+		commentIds: string[];
+		filePaths: string[];
+	}>;
+	pageInfo: {
+		hasNextPage: boolean;
+		endCursor: string | null;
+	};
+}> {
+	const result = await ctx.client.query(GetPullRequestsMetadataQuery, {
+		owner: ctx.owner,
+		repo: ctx.repo,
+		first: options.first,
+		after: options.after,
+	});
+
+	if (result.error) {
+		throw new Error(`GraphQL error: ${result.error.message}`);
+	}
+
+	const pullRequests = result.data?.repository?.pullRequests;
+	if (!pullRequests) {
+		throw new Error("Failed to fetch pull requests");
+	}
+
+	const prs =
+		pullRequests.nodes
+			?.map((pr) => {
+				if (!pr) return null;
+
+				const commentIds =
+					pr.comments.nodes
+						?.filter((c) => c && c.author?.__typename !== "Bot")
+						.map((c) => c?.id)
+						.filter((id): id is string => !!id) || [];
+
+				const filePaths =
+					pr.files?.nodes
+						?.map((f) => f?.path)
+						.filter((path): path is string => !!path) || [];
+
+				return {
+					number: pr.number,
+					mergedAt: pr.mergedAt,
+					commentIds,
+					filePaths,
+				};
+			})
+			.filter((pr): pr is NonNullable<typeof pr> => pr !== null) || [];
+
+	return {
+		pullRequests: prs,
+		pageInfo: {
+			hasNextPage: pullRequests.pageInfo.hasNextPage,
+			endCursor: pullRequests.pageInfo.endCursor,
+		},
+	};
+}
+
+export async function fetchPullRequestDetails(
+	ctx: FetchContext,
+	prNumber: number,
+): Promise<PullRequestDetails> {
+	const result = await ctx.client.query(GetPullRequestDetailsQuery, {
+		owner: ctx.owner,
+		repo: ctx.repo,
+		number: prNumber,
+	});
+
+	if (result.error) {
+		throw new Error(`GraphQL error: ${result.error.message}`);
+	}
+
+	const pr = result.data?.repository?.pullRequest;
+	if (!pr) {
+		throw new Error(`Pull request #${prNumber} not found`);
+	}
+
+	// Extract comments
+	const comments: Comment[] = [];
+	for (const comment of pr.comments.nodes || []) {
+		if (comment) {
+			comments.push({
+				id: comment.id,
+				body: comment.body,
+				authorType: comment.author?.__typename || "Unknown",
+			});
+		}
+	}
+
+	// Extract file metadata
+	const files = new Map<string, FileMetadata>();
+	const headCommit = pr.headCommit.nodes?.[0]?.commit;
+	if (headCommit?.tree) {
+		for (const entry of headCommit.tree.entries || []) {
+			if (entry.object?.__typename === "Blob" && entry.path) {
+				files.set(entry.path, {
+					isGenerated: entry.isGenerated,
+					isBinary: entry.object.isBinary,
+					byteSize: entry.object.byteSize,
+					extension: entry.extension,
+					language: null,
+					lineCount: entry.lineCount,
+				});
+			}
+		}
+	}
+
+	return {
+		title: pr.title,
+		body: pr.body,
+		comments,
+		files,
+	};
 }
