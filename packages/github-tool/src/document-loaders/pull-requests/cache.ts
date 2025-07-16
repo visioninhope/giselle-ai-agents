@@ -6,11 +6,11 @@ export type Comment = {
 
 export type FileMetadata = {
 	isGenerated: boolean;
-	isBinary: boolean;
-	byteSize?: number;
-	extension?: string;
-	language?: string;
-	lineCount?: number;
+	isBinary: boolean | null;
+	byteSize: number;
+	extension: string | null;
+	language: string | null;
+	lineCount: number | null;
 };
 
 export type PullRequestInfo = {

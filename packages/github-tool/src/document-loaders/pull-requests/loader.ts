@@ -1,27 +1,26 @@
 import type { Document, DocumentLoader } from "@giselle-sdk/rag";
-import { DocumentLoaderError } from "@giselle-sdk/rag";
 import type { Octokit } from "@octokit/core";
-import { RequestError } from "@octokit/request-error";
 import type { Client } from "urql";
 import { graphql } from "../../client";
 import type { GitHubAuthConfig } from "../../types";
 import {
-	type Comment,
 	createCacheKey,
 	diffsCache,
-	type FileMetadata,
 	type PullRequestInfo,
 	pullRequestCache,
 } from "./cache";
-import { GetPullRequestInfoQuery } from "./queries";
+import {
+	type DiffFetchContext,
+	type FetchContext,
+	fetchAllPullRequests,
+	fetchDiffs,
+	fetchPullRequestInfo,
+	type PullRequestListContext,
+} from "./fetchers";
 import type {
 	GitHubPullRequestMetadata,
 	GitHubPullRequestsLoaderConfig,
 } from "./types";
-
-type PullRequestListItem = {
-	number: number;
-};
 
 export function createGitHubPullRequestsLoader(
 	octokit: Octokit,
@@ -45,72 +44,6 @@ export function createGitHubPullRequestsLoader(
 		return graphqlClient;
 	}
 
-	async function fetchPullRequestInfo(
-		prNumber: number,
-	): Promise<PullRequestInfo> {
-		const client = await getGraphQLClient();
-		const result = await client.query(GetPullRequestInfoQuery, {
-			owner,
-			repo,
-			number: prNumber,
-			commentLimit: 100, // GitHub GraphQL API maximum
-		});
-
-		if (result.error) {
-			throw new Error(`GraphQL error: ${result.error.message}`);
-		}
-
-		const pr = result.data?.repository?.pullRequest;
-		if (!pr) {
-			throw new Error(`Pull request #${prNumber} not found`);
-		}
-
-		// Extract file metadata
-		const files = new Map<string, FileMetadata>();
-		const headCommit = pr.headCommit.nodes?.[0]?.commit;
-		const entries = headCommit?.tree?.entries || [];
-		for (const entry of entries) {
-			const blob = entry.object?.__typename === "Blob" ? entry.object : null;
-			// Only include Blob entries (actual files, not directories or submodules)
-			if (blob) {
-				files.set(entry.path || "", {
-					isGenerated: entry.isGenerated,
-					isBinary: blob.isBinary ?? false,
-					byteSize: blob.byteSize,
-					extension: entry.extension ?? undefined,
-					language: entry.language?.name ?? undefined,
-					lineCount: entry.lineCount ?? undefined,
-				});
-			}
-		}
-
-		// Extract comments
-		// Note: Using 'last: 100' to get the most recent comments (newest first).
-		// If hasPreviousPage is true, older comments will be missed.
-		// This is acceptable for vector search where recent comments are typically
-		// more relevant than older ones.
-		const comments: Comment[] = [];
-		const commentNodes = pr.comments?.nodes || [];
-		for (const comment of commentNodes) {
-			if (comment?.body) {
-				comments.push({
-					id: comment.id,
-					body: comment.body,
-					authorType: comment.author?.__typename || "Unknown",
-				});
-			}
-		}
-
-		return {
-			title: pr.title,
-			body: pr.body,
-			merged: pr.merged,
-			mergedAt: pr.mergedAt,
-			files,
-			comments,
-		};
-	}
-
 	function getPullRequestInfo(prNumber: number): Promise<PullRequestInfo> {
 		const cacheKey = createCacheKey(owner, repo, prNumber);
 
@@ -119,8 +52,9 @@ export function createGitHubPullRequestsLoader(
 			return existingPromise;
 		}
 
-		const promise = new Promise<PullRequestInfo>((resolve, reject) => {
-			fetchPullRequestInfo(prNumber).then(resolve).catch(reject);
+		const promise = getGraphQLClient().then((client) => {
+			const ctx: FetchContext = { client, owner, repo };
+			return fetchPullRequestInfo(ctx, prNumber);
 		});
 
 		pullRequestCache.set(cacheKey, promise);
@@ -132,35 +66,6 @@ export function createGitHubPullRequestsLoader(
 		return promise;
 	}
 
-	async function fetchDiffs(prNumber: number): Promise<Map<string, string>> {
-		const response = await octokit.request(
-			"GET /repos/{owner}/{repo}/pulls/{pull_number}",
-			{
-				owner,
-				repo,
-				pull_number: prNumber,
-				headers: {
-					accept: "application/vnd.github.v3.diff",
-				},
-			},
-		);
-
-		const diffText = response.data as unknown as string;
-		const fileDiffs = new Map<string, string>();
-
-		const fileChunks = diffText.split(/^diff --git /m).slice(1);
-
-		for (const chunk of fileChunks) {
-			const filenameMatch = chunk.match(/^a\/(.+?) b\//);
-			if (!filenameMatch) continue;
-
-			const filename = filenameMatch[1];
-			fileDiffs.set(filename, `diff --git ${chunk}`);
-		}
-
-		return fileDiffs;
-	}
-
 	function getDiffs(prNumber: number): Promise<Map<string, string>> {
 		const cacheKey = createCacheKey(owner, repo, prNumber);
 
@@ -169,8 +74,9 @@ export function createGitHubPullRequestsLoader(
 			return existingPromise;
 		}
 
-		const promise = new Promise<Map<string, string>>((resolve, reject) => {
-			fetchDiffs(prNumber).then(resolve).catch(reject);
+		const promise = Promise.resolve().then(() => {
+			const ctx: DiffFetchContext = { octokit, owner, repo };
+			return fetchDiffs(ctx, prNumber);
 		});
 
 		diffsCache.set(cacheKey, promise);
@@ -185,7 +91,8 @@ export function createGitHubPullRequestsLoader(
 	const loadMetadata =
 		async function* (): AsyncIterable<GitHubPullRequestMetadata> {
 			// Fetch closed pull requests (to get merged ones)
-			const pullRequests = await fetchAllPullRequests(octokit, owner, repo, {
+			const ctx: PullRequestListContext = { octokit, owner, repo };
+			const pullRequests = await fetchAllPullRequests(ctx, {
 				state: "closed",
 				sort: "created",
 				direction: "desc",
@@ -233,8 +140,8 @@ export function createGitHubPullRequestsLoader(
 
 					// File diffs documents
 					for (const [filepath, fileInfo] of prInfo.files) {
-						// Skip if file is generated or binary
-						if (fileInfo.isGenerated || fileInfo.isBinary) {
+						// Skip if file is generated or definitely binary
+						if (fileInfo.isGenerated || fileInfo.isBinary === true) {
 							continue;
 						}
 
@@ -323,142 +230,4 @@ export function createGitHubPullRequestsLoader(
 	};
 
 	return { loadMetadata, loadDocument };
-}
-
-/**
- * Execute an Octokit request with retry logic for 5xx errors
- */
-async function executeWithRetry<T>(
-	operation: () => Promise<T>,
-	resourceType: string,
-	resourcePath: string,
-	currentAttempt = 0,
-	maxAttempt = 3,
-): Promise<T> {
-	try {
-		return await operation();
-	} catch (error) {
-		if (error instanceof RequestError) {
-			// Handle 5xx errors with retry
-			if (error.status && error.status >= 500) {
-				if (currentAttempt >= maxAttempt) {
-					throw DocumentLoaderError.fetchError(
-						"github",
-						`fetching ${resourceType}`,
-						error,
-						{
-							statusCode: error.status,
-							resourceType,
-							resourcePath,
-							retryAttempts: currentAttempt,
-							maxAttempts: maxAttempt,
-						},
-					);
-				}
-				await new Promise((resolve) =>
-					setTimeout(resolve, 2 ** currentAttempt * 1000),
-				);
-				return executeWithRetry(
-					operation,
-					resourceType,
-					resourcePath,
-					currentAttempt + 1,
-					maxAttempt,
-				);
-			}
-
-			// Handle 404 errors
-			if (error.status === 404) {
-				throw DocumentLoaderError.notFound(resourcePath, error, {
-					source: "github",
-					resourceType,
-					statusCode: 404,
-				});
-			}
-
-			// Handle rate limit errors (403, 429)
-			if (error.status === 403 || error.status === 429) {
-				throw DocumentLoaderError.rateLimited(
-					"github",
-					error.response?.headers?.["retry-after"],
-					error,
-					{
-						statusCode: error.status,
-						resourceType,
-						resourcePath,
-					},
-				);
-			}
-
-			// Other 4xx errors
-			if (error.status && error.status >= 400 && error.status < 500) {
-				throw DocumentLoaderError.fetchError(
-					"github",
-					`fetching ${resourceType}`,
-					error,
-					{
-						statusCode: error.status,
-						resourceType,
-						resourcePath,
-						errorMessage: error.message,
-					},
-				);
-			}
-		}
-		// Re-throw any other errors
-		throw error;
-	}
-}
-
-// API fetch functions
-async function fetchAllPullRequests(
-	octokit: Octokit,
-	owner: string,
-	repo: string,
-	options: {
-		state: "open" | "closed" | "all";
-		sort: "created" | "updated" | "popularity" | "long-running";
-		direction: "asc" | "desc";
-		perPage: number;
-		maxPages: number;
-	},
-): Promise<PullRequestListItem[]> {
-	const pullRequests: PullRequestListItem[] = [];
-	let page = 1;
-
-	while (page <= options.maxPages) {
-		const { data } = await executeWithRetry(
-			() =>
-				octokit.request("GET /repos/{owner}/{repo}/pulls", {
-					owner,
-					repo,
-					state: options.state,
-					sort: options.sort,
-					direction: options.direction,
-					per_page: options.perPage,
-					page,
-				}),
-			"Pull Requests",
-			`${owner}/${repo}/pulls`,
-		);
-
-		if (data.length === 0) {
-			break;
-		}
-
-		// Extract only essential fields for lightweight metadata
-		pullRequests.push(
-			...data.map((pr) => ({
-				number: pr.number,
-			})),
-		);
-
-		if (data.length < options.perPage) {
-			break;
-		}
-
-		page++;
-	}
-
-	return pullRequests;
 }
