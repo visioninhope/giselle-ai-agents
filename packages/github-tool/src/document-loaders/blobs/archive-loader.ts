@@ -5,6 +5,7 @@ import { join, normalize } from "node:path";
 import type { Document, DocumentLoader } from "@giselle-sdk/rag";
 import type { Octokit } from "@octokit/core";
 import { extract } from "tar";
+import { executeRestRequest } from "../utils";
 
 export type GitHubBlobMetadata = {
 	owner: string;
@@ -45,14 +46,16 @@ export function createGitHubArchiveLoader(
 		if (!prepared) {
 			prepared = (async () => {
 				await fs.mkdir(extractDir, { recursive: true });
-				const { data } = await octokit.request(
-					"GET /repos/{owner}/{repo}/tarball/{ref}",
-					{
-						owner,
-						repo,
-						ref: commitSha,
-						request: { redirect: "follow" },
-					},
+				const { data } = await executeRestRequest(
+					() =>
+						octokit.request("GET /repos/{owner}/{repo}/tarball/{ref}", {
+							owner,
+							repo,
+							ref: commitSha,
+							request: { redirect: "follow" },
+						}),
+					"Repository Tarball",
+					`${owner}/${repo}/tarball/${commitSha}`,
 				);
 				const buffer = Buffer.isBuffer(data)
 					? data
