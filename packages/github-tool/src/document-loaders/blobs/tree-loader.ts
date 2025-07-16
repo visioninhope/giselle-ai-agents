@@ -1,7 +1,7 @@
 import type { Document, DocumentLoader } from "@giselle-sdk/rag";
 import { DocumentLoaderError } from "@giselle-sdk/rag";
 import type { Octokit } from "@octokit/core";
-import { RequestError } from "@octokit/request-error";
+import { executeRestRequest } from "../utils";
 
 type GitHubBlobMetadata = {
 	owner: string;
@@ -74,91 +74,6 @@ export function createGitHubTreeLoader(
 	return { loadMetadata, loadDocument };
 }
 
-/**
- * Execute an Octokit request with retry logic for 5xx errors
- */
-async function executeWithRetry<T>(
-	operation: () => Promise<T>,
-	resourceType: string,
-	resourcePath: string,
-	currentAttempt = 0,
-	maxAttempt = 3,
-): Promise<T> {
-	try {
-		return await operation();
-	} catch (error) {
-		if (error instanceof RequestError) {
-			// Handle 5xx errors with retry
-			if (error.status && error.status >= 500) {
-				if (currentAttempt >= maxAttempt) {
-					throw DocumentLoaderError.fetchError(
-						"github",
-						`fetching ${resourceType}`,
-						error,
-						{
-							statusCode: error.status,
-							resourceType,
-							resourcePath,
-							retryAttempts: currentAttempt,
-							maxAttempts: maxAttempt,
-						},
-					);
-				}
-				await new Promise((resolve) =>
-					setTimeout(resolve, 2 ** currentAttempt * 1000),
-				);
-				return executeWithRetry(
-					operation,
-					resourceType,
-					resourcePath,
-					currentAttempt + 1,
-					maxAttempt,
-				);
-			}
-
-			// Handle 404 errors with helpful message
-			if (error.status === 404) {
-				throw DocumentLoaderError.notFound(resourcePath, error, {
-					source: "github",
-					resourceType,
-					statusCode: 404,
-				});
-			}
-
-			// Handle rate limit errors (403, 429)
-			if (error.status === 403 || error.status === 429) {
-				throw DocumentLoaderError.rateLimited(
-					"github",
-					error.response?.headers?.["retry-after"],
-					error,
-					{
-						statusCode: error.status,
-						resourceType,
-						resourcePath,
-					},
-				);
-			}
-
-			// Other 4xx errors
-			if (error.status && error.status >= 400 && error.status < 500) {
-				throw DocumentLoaderError.fetchError(
-					"github",
-					`fetching ${resourceType}`,
-					error,
-					{
-						statusCode: error.status,
-						resourceType,
-						resourcePath,
-						errorMessage: error.message,
-					},
-				);
-			}
-		}
-		// Re-throw any other errors
-		throw error;
-	}
-}
-
 type GitHubLoadBlobParams = {
 	owner: string;
 	repo: string;
@@ -175,7 +90,7 @@ async function loadBlob(
 	// Fetch blob from GitHub API
 	// Note: This endpoint supports blobs up to 100 megabytes in size.
 	// https://docs.github.com/en/rest/git/blobs#get-a-blob
-	const { data: blobData } = await executeWithRetry(
+	const { data: blobData } = await executeRestRequest(
 		() =>
 			octokit.request("GET /repos/{owner}/{repo}/git/blobs/{file_sha}", {
 				owner,
@@ -233,7 +148,7 @@ async function* traverseTree(
 	void,
 	unknown
 > {
-	const { data: treeData } = await executeWithRetry(
+	const { data: treeData } = await executeRestRequest(
 		() =>
 			octokit.request("GET /repos/{owner}/{repo}/git/trees/{tree_sha}", {
 				owner,
@@ -281,7 +196,7 @@ export async function fetchDefaultBranchHead(
 	owner: string,
 	repo: string,
 ) {
-	const { data: repoData } = await executeWithRetry(
+	const { data: repoData } = await executeRestRequest(
 		() =>
 			octokit.request("GET /repos/{owner}/{repo}", {
 				owner,
@@ -291,7 +206,7 @@ export async function fetchDefaultBranchHead(
 		`${owner}/${repo}`,
 	);
 	const defaultBranch = repoData.default_branch;
-	const { data: branchData } = await executeWithRetry(
+	const { data: branchData } = await executeRestRequest(
 		() =>
 			octokit.request("GET /repos/{owner}/{repo}/branches/{branch}", {
 				owner,
