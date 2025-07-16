@@ -190,7 +190,7 @@ export function createGitHubPullRequestsLoader(
 					const diffs = await getDiffs(pr_number);
 					const diff = diffs.get(content_id);
 
-					if (!diff) {
+					if (!diff || diff.length > maxContentLength) {
 						return null;
 					}
 
