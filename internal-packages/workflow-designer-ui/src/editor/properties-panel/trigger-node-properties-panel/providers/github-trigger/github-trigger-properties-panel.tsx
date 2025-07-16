@@ -238,6 +238,8 @@ function Installed({
 			step,
 			eventId,
 			experimental_storage,
+			CALLSIGN_EVENTS,
+			createCallsignEvent,
 		],
 	);
 

@@ -120,7 +120,16 @@ export function ManualTriggerPropertiesPanel({ node }: { node: TriggerNode }) {
 				});
 			});
 		},
-		[parameters, staged, client, node, workspace?.id, updateNodeData],
+		[
+			parameters,
+			staged,
+			client,
+			node,
+			workspace?.id,
+			updateNodeData,
+			callbacks?.flowTriggerUpdate,
+			experimental_storage,
+		],
 	);
 
 	if (node.content.state.status === "configured") {

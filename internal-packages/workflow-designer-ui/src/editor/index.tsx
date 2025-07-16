@@ -433,7 +433,11 @@ export function Editor({
 			rightPanelWidthMotionValue.set(0);
 			rightPanelRef.current.resize(0);
 		}
-	}, [selectedNodes.length, rightPanelWidthMotionValue]);
+	}, [
+		selectedNodes.length,
+		rightPanelWidthMotionValue,
+		getPercentageForPixels,
+	]);
 
 	useAnimationFrame(() => {
 		if (!rightPanelRef.current) {
