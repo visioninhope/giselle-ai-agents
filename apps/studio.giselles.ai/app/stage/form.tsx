@@ -33,20 +33,38 @@ export function Form({
 		values: Record<string, string | number>,
 	) => Promise<void>;
 }) {
-	const [selectedTeamId, setSelectedTeamId] = useState<TeamId | undefined>();
-	const [selectedFlowTrigger, setSelectedFlowTrigger] = useState<
-		FlowTrigger | undefined
-	>();
+	const defaultTeamId = useMemo(() => teamOptions[0].id, [teamOptions]);
+	const [selectedTeamId, setSelectedTeamId] = useState<TeamId>(defaultTeamId);
+	const defaultSelectedFlowTriggerId = useMemo(
+		() =>
+			flowTriggers.find((flowTrigger) => flowTrigger.teamId === defaultTeamId)
+				?.id,
+		[flowTriggers, defaultTeamId],
+	);
+	const [selectedFlowTriggerId, setSelectedFlowTriggerId] = useState<
+		FlowTriggerId | undefined
+	>(defaultSelectedFlowTriggerId);
+
 	const [validationErrors, setValidationErrors] = useState<
 		Record<string, string>
 	>({});
 
-	const filteredFlowTriggers = flowTriggers.filter(
-		(flowTrigger) => flowTrigger.teamId === selectedTeamId,
+	const filteredFlowTriggers = useMemo(
+		() =>
+			flowTriggers.filter(
+				(flowTrigger) => flowTrigger.teamId === selectedTeamId,
+			),
+		[flowTriggers, selectedTeamId],
 	);
+
 	const inputs = useMemo(
-		() => createInputsFromTrigger(selectedFlowTrigger),
-		[selectedFlowTrigger],
+		() =>
+			createInputsFromTrigger(
+				filteredFlowTriggers.find(
+					(flowTrigger) => flowTrigger.id === selectedFlowTriggerId,
+				)?.sdkData,
+			),
+		[selectedFlowTriggerId, filteredFlowTriggers],
 	);
 
 	const handleSubmit = useCallback<React.FormEventHandler<HTMLFormElement>>(
@@ -75,28 +93,28 @@ export function Form({
 					options={teamOptions}
 					renderOption={(o) => o.label}
 					widthClassName="w-[150px]"
+					value={selectedTeamId}
 					onValueChange={(value) => setSelectedTeamId(value as TeamId)}
 				/>
 				<Select
 					id="flow"
 					placeholder="Select flow"
 					options={
-						selectedTeamId === undefined
-							? []
-							: filteredFlowTriggers.length === 0
-								? [
-										{
-											id: "no-flow",
-											label: "No flows available",
-										},
-									]
-								: filteredFlowTriggers.map((flowTrigger) => ({
-										id: flowTrigger.id,
-										label: flowTrigger.label,
-									}))
+						filteredFlowTriggers.length === 0
+							? [
+									{
+										id: "no-flow",
+										label: "No flows available",
+									},
+								]
+							: filteredFlowTriggers.map((flowTrigger) => ({
+									id: flowTrigger.id,
+									label: flowTrigger.label,
+								}))
 					}
 					renderOption={(o) => o.label}
 					widthClassName="w-[120px]"
+					value={selectedFlowTriggerId}
 					onValueChange={(value) => {
 						const selectedFlowTrigger = filteredFlowTriggers.find(
 							(flowTrigger) => flowTrigger.id === (value as FlowTriggerId),
@@ -105,7 +123,7 @@ export function Form({
 						if (selectedFlowTrigger === undefined) {
 							return;
 						}
-						setSelectedFlowTrigger(selectedFlowTrigger.sdkData);
+						setSelectedFlowTriggerId(selectedFlowTrigger.id);
 					}}
 				/>
 			</div>
