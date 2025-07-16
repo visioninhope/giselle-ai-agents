@@ -85,130 +85,119 @@ export function Form({
 	);
 
 	return (
-		<>
-			<div className="flex items-center gap-2 justify-center">
-				<Select
-					id="team"
-					placeholder="Select team"
-					options={teamOptions}
-					renderOption={(o) => o.label}
-					widthClassName="w-[150px]"
-					value={selectedTeamId}
-					onValueChange={(value) => setSelectedTeamId(value as TeamId)}
-				/>
-				<Select
-					id="flow"
-					placeholder="Select flow"
-					options={
-						filteredFlowTriggers.length === 0
-							? [
-									{
-										id: "no-flow",
-										label: "No flows available",
-									},
-								]
-							: filteredFlowTriggers.map((flowTrigger) => ({
-									id: flowTrigger.id,
-									label: flowTrigger.label,
-								}))
-					}
-					renderOption={(o) => o.label}
-					widthClassName="w-[120px]"
-					value={selectedFlowTriggerId}
-					onValueChange={(value) => {
-						const selectedFlowTrigger = filteredFlowTriggers.find(
-							(flowTrigger) => flowTrigger.id === (value as FlowTriggerId),
-						);
-						if (selectedFlowTrigger === undefined) {
-							return;
-						}
-						setSelectedFlowTriggerId(selectedFlowTrigger.id);
-					}}
-				/>
-			</div>
-			<div className="max-w-[800px] mx-auto">
-				<div className="relative">
-					<textarea
-						className="w-full h-40 border border-border bg-editor-background rounded-[4px] p-4 text-[14px] text-text resize-none outline-none"
-						placeholder="Describe a task"
-					/>
-					<div className="absolute bottom-2 right-2">
-						<Button variant="solid" size="large">
-							Start
-						</Button>
-					</div>
-				</div>
-			</div>
-
-			<form onSubmit={handleSubmit}>
-				<div className="flex flex-col gap-[8px]">
-					{inputs.map((input) => {
-						return (
-							<fieldset key={input.name} className={clsx("grid gap-2")}>
-								<label
-									className="text-[14px] font-medium text-white-900"
-									htmlFor={input.name}
-								>
-									{input.label}
-									{input.required && (
-										<span className="text-red-500 ml-1">*</span>
+		<form
+			onSubmit={handleSubmit}
+			className="max-w-[800px] mx-auto border border-border bg-panel-background rounded-[4px] p-4 text-[14px] text-text resize-none outline-none"
+		>
+			<div className="flex flex-col gap-[8px] mb-[8px]">
+				{inputs.map((input) => {
+					return (
+						<fieldset key={input.name} className={clsx("grid gap-2")}>
+							<label
+								className="text-[14px] font-medium text-white-900"
+								htmlFor={input.name}
+							>
+								{input.label}
+								{input.required && <span className="text-red-500 ml-1">*</span>}
+							</label>
+							{input.type === "text" && (
+								<input
+									type="text"
+									name={input.name}
+									id={input.name}
+									className={clsx(
+										"w-full flex justify-between items-center rounded-[8px] py-[8px] px-[12px] outline-none focus:outline-none border",
+										validationErrors[input.name]
+											? "border-error"
+											: "border-border",
+										"text-[14px]",
 									)}
-								</label>
-								{input.type === "text" && (
-									<input
-										type="text"
-										name={input.name}
-										id={input.name}
-										className={clsx(
-											"w-full flex justify-between items-center rounded-[8px] py-[8px] px-[12px] outline-none focus:outline-none",
-											"border-[1px]",
-											validationErrors[input.name]
-												? "border-red-500"
-												: "border-white-900",
-											"text-[14px]",
-										)}
-									/>
-								)}
-								{input.type === "multiline-text" && (
-									<textarea
-										name={input.name}
-										id={input.name}
-										className={clsx(
-											"w-full flex justify-between items-center rounded-[8px] py-[8px] px-[12px] outline-none focus:outline-none",
-											"border-[1px]",
-											validationErrors[input.name]
-												? "border-red-500"
-												: "border-white-900",
-											"text-[14px]",
-										)}
-										rows={4}
-									/>
-								)}
-								{input.type === "number" && (
-									<input
-										type="number"
-										name={input.name}
-										id={input.name}
-										className={clsx(
-											"w-full flex justify-between items-center rounded-[8px] py-[8px] px-[12px] outline-none focus:outline-none",
-											"border-[1px]",
-											validationErrors[input.name]
-												? "border-red-500"
-												: "border-white-900",
-											"text-[14px]",
-										)}
-									/>
-								)}
-								{validationErrors[input.name] && (
-									<span className="text-red-500 text-[12px] font-medium">
-										{validationErrors[input.name]}
-									</span>
-								)}
-							</fieldset>
-						);
-					})}
+								/>
+							)}
+							{input.type === "multiline-text" && (
+								<textarea
+									name={input.name}
+									id={input.name}
+									className={clsx(
+										"w-full flex justify-between items-center rounded-[8px] py-[8px] px-[12px] outline-none focus:outline-none",
+										"border-[1px]",
+										validationErrors[input.name]
+											? "border-red-500"
+											: "border-white-900",
+										"text-[14px]",
+									)}
+									rows={4}
+								/>
+							)}
+							{input.type === "number" && (
+								<input
+									type="number"
+									name={input.name}
+									id={input.name}
+									className={clsx(
+										"w-full flex justify-between items-center rounded-[8px] py-[8px] px-[12px] outline-none focus:outline-none",
+										"border-[1px]",
+										validationErrors[input.name]
+											? "border-red-500"
+											: "border-white-900",
+										"text-[14px]",
+									)}
+								/>
+							)}
+							{validationErrors[input.name] && (
+								<span className="text-red-500 text-[12px] font-medium">
+									{validationErrors[input.name]}
+								</span>
+							)}
+						</fieldset>
+					);
+				})}
+			</div>
+			<div className="flex items-center justify-between">
+				<div className="flex items-center gap-2 justify-center">
+					<Select
+						id="team"
+						placeholder="Select team"
+						options={teamOptions}
+						renderOption={(o) => o.label}
+						widthClassName="w-[150px]"
+						value={selectedTeamId}
+						onValueChange={(value) => setSelectedTeamId(value as TeamId)}
+					/>
+					<Select
+						id="flow"
+						placeholder="Select flow"
+						options={
+							filteredFlowTriggers.length === 0
+								? [
+										{
+											id: "no-flow",
+											label: "No flows available",
+										},
+									]
+								: filteredFlowTriggers.map((flowTrigger) => ({
+										id: flowTrigger.id,
+										label: flowTrigger.label,
+									}))
+						}
+						renderOption={(o) => o.label}
+						widthClassName="w-[120px]"
+						value={selectedFlowTriggerId}
+						onValueChange={(value) => {
+							const selectedFlowTrigger = filteredFlowTriggers.find(
+								(flowTrigger) => flowTrigger.id === (value as FlowTriggerId),
+							);
+							if (selectedFlowTrigger === undefined) {
+								return;
+							}
+							setSelectedFlowTriggerId(selectedFlowTrigger.id);
+						}}
+					/>
 				</div>
-			</form>
-		</>
+				<Button variant="solid" size="large">
+					Start
+				</Button>
+			</div>
+		</form>
 	);
 }
