@@ -119,7 +119,6 @@ export function Form({
 						const selectedFlowTrigger = filteredFlowTriggers.find(
 							(flowTrigger) => flowTrigger.id === (value as FlowTriggerId),
 						);
-						console.log(selectedFlowTrigger);
 						if (selectedFlowTrigger === undefined) {
 							return;
 						}
