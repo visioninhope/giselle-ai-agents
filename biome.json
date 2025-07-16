@@ -25,6 +25,9 @@
 			"suspicious": {
 				"useAwait": "error"
 			}
+		},
+		"domains": {
+			"react": "recommended"
 		}
 	},
 	"javascript": {
