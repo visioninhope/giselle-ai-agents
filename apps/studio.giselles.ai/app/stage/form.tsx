@@ -19,7 +19,7 @@ export interface FlowTriggerUIItem {
 	sdkData: FlowTrigger;
 }
 
-export function FlowTriggerSelect({
+export function Form({
 	teamOptions,
 	flowTriggers,
 }: {

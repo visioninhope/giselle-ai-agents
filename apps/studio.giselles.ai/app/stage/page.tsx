@@ -18,10 +18,7 @@ import { db } from "@/drizzle";
 import { experimental_storageFlag, stageFlag } from "@/flags";
 import { fetchUserTeams } from "@/services/teams";
 import { giselleEngine } from "../giselle-engine";
-import {
-	FlowTriggerSelect,
-	type FlowTriggerUIItem,
-} from "./flow-trigger-select";
+import { type FlowTriggerUIItem, Form } from "./form";
 
 const tasks = [
 	{
@@ -128,10 +125,7 @@ export default async function StagePage() {
 			<div className="text-center text-[24px] font-sans text-white-100">
 				What are we perform next ?
 			</div>
-			<FlowTriggerSelect
-				teamOptions={teamOptions}
-				flowTriggers={flowTriggers}
-			/>
+			<Form teamOptions={teamOptions} flowTriggers={flowTriggers} />
 			<div className="max-w-[800px] mx-auto">
 				<div className="relative">
 					<textarea
