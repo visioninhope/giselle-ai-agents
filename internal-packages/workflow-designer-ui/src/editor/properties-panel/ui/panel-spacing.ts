@@ -36,28 +36,9 @@ export const PANEL_SPACING = {
 } as const;
 
 /**
- * Common header height utilities
- */
-const _PANEL_HEADER = {
-	HEIGHT_CLASS: PANEL_SPACING.HEADER.HEIGHT,
-	HEIGHT_VALUE: PANEL_SPACING.HEADER.HEIGHT_VALUE,
-	PADDING_CLASS: PANEL_SPACING.HEADER.PADDING,
-
-	/**
-	 * Get inline style for header height
-	 */
-	getHeightStyle: () => ({ height: `${PANEL_SPACING.HEADER.HEIGHT_VALUE}px` }),
-
-	/**
-	 * Get complete header classes
-	 */
-	getClasses: (sidemenu = false) => getHeaderClasses(sidemenu),
-} as const;
-
-/**
  * Get header classes based on sidemenu flag
  */
-export function getHeaderClasses(_sidemenu: boolean): string {
+export function getHeaderClasses(): string {
 	const baseClasses = [
 		PANEL_SPACING.HEADER.HEIGHT,
 		"flex justify-between items-center",
@@ -71,7 +52,7 @@ export function getHeaderClasses(_sidemenu: boolean): string {
 /**
  * Get content classes based on sidemenu flag
  */
-export function getContentClasses(_sidemenu: boolean): string {
+export function getContentClasses(): string {
 	return [
 		PANEL_SPACING.LAYOUT.FLEX_1,
 		PANEL_SPACING.LAYOUT.FULL_HEIGHT,
