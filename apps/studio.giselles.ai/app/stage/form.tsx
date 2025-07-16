@@ -122,8 +122,8 @@ export function Form({
 										"w-full flex justify-between items-center rounded-[8px] py-[8px] px-[12px] outline-none focus:outline-none",
 										"border-[1px]",
 										validationErrors[input.name]
-											? "border-red-500"
-											: "border-white-900",
+											? "border-error"
+											: "border-border",
 										"text-[14px]",
 									)}
 									rows={4}
@@ -138,14 +138,14 @@ export function Form({
 										"w-full flex justify-between items-center rounded-[8px] py-[8px] px-[12px] outline-none focus:outline-none",
 										"border-[1px]",
 										validationErrors[input.name]
-											? "border-red-500"
-											: "border-white-900",
+											? "border-error"
+											: "border-border",
 										"text-[14px]",
 									)}
 								/>
 							)}
 							{validationErrors[input.name] && (
-								<span className="text-red-500 text-[12px] font-medium">
+								<span className="text-error text-[12px] font-medium">
 									{validationErrors[input.name]}
 								</span>
 							)}
@@ -160,7 +160,6 @@ export function Form({
 						placeholder="Select team"
 						options={teamOptions}
 						renderOption={(o) => o.label}
-						widthClassName="w-[150px]"
 						value={selectedTeamId}
 						onValueChange={(value) => setSelectedTeamId(value as TeamId)}
 					/>
@@ -181,7 +180,6 @@ export function Form({
 									}))
 						}
 						renderOption={(o) => o.label}
-						widthClassName="w-[120px]"
 						value={selectedFlowTriggerId}
 						onValueChange={(value) => {
 							const selectedFlowTrigger = filteredFlowTriggers.find(
@@ -194,7 +192,7 @@ export function Form({
 						}}
 					/>
 				</div>
-				<Button variant="solid" size="large">
+				<Button variant="solid" size="large" type="submit">
 					Start
 				</Button>
 			</div>
