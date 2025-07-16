@@ -1,22 +1,23 @@
 import createBundleAnalyzer from "@next/bundle-analyzer";
-import { withSentryConfig } from "@sentry/nextjs";
+import type { SentryBuildOptions } from "@sentry/nextjs";
 import type { NextConfig } from "next";
 
+export const serverExternalPackages = [
+	"@opentelemetry/sdk-node",
+	"pino",
+	"pino-pretty",
+	"unstorage",
+	"happy-dom",
+	"@supabase/supabase-js",
+	"@supabase/realtime-js",
+];
 const nextConfig: NextConfig = {
 	eslint: {
 		// Warning: This allows production builds to successfully complete even if
 		// your project has ESLint errors.
 		ignoreDuringBuilds: true,
 	},
-	serverExternalPackages: [
-		"@opentelemetry/sdk-node",
-		"pino",
-		"pino-pretty",
-		"unstorage",
-		"happy-dom",
-		"@supabase/supabase-js",
-		"@supabase/realtime-js",
-	],
+	serverExternalPackages,
 	images: {
 		remotePatterns: [
 			{
@@ -82,7 +83,7 @@ const nextConfig: NextConfig = {
 	},
 };
 
-const withSentry = withSentryConfig(nextConfig, {
+const sentryBuildOptions: SentryBuildOptions = {
 	// For all available options, see:
 	// https://www.npmjs.com/package/@sentry/webpack-plugin#options
 
@@ -123,9 +124,17 @@ const withSentry = withSentryConfig(nextConfig, {
 	// https://docs.sentry.io/product/crons/
 	// https://vercel.com/docs/cron-jobs
 	automaticVercelMonitors: true,
-});
+};
 
 const withAnalyzer = createBundleAnalyzer({
 	enabled: process.env.ANALYZE === "true",
 });
-export default withAnalyzer(withSentry);
+export default async function () {
+	const enableSentry = process.env.VERCEL_ENV !== undefined;
+	if (enableSentry) {
+		return await import("@sentry/nextjs").then((mod) =>
+			withAnalyzer(mod.withSentryConfig(nextConfig, sentryBuildOptions)),
+		);
+	}
+	return withAnalyzer(nextConfig);
+}

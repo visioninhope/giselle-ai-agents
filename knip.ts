@@ -1,7 +1,7 @@
 import type { KnipConfig } from "knip";
 
 import playgroundAppConfig from "./apps/playground/next.config";
-import studioAppConfig from "./apps/studio.giselles.ai/next.config";
+import { serverExternalPackages } from "./apps/studio.giselles.ai/next.config";
 
 /**
  * @link https://github.com/vercel/next.js/blob/canary/packages/next/src/lib/server-external-packages.json
@@ -96,7 +96,7 @@ const config: KnipConfig = {
 			entry: ["tests/e2e/global-setup.ts"],
 			ignore: ["scripts/**"],
 			ignoreDependencies: [
-				...(studioAppConfig.serverExternalPackages ?? []),
+				...serverExternalPackages,
 				...nextPredefinedExternalPackages,
 			],
 		},

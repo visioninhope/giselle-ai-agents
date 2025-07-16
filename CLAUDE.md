@@ -1,45 +1,39 @@
-# Giselle Development Guide
+# Philosophy: **Less is more**
+Keep every implementation as small and obvious as possible.
+- Prefer the simplest data structures and APIs that work.
+- Avoid needless abstractions; refactor only when duplication hurts.
+- Remove dead code early — `pnpm prune` scans the repo for unused files/deps and lets you delete them in one command.
+- Before adding a dependency, ask, “Can we do this with what we already have?”
 
-## Build, Test, and Lint Commands
-- Build all: `pnpm build`
-- Build specific packages: `pnpm build-sdk`, `pnpm build-data-type`
-- Type checking: `pnpm check-types`
-- Type check packages with modified files: `pnpm -F <modified files packagename> check-types`
-- Format code: `pnpm format`
-- Development: `pnpm dev` (playground), `pnpm dev:studio.giselles.ai` (studio)
-- Run tests: `pnpm -F <package> test` or `cd <directory> && vitest`
-- Run specific test: `cd <directory> && vitest <file.test.ts>`
-- Lint: `cd <directory> && biome check --write .`
-- Format modified files: `pnpm biome check --write [filename]`
+# Workflow
+After every code change, run:
 
-## Critical Requirements
-- MUST run `pnpm biome check --write [filename]` after EVERY code modification
-- MUST run `pnpm -F [packagename in file] check-types` to validate type safety of packages with modified files
-- All code changes must be formatted using Biome before being committed
-- All code changes must pass type checking in their respective packages before being committed
+- `pnpm format`
+- `pnpm prune`
+- `pnpm check-types`
+- `pnpm test`
 
-## Code Style Guidelines
-- Use Biome for formatting with tab indentation and double quotes
-- Follow organized imports pattern (enabled in biome.json)
-- Use TypeScript for type safety; avoid `any` types
-- Use functional components with React hooks
-- Use Next.js patterns for web applications
-- Follow package-based architecture for modularity
-- Use async/await for asynchronous code rather than promises
-- Error handling: use try/catch blocks and propagate errors appropriately
-- Tests should follow `*.test.ts` naming pattern and use Vitest
+(CI also runs these steps; your PR will fail if any step fails.)
 
-## Naming Conventions
-- **Files**: Use kebab-case for all filenames (e.g., `user-profile.ts`)
-- **Components**: Use PascalCase for React components and classes (e.g., `UserProfile`)
-- **Variables**: Use camelCase for variables, functions, and methods (e.g., `userEmail`)
-- **Boolean Variables and Functions**: Use prefixes like `is`, `has`, `can`, `should` for clarity:
-  - For variables: `isEnabled`, `hasPermission` (not `status`)
-  - For functions: `isTriggerRequiringCallsign()`, `hasActiveSubscription()` (not `requiresCallsign()` or `checkActive()`)
-- **Function Naming**: Use verbs or verb phrases that clearly indicate purpose (e.g., `calculateTotalPrice()`, not `process()`)
-- **Consistency**: Follow these conventions throughout the codebase
 
-## Language Support
-- This project's core members include non-native English speakers
-- Please correct grammar in commit messages, code comments, and pull request comments
-- Rewrite user input when necessary to ensure clear communication
+# Bash commands
+- pnpm build-sdk: build the SDK packages
+- pnpm -F playground build: build the playground app
+- pnpm -F studio.giselles.ai build: build Giselle Cloud
+- pnpm check-types: type‑check the project
+- pnpm format: format code
+- pnpm tidy --fix: delete unused files/dependencies
+- pnpm tidy: diagnose unused files/dependencies
+- pnpm test: run tests
+
+# Code Style
+
+- **Consistency wins** – follow existing naming and file‑layout patterns; if you must diverge, document why.
+- **Explicit over implicit** – favor clear, descriptive names and type annotations over clever tricks. Future you—or a teammate—should understand the code at a glance.
+- **Fail fast** – validate inputs, throw early, and surface actionable errors. The sooner something explodes in dev, the fewer surprises in prod.
+- **Let the code speak** – if you need a multi‑paragraph comment, refactor until intent is obvious.
+
+# Language Support
+- Some core members are non‑native English speakers.
+- Please correct grammar in commit messages, code comments, and PR discussions.
+- Rewrite unclear user input when necessary to ensure smooth communication.
