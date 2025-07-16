@@ -6,12 +6,14 @@ Keep every implementation as small and obvious as possible.
 - Before adding a dependency, ask, “Can we do this with what we already have?”
 
 # Workflow
-After every code change, run:
+**MANDATORY**: After every code change, you MUST immediately run these commands in order:
 
-- `pnpm format`
-- `pnpm tidy`
-- `pnpm check-types`
-- `pnpm test`
+1. `pnpm format`
+2. `pnpm tidy`
+3. `pnpm check-types`
+4. `pnpm test`
+
+**DO NOT consider any code change complete until all four commands pass successfully.**
 
 (CI also runs these steps; your PR will fail if any step fails.)
 
