@@ -17,7 +17,7 @@ import {
 	PerplexityModelPanel,
 } from "./model";
 import { PromptPanel } from "./prompt-panel";
-import { GitHubToolsPanel, PostgresToolsPanel, ToolsPanel } from "./tools";
+import { ToolsPanel } from "./tools";
 
 interface TextGenerationTabContentProps {
 	node: TextGenerationNode;
@@ -35,7 +35,6 @@ interface TextGenerationTabContentProps {
 	data: Workspace;
 	deleteConnection: (connectionId: `cnnc-${string}`) => void;
 	githubTools: boolean;
-	sidemenu: boolean;
 }
 
 export function TextGenerationTabContent({
@@ -47,7 +46,6 @@ export function TextGenerationTabContent({
 	data,
 	deleteConnection,
 	githubTools,
-	sidemenu,
 }: TextGenerationTabContentProps) {
 	return (
 		<Tabs.Root
@@ -327,14 +325,7 @@ export function TextGenerationTabContent({
 				value="tools"
 				className="flex-1 flex flex-col overflow-y-auto p-[4px] gap-[16px] outline-none"
 			>
-				{sidemenu ? (
-					<ToolsPanel node={node} />
-				) : (
-					<div className="p-[8px]">
-						<GitHubToolsPanel node={node} />
-						<PostgresToolsPanel node={node} />
-					</div>
-				)}
+				<ToolsPanel node={node} />
 			</Tabs.Content>
 		</Tabs.Root>
 	);

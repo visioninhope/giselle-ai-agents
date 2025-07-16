@@ -90,7 +90,7 @@ export function TextGenerationNodePropertiesPanel({
 		: jsonOrText;
 	const noWhitespaceText = text?.replace(/[\s\u3000]+/g, "");
 	const disabled = usageLimitsReached || !noWhitespaceText;
-	const { githubTools, sidemenu } = useFeatureFlag();
+	const { githubTools } = useFeatureFlag();
 
 	return (
 		<PropertiesPanelRoot>
@@ -159,7 +159,6 @@ export function TextGenerationNodePropertiesPanel({
 								data={data}
 								deleteConnection={deleteConnection}
 								githubTools={githubTools}
-								sidemenu={sidemenu}
 							/>
 						</PropertiesPanelContent>
 					</Panel>
