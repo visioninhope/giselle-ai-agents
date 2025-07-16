@@ -412,12 +412,12 @@ export function Editor({
 	const [showReadOnlyBanner, setShowReadOnlyBanner] = useState(isReadOnly);
 
 	// Convert 380px to percentage value
-	const getPercentageForPixels = (pixels: number) => {
+	const getPercentageForPixels = useCallback((pixels: number) => {
 		const containerWidth = window.innerWidth - 16 - 16; // subtract padding
 		const sideMenuWidth = containerWidth * 0.1; // side menu takes 10%
 		const availableWidth = containerWidth - sideMenuWidth;
 		return (pixels / availableWidth) * 100;
-	};
+	}, []);
 
 	useEffect(() => {
 		if (!rightPanelRef.current) {
