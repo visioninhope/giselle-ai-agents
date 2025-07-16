@@ -18,7 +18,6 @@ export default async function Layout({
 				sidemenu: true,
 				githubTools: true,
 				webSearchAction: false,
-				layoutV2: true,
 				layoutV3: true,
 				experimental_storage: true,
 				stage: true,

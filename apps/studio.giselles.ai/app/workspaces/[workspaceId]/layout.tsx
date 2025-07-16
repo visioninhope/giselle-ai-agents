@@ -6,7 +6,6 @@ import { db, flowTriggers } from "@/drizzle";
 import {
 	experimental_storageFlag,
 	githubToolsFlag,
-	layoutV2Flag,
 	layoutV3Flag,
 	runV3Flag,
 	sidemenuFlag,
@@ -48,7 +47,6 @@ export default async function Layout({
 	const sidemenu = await sidemenuFlag();
 	const githubTools = await githubToolsFlag();
 	const webSearchAction = await webSearchActionFlag();
-	const layoutV2 = await layoutV2Flag();
 	const layoutV3 = await layoutV3Flag();
 	const experimental_storage = await experimental_storageFlag();
 	const stage = await stageFlag();
@@ -82,7 +80,6 @@ export default async function Layout({
 				sidemenu,
 				githubTools,
 				webSearchAction,
-				layoutV2,
 				layoutV3,
 				experimental_storage,
 				stage,
