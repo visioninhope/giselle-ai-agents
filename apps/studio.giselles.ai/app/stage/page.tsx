@@ -1,4 +1,3 @@
-import { Button } from "@giselle-internal/ui/button";
 import {
 	Table,
 	TableBody,
@@ -125,7 +124,18 @@ export default async function StagePage() {
 			<div className="text-center text-[24px] font-sans text-white-100">
 				What are we perform next ?
 			</div>
-			<Form teamOptions={teamOptions} flowTriggers={flowTriggers} />
+			<Form
+				teamOptions={teamOptions}
+				flowTriggers={flowTriggers}
+				performStageAction={async () => {
+					"use server";
+
+					await new Promise((resolve) => setTimeout(resolve, 1000));
+					console.log("todo");
+					await new Promise((resolve) => setTimeout(resolve, 1000));
+					console.log("implement next pr");
+				}}
+			/>
 			<div className="max-w-[900px] mx-auto space-y-2">
 				<div className="flex items-center justify-between px-1">
 					<h2 className="text-[16px] font-sans text-white-100">Tasks</h2>

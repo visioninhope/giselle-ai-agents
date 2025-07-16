@@ -3,9 +3,11 @@
 import { Button } from "@giselle-internal/ui/button";
 import { Select } from "@giselle-internal/ui/select";
 import type { FlowTrigger, FlowTriggerId } from "@giselle-sdk/data-type";
+import clsx from "clsx/lite";
 import type { InferSelectModel } from "drizzle-orm";
-import { useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import type { teams } from "@/drizzle";
+import { createInputsFromTrigger, parseFormInputs } from "./helpers";
 
 type TeamId = InferSelectModel<typeof teams>["id"];
 interface TeamOption {
@@ -23,14 +25,45 @@ export interface FlowTriggerUIItem {
 export function Form({
 	teamOptions,
 	flowTriggers,
+	performStageAction,
 }: {
 	teamOptions: TeamOption[];
 	flowTriggers: FlowTriggerUIItem[];
+	performStageAction: (
+		values: Record<string, string | number>,
+	) => Promise<void>;
 }) {
 	const [selectedTeamId, setSelectedTeamId] = useState<TeamId | undefined>();
+	const [selectedFlowTrigger, setSelectedFlowTrigger] = useState<
+		FlowTrigger | undefined
+	>();
+	const [validationErrors, setValidationErrors] = useState<
+		Record<string, string>
+	>({});
 
 	const filteredFlowTriggers = flowTriggers.filter(
 		(flowTrigger) => flowTrigger.teamId === selectedTeamId,
+	);
+	const inputs = useMemo(
+		() => createInputsFromTrigger(selectedFlowTrigger),
+		[selectedFlowTrigger],
+	);
+
+	const handleSubmit = useCallback<React.FormEventHandler<HTMLFormElement>>(
+		async (e) => {
+			e.preventDefault();
+			const formData = new FormData(e.currentTarget);
+			const { errors, values } = parseFormInputs(inputs, formData);
+
+			if (Object.keys(errors).length > 0) {
+				setValidationErrors(errors);
+				return;
+			}
+
+			setValidationErrors({});
+			await performStageAction(values);
+		},
+		[inputs, performStageAction],
 	);
 
 	return (
@@ -64,6 +97,16 @@ export function Form({
 					}
 					renderOption={(o) => o.label}
 					widthClassName="w-[120px]"
+					onValueChange={(value) => {
+						const selectedFlowTrigger = filteredFlowTriggers.find(
+							(flowTrigger) => flowTrigger.id === (value as FlowTriggerId),
+						);
+						console.log(selectedFlowTrigger);
+						if (selectedFlowTrigger === undefined) {
+							return;
+						}
+						setSelectedFlowTrigger(selectedFlowTrigger.sdkData);
+					}}
 				/>
 			</div>
 			<div className="max-w-[800px] mx-auto">
@@ -79,6 +122,76 @@ export function Form({
 					</div>
 				</div>
 			</div>
+
+			<form onSubmit={handleSubmit}>
+				<div className="flex flex-col gap-[8px]">
+					{inputs.map((input) => {
+						return (
+							<fieldset key={input.name} className={clsx("grid gap-2")}>
+								<label
+									className="text-[14px] font-medium text-white-900"
+									htmlFor={input.name}
+								>
+									{input.label}
+									{input.required && (
+										<span className="text-red-500 ml-1">*</span>
+									)}
+								</label>
+								{input.type === "text" && (
+									<input
+										type="text"
+										name={input.name}
+										id={input.name}
+										className={clsx(
+											"w-full flex justify-between items-center rounded-[8px] py-[8px] px-[12px] outline-none focus:outline-none",
+											"border-[1px]",
+											validationErrors[input.name]
+												? "border-red-500"
+												: "border-white-900",
+											"text-[14px]",
+										)}
+									/>
+								)}
+								{input.type === "multiline-text" && (
+									<textarea
+										name={input.name}
+										id={input.name}
+										className={clsx(
+											"w-full flex justify-between items-center rounded-[8px] py-[8px] px-[12px] outline-none focus:outline-none",
+											"border-[1px]",
+											validationErrors[input.name]
+												? "border-red-500"
+												: "border-white-900",
+											"text-[14px]",
+										)}
+										rows={4}
+									/>
+								)}
+								{input.type === "number" && (
+									<input
+										type="number"
+										name={input.name}
+										id={input.name}
+										className={clsx(
+											"w-full flex justify-between items-center rounded-[8px] py-[8px] px-[12px] outline-none focus:outline-none",
+											"border-[1px]",
+											validationErrors[input.name]
+												? "border-red-500"
+												: "border-white-900",
+											"text-[14px]",
+										)}
+									/>
+								)}
+								{validationErrors[input.name] && (
+									<span className="text-red-500 text-[12px] font-medium">
+										{validationErrors[input.name]}
+									</span>
+								)}
+							</fieldset>
+						);
+					})}
+				</div>
+			</form>
 		</>
 	);
 }
