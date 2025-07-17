@@ -4,14 +4,12 @@ import {
 	RunId,
 	type Workflow,
 } from "@giselle-sdk/data-type";
-import { buildWorkflowFromNode } from "@giselle-sdk/workflow-utils";
 import type { GiselleEngineContext } from "../types";
-import { getWorkspace } from "../workspaces/utils";
+import { buildWorkflowFromTrigger } from "./build-workflow-from-trigger";
 import { createRun } from "./create-run";
 import { FlowRunIndexObject } from "./run/object";
 import { flowRunPath, workspaceFlowRunPath } from "./run/paths";
 import { type RunFlowCallbacks, runFlow } from "./run-flow";
-import { getFlowTrigger } from "./utils";
 
 /** @todo telemetry */
 export async function createAndRunFlow(args: {
@@ -23,40 +21,25 @@ export async function createAndRunFlow(args: {
 	} & RunFlowCallbacks;
 	useExperimentalStorage: boolean;
 }) {
-	const trigger = await getFlowTrigger({
-		storage: args.context.storage,
-		flowTriggerId: args.triggerId,
-	});
-	if (trigger === undefined || !trigger.enable) {
-		return;
-	}
-	const workspace = await getWorkspace({
-		storage: args.context.storage,
-		experimental_storage: args.context.experimental_storage,
-		workspaceId: trigger.workspaceId,
+	const result = await buildWorkflowFromTrigger({
+		triggerId: args.triggerId,
+		context: args.context,
 		useExperimentalStorage: args.useExperimentalStorage,
 	});
-
-	const triggerNode = workspace.nodes.find(
-		(node) => node.id === trigger.nodeId,
-	);
-	if (triggerNode === undefined) {
+	if (result === null) {
 		return;
 	}
 
-	const flow = buildWorkflowFromNode(triggerNode, workspace);
-	if (flow === null) {
-		return;
-	}
+	const { workflow, trigger } = result;
 
-	await args.callbacks?.flowCreate?.({ flow });
+	await args.callbacks?.flowCreate?.({ flow: workflow });
 
 	const runId = RunId.generate();
 	const flowRun = await createRun({
 		context: args.context,
 		trigger: trigger.configuration.provider,
 		workspaceId: trigger.workspaceId,
-		jobsCount: flow.jobs.length,
+		jobsCount: workflow.jobs.length,
 	});
 	await Promise.all([
 		args.context.storage.setItem(flowRunPath(flowRun.id), flowRun),
@@ -67,7 +50,7 @@ export async function createAndRunFlow(args: {
 	]);
 
 	await runFlow({
-		flow,
+		flow: workflow,
 		context: args.context,
 		flowRunId: flowRun.id,
 		runId,
