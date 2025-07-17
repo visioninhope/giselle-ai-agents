@@ -20,6 +20,7 @@ import { copyFile, getFileText, removeFile, uploadFile } from "./files";
 import {
 	type ConfigureTriggerInput,
 	configureTrigger,
+	createAndRunFlow,
 	createRun,
 	deleteTrigger,
 	getTrigger,
@@ -27,7 +28,6 @@ import {
 	type PatchDelta,
 	patchRun,
 	resolveTrigger,
-	runFlow,
 	setTrigger,
 } from "./flows";
 import type { FlowRunId } from "./flows/run/object";
@@ -273,11 +273,11 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 			deleteTrigger({ ...args, context }),
 		executeAction: async (args: { generation: QueuedGeneration }) =>
 			executeAction({ ...args, context }),
-		runFlow: async (args: {
+		createAndRun: async (args: {
 			triggerId: FlowTriggerId;
 			triggerInputs?: GenerationContextInput[];
 			useExperimentalStorage: boolean;
-		}) => runFlow({ ...args, context }),
+		}) => createAndRunFlow({ ...args, context }),
 		handleGitHubWebhookV2: async (args: { request: Request }) =>
 			handleGitHubWebhookV2({ ...args, context }),
 		executeQuery: async (

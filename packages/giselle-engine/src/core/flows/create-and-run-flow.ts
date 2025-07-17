@@ -224,7 +224,7 @@ async function runJob(args: {
 }
 
 /** @todo telemetry */
-export async function runFlow(args: {
+export async function createAndRunFlow(args: {
 	triggerId: FlowTriggerId;
 	context: GiselleEngineContext;
 	triggerInputs?: GenerationContextInput[];
