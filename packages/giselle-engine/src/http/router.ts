@@ -301,7 +301,7 @@ export const createJsonRouters = {
 				return new Response(null, { status: 204 });
 			},
 		}),
-	runFlow: (giselleEngine: GiselleEngine) =>
+	createAndRunFlow: (giselleEngine: GiselleEngine) =>
 		createHandler({
 			input: z.object({
 				triggerId: FlowTriggerId.schema,
@@ -313,7 +313,7 @@ export const createJsonRouters = {
 				return new Response(null, { status: 204 });
 			},
 		}),
-	runFlowDirect: (giselleEngine: GiselleEngine) =>
+	runFlow: (giselleEngine: GiselleEngine) =>
 		createHandler({
 			input: z.object({
 				flow: Workflow,
