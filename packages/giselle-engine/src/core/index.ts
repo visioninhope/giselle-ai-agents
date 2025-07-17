@@ -280,7 +280,7 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 		}) => {
 			return await buildWorkflowFromTrigger({ ...args, context });
 		},
-		createAndRun: async (args: {
+		createAndRunFlow: async (args: {
 			triggerId: FlowTriggerId;
 			triggerInputs?: GenerationContextInput[];
 			useExperimentalStorage: boolean;
