@@ -8,10 +8,11 @@ Keep every implementation as small and obvious as possible.
 # REQUIRED COMMANDS AFTER CODE CHANGES
 **IMMEDIATE ACTION REQUIRED: After using `edit_file` tool:**
 
-1. Run `pnpm format`
-2. Run `pnpm tidy`
-3. Run `pnpm check-types`
-4. Run `pnpm test`
+1. Run `pnpm build-sdk`
+2. Run `pnpm check-types`
+3. Run `pnpm format`
+4. Run `pnpm tidy`
+5. Run `pnpm test`
 
 **These commands are part of the `edit_file` operation itself.**
 
