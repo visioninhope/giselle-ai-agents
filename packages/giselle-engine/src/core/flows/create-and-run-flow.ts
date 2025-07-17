@@ -1,8 +1,10 @@
 import {
+	type FlowTrigger,
 	type FlowTriggerId,
 	type GenerationContextInput,
 	RunId,
 	type Workflow,
+	type Workspace,
 } from "@giselle-sdk/data-type";
 import { buildWorkflowFromNode } from "@giselle-sdk/workflow-utils";
 import type { GiselleEngineContext } from "../types";
@@ -13,23 +15,23 @@ import { flowRunPath, workspaceFlowRunPath } from "./run/paths";
 import { type RunFlowCallbacks, runFlow } from "./run-flow";
 import { getFlowTrigger } from "./utils";
 
-/** @todo telemetry */
-export async function createAndRunFlow(args: {
+async function buildWorkflowFromTrigger(args: {
 	triggerId: FlowTriggerId;
 	context: GiselleEngineContext;
-	triggerInputs?: GenerationContextInput[];
-	callbacks?: {
-		flowCreate?: (args: { flow: Workflow }) => void | Promise<void>;
-	} & RunFlowCallbacks;
 	useExperimentalStorage: boolean;
-}) {
+}): Promise<{
+	workflow: Workflow;
+	trigger: FlowTrigger;
+	workspace: Workspace;
+} | null> {
 	const trigger = await getFlowTrigger({
 		storage: args.context.storage,
 		flowTriggerId: args.triggerId,
 	});
 	if (trigger === undefined || !trigger.enable) {
-		return;
+		return null;
 	}
+
 	const workspace = await getWorkspace({
 		storage: args.context.storage,
 		experimental_storage: args.context.experimental_storage,
@@ -41,22 +43,50 @@ export async function createAndRunFlow(args: {
 		(node) => node.id === trigger.nodeId,
 	);
 	if (triggerNode === undefined) {
+		return null;
+	}
+
+	const workflow = buildWorkflowFromNode(triggerNode, workspace);
+	if (workflow === null) {
+		return null;
+	}
+
+	return {
+		workflow,
+		trigger,
+		workspace,
+	};
+}
+
+/** @todo telemetry */
+export async function createAndRunFlow(args: {
+	triggerId: FlowTriggerId;
+	context: GiselleEngineContext;
+	triggerInputs?: GenerationContextInput[];
+	callbacks?: {
+		flowCreate?: (args: { flow: Workflow }) => void | Promise<void>;
+	} & RunFlowCallbacks;
+	useExperimentalStorage: boolean;
+}) {
+	const result = await buildWorkflowFromTrigger({
+		triggerId: args.triggerId,
+		context: args.context,
+		useExperimentalStorage: args.useExperimentalStorage,
+	});
+	if (result === null) {
 		return;
 	}
 
-	const flow = buildWorkflowFromNode(triggerNode, workspace);
-	if (flow === null) {
-		return;
-	}
+	const { workflow, trigger } = result;
 
-	await args.callbacks?.flowCreate?.({ flow });
+	await args.callbacks?.flowCreate?.({ flow: workflow });
 
 	const runId = RunId.generate();
 	const flowRun = await createRun({
 		context: args.context,
 		trigger: trigger.configuration.provider,
 		workspaceId: trigger.workspaceId,
-		jobsCount: flow.jobs.length,
+		jobsCount: workflow.jobs.length,
 	});
 	await Promise.all([
 		args.context.storage.setItem(flowRunPath(flowRun.id), flowRun),
@@ -67,7 +97,7 @@ export async function createAndRunFlow(args: {
 	]);
 
 	await runFlow({
-		flow,
+		flow: workflow,
 		context: args.context,
 		flowRunId: flowRun.id,
 		runId,
