@@ -2,15 +2,9 @@ import type { TelemetrySettings } from "ai";
 import { escapeIdentifier } from "pg";
 import * as pgvector from "pgvector/pg";
 import type { z } from "zod/v4";
-import { createColumnMapping } from "../../database";
 import { PoolManager } from "../../database/postgres";
 import { ensurePgVectorTypes } from "../../database/postgres/pgvector-registry";
-import {
-	type ColumnMapping,
-	type DatabaseConfig,
-	REQUIRED_COLUMN_KEYS,
-	type RequiredColumns,
-} from "../../database/types";
+import type { DatabaseConfig } from "../../database/types";
 import type { EmbedderFunction } from "../../embedder";
 import { createDefaultEmbedder } from "../../embedder";
 import {
@@ -19,7 +13,11 @@ import {
 	EmbeddingError,
 	ValidationError,
 } from "../../errors";
+import type { RequiredColumns } from "../column-mapping";
+import { createColumnMapping, REQUIRED_COLUMN_KEYS } from "../column-mapping";
 import type { QueryResult } from "../types";
+
+export type { RequiredColumns } from "../column-mapping";
 
 /**
  * Extract metadata from database row
@@ -123,7 +121,6 @@ export function createPostgresQueryService<
 	database: DatabaseConfig;
 	tableName: string;
 	embedder?: EmbedderFunction;
-	columnMapping?: ColumnMapping<z.infer<TSchema>>;
 	requiredColumnOverrides?: Partial<RequiredColumns>;
 	metadataColumnOverrides?: Partial<Record<keyof z.infer<TSchema>, string>>;
 	contextToFilter: (
@@ -137,14 +134,11 @@ export function createPostgresQueryService<
 	// Resolve default embedder if not provided
 	const defaultEmbedder = config.embedder;
 
-	// Resolve column mapping
-	const columnMapping =
-		config.columnMapping ||
-		createColumnMapping({
-			metadataSchema: config.metadataSchema,
-			requiredColumnOverrides: config.requiredColumnOverrides,
-			metadataColumnOverrides: config.metadataColumnOverrides,
-		});
+	const columnMapping = createColumnMapping({
+		metadataSchema: config.metadataSchema,
+		requiredColumnOverrides: config.requiredColumnOverrides,
+		metadataColumnOverrides: config.metadataColumnOverrides,
+	});
 
 	const search = async (
 		query: string,

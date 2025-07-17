@@ -1,12 +1,14 @@
 import type { z } from "zod/v4";
 import { PoolManager } from "../../database/postgres";
 import { ensurePgVectorTypes } from "../../database/postgres/pgvector-registry";
-import type { ColumnMapping, DatabaseConfig } from "../../database/types";
+import type { DatabaseConfig } from "../../database/types";
 import {
 	ConfigurationError,
 	DatabaseError,
 	ValidationError,
 } from "../../errors";
+import type { RequiredColumns } from "../column-mapping";
+import { createColumnMapping } from "../column-mapping";
 import type { ChunkStore, ChunkWithEmbedding } from "../types";
 import {
 	deleteChunksByDocumentKey,
@@ -24,11 +26,25 @@ export function createPostgresChunkStore<
 >(config: {
 	database: DatabaseConfig;
 	tableName: string;
-	columnMapping: ColumnMapping<z.infer<TSchema>>;
 	metadataSchema: TSchema;
 	scope: Record<string, unknown>;
+	requiredColumnOverrides?: Partial<RequiredColumns>;
+	metadataColumnOverrides?: Partial<Record<keyof z.infer<TSchema>, string>>;
 }): ChunkStore<z.infer<TSchema>> {
-	const { database, tableName, columnMapping, metadataSchema, scope } = config;
+	const {
+		database,
+		tableName,
+		metadataSchema,
+		scope,
+		requiredColumnOverrides,
+		metadataColumnOverrides,
+	} = config;
+
+	const columnMapping = createColumnMapping({
+		metadataSchema,
+		requiredColumnOverrides,
+		metadataColumnOverrides,
+	});
 
 	/**
 	 * Insert chunks with metadata
