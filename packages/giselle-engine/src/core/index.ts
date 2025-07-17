@@ -28,7 +28,9 @@ import {
 	getWorkspaceFlowRuns,
 	type PatchDelta,
 	patchRun,
+	type RunFlowCallbacks,
 	resolveTrigger,
+	runFlow,
 	setTrigger,
 } from "./flows";
 import type { FlowRunId } from "./flows/run/object";
@@ -285,6 +287,15 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 			triggerInputs?: GenerationContextInput[];
 			useExperimentalStorage: boolean;
 		}) => createAndRunFlow({ ...args, context }),
+		runFlow: async (args: {
+			flow: import("@giselle-sdk/data-type").Workflow;
+			flowRunId: FlowRunId;
+			runId: import("@giselle-sdk/data-type").RunId;
+			workspaceId: WorkspaceId;
+			triggerInputs?: GenerationContextInput[];
+			callbacks?: RunFlowCallbacks;
+			useExperimentalStorage: boolean;
+		}) => runFlow({ ...args, context }),
 		handleGitHubWebhookV2: async (args: { request: Request }) =>
 			handleGitHubWebhookV2({ ...args, context }),
 		executeQuery: async (
