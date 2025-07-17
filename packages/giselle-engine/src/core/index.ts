@@ -18,6 +18,7 @@ import { createDataSource, getWorkspaceDataSources } from "./data-source";
 import type { DataSourceProviderObject } from "./data-source/types/object";
 import { copyFile, getFileText, removeFile, uploadFile } from "./files";
 import {
+	buildWorkflowFromTrigger,
 	type ConfigureTriggerInput,
 	configureTrigger,
 	createAndRunFlow,
@@ -273,6 +274,12 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 			deleteTrigger({ ...args, context }),
 		executeAction: async (args: { generation: QueuedGeneration }) =>
 			executeAction({ ...args, context }),
+		buildWorkflowFromTrigger: async (args: {
+			triggerId: FlowTriggerId;
+			useExperimentalStorage: boolean;
+		}) => {
+			return await buildWorkflowFromTrigger({ ...args, context });
+		},
 		createAndRun: async (args: {
 			triggerId: FlowTriggerId;
 			triggerInputs?: GenerationContextInput[];
