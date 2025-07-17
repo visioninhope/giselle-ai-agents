@@ -9,7 +9,9 @@ import {
 	GenerationOrigin,
 	NodeId,
 	QueuedGeneration,
+	RunId,
 	SecretId,
+	Workflow,
 	Workspace,
 	WorkspaceId,
 } from "@giselle-sdk/data-type";
@@ -299,7 +301,7 @@ export const createJsonRouters = {
 				return new Response(null, { status: 204 });
 			},
 		}),
-	runFlow: (giselleEngine: GiselleEngine) =>
+	createAndRunFlow: (giselleEngine: GiselleEngine) =>
 		createHandler({
 			input: z.object({
 				triggerId: FlowTriggerId.schema,
@@ -307,7 +309,22 @@ export const createJsonRouters = {
 				useExperimentalStorage: z.boolean(),
 			}),
 			handler: async ({ input }) => {
-				await giselleEngine.createAndRun(input);
+				await giselleEngine.createAndRunFlow(input);
+				return new Response(null, { status: 204 });
+			},
+		}),
+	runFlow: (giselleEngine: GiselleEngine) =>
+		createHandler({
+			input: z.object({
+				flow: Workflow,
+				flowRunId: FlowRunId.schema,
+				runId: RunId.schema,
+				workspaceId: WorkspaceId.schema,
+				triggerInputs: z.array(GenerationContextInput).optional(),
+				useExperimentalStorage: z.boolean(),
+			}),
+			handler: async ({ input }) => {
+				await giselleEngine.runFlow(input);
 				return new Response(null, { status: 204 });
 			},
 		}),

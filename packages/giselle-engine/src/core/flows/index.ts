@@ -8,4 +8,5 @@ export * from "./get-workspace-flow-runs";
 export * from "./patch-run";
 export * from "./resolve-trigger";
 export * from "./run/object";
+export * from "./run-flow";
 export * from "./set-trigger";
