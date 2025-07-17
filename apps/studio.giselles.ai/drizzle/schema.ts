@@ -263,12 +263,16 @@ export const githubRepositoryIndex = pgTable(
 			.notNull()
 			.references(() => teams.dbId, { onDelete: "cascade" }),
 		installationId: integer("installation_id").notNull(),
+		/** @deprecated Use githubRepositoryContentStatus table instead */
 		lastIngestedCommitSha: text("last_ingested_commit_sha"),
+		/** @deprecated Use githubRepositoryContentStatus table instead */
 		status: text("status")
 			.notNull()
 			.$type<GitHubRepositoryIndexStatus>()
 			.default("idle"),
+		/** @deprecated Use githubRepositoryContentStatus table instead */
 		errorCode: text("error_code"),
+		/** @deprecated Use githubRepositoryContentStatus table instead */
 		retryAfter: timestamp("retry_after"),
 		createdAt: timestamp("created_at").defaultNow().notNull(),
 		updatedAt: timestamp("updated_at")
@@ -279,6 +283,38 @@ export const githubRepositoryIndex = pgTable(
 	(table) => [
 		unique().on(table.owner, table.repo, table.teamDbId),
 		index().on(table.teamDbId),
+		index().on(table.status),
+	],
+);
+
+export type GitHubRepositoryContentType = "blob" | "pull_requests";
+export const githubRepositoryContentStatus = pgTable(
+	"github_repository_content_status",
+	{
+		dbId: serial("db_id").primaryKey(),
+		repositoryIndexDbId: integer("repository_index_db_id")
+			.notNull()
+			.references(() => githubRepositoryIndex.dbId, { onDelete: "cascade" }),
+		contentType: text("content_type")
+			.$type<GitHubRepositoryContentType>()
+			.notNull(),
+		enabled: boolean("enabled").notNull().default(true),
+		status: text("status")
+			.notNull()
+			.$type<GitHubRepositoryIndexStatus>()
+			.default("idle"),
+		lastSyncedAt: timestamp("last_synced_at"),
+		metadata: jsonb("metadata"),
+		errorCode: text("error_code"),
+		retryAfter: timestamp("retry_after"),
+		updatedAt: timestamp("updated_at")
+			.defaultNow()
+			.notNull()
+			.$onUpdate(() => new Date()),
+	},
+	(table) => [
+		unique().on(table.repositoryIndexDbId, table.contentType),
+		index().on(table.repositoryIndexDbId),
 		index().on(table.status),
 	],
 );
@@ -299,6 +335,40 @@ export const githubRepositoryEmbeddings = pgTable(
 	},
 	(table) => [
 		unique().on(table.repositoryIndexDbId, table.path, table.chunkIndex),
+		index().using("hnsw", table.embedding.op("vector_cosine_ops")),
+	],
+);
+
+export type GitHubRepositoryPullRequestContentType =
+	| "title_body"
+	| "comment"
+	| "diff";
+export const githubRepositoryPullRequestEmbeddings = pgTable(
+	"github_repository_pull_request_embeddings",
+	{
+		dbId: serial("db_id").primaryKey(),
+		repositoryIndexDbId: integer("repository_index_db_id")
+			.notNull()
+			.references(() => githubRepositoryIndex.dbId, { onDelete: "cascade" }),
+		prNumber: integer("pr_number").notNull(),
+		prMergedAt: timestamp("pr_merged_at").notNull(),
+		contentType: text("content_type")
+			.$type<GitHubRepositoryPullRequestContentType>()
+			.notNull(),
+		contentId: text("content_id").notNull(),
+		embedding: vector("embedding", { dimensions: 1536 }).notNull(),
+		chunkContent: text("chunk_content").notNull(),
+		chunkIndex: integer("chunk_index").notNull(),
+		createdAt: timestamp("created_at").defaultNow().notNull(),
+	},
+	(table) => [
+		unique().on(
+			table.repositoryIndexDbId,
+			table.prNumber,
+			table.contentType,
+			table.contentId,
+			table.chunkIndex,
+		),
 		index().using("hnsw", table.embedding.op("vector_cosine_ops")),
 	],
 );
