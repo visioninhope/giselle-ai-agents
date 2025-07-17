@@ -11,7 +11,7 @@ import {
 	githubRepositoryContentStatus,
 	githubRepositoryIndex,
 } from "@/drizzle";
-import { safeParseContentStatusMetadata } from "../types";
+import { safeParseContentStatusMetadata } from "../../types";
 import { createGitHubBlobChunkStore } from "./chunk-store";
 
 /**

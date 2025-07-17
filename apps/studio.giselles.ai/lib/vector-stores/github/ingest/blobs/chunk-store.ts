@@ -1,8 +1,8 @@
 import { createPostgresChunkStore } from "@giselle-sdk/rag";
 import { getTableName } from "drizzle-orm";
 import { githubRepositoryEmbeddings } from "@/drizzle";
-import { createDatabaseConfig } from "../database";
-import { githubChunkMetadataSchema } from "../types";
+import { createDatabaseConfig } from "../../database";
+import { githubChunkMetadataSchema } from "../../types";
 
 /**
  * GitHub Blob chunk store factory - for ingestion pipeline

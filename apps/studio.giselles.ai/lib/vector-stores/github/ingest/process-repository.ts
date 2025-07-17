@@ -5,8 +5,8 @@ import { and, eq } from "drizzle-orm";
 import { db, githubRepositoryContentStatus } from "@/drizzle";
 import type { RepositoryWithStatuses } from "../types";
 import { createBlobContentMetadata } from "../types";
+import { ingestGitHubBlobs } from "./blobs/ingest-github-blobs";
 import { buildOctokit } from "./build-octokit";
-import { ingestGitHubBlobs } from "./ingest-github-blobs";
 import { createIngestTelemetrySettings } from "./telemetry";
 
 /**
