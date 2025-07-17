@@ -273,7 +273,7 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 			deleteTrigger({ ...args, context }),
 		executeAction: async (args: { generation: QueuedGeneration }) =>
 			executeAction({ ...args, context }),
-		runFlow: async (args: {
+		createAndRun: async (args: {
 			triggerId: FlowTriggerId;
 			triggerInputs?: GenerationContextInput[];
 			useExperimentalStorage: boolean;

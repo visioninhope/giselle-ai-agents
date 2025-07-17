@@ -307,7 +307,7 @@ export const createJsonRouters = {
 				useExperimentalStorage: z.boolean(),
 			}),
 			handler: async ({ input }) => {
-				await giselleEngine.runFlow(input);
+				await giselleEngine.createAndRun(input);
 				return new Response(null, { status: 204 });
 			},
 		}),
