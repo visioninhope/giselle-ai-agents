@@ -1,1 +1,1 @@
-export * from "./column-mapping-utils";
+export * from "./create-column-mapping";

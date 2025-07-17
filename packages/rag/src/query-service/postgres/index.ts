@@ -17,8 +17,6 @@ import type { RequiredColumns } from "../column-mapping";
 import { createColumnMapping, REQUIRED_COLUMN_KEYS } from "../column-mapping";
 import type { QueryResult } from "../types";
 
-export type { RequiredColumns } from "../column-mapping";
-
 /**
  * Extract metadata from database row
  */

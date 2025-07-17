@@ -1,5 +1,5 @@
 import type { z } from "zod/v4";
-import { createColumnMapping as createGenericColumnMapping } from "../internal/create-column-mapping";
+import { createColumnMapping as createGenericColumnMapping } from "../internal";
 
 export const REQUIRED_COLUMN_KEYS = [
 	"documentKey",

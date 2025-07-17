@@ -1,5 +1,5 @@
 import type { z } from "zod/v4";
-import { createColumnMapping as createGenericColumnMapping } from "../internal/create-column-mapping";
+import { createColumnMapping as createGenericColumnMapping } from "../internal";
 
 export const REQUIRED_COLUMN_KEYS = [
 	"chunkContent",
@@ -12,7 +12,7 @@ export type RequiredColumns = Record<
 	string
 >;
 
-export type ColumnMapping<TMetadata> = Readonly<RequiredColumns> & {
+type ColumnMapping<TMetadata> = Readonly<RequiredColumns> & {
 	[K in Exclude<keyof TMetadata, keyof RequiredColumns>]: string;
 };
 

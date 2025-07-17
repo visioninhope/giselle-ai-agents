@@ -3,7 +3,7 @@ import { z } from "zod/v4";
 /**
  * Convert camelCase to snake_case
  */
-export function toSnakeCase(str: string): string {
+function toSnakeCase(str: string): string {
 	return str.replace(/([a-z0-9])([A-Z])/g, "$1_$2").toLowerCase();
 }
 
@@ -11,7 +11,7 @@ export function toSnakeCase(str: string): string {
  * Get all field names from a Zod schema if it's an object schema.
  * Returns an empty array for non-object schemas.
  */
-export function getSchemaFieldNames<T>(schema: z.ZodType<T>): string[] {
+function getSchemaFieldNames<T>(schema: z.ZodType<T>): string[] {
 	if (schema instanceof z.ZodObject) {
 		return Object.keys(schema.shape);
 	}
