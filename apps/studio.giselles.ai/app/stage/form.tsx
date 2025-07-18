@@ -6,7 +6,6 @@ import type {
 	FlowTrigger,
 	FlowTriggerId,
 	ParameterItem,
-	WorkspaceId,
 } from "@giselle-sdk/data-type";
 import clsx from "clsx/lite";
 import type { InferSelectModel } from "drizzle-orm";
