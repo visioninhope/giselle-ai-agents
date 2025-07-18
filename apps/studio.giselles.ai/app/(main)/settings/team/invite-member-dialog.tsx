@@ -68,21 +68,17 @@ export function InviteMemberDialog({
 			.split(/[,;\s]+/)
 			.filter((email) => email.trim());
 
+		// Remove duplicates within the input batch
+		const uniqueEmails = [...new Set(emails)];
+
 		const validTags: string[] = [];
 		const invalidEmails: string[] = [];
 		const duplicateEmails: string[] = [];
-		const seenInBatch = new Set<string>();
 
-		for (const email of emails) {
+		for (const email of uniqueEmails) {
 			try {
 				// Validate email format
 				parse(pipe(string(), emailValidator()), email);
-
-				// Check for duplicates within the current batch
-				if (seenInBatch.has(email)) {
-					continue; // Skip duplicates within the same input
-				}
-				seenInBatch.add(email);
 
 				// Check if already in tags
 				if (emailTags.includes(email)) {
