@@ -356,7 +356,7 @@ export const githubRepositoryPullRequestEmbeddings = pgTable(
 			.notNull()
 			.references(() => githubRepositoryIndex.dbId, { onDelete: "cascade" }),
 		prNumber: integer("pr_number").notNull(),
-		prMergedAt: timestamp("pr_merged_at").notNull(),
+		mergedAt: timestamp("pr_merged_at").notNull(),
 		contentType: text("content_type")
 			.$type<GitHubRepositoryPullRequestContentType>()
 			.notNull(),
