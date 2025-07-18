@@ -1,12 +1,21 @@
 import { fetchDefaultBranchHead } from "@giselle-sdk/github-tool";
 import { DocumentLoaderError, RagError } from "@giselle-sdk/rag";
 import { captureException } from "@sentry/nextjs";
+import type { TelemetrySettings } from "ai";
 import { and, eq } from "drizzle-orm";
-import { db, githubRepositoryContentStatus } from "@/drizzle";
+import {
+	db,
+	githubRepositoryContentStatus,
+	type githubRepositoryIndex,
+} from "@/drizzle";
 import type { RepositoryWithStatuses } from "../types";
-import { createBlobContentMetadata } from "../types";
+import {
+	createBlobContentMetadata,
+	createPullRequestContentMetadata,
+} from "../types";
 import { ingestGitHubBlobs } from "./blobs/ingest-github-blobs";
-import { buildOctokit } from "./build-octokit";
+import { buildGitHubAuthConfig, buildOctokit } from "./build-octokit";
+import { ingestGitHubPullRequests } from "./pull-requests/ingest-github-pull-requests";
 import { createIngestTelemetrySettings } from "./telemetry";
 
 /**
@@ -16,58 +25,145 @@ import { createIngestTelemetrySettings } from "./telemetry";
 export async function processRepository(
 	repositoryData: RepositoryWithStatuses,
 ) {
-	const { owner, repo, installationId, teamDbId, dbId } =
-		repositoryData.repositoryIndex;
+	const { repositoryIndex, contentStatuses } = repositoryData;
+	const { owner, repo, teamDbId } = repositoryIndex;
 
-	try {
-		await updateRepositoryStatusToRunning(dbId);
+	const telemetry = await createIngestTelemetrySettings(
+		teamDbId,
+		`${owner}/${repo}`,
+	);
 
-		const octokitClient = buildOctokit(installationId);
-		const commit = await fetchDefaultBranchHead(octokitClient, owner, repo);
-		const source = {
-			owner,
-			repo,
-			commitSha: commit.sha,
-		};
+	for (const contentStatus of contentStatuses) {
+		try {
+			await updateContentStatus(
+				repositoryIndex.dbId,
+				contentStatus.contentType,
+				{
+					status: "running",
+				},
+			);
 
-		const telemetry = await createIngestTelemetrySettings(
-			teamDbId,
-			`${owner}/${repo}`,
-		);
+			switch (contentStatus.contentType) {
+				case "blob":
+					await processBlobs({
+						repositoryIndex,
+						telemetry,
+					});
+					break;
+				case "pull_request":
+					await processPullRequests({
+						repositoryIndex,
+						telemetry,
+					});
+					break;
+				default: {
+					const _exhaustiveCheck: never = contentStatus.contentType;
+					throw new Error(`Unknown content type: ${_exhaustiveCheck}`);
+				}
+			}
+		} catch (error) {
+			console.error(
+				`Failed to ingest ${contentStatus.contentType} for GitHub Repository: teamDbId=${teamDbId}, repository=${owner}/${repo}`,
+				error,
+			);
 
-		await ingestGitHubBlobs({
-			octokitClient,
-			source,
-			teamDbId,
-			telemetry,
-		});
+			const { errorCode, retryAfter } = extractErrorInfo(error);
 
-		await updateRepositoryStatusToCompleted(dbId, commit.sha);
-	} catch (error) {
-		console.error(
-			`Failed to ingest GitHub Repository: teamDbId=${teamDbId}, repository=${owner}/${repo}`,
-			error,
-		);
+			captureException(error, {
+				extra: {
+					owner,
+					repo,
+					teamDbId,
+					contentType: contentStatus.contentType,
+					errorCode,
+					retryAfter,
+					errorContext:
+						error instanceof DocumentLoaderError ? error.context : undefined,
+				},
+			});
 
-		const { errorCode, retryAfter } = extractErrorInfo(error);
-
-		captureException(error, {
-			extra: {
-				owner,
-				repo,
-				teamDbId,
-				errorCode,
-				retryAfter,
-				errorContext:
-					error instanceof DocumentLoaderError ? error.context : undefined,
-			},
-		});
-
-		await updateRepositoryStatusToFailed(dbId, {
-			errorCode,
-			retryAfter,
-		});
+			await updateContentStatus(
+				repositoryIndex.dbId,
+				contentStatus.contentType,
+				{
+					status: "failed",
+					errorCode,
+					retryAfter,
+				},
+			);
+		}
 	}
+}
+
+/**
+ * Process blob content for a repository
+ */
+async function processBlobs(params: {
+	repositoryIndex: typeof githubRepositoryIndex.$inferSelect;
+	telemetry?: TelemetrySettings;
+}) {
+	const { repositoryIndex, telemetry } = params;
+	const { owner, repo, installationId, teamDbId, dbId } = repositoryIndex;
+
+	const octokitClient = buildOctokit(installationId);
+	const commit = await fetchDefaultBranchHead(octokitClient, owner, repo);
+	const source = {
+		owner,
+		repo,
+		commitSha: commit.sha,
+	};
+
+	await ingestGitHubBlobs({
+		octokitClient,
+		source,
+		teamDbId,
+		telemetry,
+	});
+
+	await updateContentStatus(dbId, "blob", {
+		status: "completed",
+		metadata: createBlobContentMetadata({
+			lastIngestedCommitSha: commit.sha,
+		}),
+		lastSyncedAt: new Date(),
+		errorCode: null,
+		retryAfter: null,
+	});
+}
+
+/**
+ * Process pull request content for a repository
+ */
+async function processPullRequests(params: {
+	repositoryIndex: typeof githubRepositoryIndex.$inferSelect;
+	telemetry?: TelemetrySettings;
+}) {
+	const { repositoryIndex, telemetry } = params;
+	const { owner, repo, installationId, teamDbId, dbId } = repositoryIndex;
+
+	// Pull requests don't need commit SHA
+	const source = {
+		owner,
+		repo,
+		commitSha: "", // Required by the type but not used for PR ingestion
+	};
+
+	await ingestGitHubPullRequests({
+		githubAuthConfig: buildGitHubAuthConfig(installationId),
+		source,
+		teamDbId,
+		telemetry,
+	});
+
+	await updateContentStatus(dbId, "pull_request", {
+		status: "completed",
+		metadata: createPullRequestContentMetadata({
+			// TODO: Track last ingested PR number
+		}),
+		lastSyncedAt: new Date(),
+		errorCode: null,
+		retryAfter: null,
+	});
 }
 
 /**
@@ -118,88 +214,54 @@ function extractErrorInfo(error: unknown): {
 }
 
 /**
- * Update repository blob content status to running
+ * Update content status for a specific content type
  */
-async function updateRepositoryStatusToRunning(dbId: number) {
-	// Ensure content status record exists
-	const [existing] = await db
-		.select()
-		.from(githubRepositoryContentStatus)
-		.where(
-			and(
-				eq(githubRepositoryContentStatus.repositoryIndexDbId, dbId),
-				eq(githubRepositoryContentStatus.contentType, "blob"),
-			),
-		)
-		.limit(1);
+async function updateContentStatus(
+	repositoryIndexDbId: number,
+	contentType: "blob" | "pull_request",
+	update: {
+		status: "running" | "completed" | "failed";
+		metadata?:
+			| ReturnType<typeof createBlobContentMetadata>
+			| ReturnType<typeof createPullRequestContentMetadata>;
+		lastSyncedAt?: Date;
+		errorCode?: string | null;
+		retryAfter?: Date | null;
+	},
+) {
+	// For running status, ensure the record exists first
+	if (update.status === "running") {
+		const [existing] = await db
+			.select()
+			.from(githubRepositoryContentStatus)
+			.where(
+				and(
+					eq(
+						githubRepositoryContentStatus.repositoryIndexDbId,
+						repositoryIndexDbId,
+					),
+					eq(githubRepositoryContentStatus.contentType, contentType),
+				),
+			)
+			.limit(1);
 
-	if (!existing) {
-		throw new Error(
-			`Blob content status not found for repository dbId: ${dbId}`,
-		);
+		if (!existing) {
+			throw new Error(
+				`${contentType} content status not found for repository dbId: ${repositoryIndexDbId}`,
+			);
+		}
 	}
 
 	await db
 		.update(githubRepositoryContentStatus)
-		.set({
-			status: "running",
-		})
+		.set(update)
 		.where(
 			and(
-				eq(githubRepositoryContentStatus.repositoryIndexDbId, dbId),
-				eq(githubRepositoryContentStatus.contentType, "blob"),
-			),
-		);
-}
-
-/**
- * Update repository blob content status to completed
- */
-async function updateRepositoryStatusToCompleted(
-	dbId: number,
-	commitSha: string,
-) {
-	await db
-		.update(githubRepositoryContentStatus)
-		.set({
-			status: "completed",
-			metadata: createBlobContentMetadata({
-				lastIngestedCommitSha: commitSha,
-			}),
-			lastSyncedAt: new Date(),
-			// clear error info
-			errorCode: null,
-			retryAfter: null,
-		})
-		.where(
-			and(
-				eq(githubRepositoryContentStatus.repositoryIndexDbId, dbId),
-				eq(githubRepositoryContentStatus.contentType, "blob"),
-			),
-		);
-}
-
-/**
- * Update repository blob content status to failed
- */
-async function updateRepositoryStatusToFailed(
-	dbId: number,
-	errorInfo: {
-		errorCode: string;
-		retryAfter: Date | null;
-	},
-) {
-	await db
-		.update(githubRepositoryContentStatus)
-		.set({
-			status: "failed",
-			errorCode: errorInfo.errorCode,
-			retryAfter: errorInfo.retryAfter,
-		})
-		.where(
-			and(
-				eq(githubRepositoryContentStatus.repositoryIndexDbId, dbId),
-				eq(githubRepositoryContentStatus.contentType, "blob"),
+				eq(
+					githubRepositoryContentStatus.repositoryIndexDbId,
+					repositoryIndexDbId,
+				),
+				eq(githubRepositoryContentStatus.contentType, contentType),
 			),
 		);
 }
