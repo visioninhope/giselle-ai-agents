@@ -287,7 +287,7 @@ export const githubRepositoryIndex = pgTable(
 	],
 );
 
-export type GitHubRepositoryContentType = "blob" | "pull_requests";
+export type GitHubRepositoryContentType = "blob" | "pull_request";
 export const githubRepositoryContentStatus = pgTable(
 	"github_repository_content_status",
 	{
