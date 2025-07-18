@@ -292,11 +292,6 @@ export function InviteMemberDialog({
 			return;
 		}
 
-		if (validEmails.length === 0) {
-			setErrors([{ message: "Please enter at least one email address" }]);
-			return;
-		}
-
 		setIsLoading(true);
 
 		const response: SendInvitationsResult = await sendInvitationsAction(
