@@ -22,7 +22,5 @@ export default async function ({
 	}
 	const { actId } = await params;
 
-	return (
-	<AgentWorkspace />
-	);
+	return <AgentWorkspace />;
 }
