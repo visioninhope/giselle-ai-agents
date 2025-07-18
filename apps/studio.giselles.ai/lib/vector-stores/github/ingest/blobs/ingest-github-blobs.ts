@@ -64,6 +64,8 @@ async function getRepositoryIndexInfo(
 	source: { owner: string; repo: string },
 	teamDbId: number,
 ): Promise<{ repositoryIndexDbId: number; isInitialIngest: boolean }> {
+	const contentType = "blob";
+
 	const result = await db
 		.select({
 			dbId: githubRepositoryIndex.dbId,
@@ -77,7 +79,7 @@ async function getRepositoryIndexInfo(
 					githubRepositoryContentStatus.repositoryIndexDbId,
 					githubRepositoryIndex.dbId,
 				),
-				eq(githubRepositoryContentStatus.contentType, "blob"),
+				eq(githubRepositoryContentStatus.contentType, contentType),
 			),
 		)
 		.where(
@@ -85,6 +87,7 @@ async function getRepositoryIndexInfo(
 				eq(githubRepositoryIndex.owner, source.owner),
 				eq(githubRepositoryIndex.repo, source.repo),
 				eq(githubRepositoryIndex.teamDbId, teamDbId),
+				eq(githubRepositoryContentStatus.enabled, true),
 			),
 		)
 		.limit(1);
@@ -103,7 +106,7 @@ async function getRepositoryIndexInfo(
 	}
 	const parseResult = safeParseContentStatusMetadata(
 		contentStatus.metadata,
-		contentStatus.contentType,
+		contentType,
 	);
 
 	// If parsing fails or no lastIngestedCommitSha exists, treat as initial ingest

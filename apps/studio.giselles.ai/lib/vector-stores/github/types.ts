@@ -14,23 +14,34 @@ export type RepositoryWithStatuses = {
 };
 
 /**
- * Schema for blob content metadata
+ * Schema for content metadata
  */
 const blobMetadataSchema = z.object({
 	lastIngestedCommitSha: z.string().optional(),
 });
+const pullRequestMetadataSchema = z.object({
+	lastIngestedPrNumber: z.number().optional(),
+});
+
+/**
+ * Mapping from database content_type (snake_case) to TypeScript keys (camelCase)
+ */
+const contentTypeToSchemaKeyMap = {
+	blob: "blob",
+	pull_request: "pullRequest",
+} as const satisfies Record<GitHubRepositoryContentType, string>;
 
 /**
  * Metadata schema map for each content type
- *
- * TODO: add Pull Request metadata schema when implemented
  */
 const metadataSchemaMap = {
 	blob: blobMetadataSchema,
+	pullRequest: pullRequestMetadataSchema,
 } as const;
 
 type ContentMetadataMap = {
 	blob: z.infer<typeof blobMetadataSchema>;
+	pullRequest: z.infer<typeof pullRequestMetadataSchema>;
 };
 
 export type ContentStatusMetadata =
@@ -38,9 +49,11 @@ export type ContentStatusMetadata =
 	| null;
 
 type ContentMetadataFor<T extends GitHubRepositoryContentType> =
-	T extends keyof ContentMetadataMap ? ContentMetadataMap[T] : never;
-
-type BlobContentMetadata = z.infer<typeof blobMetadataSchema>;
+	T extends keyof typeof contentTypeToSchemaKeyMap
+		? (typeof contentTypeToSchemaKeyMap)[T] extends keyof ContentMetadataMap
+			? ContentMetadataMap[(typeof contentTypeToSchemaKeyMap)[T]]
+			: never
+		: never;
 
 export function safeParseContentStatusMetadata<
 	T extends GitHubRepositoryContentType,
@@ -54,9 +67,17 @@ export function safeParseContentStatusMetadata<
 		return { success: true, data: null };
 	}
 
+	// Map database content_type to schema key (camelCase)
+	const schemaKey = contentTypeToSchemaKeyMap[contentType];
+	if (!schemaKey) {
+		return {
+			success: false,
+			error: `No schema key mapping defined for content type: ${contentType}`,
+		};
+	}
+
 	// Get the appropriate schema for the content type
-	const schema =
-		metadataSchemaMap[contentType as keyof typeof metadataSchemaMap];
+	const schema = metadataSchemaMap[schemaKey as keyof typeof metadataSchemaMap];
 
 	if (!schema) {
 		return {
@@ -74,25 +95,17 @@ export function safeParseContentStatusMetadata<
 	}
 }
 
+type BlobContentMetadata = z.infer<typeof blobMetadataSchema>;
+type PullRequestContentMetadata = z.infer<typeof pullRequestMetadataSchema>;
+
 export function createBlobContentMetadata(
 	data: BlobContentMetadata,
 ): ContentMetadataFor<"blob"> {
 	return blobMetadataSchema.parse(data);
 }
 
-/**
- * GitHub chunk metadata schema and type for RAG storage
- */
-export const githubChunkMetadataSchema = z.object({
-	repositoryIndexDbId: z.number(),
-	fileSha: z.string(),
-	path: z.string(),
-});
-
-/**
- * Query metadata schema for GitHub queries
- */
-export const githubQueryMetadataSchema = z.object({
-	fileSha: z.string(),
-	path: z.string(),
-});
+export function createPullRequestContentMetadata(
+	data: PullRequestContentMetadata,
+): ContentMetadataFor<"pull_request"> {
+	return pullRequestMetadataSchema.parse(data);
+}
