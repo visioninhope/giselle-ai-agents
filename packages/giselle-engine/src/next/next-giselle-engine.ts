@@ -78,6 +78,7 @@ export function createHttpHandler({
 			const file = await giselleEngine.getGeneratedImage(
 				GenerationId.parse(generationId),
 				filename,
+				false, // TODO: Get useExperimentalStorage from request parameters
 			);
 			return new Response(file, {
 				headers: {

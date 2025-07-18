@@ -1,10 +1,5 @@
-import type { WorkspaceId } from "@giselle-sdk/data-type";
-import type {
-	FlowId,
-	GitHubEventNodeMapping,
-	GitHubIntegrationSettingId,
-	GitHubRepositoryIndexId,
-} from "@giselles-ai/types";
+import type { FlowTriggerId, WorkspaceId } from "@giselle-sdk/data-type";
+import type { GitHubRepositoryIndexId } from "@giselles-ai/types";
 import { relations } from "drizzle-orm";
 import {
 	boolean,
@@ -17,14 +12,11 @@ import {
 	text,
 	timestamp,
 	unique,
+	uniqueIndex,
 	vector,
 } from "drizzle-orm/pg-core";
 import type { Stripe } from "stripe";
 import type { AgentId } from "@/services/agents/types";
-import type {
-	GitHubNextAction,
-	GitHubTriggerEvent,
-} from "@/services/external/github/types";
 import type { TeamId } from "@/services/teams/types";
 
 export const subscriptions = pgTable("subscriptions", {
@@ -91,12 +83,9 @@ export const teamMemberships = pgTable(
 			.references(() => teams.dbId, { onDelete: "cascade" }),
 		role: text("role").notNull().$type<TeamRole>(),
 	},
-	(teamMembership) => ({
-		teamMembershipsUserTeamUnique: unique().on(
-			teamMembership.userDbId,
-			teamMembership.teamDbId,
-		),
-	}),
+	(teamMembership) => [
+		unique().on(teamMembership.userDbId, teamMembership.teamDbId),
+	],
 );
 
 export const agents = pgTable(
@@ -121,9 +110,7 @@ export const agents = pgTable(
 			.notNull()
 			.references(() => users.dbId),
 	},
-	(table) => ({
-		teamDbIdIdx: index().on(table.teamDbId),
-	}),
+	(table) => [index().on(table.teamDbId)],
 );
 export const agentsRelations = relations(agents, ({ one }) => ({
 	team: one(teams, {
@@ -149,31 +136,26 @@ export const oauthCredentials = pgTable(
 		createdAt: timestamp("created_at").defaultNow().notNull(),
 		updatedAt: timestamp("updated_at").defaultNow().notNull(),
 	},
-	(table) => ({
-		oauthCredentialsUserIdProviderProviderAccountIdUnique: unique().on(
-			table.userId,
-			table.provider,
-			table.providerAccountId,
-		),
-	}),
+	(table) => [
+		unique().on(table.userId, table.provider, table.providerAccountId),
+	],
 );
 
+/** @deprecated */
 export const githubIntegrationSettings = pgTable(
 	"github_integration_settings",
 	{
-		id: text("id").$type<GitHubIntegrationSettingId>().notNull().unique(),
+		id: text("id").notNull().unique(),
 		agentDbId: integer("agent_db_id")
 			.notNull()
 			.references(() => agents.dbId),
 		dbId: serial("db_id").primaryKey(),
 		repositoryFullName: text("repository_full_name").notNull(),
 		callSign: text("call_sign").notNull(),
-		event: text("event").$type<GitHubTriggerEvent>().notNull(),
-		flowId: text("flow_id").$type<FlowId>().notNull(),
-		eventNodeMappings: jsonb("event_node_mappings")
-			.$type<GitHubEventNodeMapping[]>()
-			.notNull(),
-		nextAction: text("next_action").$type<GitHubNextAction>().notNull(),
+		event: text("event").notNull(),
+		flowId: text("flow_id").notNull(),
+		eventNodeMappings: jsonb("event_node_mappings").notNull(),
+		nextAction: text("next_action").notNull(),
 	},
 );
 
@@ -191,10 +173,7 @@ export const agentActivities = pgTable(
 			() => agentTimeUsageReports.dbId,
 		),
 	},
-	(table) => ({
-		agentDbIdIdx: index().on(table.agentDbId),
-		endedAtIdx: index().on(table.endedAt),
-	}),
+	(table) => [index().on(table.agentDbId), index().on(table.endedAt)],
 );
 
 export const agentTimeUsageReports = pgTable(
@@ -209,11 +188,11 @@ export const agentTimeUsageReports = pgTable(
 		stripeMeterEventId: text("stripe_meter_event_id").notNull(),
 		createdAt: timestamp("created_at").defaultNow().notNull(),
 	},
-	(table) => ({
-		teamDbIdIdx: index().on(table.teamDbId),
-		createdAtIdx: index().on(table.createdAt),
-		stripeMeterEventIdIdx: index().on(table.stripeMeterEventId),
-	}),
+	(table) => [
+		index().on(table.teamDbId),
+		index().on(table.createdAt),
+		index().on(table.stripeMeterEventId),
+	],
 );
 
 export const userSeatUsageReports = pgTable(
@@ -230,11 +209,11 @@ export const userSeatUsageReports = pgTable(
 		isDelta: boolean("is_delta").notNull(),
 		createdAt: timestamp("created_at").defaultNow().notNull(),
 	},
-	(table) => ({
-		teamDbIdIdx: index().on(table.teamDbId),
-		createdAtIdx: index().on(table.createdAt),
-		stripeMeterEventIdIdx: index().on(table.stripeMeterEventId),
-	}),
+	(table) => [
+		index().on(table.teamDbId),
+		index().on(table.createdAt),
+		index().on(table.stripeMeterEventId),
+	],
 );
 
 export const agentTimeRestrictions = pgTable(
@@ -246,9 +225,7 @@ export const agentTimeRestrictions = pgTable(
 			.primaryKey(),
 		createdAt: timestamp("created_at").defaultNow().notNull(),
 	},
-	(table) => ({
-		teamDbIdIdx: index().on(table.teamDbId),
-	}),
+	(table) => [index().on(table.teamDbId)],
 );
 
 export const invitations = pgTable(
@@ -267,9 +244,7 @@ export const invitations = pgTable(
 		createdAt: timestamp("created_at").defaultNow().notNull(),
 		revokedAt: timestamp("revoked_at"),
 	},
-	(table) => ({
-		teamDbIdRevokedAtIdx: index().on(table.teamDbId, table.revokedAt),
-	}),
+	(table) => [index().on(table.teamDbId, table.revokedAt)],
 );
 
 export type GitHubRepositoryIndexStatus =
@@ -301,11 +276,11 @@ export const githubRepositoryIndex = pgTable(
 			.notNull()
 			.$onUpdate(() => new Date()),
 	},
-	(table) => ({
-		ownerRepoTeamUnique: unique().on(table.owner, table.repo, table.teamDbId),
-		teamDbIdIdx: index().on(table.teamDbId),
-		statusIdx: index().on(table.status),
-	}),
+	(table) => [
+		unique().on(table.owner, table.repo, table.teamDbId),
+		index().on(table.teamDbId),
+		index().on(table.status),
+	],
 );
 
 export const githubRepositoryEmbeddings = pgTable(
@@ -322,15 +297,31 @@ export const githubRepositoryEmbeddings = pgTable(
 		chunkIndex: integer("chunk_index").notNull(),
 		createdAt: timestamp("created_at").defaultNow().notNull(),
 	},
-	(table) => ({
-		repositoryIndexDbIdFilePathChunkIndexUnique: unique().on(
-			table.repositoryIndexDbId,
-			table.path,
-			table.chunkIndex,
-		),
-		embeddingIndex: index().using(
-			"hnsw",
-			table.embedding.op("vector_cosine_ops"),
-		),
-	}),
+	(table) => [
+		unique().on(table.repositoryIndexDbId, table.path, table.chunkIndex),
+		index().using("hnsw", table.embedding.op("vector_cosine_ops")),
+	],
+);
+
+export const flowTriggers = pgTable(
+	"flow_triggers",
+	{
+		dbId: serial("db_id").primaryKey(),
+		teamDbId: integer("team_db_id")
+			.notNull()
+			.references(() => teams.dbId, { onDelete: "cascade" }),
+		staged: boolean("staged").notNull().default(false),
+		sdkWorkspaceId: text("workspace_id").$type<WorkspaceId>().notNull(),
+		sdkFlowTriggerId: text("flow_trigger_id").$type<FlowTriggerId>().notNull(),
+		createdAt: timestamp("created_at").defaultNow().notNull(),
+		updatedAt: timestamp("updated_at")
+			.defaultNow()
+			.notNull()
+			.$onUpdate(() => new Date()),
+	},
+	(table) => [
+		uniqueIndex().on(table.sdkFlowTriggerId),
+		index().on(table.teamDbId),
+		index().on(table.staged),
+	],
 );

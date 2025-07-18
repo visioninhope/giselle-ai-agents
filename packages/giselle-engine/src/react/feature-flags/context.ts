@@ -2,11 +2,10 @@ import { createContext, useContext } from "react";
 
 export interface FeatureFlagContextValue {
 	runV3: boolean;
-	sidemenu: boolean;
-	githubTools: boolean;
 	webSearchAction: boolean;
-	layoutV2: boolean;
 	layoutV3: boolean;
+	experimental_storage: boolean;
+	stage: boolean;
 }
 export const FeatureFlagContext = createContext<
 	FeatureFlagContextValue | undefined

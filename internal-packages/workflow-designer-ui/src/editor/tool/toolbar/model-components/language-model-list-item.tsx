@@ -10,7 +10,7 @@ import {
 	ProTag,
 } from "../components";
 
-export function LanguageModelListItem({
+function _LanguageModelListItem({
 	languageModel,
 	...props
 }: Omit<ToggleGroup.ToggleGroupItemProps, "value"> & {

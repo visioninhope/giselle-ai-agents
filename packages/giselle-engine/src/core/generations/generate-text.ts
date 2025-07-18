@@ -26,19 +26,21 @@ import type { PreparedToolSet, TelemetrySettings } from "./types";
 import { buildMessageObject } from "./utils";
 
 // PerplexityProviderOptions is not exported from @ai-sdk/perplexity, so we define it here based on the model configuration
-export type PerplexityProviderOptions = {
+type PerplexityProviderOptions = {
 	search_domain_filter?: string[];
 };
 
 export function generateText(args: {
 	context: GiselleEngineContext;
 	generation: QueuedGeneration;
+	useExperimentalStorage: boolean;
 	telemetry?: TelemetrySettings;
 }) {
 	return useGenerationExecutor({
 		context: args.context,
 		generation: args.generation,
 		telemetry: args.telemetry,
+		useExperimentalStorage: args.useExperimentalStorage,
 		execute: async ({
 			runningGeneration,
 			generationContext,

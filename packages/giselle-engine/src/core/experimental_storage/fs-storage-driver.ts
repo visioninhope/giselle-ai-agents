@@ -2,10 +2,12 @@ import { promises as fs } from "node:fs";
 import { dirname, join } from "node:path";
 import type { z } from "zod/v4";
 import type {
+	BlobLike,
 	GetJsonParams,
 	GiselleStorage,
+	JsonSchema,
 	SetJsonParams,
-} from "./types/interface";
+} from "./types";
 
 export interface FsStorageDriverConfig {
 	root: string;
@@ -17,7 +19,7 @@ async function ensureDir(filePath: string): Promise<void> {
 
 export function fsStorageDriver(config: FsStorageDriverConfig): GiselleStorage {
 	return {
-		async getJson<T extends z.ZodObject>(
+		async getJson<T extends JsonSchema>(
 			params: GetJsonParams<T>,
 		): Promise<z.infer<T>> {
 			const fullPath = join(config.root, params.path);
@@ -26,7 +28,7 @@ export function fsStorageDriver(config: FsStorageDriverConfig): GiselleStorage {
 			return params.schema ? params.schema.parse(obj) : obj;
 		},
 
-		async setJson<T extends z.ZodObject>(
+		async setJson<T extends JsonSchema>(
 			params: SetJsonParams<T>,
 		): Promise<void> {
 			const fullPath = join(config.root, params.path);
@@ -43,10 +45,11 @@ export function fsStorageDriver(config: FsStorageDriverConfig): GiselleStorage {
 			return new Uint8Array(buffer);
 		},
 
-		async setBlob(path: string, data: Uint8Array): Promise<void> {
+		async setBlob(path: string, data: BlobLike): Promise<void> {
 			const fullPath = join(config.root, path);
 			await ensureDir(fullPath);
-			await fs.writeFile(fullPath, data);
+			const uint8Array = new Uint8Array(data);
+			await fs.writeFile(fullPath, uint8Array);
 		},
 
 		async copy(source: string, destination: string): Promise<void> {

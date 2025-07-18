@@ -26,17 +26,12 @@ import {
 } from "@giselle-sdk/text-editor-utils";
 import type { CoreMessage, DataContent, FilePart, ImagePart } from "ai";
 import type { Storage } from "unstorage";
+import type { GiselleStorage } from "../experimental_storage";
 import type { GiselleEngineContext } from "../types";
 
-export interface GeneratedImageData {
+interface GeneratedImageData {
 	uint8Array: Uint8Array;
 	base64: string;
-}
-
-export interface FileIndex {
-	nodeId: NodeId;
-	start: number;
-	end: number;
 }
 
 export async function buildMessageObject(
@@ -291,12 +286,25 @@ export function generationPath(generationId: GenerationId) {
 
 export async function getGeneration(params: {
 	storage: Storage;
+	experimental_storage: GiselleStorage;
+	useExperimentalStorage?: boolean;
 	generationId: GenerationId;
 	options?: {
 		bypassingCache?: boolean;
 		skipMod?: boolean;
 	};
 }): Promise<Generation | undefined> {
+	if (params.useExperimentalStorage) {
+		const generation = await params.experimental_storage.getJson({
+			path: generationPath(params.generationId),
+			schema: Generation,
+		});
+		const parsedGenerationContext = GenerationContext.parse(generation.context);
+		return {
+			...generation,
+			context: parsedGenerationContext,
+		};
+	}
 	const unsafeGeneration = await params.storage.getItem(
 		`${generationPath(params.generationId)}`,
 		{
@@ -333,8 +341,16 @@ export function nodeGenerationIndexPath(nodeId: NodeId) {
 
 export async function getNodeGenerationIndexes(params: {
 	storage: Storage;
+	experimental_storage: GiselleStorage;
+	useExperimentalStorage?: boolean;
 	nodeId: NodeId;
 }) {
+	if (params.useExperimentalStorage) {
+		return await params.experimental_storage.getJson({
+			path: nodeGenerationIndexPath(params.nodeId),
+			schema: NodeGenerationIndex.array(),
+		});
+	}
 	const unsafeNodeGenerationIndexData = await params.storage.getItem(
 		nodeGenerationIndexPath(params.nodeId),
 		{
@@ -410,29 +426,6 @@ function getFilesDescription(
 		return `${getOrdinal(currentCount + 1)} ~ ${getOrdinal(currentCount + newFilesCount)} attached files`;
 	}
 	return `${getOrdinal(currentCount + 1)} attached file`;
-}
-
-export async function getRedirectedUrlAndTitle(url: string) {
-	// Make the request with fetch and set redirect to 'follow'
-	const response = await fetch(url, {
-		redirect: "follow", // This automatically follows redirects
-	});
-
-	// Get the final URL after redirects
-	const finalUrl = response.url;
-
-	// Get the HTML content
-	const html = await response.text();
-
-	// Extract title using a simple regex pattern
-	const titleMatch = html.match(/<title[^>]*>(.*?)<\/title>/i);
-	const title = titleMatch ? titleMatch[1].trim() : "No title found";
-
-	return {
-		originalUrl: url,
-		redirectedUrl: finalUrl,
-		title: title,
-	};
 }
 
 async function buildGenerationMessageForImageGeneration(
@@ -563,19 +556,25 @@ async function buildGenerationMessageForImageGeneration(
 	];
 }
 
-export function generatedImagePath(
-	generationId: GenerationId,
-	filename: string,
-) {
+function generatedImagePath(generationId: GenerationId, filename: string) {
 	return `generations/${generationId}/generated-images/${filename}`;
 }
 
 export async function setGeneratedImage(params: {
 	storage: Storage;
+	experimental_storage: GiselleStorage;
+	useExperimentalStorage?: boolean;
 	generation: Generation;
 	generatedImageFilename: string;
 	generatedImage: GeneratedImageData;
 }) {
+	if (params.useExperimentalStorage) {
+		await params.experimental_storage.setBlob(
+			generatedImagePath(params.generation.id, params.generatedImageFilename),
+			params.generatedImage.uint8Array,
+		);
+		return;
+	}
 	await params.storage.setItemRaw(
 		generatedImagePath(params.generation.id, params.generatedImageFilename),
 		params.generatedImage.uint8Array,
@@ -584,9 +583,16 @@ export async function setGeneratedImage(params: {
 
 export async function getGeneratedImage(params: {
 	storage: Storage;
+	experimental_storage: GiselleStorage;
+	useExperimentalStorage?: boolean;
 	generation: Generation;
 	filename: string;
 }) {
+	if (params.useExperimentalStorage) {
+		return await params.experimental_storage.getBlob(
+			generatedImagePath(params.generation.id, params.filename),
+		);
+	}
 	let image = await params.storage.getItemRaw(
 		generatedImagePath(params.generation.id, params.filename),
 	);

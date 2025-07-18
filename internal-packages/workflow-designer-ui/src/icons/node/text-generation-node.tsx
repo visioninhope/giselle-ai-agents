@@ -5,7 +5,7 @@ import { GoogleWhiteIcon } from "../google";
 import { OpenaiIcon } from "../openai";
 import { PerplexityIcon } from "../perplexity";
 
-export function TextGenerationNodeIcon({
+function _TextGenerationNodeIcon({
 	llmProvider,
 	...props
 }: {

@@ -1,7 +1,7 @@
 import clsx from "clsx/lite";
 import type { SVGProps } from "react";
 
-export function LayersIcon({ className, ...props }: SVGProps<SVGSVGElement>) {
+function _LayersIcon({ className, ...props }: SVGProps<SVGSVGElement>) {
 	return (
 		<svg
 			width="18"

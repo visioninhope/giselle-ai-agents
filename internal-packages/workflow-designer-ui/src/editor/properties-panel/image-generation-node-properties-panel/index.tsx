@@ -1,6 +1,5 @@
 import type { ImageGenerationNode } from "@giselle-sdk/data-type";
 import {
-	useFeatureFlag,
 	useNodeGenerations,
 	useWorkflowDesigner,
 } from "@giselle-sdk/giselle-engine/react";
@@ -74,8 +73,6 @@ export function ImageGenerationNodePropertiesPanel({
 		error,
 	]);
 
-	const { layoutV2 } = useFeatureFlag();
-
 	return (
 		<PropertiesPanelRoot>
 			{usageLimitsReached && <UsageLimitWarning />}
@@ -135,7 +132,6 @@ export function ImageGenerationNodePropertiesPanel({
 							>
 								<Tabs.Trigger value="prompt">Prompt</Tabs.Trigger>
 								<Tabs.Trigger value="model">Model</Tabs.Trigger>
-								{!layoutV2 && <Tabs.Trigger value="input">Input</Tabs.Trigger>}
 							</Tabs.List>
 							<Tabs.Content
 								value="prompt"

@@ -1,10 +1,9 @@
 import { DropdownMenu } from "@giselle-internal/ui/dropdown-menu";
+import { isVectorStoreNode, type QueryNode } from "@giselle-sdk/data-type";
 import {
-	isTextGenerationNode,
-	isVectorStoreNode,
-	type QueryNode,
-} from "@giselle-sdk/data-type";
-import { useWorkflowDesigner } from "@giselle-sdk/giselle-engine/react";
+	defaultName,
+	useWorkflowDesigner,
+} from "@giselle-sdk/giselle-engine/react";
 import { TextEditor } from "@giselle-sdk/text-editor/react-internal";
 import { createSourceExtensionJSONContent } from "@giselle-sdk/text-editor-utils";
 import { AtSignIcon, DatabaseZapIcon, X } from "lucide-react";
@@ -12,13 +11,6 @@ import { Toolbar } from "radix-ui";
 import { useMemo } from "react";
 import { GitHubIcon } from "../../../icons";
 import { type ConnectedSource, useConnectedSources } from "./sources";
-
-function getDefaultNodeName(input: ConnectedSource): string {
-	if (isTextGenerationNode(input.node)) {
-		return input.node.content.llm.id;
-	}
-	return input.node.name ?? "";
-}
 
 function getDataSourceDisplayInfo(input: ConnectedSource) {
 	const node = input.node;
@@ -164,7 +156,7 @@ export function QueryPanel({ node }: { node: QueryNode }) {
 								source,
 							}))}
 							renderItem={(item) =>
-								`${item.source.node.name ?? getDefaultNodeName(item.source)} / ${item.source.output.label}`
+								`${defaultName(item.source.node)} / ${item.source.output.label}`
 							}
 							onSelect={(_, item) => {
 								const embedNode = {

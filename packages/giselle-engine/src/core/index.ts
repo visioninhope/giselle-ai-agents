@@ -18,14 +18,17 @@ import { createDataSource, getWorkspaceDataSources } from "./data-source";
 import type { DataSourceProviderObject } from "./data-source/types/object";
 import { copyFile, getFileText, removeFile, uploadFile } from "./files";
 import {
+	buildWorkflowFromTrigger,
 	type ConfigureTriggerInput,
 	configureTrigger,
+	createAndRunFlow,
 	createRun,
 	deleteTrigger,
 	getTrigger,
 	getWorkspaceFlowRuns,
 	type PatchDelta,
 	patchRun,
+	type RunFlowCallbacks,
 	resolveTrigger,
 	runFlow,
 	setTrigger,
@@ -80,47 +83,93 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 		copyWorkspace: async (workspaceId: WorkspaceId, name?: string) => {
 			return await copyWorkspace({ context, workspaceId, name });
 		},
-		createWorkspace: async () => {
-			return await createWorkspace({ context });
+		createWorkspace: async ({
+			useExperimentalStorage,
+		}: {
+			useExperimentalStorage: boolean;
+		}) => {
+			return await createWorkspace({ context, useExperimentalStorage });
 		},
-		getWorkspace: async (workspaceId: WorkspaceId) => {
-			return await getWorkspace({ context, workspaceId });
+		getWorkspace: async (
+			workspaceId: WorkspaceId,
+			useExperimentalStorage: boolean,
+		) => {
+			return await getWorkspace({
+				context,
+				workspaceId,
+				useExperimentalStorage,
+			});
 		},
-		updateWorkspace: async (workspace: Workspace) => {
-			return await updateWorkspace({ context, workspace });
+		updateWorkspace: async (
+			workspace: Workspace,
+			useExperimentalStorage: boolean,
+		) => {
+			return await updateWorkspace({
+				context,
+				workspace,
+				useExperimentalStorage,
+			});
 		},
 		getLanguageModelProviders: async () => {
 			return await getLanguageModelProviders({ context });
 		},
 		generateText: async (
 			generation: QueuedGeneration,
+			useExperimentalStorage: boolean,
 			telemetry?: TelemetrySettings,
 		) => {
 			return await generateText({
 				context,
 				generation,
+				useExperimentalStorage,
 				telemetry,
 			});
 		},
-		getGeneration: async (generationId: GenerationId) => {
-			return await getGeneration({ context, generationId });
+		getGeneration: async (
+			generationId: GenerationId,
+			useExperimentalStorage: boolean,
+		) => {
+			return await getGeneration({
+				context,
+				generationId,
+				useExperimentalStorage,
+			});
 		},
-		getNodeGenerations: async (origin: GenerationOrigin, nodeId: NodeId) => {
-			return await getNodeGenerations({ context, origin, nodeId });
+		getNodeGenerations: async (
+			origin: GenerationOrigin,
+			nodeId: NodeId,
+			useExperimentalStorage: boolean,
+		) => {
+			return await getNodeGenerations({
+				context,
+				origin,
+				nodeId,
+				useExperimentalStorage,
+			});
 		},
-		cancelGeneration: async (generationId: GenerationId) => {
-			return await cancelGeneration({ context, generationId });
+		cancelGeneration: async (
+			generationId: GenerationId,
+			useExperimentalStorage: boolean,
+		) => {
+			return await cancelGeneration({
+				context,
+				generationId,
+				useExperimentalStorage,
+			});
 		},
 		copyFile: async (
 			workspaceId: WorkspaceId,
 			sourceFileId: FileId,
 			destinationFileId: FileId,
+			useExperimentalStorage: boolean,
 		) => {
 			return await copyFile({
-				context,
+				storage: context.storage,
+				experimental_storage: context.experimental_storage,
 				workspaceId,
 				sourceFileId,
 				destinationFileId,
+				useExperimentalStorage,
 			});
 		},
 		uploadFile: async (
@@ -128,33 +177,63 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 			workspaceId: WorkspaceId,
 			fileId: FileId,
 			fileName: string,
+			useExperimentalStorage: boolean,
 		) => {
-			return await uploadFile({ context, file, workspaceId, fileId, fileName });
+			return await uploadFile({
+				storage: context.storage,
+				experimental_storage: context.experimental_storage,
+				useExperimentalStorage,
+				file,
+				workspaceId,
+				fileId,
+				fileName,
+			});
 		},
-		removeFile: async (workspaceId: WorkspaceId, fileId: FileId) => {
-			return await removeFile({ context, fileId, workspaceId });
+		removeFile: async (
+			workspaceId: WorkspaceId,
+			fileId: FileId,
+			useExperimentalStorage: boolean,
+		) => {
+			return await removeFile({
+				storage: context.storage,
+				experimental_storage: context.experimental_storage,
+				workspaceId,
+				fileId,
+				useExperimentalStorage,
+			});
 		},
 		generateImage: async (
 			generation: QueuedGeneration,
+			useExperimentalStorage: boolean,
 			telemetry?: TelemetrySettings,
 		) => {
 			return await generateImage({
 				context,
 				generation,
+				useExperimentalStorage,
 				telemetry,
 			});
 		},
-		getGeneratedImage: async (generationId: GenerationId, filename: string) => {
+		getGeneratedImage: async (
+			generationId: GenerationId,
+			filename: string,
+			useExperimentalStorage: boolean,
+		) => {
 			return await getGeneratedImage({
 				context,
 				generationId,
 				filename,
+				useExperimentalStorage,
 			});
 		},
-		setGeneration: async (generation: Generation) => {
+		setGeneration: async (
+			generation: Generation,
+			useExperimentalStorage: boolean,
+		) => {
 			return await setGeneration({
 				context,
 				generation,
+				useExperimentalStorage,
 			});
 		},
 		createSampleWorkspace: async () => {
@@ -170,10 +249,16 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 			}
 			return await context.vault.encrypt(plaintext);
 		},
-		resolveTrigger: async (args: { generation: QueuedGeneration }) => {
+		resolveTrigger: async (args: {
+			generation: QueuedGeneration;
+			useExperimentalStorage: boolean;
+		}) => {
 			return await resolveTrigger({ ...args, context });
 		},
-		configureTrigger: async (args: { trigger: ConfigureTriggerInput }) => {
+		configureTrigger: async (args: {
+			trigger: ConfigureTriggerInput;
+			useExperimentalStorage: boolean;
+		}) => {
 			return await configureTrigger({ ...args, context });
 		},
 		getTrigger: async (args: { flowTriggerId: FlowTriggerId }) => {
@@ -191,9 +276,25 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 			deleteTrigger({ ...args, context }),
 		executeAction: async (args: { generation: QueuedGeneration }) =>
 			executeAction({ ...args, context }),
-		runFlow: async (args: {
+		buildWorkflowFromTrigger: async (args: {
+			triggerId: FlowTriggerId;
+			useExperimentalStorage: boolean;
+		}) => {
+			return await buildWorkflowFromTrigger({ ...args, context });
+		},
+		createAndRunFlow: async (args: {
 			triggerId: FlowTriggerId;
 			triggerInputs?: GenerationContextInput[];
+			useExperimentalStorage: boolean;
+		}) => createAndRunFlow({ ...args, context }),
+		runFlow: async (args: {
+			flow: import("@giselle-sdk/data-type").Workflow;
+			flowRunId: FlowRunId;
+			runId: import("@giselle-sdk/data-type").RunId;
+			workspaceId: WorkspaceId;
+			triggerInputs?: GenerationContextInput[];
+			callbacks?: RunFlowCallbacks;
+			useExperimentalStorage: boolean;
 		}) => runFlow({ ...args, context }),
 		handleGitHubWebhookV2: async (args: { request: Request }) =>
 			handleGitHubWebhookV2({ ...args, context }),
@@ -205,8 +306,18 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 			workspaceId: WorkspaceId;
 			webpage: FetchingWebPage;
 		}) => addWebPage({ ...args, context }),
-		async getFileText(args: { workspaceId: WorkspaceId; fileId: FileId }) {
-			return await getFileText({ ...args, context });
+		async getFileText(args: {
+			workspaceId: WorkspaceId;
+			fileId: FileId;
+			useExperimentalStorage: boolean;
+		}) {
+			return await getFileText({
+				storage: context.storage,
+				experimental_storage: context.experimental_storage,
+				workspaceId: args.workspaceId,
+				fileId: args.fileId,
+				useExperimentalStorage: args.useExperimentalStorage,
+			});
 		},
 		async addSecret(args: {
 			workspaceId: WorkspaceId;

@@ -28,6 +28,10 @@ function transformJsonToFormData(json: Record<string, unknown>): FormData {
 			typeof value === "string"
 		) {
 			formData.append(key, value);
+		} else if (typeof value === "boolean") {
+			formData.append(key, JSON.stringify(value));
+		} else {
+			console.warn(`Unsupported type for key ${key}: ${typeof value}`);
 		}
 	}
 	return formData;

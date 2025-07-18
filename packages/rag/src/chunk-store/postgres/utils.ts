@@ -1,7 +1,8 @@
 import type { PoolClient } from "pg";
 import { escapeIdentifier } from "pg";
 import * as pgvector from "pgvector/pg";
-import { type ColumnMapping, REQUIRED_COLUMN_KEYS } from "../../database/types";
+import type { ColumnMapping } from "../column-mapping";
+import { REQUIRED_COLUMN_KEYS } from "../column-mapping";
 import type { ChunkWithEmbedding } from "../types";
 
 const PERFORMANCE_CONSTANTS = {

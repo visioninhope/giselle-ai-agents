@@ -16,8 +16,8 @@ import {
 import type { LanguageModelProvider } from "@giselle-sdk/language-model";
 import { createContext, useCallback, useEffect, useState } from "react";
 import { APICallError } from "../errors";
+import { useFeatureFlag } from "../feature-flags";
 import { useGiselleEngine } from "../use-giselle-engine";
-
 import {
 	useAddConnection,
 	useAddNode,
@@ -49,11 +49,15 @@ export function WorkflowDesignerProvider({
 	saveWorkflowDelay?: number;
 }) {
 	const client = useGiselleEngine();
+	const { experimental_storage } = useFeatureFlag();
 	const { workspace, dispatch } = useWorkspaceReducer(
 		data,
 		async (ws) => {
 			try {
-				await client.updateWorkspace({ workspace: ws });
+				await client.updateWorkspace({
+					workspace: ws,
+					useExperimentalStorage: experimental_storage,
+				});
 			} catch (error) {
 				console.error("Failed to persist graph:", error);
 			}
@@ -159,6 +163,7 @@ export function WorkflowDesignerProvider({
 							file,
 							fileId: uploadingFileData.id,
 							fileName: file.name,
+							useExperimentalStorage: experimental_storage,
 						});
 						const uploadedFileData = createUploadedFileData(
 							uploadingFileData,
@@ -190,7 +195,7 @@ export function WorkflowDesignerProvider({
 				await uploader();
 			}
 		},
-		[updateNodeDataContent, client, data.id],
+		[updateNodeDataContent, client, data.id, experimental_storage],
 	);
 
 	const removeFile = useCallback(
@@ -198,10 +203,11 @@ export function WorkflowDesignerProvider({
 			await client.removeFile({
 				workspaceId: data.id,
 				fileId: uploadedFile.id,
+				useExperimentalStorage: experimental_storage,
 			});
 			dispatch({ type: "NO_OP" });
 		},
-		[client, data.id, dispatch],
+		[client, data.id, dispatch, experimental_storage],
 	);
 
 	const propertiesPanelHelper = usePropertiesPanel();

@@ -49,11 +49,9 @@ export const UrlSource = z.object({
 	providerMetadata: z.custom<ProviderMetadata>().optional(),
 }) as z.ZodType<UrlSource>;
 
-export const Source = UrlSource;
-
 export const SourceOutput = GenerationOutputBase.extend({
 	type: z.literal("source"),
-	sources: z.array(Source),
+	sources: z.array(UrlSource),
 });
 
 const VectorStoreSource = z.discriminatedUnion("provider", [

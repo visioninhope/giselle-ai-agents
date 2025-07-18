@@ -1,7 +1,7 @@
 import { createStorage } from "unstorage";
 import memoryDriver from "unstorage/drivers/memory";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { GiselleEngine } from "../core";
+import { type GiselleEngine, memoryStorageDriver } from "../core";
 import { createHttpHandler } from "./next-giselle-engine";
 
 // Mock the module dependencies
@@ -39,6 +39,7 @@ describe("createHttpHandler", () => {
 			config: {
 				basePath,
 				storage: memoryStorage,
+				experimental_storage: memoryStorageDriver(),
 				vault: {
 					// biome-ignore lint/suspicious/useAwait: decryption is synchronous
 					async encrypt() {
@@ -125,6 +126,7 @@ describe("createHttpHandler", () => {
 		expect(mockGiselleEngine.getGeneratedImage).toHaveBeenCalledWith(
 			generationId,
 			filename,
+			false,
 		);
 		expect(response).toBeInstanceOf(Response);
 		expect(response.headers.get("Content-Type")).toBe("image/png");

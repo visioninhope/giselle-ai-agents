@@ -6,6 +6,7 @@ import {
 } from "@giselle-sdk/giselle-engine/react";
 import { useCallback, useState } from "react";
 import { ReadOnlyBanner } from "../../ui/read-only-banner";
+import { KeyboardShortcuts } from "../keyboard-shortcuts";
 import { tourSteps, WorkspaceTour } from "../workspace-tour";
 import { V2Container, V2Footer, V2Header } from "./components";
 import { RootProvider } from "./components/provider";
@@ -80,6 +81,7 @@ export function V2Placeholder({
 						onLeftPanelClose={handleLeftPanelClose}
 					/>
 				)}
+				<KeyboardShortcuts />
 			</RootProvider>
 			<WorkspaceTour
 				steps={tourSteps}

@@ -13,7 +13,4 @@ export const gitHubQueryService = createPostgresQueryService({
 	tableName: getTableName(githubRepositoryEmbeddings),
 	metadataSchema: githubQueryMetadataSchema,
 	contextToFilter: resolveGitHubEmbeddingFilter,
-	requiredColumnOverrides: {
-		documentKey: "path",
-	},
 });

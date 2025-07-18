@@ -1,7 +1,7 @@
 import { createIdGenerator } from "@giselle-sdk/utils";
 import { z } from "zod/v4";
 
-export const Provider = z.literal("manual");
+const Provider = z.literal("manual");
 
 export const ManualParameterType = z.enum(["text", "multiline-text", "number"]);
 export type ManualParameterType = z.infer<typeof ManualParameterType>;
@@ -24,5 +24,6 @@ export type ManualFlowTriggerEvent = z.infer<typeof ManualFlowTriggerEvent>;
 export const ManualFlowTrigger = z.object({
 	provider: Provider,
 	event: ManualFlowTriggerEvent,
+	staged: z.boolean().default(false),
 });
 export type ManualFlowTrigger = z.infer<typeof ManualFlowTrigger>;

@@ -1,4 +1,8 @@
-import type { CompletedGeneration, WorkspaceId } from "@giselle-sdk/data-type";
+import type {
+	CompletedGeneration,
+	FlowTrigger,
+	WorkspaceId,
+} from "@giselle-sdk/data-type";
 import type {
 	GitHubInstallationAppAuth,
 	GitHubPersonalAccessTokenAuth,
@@ -6,6 +10,7 @@ import type {
 import type { LanguageModelProvider } from "@giselle-sdk/language-model";
 import type { QueryService } from "@giselle-sdk/rag";
 import type { Storage } from "unstorage";
+import type { GiselleStorage } from "./experimental_storage";
 import type { VectorStore } from "./experimental_vector-store/types/interface";
 import type { GenerationCompleteOption, TelemetrySettings } from "./telemetry";
 import type { UsageLimits } from "./usage-limits";
@@ -13,6 +18,7 @@ import type { Vault } from "./vault";
 
 export interface GiselleEngineContext {
 	storage: Storage;
+	experimental_storage: GiselleStorage;
 	sampleAppWorkspaceId?: WorkspaceId;
 	llmProviders: LanguageModelProvider[];
 	integrationConfigs?: {
@@ -34,6 +40,7 @@ export interface GiselleEngineContext {
 			generation: CompletedGeneration,
 			options: GenerationCompleteOption,
 		) => Promise<void>;
+		flowTriggerUpdate?: (flowTrigger: FlowTrigger) => Promise<void>;
 	};
 	vectorStore?: VectorStore;
 }
@@ -89,6 +96,7 @@ export type GitHubVectorStoreQueryService<
 
 export interface GiselleEngineConfig {
 	storage: Storage;
+	experimental_storage: GiselleStorage;
 	sampleAppWorkspaceId?: WorkspaceId;
 	llmProviders?: LanguageModelProvider[];
 	integrationConfigs?: GiselleIntegrationConfig;
@@ -108,6 +116,7 @@ export interface GiselleEngineConfig {
 			generation: CompletedGeneration,
 			options: GenerationCompleteOption,
 		) => Promise<void>;
+		flowTriggerUpdate?: (flowTrigger: FlowTrigger) => Promise<void>;
 	};
 	vectorStore?: VectorStore;
 }

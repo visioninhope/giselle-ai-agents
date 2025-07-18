@@ -1,8 +1,7 @@
 import { graphql as gql } from "./graphql";
 
-export * from "./blob-download-loader";
-export * from "./blob-loader";
 export * from "./discussions";
+export * from "./document-loaders";
 export * from "./errors";
 export * from "./installtion";
 export * from "./issues";

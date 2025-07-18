@@ -112,12 +112,10 @@ export function selectActionTool() {
 	} satisfies SelectEnviromentActionTool;
 }
 
-export function vectorStoreNode(
-	provider: VectorStoreContent["source"]["provider"],
-) {
+function _vectorStoreNode(provider: VectorStoreContent["source"]["provider"]) {
 	return nodeFactories.create("vectorStore", provider);
 }
 
-export function webPageNode() {
+function _webPageNode() {
 	return nodeFactories.create("webPage");
 }

@@ -9,7 +9,9 @@ import {
 	GenerationOrigin,
 	NodeId,
 	QueuedGeneration,
+	RunId,
 	SecretId,
+	Workflow,
 	Workspace,
 	WorkspaceId,
 } from "@giselle-sdk/data-type";
@@ -25,16 +27,25 @@ import { createHandler, withUsageLimitErrorHandler } from "./create-handler";
 export const createJsonRouters = {
 	createWorkspace: (giselleEngine: GiselleEngine) =>
 		createHandler({
-			handler: async () => {
-				const workspace = await giselleEngine.createWorkspace();
+			input: z.object({
+				useExperimentalStorage: z.boolean(),
+			}),
+			handler: async ({ input }) => {
+				const workspace = await giselleEngine.createWorkspace(input);
 				return JsonResponse.json(workspace);
 			},
 		}),
 	getWorkspace: (giselleEngine: GiselleEngine) =>
 		createHandler({
-			input: z.object({ workspaceId: WorkspaceId.schema }),
+			input: z.object({
+				workspaceId: WorkspaceId.schema,
+				useExperimentalStorage: z.boolean(),
+			}),
 			handler: async ({ input }) => {
-				const workspace = await giselleEngine.getWorkspace(input.workspaceId);
+				const workspace = await giselleEngine.getWorkspace(
+					input.workspaceId,
+					input.useExperimentalStorage,
+				);
 				return JsonResponse.json(workspace);
 			},
 		}),
@@ -43,9 +54,13 @@ export const createJsonRouters = {
 		createHandler({
 			input: z.object({
 				workspace: Workspace,
+				useExperimentalStorage: z.boolean(),
 			}),
 			handler: async ({ input }) => {
-				const workspace = await giselleEngine.updateWorkspace(input.workspace);
+				const workspace = await giselleEngine.updateWorkspace(
+					input.workspace,
+					input.useExperimentalStorage,
+				);
 				return JsonResponse.json(workspace);
 			},
 		}),
@@ -61,11 +76,13 @@ export const createJsonRouters = {
 			createHandler({
 				input: z.object({
 					generation: QueuedGeneration,
+					useExperimentalStorage: z.boolean(),
 					telemetry: z.custom<TelemetrySettings>().optional(),
 				}),
 				handler: async ({ input }) => {
 					const stream = await giselleEngine.generateText(
 						input.generation,
+						input.useExperimentalStorage,
 						input.telemetry,
 					);
 					return stream.toDataStreamResponse({
@@ -76,10 +93,14 @@ export const createJsonRouters = {
 		),
 	getGeneration: (giselleEngine: GiselleEngine) =>
 		createHandler({
-			input: z.object({ generationId: GenerationId.schema }),
+			input: z.object({
+				generationId: GenerationId.schema,
+				useExperimentalStorage: z.boolean(),
+			}),
 			handler: async ({ input }) => {
 				const generation = await giselleEngine.getGeneration(
 					input.generationId,
+					input.useExperimentalStorage,
 				);
 				return JsonResponse.json(generation);
 			},
@@ -89,21 +110,27 @@ export const createJsonRouters = {
 			input: z.object({
 				origin: GenerationOrigin,
 				nodeId: NodeId.schema,
+				useExperimentalStorage: z.boolean(),
 			}),
 			handler: async ({ input }) => {
 				const generations = await giselleEngine.getNodeGenerations(
 					input.origin,
 					input.nodeId,
+					input.useExperimentalStorage,
 				);
 				return JsonResponse.json(generations);
 			},
 		}),
 	cancelGeneration: (giselleEngine: GiselleEngine) =>
 		createHandler({
-			input: z.object({ generationId: GenerationId.schema }),
+			input: z.object({
+				generationId: GenerationId.schema,
+				useExperimentalStorage: z.boolean(),
+			}),
 			handler: async ({ input }) => {
 				const generation = await giselleEngine.cancelGeneration(
 					input.generationId,
+					input.useExperimentalStorage,
 				);
 				return JsonResponse.json(generation);
 			},
@@ -113,9 +140,14 @@ export const createJsonRouters = {
 			input: z.object({
 				workspaceId: WorkspaceId.schema,
 				fileId: FileId.schema,
+				useExperimentalStorage: z.boolean(),
 			}),
 			handler: async ({ input }) => {
-				await giselleEngine.removeFile(input.workspaceId, input.fileId);
+				await giselleEngine.removeFile(
+					input.workspaceId,
+					input.fileId,
+					input.useExperimentalStorage,
+				);
 				return new Response(null, { status: 204 });
 			},
 		}),
@@ -125,12 +157,14 @@ export const createJsonRouters = {
 				workspaceId: WorkspaceId.schema,
 				sourceFileId: FileId.schema,
 				destinationFileId: FileId.schema,
+				useExperimentalStorage: z.boolean(),
 			}),
 			handler: async ({ input }) => {
 				await giselleEngine.copyFile(
 					input.workspaceId,
 					input.sourceFileId,
 					input.destinationFileId,
+					input.useExperimentalStorage,
 				);
 
 				return new Response(null, { status: 204 });
@@ -141,19 +175,30 @@ export const createJsonRouters = {
 			createHandler({
 				input: z.object({
 					generation: QueuedGeneration,
+					useExperimentalStorage: z.boolean(),
 					telemetry: z.custom<TelemetrySettings>().optional(),
 				}),
 				handler: async ({ input }) => {
-					await giselleEngine.generateImage(input.generation, input.telemetry);
+					await giselleEngine.generateImage(
+						input.generation,
+						input.useExperimentalStorage,
+						input.telemetry,
+					);
 					return new Response(null, { status: 204 });
 				},
 			}),
 		),
 	setGeneration: (giselleEngine: GiselleEngine) =>
 		createHandler({
-			input: z.object({ generation: Generation }),
+			input: z.object({
+				generation: Generation,
+				useExperimentalStorage: z.boolean(),
+			}),
 			handler: async ({ input }) => {
-				await giselleEngine.setGeneration(input.generation);
+				await giselleEngine.setGeneration(
+					input.generation,
+					input.useExperimentalStorage,
+				);
 				return new Response(null, { status: 204 });
 			},
 		}),
@@ -184,6 +229,7 @@ export const createJsonRouters = {
 		createHandler({
 			input: z.object({
 				generation: QueuedGeneration,
+				useExperimentalStorage: z.boolean(),
 			}),
 			handler: async ({ input }) => {
 				return JsonResponse.json({
@@ -195,6 +241,7 @@ export const createJsonRouters = {
 		createHandler({
 			input: z.object({
 				trigger: ConfigureTriggerInput,
+				useExperimentalStorage: z.boolean(),
 			}),
 			handler: async ({ input }) => {
 				return JsonResponse.json({
@@ -254,16 +301,43 @@ export const createJsonRouters = {
 				return new Response(null, { status: 204 });
 			},
 		}),
-	runFlow: (giselleEngine: GiselleEngine) =>
+	createAndRunFlow: (giselleEngine: GiselleEngine) =>
 		createHandler({
 			input: z.object({
 				triggerId: FlowTriggerId.schema,
 				triggerInputs: z.array(GenerationContextInput).optional(),
+				useExperimentalStorage: z.boolean(),
+			}),
+			handler: async ({ input }) => {
+				await giselleEngine.createAndRunFlow(input);
+				return new Response(null, { status: 204 });
+			},
+		}),
+	runFlow: (giselleEngine: GiselleEngine) =>
+		createHandler({
+			input: z.object({
+				flow: Workflow,
+				flowRunId: FlowRunId.schema,
+				runId: RunId.schema,
+				workspaceId: WorkspaceId.schema,
+				triggerInputs: z.array(GenerationContextInput).optional(),
+				useExperimentalStorage: z.boolean(),
 			}),
 			handler: async ({ input }) => {
 				await giselleEngine.runFlow(input);
 				return new Response(null, { status: 204 });
 			},
+		}),
+	buildWorkflowFromTrigger: (giselleEngine: GiselleEngine) =>
+		createHandler({
+			input: z.object({
+				triggerId: FlowTriggerId.schema,
+				useExperimentalStorage: z.boolean(),
+			}),
+			handler: async ({ input }) =>
+				JsonResponse.json({
+					result: await giselleEngine.buildWorkflowFromTrigger(input),
+				}),
 		}),
 	executeQuery: (giselleEngine: GiselleEngine) =>
 		createHandler({
@@ -290,9 +364,16 @@ export const createJsonRouters = {
 			input: z.object({
 				workspaceId: WorkspaceId.schema,
 				fileId: FileId.schema,
+				useExperimentalStorage: z.boolean(),
 			}),
 			handler: async ({ input }) =>
-				JsonResponse.json({ text: await giselleEngine.getFileText(input) }),
+				JsonResponse.json({
+					text: await giselleEngine.getFileText({
+						workspaceId: input.workspaceId,
+						fileId: input.fileId,
+						useExperimentalStorage: input.useExperimentalStorage,
+					}),
+				}),
 		}),
 	addSecret: (giselleEngine: GiselleEngine) =>
 		createHandler({
@@ -385,10 +466,6 @@ export const createJsonRouters = {
 		}),
 } as const;
 
-export const jsonRouterPaths = Object.keys(
-	createJsonRouters,
-) as JsonRouterPaths[];
-
 // Export the types at module level
 export type JsonRouterPaths = keyof typeof createJsonRouters;
 export type JsonRouterHandlers = {
@@ -409,6 +486,7 @@ export const createFormDataRouters = {
 				fileId: FileId.schema,
 				fileName: z.string(),
 				file: z.instanceof(File),
+				useExperimentalStorage: z.coerce.boolean(),
 			}),
 			handler: async ({ input }) => {
 				await giselleEngine.uploadFile(
@@ -416,15 +494,12 @@ export const createFormDataRouters = {
 					input.workspaceId,
 					input.fileId,
 					input.fileName,
+					input.useExperimentalStorage,
 				);
 				return new Response(null, { status: 202 });
 			},
 		}),
 } as const;
-
-export const formDataRouterPaths = Object.keys(
-	createFormDataRouters,
-) as JsonRouterPaths[];
 
 // Export the types at module level
 export type FormDataRouterPaths = keyof typeof createFormDataRouters;

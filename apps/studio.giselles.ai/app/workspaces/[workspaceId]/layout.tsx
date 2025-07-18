@@ -2,16 +2,15 @@ import { WorkspaceId } from "@giselle-sdk/data-type";
 import { WorkspaceProvider } from "@giselle-sdk/giselle-engine/react";
 import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
-import { getGitHubVectorStores } from "@/app/services/vector-store";
-import { db } from "@/drizzle";
+import { db, flowTriggers } from "@/drizzle";
 import {
-	githubToolsFlag,
-	layoutV2Flag,
+	experimental_storageFlag,
 	layoutV3Flag,
 	runV3Flag,
-	sidemenuFlag,
+	stageFlag,
 	webSearchActionFlag,
 } from "@/flags";
+import { getGitHubVectorStores } from "@/lib/vector-stores/github";
 import { getGitHubIntegrationState } from "@/packages/lib/github";
 import { getUsageLimitsForTeam } from "@/packages/lib/usage-limits";
 import { fetchCurrentUser } from "@/services/accounts";
@@ -43,11 +42,10 @@ export default async function Layout({
 	const usageLimits = await getUsageLimitsForTeam(currentTeam);
 	const gitHubVectorStores = await getGitHubVectorStores(currentTeam.dbId);
 	const runV3 = await runV3Flag();
-	const sidemenu = await sidemenuFlag();
-	const githubTools = await githubToolsFlag();
 	const webSearchAction = await webSearchActionFlag();
-	const layoutV2 = await layoutV2Flag();
 	const layoutV3 = await layoutV3Flag();
+	const experimental_storage = await experimental_storageFlag();
+	const stage = await stageFlag();
 	return (
 		<WorkspaceProvider
 			workspaceId={workspaceId}
@@ -75,11 +73,35 @@ export default async function Layout({
 			}}
 			featureFlag={{
 				runV3,
-				sidemenu,
-				githubTools,
 				webSearchAction,
-				layoutV2,
 				layoutV3,
+				experimental_storage,
+				stage,
+			}}
+			flowTrigger={{
+				callbacks: {
+					flowTriggerUpdate: async (flowTrigger) => {
+						"use server";
+						await db
+							.insert(flowTriggers)
+							.values({
+								teamDbId: currentTeam.dbId,
+								sdkFlowTriggerId: flowTrigger.id,
+								sdkWorkspaceId: flowTrigger.workspaceId,
+								staged:
+									flowTrigger.configuration.provider === "manual" &&
+									flowTrigger.configuration.staged,
+							})
+							.onConflictDoUpdate({
+								target: flowTriggers.dbId,
+								set: {
+									staged:
+										flowTrigger.configuration.provider === "manual" &&
+										flowTrigger.configuration.staged,
+								},
+							});
+					},
+				},
 			}}
 		>
 			{children}

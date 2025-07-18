@@ -2,7 +2,7 @@
 
 import clsx from "clsx/lite";
 import type { ReactNode } from "react";
-import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
+import { Panel, PanelGroup } from "react-resizable-panels";
 
 interface ResizableSectionProps {
 	children: ReactNode;
@@ -16,11 +16,6 @@ interface ResizableSectionProps {
 
 interface ResizableSectionGroupProps {
 	children: ReactNode;
-	direction?: "horizontal" | "vertical";
-	className?: string;
-}
-
-interface ResizableSectionHandleProps {
 	direction?: "horizontal" | "vertical";
 	className?: string;
 }
@@ -71,46 +66,6 @@ export function ResizableSection({
 			)}
 			<div className="flex-1 overflow-hidden h-full">{children}</div>
 		</Panel>
-	);
-}
-
-export function ResizableSectionHandle({
-	direction = "vertical",
-	className,
-}: ResizableSectionHandleProps) {
-	const isVertical = direction === "vertical";
-
-	return (
-		<PanelResizeHandle
-			className={clsx(
-				"transition-colors duration-100 ease-in-out",
-				isVertical
-					? [
-							"h-[3px] bg-border cursor-row-resize",
-							"data-[resize-handle-state=hover]:bg-[#4a90e2]",
-							"data-[resize-handle-state=drag]:bg-[#4a90e2]",
-						]
-					: [
-							"w-[3px] bg-border cursor-col-resize",
-							"data-[resize-handle-state=hover]:bg-[#4a90e2]",
-							"data-[resize-handle-state=drag]:bg-[#4a90e2]",
-						],
-				className,
-			)}
-		/>
-	);
-}
-
-export function ResizableSectionHandleWithIcon({
-	direction = "vertical",
-	className,
-}: ResizableSectionHandleProps) {
-	return (
-		<PanelResizeHandle
-			className={clsx("flex items-center justify-center", className)}
-		>
-			<ResizeHandle direction={direction} />
-		</PanelResizeHandle>
 	);
 }
 

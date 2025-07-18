@@ -21,7 +21,9 @@ export async function createSampleWorkspace(args: {
 		throw new Error("sampleAppWorkspaceId is required");
 	}
 	const templateWorkspace = await getWorkspace({
+		useExperimentalStorage: false,
 		storage: args.context.storage,
+		experimental_storage: args.context.experimental_storage,
 		workspaceId: args.context.sampleAppWorkspaceId,
 	});
 	const idMap = new Map<string, string>();
@@ -119,6 +121,8 @@ export async function createSampleWorkspace(args: {
 			storage: args.context.storage,
 			workspaceId: newWorkspaceId,
 			workspace: newWorkspace,
+			experimental_storage: args.context.experimental_storage,
+			useExperimentalStorage: false,
 		}),
 		copyFiles({
 			storage: args.context.storage,

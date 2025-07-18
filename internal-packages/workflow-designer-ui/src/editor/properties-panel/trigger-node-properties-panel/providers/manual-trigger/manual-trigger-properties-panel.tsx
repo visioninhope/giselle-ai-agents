@@ -1,3 +1,4 @@
+import { Toggle } from "@giselle-internal/ui/toggle";
 import {
 	ManualTriggerParameter,
 	ManualTriggerParameterId,
@@ -6,6 +7,8 @@ import {
 	type TriggerNode,
 } from "@giselle-sdk/data-type";
 import {
+	useFeatureFlag,
+	useFlowTrigger,
 	useGiselleEngine,
 	useWorkflowDesigner,
 } from "@giselle-sdk/giselle-engine/react";
@@ -25,6 +28,9 @@ export function ManualTriggerPropertiesPanel({ node }: { node: TriggerNode }) {
 	const client = useGiselleEngine();
 	const [isPending, startTransition] = useTransition();
 	const [parameters, setParameters] = useState<ManualTriggerParameter[]>([]);
+	const [staged, setStaged] = useState(false);
+	const { experimental_storage, stage } = useFeatureFlag();
+	const { callbacks } = useFlowTrigger();
 
 	const handleAddParameter = useCallback<FormEventHandler<HTMLFormElement>>(
 		(e) => {
@@ -80,7 +86,24 @@ export function ManualTriggerPropertiesPanel({ node }: { node: TriggerNode }) {
 								id: "manual",
 								parameters,
 							},
+							staged,
 						},
+					},
+					useExperimentalStorage: experimental_storage,
+				});
+
+				await callbacks?.flowTriggerUpdate?.({
+					id: triggerId,
+					nodeId: node.id,
+					workspaceId: workspace?.id,
+					enable: true,
+					configuration: {
+						provider: "manual",
+						event: {
+							id: "manual",
+							parameters,
+						},
+						staged,
 					},
 				});
 
@@ -97,7 +120,16 @@ export function ManualTriggerPropertiesPanel({ node }: { node: TriggerNode }) {
 				});
 			});
 		},
-		[parameters, client, node, workspace?.id, updateNodeData],
+		[
+			parameters,
+			staged,
+			client,
+			node,
+			workspace?.id,
+			updateNodeData,
+			callbacks?.flowTriggerUpdate,
+			experimental_storage,
+		],
 	);
 
 	if (node.content.state.status === "configured") {
@@ -209,6 +241,17 @@ export function ManualTriggerPropertiesPanel({ node }: { node: TriggerNode }) {
 					</form>
 				</div>
 			</div>
+
+			{stage && (
+				<div className="mt-[8px]">
+					<Toggle name="staged" checked={staged} onCheckedChange={setStaged}>
+						<label className="text-[12px]" htmlFor="staged">
+							Staged
+						</label>
+						<div className="flex-grow mx-[12px] h-[1px] bg-black-200/30" />
+					</Toggle>
+				</div>
+			)}
 
 			<form onSubmit={handleSubmit}>
 				<button

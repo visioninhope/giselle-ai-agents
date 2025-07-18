@@ -25,7 +25,7 @@ catalog:
   react: 19.1.0
   react-dom: 19.1.0
   node-loader: 2.1.0
-  vitest: 3.1.4
+  vitest: 3.2.4
   "@radix-ui/react-tabs": 1.1.2
   lucide-react: 0.473.0
   clsx: 2.1.1
@@ -74,7 +74,9 @@ catalog:
   langfuse: 3.37.0
   langfuse-core: 3.37.0
   "@vercel/edge-config": 1.4.0
-  "@supabase/supabase-js": 2.50.0
+  "@supabase/supabase-js": 2.50.5
+  "@supabase/auth-js": 2.70.0
+  "@supabase/ssr": 0.6.1
   pg: 8.14.1
   "@types/pg": 8.11.13
   pgvector: 0.2.1

@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const ExternalServiceName = {
+const ExternalServiceName = {
 	Anthropic: "anthropic",
 	Google: "google",
 	OpenAI: "openai",
@@ -8,14 +8,9 @@ export const ExternalServiceName = {
 	Unstructured: "unstructured",
 } as const;
 
-export const UnimplementedServiceName = {
+const UnimplementedServiceName = {
 	Unknown: "unknown", // for type safety
 };
-
-export type ExternalServiceName =
-	// Name of the service to which agent requests
-	| (typeof ExternalServiceName)[keyof typeof ExternalServiceName]
-	| (typeof UnimplementedServiceName)[keyof typeof UnimplementedServiceName];
 
 const BaseMetricsSchema = z.object({
 	duration: z.number().min(0), // Time taken for text generation in milliseconds
@@ -28,10 +23,6 @@ const TokenBasedService = {
 	Google: ExternalServiceName.Google,
 	OpenAI: ExternalServiceName.OpenAI,
 } as const;
-
-export type TokenBasedServiceName =
-	| (typeof TokenBasedService)[keyof typeof TokenBasedService]
-	| (typeof UnimplementedServiceName)[keyof typeof UnimplementedServiceName];
 
 const TokenConsumedSchema = BaseMetricsSchema.extend({
 	externalServiceName: z.union([
@@ -53,9 +44,9 @@ const BasicRequestCountSchema = RequestCount.extend({
 
 const RequestCountSchema = BasicRequestCountSchema;
 
-export type TokenConsumedSchema = z.infer<typeof TokenConsumedSchema>;
-export type RequestCountSchema = z.infer<typeof RequestCountSchema>;
-export type LogSchema = TokenConsumedSchema | RequestCountSchema;
+type TokenConsumedSchema = z.infer<typeof TokenConsumedSchema>;
+type RequestCountSchema = z.infer<typeof RequestCountSchema>;
+type LogSchema = TokenConsumedSchema | RequestCountSchema;
 
 export interface OtelLoggerWrapper {
 	info: (obj: LogSchema, msg?: string) => void;

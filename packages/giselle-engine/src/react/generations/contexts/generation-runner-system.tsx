@@ -28,6 +28,7 @@ import {
 	useRef,
 	useState,
 } from "react";
+import { useFeatureFlag } from "../../feature-flags";
 import { useGiselleEngine } from "../../use-giselle-engine";
 import { GenerationRunner } from "../generation-runner";
 import {
@@ -110,6 +111,7 @@ export function GenerationRunnerSystemProvider({
 	const [generations, setGenerations] = useState<Generation[]>([]);
 	const stopHandlersRef = useRef<Record<GenerationId, () => void>>({});
 	const generationListener = useRef<Record<GenerationId, Generation>>({});
+	const { experimental_storage } = useFeatureFlag();
 
 	const nodeGenerationMap = useMemo(() => {
 		const tmp = new Map<NodeId, Generation[]>();
@@ -300,7 +302,11 @@ export function GenerationRunnerSystemProvider({
 	const updateGenerationStatusToRunning = useCallback(
 		async (generationId: GenerationId) => {
 			const generation = await waitAndGetGenerationRunning(
-				(generationId) => client.getGeneration({ generationId }),
+				(generationId) =>
+					client.getGeneration({
+						generationId,
+						useExperimentalStorage: experimental_storage,
+					}),
 				generationId,
 			);
 			setGenerations((prevGenerations) =>
@@ -311,12 +317,16 @@ export function GenerationRunnerSystemProvider({
 			generationListener.current[generationId] = generation;
 			return generation;
 		},
-		[client],
+		[client, experimental_storage],
 	);
 	const updateGenerationStatusToComplete = useCallback(
 		async (generationId: GenerationId) => {
 			const completedGeneration = await waitAndGetGenerationCompleted(
-				(generationId) => client.getGeneration({ generationId }),
+				(generationId) =>
+					client.getGeneration({
+						generationId,
+						useExperimentalStorage: experimental_storage,
+					}),
 				generationId,
 			);
 			setGenerations((prevGenerations) =>
@@ -329,13 +339,17 @@ export function GenerationRunnerSystemProvider({
 			generationListener.current[generationId] = completedGeneration;
 			return completedGeneration;
 		},
-		[client],
+		[client, experimental_storage],
 	);
 
 	const updateGenerationStatusToFailure = useCallback(
 		async (generationId: GenerationId) => {
 			const failedGeneration = await waitAndGetGenerationFailed(
-				(generationId) => client.getGeneration({ generationId }),
+				(generationId) =>
+					client.getGeneration({
+						generationId,
+						useExperimentalStorage: experimental_storage,
+					}),
 				generationId,
 			);
 			setGenerations((prevGenerations) =>
@@ -348,7 +362,7 @@ export function GenerationRunnerSystemProvider({
 			generationListener.current[generationId] = failedGeneration;
 			return failedGeneration;
 		},
-		[client],
+		[client, experimental_storage],
 	);
 
 	const addStopHandler = useCallback(
@@ -365,6 +379,7 @@ export function GenerationRunnerSystemProvider({
 				handler();
 				await client.cancelGeneration({
 					generationId,
+					useExperimentalStorage: experimental_storage,
 				});
 			}
 			setGenerations((prevGenerations) =>
@@ -387,7 +402,7 @@ export function GenerationRunnerSystemProvider({
 				cancelledAt: Date.now(),
 			} as CancelledGeneration;
 		},
-		[client],
+		[client, experimental_storage],
 	);
 
 	return (

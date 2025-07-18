@@ -7,7 +7,6 @@ import {
 	type TextGenerationNode,
 	type ToolSet,
 } from "@giselle-sdk/data-type";
-import { useFeatureFlag } from "@giselle-sdk/giselle-engine/react";
 import clsx from "clsx/lite";
 import { Tabs } from "radix-ui";
 import { InputPanel } from "./input-panel";
@@ -18,7 +17,7 @@ import {
 	PerplexityModelPanel,
 } from "./model";
 import { PromptPanel } from "./prompt-panel";
-import { GitHubToolsPanel, PostgresToolsPanel, ToolsPanel } from "./tools";
+import { ToolsPanel } from "./tools";
 
 interface TextGenerationTabContentProps {
 	node: TextGenerationNode;
@@ -35,8 +34,6 @@ interface TextGenerationTabContentProps {
 	updateNodeData: <T extends Node>(node: T, data: Partial<T>) => void;
 	data: Workspace;
 	deleteConnection: (connectionId: `cnnc-${string}`) => void;
-	githubTools: boolean;
-	sidemenu: boolean;
 }
 
 export function TextGenerationTabContent({
@@ -47,10 +44,7 @@ export function TextGenerationTabContent({
 	updateNodeData,
 	data,
 	deleteConnection,
-	githubTools,
-	sidemenu,
 }: TextGenerationTabContentProps) {
-	const { layoutV2 } = useFeatureFlag();
 	return (
 		<Tabs.Root
 			className="flex flex-col gap-[8px] h-full"
@@ -69,8 +63,7 @@ export function TextGenerationTabContent({
 			>
 				<Tabs.Trigger value="prompt">Prompt</Tabs.Trigger>
 				<Tabs.Trigger value="model">Model</Tabs.Trigger>
-				{!layoutV2 && <Tabs.Trigger value="input">Input</Tabs.Trigger>}
-				{githubTools && <Tabs.Trigger value="tools">Tools</Tabs.Trigger>}
+				<Tabs.Trigger value="tools">Tools</Tabs.Trigger>
 			</Tabs.List>
 			<Tabs.Content
 				value="prompt"
@@ -330,14 +323,7 @@ export function TextGenerationTabContent({
 				value="tools"
 				className="flex-1 flex flex-col overflow-y-auto p-[4px] gap-[16px] outline-none"
 			>
-				{sidemenu ? (
-					<ToolsPanel node={node} />
-				) : (
-					<div className="p-[8px]">
-						<GitHubToolsPanel node={node} />
-						<PostgresToolsPanel node={node} />
-					</div>
-				)}
+				<ToolsPanel node={node} />
 			</Tabs.Content>
 		</Tabs.Root>
 	);

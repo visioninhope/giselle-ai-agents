@@ -16,12 +16,15 @@ export type ConfigureTriggerInput = z.infer<typeof ConfigureTriggerInput>;
 export async function configureTrigger(args: {
 	context: GiselleEngineContext;
 	trigger: ConfigureTriggerInput;
+	useExperimentalStorage: boolean;
 }) {
 	const flowTriggerId = FlowTriggerId.generate();
 	const [workspace] = await Promise.all([
 		getWorkspace({
 			storage: args.context.storage,
+			experimental_storage: args.context.experimental_storage,
 			workspaceId: args.trigger.workspaceId,
+			useExperimentalStorage: args.useExperimentalStorage,
 		}),
 		setFlowTrigger({
 			storage: args.context.storage,
@@ -58,6 +61,8 @@ export async function configureTrigger(args: {
 					: node,
 			),
 		},
+		experimental_storage: args.context.experimental_storage,
+		useExperimentalStorage: args.useExperimentalStorage,
 	});
 	return flowTriggerId;
 }

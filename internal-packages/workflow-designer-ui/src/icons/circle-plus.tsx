@@ -1,6 +1,6 @@
 import type { FC, SVGProps } from "react";
 
-export const CirclePlusIcon: FC<SVGProps<SVGSVGElement>> = (props) => (
+const _CirclePlusIcon: FC<SVGProps<SVGSVGElement>> = (props) => (
 	<svg
 		width="20"
 		height="20"

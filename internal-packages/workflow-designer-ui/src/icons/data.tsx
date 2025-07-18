@@ -1,6 +1,6 @@
 import type { FC, SVGProps } from "react";
 
-export const DataIcon: FC<SVGProps<SVGSVGElement>> = (props) => (
+const _DataIcon: FC<SVGProps<SVGSVGElement>> = (props) => (
 	<svg
 		width="24"
 		height="24"

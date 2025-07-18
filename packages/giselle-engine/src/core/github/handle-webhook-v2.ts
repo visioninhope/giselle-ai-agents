@@ -11,7 +11,7 @@ import {
 	type WebhookEvent,
 	type WebhookEventName,
 } from "@giselle-sdk/github-tool";
-import { runFlow } from "../flows";
+import { createAndRunFlow } from "../flows";
 import { getFlowTrigger } from "../flows/utils";
 import { getGitHubRepositoryIntegrationIndex } from "../integrations/utils";
 import type { GiselleEngineContext } from "../types";
@@ -47,7 +47,7 @@ export async function handleGitHubWebhookV2(args: {
 				getGitHubRepositoryIntegrationIndex,
 				addReaction,
 				ensureWebhookEvent,
-				runFlow,
+				createAndRunFlow,
 				parseCommand,
 				createIssueComment,
 				createPullRequestComment,
@@ -100,7 +100,7 @@ function hasRequiredPayloadProps(event: unknown): event is {
 		"id" in event.data.payload.installation
 	);
 }
-export interface ProcessDeps {
+interface ProcessDeps {
 	getFlowTrigger: typeof getFlowTrigger;
 	getGitHubRepositoryIntegrationIndex: typeof getGitHubRepositoryIntegrationIndex;
 }

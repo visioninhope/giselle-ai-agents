@@ -31,6 +31,7 @@ export async function useGenerationExecutor<T>(args: {
 	context: GiselleEngineContext;
 	generation: QueuedGeneration;
 	telemetry?: TelemetrySettings;
+	useExperimentalStorage?: boolean;
 	execute: (utils: {
 		runningGeneration: RunningGeneration;
 		generationContext: GenerationContext;
@@ -61,7 +62,12 @@ export async function useGenerationExecutor<T>(args: {
 		startedAt: Date.now(),
 	};
 	const setGeneration = async (generation: Generation) => {
-		await internalSetGeneration({ storage: args.context.storage, generation });
+		await internalSetGeneration({
+			storage: args.context.storage,
+			experimental_storage: args.context.experimental_storage,
+			useExperimentalStorage: args.useExperimentalStorage,
+			generation,
+		});
 	};
 	await setGeneration(runningGeneration);
 	let workspaceId: WorkspaceId;
@@ -111,6 +117,8 @@ export async function useGenerationExecutor<T>(args: {
 	async function generationContentResolver(nodeId: NodeId, outputId: OutputId) {
 		const nodeGenerationIndexes = await getNodeGenerationIndexes({
 			storage: args.context.storage,
+			experimental_storage: args.context.experimental_storage,
+			useExperimentalStorage: args.useExperimentalStorage,
 			nodeId,
 		});
 		if (
@@ -121,6 +129,8 @@ export async function useGenerationExecutor<T>(args: {
 		}
 		const generation = await getGeneration({
 			storage: args.context.storage,
+			experimental_storage: args.context.experimental_storage,
+			useExperimentalStorage: args.useExperimentalStorage,
 			generationId: nodeGenerationIndexes[nodeGenerationIndexes.length - 1].id,
 		});
 		if (generation === undefined || !isCompletedGeneration(generation)) {

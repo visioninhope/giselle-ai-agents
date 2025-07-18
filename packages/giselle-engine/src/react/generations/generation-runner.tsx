@@ -6,6 +6,7 @@ import {
 	isTextGenerationNode,
 } from "@giselle-sdk/data-type";
 import { useEffect, useRef } from "react";
+import { useFeatureFlag } from "../feature-flags";
 import { useTelemetry } from "../telemetry";
 import { useGiselleEngine } from "../use-giselle-engine";
 import { useGenerationRunnerSystem } from "./contexts/generation-runner-system";
@@ -66,6 +67,7 @@ function TextGenerationRunner({ generation }: { generation: Generation }) {
 }
 
 function CompletionRunner({ generation }: { generation: Generation }) {
+	const { experimental_storage } = useFeatureFlag();
 	const {
 		generateTextApi,
 		updateGenerationStatusToRunning,
@@ -104,6 +106,7 @@ function CompletionRunner({ generation }: { generation: Generation }) {
 				body: {
 					generation,
 					telemetry,
+					useExperimentalStorage: experimental_storage,
 				},
 			},
 		);
@@ -117,6 +120,7 @@ function ImageGenerationRunner({ generation }: { generation: Generation }) {
 		updateGenerationStatusToRunning,
 		addStopHandler,
 	} = useGenerationRunnerSystem();
+	const { experimental_storage } = useFeatureFlag();
 	const client = useGiselleEngine();
 	const telemetry = useTelemetry();
 	const stop = () => {};
@@ -125,17 +129,23 @@ function ImageGenerationRunner({ generation }: { generation: Generation }) {
 			return;
 		}
 		addStopHandler(generation.id, stop);
-		client.setGeneration({ generation }).then(() => {
-			updateGenerationStatusToRunning(generation.id);
-			client
-				.generateImage({
-					generation,
-					telemetry,
-				})
-				.then(() => {
-					updateGenerationStatusToComplete(generation.id);
-				});
-		});
+		client
+			.setGeneration({
+				generation,
+				useExperimentalStorage: experimental_storage,
+			})
+			.then(() => {
+				updateGenerationStatusToRunning(generation.id);
+				client
+					.generateImage({
+						generation,
+						telemetry,
+						useExperimentalStorage: experimental_storage,
+					})
+					.then(() => {
+						updateGenerationStatusToComplete(generation.id);
+					});
+			});
 	});
 	return null;
 }
@@ -146,6 +156,7 @@ function TriggerRunner({ generation }: { generation: Generation }) {
 		updateGenerationStatusToRunning,
 		addStopHandler,
 	} = useGenerationRunnerSystem();
+	const { experimental_storage } = useFeatureFlag();
 	const client = useGiselleEngine();
 	const stop = () => {};
 	useOnce(() => {
@@ -153,16 +164,22 @@ function TriggerRunner({ generation }: { generation: Generation }) {
 			return;
 		}
 		addStopHandler(generation.id, stop);
-		client.setGeneration({ generation }).then(() => {
-			updateGenerationStatusToRunning(generation.id);
-			client
-				.resolveTrigger({
-					generation,
-				})
-				.then(() => {
-					updateGenerationStatusToComplete(generation.id);
-				});
-		});
+		client
+			.setGeneration({
+				generation,
+				useExperimentalStorage: experimental_storage,
+			})
+			.then(() => {
+				updateGenerationStatusToRunning(generation.id);
+				client
+					.resolveTrigger({
+						generation,
+						useExperimentalStorage: experimental_storage,
+					})
+					.then(() => {
+						updateGenerationStatusToComplete(generation.id);
+					});
+			});
 	});
 	return null;
 }
@@ -173,6 +190,7 @@ function ActionRunner({ generation }: { generation: Generation }) {
 		updateGenerationStatusToRunning,
 		addStopHandler,
 	} = useGenerationRunnerSystem();
+	const { experimental_storage } = useFeatureFlag();
 	const client = useGiselleEngine();
 	const stop = () => {};
 	useOnce(() => {
@@ -180,16 +198,21 @@ function ActionRunner({ generation }: { generation: Generation }) {
 			return;
 		}
 		addStopHandler(generation.id, stop);
-		client.setGeneration({ generation }).then(() => {
-			updateGenerationStatusToRunning(generation.id);
-			client
-				.executeAction({
-					generation,
-				})
-				.then(() => {
-					updateGenerationStatusToComplete(generation.id);
-				});
-		});
+		client
+			.setGeneration({
+				generation,
+				useExperimentalStorage: experimental_storage,
+			})
+			.then(() => {
+				updateGenerationStatusToRunning(generation.id);
+				client
+					.executeAction({
+						generation,
+					})
+					.then(() => {
+						updateGenerationStatusToComplete(generation.id);
+					});
+			});
 	});
 	return null;
 }
@@ -201,6 +224,7 @@ function QueryRunner({ generation }: { generation: Generation }) {
 		updateGenerationStatusToFailure,
 		addStopHandler,
 	} = useGenerationRunnerSystem();
+	const { experimental_storage } = useFeatureFlag();
 	const client = useGiselleEngine();
 	const telemetry = useTelemetry();
 	const stop = () => {};
@@ -210,7 +234,10 @@ function QueryRunner({ generation }: { generation: Generation }) {
 		}
 		addStopHandler(generation.id, stop);
 		client
-			.setGeneration({ generation })
+			.setGeneration({
+				generation,
+				useExperimentalStorage: experimental_storage,
+			})
 			.then(() => {
 				updateGenerationStatusToRunning(generation.id);
 				client

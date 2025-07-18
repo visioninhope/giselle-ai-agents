@@ -1,35 +1,28 @@
 import {
 	type FailedGeneration,
-	type FlowTriggerId,
 	type GenerationContextInput,
 	GenerationId,
 	type Job,
 	type QueuedGeneration,
-	RunId,
+	type RunId,
 	type Workflow,
 	type WorkspaceId,
 } from "@giselle-sdk/data-type";
-import { buildWorkflowFromNode } from "@giselle-sdk/workflow-utils";
 import { AISDKError } from "ai";
 import { generateImage, generateText, setGeneration } from "../generations";
 import { executeAction } from "../operations";
 import { executeQuery } from "../operations/execute-query";
 import type { GiselleEngineContext } from "../types";
-import { getWorkspace } from "../workspaces/utils";
-import { createRun } from "./create-run";
 import { patchRun } from "./patch-run";
 import { resolveTrigger } from "./resolve-trigger";
-import { type FlowRunId, FlowRunIndexObject } from "./run/object";
-import { flowRunPath, workspaceFlowRunPath } from "./run/paths";
-import { getFlowTrigger } from "./utils";
+import type { FlowRunId } from "./run/object";
 
-type Callbacks = {
-	flowCreate?: (args: { flow: Workflow }) => void | Promise<void>;
+export interface RunFlowCallbacks {
 	jobStart?: (args: { job: Job }) => void | Promise<void>;
 	jobFail?: (args: { job: Job }) => void | Promise<void>;
 	jobComplete?: (args: { job: Job }) => void | Promise<void>;
 	jobSkip?: (args: { job: Job }) => void | Promise<void>;
-};
+}
 
 function createQueuedGeneration(args: {
 	operation: Job["operations"][number];
@@ -59,18 +52,23 @@ async function executeOperation(args: {
 	generation: QueuedGeneration;
 	node: Job["operations"][number]["node"];
 	flowRunId: FlowRunId;
+	useExperimentalStorage: boolean;
 }): Promise<boolean> {
-	const { context, generation, node, flowRunId } = args;
+	const { context, generation, node, flowRunId, useExperimentalStorage } = args;
 	switch (node.content.type) {
 		case "action":
 			await executeAction({ context, generation });
 			return false;
 		case "imageGeneration":
-			await generateImage({ context, generation });
+			await generateImage({ context, generation, useExperimentalStorage });
 			return false;
 		case "textGeneration": {
 			let hadError = false;
-			const result = await generateText({ context, generation });
+			const result = await generateText({
+				context,
+				generation,
+				useExperimentalStorage,
+			});
 			await result.consumeStream({
 				onError: async (error) => {
 					hadError = true;
@@ -90,6 +88,7 @@ async function executeOperation(args: {
 							setGeneration({
 								context,
 								generation: failedGeneration,
+								useExperimentalStorage,
 							}),
 							patchRun({
 								context,
@@ -131,7 +130,8 @@ async function runJob(args: {
 	runId: RunId;
 	workspaceId: WorkspaceId;
 	triggerInputs?: GenerationContextInput[];
-	callbacks?: Callbacks;
+	callbacks?: RunFlowCallbacks;
+	useExperimentalStorage: boolean;
 }): Promise<boolean> {
 	const {
 		job,
@@ -141,6 +141,7 @@ async function runJob(args: {
 		workspaceId,
 		triggerInputs,
 		callbacks,
+		useExperimentalStorage,
 	} = args;
 
 	await callbacks?.jobStart?.({ job });
@@ -170,6 +171,7 @@ async function runJob(args: {
 				generation,
 				node: operation.node,
 				flowRunId,
+				useExperimentalStorage,
 			});
 			const duration = Date.now() - operationStart;
 
@@ -214,83 +216,40 @@ async function runJob(args: {
 	return hasJobError;
 }
 
-/** @todo telemetry */
 export async function runFlow(args: {
-	triggerId: FlowTriggerId;
+	flow: Workflow;
 	context: GiselleEngineContext;
+	flowRunId: FlowRunId;
+	runId: RunId;
+	workspaceId: WorkspaceId;
 	triggerInputs?: GenerationContextInput[];
-	callbacks?: {
-		flowCreate?: (args: { flow: Workflow }) => void | Promise<void>;
-		jobStart?: (args: { job: Job }) => void | Promise<void>;
-		jobFail?: (args: { job: Job }) => void | Promise<void>;
-		jobComplete?: (args: { job: Job }) => void | Promise<void>;
-		jobSkip?: (args: { job: Job }) => void | Promise<void>;
-	};
+	callbacks?: RunFlowCallbacks;
+	useExperimentalStorage: boolean;
 }) {
-	const trigger = await getFlowTrigger({
-		storage: args.context.storage,
-		flowTriggerId: args.triggerId,
-	});
-	if (trigger === undefined || !trigger.enable) {
-		return;
-	}
-	const workspace = await getWorkspace({
-		storage: args.context.storage,
-		workspaceId: trigger.workspaceId,
-	});
-
-	const triggerNode = workspace.nodes.find(
-		(node) => node.id === trigger.nodeId,
-	);
-	if (triggerNode === undefined) {
-		return;
-	}
-
-	const flow = buildWorkflowFromNode(triggerNode, workspace);
-	if (flow === null) {
-		return;
-	}
-
-	await args.callbacks?.flowCreate?.({ flow });
-
-	const runId = RunId.generate();
-	const flowRun = await createRun({
-		context: args.context,
-		trigger: trigger.configuration.provider,
-		workspaceId: trigger.workspaceId,
-		jobsCount: flow.jobs.length,
-	});
-	await Promise.all([
-		args.context.storage.setItem(flowRunPath(flowRun.id), flowRun),
-		args.context.storage.setItem(
-			workspaceFlowRunPath(trigger.workspaceId),
-			FlowRunIndexObject.parse(flowRun),
-		),
-	]);
-
 	const flowStart = Date.now();
 
-	for (let i = 0; i < flow.jobs.length; i++) {
-		const job = flow.jobs[i];
+	for (let i = 0; i < args.flow.jobs.length; i++) {
+		const job = args.flow.jobs[i];
 		const errored = await runJob({
 			job,
 			context: args.context,
-			flowRunId: flowRun.id,
-			runId,
-			workspaceId: trigger.workspaceId,
+			flowRunId: args.flowRunId,
+			runId: args.runId,
+			workspaceId: args.workspaceId,
 			triggerInputs: args.triggerInputs,
 			callbacks: args.callbacks,
+			useExperimentalStorage: args.useExperimentalStorage,
 		});
 
 		if (errored) {
 			// Skip remaining jobs
-			for (let j = i + 1; j < flow.jobs.length; j++) {
-				await args.callbacks?.jobSkip?.({ job: flow.jobs[j] });
+			for (let j = i + 1; j < args.flow.jobs.length; j++) {
+				await args.callbacks?.jobSkip?.({ job: args.flow.jobs[j] });
 			}
 
 			await patchRun({
 				context: args.context,
-				flowRunId: flowRun.id,
+				flowRunId: args.flowRunId,
 				delta: {
 					status: { set: "failed" },
 					"duration.wallClock": { set: Date.now() - flowStart },
@@ -303,7 +262,7 @@ export async function runFlow(args: {
 	// All jobs completed successfully
 	await patchRun({
 		context: args.context,
-		flowRunId: flowRun.id,
+		flowRunId: args.flowRunId,
 		delta: {
 			status: { set: "completed" },
 			"duration.wallClock": { set: Date.now() - flowStart },

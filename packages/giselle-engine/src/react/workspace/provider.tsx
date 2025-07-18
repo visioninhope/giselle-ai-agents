@@ -8,6 +8,10 @@ import {
 	type FeatureFlagContextValue,
 } from "../feature-flags";
 import { WorkflowDesignerProvider } from "../flow";
+import {
+	FlowTriggerContext,
+	type FlowTriggerContextValue,
+} from "../flow-trigger";
 import { GenerationRunnerSystemProvider } from "../generations";
 import {
 	IntegrationProvider,
@@ -29,6 +33,7 @@ export function WorkspaceProvider({
 	telemetry,
 	featureFlag,
 	vectorStore,
+	flowTrigger,
 }: {
 	children: ReactNode;
 	workspaceId: WorkspaceId;
@@ -37,6 +42,7 @@ export function WorkspaceProvider({
 	telemetry?: TelemetrySettings;
 	featureFlag?: FeatureFlagContextValue;
 	vectorStore?: VectorStoreContextValue;
+	flowTrigger?: FlowTriggerContextValue;
 }) {
 	const client = useGiselleEngine();
 
@@ -45,38 +51,40 @@ export function WorkspaceProvider({
 		client
 			.getWorkspace({
 				workspaceId,
+				useExperimentalStorage: featureFlag?.experimental_storage ?? false,
 			})
 			.then((workspace) => {
 				setWorkspace(workspace);
 			});
-	}, [workspaceId, client]);
+	}, [workspaceId, client, featureFlag?.experimental_storage]);
 	if (workspace === undefined) {
 		return null;
 	}
 	return (
-		<TelemetryProvider settings={telemetry}>
-			<UsageLimitsProvider limits={usageLimits}>
-				<IntegrationProvider {...integration}>
-					<VectorStoreProvider value={vectorStore}>
-						<WorkflowDesignerProvider data={workspace}>
-							<GenerationRunnerSystemProvider>
-								<FeatureFlagContext
-									value={{
-										runV3: featureFlag?.runV3 ?? false,
-										sidemenu: featureFlag?.sidemenu ?? false,
-										githubTools: featureFlag?.githubTools ?? false,
-										webSearchAction: featureFlag?.webSearchAction ?? false,
-										layoutV2: featureFlag?.layoutV2 ?? false,
-										layoutV3: featureFlag?.layoutV3 ?? false,
-									}}
-								>
-									{children}
-								</FeatureFlagContext>
-							</GenerationRunnerSystemProvider>
-						</WorkflowDesignerProvider>
-					</VectorStoreProvider>
-				</IntegrationProvider>
-			</UsageLimitsProvider>
-		</TelemetryProvider>
+		<FeatureFlagContext
+			value={{
+				runV3: featureFlag?.runV3 ?? false,
+				webSearchAction: featureFlag?.webSearchAction ?? false,
+				layoutV3: featureFlag?.layoutV3 ?? false,
+				experimental_storage: featureFlag?.experimental_storage ?? false,
+				stage: featureFlag?.stage ?? false,
+			}}
+		>
+			<TelemetryProvider settings={telemetry}>
+				<FlowTriggerContext value={flowTrigger}>
+					<UsageLimitsProvider limits={usageLimits}>
+						<IntegrationProvider {...integration}>
+							<VectorStoreProvider value={vectorStore}>
+								<WorkflowDesignerProvider data={workspace}>
+									<GenerationRunnerSystemProvider>
+										{children}
+									</GenerationRunnerSystemProvider>
+								</WorkflowDesignerProvider>
+							</VectorStoreProvider>
+						</IntegrationProvider>
+					</UsageLimitsProvider>
+				</FlowTriggerContext>
+			</TelemetryProvider>
+		</FeatureFlagContext>
 	);
 }

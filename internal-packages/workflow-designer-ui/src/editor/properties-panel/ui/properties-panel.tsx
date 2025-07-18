@@ -1,7 +1,7 @@
 "use client";
 
 import type { Node } from "@giselle-sdk/data-type";
-import { defaultName, useFeatureFlag } from "@giselle-sdk/giselle-engine/react";
+import { defaultName } from "@giselle-sdk/giselle-engine/react";
 import type { ReactNode } from "react";
 import { EditableText } from "../../../ui/editable-text";
 import {
@@ -33,72 +33,15 @@ export function PropertiesPanelHeader({
 	onChangeName?: (name?: string) => void;
 	action?: ReactNode;
 }) {
-	const { sidemenu, layoutV2 } = useFeatureFlag();
-	if (sidemenu) {
-		return (
-			<div className={getHeaderClasses(sidemenu)}>
-				<div className={`flex ${PANEL_SPACING.HEADER.ICON_GAP} items-center`}>
-					<div
-						className={
-							layoutV2
-								? "bg-white-900 rounded-[4px] flex items-center justify-center"
-								: `w-[${PANEL_SPACING.HEADER.ICON_SIZE}] h-[${PANEL_SPACING.HEADER.ICON_SIZE}] bg-white-900 rounded-[4px] flex items-center justify-center`
-						}
-						style={
-							layoutV2
-								? {
-										width: PANEL_SPACING.HEADER.ICON_SIZE,
-										height: PANEL_SPACING.HEADER.ICON_SIZE,
-									}
-								: undefined
-						}
-					>
-						{icon}
-					</div>
-					<div>
-						<div>
-							<EditableText
-								onValueChange={(value) => {
-									if (value === defaultName(node)) {
-										return;
-									}
-									if (value.trim().length === 0) {
-										onChangeName?.();
-										return;
-									}
-									onChangeName?.(value);
-								}}
-								text={defaultName(node)}
-							/>
-						</div>
-						{description && (
-							<p className="px-[5px] text-white-400 text-[10px]">
-								{description}
-							</p>
-						)}
-					</div>
-				</div>
-				{action}
-			</div>
-		);
-	}
 	return (
-		<div className={getHeaderClasses(sidemenu)}>
+		<div className={getHeaderClasses()}>
 			<div className={`flex ${PANEL_SPACING.HEADER.ICON_GAP} items-center`}>
 				<div
-					className={
-						layoutV2
-							? "bg-white-900 rounded-[4px] flex items-center justify-center"
-							: `w-[${PANEL_SPACING.HEADER.ICON_SIZE}] h-[${PANEL_SPACING.HEADER.ICON_SIZE}] bg-white-900 rounded-[4px] flex items-center justify-center`
-					}
-					style={
-						layoutV2
-							? {
-									width: PANEL_SPACING.HEADER.ICON_SIZE,
-									height: PANEL_SPACING.HEADER.ICON_SIZE,
-								}
-							: undefined
-					}
+					className="bg-white-900 rounded-[4px] flex items-center justify-center"
+					style={{
+						width: PANEL_SPACING.HEADER.ICON_SIZE,
+						height: PANEL_SPACING.HEADER.ICON_SIZE,
+					}}
 				>
 					{icon}
 				</div>
@@ -129,6 +72,5 @@ export function PropertiesPanelHeader({
 }
 
 export function PropertiesPanelContent({ children }: { children: ReactNode }) {
-	const { sidemenu } = useFeatureFlag();
-	return <div className={getContentClasses(sidemenu)}>{children}</div>;
+	return <div className={getContentClasses()}>{children}</div>;
 }
