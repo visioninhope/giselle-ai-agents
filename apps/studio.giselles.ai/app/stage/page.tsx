@@ -8,16 +8,23 @@ import {
 } from "@giselle-internal/ui/table";
 import {
 	isTriggerNode,
+	RunId,
 	type Workspace,
 	type WorkspaceId,
 } from "@giselle-sdk/data-type";
 import { defaultName } from "@giselle-sdk/giselle-engine";
 import { notFound } from "next/navigation";
-import { db } from "@/drizzle";
+import { after } from "next/server";
+import { acts, db } from "@/drizzle";
 import { experimental_storageFlag, stageFlag } from "@/flags";
+import { fetchCurrentUser } from "@/services/accounts";
 import { fetchUserTeams } from "@/services/teams";
 import { giselleEngine } from "../giselle-engine";
 import { type FlowTriggerUIItem, Form } from "./form";
+
+// The maximum duration of server actions on this page is extended to 800 seconds through enabled fluid compute.
+// https://vercel.com/docs/functions/runtimes#max-duration
+export const maxDuration = 800;
 
 const tasks = [
 	{
@@ -127,13 +134,51 @@ export default async function StagePage() {
 			<Form
 				teamOptions={teamOptions}
 				flowTriggers={flowTriggers}
-				performStageAction={async () => {
+				performStageAction={async (payloads) => {
 					"use server";
 
-					await new Promise((resolve) => setTimeout(resolve, 1000));
-					console.log("todo");
-					await new Promise((resolve) => setTimeout(resolve, 1000));
-					console.log("implement next pr");
+					const user = await fetchCurrentUser();
+					const build = await giselleEngine.buildWorkflowFromTrigger({
+						triggerId: payloads.flowTrigger.id,
+						useExperimentalStorage: experimental_storage,
+					});
+					if (build === null) {
+						throw new Error("Workflow not found");
+					}
+					const run = await giselleEngine.createRun({
+						workspaceId: payloads.flowTrigger.workspaceId,
+						jobsCount: build.workflow.jobs.length,
+						trigger: "studio",
+					});
+
+					const team = await db.query.teams.findFirst({
+						where: (teams, { eq }) => eq(teams.id, payloads.teamId),
+					});
+					if (team === undefined) {
+						throw new Error("Team not found");
+					}
+					await db.insert(acts).values({
+						teamDbId: team.dbId,
+						directorDbId: user.dbId,
+						sdkFlowRunId: run.id,
+						sdkFlowTriggerId: payloads.flowTrigger.id,
+						sdkWorkspaceId: payloads.flowTrigger.workspaceId,
+					});
+					after(() =>
+						giselleEngine.runFlow({
+							flow: build.workflow,
+							flowRunId: run.id,
+							runId: RunId.generate(),
+							workspaceId: payloads.flowTrigger.workspaceId,
+							triggerInputs: [
+								{
+									type: "parameters",
+									items: payloads.parameterItems,
+								},
+							],
+							useExperimentalStorage: experimental_storage,
+						}),
+					);
 				}}
 			/>
 			<div className="max-w-[900px] mx-auto space-y-2">
