@@ -111,22 +111,15 @@ export function InviteMemberDialog({
 		// Add valid tags
 		if (validTags.length > 0) {
 			setEmailTags([...emailTags, ...validTags]);
-			// Clear input only if all emails were processed successfully
-			if (invalidEmails.length === 0 && duplicateEmails.length === 0) {
-				setEmailInput("");
-			} else {
-				// Keep problematic emails in input for correction
-				setEmailInput([...invalidEmails, ...duplicateEmails].join(", "));
-			}
+		}
+
+		// Update input field
+		if (invalidEmails.length > 0 || duplicateEmails.length > 0) {
+			// Keep problematic emails in input for correction
+			setEmailInput([...invalidEmails, ...duplicateEmails].join(", "));
 		} else {
-			// No valid tags to add
-			if (invalidEmails.length > 0 || duplicateEmails.length > 0) {
-				// Keep problematic emails in input
-				setEmailInput([...invalidEmails, ...duplicateEmails].join(", "));
-			} else {
-				// All emails were duplicates within the batch (edge case)
-				setEmailInput("");
-			}
+			// Clear input when all emails were processed successfully
+			setEmailInput("");
 		}
 	};
 
