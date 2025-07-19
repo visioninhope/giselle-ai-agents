@@ -1,8 +1,8 @@
 import type { WorkspaceId } from "@giselle-sdk/data-type";
 import type { GiselleEngineContext } from "../types";
 import { getWorkspaceIndex } from "../utils/workspace-index";
-import { FlowRunIndexObject, FlowRunObject } from "./run/object";
-import { flowRunPath, workspaceFlowRunPath } from "./run/paths";
+import { FlowRunIndexObject, FlowRunObject } from "./act/object";
+import { flowRunPath, workspaceFlowRunPath } from "./act/paths";
 
 export async function getWorkspaceFlowRuns(args: {
 	context: GiselleEngineContext;

@@ -45,7 +45,7 @@ export function useFlowController() {
 		[client],
 	);
 
-	const runStep = useCallback(
+	const actStep = useCallback(
 		async (
 			runId: FlowRunId,
 			step: Workflow["sequences"][number]["steps"][number],
@@ -70,7 +70,7 @@ export function useFlowController() {
 		[patchRunAnnotations, startGeneration],
 	);
 
-	const runSequence = useCallback(
+	const actSequence = useCallback(
 		async (
 			runId: FlowRunId,
 			sequence: Workflow["sequences"][number],
@@ -91,7 +91,7 @@ export function useFlowController() {
 			let hasSequenceError = false;
 			await Promise.all(
 				sequence.steps.map(async (step) => {
-					const { duration, hasError } = await runStep(
+					const { duration, hasError } = await actStep(
 						runId,
 						step,
 						generations,
@@ -125,7 +125,7 @@ export function useFlowController() {
 
 			return hasSequenceError;
 		},
-		[client, runStep],
+		[client, actStep],
 	);
 
 	const finalizeRun = useCallback(
@@ -175,7 +175,7 @@ export function useFlowController() {
 				),
 			});
 
-			const { run } = await client.createRun({
+			const { run } = await client.createAct({
 				workspaceId: data.id,
 				jobsCount: flow.sequences.length,
 				trigger: "manual",
@@ -185,7 +185,7 @@ export function useFlowController() {
 			let hasFlowError = false;
 
 			for (const [sequenceIndex, sequence] of flow.sequences.entries()) {
-				const sequenceErrored = await runSequence(
+				const sequenceErrored = await actSequence(
 					run.id,
 					sequence,
 					sequenceIndex,
@@ -205,7 +205,7 @@ export function useFlowController() {
 			info,
 			stopFlow,
 			client,
-			runSequence,
+			actSequence,
 			finalizeRun,
 		],
 	);

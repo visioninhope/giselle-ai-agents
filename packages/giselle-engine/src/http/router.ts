@@ -19,7 +19,7 @@ import { z } from "zod/v4";
 import type { GiselleEngine } from "../core";
 import { DataSourceProviderObject } from "../core/data-source";
 import { ConfigureTriggerInput, type PatchDelta } from "../core/flows";
-import { FlowRunId } from "../core/flows/run/object";
+import { FlowRunId } from "../core/flows/act/object";
 import type { TelemetrySettings } from "../core/generations";
 import { JsonResponse } from "../utils";
 import { createHandler, withUsageLimitErrorHandler } from "./create-handler";
@@ -301,7 +301,7 @@ export const createJsonRouters = {
 				return new Response(null, { status: 204 });
 			},
 		}),
-	createAndRunFlow: (giselleEngine: GiselleEngine) =>
+	createAndActFlow: (giselleEngine: GiselleEngine) =>
 		createHandler({
 			input: z.object({
 				triggerId: FlowTriggerId.schema,
@@ -309,11 +309,11 @@ export const createJsonRouters = {
 				useExperimentalStorage: z.boolean(),
 			}),
 			handler: async ({ input }) => {
-				await giselleEngine.createAndRunFlow(input);
+				await giselleEngine.createAndActFlow(input);
 				return new Response(null, { status: 204 });
 			},
 		}),
-	runFlow: (giselleEngine: GiselleEngine) =>
+	actFlow: (giselleEngine: GiselleEngine) =>
 		createHandler({
 			input: z.object({
 				flow: Workflow,
@@ -324,7 +324,7 @@ export const createJsonRouters = {
 				useExperimentalStorage: z.boolean(),
 			}),
 			handler: async ({ input }) => {
-				await giselleEngine.runFlow(input);
+				await giselleEngine.actFlow(input);
 				return new Response(null, { status: 204 });
 			},
 		}),
@@ -420,7 +420,7 @@ export const createJsonRouters = {
 					dataSources: await giselleEngine.getWorkspaceDataSources(input),
 				}),
 		}),
-	createRun: (giselleEngine: GiselleEngine) =>
+	createAct: (giselleEngine: GiselleEngine) =>
 		createHandler({
 			input: z.object({
 				jobsCount: z.number(),
@@ -429,7 +429,7 @@ export const createJsonRouters = {
 			}),
 			handler: async ({ input }) =>
 				JsonResponse.json({
-					run: await giselleEngine.createRun(input),
+					run: await giselleEngine.createAct(input),
 				}),
 		}),
 	patchRun: (giselleEngine: GiselleEngine) =>

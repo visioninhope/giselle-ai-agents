@@ -5,20 +5,20 @@ import {
 	type Workflow,
 } from "@giselle-sdk/data-type";
 import type { GiselleEngineContext } from "../types";
+import { FlowRunIndexObject } from "./act/object";
+import { flowRunPath, workspaceFlowRunPath } from "./act/paths";
+import { type ActFlowCallbacks, actFlow } from "./act-flow";
 import { buildWorkflowFromTrigger } from "./build-workflow-from-trigger";
-import { createRun } from "./create-run";
-import { FlowRunIndexObject } from "./run/object";
-import { flowRunPath, workspaceFlowRunPath } from "./run/paths";
-import { type RunFlowCallbacks, runFlow } from "./run-flow";
+import { createAct } from "./create-act";
 
 /** @todo telemetry */
-export async function createAndRunFlow(args: {
+export async function createAndActFlow(args: {
 	triggerId: FlowTriggerId;
 	context: GiselleEngineContext;
 	triggerInputs?: GenerationContextInput[];
 	callbacks?: {
 		flowCreate?: (args: { flow: Workflow }) => void | Promise<void>;
-	} & RunFlowCallbacks;
+	} & ActFlowCallbacks;
 	useExperimentalStorage: boolean;
 }) {
 	const result = await buildWorkflowFromTrigger({
@@ -35,7 +35,7 @@ export async function createAndRunFlow(args: {
 	await args.callbacks?.flowCreate?.({ flow: workflow });
 
 	const runId = RunId.generate();
-	const flowRun = await createRun({
+	const flowRun = await createAct({
 		context: args.context,
 		trigger: trigger.configuration.provider,
 		workspaceId: trigger.workspaceId,
@@ -49,7 +49,7 @@ export async function createAndRunFlow(args: {
 		),
 	]);
 
-	await runFlow({
+	await actFlow({
 		flow: workflow,
 		context: args.context,
 		flowRunId: flowRun.id,

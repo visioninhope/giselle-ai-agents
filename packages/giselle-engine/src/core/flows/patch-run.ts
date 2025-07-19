@@ -1,7 +1,7 @@
 import type { GiselleEngineContext } from "../types";
-import type { FlowRunId, FlowRunObject } from "./run/object";
-import { type PatchDelta, patchFlowRun } from "./run/patch-object";
-import { flowRunPath } from "./run/paths";
+import type { FlowRunId, FlowRunObject } from "./act/object";
+import { type PatchDelta, patchFlowRun } from "./act/patch-object";
+import { flowRunPath } from "./act/paths";
 
 export type { PatchDelta };
 

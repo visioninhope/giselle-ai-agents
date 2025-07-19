@@ -18,22 +18,22 @@ import { createDataSource, getWorkspaceDataSources } from "./data-source";
 import type { DataSourceProviderObject } from "./data-source/types/object";
 import { copyFile, getFileText, removeFile, uploadFile } from "./files";
 import {
+	type ActFlowCallbacks,
+	actFlow,
 	buildWorkflowFromTrigger,
 	type ConfigureTriggerInput,
 	configureTrigger,
-	createAndRunFlow,
-	createRun,
+	createAct,
+	createAndActFlow,
 	deleteTrigger,
 	getTrigger,
 	getWorkspaceFlowRuns,
 	type PatchDelta,
 	patchRun,
-	type RunFlowCallbacks,
 	resolveTrigger,
-	runFlow,
 	setTrigger,
 } from "./flows";
-import type { FlowRunId } from "./flows/run/object";
+import type { FlowRunId } from "./flows/act/object";
 import {
 	cancelGeneration,
 	generateImage,
@@ -282,20 +282,20 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 		}) => {
 			return await buildWorkflowFromTrigger({ ...args, context });
 		},
-		createAndRunFlow: async (args: {
+		createAndActFlow: async (args: {
 			triggerId: FlowTriggerId;
 			triggerInputs?: GenerationContextInput[];
 			useExperimentalStorage: boolean;
-		}) => createAndRunFlow({ ...args, context }),
-		runFlow: async (args: {
+		}) => createAndActFlow({ ...args, context }),
+		actFlow: async (args: {
 			flow: import("@giselle-sdk/data-type").Workflow;
 			flowRunId: FlowRunId;
 			runId: import("@giselle-sdk/data-type").RunId;
 			workspaceId: WorkspaceId;
 			triggerInputs?: GenerationContextInput[];
-			callbacks?: RunFlowCallbacks;
+			callbacks?: ActFlowCallbacks;
 			useExperimentalStorage: boolean;
-		}) => runFlow({ ...args, context }),
+		}) => actFlow({ ...args, context }),
 		handleGitHubWebhookV2: async (args: { request: Request }) =>
 			handleGitHubWebhookV2({ ...args, context }),
 		executeQuery: async (
@@ -342,12 +342,12 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 		async getWorkspaceDataSources(args: { workspaceId: WorkspaceId }) {
 			return await getWorkspaceDataSources({ ...args, context });
 		},
-		createRun(args: {
+		createAct(args: {
 			workspaceId: WorkspaceId;
 			jobsCount: number;
 			trigger: string;
 		}) {
-			return createRun({ ...args, context });
+			return createAct({ ...args, context });
 		},
 		patchRun(args: { flowRunId: FlowRunId; delta: PatchDelta }) {
 			return patchRun({ ...args, context });

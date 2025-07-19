@@ -13,11 +13,11 @@ import { generateImage, generateText, setGeneration } from "../generations";
 import { executeAction } from "../operations";
 import { executeQuery } from "../operations/execute-query";
 import type { GiselleEngineContext } from "../types";
+import type { FlowRunId } from "./act/object";
 import { patchRun } from "./patch-run";
 import { resolveTrigger } from "./resolve-trigger";
-import type { FlowRunId } from "./run/object";
 
-export interface RunFlowCallbacks {
+export interface ActFlowCallbacks {
 	sequenceStart?: (args: { sequence: Sequence }) => void | Promise<void>;
 	sequenceFail?: (args: { sequence: Sequence }) => void | Promise<void>;
 	sequenceComplete?: (args: { sequence: Sequence }) => void | Promise<void>;
@@ -37,7 +37,7 @@ function createQueuedGeneration(args: {
 			operationNode: step.node,
 			connections: step.connections,
 			sourceNodes: step.sourceNodes,
-			origin: { type: "run", id: runId, workspaceId },
+			origin: { type: "act", id: runId, workspaceId },
 			inputs: step.node.content.type === "trigger" ? (triggerInputs ?? []) : [],
 		},
 		status: "queued",
@@ -122,14 +122,14 @@ async function executeStep(args: {
 	}
 }
 
-async function runSequence(args: {
+async function actSequence(args: {
 	sequence: Sequence;
 	context: GiselleEngineContext;
 	flowRunId: FlowRunId;
 	runId: RunId;
 	workspaceId: WorkspaceId;
 	triggerInputs?: GenerationContextInput[];
-	callbacks?: RunFlowCallbacks;
+	callbacks?: ActFlowCallbacks;
 	useExperimentalStorage: boolean;
 }): Promise<boolean> {
 	const {
@@ -215,21 +215,21 @@ async function runSequence(args: {
 	return hasSequenceError;
 }
 
-export async function runFlow(args: {
+export async function actFlow(args: {
 	flow: Workflow;
 	context: GiselleEngineContext;
 	flowRunId: FlowRunId;
 	runId: RunId;
 	workspaceId: WorkspaceId;
 	triggerInputs?: GenerationContextInput[];
-	callbacks?: RunFlowCallbacks;
+	callbacks?: ActFlowCallbacks;
 	useExperimentalStorage: boolean;
 }) {
 	const flowStart = Date.now();
 
 	for (let i = 0; i < args.flow.sequences.length; i++) {
 		const sequence = args.flow.sequences[i];
-		const errored = await runSequence({
+		const errored = await actSequence({
 			sequence,
 			context: args.context,
 			flowRunId: args.flowRunId,

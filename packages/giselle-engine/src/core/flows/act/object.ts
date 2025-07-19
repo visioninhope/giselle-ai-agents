@@ -2,16 +2,16 @@ import { WorkspaceId } from "@giselle-sdk/data-type";
 import { createIdGenerator } from "@giselle-sdk/utils";
 import { z } from "zod/v4";
 
-export const FlowRunId = createIdGenerator("flrn");
-export type FlowRunId = z.infer<typeof FlowRunId.schema>;
+export const FlowActId = createIdGenerator("flac");
+export type FlowActId = z.infer<typeof FlowActId.schema>;
 
-const FlowRunAnnotationObject = z.object({
+const FlowActAnnotationObject = z.object({
 	level: z.enum(["info", "warning", "error"]),
 	message: z.string(),
 });
 
-export const FlowRunObject = z.object({
-	id: FlowRunId.schema,
+export const FlowActObject = z.object({
+	id: FlowActId.schema,
 	workspaceId: WorkspaceId.schema,
 	status: z.enum(["inProgress", "completed", "failed", "cancelled"]),
 	steps: z.object({
@@ -34,11 +34,18 @@ export const FlowRunObject = z.object({
 	}),
 	createdAt: z.number(),
 	updatedAt: z.number(),
-	annotations: z.array(FlowRunAnnotationObject).default([]),
+	annotations: z.array(FlowActAnnotationObject).default([]),
 });
-export type FlowRunObject = z.infer<typeof FlowRunObject>;
+export type FlowActObject = z.infer<typeof FlowActObject>;
 
-export const FlowRunIndexObject = FlowRunObject.pick({
+export const FlowActIndexObject = FlowActObject.pick({
 	id: true,
 	workspaceId: true,
 });
+
+// Backward compatibility aliases
+export const FlowRunId = FlowActId;
+export type FlowRunId = FlowActId;
+export const FlowRunObject = FlowActObject;
+export type FlowRunObject = FlowActObject;
+export const FlowRunIndexObject = FlowActIndexObject;

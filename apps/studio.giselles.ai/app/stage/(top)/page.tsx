@@ -99,7 +99,7 @@ export default async function StagePage() {
 					if (build === null) {
 						throw new Error("Workflow not found");
 					}
-					const run = await giselleEngine.createRun({
+					const run = await giselleEngine.createAct({
 						workspaceId: payloads.flowTrigger.workspaceId,
 						jobsCount: build.workflow.sequences.length,
 						trigger: "studio",
@@ -119,7 +119,7 @@ export default async function StagePage() {
 						sdkWorkspaceId: payloads.flowTrigger.workspaceId,
 					});
 					after(() =>
-						giselleEngine.runFlow({
+						giselleEngine.actFlow({
 							flow: build.workflow,
 							flowRunId: run.id,
 							runId: RunId.generate(),

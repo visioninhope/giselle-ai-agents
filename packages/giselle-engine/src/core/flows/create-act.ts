@@ -5,10 +5,10 @@ import {
 	FlowRunId,
 	FlowRunIndexObject,
 	type FlowRunObject,
-} from "./run/object";
-import { flowRunPath, workspaceFlowRunPath } from "./run/paths";
+} from "./act/object";
+import { flowRunPath, workspaceFlowRunPath } from "./act/paths";
 
-export async function createRun(args: {
+export async function createAct(args: {
 	context: GiselleEngineContext;
 	jobsCount: number;
 	trigger: string;
