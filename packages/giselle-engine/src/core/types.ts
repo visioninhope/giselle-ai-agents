@@ -1,8 +1,4 @@
-import type {
-	CompletedGeneration,
-	FlowTrigger,
-	WorkspaceId,
-} from "@giselle-sdk/data-type";
+import type { FlowTrigger, WorkspaceId } from "@giselle-sdk/data-type";
 import type {
 	GitHubInstallationAppAuth,
 	GitHubPersonalAccessTokenAuth,
@@ -12,6 +8,7 @@ import type { QueryService } from "@giselle-sdk/rag";
 import type { Storage } from "unstorage";
 import type { GiselleStorage } from "./experimental_storage";
 import type { VectorStore } from "./experimental_vector-store/types/interface";
+import type { CompletedGeneration } from "./generations";
 import type { GenerationCompleteOption, TelemetrySettings } from "./telemetry";
 import type { UsageLimits } from "./usage-limits";
 import type { Vault } from "./vault";

@@ -1,17 +1,11 @@
 import { parseAndMod } from "@giselle-sdk/data-mod";
 import {
-	type CompletedGeneration,
 	type FileContent,
 	type FileId,
-	Generation,
-	GenerationContext,
-	type GenerationId,
-	type GenerationOutput,
 	type ImageGenerationNode,
 	isImageGenerationNode,
 	isTextGenerationNode,
 	type Node,
-	NodeGenerationIndex,
 	NodeId,
 	type OperationNode,
 	OutputId,
@@ -28,6 +22,14 @@ import type { CoreMessage, DataContent, FilePart, ImagePart } from "ai";
 import type { Storage } from "unstorage";
 import type { GiselleStorage } from "../experimental_storage";
 import type { GiselleEngineContext } from "../types";
+import {
+	type CompletedGeneration,
+	Generation,
+	GenerationContext,
+	type GenerationId,
+	type GenerationOutput,
+	NodeGenerationIndex,
+} from "./object";
 
 interface GeneratedImageData {
 	uint8Array: Uint8Array;

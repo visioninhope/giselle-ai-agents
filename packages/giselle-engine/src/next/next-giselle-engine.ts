@@ -1,10 +1,9 @@
-import { GenerationId } from "@giselle-ai/giselle-engine/core/generations/object";
 import {
 	GitHubWebhookUnauthorizedError,
 	verifyRequest as verifyRequestAsGitHubWebook,
 } from "@giselle-sdk/github-tool";
 import { after } from "next/server";
-import { GiselleEngine, type GiselleEngineConfig } from "../core";
+import { GenerationId, GiselleEngine, type GiselleEngineConfig } from "../core";
 import {
 	createFormDataRouters,
 	createJsonRouters,

@@ -1,3 +1,4 @@
+import { z } from "zod/v4";
 import {
 	CancelledGeneration,
 	CompletedGeneration,
@@ -5,8 +6,7 @@ import {
 	type Generation,
 	type GenerationId,
 	RunningGeneration,
-} from "@giselle-sdk/data-type";
-import { z } from "zod/v4";
+} from "../../../core/generations";
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 

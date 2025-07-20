@@ -3,12 +3,7 @@ import type {
 	FileId,
 	FlowTrigger,
 	FlowTriggerId,
-	Generation,
-	GenerationContextInput,
-	GenerationId,
-	GenerationOrigin,
 	NodeId,
-	QueuedGeneration,
 	SecretId,
 	Workspace,
 	WorkspaceId,
@@ -36,11 +31,16 @@ import {
 import type { ActId } from "./flows/act/object";
 import {
 	cancelGeneration,
+	type Generation,
+	type GenerationContextInput,
+	type GenerationId,
+	type GenerationOrigin,
 	generateImage,
 	generateText,
 	getGeneratedImage,
 	getGeneration,
 	getNodeGenerations,
+	type QueuedGeneration,
 	setGeneration,
 	type TelemetrySettings,
 } from "./generations";
@@ -65,6 +65,7 @@ import {
 export * from "./experimental_storage";
 export * from "./experimental_vector-store";
 export { ActId } from "./flows";
+export { GenerationId } from "./generations";
 export * from "./integrations";
 export * from "./telemetry";
 export * from "./types";
