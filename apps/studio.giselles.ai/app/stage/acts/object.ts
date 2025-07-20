@@ -1,4 +1,4 @@
-import type { GenerationId } from "@giselle-ai/giselle-engine/core/generations/object";
+import type { GenerationId } from "@giselle-sdk/giselle-engine";
 
 type Status = "success" | "in-progress" | "failed" | "pending" | "warning";
 

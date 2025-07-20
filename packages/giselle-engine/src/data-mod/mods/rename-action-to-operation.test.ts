@@ -1,6 +1,6 @@
-import { Generation } from "@giselle-sdk/giselle-engine";
 import type { $ZodIssue } from "@zod/core";
 import { expect, test } from "vitest";
+import { Generation } from "../../core";
 import generationJson from "./fixtures/rename-action-to-operation/generation1.json";
 import { renameActionToOperation } from "./rename-action-to-operation";
 

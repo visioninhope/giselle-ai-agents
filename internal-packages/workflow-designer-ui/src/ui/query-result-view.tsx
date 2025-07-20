@@ -2,7 +2,7 @@ import {
 	type Generation,
 	isCompletedGeneration,
 	isFailedGeneration,
-} from "@giselle-sdk/data-type";
+} from "@giselle-sdk/giselle-engine";
 import clsx from "clsx/lite";
 import { ChevronDownIcon, ChevronRightIcon } from "lucide-react";
 import { useState } from "react";

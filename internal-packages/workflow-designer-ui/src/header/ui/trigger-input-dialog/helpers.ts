@@ -1,11 +1,10 @@
 import type {
 	FlowTrigger,
-	Generation,
-	ParameterItem,
 	TriggerNode,
 	WorkspaceId,
 } from "@giselle-sdk/data-type";
 import type { githubTriggers } from "@giselle-sdk/flow";
+import type { Generation, ParameterItem } from "@giselle-sdk/giselle-engine";
 import type { useGenerationRunnerSystem } from "@giselle-sdk/giselle-engine/react";
 import type { buildWorkflowFromNode } from "@giselle-sdk/workflow-utils";
 import type { z } from "zod";

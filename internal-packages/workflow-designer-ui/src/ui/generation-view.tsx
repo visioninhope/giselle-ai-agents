@@ -4,7 +4,7 @@ import {
 	type Generation,
 	isCompletedGeneration,
 	isFailedGeneration,
-} from "@giselle-sdk/data-type";
+} from "@giselle-sdk/giselle-engine";
 import { useGiselleEngine } from "@giselle-sdk/giselle-engine/react";
 import { ChevronRightIcon } from "lucide-react";
 import { Accordion } from "radix-ui";

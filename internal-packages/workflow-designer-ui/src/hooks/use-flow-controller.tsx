@@ -1,6 +1,5 @@
-import type { Generation } from "@giselle-ai/giselle-engine/core/generations/object";
 import type { Workflow } from "@giselle-sdk/data-type";
-import type { ActId } from "@giselle-sdk/giselle-engine";
+import type { ActId, Generation } from "@giselle-sdk/giselle-engine";
 import {
 	useGenerationRunnerSystem,
 	useGiselleEngine,

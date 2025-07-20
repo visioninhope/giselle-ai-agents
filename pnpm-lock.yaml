@@ -883,6 +883,9 @@ importers:
       '@types/react':
         specifier: 'catalog:'
         version: 19.1.0
+      '@zod/core':
+        specifier: 0.11.6
+        version: 0.11.6
       tsup:
         specifier: 'catalog:'
         version: 8.3.5(jiti@2.4.2)(postcss@8.5.5)(typescript@5.7.3)(yaml@2.7.0)

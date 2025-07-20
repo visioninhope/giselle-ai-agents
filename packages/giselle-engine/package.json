@@ -47,6 +47,7 @@
 		"@giselle/giselle-sdk-tsconfig": "workspace:*",
 		"@types/pg": "catalog:",
 		"@types/react": "catalog:",
+		"@zod/core": "0.11.6",
 		"tsup": "catalog:",
 		"vitest": "catalog:"
 	},

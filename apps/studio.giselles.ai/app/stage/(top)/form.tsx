@@ -2,11 +2,8 @@
 
 import { Button } from "@giselle-internal/ui/button";
 import { Select } from "@giselle-internal/ui/select";
-import type {
-	FlowTrigger,
-	FlowTriggerId,
-	ParameterItem,
-} from "@giselle-sdk/data-type";
+import type { FlowTrigger, FlowTriggerId } from "@giselle-sdk/data-type";
+import type { ParameterItem } from "@giselle-sdk/giselle-engine";
 import clsx from "clsx/lite";
 import type { InferSelectModel } from "drizzle-orm";
 import { useCallback, useMemo, useState } from "react";

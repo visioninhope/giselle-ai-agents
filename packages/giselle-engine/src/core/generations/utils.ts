@@ -1,4 +1,3 @@
-import { parseAndMod } from "@giselle-sdk/data-mod";
 import {
 	type FileContent,
 	type FileId,
@@ -20,6 +19,7 @@ import {
 } from "@giselle-sdk/text-editor-utils";
 import type { CoreMessage, DataContent, FilePart, ImagePart } from "ai";
 import type { Storage } from "unstorage";
+import { parseAndMod } from "../../data-mod";
 import type { GiselleStorage } from "../experimental_storage";
 import type { GiselleEngineContext } from "../types";
 import {
