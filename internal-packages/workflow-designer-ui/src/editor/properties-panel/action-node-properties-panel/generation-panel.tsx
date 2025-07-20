@@ -1,4 +1,5 @@
-import type { ActionNode, Generation } from "@giselle-sdk/data-type";
+import type { Generation } from "@giselle-ai/giselle-engine/core/generations/object";
+import type { ActionNode } from "@giselle-sdk/data-type";
 import {
 	useNodeGenerations,
 	useWorkflowDesigner,

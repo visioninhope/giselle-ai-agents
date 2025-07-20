@@ -1,4 +1,4 @@
-import { Generation } from "@giselle-sdk/data-type";
+import { Generation } from "@giselle-ai/giselle-engine/core/generations/object";
 import type { $ZodIssue } from "@zod/core";
 import { expect, test } from "vitest";
 import generationJson from "./fixtures/rename-action-to-operation/generation1.json";

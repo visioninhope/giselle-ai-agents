@@ -1,6 +1,5 @@
 export * from "./types";
 
-import type { CompletedGeneration } from "@giselle-sdk/data-type";
 import {
 	type ImageGenerationNode,
 	isImageGenerationNode,
@@ -16,6 +15,7 @@ import {
 } from "@giselle-sdk/language-model";
 import { type ApiMediaContentType, Langfuse, LangfuseMedia } from "langfuse";
 import type { Storage } from "unstorage";
+import type { CompletedGeneration } from "../generations/object";
 import type {
 	AnthropicProviderOptions,
 	TelemetrySettings,

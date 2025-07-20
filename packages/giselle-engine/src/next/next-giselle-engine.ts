@@ -1,4 +1,4 @@
-import { GenerationId } from "@giselle-sdk/data-type";
+import { GenerationId } from "@giselle-ai/giselle-engine/core/generations/object";
 import {
 	GitHubWebhookUnauthorizedError,
 	verifyRequest as verifyRequestAsGitHubWebook,

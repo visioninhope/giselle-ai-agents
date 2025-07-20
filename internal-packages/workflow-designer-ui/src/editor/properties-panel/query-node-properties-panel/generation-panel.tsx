@@ -1,4 +1,5 @@
-import type { Generation, QueryNode } from "@giselle-sdk/data-type";
+import type { Generation } from "@giselle-ai/giselle-engine/core/generations/object";
+import type { QueryNode } from "@giselle-sdk/data-type";
 import {
 	useNodeGenerations,
 	useWorkflowDesigner,

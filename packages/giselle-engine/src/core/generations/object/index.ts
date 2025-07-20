@@ -2,9 +2,9 @@ import type { Message as AISdkMessage } from "@ai-sdk/react";
 
 export type { Message as AISdkMessage } from "@ai-sdk/react";
 
+import { NodeId } from "@giselle-ai/data-type/node";
 import { createIdGenerator } from "@giselle-sdk/utils";
 import { z } from "zod/v4";
-import { NodeId } from "../node";
 import { GenerationContextLike, GenerationOrigin } from "./context";
 import { GenerationOutput } from "./output";
 
