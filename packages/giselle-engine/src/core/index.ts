@@ -65,7 +65,7 @@ import {
 export * from "./experimental_storage";
 export * from "./experimental_vector-store";
 export { ActId } from "./flows";
-export { GenerationId } from "./generations";
+export * from "./generations/object";
 export * from "./integrations";
 export * from "./telemetry";
 export * from "./types";
