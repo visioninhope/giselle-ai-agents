@@ -5,8 +5,8 @@ import {
 	type Workflow,
 } from "@giselle-sdk/data-type";
 import type { GiselleEngineContext } from "../types";
-import { FlowRunIndexObject } from "./act/object";
-import { flowRunPath, workspaceFlowRunPath } from "./act/paths";
+import { ActIndexObject } from "./act/object";
+import { actPath, workspaceActPath } from "./act/paths";
 import { type ActFlowCallbacks, actFlow } from "./act-flow";
 import { buildWorkflowFromTrigger } from "./build-workflow-from-trigger";
 import { createAct } from "./create-act";
@@ -35,24 +35,24 @@ export async function createAndActFlow(args: {
 	await args.callbacks?.flowCreate?.({ flow: workflow });
 
 	const runId = RunId.generate();
-	const flowRun = await createAct({
+	const act = await createAct({
 		context: args.context,
 		trigger: trigger.configuration.provider,
 		workspaceId: trigger.workspaceId,
 		jobsCount: workflow.sequences.length,
 	});
 	await Promise.all([
-		args.context.storage.setItem(flowRunPath(flowRun.id), flowRun),
+		args.context.storage.setItem(actPath(act.id), act),
 		args.context.storage.setItem(
-			workspaceFlowRunPath(trigger.workspaceId),
-			FlowRunIndexObject.parse(flowRun),
+			workspaceActPath(trigger.workspaceId),
+			ActIndexObject.parse(act),
 		),
 	]);
 
 	await actFlow({
 		flow: workflow,
 		context: args.context,
-		flowRunId: flowRun.id,
+		actId: act.id,
 		runId,
 		workspaceId: trigger.workspaceId,
 		triggerInputs: args.triggerInputs,

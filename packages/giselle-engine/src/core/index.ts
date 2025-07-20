@@ -27,13 +27,13 @@ import {
 	createAndActFlow,
 	deleteTrigger,
 	getTrigger,
-	getWorkspaceFlowRuns,
+	getWorkspaceActs,
 	type PatchDelta,
-	patchRun,
+	patchAct,
 	resolveTrigger,
 	setTrigger,
 } from "./flows";
-import type { FlowRunId } from "./flows/act/object";
+import type { ActId } from "./flows/act/object";
 import {
 	cancelGeneration,
 	generateImage,
@@ -64,7 +64,7 @@ import {
 
 export * from "./experimental_storage";
 export * from "./experimental_vector-store";
-export { FlowRunId } from "./flows";
+export { ActId } from "./flows";
 export * from "./integrations";
 export * from "./telemetry";
 export * from "./types";
@@ -289,7 +289,7 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 		}) => createAndActFlow({ ...args, context }),
 		actFlow: async (args: {
 			flow: import("@giselle-sdk/data-type").Workflow;
-			flowRunId: FlowRunId;
+			actId: ActId;
 			runId: import("@giselle-sdk/data-type").RunId;
 			workspaceId: WorkspaceId;
 			triggerInputs?: GenerationContextInput[];
@@ -349,11 +349,11 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 		}) {
 			return createAct({ ...args, context });
 		},
-		patchRun(args: { flowRunId: FlowRunId; delta: PatchDelta }) {
-			return patchRun({ ...args, context });
+		patchAct(args: { actId: ActId; delta: PatchDelta }) {
+			return patchAct({ ...args, context });
 		},
-		getWorkspaceFlowRuns(args: { workspaceId: WorkspaceId }) {
-			return getWorkspaceFlowRuns({ ...args, context });
+		getWorkspaceActs(args: { workspaceId: WorkspaceId }) {
+			return getWorkspaceActs({ ...args, context });
 		},
 		deleteSecret(args: { workspaceId: WorkspaceId; secretId: SecretId }) {
 			return deleteSecret({ ...args, context });

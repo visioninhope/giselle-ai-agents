@@ -19,7 +19,7 @@ import { z } from "zod/v4";
 import type { GiselleEngine } from "../core";
 import { DataSourceProviderObject } from "../core/data-source";
 import { ConfigureTriggerInput, type PatchDelta } from "../core/flows";
-import { FlowRunId } from "../core/flows/act/object";
+import { ActId } from "../core/flows/act/object";
 import type { TelemetrySettings } from "../core/generations";
 import { JsonResponse } from "../utils";
 import { createHandler, withUsageLimitErrorHandler } from "./create-handler";
@@ -317,7 +317,7 @@ export const createJsonRouters = {
 		createHandler({
 			input: z.object({
 				flow: Workflow,
-				flowRunId: FlowRunId.schema,
+				actId: ActId.schema,
 				runId: RunId.schema,
 				workspaceId: WorkspaceId.schema,
 				triggerInputs: z.array(GenerationContextInput).optional(),
@@ -429,28 +429,28 @@ export const createJsonRouters = {
 			}),
 			handler: async ({ input }) =>
 				JsonResponse.json({
-					run: await giselleEngine.createAct(input),
+					act: await giselleEngine.createAct(input),
 				}),
 		}),
-	patchRun: (giselleEngine: GiselleEngine) =>
+	patchAct: (giselleEngine: GiselleEngine) =>
 		createHandler({
 			input: z.object({
-				flowRunId: FlowRunId.schema,
+				actId: ActId.schema,
 				delta: z.custom<PatchDelta>(),
 			}),
 			handler: async ({ input }) =>
 				JsonResponse.json({
-					run: await giselleEngine.patchRun(input),
+					act: await giselleEngine.patchAct(input),
 				}),
 		}),
-	getWorkspaceFlowRuns: (giselleEngine: GiselleEngine) =>
+	getWorkspaceActs: (giselleEngine: GiselleEngine) =>
 		createHandler({
 			input: z.object({
 				workspaceId: WorkspaceId.schema,
 			}),
 			handler: async ({ input }) =>
 				JsonResponse.json({
-					runs: await giselleEngine.getWorkspaceFlowRuns(input),
+					acts: await giselleEngine.getWorkspaceActs(input),
 				}),
 		}),
 	deleteSecret: (giselleEngine: GiselleEngine) =>

@@ -34,11 +34,11 @@ export function RunHistoryTable() {
 	const { data: workspace } = useWorkflowDesigner();
 	const { data, isLoading, isValidating, mutate } = useSWR(
 		{
-			namespace: "getWorkspaceFlowRuns",
+			namespace: "getWorkspaceActs",
 			workspaceId: workspace.id,
 		},
 		({ workspaceId }) =>
-			client.getWorkspaceFlowRuns({ workspaceId }).then((res) => res.runs),
+			client.getWorkspaceActs({ workspaceId }).then((res) => res.acts),
 	);
 
 	if (isLoading) {

@@ -13,8 +13,8 @@ import { generateImage, generateText, setGeneration } from "../generations";
 import { executeAction } from "../operations";
 import { executeQuery } from "../operations/execute-query";
 import type { GiselleEngineContext } from "../types";
-import type { FlowRunId } from "./act/object";
-import { patchRun } from "./patch-run";
+import type { ActId } from "./act/object";
+import { patchAct } from "./patch-run";
 import { resolveTrigger } from "./resolve-trigger";
 
 export interface ActFlowCallbacks {
@@ -50,10 +50,10 @@ async function executeStep(args: {
 	context: GiselleEngineContext;
 	generation: QueuedGeneration;
 	node: Sequence["steps"][number]["node"];
-	flowRunId: FlowRunId;
+	actId: ActId;
 	useExperimentalStorage: boolean;
 }): Promise<boolean> {
-	const { context, generation, node, flowRunId, useExperimentalStorage } = args;
+	const { context, generation, node, actId, useExperimentalStorage } = args;
 	switch (node.content.type) {
 		case "action":
 			await executeAction({ context, generation });
@@ -89,9 +89,9 @@ async function executeStep(args: {
 								generation: failedGeneration,
 								useExperimentalStorage,
 							}),
-							patchRun({
+							patchAct({
 								context,
-								flowRunId,
+								actId,
 								delta: {
 									annotations: {
 										push: [
@@ -125,7 +125,7 @@ async function executeStep(args: {
 async function actSequence(args: {
 	sequence: Sequence;
 	context: GiselleEngineContext;
-	flowRunId: FlowRunId;
+	actId: ActId;
 	runId: RunId;
 	workspaceId: WorkspaceId;
 	triggerInputs?: GenerationContextInput[];
@@ -135,7 +135,7 @@ async function actSequence(args: {
 	const {
 		sequence,
 		context,
-		flowRunId,
+		actId,
 		runId,
 		workspaceId,
 		triggerInputs,
@@ -144,9 +144,9 @@ async function actSequence(args: {
 	} = args;
 
 	await callbacks?.sequenceStart?.({ sequence });
-	await patchRun({
+	await patchAct({
 		context,
-		flowRunId,
+		actId,
 		delta: {
 			"steps.inProgress": { increment: 1 },
 			"steps.queued": { decrement: 1 },
@@ -169,7 +169,7 @@ async function actSequence(args: {
 				context,
 				generation,
 				node: step.node,
-				flowRunId,
+				actId,
 				useExperimentalStorage,
 			});
 			const duration = Date.now() - stepStart;
@@ -187,9 +187,9 @@ async function actSequence(args: {
 	if (hasSequenceError) {
 		await Promise.all([
 			callbacks?.sequenceFail?.({ sequence }),
-			patchRun({
+			patchAct({
 				context,
-				flowRunId,
+				actId,
 				delta: {
 					"steps.inProgress": { decrement: 1 },
 					"steps.failed": { increment: 1 },
@@ -200,9 +200,9 @@ async function actSequence(args: {
 	} else {
 		await Promise.all([
 			callbacks?.sequenceComplete?.({ sequence }),
-			patchRun({
+			patchAct({
 				context,
-				flowRunId,
+				actId,
 				delta: {
 					"steps.inProgress": { decrement: 1 },
 					"steps.completed": { increment: 1 },
@@ -218,7 +218,7 @@ async function actSequence(args: {
 export async function actFlow(args: {
 	flow: Workflow;
 	context: GiselleEngineContext;
-	flowRunId: FlowRunId;
+	actId: ActId;
 	runId: RunId;
 	workspaceId: WorkspaceId;
 	triggerInputs?: GenerationContextInput[];
@@ -232,7 +232,7 @@ export async function actFlow(args: {
 		const errored = await actSequence({
 			sequence,
 			context: args.context,
-			flowRunId: args.flowRunId,
+			actId: args.actId,
 			runId: args.runId,
 			workspaceId: args.workspaceId,
 			triggerInputs: args.triggerInputs,
@@ -248,9 +248,9 @@ export async function actFlow(args: {
 				});
 			}
 
-			await patchRun({
+			await patchAct({
 				context: args.context,
-				flowRunId: args.flowRunId,
+				actId: args.actId,
 				delta: {
 					status: { set: "failed" },
 					"duration.wallClock": { set: Date.now() - flowStart },
@@ -261,9 +261,9 @@ export async function actFlow(args: {
 	}
 
 	// All sequences completed successfully
-	await patchRun({
+	await patchAct({
 		context: args.context,
-		flowRunId: args.flowRunId,
+		actId: args.actId,
 		delta: {
 			status: { set: "completed" },
 			"duration.wallClock": { set: Date.now() - flowStart },

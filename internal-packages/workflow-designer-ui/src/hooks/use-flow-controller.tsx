@@ -1,5 +1,5 @@
 import type { Generation, Workflow } from "@giselle-sdk/data-type";
-import type { FlowRunId } from "@giselle-sdk/giselle-engine";
+import type { ActId } from "@giselle-sdk/giselle-engine";
 import {
 	useGenerationRunnerSystem,
 	useGiselleEngine,
@@ -32,9 +32,9 @@ export function useFlowController() {
 	}, [stopGeneration]);
 
 	const patchRunAnnotations = useCallback(
-		async (runId: FlowRunId, message: string) => {
-			await client.patchRun({
-				flowRunId: runId,
+		async (runId: ActId, message: string) => {
+			await client.patchAct({
+				actId: runId,
 				delta: {
 					annotations: {
 						push: [{ level: "error", message }],
@@ -47,7 +47,7 @@ export function useFlowController() {
 
 	const actStep = useCallback(
 		async (
-			runId: FlowRunId,
+			runId: ActId,
 			step: Workflow["sequences"][number]["steps"][number],
 			generations: Generation[],
 			sequenceStartedAt: number,
@@ -72,14 +72,14 @@ export function useFlowController() {
 
 	const actSequence = useCallback(
 		async (
-			runId: FlowRunId,
+			runId: ActId,
 			sequence: Workflow["sequences"][number],
 			sequenceIndex: number,
 			generations: Generation[],
 			onComplete?: () => void,
 		) => {
-			await client.patchRun({
-				flowRunId: runId,
+			await client.patchAct({
+				actId: runId,
 				delta: {
 					"steps.inProgress": { increment: 1 },
 					"steps.queued": { decrement: 1 },
@@ -108,8 +108,8 @@ export function useFlowController() {
 				onComplete();
 			}
 
-			await client.patchRun({
-				flowRunId: runId,
+			await client.patchAct({
+				actId: runId,
 				delta: hasSequenceError
 					? {
 							"steps.failed": { increment: 1 },
@@ -129,9 +129,9 @@ export function useFlowController() {
 	);
 
 	const finalizeRun = useCallback(
-		async (runId: FlowRunId, hasError: boolean, startedAt: number) => {
-			await client.patchRun({
-				flowRunId: runId,
+		async (runId: ActId, hasError: boolean, startedAt: number) => {
+			await client.patchAct({
+				actId: runId,
 				delta: {
 					status: { set: hasError ? "failed" : "completed" },
 					"duration.wallClock": { set: Date.now() - startedAt },
@@ -175,7 +175,7 @@ export function useFlowController() {
 				),
 			});
 
-			const { run } = await client.createAct({
+			const { act } = await client.createAct({
 				workspaceId: data.id,
 				jobsCount: flow.sequences.length,
 				trigger: "manual",
@@ -186,7 +186,7 @@ export function useFlowController() {
 
 			for (const [sequenceIndex, sequence] of flow.sequences.entries()) {
 				const sequenceErrored = await actSequence(
-					run.id,
+					act.id,
 					sequence,
 					sequenceIndex,
 					generations,
@@ -197,7 +197,7 @@ export function useFlowController() {
 				}
 			}
 
-			await finalizeRun(run.id, hasFlowError, flowStartedAt);
+			await finalizeRun(act.id, hasFlowError, flowStartedAt);
 		},
 		[
 			createGeneration,
