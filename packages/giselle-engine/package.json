@@ -58,7 +58,6 @@
 		"@ai-sdk/openai": "catalog:",
 		"@ai-sdk/perplexity": "catalog:",
 		"@ai-sdk/react": "catalog:",
-		"@giselle-sdk/data-mod": "workspace:^",
 		"@giselle-sdk/flow": "workspace:^",
 		"@giselle-sdk/github-tool": "workspace:^",
 		"@giselle-sdk/language-model": "workspace:^",

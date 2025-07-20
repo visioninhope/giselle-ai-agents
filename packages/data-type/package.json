@@ -22,17 +22,14 @@
 		}
 	},
 	"devDependencies": {
-		"@giselle-sdk/github-tool": "workspace:^",
 		"@giselle-sdk/utils": "workspace:*",
 		"@giselle/giselle-sdk-tsconfig": "workspace:*",
 		"tsup": "catalog:",
 		"vitest": "catalog:"
 	},
 	"dependencies": {
-		"@ai-sdk/react": "catalog:",
 		"@giselle-sdk/flow": "workspace:^",
 		"@giselle-sdk/language-model": "workspace:^",
-		"ai": "catalog:",
 		"zod": "catalog:"
 	}
 }
