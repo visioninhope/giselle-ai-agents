@@ -1,3 +1,4 @@
+"use client";
 export * from "../utils";
 export * from "./errors";
 export * from "./feature-flags";

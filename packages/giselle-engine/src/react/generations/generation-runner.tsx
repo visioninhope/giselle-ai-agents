@@ -5,7 +5,7 @@ import {
 	type Generation,
 	GenerationContext,
 	isQueuedGeneration,
-} from "../../core/generations";
+} from "../../core/generations/object";
 import { useFeatureFlag } from "../feature-flags";
 import { useTelemetry } from "../telemetry";
 import { useGiselleEngine } from "../use-giselle-engine";

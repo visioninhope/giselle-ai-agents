@@ -1,5 +1,5 @@
 import { WorkspaceId } from "@giselle-sdk/data-type";
-import { WorkspaceProvider } from "@giselle-sdk/giselle-engine/react";
+import { WorkspaceProvider } from "@giselle-sdk/giselle-engine/react"
 import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
 import { db, flowTriggers } from "@/drizzle";
@@ -46,6 +46,7 @@ export default async function Layout({
 	const layoutV3 = await layoutV3Flag();
 	const experimental_storage = await experimental_storageFlag();
 	const stage = await stageFlag();
+	// return children
 	return (
 		<WorkspaceProvider
 			workspaceId={workspaceId}
