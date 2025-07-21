@@ -7,7 +7,7 @@ import type { GenerationId } from "./object";
 import { getGeneration } from "./utils";
 
 // Mock parseAndMod to track when it's called
-vi.mock("@giselle-sdk/data-mod", () => ({
+vi.mock("../../data-mod", () => ({
 	parseAndMod: vi.fn((schema, data) => {
 		return schema.parse(data);
 	}),
