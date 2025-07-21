@@ -6,7 +6,7 @@ export * from "./create-act";
 export * from "./create-and-act-flow";
 export * from "./delete-trigger";
 export * from "./get-trigger";
-export * from "./get-workspace-flow-runs";
+export * from "./get-workspace-acts";
 export * from "./patch-run";
 export * from "./resolve-trigger";
 export * from "./set-trigger";
