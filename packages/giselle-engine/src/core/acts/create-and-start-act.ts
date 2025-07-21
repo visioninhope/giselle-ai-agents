@@ -3,16 +3,16 @@ import {
 	RunId,
 	type Workflow,
 } from "@giselle-sdk/data-type";
+import { buildWorkflowFromTrigger } from "../flows/build-workflow-from-trigger";
 import type { GenerationContextInput } from "../generations";
 import type { GiselleEngineContext } from "../types";
-import { ActIndexObject } from "./act/object";
-import { actPath, workspaceActPath } from "./act/paths";
-import { type ActFlowCallbacks, actFlow } from "./act-flow";
-import { buildWorkflowFromTrigger } from "./build-workflow-from-trigger";
 import { createAct } from "./create-act";
+import { ActIndexObject } from "./object";
+import { actPath, workspaceActPath } from "./object/paths";
+import { type ActFlowCallbacks, startAct } from "./start-act";
 
 /** @todo telemetry */
-export async function createAndActFlow(args: {
+export async function createAndStartAct(args: {
 	triggerId: FlowTriggerId;
 	context: GiselleEngineContext;
 	triggerInputs?: GenerationContextInput[];
@@ -49,7 +49,7 @@ export async function createAndActFlow(args: {
 		),
 	]);
 
-	await actFlow({
+	await startAct({
 		flow: workflow,
 		context: args.context,
 		actId: act.id,

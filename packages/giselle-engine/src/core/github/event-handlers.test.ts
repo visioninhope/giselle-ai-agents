@@ -54,7 +54,7 @@ describe("GitHub Event Handlers", () => {
 		testDeps = {
 			addReaction: vi.fn().mockResolvedValue(undefined),
 			ensureWebhookEvent: createEnsureWebhookEventMock(),
-			createAndActFlow: vi.fn().mockResolvedValue(undefined),
+			createAndStartAct: vi.fn().mockResolvedValue(undefined),
 			parseCommand: vi
 				.fn()
 				.mockReturnValue({ callsign: "giselle", content: "help me" }),
@@ -701,7 +701,7 @@ describe("GitHub Event Handlers", () => {
 			});
 
 			// Assert
-			expect(testDeps.createAndActFlow).toHaveBeenCalledWith(
+			expect(testDeps.createAndStartAct).toHaveBeenCalledWith(
 				expect.objectContaining({
 					context: expect.anything(),
 					triggerId: mockFlowTriggerId,
@@ -772,7 +772,7 @@ describe("GitHub Event Handlers", () => {
 
 			// Assert
 			expect(result).toBe(false);
-			expect(testDeps.createAndActFlow).not.toHaveBeenCalled();
+			expect(testDeps.createAndStartAct).not.toHaveBeenCalled();
 			expect(testDeps.addReaction).not.toHaveBeenCalled();
 		});
 	});

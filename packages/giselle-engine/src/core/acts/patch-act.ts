@@ -1,10 +1,10 @@
 import type { GiselleEngineContext } from "../types";
-import type { ActId, ActObject } from "./act/object";
+import type { ActId, ActObject } from "./object";
 import {
 	type PatchDelta,
 	patchAct as patchActObject,
-} from "./act/patch-object";
-import { actPath } from "./act/paths";
+} from "./object/patch-object";
+import { actPath } from "./object/paths";
 
 export type { PatchDelta };
 

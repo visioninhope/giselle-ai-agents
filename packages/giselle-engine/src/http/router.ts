@@ -12,9 +12,9 @@ import {
 } from "@giselle-sdk/data-type";
 import { z } from "zod/v4";
 import type { GiselleEngine } from "../core";
+import { ActId, type PatchDelta } from "../core/acts";
 import { DataSourceProviderObject } from "../core/data-source";
-import { ConfigureTriggerInput, type PatchDelta } from "../core/flows";
-import { ActId } from "../core/flows/act/object";
+import { ConfigureTriggerInput } from "../core/flows";
 import {
 	Generation,
 	GenerationContextInput,
