@@ -45,7 +45,7 @@ export function useFlowController() {
 		[client],
 	);
 
-	const actStep = useCallback(
+	const executeStep = useCallback(
 		async (
 			actId: ActId,
 			step: Workflow["sequences"][number]["steps"][number],
@@ -70,7 +70,7 @@ export function useFlowController() {
 		[patchRunAnnotations, startGeneration],
 	);
 
-	const actSequence = useCallback(
+	const executeSequence = useCallback(
 		async (
 			actId: ActId,
 			sequence: Workflow["sequences"][number],
@@ -91,7 +91,7 @@ export function useFlowController() {
 			let hasSequenceError = false;
 			await Promise.all(
 				sequence.steps.map(async (step) => {
-					const { duration, hasError } = await actStep(
+					const { duration, hasError } = await executeStep(
 						actId,
 						step,
 						generations,
@@ -125,7 +125,7 @@ export function useFlowController() {
 
 			return hasSequenceError;
 		},
-		[client, actStep],
+		[client, executeStep],
 	);
 
 	const finalizeRun = useCallback(
@@ -185,7 +185,7 @@ export function useFlowController() {
 			let hasFlowError = false;
 
 			for (const [sequenceIndex, sequence] of flow.sequences.entries()) {
-				const sequenceErrored = await actSequence(
+				const sequenceErrored = await executeSequence(
 					act.id,
 					sequence,
 					sequenceIndex,
@@ -205,7 +205,7 @@ export function useFlowController() {
 			info,
 			stopFlow,
 			client,
-			actSequence,
+			executeSequence,
 			finalizeRun,
 		],
 	);
