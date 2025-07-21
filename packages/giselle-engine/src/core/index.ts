@@ -285,12 +285,12 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 		}) => {
 			return await buildWorkflowFromTrigger({ ...args, context });
 		},
-		createAndActFlow: async (args: {
+		createAndStartAct: async (args: {
 			triggerId: FlowTriggerId;
 			triggerInputs?: GenerationContextInput[];
 			useExperimentalStorage: boolean;
 		}) => createAndStartAct({ ...args, context }),
-		actFlow: async (args: {
+		startAct: async (args: {
 			flow: import("@giselle-sdk/data-type").Workflow;
 			actId: ActId;
 			runId: import("@giselle-sdk/data-type").RunId;

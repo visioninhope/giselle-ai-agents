@@ -303,7 +303,7 @@ export const createJsonRouters = {
 				return new Response(null, { status: 204 });
 			},
 		}),
-	createAndActFlow: (giselleEngine: GiselleEngine) =>
+	createAndStartAct: (giselleEngine: GiselleEngine) =>
 		createHandler({
 			input: z.object({
 				triggerId: FlowTriggerId.schema,
@@ -311,11 +311,11 @@ export const createJsonRouters = {
 				useExperimentalStorage: z.boolean(),
 			}),
 			handler: async ({ input }) => {
-				await giselleEngine.createAndActFlow(input);
+				await giselleEngine.createAndStartAct(input);
 				return new Response(null, { status: 204 });
 			},
 		}),
-	actFlow: (giselleEngine: GiselleEngine) =>
+	startAct: (giselleEngine: GiselleEngine) =>
 		createHandler({
 			input: z.object({
 				flow: Workflow,
@@ -326,7 +326,7 @@ export const createJsonRouters = {
 				useExperimentalStorage: z.boolean(),
 			}),
 			handler: async ({ input }) => {
-				await giselleEngine.actFlow(input);
+				await giselleEngine.startAct(input);
 				return new Response(null, { status: 204 });
 			},
 		}),
