@@ -32,9 +32,9 @@ export function useFlowController() {
 	}, [stopGeneration]);
 
 	const patchRunAnnotations = useCallback(
-		async (runId: ActId, message: string) => {
+		async (actId: ActId, message: string) => {
 			await client.patchAct({
-				actId: runId,
+				actId,
 				delta: {
 					annotations: {
 						push: [{ level: "error", message }],
@@ -47,7 +47,7 @@ export function useFlowController() {
 
 	const actStep = useCallback(
 		async (
-			runId: ActId,
+			actId: ActId,
 			step: Workflow["sequences"][number]["steps"][number],
 			generations: Generation[],
 			sequenceStartedAt: number,
@@ -62,7 +62,7 @@ export function useFlowController() {
 			await startGeneration(generation.id, {
 				onGenerationFailed: async (failedGeneration) => {
 					hasError = true;
-					await patchRunAnnotations(runId, failedGeneration.error.message);
+					await patchRunAnnotations(actId, failedGeneration.error.message);
 				},
 			});
 			return { duration: Date.now() - sequenceStartedAt, hasError };
@@ -72,14 +72,14 @@ export function useFlowController() {
 
 	const actSequence = useCallback(
 		async (
-			runId: ActId,
+			actId: ActId,
 			sequence: Workflow["sequences"][number],
 			sequenceIndex: number,
 			generations: Generation[],
 			onComplete?: () => void,
 		) => {
 			await client.patchAct({
-				actId: runId,
+				actId,
 				delta: {
 					"steps.inProgress": { increment: 1 },
 					"steps.queued": { decrement: 1 },
@@ -92,7 +92,7 @@ export function useFlowController() {
 			await Promise.all(
 				sequence.steps.map(async (step) => {
 					const { duration, hasError } = await actStep(
-						runId,
+						actId,
 						step,
 						generations,
 						sequenceStartedAt,
@@ -109,7 +109,7 @@ export function useFlowController() {
 			}
 
 			await client.patchAct({
-				actId: runId,
+				actId: actId,
 				delta: hasSequenceError
 					? {
 							"steps.failed": { increment: 1 },
@@ -129,9 +129,9 @@ export function useFlowController() {
 	);
 
 	const finalizeRun = useCallback(
-		async (runId: ActId, hasError: boolean, startedAt: number) => {
+		async (actId: ActId, hasError: boolean, startedAt: number) => {
 			await client.patchAct({
-				actId: runId,
+				actId,
 				delta: {
 					status: { set: hasError ? "failed" : "completed" },
 					"duration.wallClock": { set: Date.now() - startedAt },
