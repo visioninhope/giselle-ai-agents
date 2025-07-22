@@ -294,9 +294,7 @@ export const githubRepositoryContentStatus = pgTable(
 	"github_repository_content_status",
 	{
 		dbId: serial("db_id").primaryKey(),
-		repositoryIndexDbId: integer("repository_index_db_id")
-			.notNull()
-			.references(() => githubRepositoryIndex.dbId, { onDelete: "cascade" }),
+		repositoryIndexDbId: integer("repository_index_db_id").notNull(),
 		contentType: text("content_type")
 			.$type<GitHubRepositoryContentType>()
 			.notNull(),
@@ -314,7 +312,17 @@ export const githubRepositoryContentStatus = pgTable(
 			.notNull()
 			.$onUpdate(() => new Date()),
 	},
-	(table) => [unique().on(table.repositoryIndexDbId, table.contentType)],
+	(table) => [
+		unique("gh_content_status_unique").on(
+			table.repositoryIndexDbId,
+			table.contentType,
+		),
+		foreignKey({
+			columns: [table.repositoryIndexDbId],
+			foreignColumns: [githubRepositoryIndex.dbId],
+			name: "gh_content_status_repo_idx_fk",
+		}).onDelete("cascade"),
+	],
 );
 
 export const githubRepositoryEmbeddings = pgTable(
