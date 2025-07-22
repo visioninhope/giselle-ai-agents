@@ -10,45 +10,23 @@ import type { WebhookEvent } from "@giselle-sdk/github-tool";
 import { z } from "zod/v4";
 import { ActId } from "../../acts/object";
 
-export const GenerationOriginTypeStudio = z.literal("studio");
-export type GenerationOriginTypeStudio = z.infer<
-	typeof GenerationOriginTypeStudio
->;
-
-export const GenerationOriginTypeStage = z.literal("stage");
-export type GenerationOriginTypeStage = z.infer<
-	typeof GenerationOriginTypeStage
->;
-
-export const GenerationOriginTypeGitHubApp = z.literal("github-app");
-export type GenerationOriginTypeGitHubApp = z.infer<
-	typeof GenerationOriginTypeGitHubApp
->;
-
-export const GenerationOriginType = z.union([
-	GenerationOriginTypeStudio,
-	GenerationOriginTypeStage,
-	GenerationOriginTypeGitHubApp,
-]);
-export type GenerationOriginType = z.infer<typeof GenerationOriginType>;
-
 export const GenerationOriginStudio = z.object({
 	workspaceId: WorkspaceId.schema,
-	type: GenerationOriginTypeStudio,
+	type: z.literal("studio"),
 });
 export type GenerationOriginStudio = z.infer<typeof GenerationOriginStudio>;
 
 export const GenerationOriginStage = z.object({
 	actId: ActId.schema,
 	workspaceId: WorkspaceId.schema,
-	type: GenerationOriginTypeStage,
+	type: z.literal("stage"),
 });
 export type GenerationOriginStage = z.infer<typeof GenerationOriginStage>;
 
 export const GenerationOriginGitHubApp = z.object({
 	actId: ActId.schema,
 	workspaceId: WorkspaceId.schema,
-	type: GenerationOriginTypeGitHubApp,
+	type: z.literal("github-app"),
 });
 export type GenerationOriginGitHubApp = z.infer<
 	typeof GenerationOriginGitHubApp
