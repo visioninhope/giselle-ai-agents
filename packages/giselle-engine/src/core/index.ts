@@ -293,7 +293,7 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 		startAct: async (args: {
 			flow: import("@giselle-sdk/data-type").Workflow;
 			actId: ActId;
-			runId: import("@giselle-sdk/data-type").RunId;
+			runId: ActId;
 			workspaceId: WorkspaceId;
 			triggerInputs?: GenerationContextInput[];
 			callbacks?: ActFlowCallbacks;

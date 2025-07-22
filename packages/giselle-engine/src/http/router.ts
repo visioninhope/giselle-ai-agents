@@ -4,7 +4,6 @@ import {
 	FlowTrigger,
 	FlowTriggerId,
 	NodeId,
-	RunId,
 	SecretId,
 	Workflow,
 	Workspace,
@@ -320,7 +319,7 @@ export const createJsonRouters = {
 			input: z.object({
 				flow: Workflow,
 				actId: ActId.schema,
-				runId: RunId.schema,
+				runId: ActId.schema,
 				workspaceId: WorkspaceId.schema,
 				triggerInputs: z.array(GenerationContextInput).optional(),
 				useExperimentalStorage: z.boolean(),

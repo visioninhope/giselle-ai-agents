@@ -6,11 +6,10 @@ import {
 } from "@giselle-internal/ui/table";
 import {
 	isTriggerNode,
-	RunId,
 	type Workspace,
 	type WorkspaceId,
 } from "@giselle-sdk/data-type";
-import { defaultName } from "@giselle-sdk/giselle-engine";
+import { ActId, defaultName } from "@giselle-sdk/giselle-engine";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { after } from "next/server";
@@ -122,7 +121,7 @@ export default async function StagePage() {
 						giselleEngine.startAct({
 							flow: build.workflow,
 							actId: act.id,
-							runId: RunId.generate(),
+							runId: ActId.generate(),
 							workspaceId: payloads.flowTrigger.workspaceId,
 							triggerInputs: [
 								{

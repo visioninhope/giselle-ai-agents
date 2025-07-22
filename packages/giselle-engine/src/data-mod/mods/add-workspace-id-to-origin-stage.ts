@@ -41,10 +41,7 @@ export function addWorkspaceIdToOriginStage(data: unknown, issue: $ZodIssue) {
 
 	if (context && typeof context === "object") {
 		// Try to find workspaceId in other parts of the context
-		if (
-			context.origin &&
-			typeof context.origin === "object"
-		) {
+		if (context.origin && typeof context.origin === "object") {
 			// If origin.type is "studio", use that workspaceId
 			if (context.origin.type === "studio" && context.origin.workspaceId) {
 				workspaceId = context.origin.workspaceId;

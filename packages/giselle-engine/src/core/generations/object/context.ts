@@ -4,11 +4,11 @@ import {
 	NodeLike,
 	OperationNode,
 	OperationNodeLike,
-	RunId,
 	WorkspaceId,
 } from "@giselle-sdk/data-type";
 import type { WebhookEvent } from "@giselle-sdk/github-tool";
 import { z } from "zod/v4";
+import { ActId } from "../../acts/object";
 
 export const GenerationOriginTypeStudio = z.literal("studio");
 export type GenerationOriginTypeStudio = z.infer<
@@ -39,14 +39,14 @@ export const GenerationOriginStudio = z.object({
 export type GenerationOriginStudio = z.infer<typeof GenerationOriginStudio>;
 
 export const GenerationOriginStage = z.object({
-	id: RunId.schema,
+	id: ActId.schema,
 	workspaceId: WorkspaceId.schema,
 	type: GenerationOriginTypeStage,
 });
 export type GenerationOriginStage = z.infer<typeof GenerationOriginStage>;
 
 export const GenerationOriginGitHubApp = z.object({
-	id: RunId.schema,
+	id: ActId.schema,
 	workspaceId: WorkspaceId.schema,
 	type: GenerationOriginTypeGitHubApp,
 });

@@ -1,9 +1,4 @@
-import type {
-	RunId,
-	Sequence,
-	Workflow,
-	WorkspaceId,
-} from "@giselle-sdk/data-type";
+import type { Sequence, Workflow, WorkspaceId } from "@giselle-sdk/data-type";
 import { AISDKError } from "ai";
 import { resolveTrigger } from "../flows";
 import {
@@ -30,7 +25,7 @@ export interface ActFlowCallbacks {
 
 function createQueuedGeneration(args: {
 	step: Sequence["steps"][number];
-	runId: RunId;
+	runId: ActId;
 	workspaceId: WorkspaceId;
 	triggerInputs?: GenerationContextInput[];
 }) {
@@ -130,7 +125,7 @@ async function actSequence(args: {
 	sequence: Sequence;
 	context: GiselleEngineContext;
 	actId: ActId;
-	runId: RunId;
+	runId: ActId;
 	workspaceId: WorkspaceId;
 	triggerInputs?: GenerationContextInput[];
 	callbacks?: ActFlowCallbacks;
@@ -223,7 +218,7 @@ export async function startAct(args: {
 	flow: Workflow;
 	context: GiselleEngineContext;
 	actId: ActId;
-	runId: RunId;
+	runId: ActId;
 	workspaceId: WorkspaceId;
 	triggerInputs?: GenerationContextInput[];
 	callbacks?: ActFlowCallbacks;

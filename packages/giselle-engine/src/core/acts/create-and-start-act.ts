@@ -1,13 +1,9 @@
-import {
-	type FlowTriggerId,
-	RunId,
-	type Workflow,
-} from "@giselle-sdk/data-type";
+import type { FlowTriggerId, Workflow } from "@giselle-sdk/data-type";
 import { buildWorkflowFromTrigger } from "../flows/build-workflow-from-trigger";
 import type { GenerationContextInput } from "../generations";
 import type { GiselleEngineContext } from "../types";
 import { createAct } from "./create-act";
-import { ActIndexObject } from "./object";
+import { ActId, ActIndexObject } from "./object";
 import { actPath, workspaceActPath } from "./object/paths";
 import { type ActFlowCallbacks, startAct } from "./start-act";
 
@@ -34,7 +30,7 @@ export async function createAndStartAct(args: {
 
 	await args.callbacks?.flowCreate?.({ flow: workflow });
 
-	const runId = RunId.generate();
+	const runId = ActId.generate();
 	const act = await createAct({
 		context: args.context,
 		trigger: trigger.configuration.provider,
