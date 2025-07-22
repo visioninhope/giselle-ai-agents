@@ -1,9 +1,14 @@
+import {
+	Connection,
+	Node,
+	NodeLike,
+	OperationNode,
+	OperationNodeLike,
+	RunId,
+	WorkspaceId,
+} from "@giselle-sdk/data-type";
 import type { WebhookEvent } from "@giselle-sdk/github-tool";
 import { z } from "zod/v4";
-import { Connection } from "../connection";
-import { Node, NodeLike, OperationNode, OperationNodeLike } from "../node";
-import { RunId } from "../run";
-import { WorkspaceId } from "../workspace";
 
 export const GenerationOriginTypeWorkspace = z.literal("workspace");
 export type GenerationOriginTypeWorkspace = z.infer<

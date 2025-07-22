@@ -1,9 +1,9 @@
 import {
 	type FlowTriggerId,
-	type GenerationContextInput,
 	RunId,
 	type Workflow,
 } from "@giselle-sdk/data-type";
+import type { GenerationContextInput } from "../generations";
 import type { GiselleEngineContext } from "../types";
 import { ActIndexObject } from "./act/object";
 import { actPath, workspaceActPath } from "./act/paths";

@@ -1,7 +1,7 @@
+import { GitHubVectorStoreSource, OutputId } from "@giselle-sdk/data-type";
 import { createIdGenerator } from "@giselle-sdk/utils";
 import type { ProviderMetadata } from "ai";
 import { z } from "zod/v4";
-import { GitHubVectorStoreSource, OutputId } from "../node";
 
 export const GenerationOutputBase = z.object({
 	type: z.string(),

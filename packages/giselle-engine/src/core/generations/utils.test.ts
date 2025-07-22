@@ -1,13 +1,13 @@
-import { parseAndMod } from "@giselle-sdk/data-mod";
-import type { GenerationId } from "@giselle-sdk/data-type";
 import { createStorage } from "unstorage";
 import memoryDriver from "unstorage/drivers/memory";
 import { beforeEach, describe, expect, test, vi } from "vitest";
+import { parseAndMod } from "../../data-mod";
 import { memoryStorageDriver } from "../experimental_storage";
+import type { GenerationId } from "./object";
 import { getGeneration } from "./utils";
 
 // Mock parseAndMod to track when it's called
-vi.mock("@giselle-sdk/data-mod", () => ({
+vi.mock("../../data-mod", () => ({
 	parseAndMod: vi.fn((schema, data) => {
 		return schema.parse(data);
 	}),

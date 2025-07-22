@@ -1,6 +1,6 @@
-import { parseAndMod } from "@giselle-sdk/data-mod";
 import { Node, Workspace, type WorkspaceId } from "@giselle-sdk/data-type";
 import type { Storage } from "unstorage";
+import { parseAndMod } from "../../data-mod";
 import type { GiselleStorage } from "../experimental_storage";
 
 function workspacePath(workspaceId: WorkspaceId) {

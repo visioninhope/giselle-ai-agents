@@ -1,4 +1,16 @@
 import type { Message } from "@ai-sdk/react";
+import type { NodeId } from "@giselle-sdk/data-type";
+import {
+	createContext,
+	type Dispatch,
+	type ReactNode,
+	type SetStateAction,
+	useCallback,
+	useContext,
+	useMemo,
+	useRef,
+	useState,
+} from "react";
 import {
 	type CancelledGeneration,
 	type CompletedGeneration,
@@ -13,21 +25,9 @@ import {
 	isCreatedGeneration,
 	isFailedGeneration,
 	isRunningGeneration,
-	type NodeId,
 	type QueuedGeneration,
 	type RunningGeneration,
-} from "@giselle-sdk/data-type";
-import {
-	createContext,
-	type Dispatch,
-	type ReactNode,
-	type SetStateAction,
-	useCallback,
-	useContext,
-	useMemo,
-	useRef,
-	useState,
-} from "react";
+} from "../../../core/generations/object";
 import { useFeatureFlag } from "../../feature-flags";
 import { useGiselleEngine } from "../../use-giselle-engine";
 import { GenerationRunner } from "../generation-runner";

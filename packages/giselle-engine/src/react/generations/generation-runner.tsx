@@ -1,11 +1,11 @@
 import { useChat } from "@ai-sdk/react";
+import { isTextGenerationNode } from "@giselle-sdk/data-type";
+import { useEffect, useRef } from "react";
 import {
 	type Generation,
 	GenerationContext,
 	isQueuedGeneration,
-	isTextGenerationNode,
-} from "@giselle-sdk/data-type";
-import { useEffect, useRef } from "react";
+} from "../../core/generations/object";
 import { useFeatureFlag } from "../feature-flags";
 import { useTelemetry } from "../telemetry";
 import { useGiselleEngine } from "../use-giselle-engine";

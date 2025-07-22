@@ -6,7 +6,7 @@ import { fixTypoAccesorToAccessor } from "./mods/fix-typo-accesor-to-accessor";
 import { fixTypoQuquedAtToQueuedAt } from "./mods/fix-typo-ququedAt-queuedAt";
 import { renameActionToOperation } from "./mods/rename-action-to-operation";
 
-export function dataMod(data: unknown, issue: $ZodIssue) {
+function dataMod(data: unknown, issue: $ZodIssue) {
 	let modData = data;
 	modData = fixTypoAccesorToAccessor(modData, issue);
 	modData = fixTypoQuquedAtToQueuedAt(modData, issue);
