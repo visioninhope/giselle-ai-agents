@@ -13,8 +13,11 @@ import {
 import { useToasts } from "../ui/toast";
 
 export function useFlowController() {
-	const { createGenerationRunner, startGenerationRunner, stopGeneration } =
-		useGenerationRunnerSystem();
+	const {
+		createGenerationRunner,
+		startGenerationRunner,
+		stopGenerationRunner,
+	} = useGenerationRunnerSystem();
 	const { data } = useWorkflowDesigner();
 	const { info } = useToasts();
 	const client = useGiselleEngine();
@@ -26,10 +29,10 @@ export function useFlowController() {
 		cancelRef.current = true;
 		await Promise.all(
 			activeGenerationsRef.current.map((generation) =>
-				stopGeneration(generation.id),
+				stopGenerationRunner(generation.id),
 			),
 		);
-	}, [stopGeneration]);
+	}, [stopGenerationRunner]);
 
 	const patchRunAnnotations = useCallback(
 		async (actId: ActId, message: string) => {

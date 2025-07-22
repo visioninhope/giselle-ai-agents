@@ -26,7 +26,7 @@ import { useConnectedSources } from "./sources";
 
 export function QueryNodePropertiesPanel({ node }: { node: QueryNode }) {
 	const { data, updateNodeData } = useWorkflowDesigner();
-	const { createAndStartGeneration, isGenerating, stopGeneration } =
+	const { createAndStartGenerationRunner, isGenerating, stopGenerationRunner } =
 		useNodeGenerations({
 			nodeId: node.id,
 			origin: { type: "workspace", id: data.id },
@@ -47,7 +47,7 @@ export function QueryNodePropertiesPanel({ node }: { node: QueryNode }) {
 			error("Query is empty");
 			return;
 		}
-		createAndStartGeneration({
+		createAndStartGenerationRunner({
 			origin: {
 				type: "workspace",
 				id: data.id,
@@ -65,7 +65,7 @@ export function QueryNodePropertiesPanel({ node }: { node: QueryNode }) {
 		data.id,
 		data.connections,
 		node,
-		createAndStartGeneration,
+		createAndStartGenerationRunner,
 		error,
 		query,
 	]);
@@ -84,7 +84,7 @@ export function QueryNodePropertiesPanel({ node }: { node: QueryNode }) {
 						type="button"
 						onClick={() => {
 							if (isGenerating) {
-								stopGeneration();
+								stopGenerationRunner();
 							} else {
 								generate();
 							}
