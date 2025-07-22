@@ -320,10 +320,13 @@ async function queryVectorStore(
 							query,
 							queryContext,
 							limit,
+							similarityThreshold,
 							telemetry,
 						);
-						const records = res
-							.map((result) => ({
+						return {
+							type: "vector-store" as const,
+							source,
+							records: res.map((result) => ({
 								chunkContent: result.chunk.content,
 								chunkIndex: result.chunk.index,
 								score: result.similarity,
@@ -333,16 +336,7 @@ async function queryVectorStore(
 										String(v),
 									]),
 								),
-							}))
-							.filter((record) =>
-								similarityThreshold !== undefined
-									? record.score >= similarityThreshold
-									: true,
-							);
-						return {
-							type: "vector-store" as const,
-							source,
-							records,
+							})),
 						};
 					}
 					default: {

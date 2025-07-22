@@ -142,6 +142,7 @@ export function createPostgresQueryService<
 		query: string,
 		context: TContext,
 		limit = 10,
+		similarityThreshold?: number,
 		telemetry?: TelemetrySettings,
 	): Promise<QueryResult<z.infer<TSchema>>[]> => {
 		const { tableName, contextToFilter, metadataSchema } = config;
@@ -172,6 +173,15 @@ export function createPostgresQueryService<
 			for (const [column, value] of Object.entries(filters)) {
 				whereConditions.push(`${escapeIdentifier(column)} = $${paramIndex}`);
 				values.push(value);
+				paramIndex++;
+			}
+
+			// Add similarity threshold filter if provided
+			if (similarityThreshold !== undefined && similarityThreshold > 0) {
+				whereConditions.push(
+					`1 - (${escapeIdentifier(columnMapping.embedding)} <=> $1) >= $${paramIndex}`,
+				);
+				values.push(similarityThreshold);
 				paramIndex++;
 			}
 
