@@ -267,13 +267,6 @@
 			"when": 1752221767858,
 			"tag": "0037_safe_korvac",
 			"breakpoints": true
-		},
-		{
-			"idx": 38,
-			"version": "7",
-			"when": 1753154132965,
-			"tag": "0038_watery_monster_badoon",
-			"breakpoints": true
 		}
 	]
 }
