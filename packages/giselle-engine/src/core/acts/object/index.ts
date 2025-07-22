@@ -2,7 +2,7 @@ import { WorkspaceId } from "@giselle-sdk/data-type";
 import { createIdGenerator } from "@giselle-sdk/utils";
 import { z } from "zod/v4";
 
-export const ActId = createIdGenerator("flac");
+export const ActId = createIdGenerator("act");
 export type ActId = z.infer<typeof ActId.schema>;
 
 const ActAnnotationObject = z.object({
