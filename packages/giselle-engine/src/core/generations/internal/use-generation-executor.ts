@@ -73,6 +73,7 @@ export async function useGenerationExecutor<T>(args: {
 	let workspaceId: WorkspaceId;
 	switch (args.generation.context.origin.type) {
 		case "run":
+		case "act":
 			workspaceId = args.generation.context.origin.workspaceId;
 			break;
 		case "workspace":

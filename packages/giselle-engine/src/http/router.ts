@@ -19,7 +19,7 @@ import { z } from "zod/v4";
 import type { GiselleEngine } from "../core";
 import { DataSourceProviderObject } from "../core/data-source";
 import { ConfigureTriggerInput, type PatchDelta } from "../core/flows";
-import { FlowRunId } from "../core/flows/run/object";
+import { ActId } from "../core/flows/act/object";
 import type { TelemetrySettings } from "../core/generations";
 import { JsonResponse } from "../utils";
 import { createHandler, withUsageLimitErrorHandler } from "./create-handler";
@@ -301,7 +301,7 @@ export const createJsonRouters = {
 				return new Response(null, { status: 204 });
 			},
 		}),
-	createAndRunFlow: (giselleEngine: GiselleEngine) =>
+	createAndActFlow: (giselleEngine: GiselleEngine) =>
 		createHandler({
 			input: z.object({
 				triggerId: FlowTriggerId.schema,
@@ -309,22 +309,22 @@ export const createJsonRouters = {
 				useExperimentalStorage: z.boolean(),
 			}),
 			handler: async ({ input }) => {
-				await giselleEngine.createAndRunFlow(input);
+				await giselleEngine.createAndActFlow(input);
 				return new Response(null, { status: 204 });
 			},
 		}),
-	runFlow: (giselleEngine: GiselleEngine) =>
+	actFlow: (giselleEngine: GiselleEngine) =>
 		createHandler({
 			input: z.object({
 				flow: Workflow,
-				flowRunId: FlowRunId.schema,
+				actId: ActId.schema,
 				runId: RunId.schema,
 				workspaceId: WorkspaceId.schema,
 				triggerInputs: z.array(GenerationContextInput).optional(),
 				useExperimentalStorage: z.boolean(),
 			}),
 			handler: async ({ input }) => {
-				await giselleEngine.runFlow(input);
+				await giselleEngine.actFlow(input);
 				return new Response(null, { status: 204 });
 			},
 		}),
@@ -420,7 +420,7 @@ export const createJsonRouters = {
 					dataSources: await giselleEngine.getWorkspaceDataSources(input),
 				}),
 		}),
-	createRun: (giselleEngine: GiselleEngine) =>
+	createAct: (giselleEngine: GiselleEngine) =>
 		createHandler({
 			input: z.object({
 				jobsCount: z.number(),
@@ -429,28 +429,28 @@ export const createJsonRouters = {
 			}),
 			handler: async ({ input }) =>
 				JsonResponse.json({
-					run: await giselleEngine.createRun(input),
+					act: await giselleEngine.createAct(input),
 				}),
 		}),
-	patchRun: (giselleEngine: GiselleEngine) =>
+	patchAct: (giselleEngine: GiselleEngine) =>
 		createHandler({
 			input: z.object({
-				flowRunId: FlowRunId.schema,
+				actId: ActId.schema,
 				delta: z.custom<PatchDelta>(),
 			}),
 			handler: async ({ input }) =>
 				JsonResponse.json({
-					run: await giselleEngine.patchRun(input),
+					act: await giselleEngine.patchAct(input),
 				}),
 		}),
-	getWorkspaceFlowRuns: (giselleEngine: GiselleEngine) =>
+	getWorkspaceActs: (giselleEngine: GiselleEngine) =>
 		createHandler({
 			input: z.object({
 				workspaceId: WorkspaceId.schema,
 			}),
 			handler: async ({ input }) =>
 				JsonResponse.json({
-					runs: await giselleEngine.getWorkspaceFlowRuns(input),
+					acts: await giselleEngine.getWorkspaceActs(input),
 				}),
 		}),
 	deleteSecret: (giselleEngine: GiselleEngine) =>

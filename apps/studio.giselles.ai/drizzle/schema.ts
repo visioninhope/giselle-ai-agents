@@ -1,5 +1,5 @@
 import type { FlowTriggerId, WorkspaceId } from "@giselle-sdk/data-type";
-import type { FlowRunId } from "@giselle-sdk/giselle-engine";
+import type { ActId } from "@giselle-sdk/giselle-engine";
 import type { GitHubRepositoryIndexId } from "@giselles-ai/types";
 import { relations } from "drizzle-orm";
 import {
@@ -341,7 +341,7 @@ export const acts = pgTable(
 		sdkFlowTriggerId: text("sdk_flow_trigger_id")
 			.$type<FlowTriggerId>()
 			.notNull(),
-		sdkFlowRunId: text("sdk_flow_run_id").$type<FlowRunId>().notNull(),
+		sdkActId: text("sdk_act_id").$type<ActId>().notNull(),
 		createdAt: timestamp("created_at").defaultNow().notNull(),
 		updatedAt: timestamp("updated_at")
 			.defaultNow()
@@ -352,6 +352,6 @@ export const acts = pgTable(
 		index().on(table.teamDbId),
 		index().on(table.sdkWorkspaceId),
 		index().on(table.sdkFlowTriggerId),
-		index().on(table.sdkFlowRunId),
+		index().on(table.sdkActId),
 	],
 );

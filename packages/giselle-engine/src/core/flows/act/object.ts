@@ -2,16 +2,16 @@ import { WorkspaceId } from "@giselle-sdk/data-type";
 import { createIdGenerator } from "@giselle-sdk/utils";
 import { z } from "zod/v4";
 
-export const FlowRunId = createIdGenerator("flrn");
-export type FlowRunId = z.infer<typeof FlowRunId.schema>;
+export const ActId = createIdGenerator("flac");
+export type ActId = z.infer<typeof ActId.schema>;
 
-const FlowRunAnnotationObject = z.object({
+const ActAnnotationObject = z.object({
 	level: z.enum(["info", "warning", "error"]),
 	message: z.string(),
 });
 
-export const FlowRunObject = z.object({
-	id: FlowRunId.schema,
+export const ActObject = z.object({
+	id: ActId.schema,
 	workspaceId: WorkspaceId.schema,
 	status: z.enum(["inProgress", "completed", "failed", "cancelled"]),
 	steps: z.object({
@@ -34,11 +34,11 @@ export const FlowRunObject = z.object({
 	}),
 	createdAt: z.number(),
 	updatedAt: z.number(),
-	annotations: z.array(FlowRunAnnotationObject).default([]),
+	annotations: z.array(ActAnnotationObject).default([]),
 });
-export type FlowRunObject = z.infer<typeof FlowRunObject>;
+export type ActObject = z.infer<typeof ActObject>;
 
-export const FlowRunIndexObject = FlowRunObject.pick({
+export const ActIndexObject = ActObject.pick({
 	id: true,
 	workspaceId: true,
 });

@@ -99,7 +99,7 @@ export default async function StagePage() {
 					if (build === null) {
 						throw new Error("Workflow not found");
 					}
-					const run = await giselleEngine.createRun({
+					const act = await giselleEngine.createAct({
 						workspaceId: payloads.flowTrigger.workspaceId,
 						jobsCount: build.workflow.sequences.length,
 						trigger: "studio",
@@ -114,14 +114,14 @@ export default async function StagePage() {
 					await db.insert(actsSchema).values({
 						teamDbId: team.dbId,
 						directorDbId: user.dbId,
-						sdkFlowRunId: run.id,
+						sdkActId: act.id,
 						sdkFlowTriggerId: payloads.flowTrigger.id,
 						sdkWorkspaceId: payloads.flowTrigger.workspaceId,
 					});
 					after(() =>
-						giselleEngine.runFlow({
+						giselleEngine.actFlow({
 							flow: build.workflow,
-							flowRunId: run.id,
+							actId: act.id,
 							runId: RunId.generate(),
 							workspaceId: payloads.flowTrigger.workspaceId,
 							triggerInputs: [
@@ -153,7 +153,7 @@ export default async function StagePage() {
 								<TableRow key={task.dbId}>
 									<TableCell>
 										<div className="flex flex-col">
-											<span>Flow Run: {task.sdkFlowRunId}</span>
+											<span>Act: {task.sdkActId}</span>
 											<span className="text-[12px] text-black-600">
 												{task.createdAt.toLocaleString()} ·{" "}
 												{team?.name || "Unknown Team"}
@@ -163,9 +163,7 @@ export default async function StagePage() {
 									<TableCell className="text-center">-</TableCell>
 									<TableCell className="text-right">
 										<div className="flex justify-end">
-											<Link
-												href={`/stage/acts/${task.sdkFlowRunId.substring(5)}`}
-											>
+											<Link href={`/stage/acts/${task.sdkActId.substring(5)}`}>
 												Details
 											</Link>
 										</div>

@@ -1,26 +1,26 @@
 import type { WorkspaceId } from "@giselle-sdk/data-type";
 import type { GiselleEngineContext } from "../types";
 import { getWorkspaceIndex } from "../utils/workspace-index";
-import { FlowRunIndexObject, FlowRunObject } from "./run/object";
-import { flowRunPath, workspaceFlowRunPath } from "./run/paths";
+import { ActIndexObject, ActObject } from "./act/object";
+import { actPath, workspaceActPath } from "./act/paths";
 
-export async function getWorkspaceFlowRuns(args: {
+export async function getWorkspaceActs(args: {
 	context: GiselleEngineContext;
 	workspaceId: WorkspaceId;
 }) {
-	const workspaceFlowRunIndices = await getWorkspaceIndex({
+	const workspaceActIndices = await getWorkspaceIndex({
 		storage: args.context.storage,
-		indexPath: workspaceFlowRunPath(args.workspaceId),
-		itemSchema: FlowRunIndexObject,
+		indexPath: workspaceActPath(args.workspaceId),
+		itemSchema: ActIndexObject,
 	});
 	return await Promise.all(
-		workspaceFlowRunIndices.map((workspaceFlowRunIndex) =>
-			args.context.storage.getItem(flowRunPath(workspaceFlowRunIndex.id)),
+		workspaceActIndices.map((workspaceActIndex) =>
+			args.context.storage.getItem(actPath(workspaceActIndex.id)),
 		),
-	).then((flowRunLike) =>
-		flowRunLike
+	).then((actLike) =>
+		actLike
 			.map((data) => {
-				const parse = FlowRunObject.safeParse(data);
+				const parse = ActObject.safeParse(data);
 				if (parse.success) {
 					return parse.data;
 				}

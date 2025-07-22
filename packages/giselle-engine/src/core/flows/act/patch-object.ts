@@ -1,6 +1,6 @@
-import type { FlowRunObject } from "./object";
+import type { ActObject } from "./object";
 
-type FlowRunPath = DotPaths<FlowRunObject>;
+type ActPath = DotPaths<ActObject>;
 
 type PatchValue<T> = T extends number
 	? { increment?: number; decrement?: number; set?: number }
@@ -14,14 +14,14 @@ type PatchValue<T> = T extends number
 			: never;
 
 export type PatchDelta = {
-	[P in FlowRunPath]?: PatchValue<Get<FlowRunObject, P>>;
+	[P in ActPath]?: PatchValue<Get<ActObject, P>>;
 };
 
-export function patchFlowRun(flowRun: FlowRunObject, delta: PatchDelta) {
-	const result: FlowRunObject = structuredClone(flowRun);
+export function patchAct(act: ActObject, delta: PatchDelta) {
+	const result: ActObject = structuredClone(act);
 
 	for (const key in delta) {
-		const patch = delta[key as FlowRunPath];
+		const patch = delta[key as ActPath];
 		if (!patch) continue;
 
 		const parts = key.split(".");

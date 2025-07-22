@@ -1,21 +1,17 @@
 import type { WorkspaceId } from "@giselle-sdk/data-type";
 import type { GiselleEngineContext } from "../types";
 import { addWorkspaceIndexItem } from "../utils/workspace-index";
-import {
-	FlowRunId,
-	FlowRunIndexObject,
-	type FlowRunObject,
-} from "./run/object";
-import { flowRunPath, workspaceFlowRunPath } from "./run/paths";
+import { ActId, ActIndexObject, type ActObject } from "./act/object";
+import { actPath, workspaceActPath } from "./act/paths";
 
-export async function createRun(args: {
+export async function createAct(args: {
 	context: GiselleEngineContext;
 	jobsCount: number;
 	trigger: string;
 	workspaceId: WorkspaceId;
 }) {
-	const flowRun: FlowRunObject = {
-		id: FlowRunId.generate(),
+	const act: ActObject = {
+		id: ActId.generate(),
 		workspaceId: args.workspaceId,
 		status: "inProgress",
 		steps: {
@@ -41,13 +37,13 @@ export async function createRun(args: {
 		annotations: [],
 	};
 	await Promise.all([
-		args.context.storage.setItem(flowRunPath(flowRun.id), flowRun),
+		args.context.storage.setItem(actPath(act.id), act),
 		addWorkspaceIndexItem({
 			storage: args.context.storage,
-			indexPath: workspaceFlowRunPath(args.workspaceId),
-			item: flowRun,
-			itemSchema: FlowRunIndexObject,
+			indexPath: workspaceActPath(args.workspaceId),
+			item: act,
+			itemSchema: ActIndexObject,
 		}),
 	]);
-	return flowRun;
+	return act;
 }

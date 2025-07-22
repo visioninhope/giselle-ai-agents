@@ -13,9 +13,13 @@ export type GenerationOriginTypeWorkspace = z.infer<
 export const GenerationOriginTypeRun = z.literal("run");
 export type GenerationOriginTypeRun = z.infer<typeof GenerationOriginTypeRun>;
 
+export const GenerationOriginTypeAct = z.literal("act");
+export type GenerationOriginTypeAct = z.infer<typeof GenerationOriginTypeAct>;
+
 export const GenerationOriginType = z.union([
 	GenerationOriginTypeWorkspace,
 	GenerationOriginTypeRun,
+	GenerationOriginTypeAct,
 ]);
 export type GenerationOriginType = z.infer<typeof GenerationOriginType>;
 
@@ -34,9 +38,17 @@ export const GenerationOriginRun = z.object({
 });
 export type GenerationOriginRun = z.infer<typeof GenerationOriginRun>;
 
+export const GenerationOriginAct = z.object({
+	id: RunId.schema,
+	workspaceId: WorkspaceId.schema,
+	type: GenerationOriginTypeAct,
+});
+export type GenerationOriginAct = z.infer<typeof GenerationOriginAct>;
+
 export const GenerationOrigin = z.discriminatedUnion("type", [
 	GenerationOriginWorkspace,
 	GenerationOriginRun,
+	GenerationOriginAct,
 ]);
 export type GenerationOrigin = z.infer<typeof GenerationOrigin>;
 

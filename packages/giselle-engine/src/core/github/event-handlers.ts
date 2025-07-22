@@ -15,7 +15,7 @@ import type {
 	WebhookEvent,
 	WebhookEventName,
 } from "@giselle-sdk/github-tool";
-import type { createAndRunFlow } from "../flows";
+import type { createAndActFlow } from "../flows";
 import type { GiselleEngineContext } from "../types";
 import type { parseCommand } from "./utils";
 
@@ -90,7 +90,7 @@ function buildProgressTable(data: ProgressTableData) {
 export interface EventHandlerDependencies {
 	addReaction: typeof addReaction;
 	ensureWebhookEvent: typeof ensureWebhookEvent;
-	createAndRunFlow: typeof createAndRunFlow;
+	createAndActFlow: typeof createAndActFlow;
 	parseCommand: typeof parseCommand;
 	createIssueComment: typeof createIssueComment;
 	createPullRequestComment: typeof createPullRequestComment;
@@ -377,7 +377,7 @@ export async function processEvent<TEventName extends WebhookEventName>(
 		let progressTableData: ProgressTableData = [];
 		let hasFlowError = false;
 
-		await deps.createAndRunFlow({
+		await deps.createAndActFlow({
 			useExperimentalStorage: false,
 			context: args.context,
 			triggerId: args.trigger.id,

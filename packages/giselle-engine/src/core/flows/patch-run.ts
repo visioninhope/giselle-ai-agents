@@ -1,34 +1,34 @@
 import type { GiselleEngineContext } from "../types";
-import type { FlowRunId, FlowRunObject } from "./run/object";
-import { type PatchDelta, patchFlowRun } from "./run/patch-object";
-import { flowRunPath } from "./run/paths";
+import type { ActId, ActObject } from "./act/object";
+import {
+	type PatchDelta,
+	patchAct as patchActObject,
+} from "./act/patch-object";
+import { actPath } from "./act/paths";
 
 export type { PatchDelta };
 
-export async function patchRun(args: {
+export async function patchAct(args: {
 	context: GiselleEngineContext;
-	flowRunId: FlowRunId;
+	actId: ActId;
 	delta: PatchDelta;
 }) {
-	// Get the current flow run
-	const currentFlowRun = await args.context.storage.getItem<FlowRunObject>(
-		flowRunPath(args.flowRunId),
+	// Get the current act
+	const currentAct = await args.context.storage.getItem<ActObject>(
+		actPath(args.actId),
 	);
 
-	if (!currentFlowRun) {
-		throw new Error(`Flow run not found: ${args.flowRunId}`);
+	if (!currentAct) {
+		throw new Error(`Act not found: ${args.actId}`);
 	}
 
 	// Apply the patch
-	const updatedFlowRun = patchFlowRun(currentFlowRun, {
+	const updatedAct = patchActObject(currentAct, {
 		...args.delta,
 		updatedAt: { set: Date.now() },
 	});
 
-	await args.context.storage.setItem(
-		flowRunPath(args.flowRunId),
-		updatedFlowRun,
-	);
+	await args.context.storage.setItem(actPath(args.actId), updatedAct);
 
-	return updatedFlowRun;
+	return updatedAct;
 }
