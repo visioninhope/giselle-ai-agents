@@ -1,4 +1,5 @@
 import type { FlowTriggerId, WorkspaceId } from "@giselle-sdk/data-type";
+import type { ActId } from "@giselle-sdk/giselle-engine";
 import type { GitHubRepositoryIndexId } from "@giselles-ai/types";
 import { relations } from "drizzle-orm";
 import {
@@ -398,5 +399,34 @@ export const flowTriggers = pgTable(
 		uniqueIndex().on(table.sdkFlowTriggerId),
 		index().on(table.teamDbId),
 		index().on(table.staged),
+	],
+);
+
+export const acts = pgTable(
+	"acts",
+	{
+		dbId: serial("db_id").primaryKey(),
+		teamDbId: integer("team_db_id")
+			.notNull()
+			.references(() => teams.dbId, { onDelete: "cascade" }),
+		directorDbId: integer("director_db_id")
+			.notNull()
+			.references(() => users.dbId, { onDelete: "cascade" }),
+		sdkWorkspaceId: text("sdk_workspace_id").$type<WorkspaceId>().notNull(),
+		sdkFlowTriggerId: text("sdk_flow_trigger_id")
+			.$type<FlowTriggerId>()
+			.notNull(),
+		sdkActId: text("sdk_act_id").$type<ActId>().notNull(),
+		createdAt: timestamp("created_at").defaultNow().notNull(),
+		updatedAt: timestamp("updated_at")
+			.defaultNow()
+			.notNull()
+			.$onUpdate(() => new Date()),
+	},
+	(table) => [
+		index().on(table.teamDbId),
+		index().on(table.sdkWorkspaceId),
+		index().on(table.sdkFlowTriggerId),
+		index().on(table.sdkActId),
 	],
 );

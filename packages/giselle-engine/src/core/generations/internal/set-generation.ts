@@ -1,6 +1,6 @@
-import { Generation, NodeGenerationIndex } from "@giselle-sdk/data-type";
 import type { Storage } from "unstorage";
 import type { GiselleStorage } from "../../experimental_storage";
+import { Generation, NodeGenerationIndex } from "../object";
 import {
 	generationPath,
 	getNodeGenerationIndexes,

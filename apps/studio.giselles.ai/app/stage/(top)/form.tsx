@@ -3,11 +3,16 @@
 import { Button } from "@giselle-internal/ui/button";
 import { Select } from "@giselle-internal/ui/select";
 import type { FlowTrigger, FlowTriggerId } from "@giselle-sdk/data-type";
+import type { ParameterItem } from "@giselle-sdk/giselle-engine";
 import clsx from "clsx/lite";
 import type { InferSelectModel } from "drizzle-orm";
 import { useCallback, useMemo, useState } from "react";
 import type { teams } from "@/drizzle";
-import { createInputsFromTrigger, parseFormInputs } from "./helpers";
+import {
+	createInputsFromTrigger,
+	parseFormInputs,
+	toParameterItems,
+} from "./helpers";
 
 type TeamId = InferSelectModel<typeof teams>["id"];
 interface TeamOption {
@@ -22,6 +27,14 @@ export interface FlowTriggerUIItem {
 	sdkData: FlowTrigger;
 }
 
+interface PerformStagePayloads {
+	teamId: TeamId;
+	flowTrigger: FlowTrigger;
+	parameterItems: ParameterItem[];
+}
+
+type PerformStageAction = (payloads: PerformStagePayloads) => Promise<void>;
+
 export function Form({
 	teamOptions,
 	flowTriggers,
@@ -29,9 +42,7 @@ export function Form({
 }: {
 	teamOptions: TeamOption[];
 	flowTriggers: FlowTriggerUIItem[];
-	performStageAction: (
-		values: Record<string, string | number>,
-	) => Promise<void>;
+	performStageAction: PerformStageAction;
 }) {
 	const defaultTeamId = useMemo(() => teamOptions[0].id, [teamOptions]);
 	const [selectedTeamId, setSelectedTeamId] = useState<TeamId>(defaultTeamId);
@@ -70,6 +81,9 @@ export function Form({
 	const handleSubmit = useCallback<React.FormEventHandler<HTMLFormElement>>(
 		async (e) => {
 			e.preventDefault();
+			if (selectedFlowTriggerId === undefined) {
+				return;
+			}
 			const formData = new FormData(e.currentTarget);
 			const { errors, values } = parseFormInputs(inputs, formData);
 
@@ -79,9 +93,29 @@ export function Form({
 			}
 
 			setValidationErrors({});
-			await performStageAction(values);
+
+			const flowTrigger = filteredFlowTriggers.find(
+				(flowTrigger) => flowTrigger.id === selectedFlowTriggerId,
+			);
+			if (flowTrigger === undefined) {
+				throw new Error(
+					`Flow trigger with ID ${selectedFlowTriggerId} not found`,
+				);
+			}
+
+			await performStageAction({
+				teamId: selectedTeamId,
+				flowTrigger: flowTrigger.sdkData,
+				parameterItems: toParameterItems(inputs, values),
+			});
 		},
-		[inputs, performStageAction],
+		[
+			inputs,
+			performStageAction,
+			selectedFlowTriggerId,
+			selectedTeamId,
+			filteredFlowTriggers,
+		],
 	);
 
 	return (

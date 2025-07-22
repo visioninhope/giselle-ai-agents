@@ -1,8 +1,4 @@
-import type {
-	FlowTrigger,
-	GenerationOutput,
-	Output,
-} from "@giselle-sdk/data-type";
+import type { FlowTrigger, Output } from "@giselle-sdk/data-type";
 import type { githubTriggers } from "@giselle-sdk/flow";
 import {
 	ensureWebhookEvent,
@@ -10,6 +6,7 @@ import {
 	getPullRequestReviewComment,
 	type WebhookEvent,
 } from "@giselle-sdk/github-tool";
+import type { GenerationOutput } from "../generations";
 import { parseCommand } from "./utils";
 
 interface ResolveTriggerArgs {

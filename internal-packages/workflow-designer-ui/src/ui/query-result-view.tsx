@@ -1,8 +1,4 @@
-import {
-	type Generation,
-	isCompletedGeneration,
-	isFailedGeneration,
-} from "@giselle-sdk/data-type";
+import type { Generation } from "@giselle-sdk/giselle-engine";
 import clsx from "clsx/lite";
 import { ChevronDownIcon, ChevronRightIcon } from "lucide-react";
 import { useState } from "react";
@@ -249,7 +245,7 @@ function QueryResultCard({ result }: { result: QueryResultData }) {
 export function QueryResultView({ generation }: { generation: Generation }) {
 	const [activeTabIndex, setActiveTabIndex] = useState(0);
 
-	if (isFailedGeneration(generation)) {
+	if (generation.status === "failed") {
 		return (
 			<div className="text-red-400 text-[14px] p-[16px] bg-red-900/10 rounded-[8px] border border-red-900/20">
 				{generation.error.message}
@@ -265,61 +261,60 @@ export function QueryResultView({ generation }: { generation: Generation }) {
 		);
 	}
 
-	if (isCompletedGeneration(generation)) {
-		const queryResults = getGenerationQueryResult(generation);
+	if (generation.status !== "completed") {
+		return null;
+	}
+	const queryResults = getGenerationQueryResult(generation);
 
-		if (queryResults.length === 0) {
-			return (
-				<div className="text-white-600 text-[14px] p-[16px] bg-white-900/5 rounded-[8px] border border-white-900/10 text-center">
-					No results found.
-				</div>
-			);
-		}
-
-		const activeResult = queryResults[activeTabIndex];
-		const totalRecords = queryResults.reduce(
-			(sum, result) => sum + (result.records?.length || 0),
-			0,
-		);
-
+	if (queryResults.length === 0) {
 		return (
-			<div className="space-y-[16px]">
-				{/* Header */}
-				<div className="flex items-center gap-[12px] py-[8px]">
-					<p className="text-[12px] text-white-600">
-						Found {totalRecords} result{totalRecords !== 1 ? "s" : ""} in{" "}
-						{queryResults.length} data source
-						{queryResults.length !== 1 ? "s" : ""}
-					</p>
-				</div>
-
-				{/* Tab Navigation */}
-				<div>
-					<div className="overflow-x-auto">
-						<div className="flex gap-[0px] min-w-full">
-							{queryResults.map((result, index) => (
-								<DataSourceTab
-									key={`datasource-${index}-${result.source?.provider || "unknown"}-${result.source?.state?.owner || ""}-${result.source?.state?.repo || ""}`}
-									result={result}
-									isActive={activeTabIndex === index}
-									onClick={() => setActiveTabIndex(index)}
-								/>
-							))}
-						</div>
-					</div>
-				</div>
-
-				{/* Tab Content */}
-				<div>{activeResult && <QueryResultCard result={activeResult} />}</div>
+			<div className="text-white-600 text-[14px] p-[16px] bg-white-900/5 rounded-[8px] border border-white-900/10 text-center">
+				No results found.
 			</div>
 		);
 	}
 
-	return null;
+	const activeResult = queryResults[activeTabIndex];
+	const totalRecords = queryResults.reduce(
+		(sum, result) => sum + (result.records?.length || 0),
+		0,
+	);
+
+	return (
+		<div className="space-y-[16px]">
+			{/* Header */}
+			<div className="flex items-center gap-[12px] py-[8px]">
+				<p className="text-[12px] text-white-600">
+					Found {totalRecords} result{totalRecords !== 1 ? "s" : ""} in{" "}
+					{queryResults.length} data source
+					{queryResults.length !== 1 ? "s" : ""}
+				</p>
+			</div>
+
+			{/* Tab Navigation */}
+			<div>
+				<div className="overflow-x-auto">
+					<div className="flex gap-[0px] min-w-full">
+						{queryResults.map((result, index) => (
+							<DataSourceTab
+								key={`datasource-${index}-${result.source?.provider || "unknown"}-${result.source?.state?.owner || ""}-${result.source?.state?.repo || ""}`}
+								result={result}
+								isActive={activeTabIndex === index}
+								onClick={() => setActiveTabIndex(index)}
+							/>
+						))}
+					</div>
+				</div>
+			</div>
+
+			{/* Tab Content */}
+			<div>{activeResult && <QueryResultCard result={activeResult} />}</div>
+		</div>
+	);
 }
 
 function getGenerationQueryResult(generation: Generation): QueryResultData[] {
-	if (!isCompletedGeneration(generation)) {
+	if (generation.status !== "completed") {
 		throw new Error("Generation is not completed");
 	}
 	const queryResultOutputs = generation.outputs.filter(

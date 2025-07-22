@@ -1,10 +1,10 @@
+import type { NodeId } from "@giselle-sdk/data-type";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import useSWR from "swr";
 import {
 	type Generation,
 	GenerationOrigin,
-	type NodeId,
-} from "@giselle-sdk/data-type";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import useSWR from "swr";
+} from "../../../core/generations/object";
 import { useFeatureFlag } from "../../feature-flags";
 import { useGiselleEngine } from "../../use-giselle-engine";
 import { useGenerationRunnerSystem } from "../contexts";

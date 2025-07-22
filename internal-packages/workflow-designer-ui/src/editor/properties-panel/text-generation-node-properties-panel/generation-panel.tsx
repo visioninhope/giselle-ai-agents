@@ -1,8 +1,8 @@
+import type { TextGenerationNode } from "@giselle-sdk/data-type";
 import type {
 	CompletedGeneration,
 	Generation,
-	TextGenerationNode,
-} from "@giselle-sdk/data-type";
+} from "@giselle-sdk/giselle-engine";
 import {
 	useNodeGenerations,
 	useWorkflowDesigner,

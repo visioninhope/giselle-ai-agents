@@ -1,8 +1,6 @@
-import {
-	type Generation,
-	isCompletedGeneration,
-	isFailedGeneration,
-} from "@giselle-sdk/data-type";
+"use client";
+
+import type { Generation } from "@giselle-sdk/giselle-engine";
 import { useGiselleEngine } from "@giselle-sdk/giselle-engine/react";
 import { ChevronRightIcon } from "lucide-react";
 import { Accordion } from "radix-ui";
@@ -29,7 +27,7 @@ export function GenerationView({ generation }: { generation: Generation }) {
 		[generation],
 	);
 
-	if (isFailedGeneration(generation)) {
+	if (generation.status === "failed") {
 		return generation.error.message;
 	}
 
@@ -46,7 +44,7 @@ export function GenerationView({ generation }: { generation: Generation }) {
 	}
 	return (
 		<>
-			{isCompletedGeneration(generation) &&
+			{generation.status === "completed" &&
 				generation.outputs.map((output) => {
 					if (output.type !== "generated-image") {
 						return null;

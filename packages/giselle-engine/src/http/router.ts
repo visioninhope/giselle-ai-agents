@@ -3,22 +3,26 @@ import {
 	FileId,
 	FlowTrigger,
 	FlowTriggerId,
-	Generation,
-	GenerationContextInput,
-	GenerationId,
-	GenerationOrigin,
 	NodeId,
-	QueuedGeneration,
+	RunId,
 	SecretId,
+	Workflow,
 	Workspace,
 	WorkspaceId,
 } from "@giselle-sdk/data-type";
 import { z } from "zod/v4";
 import type { GiselleEngine } from "../core";
+import { ActId, type PatchDelta } from "../core/acts";
 import { DataSourceProviderObject } from "../core/data-source";
-import { ConfigureTriggerInput, type PatchDelta } from "../core/flows";
-import { FlowRunId } from "../core/flows/run/object";
-import type { TelemetrySettings } from "../core/generations";
+import { ConfigureTriggerInput } from "../core/flows";
+import {
+	Generation,
+	GenerationContextInput,
+	GenerationId,
+	GenerationOrigin,
+	QueuedGeneration,
+	type TelemetrySettings,
+} from "../core/generations";
 import { JsonResponse } from "../utils";
 import { createHandler, withUsageLimitErrorHandler } from "./create-handler";
 
@@ -299,7 +303,7 @@ export const createJsonRouters = {
 				return new Response(null, { status: 204 });
 			},
 		}),
-	runFlow: (giselleEngine: GiselleEngine) =>
+	createAndStartAct: (giselleEngine: GiselleEngine) =>
 		createHandler({
 			input: z.object({
 				triggerId: FlowTriggerId.schema,
@@ -307,9 +311,35 @@ export const createJsonRouters = {
 				useExperimentalStorage: z.boolean(),
 			}),
 			handler: async ({ input }) => {
-				await giselleEngine.createAndRun(input);
+				await giselleEngine.createAndStartAct(input);
 				return new Response(null, { status: 204 });
 			},
+		}),
+	startAct: (giselleEngine: GiselleEngine) =>
+		createHandler({
+			input: z.object({
+				flow: Workflow,
+				actId: ActId.schema,
+				runId: RunId.schema,
+				workspaceId: WorkspaceId.schema,
+				triggerInputs: z.array(GenerationContextInput).optional(),
+				useExperimentalStorage: z.boolean(),
+			}),
+			handler: async ({ input }) => {
+				await giselleEngine.startAct(input);
+				return new Response(null, { status: 204 });
+			},
+		}),
+	buildWorkflowFromTrigger: (giselleEngine: GiselleEngine) =>
+		createHandler({
+			input: z.object({
+				triggerId: FlowTriggerId.schema,
+				useExperimentalStorage: z.boolean(),
+			}),
+			handler: async ({ input }) =>
+				JsonResponse.json({
+					result: await giselleEngine.buildWorkflowFromTrigger(input),
+				}),
 		}),
 	executeQuery: (giselleEngine: GiselleEngine) =>
 		createHandler({
@@ -392,7 +422,7 @@ export const createJsonRouters = {
 					dataSources: await giselleEngine.getWorkspaceDataSources(input),
 				}),
 		}),
-	createRun: (giselleEngine: GiselleEngine) =>
+	createAct: (giselleEngine: GiselleEngine) =>
 		createHandler({
 			input: z.object({
 				jobsCount: z.number(),
@@ -401,28 +431,28 @@ export const createJsonRouters = {
 			}),
 			handler: async ({ input }) =>
 				JsonResponse.json({
-					run: await giselleEngine.createRun(input),
+					act: await giselleEngine.createAct(input),
 				}),
 		}),
-	patchRun: (giselleEngine: GiselleEngine) =>
+	patchAct: (giselleEngine: GiselleEngine) =>
 		createHandler({
 			input: z.object({
-				flowRunId: FlowRunId.schema,
+				actId: ActId.schema,
 				delta: z.custom<PatchDelta>(),
 			}),
 			handler: async ({ input }) =>
 				JsonResponse.json({
-					run: await giselleEngine.patchRun(input),
+					act: await giselleEngine.patchAct(input),
 				}),
 		}),
-	getWorkspaceFlowRuns: (giselleEngine: GiselleEngine) =>
+	getWorkspaceActs: (giselleEngine: GiselleEngine) =>
 		createHandler({
 			input: z.object({
 				workspaceId: WorkspaceId.schema,
 			}),
 			handler: async ({ input }) =>
 				JsonResponse.json({
-					runs: await giselleEngine.getWorkspaceFlowRuns(input),
+					acts: await giselleEngine.getWorkspaceActs(input),
 				}),
 		}),
 	deleteSecret: (giselleEngine: GiselleEngine) =>

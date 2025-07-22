@@ -116,7 +116,7 @@ export function ManualTriggerPropertiesPanel({ node }: { node: TriggerNode }) {
 						},
 					},
 					outputs,
-					name: "Manual Trigger",
+					name: node.name,
 				});
 			});
 		},

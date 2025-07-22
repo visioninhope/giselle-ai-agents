@@ -3,41 +3,46 @@ import type {
 	FileId,
 	FlowTrigger,
 	FlowTriggerId,
-	Generation,
-	GenerationContextInput,
-	GenerationId,
-	GenerationOrigin,
 	NodeId,
-	QueuedGeneration,
 	SecretId,
 	Workspace,
 	WorkspaceId,
 } from "@giselle-sdk/data-type";
+import {
+	type ActFlowCallbacks,
+	type ActId,
+	createAct,
+	createAndStartAct,
+	getWorkspaceActs,
+	type PatchDelta,
+	patchAct,
+	startAct,
+} from "./acts";
 import { getLanguageModelProviders } from "./configurations/get-language-model-providers";
 import { createDataSource, getWorkspaceDataSources } from "./data-source";
 import type { DataSourceProviderObject } from "./data-source/types/object";
 import { copyFile, getFileText, removeFile, uploadFile } from "./files";
 import {
+	buildWorkflowFromTrigger,
 	type ConfigureTriggerInput,
 	configureTrigger,
-	createAndRunFlow,
-	createRun,
 	deleteTrigger,
 	getTrigger,
-	getWorkspaceFlowRuns,
-	type PatchDelta,
-	patchRun,
 	resolveTrigger,
 	setTrigger,
 } from "./flows";
-import type { FlowRunId } from "./flows/run/object";
 import {
 	cancelGeneration,
+	type Generation,
+	type GenerationContextInput,
+	type GenerationId,
+	type GenerationOrigin,
 	generateImage,
 	generateText,
 	getGeneratedImage,
 	getGeneration,
 	getNodeGenerations,
+	type QueuedGeneration,
 	setGeneration,
 	type TelemetrySettings,
 } from "./generations";
@@ -59,9 +64,10 @@ import {
 	updateWorkspace,
 } from "./workspaces";
 
+export * from "./acts/object";
 export * from "./experimental_storage";
 export * from "./experimental_vector-store";
-export { FlowRunId } from "./flows";
+export * from "./generations/object";
 export * from "./integrations";
 export * from "./telemetry";
 export * from "./types";
@@ -273,11 +279,26 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 			deleteTrigger({ ...args, context }),
 		executeAction: async (args: { generation: QueuedGeneration }) =>
 			executeAction({ ...args, context }),
-		createAndRun: async (args: {
+		buildWorkflowFromTrigger: async (args: {
+			triggerId: FlowTriggerId;
+			useExperimentalStorage: boolean;
+		}) => {
+			return await buildWorkflowFromTrigger({ ...args, context });
+		},
+		createAndStartAct: async (args: {
 			triggerId: FlowTriggerId;
 			triggerInputs?: GenerationContextInput[];
 			useExperimentalStorage: boolean;
-		}) => createAndRunFlow({ ...args, context }),
+		}) => createAndStartAct({ ...args, context }),
+		startAct: async (args: {
+			flow: import("@giselle-sdk/data-type").Workflow;
+			actId: ActId;
+			runId: import("@giselle-sdk/data-type").RunId;
+			workspaceId: WorkspaceId;
+			triggerInputs?: GenerationContextInput[];
+			callbacks?: ActFlowCallbacks;
+			useExperimentalStorage: boolean;
+		}) => startAct({ ...args, context }),
 		handleGitHubWebhookV2: async (args: { request: Request }) =>
 			handleGitHubWebhookV2({ ...args, context }),
 		executeQuery: async (
@@ -324,18 +345,18 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 		async getWorkspaceDataSources(args: { workspaceId: WorkspaceId }) {
 			return await getWorkspaceDataSources({ ...args, context });
 		},
-		createRun(args: {
+		createAct(args: {
 			workspaceId: WorkspaceId;
 			jobsCount: number;
 			trigger: string;
 		}) {
-			return createRun({ ...args, context });
+			return createAct({ ...args, context });
 		},
-		patchRun(args: { flowRunId: FlowRunId; delta: PatchDelta }) {
-			return patchRun({ ...args, context });
+		patchAct(args: { actId: ActId; delta: PatchDelta }) {
+			return patchAct({ ...args, context });
 		},
-		getWorkspaceFlowRuns(args: { workspaceId: WorkspaceId }) {
-			return getWorkspaceFlowRuns({ ...args, context });
+		getWorkspaceActs(args: { workspaceId: WorkspaceId }) {
+			return getWorkspaceActs({ ...args, context });
 		},
 		deleteSecret(args: { workspaceId: WorkspaceId; secretId: SecretId }) {
 			return deleteSecret({ ...args, context });

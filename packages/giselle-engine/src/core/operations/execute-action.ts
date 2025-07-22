@@ -1,12 +1,9 @@
 import {
-	type GenerationContext,
-	type GenerationOutput,
 	type GitHubActionCommandConfiguredState,
 	isActionNode,
 	isTextNode,
 	type NodeId,
 	type OutputId,
-	type QueuedGeneration,
 } from "@giselle-sdk/data-type";
 import { githubActions } from "@giselle-sdk/flow";
 import {
@@ -21,6 +18,11 @@ import {
 	isJsonContent,
 	jsonContentToText,
 } from "@giselle-sdk/text-editor-utils";
+import type {
+	GenerationContext,
+	GenerationOutput,
+	QueuedGeneration,
+} from "../generations";
 import { useGenerationExecutor } from "../generations/internal/use-generation-executor";
 import type { GiselleEngineContext } from "../types";
 

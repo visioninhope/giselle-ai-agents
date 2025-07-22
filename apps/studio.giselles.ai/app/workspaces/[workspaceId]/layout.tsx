@@ -46,6 +46,7 @@ export default async function Layout({
 	const layoutV3 = await layoutV3Flag();
 	const experimental_storage = await experimental_storageFlag();
 	const stage = await stageFlag();
+	// return children
 	return (
 		<WorkspaceProvider
 			workspaceId={workspaceId}

@@ -1,5 +1,5 @@
-import type { GenerationId } from "@giselle-sdk/data-type";
 import type { GiselleEngineContext } from "../types";
+import type { GenerationId } from "./object";
 import {
 	detectImageType,
 	getGeneratedImage as getGeneratedImageInternal,

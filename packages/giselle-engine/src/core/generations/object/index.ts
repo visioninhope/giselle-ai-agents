@@ -1,10 +1,8 @@
 import type { Message as AISdkMessage } from "@ai-sdk/react";
 
-export type { Message as AISdkMessage } from "@ai-sdk/react";
-
+import { NodeId } from "@giselle-sdk/data-type";
 import { createIdGenerator } from "@giselle-sdk/utils";
 import { z } from "zod/v4";
-import { NodeId } from "../node";
 import { GenerationContextLike, GenerationOrigin } from "./context";
 import { GenerationOutput } from "./output";
 
@@ -14,15 +12,6 @@ export * from "./output";
 export const GenerationId = createIdGenerator("gnr");
 export type GenerationId = z.infer<typeof GenerationId.schema>;
 
-export const GenerationTypeWorkspace = z.literal("workspace");
-export type GenerationTypeWorkspace = z.infer<typeof GenerationTypeWorkspace>;
-export const GenerationTypeRun = z.literal("run");
-export type GenerationTypeRun = z.infer<typeof GenerationTypeRun>;
-export const GenerationType = z.union([
-	GenerationTypeWorkspace,
-	GenerationTypeRun,
-]);
-export type GenerationType = z.infer<typeof GenerationType>;
 export const Message = z.custom<AISdkMessage>();
 export type Message = z.infer<typeof Message>;
 

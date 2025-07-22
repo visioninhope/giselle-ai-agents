@@ -1,4 +1,5 @@
-import type { Generation, ImageGenerationNode } from "@giselle-sdk/data-type";
+import type { ImageGenerationNode } from "@giselle-sdk/data-type";
+import type { Generation } from "@giselle-sdk/giselle-engine";
 import {
 	useNodeGenerations,
 	useWorkflowDesigner,

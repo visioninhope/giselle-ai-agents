@@ -1,12 +1,12 @@
+import { isTriggerNode } from "@giselle-sdk/data-type";
+import { githubTriggers } from "@giselle-sdk/flow";
 import {
 	type CompletedGeneration,
 	GenerationContext,
 	type GenerationContextInput,
 	type GenerationOutput,
-	isTriggerNode,
 	type QueuedGeneration,
-} from "@giselle-sdk/data-type";
-import { githubTriggers } from "@giselle-sdk/flow";
+} from "../generations";
 import { internalSetGeneration } from "../generations/internal/set-generation";
 import { resolveTrigger as resolveGitHubTrigger } from "../github/trigger-utils";
 import type { GiselleEngineContext } from "../types";
@@ -38,6 +38,7 @@ export async function resolveTrigger(args: {
 		case "github": {
 			switch (args.generation.context.origin.type) {
 				case "run":
+				case "act":
 					{
 						const githubWebhookEventInput = generationContext.inputs?.find(
 							(input) => input.type === "github-webhook-event",
