@@ -71,6 +71,8 @@ export function executeQuery(args: {
 					query,
 					args.context,
 					vectorStoreNodes as VectorStoreNode[],
+					operationNode.content.maxResults,
+					operationNode.content.similarityThreshold,
 					args.telemetry,
 				);
 
@@ -273,6 +275,8 @@ async function queryVectorStore(
 	query: string,
 	context: GiselleEngineContext,
 	vectorStoreNodes: VectorStoreNode[],
+	maxResults?: number,
+	similarityThreshold?: number,
 	telemetry?: TelemetrySettings,
 ) {
 	if (vectorStoreNodes.length === 0) {
@@ -288,9 +292,8 @@ async function queryVectorStore(
 		throw new Error("Query is empty");
 	}
 
-	// Default values for query parameters
-	// TODO: Make these configurable via the UI
-	const LIMIT = 10;
+	// Use configurable values or defaults
+	const limit = maxResults ?? 10;
 
 	const results = await Promise.all(
 		vectorStoreNodes
@@ -316,7 +319,8 @@ async function queryVectorStore(
 						const res = await vectorStoreQueryServices.github.search(
 							query,
 							queryContext,
-							LIMIT,
+							limit,
+							similarityThreshold,
 							telemetry,
 						);
 						return {

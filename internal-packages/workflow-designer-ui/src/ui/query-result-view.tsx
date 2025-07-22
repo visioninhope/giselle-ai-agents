@@ -39,7 +39,7 @@ function ScoreIndicator({ score }: { score: number }) {
 				/>
 			</div>
 			<span className={clsx("text-[12px] font-medium", getScoreText(score))}>
-				{(score * 100).toFixed(0)}%
+				{score.toFixed(2)}
 			</span>
 		</div>
 	);

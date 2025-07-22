@@ -62,7 +62,7 @@ export function QueryPanel({ node }: { node: QueryNode }) {
 	);
 
 	return (
-		<div className="flex flex-col h-full">
+		<div className="flex flex-col h-full gap-4">
 			<div className="flex-1 min-h-0">
 				<TextEditor
 					placeholder="Write your query here..."

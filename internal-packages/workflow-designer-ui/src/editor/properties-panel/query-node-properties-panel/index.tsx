@@ -22,6 +22,7 @@ import {
 } from "../ui";
 import { GenerationPanel } from "./generation-panel";
 import { QueryPanel } from "./query-panel";
+import { SettingsPanel } from "./settings-panel";
 import { useConnectedSources } from "./sources";
 
 export function QueryNodePropertiesPanel({ node }: { node: QueryNode }) {
@@ -117,12 +118,19 @@ export function QueryNodePropertiesPanel({ node }: { node: QueryNode }) {
 							>
 								<Tabs.List className="flex gap-[16px] text-[14px] font-accent **:p-[4px] **:border-b **:cursor-pointer **:data-[state=active]:text-white-900 **:data-[state=active]:border-white-900 **:data-[state=inactive]:text-black-400 **:data-[state=inactive]:border-transparent">
 									<Tabs.Trigger value="query">Query</Tabs.Trigger>
+									<Tabs.Trigger value="settings">Settings</Tabs.Trigger>
 								</Tabs.List>
 								<Tabs.Content
 									value="query"
 									className="flex-1 flex flex-col overflow-hidden"
 								>
 									<QueryPanel node={node} />
+								</Tabs.Content>
+								<Tabs.Content
+									value="settings"
+									className="flex-1 flex flex-col overflow-y-auto px-[4px] outline-none"
+								>
+									<SettingsPanel node={node} />
 								</Tabs.Content>
 							</Tabs.Root>
 						</PropertiesPanelContent>

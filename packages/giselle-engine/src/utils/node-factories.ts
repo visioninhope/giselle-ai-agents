@@ -359,6 +359,7 @@ const queryFactoryImpl = {
 			content: {
 				type: "query",
 				query: "",
+				maxResults: 10,
 			},
 			inputs: [],
 			outputs: [
