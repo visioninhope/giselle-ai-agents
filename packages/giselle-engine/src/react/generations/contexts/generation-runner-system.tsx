@@ -94,6 +94,7 @@ interface GenerationRunnerSystemContextType {
 	addStopHandler: (generationId: GenerationId, handler: () => void) => void;
 	stopGenerationRunner: (generationId: GenerationId) => Promise<void>;
 	setGenerations: Dispatch<SetStateAction<Generation[]>>;
+	addGenerationRunner: (generations: Generation | Generation[]) => void;
 }
 
 export const GenerationRunnerSystemContext =
@@ -406,6 +407,24 @@ export function GenerationRunnerSystemProvider({
 		[client, experimental_storage],
 	);
 
+	const addGenerationRunner = useCallback(
+		(generations: Generation | Generation[]) => {
+			const generationsArray = Array.isArray(generations)
+				? generations
+				: [generations];
+
+			setGenerations((prevGenerations) => [
+				...prevGenerations,
+				...generationsArray,
+			]);
+
+			for (const generation of generationsArray) {
+				generationListener.current[generation.id] = generation;
+			}
+		},
+		[],
+	);
+
 	return (
 		<GenerationRunnerSystemContext.Provider
 			value={{
@@ -423,6 +442,7 @@ export function GenerationRunnerSystemProvider({
 				addStopHandler,
 				stopGenerationRunner,
 				setGenerations,
+				addGenerationRunner,
 			}}
 		>
 			{children}
