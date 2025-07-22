@@ -47,7 +47,7 @@ const SSL_MODES = new Set([
 ]);
 
 // Characters that need percent-encoding in URI components
-const SPECIAL_CHARS_REGEX = /[@:#/?&=%\s]/;
+const SPECIAL_CHARS_REGEX = /[@:#/?&=%\s[\]]/;
 
 export function validatePostgreSQLConnectionString(
 	connectionString: string,
