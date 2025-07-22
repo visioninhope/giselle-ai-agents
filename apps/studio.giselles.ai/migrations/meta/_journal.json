@@ -281,6 +281,13 @@
 			"when": 1752993516031,
 			"tag": "0039_wooden_tyrannus",
 			"breakpoints": true
+		},
+		{
+			"idx": 40,
+			"version": "7",
+			"when": 1753157006204,
+			"tag": "0040_dusty_jasper_sitwell",
+			"breakpoints": true
 		}
 	]
 }
