@@ -1,6 +1,6 @@
-import type { ActObject } from "./index";
+import type { Act } from ".";
 
-type ActPath = DotPaths<ActObject>;
+type ActPath = DotPaths<Act>;
 
 type PatchValue<T> = T extends number
 	? { increment?: number; decrement?: number; set?: number }
@@ -14,11 +14,11 @@ type PatchValue<T> = T extends number
 			: never;
 
 export type PatchDelta = {
-	[P in ActPath]?: PatchValue<Get<ActObject, P>>;
+	[P in ActPath]?: PatchValue<Get<Act, P>>;
 };
 
-export function patchAct(act: ActObject, delta: PatchDelta) {
-	const result: ActObject = structuredClone(act);
+export function patchAct(act: Act, delta: PatchDelta) {
+	const result: Act = structuredClone(act);
 
 	for (const key in delta) {
 		const patch = delta[key as ActPath];

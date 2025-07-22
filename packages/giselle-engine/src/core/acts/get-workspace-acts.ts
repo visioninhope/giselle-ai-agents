@@ -1,7 +1,7 @@
 import type { WorkspaceId } from "@giselle-sdk/data-type";
 import type { GiselleEngineContext } from "../types";
 import { getWorkspaceIndex } from "../utils/workspace-index";
-import { ActIndexObject, ActObject } from "./object";
+import { ActIndexObject, Act } from "./object";
 import { actPath, workspaceActPath } from "./object/paths";
 
 export async function getWorkspaceActs(args: {
@@ -20,7 +20,7 @@ export async function getWorkspaceActs(args: {
 	).then((actLike) =>
 		actLike
 			.map((data) => {
-				const parse = ActObject.safeParse(data);
+				const parse = Act.safeParse(data);
 				if (parse.success) {
 					return parse.data;
 				}

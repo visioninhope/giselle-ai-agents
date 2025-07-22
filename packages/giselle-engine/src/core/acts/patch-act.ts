@@ -1,5 +1,5 @@
 import type { GiselleEngineContext } from "../types";
-import type { ActId, ActObject } from "./object";
+import type { Act, ActId } from "./object";
 import {
 	type PatchDelta,
 	patchAct as patchActObject,
@@ -14,7 +14,7 @@ export async function patchAct(args: {
 	delta: PatchDelta;
 }) {
 	// Get the current act
-	const currentAct = await args.context.storage.getItem<ActObject>(
+	const currentAct = await args.context.storage.getItem<Act>(
 		actPath(args.actId),
 	);
 
