@@ -24,7 +24,7 @@ describe("getGeneration", () => {
 		context: {
 			origin: {
 				type: "studio" as const,
-				id: "wrks-1234567890abcdef",
+				workspaceId: "wrks-1234567890abcdef",
 			},
 			operationNode: {
 				id: "nd-1234567890abcdef",

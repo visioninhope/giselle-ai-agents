@@ -33,7 +33,7 @@ export const GenerationOriginType = z.union([
 export type GenerationOriginType = z.infer<typeof GenerationOriginType>;
 
 export const GenerationOriginStudio = z.object({
-	id: WorkspaceId.schema,
+	workspaceId: WorkspaceId.schema,
 	type: GenerationOriginTypeStudio,
 });
 export type GenerationOriginStudio = z.infer<typeof GenerationOriginStudio>;

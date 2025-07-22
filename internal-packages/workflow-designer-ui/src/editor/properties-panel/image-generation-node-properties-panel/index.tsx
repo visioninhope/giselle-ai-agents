@@ -36,7 +36,7 @@ export function ImageGenerationNodePropertiesPanel({
 	const { createAndStartGenerationRunner, isGenerating, stopGenerationRunner } =
 		useNodeGenerations({
 			nodeId: node.id,
-			origin: { type: "studio", id: data.id },
+			origin: { type: "studio", workspaceId: data.id },
 		});
 	const { all: connectedSources } = useConnectedSources(node);
 	const usageLimitsReached = useUsageLimitsReached();
@@ -53,7 +53,7 @@ export function ImageGenerationNodePropertiesPanel({
 		createAndStartGenerationRunner({
 			origin: {
 				type: "studio",
-				id: data.id,
+				workspaceId: data.id,
 			},
 			operationNode: node,
 			sourceNodes: connectedSources.map(

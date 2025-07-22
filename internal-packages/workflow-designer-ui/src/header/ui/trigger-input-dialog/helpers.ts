@@ -240,7 +240,7 @@ export function createGenerationsForFlow(
 					? toParameterItems(inputs, values)
 					: [];
 			const generation = createGenerationRunner({
-				origin: { type: "studio", id: workspaceId },
+				origin: { type: "studio", workspaceId: workspaceId },
 				inputs:
 					parameterItems.length > 0
 						? [{ type: "parameters", items: parameterItems }]

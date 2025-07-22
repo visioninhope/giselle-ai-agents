@@ -15,7 +15,7 @@ export async function uploadFile(args: {
 	const fileBuffer = await fileToBuffer(args.file);
 	const path = filePath({
 		type: "studio",
-		id: args.workspaceId,
+		workspaceId: args.workspaceId,
 		fileId: args.fileId,
 	});
 	if (args.useExperimentalStorage) {

@@ -12,7 +12,7 @@ export async function getFileText(args: {
 }) {
 	const path = filePath({
 		type: "studio",
-		id: args.workspaceId,
+		workspaceId: args.workspaceId,
 		fileId: args.fileId,
 	});
 	if (args.useExperimentalStorage) {

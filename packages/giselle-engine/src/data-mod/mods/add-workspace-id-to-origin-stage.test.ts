@@ -39,7 +39,7 @@ describe("addWorkspaceIdToOriginStage", () => {
 			context: {
 				origin: {
 					type: "studio",
-					id: "wrks-abcdef",
+					workspaceId: "wrks-abcdef",
 				},
 				someOtherField: {
 					origin: {
@@ -64,7 +64,7 @@ describe("addWorkspaceIdToOriginStage", () => {
 			context: {
 				origin: {
 					type: "studio",
-					id: "wrks-abcdef",
+					workspaceId: "wrks-abcdef",
 				},
 				someOtherField: {
 					origin: {
@@ -128,7 +128,7 @@ describe("addWorkspaceIdToOriginStage", () => {
 			context: {
 				origin: {
 					type: "studio",
-					id: "wrks-123456",
+					workspaceId: "wrks-123456",
 				},
 			},
 		};

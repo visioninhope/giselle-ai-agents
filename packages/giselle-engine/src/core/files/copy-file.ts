@@ -32,12 +32,12 @@ export async function copyFile(args: {
 
 	const sourcePath = filePath({
 		type: "studio",
-		id: workspaceId,
+		workspaceId: workspaceId,
 		fileId: sourceFileId,
 	});
 	const destinationPath = filePath({
 		type: "studio",
-		id: workspaceId,
+		workspaceId: workspaceId,
 		fileId: destinationFileId,
 	});
 

@@ -46,7 +46,7 @@ export function TextGenerationNodePropertiesPanel({
 	const { createAndStartGenerationRunner, isGenerating, stopGenerationRunner } =
 		useNodeGenerations({
 			nodeId: node.id,
-			origin: { type: "studio", id: data.id },
+			origin: { type: "studio", workspaceId: data.id },
 		});
 	const { all: connectedSources } = useConnectedOutputs(node);
 	const usageLimitsReached = useUsageLimitsReached();
@@ -63,7 +63,7 @@ export function TextGenerationNodePropertiesPanel({
 		createAndStartGenerationRunner({
 			origin: {
 				type: "studio",
-				id: data.id,
+				workspaceId: data.id,
 			},
 			operationNode: node,
 			sourceNodes: connectedSources.map(

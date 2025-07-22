@@ -78,7 +78,7 @@ export async function useGenerationExecutor<T>(args: {
 			workspaceId = args.generation.context.origin.workspaceId;
 			break;
 		case "studio":
-			workspaceId = args.generation.context.origin.id;
+			workspaceId = args.generation.context.origin.workspaceId;
 			break;
 		default: {
 			const _exhaustiveCheck: never = args.generation.context.origin;
