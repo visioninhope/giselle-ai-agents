@@ -1,3 +1,5 @@
+import levenshtein from "fast-levenshtein";
+
 type ValidationResult = {
 	isValid: boolean;
 	error?: string;
@@ -228,11 +230,26 @@ function validateKeyValueFormat(kvString: string): ValidationResult {
 
 		// Check if the key is recognized
 		if (!RECOGNIZED_PARAMS.has(key)) {
-			// Provide helpful suggestion for common mistakes
-			if (key === "db") {
+			// Find the closest match using fast-levenshtein
+			let closestMatch: string | undefined;
+			let minDistance = Infinity;
+			const threshold = 3;
+
+			for (const param of RECOGNIZED_PARAMS) {
+				const distance = levenshtein.get(
+					key.toLowerCase(),
+					param.toLowerCase(),
+				);
+				if (distance < minDistance && distance <= threshold) {
+					minDistance = distance;
+					closestMatch = param;
+				}
+			}
+
+			if (closestMatch) {
 				return {
 					isValid: false,
-					error: `'${key}' is not a recognized keyword. Did you mean 'dbname'?`,
+					error: `'${key}' is not a recognized keyword. Did you mean '${closestMatch}'?`,
 				};
 			}
 			return {

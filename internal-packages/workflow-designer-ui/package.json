@@ -26,6 +26,7 @@
 		"marked": "catalog:",
 		"motion": "catalog:",
 		"next": "catalog:",
+		"fast-levenshtein": "catalog:",
 		"pluralize": "catalog:",
 		"radix-ui": "catalog:",
 		"react": "catalog:",
@@ -38,6 +39,7 @@
 		"zod": "catalog:"
 	},
 	"devDependencies": {
+		"@types/fast-levenshtein": "catalog:",
 		"@types/node": "catalog:",
 		"@types/pluralize": "catalog:",
 		"@types/react": "catalog:",
