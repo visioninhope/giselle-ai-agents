@@ -16,9 +16,7 @@ export {
 	SourceLinkIcon,
 	TextFileIcon,
 	TriggerIcon,
-	UploadIcon,
 	VideoIcon,
 	WebPageFileIcon,
-	WilliIcon,
 } from "../../../../icons";
 export { ImageGenerationNodeIcon } from "../../../../icons/node";
