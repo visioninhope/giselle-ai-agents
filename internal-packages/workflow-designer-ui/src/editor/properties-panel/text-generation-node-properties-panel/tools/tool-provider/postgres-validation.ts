@@ -49,6 +49,40 @@ const SSL_MODES = new Set([
 // Characters that need percent-encoding in URI components
 const SPECIAL_CHARS_REGEX = /[@:#/?&=%\s[\]]/;
 
+/**
+ * Validates if a URI component contains unencoded special characters
+ * @param value - The URI component to validate
+ * @param fieldName - The name of the field for error messages
+ * @returns ValidationResult indicating if the value is properly encoded
+ */
+function validateURIComponent(
+	value: string | undefined,
+	fieldName: string,
+): ValidationResult {
+	if (!value) {
+		return { isValid: true };
+	}
+
+	try {
+		const decoded = decodeURIComponent(value);
+		// If decoding changes the value, it was already encoded
+		if (decoded === value && SPECIAL_CHARS_REGEX.test(value)) {
+			const specialChar = value.match(SPECIAL_CHARS_REGEX)?.[0];
+			return {
+				isValid: false,
+				error: `The ${fieldName} contains a special character ('${specialChar}') that should be percent-encoded to '${encodeURIComponent(specialChar || "")}'`,
+			};
+		}
+		return { isValid: true };
+	} catch {
+		// Invalid encoding
+		return {
+			isValid: false,
+			error: `The ${fieldName} contains invalid percent-encoding`,
+		};
+	}
+}
+
 export function validatePostgreSQLConnectionString(
 	connectionString: string,
 ): ValidationResult {
@@ -99,42 +133,21 @@ function validateURIFormat(uri: string): ValidationResult {
 		}
 
 		// Check for unencoded special characters in user
-		if (user && SPECIAL_CHARS_REGEX.test(decodeURIComponent(user))) {
-			const specialChar = user.match(SPECIAL_CHARS_REGEX)?.[0];
-			return {
-				isValid: false,
-				error: `The username contains a special character ('${specialChar}') that should be percent-encoded to '${encodeURIComponent(specialChar || "")}'`,
-			};
+		const userValidation = validateURIComponent(user, "username");
+		if (!userValidation.isValid) {
+			return userValidation;
 		}
 
 		// Check for unencoded special characters in password
-		if (password) {
-			try {
-				const decoded = decodeURIComponent(password);
-				// If decoding changes the password, it was already encoded
-				if (decoded === password && SPECIAL_CHARS_REGEX.test(password)) {
-					const specialChar = password.match(SPECIAL_CHARS_REGEX)?.[0];
-					return {
-						isValid: false,
-						error: `The password contains a special character ('${specialChar}') that should be percent-encoded to '${encodeURIComponent(specialChar || "")}'`,
-					};
-				}
-			} catch {
-				// Invalid encoding
-				return {
-					isValid: false,
-					error: "The password contains invalid percent-encoding",
-				};
-			}
+		const passwordValidation = validateURIComponent(password, "password");
+		if (!passwordValidation.isValid) {
+			return passwordValidation;
 		}
 
 		// Check for unencoded special characters in database name
-		if (database && SPECIAL_CHARS_REGEX.test(decodeURIComponent(database))) {
-			const specialChar = database.match(SPECIAL_CHARS_REGEX)?.[0];
-			return {
-				isValid: false,
-				error: `The database name contains a special character ('${specialChar}') that should be percent-encoded to '${encodeURIComponent(specialChar || "")}'`,
-			};
+		const databaseValidation = validateURIComponent(database, "database name");
+		if (!databaseValidation.isValid) {
+			return databaseValidation;
 		}
 
 		// Validate query parameters if present
