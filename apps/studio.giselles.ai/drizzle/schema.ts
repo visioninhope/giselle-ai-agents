@@ -312,10 +312,7 @@ export const githubRepositoryContentStatus = pgTable(
 			.notNull()
 			.$onUpdate(() => new Date()),
 	},
-	(table) => [
-		unique().on(table.repositoryIndexDbId, table.contentType),
-		index().on(table.status),
-	],
+	(table) => [unique().on(table.repositoryIndexDbId, table.contentType)],
 );
 
 export const githubRepositoryEmbeddings = pgTable(
@@ -378,7 +375,6 @@ export const githubRepositoryPullRequestEmbeddings = pgTable(
 			table.chunkIndex,
 		),
 		index().using("hnsw", table.embedding.op("vector_cosine_ops")),
-		index().on(table.documentKey),
 	],
 );
 
