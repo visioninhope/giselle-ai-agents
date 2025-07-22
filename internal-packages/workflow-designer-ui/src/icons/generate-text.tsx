@@ -19,26 +19,3 @@ export const SearchIcon: FC<SVGProps<SVGSVGElement>> = (props) => (
 		/>
 	</svg>
 );
-
-export const GenerateTextIcon: FC<SVGProps<SVGSVGElement>> = (props) => (
-	<svg
-		className={clsx("fill-current", props.className)}
-		width="20"
-		height="18"
-		viewBox="0 0 17 15"
-		fill="none"
-		xmlns="http://www.w3.org/2000/svg"
-		role="img"
-		aria-label="Generate Text"
-		{...props}
-	>
-		<path
-			d="M3.74732 12.4812L5.44447 12.2322V2.12443H3.09457C3.09457 2.12443 2.40701 3.29236 1.39742 5.26754H0.727264L1.0928 2.33913L1.01447 1.45459L2.9118 1.48894H10.1704L12.0677 1.45459L11.9894 2.33913L12.3636 5.27613H11.6935C10.6839 3.29236 9.99632 2.13302 9.99632 2.13302H7.64642V12.2408L9.36968 12.4898L9.40449 13.091H3.70381L3.73862 12.4898L3.74732 12.4812Z"
-			fill="currentColor"
-		/>
-		<path
-			d="M12.3636 14.5455C12.0658 10.7201 11.8254 10.4798 7.99999 10.1819C11.8254 9.884 12.0658 9.6436 12.3636 5.81824C12.6615 9.6436 12.9019 9.884 16.7273 10.1819C12.9019 10.4798 12.6615 10.7201 12.3636 14.5455Z"
-			fill="currentColor"
-		/>
-	</svg>
-);
