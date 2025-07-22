@@ -1,59 +1,33 @@
-import type { FlowTriggerId, Workflow } from "@giselle-sdk/data-type";
-import { buildWorkflowFromTrigger } from "../flows/build-workflow-from-trigger";
-import type { GenerationContextInput } from "../generations";
+import { z } from "zod/v4";
 import type { GiselleEngineContext } from "../types";
 import { CreateActInputs, createAct } from "./create-act";
-import { ActId, ActIndexObject } from "./object";
-import { actPath, workspaceActPath } from "./object/paths";
-import { type ActFlowCallbacks, startAct } from "./start-act";
+import type { Act } from "./object";
+import { type StartActCallbacks, StartActInputs, startAct } from "./start-act";
 
-export const CreateAndStartActInputs = CreateActInputs;
+interface CreateAndStartActCallbacks extends StartActCallbacks {
+	actCreate?: (args: { act: Act }) => void | Promise<void>;
+}
+
+export const CreateAndStartActInputs = z.object({
+	...CreateActInputs.shape,
+	...StartActInputs.omit({ actId: true }).shape,
+	...z.object({
+		callbacks: z.optional(z.custom<CreateAndStartActCallbacks>()),
+	}).shape,
+});
+export type CreateAndStartActInputs = z.infer<typeof CreateAndStartActInputs>;
+
 /** @todo telemetry */
-export async function createAndStartAct(args: {
-	triggerId: FlowTriggerId;
-	context: GiselleEngineContext;
-	triggerInputs?: GenerationContextInput[];
-	callbacks?: {
-		flowCreate?: (args: { flow: Workflow }) => void | Promise<void>;
-	} & ActFlowCallbacks;
-	useExperimentalStorage: boolean;
-}) {
-	const result = await buildWorkflowFromTrigger({
-		triggerId: args.triggerId,
-		context: args.context,
-		useExperimentalStorage: args.useExperimentalStorage,
-	});
-	if (result === null) {
-		return;
-	}
-
-	const { workflow, trigger } = result;
-
-	await args.callbacks?.flowCreate?.({ flow: workflow });
-
-	const runId = ActId.generate();
-	const act = await createAct({
-		context: args.context,
-		trigger: trigger.configuration.provider,
-		workspaceId: trigger.workspaceId,
-		jobsCount: workflow.sequences.length,
-	});
-	await Promise.all([
-		args.context.storage.setItem(actPath(act.id), act),
-		args.context.storage.setItem(
-			workspaceActPath(trigger.workspaceId),
-			ActIndexObject.parse(act),
-		),
-	]);
-
+export async function createAndStartAct(
+	args: CreateAndStartActInputs & {
+		context: GiselleEngineContext;
+	},
+) {
+	const act = await createAct(args);
+	await args.callbacks?.actCreate?.({ act });
 	await startAct({
-		flow: workflow,
 		context: args.context,
 		actId: act.id,
-		runId,
-		workspaceId: trigger.workspaceId,
-		triggerInputs: args.triggerInputs,
 		callbacks: args.callbacks,
-		useExperimentalStorage: args.useExperimentalStorage,
 	});
 }
