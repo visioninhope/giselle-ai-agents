@@ -314,7 +314,6 @@ export const githubRepositoryContentStatus = pgTable(
 	},
 	(table) => [
 		unique().on(table.repositoryIndexDbId, table.contentType),
-		index().on(table.repositoryIndexDbId),
 		index().on(table.status),
 	],
 );
