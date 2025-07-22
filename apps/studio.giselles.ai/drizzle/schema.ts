@@ -323,6 +323,7 @@ export const githubRepositoryContentStatus = pgTable(
 			foreignColumns: [githubRepositoryIndex.dbId],
 			name: "gh_content_status_repo_idx_fk",
 		}).onDelete("cascade"),
+		index().on(table.enabled, table.status, table.updatedAt, table.retryAfter),
 	],
 );
 
@@ -389,6 +390,7 @@ export const githubRepositoryPullRequestEmbeddings = pgTable(
 			foreignColumns: [githubRepositoryIndex.dbId],
 			name: "gh_pr_embeddings_repo_idx_fk",
 		}).onDelete("cascade"),
+		index().on(table.repositoryIndexDbId, table.documentKey),
 	],
 );
 
