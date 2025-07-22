@@ -23,7 +23,7 @@ function ConnectedNodeRunning({
 	const { data } = useWorkflowDesigner();
 	const { currentGeneration: inputNodeCurrentGeneration } = useNodeGenerations({
 		nodeId: inputNodeId,
-		origin: { type: "workspace", id: data.id },
+		origin: { type: "studio", workspaceId: data.id },
 	});
 	if (
 		inputNodeCurrentGeneration?.status === "queued" ||

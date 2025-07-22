@@ -11,8 +11,8 @@ export async function removeFile(args: {
 	fileId: FileId;
 }) {
 	const path = filePath({
-		type: "workspace",
-		id: args.workspaceId,
+		type: "studio",
+		workspaceId: args.workspaceId,
 		fileId: args.fileId,
 	});
 	if (args.useExperimentalStorage) {

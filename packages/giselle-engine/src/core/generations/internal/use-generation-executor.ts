@@ -73,12 +73,12 @@ export async function useGenerationExecutor<T>(args: {
 	await setGeneration(runningGeneration);
 	let workspaceId: WorkspaceId;
 	switch (args.generation.context.origin.type) {
-		case "run":
-		case "act":
+		case "stage":
+		case "github-app":
 			workspaceId = args.generation.context.origin.workspaceId;
 			break;
-		case "workspace":
-			workspaceId = args.generation.context.origin.id;
+		case "studio":
+			workspaceId = args.generation.context.origin.workspaceId;
 			break;
 		default: {
 			const _exhaustiveCheck: never = args.generation.context.origin;

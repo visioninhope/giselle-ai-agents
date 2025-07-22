@@ -31,13 +31,13 @@ export async function copyFile(args: {
 	} = args;
 
 	const sourcePath = filePath({
-		type: "workspace",
-		id: workspaceId,
+		type: "studio",
+		workspaceId: workspaceId,
 		fileId: sourceFileId,
 	});
 	const destinationPath = filePath({
-		type: "workspace",
-		id: workspaceId,
+		type: "studio",
+		workspaceId: workspaceId,
 		fileId: destinationFileId,
 	});
 

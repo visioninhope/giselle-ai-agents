@@ -17,7 +17,7 @@ import { useGenerationRunnerSystem } from "../contexts";
  */
 export function useNodeGenerations({
 	nodeId,
-	origin: { id: originId, type: originType },
+	origin,
 }: {
 	nodeId: NodeId;
 	origin: GenerationOrigin;
@@ -35,13 +35,10 @@ export function useNodeGenerations({
 	/** @todo fetch on server */
 	const { data, isLoading } = useSWR(
 		() => {
-			const origin = GenerationOrigin.parse({
-				id: originId,
-				type: originType,
-			});
+			const parsedOrigin = GenerationOrigin.parse(origin);
 			return {
 				api: "node-generations",
-				origin,
+				origin: parsedOrigin,
 				nodeId,
 				useExperimentalStorage: experimental_storage,
 			};
@@ -80,14 +77,18 @@ export function useNodeGenerations({
 				.filter(
 					(generation) =>
 						generation.context.operationNode.id === nodeId &&
-						generation.context.origin.type === originType &&
-						generation.context.origin.id === originId,
+						generation.context.origin.type === origin.type &&
+						(origin.type === "studio"
+							? generation.context.origin.type === "studio" &&
+								generation.context.origin.workspaceId === origin.workspaceId
+							: generation.context.origin.type !== "studio" &&
+								generation.context.origin.actId === origin.actId),
 				)
 				.sort(
 					(a, b) =>
 						new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
 				),
-		[allGenerations, nodeId, originId, originType],
+		[allGenerations, nodeId, origin],
 	);
 
 	useEffect(() => {

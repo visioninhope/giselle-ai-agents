@@ -37,8 +37,8 @@ export async function resolveTrigger(args: {
 	switch (triggerData.configuration.provider) {
 		case "github": {
 			switch (args.generation.context.origin.type) {
-				case "run":
-				case "act":
+				case "stage":
+				case "github-app":
 					{
 						const githubWebhookEventInput = generationContext.inputs?.find(
 							(input) => input.type === "github-webhook-event",
@@ -75,7 +75,7 @@ export async function resolveTrigger(args: {
 					}
 
 					break;
-				case "workspace": {
+				case "studio": {
 					const parameterInput = generationContext.inputs?.find(
 						(input) => input.type === "parameters",
 					);

@@ -1,13 +1,13 @@
 import type { $ZodIssue } from "@zod/core";
 import { describe, expect, it } from "vitest";
-import { addWorkspaceIdToOriginRun } from "./add-workspace-id-to-origin-run";
+import { addWorkspaceIdToOriginStage } from "./add-workspace-id-to-origin-stage";
 
-describe("addWorkspaceIdToOriginRun", () => {
-	it("should add workspaceId to GenerationOriginRun when missing", () => {
+describe("addWorkspaceIdToOriginStage", () => {
+	it("should add workspaceId to GenerationOriginStage when missing", () => {
 		const data = {
 			context: {
 				origin: {
-					type: "run",
+					type: "stage",
 					id: "run-123456",
 				},
 			},
@@ -21,12 +21,12 @@ describe("addWorkspaceIdToOriginRun", () => {
 			message: "Required",
 		};
 
-		const result = addWorkspaceIdToOriginRun(data, issue);
+		const result = addWorkspaceIdToOriginStage(data, issue);
 
 		expect(result).toEqual({
 			context: {
 				origin: {
-					type: "run",
+					type: "stage",
 					id: "run-123456",
 					workspaceId: "wrks-9999999999999999",
 				},
@@ -38,12 +38,12 @@ describe("addWorkspaceIdToOriginRun", () => {
 		const data = {
 			context: {
 				origin: {
-					type: "workspace",
-					id: "wrks-abcdef",
+					type: "studio",
+					workspaceId: "wrks-abcdef",
 				},
 				someOtherField: {
 					origin: {
-						type: "run",
+						type: "stage",
 						id: "run-123456",
 					},
 				},
@@ -58,17 +58,17 @@ describe("addWorkspaceIdToOriginRun", () => {
 			message: "Required",
 		};
 
-		const result = addWorkspaceIdToOriginRun(data, issue);
+		const result = addWorkspaceIdToOriginStage(data, issue);
 
 		expect(result).toEqual({
 			context: {
 				origin: {
-					type: "workspace",
-					id: "wrks-abcdef",
+					type: "studio",
+					workspaceId: "wrks-abcdef",
 				},
 				someOtherField: {
 					origin: {
-						type: "run",
+						type: "stage",
 						id: "run-123456",
 						workspaceId: "wrks-abcdef",
 					},
@@ -81,7 +81,7 @@ describe("addWorkspaceIdToOriginRun", () => {
 		const data = {
 			context: {
 				origin: {
-					type: "run",
+					type: "stage",
 					id: "run-123456",
 				},
 			},
@@ -95,7 +95,7 @@ describe("addWorkspaceIdToOriginRun", () => {
 			message: "Required",
 		};
 
-		const result = addWorkspaceIdToOriginRun(data, issue);
+		const result = addWorkspaceIdToOriginStage(data, issue);
 
 		expect(result).toBe(data);
 	});
@@ -105,7 +105,7 @@ describe("addWorkspaceIdToOriginRun", () => {
 			context: {
 				someField: {
 					id: "run-123456",
-					type: "run",
+					type: "stage",
 				},
 			},
 		};
@@ -118,17 +118,17 @@ describe("addWorkspaceIdToOriginRun", () => {
 			message: "Required",
 		};
 
-		const result = addWorkspaceIdToOriginRun(data, issue);
+		const result = addWorkspaceIdToOriginStage(data, issue);
 
 		expect(result).toBe(data);
 	});
 
-	it("should not modify data when origin type is not run", () => {
+	it("should not modify data when origin type is not stage", () => {
 		const data = {
 			context: {
 				origin: {
-					type: "workspace",
-					id: "wrks-123456",
+					type: "studio",
+					workspaceId: "wrks-123456",
 				},
 			},
 		};
@@ -141,7 +141,7 @@ describe("addWorkspaceIdToOriginRun", () => {
 			message: "Required",
 		};
 
-		const result = addWorkspaceIdToOriginRun(data, issue);
+		const result = addWorkspaceIdToOriginStage(data, issue);
 
 		expect(result).toBe(data);
 	});
@@ -157,7 +157,7 @@ describe("addWorkspaceIdToOriginRun", () => {
 			message: "Required",
 		};
 
-		const result = addWorkspaceIdToOriginRun(data, issue);
+		const result = addWorkspaceIdToOriginStage(data, issue);
 
 		expect(result).toBe(data);
 	});

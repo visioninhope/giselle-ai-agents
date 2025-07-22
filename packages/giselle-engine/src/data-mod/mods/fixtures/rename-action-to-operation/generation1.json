@@ -63,7 +63,7 @@
 				]
 			}
 		],
-		"origin": { "type": "workspace", "id": "wrks-e10pTcYqMY5rb6v4" }
+		"origin": { "type": "studio", "workspaceId": "wrks-e10pTcYqMY5rb6v4" }
 	},
 	"status": "completed",
 	"createdAt": 1745560513368,

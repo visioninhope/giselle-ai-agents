@@ -4,56 +4,38 @@ import {
 	NodeLike,
 	OperationNode,
 	OperationNodeLike,
-	RunId,
 	WorkspaceId,
 } from "@giselle-sdk/data-type";
 import type { WebhookEvent } from "@giselle-sdk/github-tool";
 import { z } from "zod/v4";
+import { ActId } from "../../acts/object";
 
-export const GenerationOriginTypeWorkspace = z.literal("workspace");
-export type GenerationOriginTypeWorkspace = z.infer<
-	typeof GenerationOriginTypeWorkspace
->;
-
-export const GenerationOriginTypeRun = z.literal("run");
-export type GenerationOriginTypeRun = z.infer<typeof GenerationOriginTypeRun>;
-
-export const GenerationOriginTypeAct = z.literal("act");
-export type GenerationOriginTypeAct = z.infer<typeof GenerationOriginTypeAct>;
-
-export const GenerationOriginType = z.union([
-	GenerationOriginTypeWorkspace,
-	GenerationOriginTypeRun,
-	GenerationOriginTypeAct,
-]);
-export type GenerationOriginType = z.infer<typeof GenerationOriginType>;
-
-export const GenerationOriginWorkspace = z.object({
-	id: WorkspaceId.schema,
-	type: GenerationOriginTypeWorkspace,
-});
-export type GenerationOriginWorkspace = z.infer<
-	typeof GenerationOriginWorkspace
->;
-
-export const GenerationOriginRun = z.object({
-	id: RunId.schema,
+export const GenerationOriginStudio = z.object({
 	workspaceId: WorkspaceId.schema,
-	type: GenerationOriginTypeRun,
+	type: z.literal("studio"),
 });
-export type GenerationOriginRun = z.infer<typeof GenerationOriginRun>;
+export type GenerationOriginStudio = z.infer<typeof GenerationOriginStudio>;
 
-export const GenerationOriginAct = z.object({
-	id: RunId.schema,
+export const GenerationOriginStage = z.object({
+	actId: ActId.schema,
 	workspaceId: WorkspaceId.schema,
-	type: GenerationOriginTypeAct,
+	type: z.literal("stage"),
 });
-export type GenerationOriginAct = z.infer<typeof GenerationOriginAct>;
+export type GenerationOriginStage = z.infer<typeof GenerationOriginStage>;
+
+export const GenerationOriginGitHubApp = z.object({
+	actId: ActId.schema,
+	workspaceId: WorkspaceId.schema,
+	type: z.literal("github-app"),
+});
+export type GenerationOriginGitHubApp = z.infer<
+	typeof GenerationOriginGitHubApp
+>;
 
 export const GenerationOrigin = z.discriminatedUnion("type", [
-	GenerationOriginWorkspace,
-	GenerationOriginRun,
-	GenerationOriginAct,
+	GenerationOriginStudio,
+	GenerationOriginStage,
+	GenerationOriginGitHubApp,
 ]);
 export type GenerationOrigin = z.infer<typeof GenerationOrigin>;
 

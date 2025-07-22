@@ -19,7 +19,7 @@ export function ActionNodePropertiesPanel({ node }: { node: ActionNode }) {
 	const { isValid, connectedInputs } = useConnectedInputs(node.id, node.inputs);
 	const { createAndStartGenerationRunner } = useNodeGenerations({
 		nodeId: node.id,
-		origin: { type: "workspace", id: data.id },
+		origin: { type: "studio", workspaceId: data.id },
 	});
 	const handleClick = useCallback(() => {
 		if (!isValid) {
@@ -34,8 +34,8 @@ export function ActionNodePropertiesPanel({ node }: { node: ActionNode }) {
 		});
 		createAndStartGenerationRunner({
 			origin: {
-				type: "workspace",
-				id: data.id,
+				type: "studio",
+				workspaceId: data.id,
 			},
 			operationNode: node,
 			sourceNodes: connectedInputs

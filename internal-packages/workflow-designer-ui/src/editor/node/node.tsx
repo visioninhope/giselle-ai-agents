@@ -144,7 +144,7 @@ export function NodeComponent({
 	const { updateNodeData, data } = useWorkflowDesigner();
 	const { stopGenerationRunner, currentGeneration } = useNodeGenerations({
 		nodeId: node.id,
-		origin: { type: "workspace", id: data.id },
+		origin: { type: "studio", workspaceId: data.id },
 	});
 	const prevGenerationStatusRef = useRef(currentGeneration?.status);
 	const [showCompleteLabel, startTransition] = useTransition();
