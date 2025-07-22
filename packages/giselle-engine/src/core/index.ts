@@ -8,27 +8,29 @@ import type {
 	Workspace,
 	WorkspaceId,
 } from "@giselle-sdk/data-type";
+import {
+	type ActFlowCallbacks,
+	type ActId,
+	createAct,
+	createAndStartAct,
+	getWorkspaceActs,
+	type PatchDelta,
+	patchAct,
+	startAct,
+} from "./acts";
 import { getLanguageModelProviders } from "./configurations/get-language-model-providers";
 import { createDataSource, getWorkspaceDataSources } from "./data-source";
 import type { DataSourceProviderObject } from "./data-source/types/object";
 import { copyFile, getFileText, removeFile, uploadFile } from "./files";
 import {
-	type ActFlowCallbacks,
-	actFlow,
 	buildWorkflowFromTrigger,
 	type ConfigureTriggerInput,
 	configureTrigger,
-	createAct,
-	createAndActFlow,
 	deleteTrigger,
 	getTrigger,
-	getWorkspaceActs,
-	type PatchDelta,
-	patchAct,
 	resolveTrigger,
 	setTrigger,
 } from "./flows";
-import type { ActId } from "./flows/act/object";
 import {
 	cancelGeneration,
 	type Generation,
@@ -62,9 +64,9 @@ import {
 	updateWorkspace,
 } from "./workspaces";
 
+export * from "./acts/object";
 export * from "./experimental_storage";
 export * from "./experimental_vector-store";
-export { ActId } from "./flows";
 export * from "./generations/object";
 export * from "./integrations";
 export * from "./telemetry";
@@ -283,12 +285,12 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 		}) => {
 			return await buildWorkflowFromTrigger({ ...args, context });
 		},
-		createAndActFlow: async (args: {
+		createAndStartAct: async (args: {
 			triggerId: FlowTriggerId;
 			triggerInputs?: GenerationContextInput[];
 			useExperimentalStorage: boolean;
-		}) => createAndActFlow({ ...args, context }),
-		actFlow: async (args: {
+		}) => createAndStartAct({ ...args, context }),
+		startAct: async (args: {
 			flow: import("@giselle-sdk/data-type").Workflow;
 			actId: ActId;
 			runId: import("@giselle-sdk/data-type").RunId;
@@ -296,7 +298,7 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 			triggerInputs?: GenerationContextInput[];
 			callbacks?: ActFlowCallbacks;
 			useExperimentalStorage: boolean;
-		}) => actFlow({ ...args, context }),
+		}) => startAct({ ...args, context }),
 		handleGitHubWebhookV2: async (args: { request: Request }) =>
 			handleGitHubWebhookV2({ ...args, context }),
 		executeQuery: async (

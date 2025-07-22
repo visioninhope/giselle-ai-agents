@@ -1,4 +1,4 @@
-import type { ActObject } from "./object";
+import type { ActObject } from "./index";
 
 type ActPath = DotPaths<ActObject>;
 

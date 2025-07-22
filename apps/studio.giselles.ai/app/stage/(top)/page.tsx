@@ -119,7 +119,7 @@ export default async function StagePage() {
 						sdkWorkspaceId: payloads.flowTrigger.workspaceId,
 					});
 					after(() =>
-						giselleEngine.actFlow({
+						giselleEngine.startAct({
 							flow: build.workflow,
 							actId: act.id,
 							runId: RunId.generate(),

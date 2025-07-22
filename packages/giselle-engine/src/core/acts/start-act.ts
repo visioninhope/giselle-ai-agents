@@ -5,6 +5,7 @@ import type {
 	WorkspaceId,
 } from "@giselle-sdk/data-type";
 import { AISDKError } from "ai";
+import { resolveTrigger } from "../flows";
 import {
 	type FailedGeneration,
 	type GenerationContextInput,
@@ -17,9 +18,8 @@ import {
 import { executeAction } from "../operations";
 import { executeQuery } from "../operations/execute-query";
 import type { GiselleEngineContext } from "../types";
-import type { ActId } from "./act/object";
-import { patchAct } from "./patch-run";
-import { resolveTrigger } from "./resolve-trigger";
+import type { ActId } from "./object";
+import { patchAct } from "./patch-act";
 
 export interface ActFlowCallbacks {
 	sequenceStart?: (args: { sequence: Sequence }) => void | Promise<void>;
@@ -219,7 +219,7 @@ async function actSequence(args: {
 	return hasSequenceError;
 }
 
-export async function actFlow(args: {
+export async function startAct(args: {
 	flow: Workflow;
 	context: GiselleEngineContext;
 	actId: ActId;
