@@ -13,20 +13,21 @@ const ActAnnotationObject = z.object({
 
 const StepStatus = z.enum(["success", "in-progress", "failed", "pending"]);
 export const StepId = createIdGenerator("stp");
-const Step = z.object({
+export const Step = z.object({
 	id: StepId.schema,
 	status: StepStatus,
 	generationId: GenerationId.schema,
 });
+export type Step = z.infer<typeof Step>;
 
 const SequenceStatus = z.enum(["success", "in-progress", "failed", "pending"]);
-const SequenceId = createIdGenerator("sqn");
-const Sequence = z.object({
+export const SequenceId = createIdGenerator("sqn");
+export const Sequence = z.object({
 	id: SequenceId.schema,
-	generationId: GenerationId.schema,
 	steps: z.array(Step),
 	status: SequenceStatus,
 });
+export type Sequence = z.infer<typeof Sequence>;
 
 export const Act = z.object({
 	id: ActId.schema,

@@ -2,11 +2,12 @@ import type { FlowTriggerId, Workflow } from "@giselle-sdk/data-type";
 import { buildWorkflowFromTrigger } from "../flows/build-workflow-from-trigger";
 import type { GenerationContextInput } from "../generations";
 import type { GiselleEngineContext } from "../types";
-import { createAct } from "./create-act";
+import { CreateActInputs, createAct } from "./create-act";
 import { ActId, ActIndexObject } from "./object";
 import { actPath, workspaceActPath } from "./object/paths";
 import { type ActFlowCallbacks, startAct } from "./start-act";
 
+export const CreateAndStartActInputs = CreateActInputs;
 /** @todo telemetry */
 export async function createAndStartAct(args: {
 	triggerId: FlowTriggerId;

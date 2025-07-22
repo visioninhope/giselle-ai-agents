@@ -11,6 +11,7 @@ import type {
 import {
 	type ActFlowCallbacks,
 	type ActId,
+	type CreateActInputs,
 	createAct,
 	createAndStartAct,
 	getWorkspaceActs,
@@ -345,11 +346,7 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 		async getWorkspaceDataSources(args: { workspaceId: WorkspaceId }) {
 			return await getWorkspaceDataSources({ ...args, context });
 		},
-		createAct(args: {
-			workspaceId: WorkspaceId;
-			jobsCount: number;
-			trigger: string;
-		}) {
+		createAct(args: CreateActInputs) {
 			return createAct({ ...args, context });
 		},
 		patchAct(args: { actId: ActId; delta: PatchDelta }) {

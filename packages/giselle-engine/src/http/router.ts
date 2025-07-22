@@ -11,7 +11,7 @@ import {
 } from "@giselle-sdk/data-type";
 import { z } from "zod/v4";
 import type { GiselleEngine } from "../core";
-import { ActId, type PatchDelta } from "../core/acts";
+import { ActId, CreateActInputs, type PatchDelta } from "../core/acts";
 import { DataSourceProviderObject } from "../core/data-source";
 import { ConfigureTriggerInput } from "../core/flows";
 import {
@@ -423,11 +423,7 @@ export const createJsonRouters = {
 		}),
 	createAct: (giselleEngine: GiselleEngine) =>
 		createHandler({
-			input: z.object({
-				jobsCount: z.number(),
-				trigger: z.string(),
-				workspaceId: WorkspaceId.schema,
-			}),
+			input: CreateActInputs,
 			handler: async ({ input }) =>
 				JsonResponse.json({
 					act: await giselleEngine.createAct(input),
