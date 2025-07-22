@@ -302,20 +302,33 @@ export function NodeComponent({
             <NodeIcon
               node={node}
               className={clsx(
-                "w-[16px] h-[16px] stroke-current fill-none",
+                "w-[16px] h-[16px]",
+                "group-data-[content-type=text]:fill-current",
+                "group-data-[content-type=file]:fill-current",
+                "group-data-[content-type=webPage]:fill-current",
+                "group-data-[content-type=textGeneration]:stroke-current fill-none",
+                "group-data-[content-type=imageGeneration]:stroke-current fill-none",
+                "group-data-[content-type=github]:fill-current",
+                "group-data-[content-type=vectorStore]:fill-current",
+                "group-data-[content-type=webSearch]:stroke-current fill-none",
+                "group-data-[content-type=audioGeneration]:stroke-current fill-none",
+                "group-data-[content-type=videoGeneration]:stroke-current fill-none",
+                "group-data-[content-type=trigger]:stroke-current fill-none",
+                "group-data-[content-type=action]:fill-current",
+                "group-data-[content-type=query]:stroke-current fill-none",
                 "group-data-[content-type=text]:text-black-900",
                 "group-data-[content-type=file]:text-black-900",
                 "group-data-[content-type=webPage]:text-black-900",
                 "group-data-[content-type=textGeneration]:text-white-900",
                 "group-data-[content-type=imageGeneration]:text-white-900",
-                "group-data-[content-type=github]:text-white-900",
-                "group-data-[content-type=vectorStore]:text-white-900",
+                "group-data-[content-type=github]:text-black-900",
+                "group-data-[content-type=vectorStore]:text-black-900",
                 "group-data-[content-type=webSearch]:text-white-900",
                 "group-data-[content-type=audioGeneration]:text-white-900",
                 "group-data-[content-type=videoGeneration]:text-white-900",
                 "group-data-[content-type=trigger]:text-white-900",
                 "group-data-[content-type=action]:text-white-900",
-                "group-data-[content-type=query]:text-white-900",
+                "group-data-[content-type=query]:text-black-900",
               )}
             />
           </div>
