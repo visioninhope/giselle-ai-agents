@@ -13,7 +13,6 @@ async function main() {
 			metadata,
 			error_code,
 			retry_after,
-			created_at,
 			updated_at
 		)
 		SELECT
@@ -31,7 +30,6 @@ async function main() {
 			END as metadata,
 			gri.error_code,
 			gri.retry_after,
-			NOW() as created_at,
 			NOW() as updated_at
 		FROM github_repository_index gri
 		WHERE NOT EXISTS (
