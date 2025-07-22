@@ -2,12 +2,12 @@ import type { $ZodIssue } from "@zod/core";
 import { getValueAtPath, isObject, setValueAtPath } from "../utils";
 
 /**
- * Adds workspaceId to GenerationOriginRun objects when missing
- * This handles the schema change where workspaceId was added to GenerationOriginRun
+ * Adds workspaceId to GenerationOriginStage objects when missing
+ * This handles the schema change where workspaceId was added to GenerationOriginStage
  * When adding workspaceId via this mod, we use a fixed value "wrks-9999999999999999"
  * to make it clear the ID was automatically added by the data-mod system
  */
-export function addWorkspaceIdToOriginRun(data: unknown, issue: $ZodIssue) {
+export function addWorkspaceIdToOriginStage(data: unknown, issue: $ZodIssue) {
 	// Check if this is an issue with a missing required workspaceId field in an origin object
 	const pathLen = issue.path.length;
 	if (
@@ -26,8 +26,8 @@ export function addWorkspaceIdToOriginRun(data: unknown, issue: $ZodIssue) {
 	const originPath = issue.path.slice(0, -1);
 	const origin = getValueAtPath(data, originPath);
 
-	// Verify this is a run type origin
-	if (!origin || typeof origin !== "object" || origin.type !== "run") {
+	// Verify this is a stage type origin
+	if (!origin || typeof origin !== "object" || origin.type !== "stage") {
 		return data;
 	}
 
@@ -46,8 +46,8 @@ export function addWorkspaceIdToOriginRun(data: unknown, issue: $ZodIssue) {
 			typeof context.origin === "object" &&
 			context.origin.id
 		) {
-			// If origin.type is "workspace", use that ID
-			if (context.origin.type === "workspace") {
+			// If origin.type is "studio", use that ID
+			if (context.origin.type === "studio") {
 				workspaceId = context.origin.id;
 			}
 		}

@@ -11,7 +11,7 @@ export function GenerationPanel({ node }: { node: ActionNode }) {
 	const { data } = useWorkflowDesigner();
 	const { generations } = useNodeGenerations({
 		nodeId: node.id,
-		origin: { type: "workspace", id: data.id },
+		origin: { type: "studio", id: data.id },
 	});
 	const [currentGeneration, setCurrentGeneration] = useState<
 		Generation | undefined

@@ -11,7 +11,7 @@ export async function getFileText(args: {
 	fileId: FileId;
 }) {
 	const path = filePath({
-		type: "workspace",
+		type: "studio",
 		id: args.workspaceId,
 		fileId: args.fileId,
 	});

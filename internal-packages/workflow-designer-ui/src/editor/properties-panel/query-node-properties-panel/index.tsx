@@ -30,7 +30,7 @@ export function QueryNodePropertiesPanel({ node }: { node: QueryNode }) {
 	const { createAndStartGenerationRunner, isGenerating, stopGenerationRunner } =
 		useNodeGenerations({
 			nodeId: node.id,
-			origin: { type: "workspace", id: data.id },
+			origin: { type: "studio", id: data.id },
 		});
 	const { all: connectedSources } = useConnectedSources(node);
 	const { error } = useToasts();
@@ -50,7 +50,7 @@ export function QueryNodePropertiesPanel({ node }: { node: QueryNode }) {
 		}
 		createAndStartGenerationRunner({
 			origin: {
-				type: "workspace",
+				type: "studio",
 				id: data.id,
 			},
 			operationNode: node,

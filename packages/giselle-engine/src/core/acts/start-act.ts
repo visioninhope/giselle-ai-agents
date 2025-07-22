@@ -41,7 +41,7 @@ function createQueuedGeneration(args: {
 			operationNode: step.node,
 			connections: step.connections,
 			sourceNodes: step.sourceNodes,
-			origin: { type: "act", id: runId, workspaceId },
+			origin: { type: "github-app", id: runId, workspaceId },
 			inputs: step.node.content.type === "trigger" ? (triggerInputs ?? []) : [],
 		},
 		status: "queued",

@@ -23,7 +23,7 @@ describe("getGeneration", () => {
 		status: "completed" as const,
 		context: {
 			origin: {
-				type: "workspace" as const,
+				type: "studio" as const,
 				id: "wrks-1234567890abcdef",
 			},
 			operationNode: {

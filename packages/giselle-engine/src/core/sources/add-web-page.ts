@@ -31,7 +31,7 @@ export async function addWebPage(args: {
 
 		const fileId = FileId.generate();
 		const storagePath = filePath({
-			type: "workspace",
+			type: "studio",
 			id: args.workspaceId,
 			fileId,
 		});
