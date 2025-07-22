@@ -13,7 +13,7 @@ import {
 import { useToasts } from "../ui/toast";
 
 export function useFlowController() {
-	const { createGenerationRunner, startGeneration, stopGeneration } =
+	const { createGenerationRunner, startGenerationRunner, stopGeneration } =
 		useGenerationRunnerSystem();
 	const { data } = useWorkflowDesigner();
 	const { info } = useToasts();
@@ -59,7 +59,7 @@ export function useFlowController() {
 				return { duration: 0, hasError: false };
 			}
 			let hasError = false;
-			await startGeneration(generation.id, {
+			await startGenerationRunner(generation.id, {
 				onGenerationFailed: async (failedGeneration) => {
 					hasError = true;
 					await patchRunAnnotations(actId, failedGeneration.error.message);
@@ -67,7 +67,7 @@ export function useFlowController() {
 			});
 			return { duration: Date.now() - sequenceStartedAt, hasError };
 		},
-		[patchRunAnnotations, startGeneration],
+		[patchRunAnnotations, startGenerationRunner],
 	);
 
 	const executeSequence = useCallback(

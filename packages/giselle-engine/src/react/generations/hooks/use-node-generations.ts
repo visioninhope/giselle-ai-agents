@@ -25,7 +25,7 @@ export function useNodeGenerations({
 	const {
 		generations: allGenerations,
 		createGenerationRunner,
-		startGeneration,
+		startGenerationRunner,
 		createAndStartGeneration,
 		stopGeneration: stopGenerationSystem,
 		setGenerations,
@@ -119,7 +119,7 @@ export function useNodeGenerations({
 	return {
 		generations,
 		createGenerationRunner,
-		startGeneration,
+		startGenerationRunner,
 		createAndStartGeneration,
 		isGenerating,
 		currentGeneration,

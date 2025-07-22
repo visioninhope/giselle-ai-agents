@@ -50,7 +50,7 @@ interface StartGenerationOptions {
 	onGenerationFailed?: (generation: FailedGeneration) => void | Promise<void>;
 	onUpdateMessages?: (generation: RunningGeneration) => void;
 }
-export type StartGeneration = (
+export type StartGenerationRunner = (
 	id: GenerationId,
 	options?: StartGenerationOptions,
 ) => Promise<void>;
@@ -71,7 +71,7 @@ export interface FetchNodeGenerationsParams {
 interface GenerationRunnerSystemContextType {
 	generateTextApi: string;
 	createGenerationRunner: CreateGenerationRunner;
-	startGeneration: StartGeneration;
+	startGenerationRunner: StartGenerationRunner;
 	createAndStartGeneration: CreateAndStartGeneration;
 	getGeneration: (generationId: GenerationId) => Generation | undefined;
 	generations: Generation[];
@@ -237,7 +237,7 @@ export function GenerationRunnerSystemProvider({
 		[],
 	);
 
-	const startGeneration = useCallback<StartGeneration>(
+	const startGenerationRunner = useCallback<StartGenerationRunner>(
 		async (id, options = {}) => {
 			const generation = generationListener.current[id];
 			if (!isCreatedGeneration(generation)) {
@@ -271,9 +271,9 @@ export function GenerationRunnerSystemProvider({
 		async (generationContext, options = {}) => {
 			const createdGeneration = createGenerationRunner(generationContext);
 			options?.onGenerationCreated?.(createdGeneration);
-			await startGeneration(createdGeneration.id, options);
+			await startGenerationRunner(createdGeneration.id, options);
 		},
-		[createGenerationRunner, startGeneration],
+		[createGenerationRunner, startGenerationRunner],
 	);
 	const getGeneration = useCallback(
 		(generationId: GenerationId) =>
@@ -410,7 +410,7 @@ export function GenerationRunnerSystemProvider({
 			value={{
 				generateTextApi,
 				createGenerationRunner,
-				startGeneration,
+				startGenerationRunner,
 				createAndStartGeneration,
 				getGeneration,
 				generations,
