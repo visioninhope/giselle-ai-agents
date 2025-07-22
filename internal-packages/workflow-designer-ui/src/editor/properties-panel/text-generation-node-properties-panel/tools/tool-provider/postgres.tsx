@@ -6,12 +6,13 @@ import type { TextGenerationNode } from "@giselle-sdk/data-type";
 import { useWorkflowDesigner } from "@giselle-sdk/giselle-engine/react";
 import { CheckIcon, PlusIcon, Settings2Icon, TrashIcon } from "lucide-react";
 import { Checkbox } from "radix-ui";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import {
 	ToolConfigurationDialog,
 	type ToolConfigurationDialogProps,
 } from "../ui/tool-configuration-dialog";
+import { validatePostgreSQLConnectionString } from "./postgres-validation";
 import {
 	ToolProviderSecretTypeValue,
 	useToolProviderConnection,
@@ -82,12 +83,26 @@ function PostgresToolConnectionDialog({
 	secrets: { id: string; label: string }[] | undefined;
 	onSubmit: React.FormEventHandler<HTMLFormElement>;
 }) {
+	const [connectionString, setConnectionString] = useState("");
+	const [validationError, setValidationError] = useState<string | null>(null);
+
+	const handleConnectionStringChange = (value: string) => {
+		setConnectionString(value);
+		if (value.trim()) {
+			const validation = validatePostgreSQLConnectionString(value);
+			setValidationError(validation.isValid ? null : validation.error || null);
+		} else {
+			setValidationError(null);
+		}
+	};
+
 	return (
 		<ToolConfigurationDialog
 			title="Connect to PostgreSQL"
 			description="How would you like to connect to your database?"
 			onSubmit={onSubmit}
 			submitting={isPending}
+			disabled={tabValue === "create" && !!validationError}
 			trigger={
 				<Button type="button" leftIcon={<PlusIcon data-dialog-trigger-icon />}>
 					Connect
@@ -136,11 +151,20 @@ function PostgresToolConnectionDialog({
 								data-lpignore="true"
 								id="pat"
 								name="value"
+								value={connectionString}
+								onChange={(e) => handleConnectionStringChange(e.target.value)}
+								className={validationError ? "border-red-500" : ""}
 							/>
-							<p className="text-[11px] text-text-muted px-[4px] mt-[1px]">
-								We’ll encrypt the connection string with authenticated
-								encryption before saving it.
-							</p>
+							{validationError ? (
+								<p className="text-[11px] text-red-500 px-[4px] mt-[1px]">
+									{validationError}
+								</p>
+							) : (
+								<p className="text-[11px] text-text-muted px-[4px] mt-[1px]">
+									We'll encrypt the connection string with authenticated
+									encryption before saving it.
+								</p>
+							)}
 						</fieldset>
 					</div>
 				</TabsContent>

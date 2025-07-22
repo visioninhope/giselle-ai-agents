@@ -16,6 +16,7 @@ export interface ToolConfigurationDialogProps
 	onSubmit: React.FormEventHandler<HTMLFormElement>;
 	submitting: boolean;
 	trigger: React.ReactNode;
+	disabled?: boolean;
 }
 
 export function ToolConfigurationDialog({
@@ -28,6 +29,7 @@ export function ToolConfigurationDialog({
 	title,
 	description,
 	trigger,
+	disabled,
 }: PropsWithChildren<ToolConfigurationDialogProps>) {
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange} defaultOpen={defaultOpen}>
@@ -47,7 +49,7 @@ export function ToolConfigurationDialog({
 						<Button
 							type="submit"
 							variant="solid"
-							disabled={submitting}
+							disabled={submitting || disabled}
 							size="large"
 						>
 							{submitting ? "..." : "Save & Connect"}
