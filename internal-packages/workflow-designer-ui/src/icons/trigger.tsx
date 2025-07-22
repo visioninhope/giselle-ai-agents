@@ -1,4 +1,3 @@
-import clsx from "clsx/lite";
 import type { SVGProps } from "react";
 
 export function TriggerIcon({ className, ...props }: SVGProps<SVGSVGElement>) {

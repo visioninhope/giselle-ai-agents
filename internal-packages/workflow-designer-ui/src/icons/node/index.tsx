@@ -24,7 +24,7 @@ import { PromptIcon } from "../prompt";
 import { RecraftIcon } from "../recraft";
 import { StableDiffusionIcon } from "../stable-diffusion";
 import { TextFileIcon } from "../text-file";
-import { TriggerIcon } from "../trigger";
+
 import { WebPageFileIcon } from "../web-page-file";
 
 // Node-specific GitHub icon with dark fill for visibility on light backgrounds
