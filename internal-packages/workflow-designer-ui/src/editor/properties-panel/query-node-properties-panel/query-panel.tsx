@@ -10,7 +10,6 @@ import { AtSignIcon, DatabaseZapIcon, X } from "lucide-react";
 import { Toolbar } from "radix-ui";
 import { useMemo } from "react";
 import { GitHubIcon } from "../../../icons";
-import { Slider } from "../../../ui/slider";
 import { type ConnectedSource, useConnectedSources } from "./sources";
 
 function getDataSourceDisplayInfo(input: ConnectedSource) {
@@ -180,41 +179,6 @@ export function QueryPanel({ node }: { node: QueryNode }) {
 						/>
 					)}
 				/>
-			</div>
-			<div className="px-4 pb-4 space-y-4">
-				<div className="border-t border-black-200 pt-4">
-					<h3 className="text-[12px] font-semibold text-black-600 mb-3">
-						Advanced Settings
-					</h3>
-					<div className="space-y-4">
-						<Slider
-							label="Max Results"
-							value={node.content.maxResults ?? 10}
-							max={100}
-							min={1}
-							step={1}
-							onChange={(value) => {
-								updateNodeDataContent(node, {
-									...node.content,
-									maxResults: value,
-								});
-							}}
-						/>
-						<Slider
-							label="Similarity Threshold"
-							value={node.content.similarityThreshold ?? 0}
-							max={1}
-							min={0}
-							step={0.01}
-							onChange={(value) => {
-								updateNodeDataContent(node, {
-									...node.content,
-									similarityThreshold: value === 0 ? undefined : value,
-								});
-							}}
-						/>
-					</div>
-				</div>
 			</div>
 		</div>
 	);
