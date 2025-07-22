@@ -2,11 +2,12 @@ import { fetchDefaultBranchHead } from "@giselle-sdk/github-tool";
 import { DocumentLoaderError, RagError } from "@giselle-sdk/rag";
 import { captureException } from "@sentry/nextjs";
 import type { TelemetrySettings } from "ai";
-import { and, eq } from "drizzle-orm";
+import { and, eq, max } from "drizzle-orm";
 import {
 	db,
 	githubRepositoryContentStatus,
 	type githubRepositoryIndex,
+	githubRepositoryPullRequestEmbeddings,
 } from "@/drizzle";
 import type { RepositoryWithStatuses } from "../types";
 import {
@@ -141,11 +142,9 @@ async function processPullRequests(params: {
 	const { repositoryIndex, telemetry } = params;
 	const { owner, repo, installationId, teamDbId, dbId } = repositoryIndex;
 
-	// Pull requests don't need commit SHA
 	const source = {
 		owner,
 		repo,
-		commitSha: "", // Required by the type but not used for PR ingestion
 	};
 
 	await ingestGitHubPullRequests({
@@ -155,15 +154,40 @@ async function processPullRequests(params: {
 		telemetry,
 	});
 
+	const lastIngestedPrNumber = await getLastIngestedPrNumber(
+		repositoryIndex.dbId,
+	);
+
 	await updateContentStatus(dbId, "pull_request", {
 		status: "completed",
 		metadata: createPullRequestContentMetadata({
-			// TODO: Track last ingested PR number
+			lastIngestedPrNumber: lastIngestedPrNumber ?? undefined,
 		}),
 		lastSyncedAt: new Date(),
 		errorCode: null,
 		retryAfter: null,
 	});
+}
+
+async function getLastIngestedPrNumber(repositoryIndexDbId: number) {
+	const results = await db
+		.select({
+			lastIngestedPrNumber: max(githubRepositoryPullRequestEmbeddings.prNumber),
+		})
+		.from(githubRepositoryPullRequestEmbeddings)
+		.where(
+			and(
+				eq(
+					githubRepositoryPullRequestEmbeddings.repositoryIndexDbId,
+					repositoryIndexDbId,
+				),
+			),
+		);
+	if (results.length === 0) {
+		return null;
+	}
+
+	return results[0].lastIngestedPrNumber;
 }
 
 /**

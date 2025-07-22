@@ -18,7 +18,7 @@ import { createGitHubPullRequestChunkStore } from "./chunk-store";
  */
 export async function ingestGitHubPullRequests(params: {
 	githubAuthConfig: GitHubAuthConfig;
-	source: { owner: string; repo: string; commitSha: string };
+	source: { owner: string; repo: string };
 	teamDbId: number;
 	telemetry?: TelemetrySettings;
 }): Promise<void> {
