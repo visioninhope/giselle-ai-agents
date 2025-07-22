@@ -38,7 +38,7 @@ import {
 	waitAndGetGenerationRunning,
 } from "../helpers";
 
-type CreateGeneration = (
+type CreateGenerationRunner = (
 	generationContext: GenerationContext,
 ) => CreatedGeneration;
 
@@ -70,7 +70,7 @@ export interface FetchNodeGenerationsParams {
 
 interface GenerationRunnerSystemContextType {
 	generateTextApi: string;
-	createGeneration: CreateGeneration;
+	createGenerationRunner: CreateGenerationRunner;
 	startGeneration: StartGeneration;
 	createAndStartGeneration: CreateAndStartGeneration;
 	getGeneration: (generationId: GenerationId) => Generation | undefined;
@@ -221,7 +221,7 @@ export function GenerationRunnerSystemProvider({
 		},
 		[],
 	);
-	const createGeneration = useCallback<CreateGeneration>(
+	const createGenerationRunner = useCallback<CreateGenerationRunner>(
 		(generationContext) => {
 			const generationId = GenerationId.generate();
 			const createdGeneration = {
@@ -269,11 +269,11 @@ export function GenerationRunnerSystemProvider({
 
 	const createAndStartGeneration = useCallback<CreateAndStartGeneration>(
 		async (generationContext, options = {}) => {
-			const createdGeneration = createGeneration(generationContext);
+			const createdGeneration = createGenerationRunner(generationContext);
 			options?.onGenerationCreated?.(createdGeneration);
 			await startGeneration(createdGeneration.id, options);
 		},
-		[createGeneration, startGeneration],
+		[createGenerationRunner, startGeneration],
 	);
 	const getGeneration = useCallback(
 		(generationId: GenerationId) =>
@@ -409,7 +409,7 @@ export function GenerationRunnerSystemProvider({
 		<GenerationRunnerSystemContext.Provider
 			value={{
 				generateTextApi,
-				createGeneration,
+				createGenerationRunner,
 				startGeneration,
 				createAndStartGeneration,
 				getGeneration,

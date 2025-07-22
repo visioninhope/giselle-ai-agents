@@ -13,7 +13,7 @@ import {
 import { useToasts } from "../ui/toast";
 
 export function useFlowController() {
-	const { createGeneration, startGeneration, stopGeneration } =
+	const { createGenerationRunner, startGeneration, stopGeneration } =
 		useGenerationRunnerSystem();
 	const { data } = useWorkflowDesigner();
 	const { info } = useToasts();
@@ -155,7 +155,7 @@ export function useFlowController() {
 				flow,
 				inputs,
 				values,
-				createGeneration,
+				createGenerationRunner,
 				data.id,
 			);
 			activeGenerationsRef.current = generations;
@@ -200,7 +200,7 @@ export function useFlowController() {
 			await finalizeRun(act.id, hasFlowError, flowStartedAt);
 		},
 		[
-			createGeneration,
+			createGenerationRunner,
 			data.id,
 			info,
 			stopFlow,
