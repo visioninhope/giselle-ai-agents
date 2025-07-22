@@ -39,14 +39,14 @@ export const GenerationOriginStudio = z.object({
 export type GenerationOriginStudio = z.infer<typeof GenerationOriginStudio>;
 
 export const GenerationOriginStage = z.object({
-	id: ActId.schema,
+	actId: ActId.schema,
 	workspaceId: WorkspaceId.schema,
 	type: GenerationOriginTypeStage,
 });
 export type GenerationOriginStage = z.infer<typeof GenerationOriginStage>;
 
 export const GenerationOriginGitHubApp = z.object({
-	id: ActId.schema,
+	actId: ActId.schema,
 	workspaceId: WorkspaceId.schema,
 	type: GenerationOriginTypeGitHubApp,
 });
