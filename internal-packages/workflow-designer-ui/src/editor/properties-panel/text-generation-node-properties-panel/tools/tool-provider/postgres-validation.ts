@@ -35,8 +35,6 @@ const RECOGNIZED_PARAMS = new Set([
 	"target_session_attrs",
 	"passfile",
 	"channel_binding",
-	"connect_timeout",
-	"tcp_user_timeout",
 ]);
 
 const SSL_MODES = new Set([
@@ -83,7 +81,7 @@ function validateURIFormat(uri: string): ValidationResult {
 			return {
 				isValid: false,
 				error:
-					"Invalid connection string format. Expected: postgresql://[user[:password]@][host][:port][/database][?options]",
+					"Invalid connection string format. It should start with `postgresql://`.",
 			};
 		}
 
@@ -96,7 +94,7 @@ function validateURIFormat(uri: string): ValidationResult {
 		) {
 			return {
 				isValid: false,
-				error: `The port '${port}' is not a valid number (must be between 1 and 65535)`,
+				error: `The port '${port}' is not a valid number.`,
 			};
 		}
 
@@ -175,7 +173,7 @@ function validateURIFormat(uri: string): ValidationResult {
 					if (Number.isNaN(portNum) || portNum < 1 || portNum > 65535) {
 						return {
 							isValid: false,
-							error: `The port '${decodeURIComponent(value)}' is not a valid number (must be between 1 and 65535)`,
+							error: `The port '${decodeURIComponent(value)}' is not a valid number.`,
 						};
 					}
 				}
@@ -236,7 +234,7 @@ function validateKeyValueFormat(kvString: string): ValidationResult {
 			if (Number.isNaN(portNum) || portNum < 1 || portNum > 65535) {
 				return {
 					isValid: false,
-					error: `The port '${value}' is not a valid number (must be between 1 and 65535)`,
+					error: `The port '${value}' is not a valid number.`,
 				};
 			}
 		}
