@@ -1,7 +1,9 @@
 import { db } from "@/drizzle";
 
 async function main() {
-	console.log("Starting idempotent migration of GitHub repository status data...");
+	console.log(
+		"Starting idempotent migration of GitHub repository status data...",
+	);
 
 	await db.transaction(async (tx) => {
 		// Step 1: Delete records that don't exist in source table anymore
