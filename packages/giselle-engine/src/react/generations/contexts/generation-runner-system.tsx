@@ -38,7 +38,7 @@ import {
 	waitAndGetGenerationRunning,
 } from "../helpers";
 
-type CreateGeneration = (
+type CreateGenerationRunner = (
 	generationContext: GenerationContext,
 ) => CreatedGeneration;
 
@@ -50,7 +50,7 @@ interface StartGenerationOptions {
 	onGenerationFailed?: (generation: FailedGeneration) => void | Promise<void>;
 	onUpdateMessages?: (generation: RunningGeneration) => void;
 }
-export type StartGeneration = (
+export type StartGenerationRunner = (
 	id: GenerationId,
 	options?: StartGenerationOptions,
 ) => Promise<void>;
@@ -58,7 +58,7 @@ export type StartGeneration = (
 interface CreateAndStartGenerationOptions extends StartGenerationOptions {
 	onGenerationCreated?: (generation: CreatedGeneration) => void;
 }
-export type CreateAndStartGeneration = (
+export type CreateAndStartGenerationRunner = (
 	generationContext: GenerationContext,
 	options?: CreateAndStartGenerationOptions,
 ) => Promise<void>;
@@ -70,9 +70,9 @@ export interface FetchNodeGenerationsParams {
 
 interface GenerationRunnerSystemContextType {
 	generateTextApi: string;
-	createGeneration: CreateGeneration;
-	startGeneration: StartGeneration;
-	createAndStartGeneration: CreateAndStartGeneration;
+	createGenerationRunner: CreateGenerationRunner;
+	startGenerationRunner: StartGenerationRunner;
+	createAndStartGenerationRunner: CreateAndStartGenerationRunner;
 	getGeneration: (generationId: GenerationId) => Generation | undefined;
 	generations: Generation[];
 	nodeGenerationMap: Map<NodeId, Generation[]>;
@@ -92,7 +92,7 @@ interface GenerationRunnerSystemContextType {
 	) => Promise<FailedGeneration>;
 	updateMessages: (generationId: GenerationId, newMessages: Message[]) => void;
 	addStopHandler: (generationId: GenerationId, handler: () => void) => void;
-	stopGeneration: (generationId: GenerationId) => Promise<void>;
+	stopGenerationRunner: (generationId: GenerationId) => Promise<void>;
 	setGenerations: Dispatch<SetStateAction<Generation[]>>;
 }
 
@@ -221,7 +221,7 @@ export function GenerationRunnerSystemProvider({
 		},
 		[],
 	);
-	const createGeneration = useCallback<CreateGeneration>(
+	const createGenerationRunner = useCallback<CreateGenerationRunner>(
 		(generationContext) => {
 			const generationId = GenerationId.generate();
 			const createdGeneration = {
@@ -237,7 +237,7 @@ export function GenerationRunnerSystemProvider({
 		[],
 	);
 
-	const startGeneration = useCallback<StartGeneration>(
+	const startGenerationRunner = useCallback<StartGenerationRunner>(
 		async (id, options = {}) => {
 			const generation = generationListener.current[id];
 			if (!isCreatedGeneration(generation)) {
@@ -267,14 +267,15 @@ export function GenerationRunnerSystemProvider({
 		[waitForGeneration],
 	);
 
-	const createAndStartGeneration = useCallback<CreateAndStartGeneration>(
-		async (generationContext, options = {}) => {
-			const createdGeneration = createGeneration(generationContext);
-			options?.onGenerationCreated?.(createdGeneration);
-			await startGeneration(createdGeneration.id, options);
-		},
-		[createGeneration, startGeneration],
-	);
+	const createAndStartGenerationRunner =
+		useCallback<CreateAndStartGenerationRunner>(
+			async (generationContext, options = {}) => {
+				const createdGeneration = createGenerationRunner(generationContext);
+				options?.onGenerationCreated?.(createdGeneration);
+				await startGenerationRunner(createdGeneration.id, options);
+			},
+			[createGenerationRunner, startGenerationRunner],
+		);
 	const getGeneration = useCallback(
 		(generationId: GenerationId) =>
 			generations.find((generation) => generation.id === generationId),
@@ -372,7 +373,7 @@ export function GenerationRunnerSystemProvider({
 		[],
 	);
 
-	const stopGeneration = useCallback(
+	const stopGenerationRunner = useCallback(
 		async (generationId: GenerationId) => {
 			const handler = stopHandlersRef.current[generationId];
 			if (handler) {
@@ -409,9 +410,9 @@ export function GenerationRunnerSystemProvider({
 		<GenerationRunnerSystemContext.Provider
 			value={{
 				generateTextApi,
-				createGeneration,
-				startGeneration,
-				createAndStartGeneration,
+				createGenerationRunner,
+				startGenerationRunner,
+				createAndStartGenerationRunner,
 				getGeneration,
 				generations,
 				updateGenerationStatusToRunning,
@@ -420,7 +421,7 @@ export function GenerationRunnerSystemProvider({
 				updateMessages,
 				nodeGenerationMap,
 				addStopHandler,
-				stopGeneration,
+				stopGenerationRunner,
 				setGenerations,
 			}}
 		>

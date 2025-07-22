@@ -24,10 +24,10 @@ export function useNodeGenerations({
 }) {
 	const {
 		generations: allGenerations,
-		createGeneration,
-		startGeneration,
-		createAndStartGeneration,
-		stopGeneration: stopGenerationSystem,
+		createGenerationRunner,
+		startGenerationRunner,
+		createAndStartGenerationRunner,
+		stopGenerationRunner: stopGenerationSystem,
 		setGenerations,
 	} = useGenerationRunnerSystem();
 	const client = useGiselleEngine();
@@ -109,7 +109,7 @@ export function useNodeGenerations({
 		);
 	}, [generations]);
 
-	const stopGeneration = useCallback(() => {
+	const stopGenerationRunner = useCallback(() => {
 		const latestGeneration = generations[generations.length - 1];
 		if (latestGeneration !== undefined) {
 			stopGenerationSystem(latestGeneration.id);
@@ -118,11 +118,11 @@ export function useNodeGenerations({
 
 	return {
 		generations,
-		createGeneration,
-		startGeneration,
-		createAndStartGeneration,
+		createGenerationRunner,
+		startGenerationRunner,
+		createAndStartGenerationRunner,
 		isGenerating,
 		currentGeneration,
-		stopGeneration,
+		stopGenerationRunner,
 	};
 }

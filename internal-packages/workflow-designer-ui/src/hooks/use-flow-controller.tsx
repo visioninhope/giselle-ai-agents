@@ -13,8 +13,11 @@ import {
 import { useToasts } from "../ui/toast";
 
 export function useFlowController() {
-	const { createGeneration, startGeneration, stopGeneration } =
-		useGenerationRunnerSystem();
+	const {
+		createGenerationRunner,
+		startGenerationRunner,
+		stopGenerationRunner,
+	} = useGenerationRunnerSystem();
 	const { data } = useWorkflowDesigner();
 	const { info } = useToasts();
 	const client = useGiselleEngine();
@@ -26,10 +29,10 @@ export function useFlowController() {
 		cancelRef.current = true;
 		await Promise.all(
 			activeGenerationsRef.current.map((generation) =>
-				stopGeneration(generation.id),
+				stopGenerationRunner(generation.id),
 			),
 		);
-	}, [stopGeneration]);
+	}, [stopGenerationRunner]);
 
 	const patchRunAnnotations = useCallback(
 		async (actId: ActId, message: string) => {
@@ -59,7 +62,7 @@ export function useFlowController() {
 				return { duration: 0, hasError: false };
 			}
 			let hasError = false;
-			await startGeneration(generation.id, {
+			await startGenerationRunner(generation.id, {
 				onGenerationFailed: async (failedGeneration) => {
 					hasError = true;
 					await patchRunAnnotations(actId, failedGeneration.error.message);
@@ -67,7 +70,7 @@ export function useFlowController() {
 			});
 			return { duration: Date.now() - sequenceStartedAt, hasError };
 		},
-		[patchRunAnnotations, startGeneration],
+		[patchRunAnnotations, startGenerationRunner],
 	);
 
 	const executeSequence = useCallback(
@@ -155,7 +158,7 @@ export function useFlowController() {
 				flow,
 				inputs,
 				values,
-				createGeneration,
+				createGenerationRunner,
 				data.id,
 			);
 			activeGenerationsRef.current = generations;
@@ -200,7 +203,7 @@ export function useFlowController() {
 			await finalizeRun(act.id, hasFlowError, flowStartedAt);
 		},
 		[
-			createGeneration,
+			createGenerationRunner,
 			data.id,
 			info,
 			stopFlow,

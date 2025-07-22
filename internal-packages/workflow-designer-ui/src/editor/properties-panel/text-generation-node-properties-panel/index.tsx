@@ -43,7 +43,7 @@ export function TextGenerationNodePropertiesPanel({
 		setUiNodeState,
 		deleteConnection,
 	} = useWorkflowDesigner();
-	const { createAndStartGeneration, isGenerating, stopGeneration } =
+	const { createAndStartGenerationRunner, isGenerating, stopGenerationRunner } =
 		useNodeGenerations({
 			nodeId: node.id,
 			origin: { type: "workspace", id: data.id },
@@ -60,7 +60,7 @@ export function TextGenerationNodePropertiesPanel({
 			return;
 		}
 
-		createAndStartGeneration({
+		createAndStartGenerationRunner({
 			origin: {
 				type: "workspace",
 				id: data.id,
@@ -78,7 +78,7 @@ export function TextGenerationNodePropertiesPanel({
 		data.id,
 		data.connections,
 		node,
-		createAndStartGeneration,
+		createAndStartGenerationRunner,
 		usageLimitsReached,
 		error,
 	]);
@@ -122,7 +122,7 @@ export function TextGenerationNodePropertiesPanel({
 						disabled={disabled}
 						onClick={() => {
 							if (isGenerating) {
-								stopGeneration();
+								stopGenerationRunner();
 							} else {
 								generateText();
 							}

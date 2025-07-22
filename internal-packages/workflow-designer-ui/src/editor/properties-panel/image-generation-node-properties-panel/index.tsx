@@ -33,7 +33,7 @@ export function ImageGenerationNodePropertiesPanel({
 }) {
 	const { data, updateNodeDataContent, updateNodeData, setUiNodeState } =
 		useWorkflowDesigner();
-	const { createAndStartGeneration, isGenerating, stopGeneration } =
+	const { createAndStartGenerationRunner, isGenerating, stopGenerationRunner } =
 		useNodeGenerations({
 			nodeId: node.id,
 			origin: { type: "workspace", id: data.id },
@@ -50,7 +50,7 @@ export function ImageGenerationNodePropertiesPanel({
 			return;
 		}
 
-		createAndStartGeneration({
+		createAndStartGenerationRunner({
 			origin: {
 				type: "workspace",
 				id: data.id,
@@ -68,7 +68,7 @@ export function ImageGenerationNodePropertiesPanel({
 		data.id,
 		data.connections,
 		node,
-		createAndStartGeneration,
+		createAndStartGenerationRunner,
 		usageLimitsReached,
 		error,
 	]);
@@ -90,7 +90,7 @@ export function ImageGenerationNodePropertiesPanel({
 						loading={isGenerating}
 						onClick={() => {
 							if (isGenerating) {
-								stopGeneration();
+								stopGenerationRunner();
 							} else {
 								generateText();
 							}

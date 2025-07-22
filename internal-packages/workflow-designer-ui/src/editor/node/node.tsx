@@ -142,7 +142,7 @@ export function NodeComponent({
 	connectedOutputIds?: OutputId[];
 }) {
 	const { updateNodeData, data } = useWorkflowDesigner();
-	const { stopGeneration, currentGeneration } = useNodeGenerations({
+	const { stopGenerationRunner, currentGeneration } = useNodeGenerations({
 		nodeId: node.id,
 		origin: { type: "workspace", id: data.id },
 	});
@@ -230,7 +230,7 @@ export function NodeComponent({
 								type="button"
 								onClick={(e) => {
 									e.stopPropagation();
-									stopGeneration();
+									stopGenerationRunner();
 								}}
 								className="ml-1 p-1 rounded-full bg-blue-500 hover:bg-blue-600 transition-colors"
 							>

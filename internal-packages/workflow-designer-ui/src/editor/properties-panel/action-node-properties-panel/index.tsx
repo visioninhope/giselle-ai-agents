@@ -17,7 +17,7 @@ import { useConnectedInputs } from "./lib";
 export function ActionNodePropertiesPanel({ node }: { node: ActionNode }) {
 	const { data, updateNodeData, setUiNodeState } = useWorkflowDesigner();
 	const { isValid, connectedInputs } = useConnectedInputs(node.id, node.inputs);
-	const { createAndStartGeneration } = useNodeGenerations({
+	const { createAndStartGenerationRunner } = useNodeGenerations({
 		nodeId: node.id,
 		origin: { type: "workspace", id: data.id },
 	});
@@ -32,7 +32,7 @@ export function ActionNodePropertiesPanel({ node }: { node: ActionNode }) {
 		setUiNodeState(node.id, {
 			showError: false,
 		});
-		createAndStartGeneration({
+		createAndStartGenerationRunner({
 			origin: {
 				type: "workspace",
 				id: data.id,
@@ -51,7 +51,7 @@ export function ActionNodePropertiesPanel({ node }: { node: ActionNode }) {
 		node,
 		data.id,
 		data.connections,
-		createAndStartGeneration,
+		createAndStartGenerationRunner,
 		connectedInputs,
 	]);
 	return (

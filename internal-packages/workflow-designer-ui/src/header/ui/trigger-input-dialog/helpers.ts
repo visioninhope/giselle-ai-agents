@@ -227,9 +227,9 @@ export function createGenerationsForFlow(
 	flow: NonNullable<ReturnType<typeof buildWorkflowFromNode>>,
 	inputs: FormInput[],
 	values: Record<string, string | number>,
-	createGeneration: ReturnType<
+	createGenerationRunner: ReturnType<
 		typeof useGenerationRunnerSystem
-	>["createGeneration"],
+	>["createGenerationRunner"],
 	workspaceId: WorkspaceId,
 ) {
 	const generations: Generation[] = [];
@@ -239,7 +239,7 @@ export function createGenerationsForFlow(
 				step.node.content.type === "trigger"
 					? toParameterItems(inputs, values)
 					: [];
-			const generation = createGeneration({
+			const generation = createGenerationRunner({
 				origin: { type: "workspace", id: workspaceId },
 				inputs:
 					parameterItems.length > 0
