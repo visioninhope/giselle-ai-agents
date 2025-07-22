@@ -4,6 +4,7 @@ import type { GitHubRepositoryIndexId } from "@giselles-ai/types";
 import { relations } from "drizzle-orm";
 import {
 	boolean,
+	foreignKey,
 	index,
 	integer,
 	jsonb,
@@ -349,9 +350,7 @@ export const githubRepositoryPullRequestEmbeddings = pgTable(
 	"github_repository_pull_request_embeddings",
 	{
 		dbId: serial("db_id").primaryKey(),
-		repositoryIndexDbId: integer("repository_index_db_id")
-			.notNull()
-			.references(() => githubRepositoryIndex.dbId, { onDelete: "cascade" }),
+		repositoryIndexDbId: integer("repository_index_db_id").notNull(),
 		prNumber: integer("pr_number").notNull(),
 		mergedAt: timestamp("pr_merged_at").notNull(),
 		contentType: text("content_type")
@@ -368,7 +367,7 @@ export const githubRepositoryPullRequestEmbeddings = pgTable(
 		createdAt: timestamp("created_at").defaultNow().notNull(),
 	},
 	(table) => [
-		unique().on(
+		unique("gh_pr_emb_unique").on(
 			table.repositoryIndexDbId,
 			table.prNumber,
 			table.contentType,
@@ -376,6 +375,11 @@ export const githubRepositoryPullRequestEmbeddings = pgTable(
 			table.chunkIndex,
 		),
 		index().using("hnsw", table.embedding.op("vector_cosine_ops")),
+		foreignKey({
+			columns: [table.repositoryIndexDbId],
+			foreignColumns: [githubRepositoryIndex.dbId],
+			name: "gh_pr_embeddings_repo_idx_fk",
+		}).onDelete("cascade"),
 	],
 );
 
