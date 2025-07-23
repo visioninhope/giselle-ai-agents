@@ -1,5 +1,5 @@
 import type { Input, NodeId } from "@giselle-sdk/data-type";
-import { useWorkflowDesigner } from "@giselle-sdk/giselle-engine/react";
+import { useWorkflowDesigner } from "@giselle-sdk/giselle/react";
 import { useMemo } from "react";
 import type { InputWithConnectedOutput } from "./connected-outputs";
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useGiselleEngine } from "@giselle-sdk/giselle-engine/react";
+import { useGiselleEngine } from "@giselle-sdk/giselle/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback } from "react";

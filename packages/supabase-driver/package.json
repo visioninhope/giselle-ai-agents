@@ -22,7 +22,7 @@
 		}
 	},
 	"devDependencies": {
-		"@giselle-sdk/giselle-engine": "workspace:^",
+		"@giselle-sdk/giselle": "workspace:^",
 		"tsup": "catalog:"
 	},
 	"dependencies": {

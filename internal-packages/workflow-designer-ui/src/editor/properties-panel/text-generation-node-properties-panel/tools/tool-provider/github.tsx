@@ -3,7 +3,7 @@ import { EmptyState } from "@giselle-internal/ui/empty-state";
 import { Input } from "@giselle-internal/ui/input";
 import { Select } from "@giselle-internal/ui/select";
 import type { TextGenerationNode } from "@giselle-sdk/data-type";
-import { useWorkflowDesigner } from "@giselle-sdk/giselle-engine/react";
+import { useWorkflowDesigner } from "@giselle-sdk/giselle/react";
 import {
 	CheckIcon,
 	MoveUpRightIcon,

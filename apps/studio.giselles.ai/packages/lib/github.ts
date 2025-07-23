@@ -6,7 +6,7 @@ import type {
 	GitHubIntegrationInvalidCredentialState,
 	GitHubIntegrationNotInstalledState,
 	GitHubIntegrationUnauthorizedState,
-} from "@giselle-sdk/giselle-engine";
+} from "@giselle-sdk/giselle";
 import { db, type githubIntegrationSettings } from "@/drizzle";
 import { getGitHubIdentityState } from "@/services/accounts";
 import { gitHubAppInstallURL } from "@/services/external/github";

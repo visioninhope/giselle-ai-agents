@@ -9,7 +9,7 @@ import {
 	isVectorStoreNode,
 	isWebPageNode,
 } from "@giselle-sdk/data-type";
-import { useWorkflowDesigner } from "@giselle-sdk/giselle-engine/react";
+import { useWorkflowDesigner } from "@giselle-sdk/giselle/react";
 import clsx from "clsx/lite";
 import { useMemo } from "react";
 import { ActionNodePropertiesPanel } from "./action-node-properties-panel";

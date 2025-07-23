@@ -1,4 +1,4 @@
-import type { GitHubQueryContext } from "@giselle-sdk/giselle-engine";
+import type { GitHubQueryContext } from "@giselle-sdk/giselle";
 import { and, eq } from "drizzle-orm";
 import {
 	agents,

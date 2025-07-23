@@ -8,7 +8,7 @@ import {
 	useFeatureFlag,
 	useGiselleEngine,
 	useWorkflowDesigner,
-} from "@giselle-sdk/giselle-engine/react";
+} from "@giselle-sdk/giselle/react";
 import clsx from "clsx/lite";
 import { TrashIcon } from "lucide-react";
 import { Dialog } from "radix-ui";

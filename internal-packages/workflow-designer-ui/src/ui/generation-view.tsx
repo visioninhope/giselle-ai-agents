@@ -1,7 +1,7 @@
 "use client";
 
-import type { Generation } from "@giselle-sdk/giselle-engine";
-import { useGiselleEngine } from "@giselle-sdk/giselle-engine/react";
+import type { Generation } from "@giselle-sdk/giselle";
+import { useGiselleEngine } from "@giselle-sdk/giselle/react";
 import { ChevronRightIcon } from "lucide-react";
 import { Accordion } from "radix-ui";
 import { useMemo } from "react";

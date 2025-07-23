@@ -2,7 +2,7 @@ import type { QueryNode } from "@giselle-sdk/data-type";
 import {
 	useNodeGenerations,
 	useWorkflowDesigner,
-} from "@giselle-sdk/giselle-engine/react";
+} from "@giselle-sdk/giselle/react";
 import {
 	isJsonContent,
 	jsonContentToText,

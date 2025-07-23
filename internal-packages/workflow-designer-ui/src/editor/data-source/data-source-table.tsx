@@ -11,7 +11,7 @@ import { Select } from "@giselle-internal/ui/select";
 import {
 	useGiselleEngine,
 	useWorkflowDesigner,
-} from "@giselle-sdk/giselle-engine/react";
+} from "@giselle-sdk/giselle/react";
 import { PlusIcon } from "lucide-react";
 import { useCallback, useState, useTransition } from "react";
 import { z } from "zod/v4";

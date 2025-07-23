@@ -1,4 +1,4 @@
-import { useIntegration } from "@giselle-sdk/giselle-engine/react";
+import { useIntegration } from "@giselle-sdk/giselle/react";
 import { useCallback, useEffect, useTransition } from "react";
 import { SourceLinkIcon, SpinnerIcon } from "../../../../../../icons";
 import { usePopupWindow } from "../../../hooks/use-popup-window";

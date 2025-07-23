@@ -5,11 +5,11 @@ import {
 	OutputId,
 } from "@giselle-sdk/data-type";
 import { type GitHubActionCommandId, githubActions } from "@giselle-sdk/flow";
-import type { GitHubIntegrationInstallation } from "@giselle-sdk/giselle-engine";
+import type { GitHubIntegrationInstallation } from "@giselle-sdk/giselle";
 import {
 	useIntegration,
 	useWorkflowDesigner,
-} from "@giselle-sdk/giselle-engine/react";
+} from "@giselle-sdk/giselle/react";
 import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import { GitHubIcon, SpinnerIcon } from "../../../icons";
 // Import icons from GitHub trigger components

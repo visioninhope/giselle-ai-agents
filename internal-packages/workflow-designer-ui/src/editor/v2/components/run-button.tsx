@@ -11,10 +11,7 @@ import {
 	isTriggerNode,
 	type NodeLike,
 } from "@giselle-sdk/data-type";
-import {
-	defaultName,
-	useWorkflowDesigner,
-} from "@giselle-sdk/giselle-engine/react";
+import { defaultName, useWorkflowDesigner } from "@giselle-sdk/giselle/react";
 import { PlayIcon } from "lucide-react";
 import { type ButtonHTMLAttributes, useMemo, useState } from "react";
 import { TriggerInputDialog } from "../../../header/ui";

@@ -1,5 +1,5 @@
-import type { GitHubIntegrationInstalledState } from "@giselle-sdk/giselle-engine";
-import { useIntegration } from "@giselle-sdk/giselle-engine/react";
+import type { GitHubIntegrationInstalledState } from "@giselle-sdk/giselle";
+import { useIntegration } from "@giselle-sdk/giselle/react";
 import { Check, ChevronDown } from "lucide-react";
 import {
 	useCallback,
