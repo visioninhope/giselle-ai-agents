@@ -1,7 +1,4 @@
-import {
-	type NodeLike,
-	type Workspace,
-} from "@giselle-sdk/data-type";
+import type { NodeLike, Workspace } from "@giselle-sdk/data-type";
 import { WorkflowId } from "../../../concepts/workflow";
 import { buildSequenceList } from "./helper";
 import { sliceGraphFromNode } from "./slice-graph-from-node";
