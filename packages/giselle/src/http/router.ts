@@ -14,7 +14,7 @@ import type { GiselleEngine } from "../engine";
 import {
 	CreateActInputs,
 	CreateAndStartActInputs,
-	type PatchDelta,
+	type SimplePatch,
 } from "../engine/acts";
 import { DataSourceProviderObject } from "../engine/data-source";
 import { ConfigureTriggerInput } from "../engine/flows";
@@ -426,7 +426,7 @@ export const createJsonRouters = {
 		createHandler({
 			input: z.object({
 				actId: ActId.schema,
-				delta: z.custom<PatchDelta>(),
+				patches: z.array(z.custom<SimplePatch>()),
 			}),
 			handler: async ({ input }) =>
 				JsonResponse.json({

@@ -58,19 +58,19 @@ export function useActController() {
 				if (hasError) {
 					await client.patchAct({
 						actId: act.id,
-						delta: {
-							"steps.cancelled": { increment: stepsCount },
-							"steps.queued": { decrement: stepsCount },
-						},
+						patches: [
+							{ path: "steps.cancelled", increment: stepsCount },
+							{ path: "steps.queued", decrement: stepsCount },
+						],
 					});
 					return;
 				}
 				await client.patchAct({
 					actId: act.id,
-					delta: {
-						"steps.inProgress": { increment: stepsCount },
-						"steps.queued": { decrement: stepsCount },
-					},
+					patches: [
+						{ path: "steps.inProgress", increment: stepsCount },
+						{ path: "steps.queued", decrement: stepsCount },
+					],
 				});
 				const sequenceStartedAt = Date.now();
 				let durationTotalTasks = 0;
@@ -90,8 +90,9 @@ export function useActController() {
 								hasError = true;
 								await client.patchAct({
 									actId: act.id,
-									delta: {
-										annotations: {
+									patches: [
+										{
+											path: "annotations",
 											push: [
 												{
 													level: "error",
@@ -99,34 +100,34 @@ export function useActController() {
 												},
 											],
 										},
-									},
+									],
 								});
 							},
 						});
 
 						await client.patchAct({
 							actId: act.id,
-							delta: hasError
-								? {
-										"steps.failed": { increment: stepsCount },
-										"steps.inProgress": { decrement: stepsCount },
-										"duration.totalTask": { increment: durationTotalTasks },
-									}
-								: {
-										"steps.completed": { increment: stepsCount },
-										"steps.inProgress": { decrement: stepsCount },
-										"duration.totalTask": { increment: durationTotalTasks },
-									},
+							patches: hasError
+								? [
+										{ path: "steps.failed", increment: stepsCount },
+										{ path: "steps.inProgress", decrement: stepsCount },
+										{ path: "duration.totalTask", increment: durationTotalTasks },
+									]
+								: [
+										{ path: "steps.completed", increment: stepsCount },
+										{ path: "steps.inProgress", decrement: stepsCount },
+										{ path: "duration.totalTask", increment: durationTotalTasks },
+									],
 						});
 						return;
 					}),
 				);
 				await client.patchAct({
 					actId: act.id,
-					delta: {
-						status: { set: hasError ? "failed" : "completed" },
-						"duration.wallClock": { set: Date.now() - actStartedAt },
-					},
+					patches: [
+						{ path: "status", set: hasError ? "failed" : "completed" },
+						{ path: "duration.wallClock", set: Date.now() - actStartedAt },
+					],
 				});
 			}
 		},

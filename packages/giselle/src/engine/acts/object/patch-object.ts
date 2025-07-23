@@ -11,9 +11,9 @@ export function patchAct(act: Act, ...patches: SimplePatch[]): Act {
 	const result = structuredClone(act);
 
 	for (const patch of patches) {
-		// Convert array notation [0] to dot notation .0
-		const path = patch.path.replace(/\[(\d+)\]/g, ".$1");
-		const keys = path.split(".");
+		// Support both [0] and .0 notation for arrays
+		const normalizedPath = patch.path.replace(/\[(\d+)\]/g, ".$1");
+		const keys = normalizedPath.split(".");
 		const lastKey = keys.pop();
 
 		if (!lastKey) {

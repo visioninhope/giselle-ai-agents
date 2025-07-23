@@ -65,8 +65,9 @@ async function executeStep(args: {
 							}),
 							patchAct({
 								...args,
-								delta: {
-									annotations: {
+								patches: [
+									{
+										path: "annotations",
 										push: [
 											{
 												level: "error",
@@ -74,7 +75,7 @@ async function executeStep(args: {
 											},
 										],
 									},
-								},
+								],
 							}),
 						]);
 					}
@@ -106,11 +107,11 @@ async function actSequence(args: {
 	await patchAct({
 		context: args.context,
 		actId: args.actId,
-		delta: {
-			"steps.inProgress": { increment: stepsCount },
-			"steps.queued": { decrement: stepsCount },
-			[`sequences.[${args.sequenceIndex}].status`]: { set: "running" },
-		} as any,
+		patches: [
+			{ path: "steps.inProgress", increment: stepsCount },
+			{ path: "steps.queued", decrement: stepsCount },
+			{ path: `sequences.${args.sequenceIndex}.status`, set: "running" },
+		],
 	});
 
 	let hasSequenceError = false;
@@ -142,21 +143,21 @@ async function actSequence(args: {
 				await patchAct({
 					context: args.context,
 					actId: args.actId,
-					delta: {
-						"steps.inProgress": { decrement: stepsCount },
-						"steps.completed": { increment: stepsCount },
-						"sequences.[0].status": { set: "completed" },
-					},
+					patches: [
+						{ path: "steps.inProgress", decrement: stepsCount },
+						{ path: "steps.completed", increment: stepsCount },
+						{ path: "sequences.[0].status", set: "completed" },
+					],
 				});
 			} else {
 				await patchAct({
 					context: args.context,
 					actId: args.actId,
-					delta: {
-						"steps.inProgress": { decrement: stepsCount },
-						"steps.failed": { increment: stepsCount },
-						"sequences.[0].status": { set: "failed" },
-					},
+					patches: [
+						{ path: "steps.inProgress", decrement: stepsCount },
+						{ path: "steps.failed", increment: stepsCount },
+						{ path: "sequences.[0].status", set: "failed" },
+					],
 				});
 			}
 
@@ -189,9 +190,7 @@ export async function startAct(
 
 	await patchAct({
 		...args,
-		delta: {
-			status: { set: "inProgress" },
-		},
+		patches: [{ path: "status", set: "inProgress" }],
 	});
 
 	for (let i = 0; i < act.sequences.length; i++) {
@@ -216,13 +215,13 @@ export async function startAct(
 				args.callbacks?.sequenceFail?.({ sequence }),
 				patchAct({
 					...args,
-					delta: {
-						"steps.inProgress": { decrement: 1 },
-						"steps.failed": { increment: 1 },
-						"duration.totalTask": { increment: totalTaskDuration },
-						status: { set: "failed" },
-						"duration.wallClock": { set: Date.now() - flowStart },
-					},
+					patches: [
+						{ path: "steps.inProgress", decrement: 1 },
+						{ path: "steps.failed", increment: 1 },
+						{ path: "duration.totalTask", increment: totalTaskDuration },
+						{ path: "status", set: "failed" },
+						{ path: "duration.wallClock", set: Date.now() - flowStart },
+					],
 				}),
 			]);
 			return;
@@ -231,11 +230,11 @@ export async function startAct(
 			args.callbacks?.sequenceComplete?.({ sequence }),
 			patchAct({
 				...args,
-				delta: {
-					"steps.inProgress": { decrement: 1 },
-					"steps.completed": { increment: 1 },
-					"duration.totalTask": { increment: totalTaskDuration },
-				},
+				patches: [
+					{ path: "steps.inProgress", decrement: 1 },
+					{ path: "steps.completed", increment: 1 },
+					{ path: "duration.totalTask", increment: totalTaskDuration },
+				],
 			}),
 		]);
 	}
@@ -244,9 +243,9 @@ export async function startAct(
 	await patchAct({
 		context: args.context,
 		actId: args.actId,
-		delta: {
-			status: { set: "completed" },
-			"duration.wallClock": { set: Date.now() - flowStart },
-		},
+		patches: [
+			{ path: "status", set: "completed" },
+			{ path: "duration.wallClock", set: Date.now() - flowStart },
+		],
 	});
 }

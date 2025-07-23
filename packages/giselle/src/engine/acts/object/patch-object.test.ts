@@ -141,10 +141,28 @@ describe("patchAct", () => {
 	});
 
 	describe("array index patching", () => {
+		it("should support both dot and bracket notation", () => {
+			const act = createTestAct();
+
+			// Test bracket notation still works
+			const result1 = patchAct(act, {
+				path: "sequences[0].steps[1].status",
+				set: "completed",
+			});
+			expect(result1.sequences[0].steps[1].status).toBe("completed");
+
+			// Test dot notation works
+			const result2 = patchAct(act, {
+				path: "sequences.0.steps.1.status",
+				set: "completed",
+			});
+			expect(result2.sequences[0].steps[1].status).toBe("completed");
+		});
+
 		it("should update sequence status using array index", () => {
 			const act = createTestAct();
 			const result = patchAct(act, {
-				path: "sequences[0].status",
+				path: "sequences.0.status",
 				set: "completed",
 			});
 
@@ -155,7 +173,7 @@ describe("patchAct", () => {
 		it("should update nested step status using array indices", () => {
 			const act = createTestAct();
 			const result = patchAct(act, {
-				path: "sequences[0].steps[1].status",
+				path: "sequences.0.steps.1.status",
 				set: "completed",
 			});
 
@@ -167,7 +185,7 @@ describe("patchAct", () => {
 		it("should update step name using array indices", () => {
 			const act = createTestAct();
 			const result = patchAct(act, {
-				path: "sequences[0].steps[2].name",
+				path: "sequences.0.steps.2.name",
 				set: "Updated Step 3",
 			});
 
@@ -183,7 +201,7 @@ describe("patchAct", () => {
 				{ path: "status", set: "completed" },
 				{ path: "steps.completed", increment: 2 },
 				{ path: "steps.inProgress", decrement: 1 },
-				{ path: "sequences[0].status", set: "running" },
+				{ path: "sequences.0.status", set: "running" },
 			);
 
 			expect(result.status).toBe("completed");
@@ -217,9 +235,9 @@ describe("patchAct", () => {
 				act,
 				{ path: "steps.inProgress", increment: 2 },
 				{ path: "steps.queued", decrement: 2 },
-				{ path: `sequences[${sequenceIndex}].status`, set: "running" },
+				{ path: `sequences.${sequenceIndex}.status`, set: "running" },
 				{
-					path: `sequences[${sequenceIndex}].steps[${stepIndex}].status`,
+					path: `sequences.${sequenceIndex}.steps.${stepIndex}.status`,
 					set: "completed",
 				},
 			);
@@ -233,7 +251,7 @@ describe("patchAct", () => {
 		it("should handle computed paths", () => {
 			const act = createTestAct();
 			const patches = [0, 1, 2].map((idx) => ({
-				path: `sequences[0].steps[${idx}].status`,
+				path: `sequences.0.steps.${idx}.status`,
 				set: "completed" as const,
 			}));
 
@@ -292,7 +310,7 @@ describe("patchAct", () => {
 				act,
 				{ path: "status", set: "completed" },
 				{ path: "steps.completed", increment: 5 },
-				{ path: "sequences[0].status", set: "completed" },
+				{ path: "sequences.0.status", set: "completed" },
 			);
 
 			expect(act).toEqual(original); // Original should remain unchanged
