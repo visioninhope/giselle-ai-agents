@@ -1,7 +1,7 @@
 import { z } from "zod/v4";
 import type { GiselleEngineContext } from "../types";
 import { CreateActInputs, createAct } from "./create-act";
-import type { Act } from "./object";
+import type { Act } from "../../concepts/act";
 import { type StartActCallbacks, StartActInputs, startAct } from "./start-act";
 
 interface CreateAndStartActCallbacks extends StartActCallbacks {

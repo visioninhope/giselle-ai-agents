@@ -11,11 +11,11 @@ import {
 import { z } from "zod/v4";
 import type { GiselleEngine } from "../engine";
 import {
-	ActId,
 	CreateActInputs,
 	CreateAndStartActInputs,
 	type PatchDelta,
 } from "../engine/acts";
+import { ActId } from "../concepts/identifiers";
 import { DataSourceProviderObject } from "../engine/data-source";
 import { ConfigureTriggerInput } from "../engine/flows";
 import {

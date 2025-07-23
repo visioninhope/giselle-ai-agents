@@ -1,7 +1,7 @@
 import type { WorkspaceId } from "@giselle-sdk/data-type";
 import type { GiselleEngineContext } from "../types";
 import { getWorkspaceIndex } from "../utils/workspace-index";
-import { Act, ActIndexObject } from "./object";
+import { Act, ActIndexObject } from "../../concepts/act";
 import { actPath, workspaceActPath } from "./object/paths";
 
 export async function getWorkspaceActs(args: {

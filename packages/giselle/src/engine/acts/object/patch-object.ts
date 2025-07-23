@@ -1,4 +1,4 @@
-import type { Act } from ".";
+import type { Act } from "../../../concepts/act";
 
 type ActPath = DotPaths<Act>;
 

@@ -18,7 +18,7 @@ import {
 	type Sequence,
 	SequenceId,
 	type Step,
-} from "./object";
+} from "../../concepts/act";
 import { actPath, workspaceActPath } from "./object/paths";
 
 export const CreateActInputs = z.object({
