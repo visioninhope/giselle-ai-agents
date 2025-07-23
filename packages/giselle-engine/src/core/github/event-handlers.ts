@@ -1,8 +1,4 @@
-import {
-	type FlowTrigger,
-	isTriggerNode,
-	type Sequence,
-} from "@giselle-sdk/data-type";
+import type { FlowTrigger } from "@giselle-sdk/data-type";
 import type {
 	addReaction,
 	createIssueComment,
@@ -19,8 +15,11 @@ import type { createAndStartAct } from "../acts";
 import type { GiselleEngineContext } from "../types";
 import type { parseCommand } from "./utils";
 
-type ProgressTableRow = Sequence & {
-	status: "queued" | "running" | "complete" | "failed" | "skipped";
+// Since we can't access node information from the new Act structure,
+// we'll simplify the progress tracking
+type ProgressTableRow = {
+	id: string;
+	status: "pending" | "in-progress" | "success" | "failed";
 	updatedAt: Date | undefined;
 };
 type ProgressTableData = ProgressTableRow[];
@@ -53,28 +52,22 @@ function formatDateTime(date: Date): string {
 }
 
 function buildProgressTable(data: ProgressTableData) {
-	const header = "| Step | Nodes | Status | Updated(UTC) |";
-	const separator = "| --- | --- | --- | --- |";
+	const header = "| Step | Status | Updated(UTC) |";
+	const separator = "| --- | --- | --- |";
 	const rows = data.map((row, i) => {
-		const names = row.steps
-			.map((step) => step.node.name ?? step.node.id)
-			.join(", ");
 		let status = "";
 		switch (row.status) {
-			case "queued":
+			case "pending":
 				status = "--";
 				break;
-			case "running":
+			case "in-progress":
 				status = "⏳";
 				break;
-			case "complete":
+			case "success":
 				status = "✅";
 				break;
 			case "failed":
 				status = "❌";
-				break;
-			case "skipped":
-				status = "--";
 				break;
 			default: {
 				const _exhaustiveCheck: never = row.status;
@@ -82,7 +75,7 @@ function buildProgressTable(data: ProgressTableData) {
 			}
 		}
 
-		return `| ${i + 1} | ${names} | ${status} | ${row.updatedAt ? formatDateTime(row.updatedAt) : "--"} |`;
+		return `| ${i + 1} | ${status} | ${row.updatedAt ? formatDateTime(row.updatedAt) : "--"} |`;
 	});
 	return [header, separator, ...rows].join("\n");
 }
@@ -377,28 +370,32 @@ export async function processEvent<TEventName extends WebhookEventName>(
 		let progressTableData: ProgressTableData = [];
 		let hasFlowError = false;
 
-		await deps.createAndStartAct({
-			useExperimentalStorage: false,
+		// Fetch workspace for createAndStartAct
+		const { getWorkspace } = await import("../workspaces");
+		const workspace = await getWorkspace({
 			context: args.context,
-			triggerId: args.trigger.id,
-			triggerInputs: [
+			workspaceId: args.trigger.workspaceId,
+			useExperimentalStorage: true,
+		});
+
+		await deps.createAndStartAct({
+			context: args.context,
+			startNodeId: args.trigger.nodeId,
+			workspace,
+			generationOriginType: "github-app",
+			inputs: [
 				{
 					type: "github-webhook-event",
 					webhookEvent: args.event,
 				},
 			],
 			callbacks: {
-				flowCreate: async ({ flow }) => {
-					progressTableData = flow.sequences
-						.filter(
-							(sequence) =>
-								!sequence.steps.some((step) => isTriggerNode(step.node)),
-						)
-						.map((sequence) => ({
-							...sequence,
-							status: "queued",
-							updatedAt: undefined,
-						}));
+				actCreate: async ({ act }) => {
+					progressTableData = act.sequences.map((sequence) => ({
+						id: sequence.id,
+						status: "pending" as const,
+						updatedAt: undefined,
+					}));
 
 					const body = `Running flow...\n\n${buildProgressTable(progressTableData)}`;
 
@@ -451,7 +448,11 @@ export async function processEvent<TEventName extends WebhookEventName>(
 				sequenceStart: async ({ sequence }) => {
 					progressTableData = progressTableData.map((row) =>
 						row.id === sequence.id
-							? { ...row, status: "running", updatedAt: new Date() }
+							? {
+									...row,
+									status: "in-progress" as const,
+									updatedAt: new Date(),
+								}
 							: row,
 					);
 					await updateComment(
@@ -461,7 +462,7 @@ export async function processEvent<TEventName extends WebhookEventName>(
 				sequenceComplete: async ({ sequence }) => {
 					progressTableData = progressTableData.map((row) =>
 						row.id === sequence.id
-							? { ...row, status: "complete", updatedAt: new Date() }
+							? { ...row, status: "success" as const, updatedAt: new Date() }
 							: row,
 					);
 					await updateComment(
@@ -482,7 +483,7 @@ export async function processEvent<TEventName extends WebhookEventName>(
 				sequenceSkip: async ({ sequence }) => {
 					progressTableData = progressTableData.map((row) =>
 						row.id === sequence.id
-							? { ...row, status: "skipped", updatedAt: new Date() }
+							? { ...row, status: "failed" as const, updatedAt: new Date() }
 							: row,
 					);
 					await updateComment(

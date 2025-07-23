@@ -9,14 +9,15 @@ import type {
 	WorkspaceId,
 } from "@giselle-sdk/data-type";
 import {
-	type ActFlowCallbacks,
 	type ActId,
 	type CreateActInputs,
+	type CreateAndStartActInputs,
 	createAct,
 	createAndStartAct,
 	getWorkspaceActs,
 	type PatchDelta,
 	patchAct,
+	type StartActInputs,
 	startAct,
 } from "./acts";
 import { getLanguageModelProviders } from "./configurations/get-language-model-providers";
@@ -35,7 +36,6 @@ import {
 import {
 	cancelGeneration,
 	type Generation,
-	type GenerationContextInput,
 	type GenerationId,
 	type GenerationOrigin,
 	generateImage,
@@ -65,6 +65,7 @@ import {
 	updateWorkspace,
 } from "./workspaces";
 
+export type * from "./acts";
 export * from "./acts/object";
 export * from "./experimental_storage";
 export * from "./experimental_vector-store";
@@ -286,20 +287,9 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 		}) => {
 			return await buildWorkflowFromTrigger({ ...args, context });
 		},
-		createAndStartAct: async (args: {
-			triggerId: FlowTriggerId;
-			triggerInputs?: GenerationContextInput[];
-			useExperimentalStorage: boolean;
-		}) => createAndStartAct({ ...args, context }),
-		startAct: async (args: {
-			flow: import("@giselle-sdk/data-type").Workflow;
-			actId: ActId;
-			runId: ActId;
-			workspaceId: WorkspaceId;
-			triggerInputs?: GenerationContextInput[];
-			callbacks?: ActFlowCallbacks;
-			useExperimentalStorage: boolean;
-		}) => startAct({ ...args, context }),
+		createAndStartAct: async (args: CreateAndStartActInputs) =>
+			createAndStartAct({ ...args, context }),
+		startAct: async (args: StartActInputs) => startAct({ ...args, context }),
 		handleGitHubWebhookV2: async (args: { request: Request }) =>
 			handleGitHubWebhookV2({ ...args, context }),
 		executeQuery: async (
@@ -346,8 +336,11 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 		async getWorkspaceDataSources(args: { workspaceId: WorkspaceId }) {
 			return await getWorkspaceDataSources({ ...args, context });
 		},
-		createAct(args: CreateActInputs) {
-			return createAct({ ...args, context });
+		async createAct(args: CreateActInputs) {
+			return await createAct({
+				...args,
+				context,
+			});
 		},
 		patchAct(args: { actId: ActId; delta: PatchDelta }) {
 			return patchAct({ ...args, context });

@@ -23,7 +23,7 @@ export async function createAndStartAct(
 		context: GiselleEngineContext;
 	},
 ) {
-	const act = await createAct(args);
+	const { act } = await createAct(args);
 	await args.callbacks?.actCreate?.({ act });
 	await startAct({
 		context: args.context,

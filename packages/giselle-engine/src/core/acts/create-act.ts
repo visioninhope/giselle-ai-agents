@@ -1,4 +1,4 @@
-import { NodeId, WorkspaceId } from "@giselle-sdk/data-type";
+import { NodeId, Workspace, WorkspaceId } from "@giselle-sdk/data-type";
 import { buildWorkflowFromNode } from "@giselle-sdk/workflow-utils";
 import { z } from "zod/v4";
 import { setGeneration } from "../generations";
@@ -23,23 +23,31 @@ import {
 import { actPath, workspaceActPath } from "./object/paths";
 
 export const CreateActInputs = z.object({
-	workspaceId: WorkspaceId.schema,
+	workspaceId: z.optional(WorkspaceId.schema),
+	workspace: z.optional(Workspace),
 	startNodeId: NodeId.schema,
 	inputs: z.array(GenerationContextInput),
 	generationOriginType: z.enum(
 		GenerationOrigin.options.map((option) => option.shape.type.value),
 	),
 });
-
 export type CreateActInputs = z.infer<typeof CreateActInputs>;
 
 export async function createAct(
 	args: CreateActInputs & { context: GiselleEngineContext },
 ) {
-	const workspace = await getWorkspace({
-		...args,
-		useExperimentalStorage: true,
-	});
+	let workspace: Workspace | undefined = args.workspace;
+
+	if (args.workspaceId !== undefined) {
+		workspace = await getWorkspace({
+			...args,
+			workspaceId: args.workspaceId,
+			useExperimentalStorage: true,
+		});
+	}
+	if (workspace === undefined) {
+		throw new Error("workspace or workspaceId is required");
+	}
 	const startNode = workspace.nodes.find(
 		(node) => node.id === args.startNodeId,
 	);
@@ -62,7 +70,7 @@ export async function createAct(
 				context: {
 					origin: {
 						type: args.generationOriginType,
-						workspaceId: args.workspaceId,
+						workspaceId: workspace.id,
 						actId,
 					},
 					inputs: args.inputs,
@@ -87,7 +95,7 @@ export async function createAct(
 
 	const act: Act = {
 		id: ActId.generate(),
-		workspaceId: args.workspaceId,
+		workspaceId: workspace.id,
 		status: "inProgress",
 		steps: {
 			queued: generations.length,
@@ -116,7 +124,7 @@ export async function createAct(
 		args.context.storage.setItem(actPath(act.id), act),
 		addWorkspaceIndexItem({
 			storage: args.context.storage,
-			indexPath: workspaceActPath(args.workspaceId),
+			indexPath: workspaceActPath(workspace.id),
 			item: act,
 			itemSchema: ActIndexObject,
 		}),
@@ -128,5 +136,5 @@ export async function createAct(
 			}),
 		),
 	]);
-	return act;
+	return { act, generations };
 }
