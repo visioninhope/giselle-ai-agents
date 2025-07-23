@@ -2,7 +2,11 @@ import levenshtein from "fast-levenshtein";
 
 type ValidationResult = { isValid: true } | { isValid: false; error: string };
 
-// Recognized PostgreSQL connection parameters
+/**
+ * Recognized PostgreSQL connection parameters
+ * Based on the official PostgreSQL 17 documentation:
+ * https://www.postgresql.org/docs/17/libpq-connect.html
+ */
 const RECOGNIZED_PARAMS = new Set([
 	"host",
 	"hostaddr",
