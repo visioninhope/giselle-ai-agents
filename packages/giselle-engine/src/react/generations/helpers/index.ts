@@ -6,7 +6,7 @@ import {
 	type Generation,
 	RunningGeneration,
 } from "../../../core/generations/object";
-import type { GenerationId } from "../../../core/shared-types";
+import type { GenerationId } from "../../../core/concepts/identifiers";
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 

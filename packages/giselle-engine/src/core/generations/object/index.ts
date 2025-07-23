@@ -2,11 +2,11 @@ import type { Message as AISdkMessage } from "@ai-sdk/react";
 
 import { NodeId } from "@giselle-sdk/data-type";
 import { z } from "zod/v4";
-import { GenerationId } from "../../shared-types";
+import { GenerationId } from "../../concepts/identifiers";
 import { GenerationContextLike, GenerationOrigin } from "./context";
 import { GenerationOutput } from "./output";
 
-export { GenerationId } from "../../shared-types";
+export { GenerationId } from "../../concepts/identifiers";
 export * from "./context";
 export * from "./output";
 

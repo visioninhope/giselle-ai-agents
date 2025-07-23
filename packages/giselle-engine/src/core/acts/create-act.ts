@@ -7,7 +7,7 @@ import {
 	GenerationContextInput,
 	GenerationOrigin,
 } from "../generations/object";
-import { GenerationId } from "../shared-types";
+import { GenerationId } from "../concepts/identifiers";
 import type { GiselleEngineContext } from "../types";
 import { addWorkspaceIndexItem } from "../utils/workspace-index";
 import { getWorkspace } from "../workspaces";

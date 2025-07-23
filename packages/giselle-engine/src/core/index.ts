@@ -71,7 +71,7 @@ export * from "./experimental_storage";
 export * from "./experimental_vector-store";
 export * from "./generations/object";
 export * from "./integrations";
-export * from "./shared-types";
+export * from "./concepts/identifiers";
 export * from "./telemetry";
 export * from "./types";
 export * from "./usage-limits";

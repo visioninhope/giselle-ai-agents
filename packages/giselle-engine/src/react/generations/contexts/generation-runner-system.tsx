@@ -27,7 +27,7 @@ import {
 	type QueuedGeneration,
 	type RunningGeneration,
 } from "../../../core/generations/object";
-import { GenerationId } from "../../../core/shared-types";
+import { GenerationId } from "../../../core/concepts/identifiers";
 import { useFeatureFlag } from "../../feature-flags";
 import { useGiselleEngine } from "../../use-giselle-engine";
 import { GenerationRunner } from "../generation-runner";
