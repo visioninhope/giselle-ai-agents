@@ -115,7 +115,7 @@ describe("getGeneration", () => {
 				experimental_storage,
 				generationId: nonExistentId,
 			}),
-		).rejects.toThrow("Generation not found");
+		).rejects.toThrow("Generation(id: gnr-nonexistent1234) is not found");
 	});
 
 	test("should respect bypassingCache option", async () => {
