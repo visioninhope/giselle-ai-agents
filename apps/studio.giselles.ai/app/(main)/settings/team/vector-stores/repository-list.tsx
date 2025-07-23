@@ -1,4 +1,5 @@
 import { Card } from "@/components/ui/card";
+import type { GitHubRepositoryContentType } from "@/drizzle";
 import type { RepositoryWithStatuses } from "@/lib/vector-stores/github";
 import type { GitHubRepositoryIndexId } from "@/packages/types";
 import { RepositoryItem } from "./repository-item";
@@ -11,12 +12,20 @@ type RepositoryListProps = {
 	triggerManualIngestAction: (
 		indexId: GitHubRepositoryIndexId,
 	) => Promise<{ success: boolean; error?: string }>;
+	updateRepositoryContentTypesAction: (
+		repositoryIndexId: string,
+		contentTypes: {
+			contentType: GitHubRepositoryContentType;
+			enabled: boolean;
+		}[],
+	) => Promise<{ success: boolean; error?: string }>;
 };
 
 export function RepositoryList({
 	repositories,
 	deleteRepositoryIndexAction,
 	triggerManualIngestAction,
+	updateRepositoryContentTypesAction,
 }: RepositoryListProps) {
 	return (
 		<div className="flex flex-col gap-y-[16px]">
@@ -41,6 +50,9 @@ export function RepositoryList({
 								repositoryData={repo}
 								deleteRepositoryIndexAction={deleteRepositoryIndexAction}
 								triggerManualIngestAction={triggerManualIngestAction}
+								updateRepositoryContentTypesAction={
+									updateRepositoryContentTypesAction
+								}
 							/>
 						))}
 					</div>
