@@ -679,6 +679,14 @@ describe("GitHub Event Handlers", () => {
 				context: {
 					llmProviders: [],
 					storage: createStorage({ driver: memoryDriver() }),
+					experimental_storage: {
+						getJson: vi.fn().mockResolvedValue({
+							id: "wrks-test",
+							name: "Test Workspace",
+							nodes: [],
+							connections: [],
+						}),
+					},
 					integrationConfigs: {
 						github: {
 							auth: {
@@ -704,8 +712,19 @@ describe("GitHub Event Handlers", () => {
 			expect(testDeps.createAndStartAct).toHaveBeenCalledWith(
 				expect.objectContaining({
 					context: expect.anything(),
-					triggerId: mockFlowTriggerId,
-					triggerInputs: expect.any(Array),
+					startNodeId: "nd-test",
+					workspace: expect.objectContaining({
+						id: "wrks-test",
+					}),
+					generationOriginType: "github-app",
+					inputs: expect.arrayContaining([
+						expect.objectContaining({
+							type: "github-webhook-event",
+							webhookEvent: expect.objectContaining({
+								name: "issues.opened",
+							}),
+						}),
+					]),
 				}),
 			);
 			expect(testDeps.addReaction).toHaveBeenCalledWith({
