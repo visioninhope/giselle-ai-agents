@@ -1,4 +1,5 @@
-import type { WorkflowId, WorkspaceId } from "@giselle-sdk/data-type";
+import type { WorkspaceId } from "@giselle-sdk/data-type";
+import type { WorkflowId } from "../concepts/workflow";
 
 class BaseError extends Error {
 	constructor(message: string, options?: ErrorOptions) {
