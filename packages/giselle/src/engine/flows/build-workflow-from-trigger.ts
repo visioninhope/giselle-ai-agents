@@ -4,8 +4,8 @@ import type {
 	Workflow,
 	Workspace,
 } from "@giselle-sdk/data-type";
-import { buildWorkflowFromNode } from "@giselle-sdk/workflow-utils";
 import type { GiselleEngineContext } from "../types";
+import { buildWorkflowFromNode } from "../utils/workflow/build-workflow-from-node";
 import { getWorkspace } from "../workspaces/utils";
 import { getFlowTrigger } from "./utils";
 

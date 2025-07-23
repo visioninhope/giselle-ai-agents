@@ -1,5 +1,4 @@
 import { NodeId, Workspace, WorkspaceId } from "@giselle-sdk/data-type";
-import { buildWorkflowFromNode } from "@giselle-sdk/workflow-utils";
 import { z } from "zod/v4";
 import {
 	type Act,
@@ -17,6 +16,7 @@ import {
 import { GenerationId, StepId } from "../../concepts/identifiers";
 import { setGeneration } from "../generations";
 import type { GiselleEngineContext } from "../types";
+import { buildWorkflowFromNode } from "../utils/workflow/build-workflow-from-node";
 import { addWorkspaceIndexItem } from "../utils/workspace-index";
 import { getWorkspace } from "../workspaces";
 import { actPath, workspaceActPath } from "./object/paths";
