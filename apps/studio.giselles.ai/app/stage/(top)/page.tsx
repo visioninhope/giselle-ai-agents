@@ -98,10 +98,16 @@ export default async function StagePage() {
 					if (build === null) {
 						throw new Error("Workflow not found");
 					}
-					const act = await giselleEngine.createAct({
+					const { act } = await giselleEngine.createAct({
 						workspaceId: payloads.flowTrigger.workspaceId,
-						jobsCount: build.workflow.sequences.length,
-						trigger: "studio",
+						startNodeId: payloads.flowTrigger.nodeId,
+						inputs: [
+							{
+								type: "parameters",
+								items: payloads.parameterItems,
+							},
+						],
+						generationOriginType: "stage",
 					});
 
 					const team = await db.query.teams.findFirst({
@@ -119,17 +125,7 @@ export default async function StagePage() {
 					});
 					after(() =>
 						giselleEngine.startAct({
-							flow: build.workflow,
 							actId: act.id,
-							runId: ActId.generate(),
-							workspaceId: payloads.flowTrigger.workspaceId,
-							triggerInputs: [
-								{
-									type: "parameters",
-									items: payloads.parameterItems,
-								},
-							],
-							useExperimentalStorage: experimental_storage,
 						}),
 					);
 				}}
