@@ -18,6 +18,7 @@ import {
 	vector,
 } from "drizzle-orm/pg-core";
 import type { Stripe } from "stripe";
+import type { ContentStatusMetadata } from "@/lib/vector-stores/github/types";
 import type { AgentId } from "@/services/agents/types";
 import type { TeamId } from "@/services/teams/types";
 
@@ -304,7 +305,7 @@ export const githubRepositoryContentStatus = pgTable(
 			.$type<GitHubRepositoryIndexStatus>()
 			.default("idle"),
 		lastSyncedAt: timestamp("last_synced_at"),
-		metadata: jsonb("metadata"),
+		metadata: jsonb("metadata").$type<ContentStatusMetadata>(),
 		errorCode: text("error_code"),
 		retryAfter: timestamp("retry_after"),
 		updatedAt: timestamp("updated_at")
@@ -322,6 +323,12 @@ export const githubRepositoryContentStatus = pgTable(
 			foreignColumns: [githubRepositoryIndex.dbId],
 			name: "gh_content_status_repo_idx_fk",
 		}).onDelete("cascade"),
+		index("gh_content_status_query_idx").on(
+			table.enabled,
+			table.status,
+			table.updatedAt,
+			table.retryAfter,
+		),
 	],
 );
 
@@ -388,6 +395,10 @@ export const githubRepositoryPullRequestEmbeddings = pgTable(
 			foreignColumns: [githubRepositoryIndex.dbId],
 			name: "gh_pr_embeddings_repo_idx_fk",
 		}).onDelete("cascade"),
+		index("gh_pr_emb_repo_doc_idx").on(
+			table.repositoryIndexDbId,
+			table.documentKey,
+		),
 	],
 );
 
