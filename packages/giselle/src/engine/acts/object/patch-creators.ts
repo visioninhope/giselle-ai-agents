@@ -1,10 +1,11 @@
+import type { Act } from "../../../concepts/act";
 import type { Patch } from "./patch-object";
 
 // Type-safe patch creators for Act fields
 
 // Status patches
 export const status = {
-	set: (value: "inProgress" | "completed" | "failed" | "cancelled"): Patch => ({
+	set: (value: Act["status"]): Patch => ({
 		path: "status",
 		set: value,
 	}),
@@ -13,7 +14,10 @@ export const status = {
 // Steps patches
 export const steps = {
 	queued: {
-		set: (value: number): Patch => ({ path: "steps.queued", set: value }),
+		set: (value: Act["steps"]["queued"]): Patch => ({
+			path: "steps.queued",
+			set: value,
+		}),
 		increment: (value: number): Patch => ({
 			path: "steps.queued",
 			increment: value,
@@ -24,7 +28,10 @@ export const steps = {
 		}),
 	},
 	inProgress: {
-		set: (value: number): Patch => ({ path: "steps.inProgress", set: value }),
+		set: (value: Act["steps"]["inProgress"]): Patch => ({
+			path: "steps.inProgress",
+			set: value,
+		}),
 		increment: (value: number): Patch => ({
 			path: "steps.inProgress",
 			increment: value,
@@ -35,7 +42,10 @@ export const steps = {
 		}),
 	},
 	completed: {
-		set: (value: number): Patch => ({ path: "steps.completed", set: value }),
+		set: (value: Act["steps"]["completed"]): Patch => ({
+			path: "steps.completed",
+			set: value,
+		}),
 		increment: (value: number): Patch => ({
 			path: "steps.completed",
 			increment: value,
@@ -46,7 +56,10 @@ export const steps = {
 		}),
 	},
 	warning: {
-		set: (value: number): Patch => ({ path: "steps.warning", set: value }),
+		set: (value: Act["steps"]["warning"]): Patch => ({
+			path: "steps.warning",
+			set: value,
+		}),
 		increment: (value: number): Patch => ({
 			path: "steps.warning",
 			increment: value,
@@ -57,7 +70,10 @@ export const steps = {
 		}),
 	},
 	cancelled: {
-		set: (value: number): Patch => ({ path: "steps.cancelled", set: value }),
+		set: (value: Act["steps"]["cancelled"]): Patch => ({
+			path: "steps.cancelled",
+			set: value,
+		}),
 		increment: (value: number): Patch => ({
 			path: "steps.cancelled",
 			increment: value,
@@ -68,7 +84,10 @@ export const steps = {
 		}),
 	},
 	failed: {
-		set: (value: number): Patch => ({ path: "steps.failed", set: value }),
+		set: (value: Act["steps"]["failed"]): Patch => ({
+			path: "steps.failed",
+			set: value,
+		}),
 		increment: (value: number): Patch => ({
 			path: "steps.failed",
 			increment: value,
@@ -83,7 +102,10 @@ export const steps = {
 // Duration patches
 export const duration = {
 	wallClock: {
-		set: (value: number): Patch => ({ path: "duration.wallClock", set: value }),
+		set: (value: Act["duration"]["wallClock"]): Patch => ({
+			path: "duration.wallClock",
+			set: value,
+		}),
 		increment: (value: number): Patch => ({
 			path: "duration.wallClock",
 			increment: value,
@@ -94,7 +116,10 @@ export const duration = {
 		}),
 	},
 	totalTask: {
-		set: (value: number): Patch => ({ path: "duration.totalTask", set: value }),
+		set: (value: Act["duration"]["totalTask"]): Patch => ({
+			path: "duration.totalTask",
+			set: value,
+		}),
 		increment: (value: number): Patch => ({
 			path: "duration.totalTask",
 			increment: value,
@@ -109,7 +134,10 @@ export const duration = {
 // Usage patches
 export const usage = {
 	promptTokens: {
-		set: (value: number): Patch => ({ path: "usage.promptTokens", set: value }),
+		set: (value: Act["usage"]["promptTokens"]): Patch => ({
+			path: "usage.promptTokens",
+			set: value,
+		}),
 		increment: (value: number): Patch => ({
 			path: "usage.promptTokens",
 			increment: value,
@@ -120,7 +148,7 @@ export const usage = {
 		}),
 	},
 	completionTokens: {
-		set: (value: number): Patch => ({
+		set: (value: Act["usage"]["completionTokens"]): Patch => ({
 			path: "usage.completionTokens",
 			set: value,
 		}),
@@ -134,7 +162,10 @@ export const usage = {
 		}),
 	},
 	totalTokens: {
-		set: (value: number): Patch => ({ path: "usage.totalTokens", set: value }),
+		set: (value: Act["usage"]["totalTokens"]): Patch => ({
+			path: "usage.totalTokens",
+			set: value,
+		}),
 		increment: (value: number): Patch => ({
 			path: "usage.totalTokens",
 			increment: value,
@@ -148,15 +179,11 @@ export const usage = {
 
 // Annotations patches
 export const annotations = {
-	push: (
-		items: Array<{ level: "info" | "warning" | "error"; message: string }>,
-	): Patch => ({
+	push: (items: Act["annotations"]): Patch => ({
 		path: "annotations",
 		push: items,
 	}),
-	set: (
-		items: Array<{ level: "info" | "warning" | "error"; message: string }>,
-	): Patch => ({
+	set: (items: Act["annotations"]): Patch => ({
 		path: "annotations",
 		set: items,
 	}),
@@ -165,15 +192,7 @@ export const annotations = {
 // Sequences patches with dynamic indices
 export const sequences = (index: number) => ({
 	status: {
-		set: (
-			value:
-				| "queued"
-				| "created"
-				| "running"
-				| "completed"
-				| "failed"
-				| "cancelled",
-		): Patch => ({
+		set: (value: Act["sequences"][number]["status"]): Patch => ({
 			path: `sequences.${index}.status`,
 			set: value,
 		}),
@@ -181,20 +200,16 @@ export const sequences = (index: number) => ({
 	steps: (stepIndex: number) => ({
 		status: {
 			set: (
-				value:
-					| "queued"
-					| "created"
-					| "running"
-					| "completed"
-					| "failed"
-					| "cancelled",
+				value: Act["sequences"][number]["steps"][number]["status"],
 			): Patch => ({
 				path: `sequences.${index}.steps.${stepIndex}.status`,
 				set: value,
 			}),
 		},
 		name: {
-			set: (value: string): Patch => ({
+			set: (
+				value: Act["sequences"][number]["steps"][number]["name"],
+			): Patch => ({
 				path: `sequences.${index}.steps.${stepIndex}.name`,
 				set: value,
 			}),
@@ -204,11 +219,11 @@ export const sequences = (index: number) => ({
 
 // Other simple fields
 export const trigger = {
-	set: (value: string): Patch => ({ path: "trigger", set: value }),
+	set: (value: Act["trigger"]): Patch => ({ path: "trigger", set: value }),
 } as const;
 
 export const updatedAt = {
-	set: (value: number): Patch => ({ path: "updatedAt", set: value }),
+	set: (value: Act["updatedAt"]): Patch => ({ path: "updatedAt", set: value }),
 } as const;
 
 // Convenience re-export of all patch creators
