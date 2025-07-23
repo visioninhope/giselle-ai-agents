@@ -4,9 +4,9 @@ import {
 	CompletedGeneration,
 	FailedGeneration,
 	type Generation,
-	type GenerationId,
 	RunningGeneration,
-} from "../../../core/generations/object";
+} from "../../../concepts/generation";
+import type { GenerationId } from "../../../concepts/identifiers";
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 

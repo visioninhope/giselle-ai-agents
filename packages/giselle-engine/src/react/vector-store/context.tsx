@@ -1,5 +1,5 @@
 import { createContext, type PropsWithChildren, useContext } from "react";
-import type { GitHubVectorStoreInfo } from "../../core/vector-store";
+import type { GitHubVectorStoreInfo } from "../../engine/vector-store";
 
 export interface VectorStoreContextValue {
 	github: GitHubVectorStoreInfo[];

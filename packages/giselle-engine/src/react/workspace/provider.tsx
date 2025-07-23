@@ -2,7 +2,7 @@
 
 import type { Workspace, WorkspaceId } from "@giselle-sdk/data-type";
 import { type ReactNode, useEffect, useState } from "react";
-import type { TelemetrySettings, UsageLimits } from "../../core";
+import type { TelemetrySettings, UsageLimits } from "../../engine";
 import {
 	FeatureFlagContext,
 	type FeatureFlagContextValue,

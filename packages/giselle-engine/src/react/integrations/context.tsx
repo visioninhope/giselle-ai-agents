@@ -5,7 +5,7 @@ import {
 	useContext,
 	useState,
 } from "react";
-import type { Integration } from "../../core/integrations";
+import type { Integration } from "../../engine/integrations";
 
 interface IntegrationContextValue {
 	value: Partial<Integration>;

@@ -18,7 +18,6 @@
 		"@giselle-sdk/language-model": "workspace:^",
 		"@giselle-sdk/text-editor": "workspace:^",
 		"@giselle-sdk/text-editor-utils": "workspace:^",
-		"@giselle-sdk/workflow-utils": "workspace:^",
 		"@giselle/giselle-sdk-tsconfig": "workspace:*",
 		"@xyflow/react": "catalog:",
 		"clsx": "catalog:",
