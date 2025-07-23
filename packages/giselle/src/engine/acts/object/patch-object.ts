@@ -24,7 +24,8 @@ export function patchAct(act: Act, delta: PatchDelta) {
 		const patch = delta[key as ActPath];
 		if (!patch) continue;
 
-		const parts = key.split(".");
+		// Parse path with array indices support
+		const parts = parsePath(key);
 		const lastKey = parts.at(-1);
 		if (!lastKey) {
 			throw new Error(`Invalid dot path: "${key}"`);
@@ -34,28 +35,38 @@ export function patchAct(act: Act, delta: PatchDelta) {
 		// biome-ignore lint: lint/suspicious/noExplicitAny: internal use
 		let target: any = result;
 		for (const part of pathToLast) {
-			target = target[part];
+			if (isArrayIndex(part)) {
+				const index = getArrayIndex(part);
+				target = target[index];
+			} else {
+				target = target[part];
+			}
 		}
 
-		const current = target[lastKey];
+		// Handle the last key
+		const current = isArrayIndex(lastKey)
+			? target[getArrayIndex(lastKey)]
+			: target[lastKey];
+
+		const finalKey = isArrayIndex(lastKey) ? getArrayIndex(lastKey) : lastKey;
 
 		if (typeof current === "number" && typeof patch === "object") {
 			if ("set" in patch) {
-				target[lastKey] = patch.set;
+				target[finalKey] = patch.set;
 			} else if ("increment" in patch) {
 				const inc = patch.increment ?? 0;
-				target[lastKey] = current + inc;
+				target[finalKey] = current + inc;
 			} else if ("decrement" in patch) {
 				const dec = patch.decrement ?? 0;
-				target[lastKey] = current - dec;
+				target[finalKey] = current - dec;
 			}
 		} else if (typeof current === "string" && typeof patch === "object") {
 			if ("set" in patch && patch.set !== undefined) {
-				target[lastKey] = patch.set;
+				target[finalKey] = patch.set;
 			}
 		} else if (Array.isArray(current) && typeof patch === "object") {
 			if ("set" in patch && patch.set !== undefined) {
-				target[lastKey] = patch.set;
+				target[finalKey] = patch.set;
 			} else {
 				const newArray = [...current];
 
@@ -63,12 +74,58 @@ export function patchAct(act: Act, delta: PatchDelta) {
 					newArray.push(...patch.push);
 				}
 
-				target[lastKey] = newArray;
+				target[finalKey] = newArray;
 			}
 		}
 	}
 
 	return result;
+}
+
+// Helper functions for array index handling
+function parsePath(path: string): string[] {
+	const parts: string[] = [];
+	let current = "";
+	let inBracket = false;
+
+	for (let i = 0; i < path.length; i++) {
+		const char = path[i];
+
+		if (char === "[" && !inBracket) {
+			if (current) {
+				parts.push(current);
+				current = "";
+			}
+			inBracket = true;
+			current = "[";
+		} else if (char === "]" && inBracket) {
+			current += "]";
+			parts.push(current);
+			current = "";
+			inBracket = false;
+		} else if (char === "." && !inBracket) {
+			if (current) {
+				parts.push(current);
+				current = "";
+			}
+		} else {
+			current += char;
+		}
+	}
+
+	if (current) {
+		parts.push(current);
+	}
+
+	return parts;
+}
+
+function isArrayIndex(part: string): boolean {
+	return /^\[\d+\]$/.test(part);
+}
+
+function getArrayIndex(part: string): number {
+	return parseInt(part.slice(1, -1), 10);
 }
 
 type IsRecord<T> = T extends Record<string, unknown> ? T : never;
