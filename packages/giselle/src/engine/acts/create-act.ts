@@ -15,6 +15,7 @@ import {
 	GenerationOrigin,
 } from "../../concepts/generation";
 import { GenerationId, StepId } from "../../concepts/identifiers";
+import { defaultName } from "../../utils";
 import { setGeneration } from "../generations";
 import type { GiselleEngineContext } from "../types";
 import { addWorkspaceIndexItem } from "../utils/workspace-index";
@@ -81,13 +82,14 @@ export async function createAct(
 			generations.push(generation);
 			steps.push({
 				id: StepId.generate(),
-				status: "pending",
+				name: step.node.name ?? defaultName(step.node),
+				status: "created",
 				generationId: generation.id,
 			});
 		}
 		sequences.push({
 			id: SequenceId.generate(),
-			status: "pending",
+			status: "created",
 			steps,
 		});
 	}
