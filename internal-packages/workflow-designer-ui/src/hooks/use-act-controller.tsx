@@ -1,11 +1,9 @@
-import type { NodeId } from "@giselle-sdk/data-type";
 import type { CreateActInputs, Generation } from "@giselle-sdk/giselle-engine";
 import {
 	useGenerationRunnerSystem,
 	useGiselleEngine,
 	useWorkflowDesigner,
 } from "@giselle-sdk/giselle-engine/react";
-import { buildWorkflowFromNode } from "@giselle-sdk/workflow-utils";
 import { useCallback, useRef } from "react";
 import { useToasts } from "../ui/toast";
 
@@ -53,27 +51,41 @@ export function useActController() {
 					</button>
 				),
 			});
+			const actStartedAt = Date.now();
+			let hasError = false;
 			for (const sequence of act.sequences) {
+				const stepsCount = sequence.steps.length;
+				if (hasError) {
+					await client.patchAct({
+						actId: act.id,
+						delta: {
+							"steps.cancelled": { increment: stepsCount },
+							"steps.queued": { decrement: stepsCount },
+						},
+					});
+					return;
+				}
 				await client.patchAct({
 					actId: act.id,
 					delta: {
-						"steps.inProgress": { increment: 1 },
-						"steps.queued": { decrement: 1 },
+						"steps.inProgress": { increment: stepsCount },
+						"steps.queued": { decrement: stepsCount },
 					},
 				});
 				const sequenceStartedAt = Date.now();
-				const totalTasks = 0;
-				const hasSequenceError = false;
+				let durationTotalTasks = 0;
 				await Promise.all(
 					sequence.steps.map(async (step) => {
 						const generation = generations.find(
 							(g) => g.id === step.generationId,
 						);
 						if (generation === undefined || cancelRef.current) {
-							return { duration: 0, hasError: false };
+							return;
 						}
-						let hasError = false;
 						await startGenerationRunner(generation.id, {
+							onGenerationCompleted: () => {
+								durationTotalTasks += Date.now() - sequenceStartedAt;
+							},
 							onGenerationFailed: async (failedGeneration) => {
 								hasError = true;
 								await client.patchAct({
@@ -91,9 +103,31 @@ export function useActController() {
 								});
 							},
 						});
-						return { duration: Date.now() - sequenceStartedAt, hasError };
+
+						await client.patchAct({
+							actId: act.id,
+							delta: hasError
+								? {
+										"steps.failed": { increment: stepsCount },
+										"steps.inProgress": { decrement: stepsCount },
+										"duration.totalTask": { increment: durationTotalTasks },
+									}
+								: {
+										"steps.completed": { increment: stepsCount },
+										"steps.inProgress": { decrement: stepsCount },
+										"duration.totalTask": { increment: durationTotalTasks },
+									},
+						});
+						return;
 					}),
 				);
+				await client.patchAct({
+					actId: act.id,
+					delta: {
+						status: { set: hasError ? "failed" : "completed" },
+						"duration.wallClock": { set: Date.now() - actStartedAt },
+					},
+				});
 			}
 		},
 		[
@@ -105,4 +139,8 @@ export function useActController() {
 			stopGenerationRunner,
 		],
 	);
+
+	return {
+		createAndStartAct,
+	};
 }
