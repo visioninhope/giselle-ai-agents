@@ -1,5 +1,7 @@
 import {
 	type ActionNode,
+	DEFAULT_MAX_RESULTS,
+	DEFAULT_SIMILARITY_THRESHOLD,
 	type FileContent,
 	type FileData,
 	FileId,
@@ -359,7 +361,8 @@ const queryFactoryImpl = {
 			content: {
 				type: "query",
 				query: "",
-				maxResults: 10,
+				maxResults: DEFAULT_MAX_RESULTS,
+				similarityThreshold: DEFAULT_SIMILARITY_THRESHOLD,
 			},
 			inputs: [],
 			outputs: [
