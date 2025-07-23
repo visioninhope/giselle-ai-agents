@@ -1,31 +1,36 @@
+import { defaultName, type ActId, type Step, type StepId } from "@giselle-sdk/giselle";
 import { NodeIcon } from "@giselles-ai/icons/node";
 import { notFound } from "next/navigation";
 import { giselleEngine } from "@/app/giselle-engine";
 import { experimental_storageFlag } from "@/flags";
 import { GenerationView } from "../../../../../../../internal-packages/workflow-designer-ui/src/ui/generation-view";
-import type { Step } from "../../object";
-
-async function fetchStep(_actId: string, _stepId: string) {
-	await new Promise((resolve) => setTimeout(resolve, 1000));
-	return {
-		id: "step-1-1",
-		text: "Generate Query",
-		status: "success",
-		generationId: "gnr-Q7IQPMn4dSpzfDVS",
-	} satisfies Step;
-}
 
 export default async function ({
 	params,
 }: {
-	params: Promise<{ actId: string; stepId: string }>;
+	params: Promise<{ actId: ActId; stepId: StepId }>;
 }) {
 	const { actId, stepId } = await params;
-	const step = await fetchStep(actId, stepId);
-	const useExperimentalStorage = await experimental_storageFlag();
+
+	const act = await giselleEngine.getAct({ actId });
+	let step: Step | undefined;
+	for (const sequence of act.sequences) {
+		for (const tmp of sequence.steps) {
+			if (tmp.id === stepId) {
+				step = tmp;
+				break;
+			}
+		}
+		if (step !== undefined) {
+			break;
+		}
+	}
+	if (step === undefined) {
+		return notFound();
+	}
 	const generation = await giselleEngine.getGeneration(
 		step.generationId,
-		useExperimentalStorage,
+		true,
 	);
 	if (generation === undefined) {
 		return notFound();
@@ -42,7 +47,7 @@ export default async function ({
 						/>
 					</div>
 					<div className="flex flex-col">
-						<div className="text-[14px]">Generate Query</div>
+            <div className="text-[14px]">{generation.context.operationNode.name ?? defaultName(generation.context.operationNode)}</div>
 						<div className="text text-text-muted text-[10px] flex items-center gap-[4px]">
 							<span>gpt-4o</span>
 							<div className="size-[2px] rounded-full bg-text-muted" />

@@ -1,7 +1,7 @@
 import { WorkspaceId } from "@giselle-sdk/data-type";
 import { createIdGenerator } from "@giselle-sdk/utils";
 import { z } from "zod/v4";
-import { ActId, GenerationId } from "./identifiers";
+import { ActId, GenerationId, StepId } from "./identifiers";
 
 // Re-export ActId from identifiers
 export { ActId } from "./identifiers";
@@ -12,7 +12,6 @@ const ActAnnotationObject = z.object({
 });
 
 const StepStatus = z.enum(["success", "in-progress", "failed", "pending"]);
-export const StepId = createIdGenerator("stp");
 export const Step = z.object({
 	id: StepId.schema,
 	status: StepStatus,

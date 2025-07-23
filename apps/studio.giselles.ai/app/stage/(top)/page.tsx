@@ -159,9 +159,7 @@ export default async function StagePage() {
 									<TableCell className="text-center">-</TableCell>
 									<TableCell className="text-right">
 										<div className="flex justify-end">
-											<Link href={`/stage/acts/${task.sdkActId.substring(5)}`}>
-												Details
-											</Link>
+											<Link href={`/stage/acts/${task.sdkActId}`}>Details</Link>
 										</div>
 									</TableCell>
 								</TableRow>

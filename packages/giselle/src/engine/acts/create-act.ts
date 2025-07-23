@@ -6,7 +6,7 @@ import {
 	GenerationContextInput,
 	GenerationOrigin,
 } from "../../concepts/generation";
-import { GenerationId } from "../../concepts/identifiers";
+import { GenerationId, StepId } from "../../concepts/identifiers";
 import { setGeneration } from "../generations";
 import type { GiselleEngineContext } from "../types";
 import { addWorkspaceIndexItem } from "../utils/workspace-index";
@@ -18,7 +18,6 @@ import {
 	type Sequence,
 	SequenceId,
 	type Step,
-	StepId,
 } from "./object";
 import { actPath, workspaceActPath } from "./object/paths";
 

@@ -7,5 +7,8 @@ import type { z } from "zod/v4";
 export const ActId = createIdGenerator("act");
 export type ActId = z.infer<typeof ActId.schema>;
 
+export const StepId = createIdGenerator("stp");
+export type StepId = z.infer<typeof StepId.schema>;
+
 export const GenerationId = createIdGenerator("gnr");
 export type GenerationId = z.infer<typeof GenerationId.schema>;

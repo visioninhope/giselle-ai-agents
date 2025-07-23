@@ -314,7 +314,7 @@ export async function getGeneration(params: {
 		},
 	);
 	if (unsafeGeneration == null) {
-		throw new Error("Generation not found");
+		throw new Error(`Generation(id: ${params.generationId}) is not found`);
 	}
 	if (params.options?.skipMod) {
 		const parsedGeneration = Generation.parse(unsafeGeneration);

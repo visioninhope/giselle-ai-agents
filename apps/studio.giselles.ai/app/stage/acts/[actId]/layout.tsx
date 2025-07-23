@@ -1,159 +1,26 @@
+import type { ActId, Generation } from "@giselle-sdk/giselle";
 import { ArrowLeftIcon } from "lucide-react";
 import Link from "next/link";
-import type { Act } from "../object";
+import { giselleEngine } from "@/app/giselle-engine";
 import { Nav } from "./ui/nav";
-
-const actData: Act = {
-	id: "act-1",
-	sequences: [
-		{
-			id: "seq-1",
-			name: "Sequence 1",
-			count: 4,
-			status: "success",
-			steps: [
-				{
-					id: "step-1-1",
-					text: "Generate Query",
-					status: "success",
-					generationId: "gnr-1234567890",
-				},
-				{
-					id: "step-1-2",
-					text: "Ingest",
-					status: "success",
-					generationId: "gnr-1234567890",
-				},
-				{
-					id: "step-1-3",
-					text: "Search",
-					status: "success",
-					generationId: "gnr-1234567890",
-				},
-				{
-					id: "step-1-4",
-					text: "Analyze",
-					status: "success",
-					generationId: "gnr-1234567890",
-				},
-			],
-		},
-		{
-			id: "seq-2",
-			name: "cyberpunk_roguelike_sy",
-			count: 1,
-			status: "in-progress",
-			steps: [
-				{
-					id: "step-2-1",
-					text: "Initialize",
-					status: "success",
-					generationId: "gnr-1234567890",
-				},
-				{
-					id: "step-2-2",
-					text: "Process",
-					status: "in-progress",
-					generationId: "gnr-1234567890",
-				},
-				{
-					id: "step-2-3",
-					text: "Complete",
-					status: "pending",
-					generationId: "gnr-1234567890",
-				},
-			],
-		},
-		{
-			id: "seq-3",
-			name: "futuristic_sword_slash",
-			count: 1,
-			status: "failed",
-			steps: [
-				{
-					id: "step-3-1",
-					text: "Load Assets",
-					status: "success",
-					generationId: "gnr-1234567890",
-				},
-				{
-					id: "step-3-2",
-					text: "Generate Sound",
-					status: "failed",
-					generationId: "gnr-1234567890",
-				},
-			],
-		},
-		{
-			id: "seq-4",
-			name: "player_damage_sound_effect-",
-			count: 1,
-			status: "pending",
-			steps: [],
-		},
-		{
-			id: "seq-5",
-			name: "drone_destruction_sound_effect",
-			count: 1,
-			status: "warning",
-			steps: [
-				{
-					id: "step-5-1",
-					text: "Analyze",
-					status: "success",
-					generationId: "gnr-1234567890",
-				},
-				{
-					id: "step-5-2",
-					text: "Synthesize",
-					status: "warning",
-					generationId: "gnr-1234567890",
-				},
-				{
-					id: "step-5-3",
-					text: "Export",
-					status: "pending",
-					generationId: "gnr-1234567890",
-				},
-			],
-		},
-		{
-			id: "seq-6",
-
-			name: "digital_dash_blink_sound_effect",
-			count: 1,
-			status: "success",
-			steps: [
-				{
-					id: "step-6-1",
-					text: "Setup",
-					status: "success",
-					generationId: "gnr-1234567890",
-				},
-				{
-					id: "step-6-2",
-					text: "Render",
-					status: "success",
-					generationId: "gnr-1234567890",
-				},
-			],
-		},
-	],
-};
-
-async function fetchAct(_actId: string) {
-	await new Promise((resolve) => setTimeout(resolve, 1000));
-	return actData;
-}
 
 export default async function ({
 	children,
 	params,
 }: React.PropsWithChildren<{
-	params: Promise<{ actId: string }>;
+	params: Promise<{ actId: ActId }>;
 }>) {
 	const { actId } = await params;
-	const act = await fetchAct(actId);
+	const act = await giselleEngine.getAct({ actId });
+	const generations: Generation[] = await Promise.all(
+		act.sequences.flatMap((sequence) =>
+			sequence.steps.map((step) =>
+				giselleEngine.getGeneration(step.generationId, true),
+			),
+		),
+	).then((genereations) =>
+		genereations.filter((generation) => generation !== undefined),
+	);
 	return (
 		<div className="bg-surface-background text-foreground h-screen flex font-sans">
 			{/* Left Sidebar */}
@@ -192,7 +59,28 @@ export default async function ({
 								</span>
 							</div>
 						</div> */}
-					<Nav act={act} />
+					<Nav
+						act={{
+							...act,
+							sequences: act.sequences.map((sequence) => ({
+								...sequence,
+								steps: sequence.steps
+									.map((step) => {
+										const generation = generations.find(
+											(generation) => generation.id === step.generationId,
+										);
+										if (generation === undefined) {
+											return null;
+										}
+										return {
+											...step,
+											generation,
+										};
+									})
+									.filter((step) => step !== null),
+							})),
+						}}
+					/>
 				</div>
 
 				{/* <div className="flex items-center justify-between p-2 border-t border-border">
