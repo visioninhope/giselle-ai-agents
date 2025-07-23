@@ -9,7 +9,7 @@ import {
 	type Workspace,
 	type WorkspaceId,
 } from "@giselle-sdk/data-type";
-import { ActId, defaultName } from "@giselle-sdk/giselle";
+import { defaultName } from "@giselle-sdk/giselle";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { after } from "next/server";
@@ -90,6 +90,7 @@ export default async function StagePage() {
 				performStageAction={async (payloads) => {
 					"use server";
 
+					const experimental_storage = await experimental_storageFlag();
 					const user = await fetchCurrentUser();
 					const build = await giselleEngine.buildWorkflowFromTrigger({
 						triggerId: payloads.flowTrigger.id,
