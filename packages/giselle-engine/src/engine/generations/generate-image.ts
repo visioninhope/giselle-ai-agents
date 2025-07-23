@@ -14,8 +14,6 @@ import {
 	experimental_generateImage as generateImageAiSdk,
 } from "ai";
 import { type ApiMediaContentType, Langfuse, LangfuseMedia } from "langfuse";
-import type { GiselleEngineContext } from "../types";
-import { useGenerationExecutor } from "./internal/use-generation-executor";
 import {
 	type GenerationContext,
 	type GenerationOutput,
@@ -23,7 +21,9 @@ import {
 	ImageId,
 	type QueuedGeneration,
 	type RunningGeneration,
-} from "./object";
+} from "../../concepts/generation";
+import type { GiselleEngineContext } from "../types";
+import { useGenerationExecutor } from "./internal/use-generation-executor";
 import type { TelemetrySettings } from "./types";
 import {
 	buildMessageObject,

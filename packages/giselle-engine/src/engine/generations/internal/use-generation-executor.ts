@@ -18,7 +18,7 @@ import {
 	isCompletedGeneration,
 	type QueuedGeneration,
 	type RunningGeneration,
-} from "../object";
+} from "../../../concepts/generation";
 import {
 	checkUsageLimits,
 	getGeneration,

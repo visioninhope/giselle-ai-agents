@@ -15,7 +15,7 @@ import {
 } from "@giselle-sdk/language-model";
 import { type ApiMediaContentType, Langfuse, LangfuseMedia } from "langfuse";
 import type { Storage } from "unstorage";
-import type { CompletedGeneration } from "../generations/object";
+import type { CompletedGeneration } from "../../concepts/generation";
 import type {
 	AnthropicProviderOptions,
 	TelemetrySettings,

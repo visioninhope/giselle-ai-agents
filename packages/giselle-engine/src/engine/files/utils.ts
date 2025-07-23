@@ -1,5 +1,5 @@
 import type { FileId } from "@giselle-sdk/data-type";
-import type { GenerationOrigin } from "../generations/object";
+import type { GenerationOrigin } from "../../concepts/generation";
 
 export function filePath(params: { fileId: FileId } & GenerationOrigin) {
 	switch (params.type) {

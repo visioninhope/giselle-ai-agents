@@ -11,7 +11,6 @@ import {
 	useRef,
 	useState,
 } from "react";
-import { GenerationId } from "../../../concepts/identifiers";
 import {
 	type CancelledGeneration,
 	type CompletedGeneration,
@@ -27,7 +26,8 @@ import {
 	isRunningGeneration,
 	type QueuedGeneration,
 	type RunningGeneration,
-} from "../../../engine/generations/object";
+} from "../../../concepts/generation";
+import { GenerationId } from "../../../concepts/identifiers";
 import { useFeatureFlag } from "../../feature-flags";
 import { useGiselleEngine } from "../../use-giselle-engine";
 import { GenerationRunner } from "../generation-runner";

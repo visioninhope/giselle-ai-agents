@@ -1,6 +1,6 @@
+import type { Generation } from "../../concepts/generation";
 import type { GiselleEngineContext } from "../types";
 import { internalSetGeneration } from "./internal/set-generation";
-import type { Generation } from "./object";
 
 export async function setGeneration(args: {
 	context: GiselleEngineContext;

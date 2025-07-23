@@ -65,12 +65,12 @@ import {
 	updateWorkspace,
 } from "./workspaces";
 
+export * from "../concepts/generation";
 export * from "../concepts/identifiers";
 export type * from "./acts";
 export * from "./acts/object";
 export * from "./experimental_storage";
 export * from "./experimental_vector-store";
-export * from "./generations/object";
 export * from "./integrations";
 export * from "./telemetry";
 export * from "./types";

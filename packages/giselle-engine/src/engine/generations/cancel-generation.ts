@@ -1,7 +1,7 @@
+import type { CancelledGeneration } from "../../concepts/generation";
 import type { GenerationId } from "../../concepts/identifiers";
 import type { GiselleEngineContext } from "../types";
 import { internalSetGeneration } from "./internal/set-generation";
-import type { CancelledGeneration } from "./object";
 import { getGeneration } from "./utils";
 
 export async function cancelGeneration(args: {

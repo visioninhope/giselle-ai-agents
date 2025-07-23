@@ -1,9 +1,9 @@
 import { createStorage } from "unstorage";
 import memoryDriver from "unstorage/drivers/memory";
 import { beforeEach, describe, expect, test, vi } from "vitest";
+import type { GenerationId } from "../../concepts/identifiers";
 import { parseAndMod } from "../../data-mod";
 import { memoryStorageDriver } from "../experimental_storage";
-import type { GenerationId } from "./object";
 import { getGeneration } from "./utils";
 
 // Mock parseAndMod to track when it's called

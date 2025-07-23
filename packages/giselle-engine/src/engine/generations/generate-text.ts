@@ -4,6 +4,7 @@ import { openai } from "@ai-sdk/openai";
 import { perplexity } from "@ai-sdk/perplexity";
 import {
 	isTextGenerationNode,
+	type Output,
 	type TextGenerationLanguageModelData,
 } from "@giselle-sdk/data-type";
 import { githubTools, octokit } from "@giselle-sdk/github-tool";
@@ -13,16 +14,16 @@ import {
 	languageModels,
 } from "@giselle-sdk/language-model";
 import { AISDKError, appendResponseMessages, streamText } from "ai";
-import { decryptSecret } from "../secrets";
-import { generateTelemetryTags } from "../telemetry";
-import type { GiselleEngineContext } from "../types";
-import { useGenerationExecutor } from "./internal/use-generation-executor";
 import type {
 	FailedGeneration,
 	GenerationOutput,
 	QueuedGeneration,
 	UrlSource,
-} from "./object";
+} from "../../concepts/generation";
+import { decryptSecret } from "../secrets";
+import { generateTelemetryTags } from "../telemetry";
+import type { GiselleEngineContext } from "../types";
+import { useGenerationExecutor } from "./internal/use-generation-executor";
 import { createPostgresTools } from "./tools/postgres";
 import type { PreparedToolSet, TelemetrySettings } from "./types";
 import { buildMessageObject } from "./utils";
@@ -198,7 +199,7 @@ export function generateText(args: {
 					const generationOutputs: GenerationOutput[] = [];
 					const generatedTextOutput =
 						generationContext.operationNode.outputs.find(
-							(output) => output.accessor === "generated-text",
+							(output: Output) => output.accessor === "generated-text",
 						);
 					if (generatedTextOutput !== undefined) {
 						generationOutputs.push({
@@ -209,7 +210,7 @@ export function generateText(args: {
 					}
 
 					const reasoningOutput = generationContext.operationNode.outputs.find(
-						(output) => output.accessor === "reasoning",
+						(output: Output) => output.accessor === "reasoning",
 					);
 					if (reasoningOutput !== undefined && event.reasoning !== undefined) {
 						generationOutputs.push({
@@ -219,7 +220,7 @@ export function generateText(args: {
 						});
 					}
 					const sourceOutput = generationContext.operationNode.outputs.find(
-						(output) => output.accessor === "source",
+						(output: Output) => output.accessor === "source",
 					);
 					if (sourceOutput !== undefined && event.sources.length > 0) {
 						const sources = await Promise.all(

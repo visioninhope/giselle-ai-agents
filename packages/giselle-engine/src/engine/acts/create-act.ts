@@ -1,13 +1,13 @@
 import { NodeId, Workspace, WorkspaceId } from "@giselle-sdk/data-type";
 import { buildWorkflowFromNode } from "@giselle-sdk/workflow-utils";
 import { z } from "zod/v4";
-import { GenerationId } from "../../concepts/identifiers";
-import { setGeneration } from "../generations";
 import {
 	type CreatedGeneration,
 	GenerationContextInput,
 	GenerationOrigin,
-} from "../generations/object";
+} from "../../concepts/generation";
+import { GenerationId } from "../../concepts/identifiers";
+import { setGeneration } from "../generations";
 import type { GiselleEngineContext } from "../types";
 import { addWorkspaceIndexItem } from "../utils/workspace-index";
 import { getWorkspace } from "../workspaces";
