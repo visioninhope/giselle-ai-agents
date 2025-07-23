@@ -1,6 +1,6 @@
 import type { Storage } from "unstorage";
-import type { GiselleStorage } from "../../experimental_storage";
 import { Generation, NodeGenerationIndex } from "../../../concepts/generation";
+import type { GiselleStorage } from "../../experimental_storage";
 import {
 	generationPath,
 	getNodeGenerationIndexes,
