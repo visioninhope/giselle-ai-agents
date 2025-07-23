@@ -1,7 +1,6 @@
 import type { $ZodIssue } from "@zod/core";
 import type { ZodType, z } from "zod/v4";
 import { addAccessorToInput } from "./mods/add-accessor-to-input";
-import { addWorkspaceIdToOriginStage } from "./mods/add-workspace-id-to-origin-stage";
 import { fixTypoAccesorToAccessor } from "./mods/fix-typo-accesor-to-accessor";
 import { fixTypoQuquedAtToQueuedAt } from "./mods/fix-typo-ququedAt-queuedAt";
 import { renameActionToOperation } from "./mods/rename-action-to-operation";
@@ -12,7 +11,6 @@ function dataMod(data: unknown, issue: $ZodIssue) {
 	modData = fixTypoQuquedAtToQueuedAt(modData, issue);
 	modData = renameActionToOperation(modData, issue);
 	modData = addAccessorToInput(modData, issue);
-	modData = addWorkspaceIdToOriginStage(modData, issue);
 	return modData;
 }
 
