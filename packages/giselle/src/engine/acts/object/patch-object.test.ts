@@ -67,9 +67,7 @@ describe("patchAct", () => {
 	describe("string patching", () => {
 		it("should update status field", () => {
 			const act = createTestAct();
-			const result = patchAct(act, {
-				status: { set: "completed" },
-			});
+			const result = patchAct(act, { path: "status", set: "completed" });
 
 			expect(result.status).toBe("completed");
 			expect(act.status).toBe("inProgress"); // Original should be unchanged
@@ -77,9 +75,7 @@ describe("patchAct", () => {
 
 		it("should update trigger field", () => {
 			const act = createTestAct();
-			const result = patchAct(act, {
-				trigger: { set: "github" },
-			});
+			const result = patchAct(act, { path: "trigger", set: "github" });
 
 			expect(result.trigger).toBe("github");
 		});
@@ -88,9 +84,7 @@ describe("patchAct", () => {
 	describe("number patching", () => {
 		it("should set number value", () => {
 			const act = createTestAct();
-			const result = patchAct(act, {
-				"steps.queued": { set: 5 },
-			});
+			const result = patchAct(act, { path: "steps.queued", set: 5 });
 
 			expect(result.steps.queued).toBe(5);
 		});
@@ -98,7 +92,8 @@ describe("patchAct", () => {
 		it("should increment number value", () => {
 			const act = createTestAct();
 			const result = patchAct(act, {
-				"steps.completed": { increment: 3 },
+				path: "steps.completed",
+				increment: 3,
 			});
 
 			expect(result.steps.completed).toBe(3);
@@ -107,19 +102,11 @@ describe("patchAct", () => {
 		it("should decrement number value", () => {
 			const act = createTestAct();
 			const result = patchAct(act, {
-				"steps.inProgress": { decrement: 1 },
+				path: "steps.inProgress",
+				decrement: 1,
 			});
 
 			expect(result.steps.inProgress).toBe(0);
-		});
-
-		it("should handle increment with default value", () => {
-			const act = createTestAct();
-			const result = patchAct(act, {
-				"usage.promptTokens": { increment: undefined },
-			});
-
-			expect(result.usage.promptTokens).toBe(10); // Should remain unchanged
 		});
 	});
 
@@ -127,12 +114,11 @@ describe("patchAct", () => {
 		it("should push to annotations array", () => {
 			const act = createTestAct();
 			const result = patchAct(act, {
-				annotations: {
-					push: [
-						{ level: "info", message: "Test annotation" },
-						{ level: "warning", message: "Another annotation" },
-					],
-				},
+				path: "annotations",
+				push: [
+					{ level: "info", message: "Test annotation" },
+					{ level: "warning", message: "Another annotation" },
+				],
 			});
 
 			expect(result.annotations).toHaveLength(2);
@@ -145,9 +131,8 @@ describe("patchAct", () => {
 		it("should set entire array", () => {
 			const act = createTestAct();
 			const result = patchAct(act, {
-				annotations: {
-					set: [{ level: "error", message: "Error occurred" }],
-				},
+				path: "annotations",
+				set: [{ level: "error", message: "Error occurred" }],
 			});
 
 			expect(result.annotations).toHaveLength(1);
@@ -159,7 +144,8 @@ describe("patchAct", () => {
 		it("should update sequence status using array index", () => {
 			const act = createTestAct();
 			const result = patchAct(act, {
-				"sequences.[0].status": { set: "completed" },
+				path: "sequences[0].status",
+				set: "completed",
 			});
 
 			expect(result.sequences[0].status).toBe("completed");
@@ -169,7 +155,8 @@ describe("patchAct", () => {
 		it("should update nested step status using array indices", () => {
 			const act = createTestAct();
 			const result = patchAct(act, {
-				"sequences.[0].steps.[1].status": { set: "completed" },
+				path: "sequences[0].steps[1].status",
+				set: "completed",
 			});
 
 			expect(result.sequences[0].steps[1].status).toBe("completed");
@@ -180,112 +167,133 @@ describe("patchAct", () => {
 		it("should update step name using array indices", () => {
 			const act = createTestAct();
 			const result = patchAct(act, {
-				"sequences.[0].steps.[2].name": { set: "Updated Step 3" },
+				path: "sequences[0].steps[2].name",
+				set: "Updated Step 3",
 			});
 
 			expect(result.sequences[0].steps[2].name).toBe("Updated Step 3");
 		});
-
-		it("should handle multiple array indices in one path", () => {
-			const act = createTestAct();
-			const result = patchAct(act, {
-				"sequences.[1].status": { set: "running" },
-				"sequences.[0].steps.[0].status": { set: "completed" },
-			});
-
-			expect(result.sequences[1].status).toBe("running");
-			expect(result.sequences[0].steps[0].status).toBe("completed");
-		});
 	});
 
-	describe("complex nested patching", () => {
-		it("should update multiple nested fields", () => {
+	describe("multiple patches", () => {
+		it("should apply multiple patches in one call", () => {
 			const act = createTestAct();
-			const result = patchAct(act, {
-				"duration.wallClock": { increment: 50 },
-				"duration.totalTask": { set: 75 },
-				"usage.totalTokens": { decrement: 5 },
-			});
+			const result = patchAct(
+				act,
+				{ path: "status", set: "completed" },
+				{ path: "steps.completed", increment: 2 },
+				{ path: "steps.inProgress", decrement: 1 },
+				{ path: "sequences[0].status", set: "running" },
+			);
+
+			expect(result.status).toBe("completed");
+			expect(result.steps.completed).toBe(2);
+			expect(result.steps.inProgress).toBe(0);
+			expect(result.sequences[0].status).toBe("running");
+		});
+
+		it("should handle complex nested patches", () => {
+			const act = createTestAct();
+			const result = patchAct(
+				act,
+				{ path: "duration.wallClock", increment: 50 },
+				{ path: "duration.totalTask", set: 75 },
+				{ path: "usage.totalTokens", decrement: 5 },
+			);
 
 			expect(result.duration.wallClock).toBe(150);
 			expect(result.duration.totalTask).toBe(75);
 			expect(result.usage.totalTokens).toBe(25);
 		});
+	});
 
-		it("should handle mixed array and object paths", () => {
+	describe("dynamic paths", () => {
+		it("should handle dynamic array indices", () => {
 			const act = createTestAct();
-			const result = patchAct(act, {
-				"sequences.[0].id": { set: "sqn-updated" },
-				"steps.completed": { increment: 1 },
-			});
+			const sequenceIndex = 0;
+			const stepIndex = 1;
 
-			expect(result.sequences[0].id).toBe("sqn-updated");
-			expect(result.steps.completed).toBe(1);
+			const result = patchAct(
+				act,
+				{ path: "steps.inProgress", increment: 2 },
+				{ path: "steps.queued", decrement: 2 },
+				{ path: `sequences[${sequenceIndex}].status`, set: "running" },
+				{
+					path: `sequences[${sequenceIndex}].steps[${stepIndex}].status`,
+					set: "completed",
+				},
+			);
+
+			expect(result.steps.inProgress).toBe(3);
+			expect(result.steps.queued).toBe(-2);
+			expect(result.sequences[0].status).toBe("running");
+			expect(result.sequences[0].steps[1].status).toBe("completed");
+		});
+
+		it("should handle computed paths", () => {
+			const act = createTestAct();
+			const patches = [0, 1, 2].map((idx) => ({
+				path: `sequences[0].steps[${idx}].status`,
+				set: "completed" as const,
+			}));
+
+			const result = patchAct(act, ...patches);
+
+			expect(result.sequences[0].steps[0].status).toBe("completed");
+			expect(result.sequences[0].steps[1].status).toBe("completed");
+			expect(result.sequences[0].steps[2].status).toBe("completed");
 		});
 	});
 
 	describe("edge cases", () => {
-		it("should handle empty delta", () => {
+		it("should handle empty patches", () => {
 			const act = createTestAct();
-			const result = patchAct(act, {});
+			const result = patchAct(act);
 
 			expect(result).toEqual(act);
 			expect(result).not.toBe(act); // Should be a clone
 		});
 
-		it("should skip undefined patches", () => {
-			const act = createTestAct();
-			const result = patchAct(act, {
-				// biome-ignore lint/suspicious/noExplicitAny: for testing
-				status: undefined as any,
-			});
-
-			expect(result).toEqual(act);
-		});
-
 		it("should throw error for invalid path", () => {
 			const act = createTestAct();
 			expect(() => {
-				patchAct(act, {
-					"": { set: "value" },
-					// biome-ignore lint/suspicious/noExplicitAny: for testing
-				} as any);
-			}).toThrow('Invalid dot path: ""');
+				patchAct(act, { path: "", set: "value" });
+			}).toThrow('Invalid path: ""');
 		});
 
-		it("should handle paths with consecutive dots correctly", () => {
+		it("should throw error for non-existent path", () => {
 			const act = createTestAct();
-			const result = patchAct(act, {
-				"sequences.[0].steps.[0].status": { set: "failed" },
-			});
+			expect(() => {
+				patchAct(act, { path: "nonexistent.field", set: "value" });
+			}).toThrow('Path not found: "nonexistent.field"');
+		});
 
-			expect(result.sequences[0].steps[0].status).toBe("failed");
+		it("should throw error when incrementing non-number", () => {
+			const act = createTestAct();
+			expect(() => {
+				patchAct(act, { path: "status", increment: 1 });
+			}).toThrow('Cannot increment non-number at path: "status"');
+		});
+
+		it("should throw error when pushing to non-array", () => {
+			const act = createTestAct();
+			expect(() => {
+				patchAct(act, { path: "status", push: ["item"] });
+			}).toThrow('Cannot push to non-array at path: "status"');
 		});
 	});
 
-	describe("type safety", () => {
-		it("should maintain type safety for number operations", () => {
-			const act = createTestAct();
-			const result = patchAct(act, {
-				"steps.queued": { increment: 2 },
-				"steps.inProgress": { decrement: 1 },
-				"steps.completed": { set: 10 },
-			});
-
-			expect(result.steps.queued).toBe(2);
-			expect(result.steps.inProgress).toBe(0);
-			expect(result.steps.completed).toBe(10);
-		});
-
+	describe("immutability", () => {
 		it("should maintain immutability", () => {
 			const act = createTestAct();
 			const original = structuredClone(act);
 
-			patchAct(act, {
-				status: { set: "completed" },
-				"steps.completed": { increment: 5 },
-				"sequences.[0].status": { set: "completed" },
-			});
+			patchAct(
+				act,
+				{ path: "status", set: "completed" },
+				{ path: "steps.completed", increment: 5 },
+				{ path: "sequences[0].status", set: "completed" },
+			);
 
 			expect(act).toEqual(original); // Original should remain unchanged
 		});

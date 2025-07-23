@@ -98,16 +98,19 @@ async function executeStep(args: {
 
 async function actSequence(args: {
 	actId: ActId;
+	sequenceIndex: number;
 	sequence: Sequence;
 	context: GiselleEngineContext;
 }) {
+	const stepsCount = args.sequence.steps.length;
 	await patchAct({
 		context: args.context,
 		actId: args.actId,
 		delta: {
-			"steps.inProgress": { increment: 1 },
-			"steps.queued": { decrement: 1 },
-		},
+			"steps.inProgress": { increment: stepsCount },
+			"steps.queued": { decrement: stepsCount },
+			[`sequences.[${args.sequenceIndex}].status`]: { set: "running" },
+		} as any,
 	});
 
 	let hasSequenceError = false;
@@ -136,6 +139,25 @@ async function actSequence(args: {
 
 			if (errored) {
 				hasSequenceError = true;
+				await patchAct({
+					context: args.context,
+					actId: args.actId,
+					delta: {
+						"steps.inProgress": { decrement: stepsCount },
+						"steps.completed": { increment: stepsCount },
+						"sequences.[0].status": { set: "completed" },
+					},
+				});
+			} else {
+				await patchAct({
+					context: args.context,
+					actId: args.actId,
+					delta: {
+						"steps.inProgress": { decrement: stepsCount },
+						"steps.failed": { increment: stepsCount },
+						"sequences.[0].status": { set: "failed" },
+					},
+				});
 			}
 
 			return duration;
@@ -177,6 +199,7 @@ export async function startAct(
 		await args.callbacks?.sequenceStart?.({ sequence });
 		const { totalTaskDuration, hasSequenceError } = await actSequence({
 			sequence,
+			sequenceIndex: i,
 			context: args.context,
 			actId: args.actId,
 		});
