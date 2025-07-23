@@ -1,5 +1,5 @@
 import { WorkspaceId } from "@giselle-sdk/data-type";
-import { WorkspaceProvider } from "@giselle-sdk/giselle-engine/react";
+import { WorkspaceProvider } from "@giselle-sdk/giselle/react";
 import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
 import { db, flowTriggers } from "@/drizzle";

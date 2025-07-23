@@ -20,7 +20,7 @@ import {
 	defaultName,
 	useNodeGenerations,
 	useWorkflowDesigner,
-} from "@giselle-sdk/giselle-engine/react";
+} from "@giselle-sdk/giselle/react";
 import {
 	Handle,
 	type NodeProps,

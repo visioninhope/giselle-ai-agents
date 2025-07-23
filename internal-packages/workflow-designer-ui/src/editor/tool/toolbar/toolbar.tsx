@@ -26,7 +26,7 @@ import {
 	useFeatureFlag,
 	useVectorStore,
 	useWorkflowDesigner,
-} from "@giselle-sdk/giselle-engine/react";
+} from "@giselle-sdk/giselle/react";
 import {
 	Capability,
 	hasCapability,

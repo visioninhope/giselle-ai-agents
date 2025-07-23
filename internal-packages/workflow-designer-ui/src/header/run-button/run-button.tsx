@@ -4,10 +4,7 @@ import {
 	type NodeLike,
 	type OperationNode,
 } from "@giselle-sdk/data-type";
-import {
-	defaultName,
-	useWorkflowDesigner,
-} from "@giselle-sdk/giselle-engine/react";
+import { defaultName, useWorkflowDesigner } from "@giselle-sdk/giselle/react";
 import clsx from "clsx/lite";
 import { CirclePlayIcon } from "lucide-react";
 import { Dialog, DropdownMenu } from "radix-ui";

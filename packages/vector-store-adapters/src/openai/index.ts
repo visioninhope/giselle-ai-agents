@@ -1,4 +1,4 @@
-import { type VectorStore, VectorStoreId } from "@giselle-sdk/giselle-engine";
+import { type VectorStore, VectorStoreId } from "@giselle-sdk/giselle";
 import OpenAI from "openai";
 
 export function openaiVectorStore(apiKey: string): VectorStore {

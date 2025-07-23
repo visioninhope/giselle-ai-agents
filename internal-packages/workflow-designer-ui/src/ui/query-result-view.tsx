@@ -1,4 +1,4 @@
-import type { Generation } from "@giselle-sdk/giselle-engine";
+import type { Generation } from "@giselle-sdk/giselle";
 import clsx from "clsx/lite";
 import { ChevronDownIcon, ChevronRightIcon } from "lucide-react";
 import { useState } from "react";

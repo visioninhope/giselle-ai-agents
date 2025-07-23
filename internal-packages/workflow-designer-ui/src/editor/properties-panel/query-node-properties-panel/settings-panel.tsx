@@ -3,7 +3,7 @@ import {
 	DEFAULT_SIMILARITY_THRESHOLD,
 	type QueryNode,
 } from "@giselle-sdk/data-type";
-import { useWorkflowDesigner } from "@giselle-sdk/giselle-engine/react";
+import { useWorkflowDesigner } from "@giselle-sdk/giselle/react";
 import { Slider } from "../../../ui/slider";
 
 export function SettingsPanel({ node }: { node: QueryNode }) {

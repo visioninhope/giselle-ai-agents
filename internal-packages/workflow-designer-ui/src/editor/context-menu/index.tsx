@@ -1,6 +1,6 @@
 import { Button } from "@giselle-internal/ui/button";
 import { PopoverContent } from "@giselle-internal/ui/popover";
-import { useWorkflowDesigner } from "@giselle-sdk/giselle-engine/react";
+import { useWorkflowDesigner } from "@giselle-sdk/giselle/react";
 import { useCallback } from "react";
 import { useToasts } from "../../ui/toast";
 import { useDuplicateNode } from "../node";

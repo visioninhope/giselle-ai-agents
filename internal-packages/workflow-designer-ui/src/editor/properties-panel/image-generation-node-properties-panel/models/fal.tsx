@@ -1,5 +1,5 @@
 import { FalLanguageModelData } from "@giselle-sdk/data-type";
-import { useUsageLimits } from "@giselle-sdk/giselle-engine/react";
+import { useUsageLimits } from "@giselle-sdk/giselle/react";
 import {
 	falLanguageModels,
 	imageGenerationSizes,

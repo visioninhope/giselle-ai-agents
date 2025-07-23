@@ -9,7 +9,7 @@ import {
 	type Workspace,
 	type WorkspaceId,
 } from "@giselle-sdk/data-type";
-import { ActId, defaultName } from "@giselle-sdk/giselle-engine";
+import { ActId, defaultName } from "@giselle-sdk/giselle";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { after } from "next/server";

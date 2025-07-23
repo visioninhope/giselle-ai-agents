@@ -1,9 +1,9 @@
-import type { CreateActInputs, Generation } from "@giselle-sdk/giselle-engine";
+import type { CreateActInputs, Generation } from "@giselle-sdk/giselle";
 import {
 	useGenerationRunnerSystem,
 	useGiselleEngine,
 	useWorkflowDesigner,
-} from "@giselle-sdk/giselle-engine/react";
+} from "@giselle-sdk/giselle/react";
 import { useCallback, useRef } from "react";
 import { useToasts } from "../ui/toast";
 

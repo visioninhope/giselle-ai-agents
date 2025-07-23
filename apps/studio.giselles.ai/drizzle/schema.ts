@@ -1,5 +1,5 @@
 import type { FlowTriggerId, WorkspaceId } from "@giselle-sdk/data-type";
-import type { ActId } from "@giselle-sdk/giselle-engine";
+import type { ActId } from "@giselle-sdk/giselle";
 import type { GitHubRepositoryIndexId } from "@giselles-ai/types";
 import { relations } from "drizzle-orm";
 import {

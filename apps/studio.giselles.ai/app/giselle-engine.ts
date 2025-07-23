@@ -1,6 +1,6 @@
 import { WorkspaceId } from "@giselle-sdk/data-type";
-import { emitTelemetry } from "@giselle-sdk/giselle-engine";
-import { NextGiselleEngine } from "@giselle-sdk/giselle-engine/next";
+import { emitTelemetry } from "@giselle-sdk/giselle";
+import { NextGiselleEngine } from "@giselle-sdk/giselle/next";
 import {
 	supabaseStorageDriver as experimental_supabaseStorageDriver,
 	supabaseVaultDriver,
