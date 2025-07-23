@@ -14,6 +14,7 @@ import {
 import { executeAction } from "../operations";
 import { executeQuery } from "../operations/execute-query";
 import type { GiselleEngineContext } from "../types";
+import { patches } from "./object/patch-creators";
 import { actPath } from "./object/paths";
 import { patchAct } from "./patch-act";
 
@@ -66,15 +67,12 @@ async function executeStep(args: {
 							patchAct({
 								...args,
 								patches: [
-									{
-										path: "annotations",
-										push: [
-											{
-												level: "error",
-												message: error.message,
-											},
-										],
-									},
+									patches.annotations.push([
+										{
+											level: "error",
+											message: error.message,
+										},
+									]),
 								],
 							}),
 						]);
@@ -108,16 +106,16 @@ async function actSequence(args: {
 		context: args.context,
 		actId: args.actId,
 		patches: [
-			{ path: "steps.inProgress", increment: stepsCount },
-			{ path: "steps.queued", decrement: stepsCount },
-			{ path: `sequences.${args.sequenceIndex}.status`, set: "running" },
+			patches.steps.inProgress.increment(stepsCount),
+			patches.steps.queued.decrement(stepsCount),
+			patches.sequences(args.sequenceIndex).status.set("running"),
 		],
 	});
 
 	let hasSequenceError = false;
 
 	const stepDurations = await Promise.all(
-		args.sequence.steps.map(async (step) => {
+		args.sequence.steps.map(async (step, index) => {
 			const generation = await getGeneration({
 				context: args.context,
 				useExperimentalStorage: true,
@@ -132,6 +130,16 @@ async function actSequence(args: {
 				status: "queued",
 				queuedAt: stepStart,
 			};
+			await patchAct({
+				context: args.context,
+				actId: args.actId,
+				patches: [
+					patches
+						.sequences(args.sequenceIndex)
+						.steps(index)
+						.status.set("running"),
+				],
+			});
 			const errored = await executeStep({
 				...args,
 				generation: queuedGeneration,
@@ -144,9 +152,12 @@ async function actSequence(args: {
 					context: args.context,
 					actId: args.actId,
 					patches: [
-						{ path: "steps.inProgress", decrement: stepsCount },
-						{ path: "steps.completed", increment: stepsCount },
-						{ path: "sequences.[0].status", set: "completed" },
+						patches.steps.inProgress.decrement(1),
+						patches.steps.failed.increment(1),
+						patches
+							.sequences(args.sequenceIndex)
+							.steps(index)
+							.status.set("failed"),
 					],
 				});
 			} else {
@@ -154,9 +165,12 @@ async function actSequence(args: {
 					context: args.context,
 					actId: args.actId,
 					patches: [
-						{ path: "steps.inProgress", decrement: stepsCount },
-						{ path: "steps.failed", increment: stepsCount },
-						{ path: "sequences.[0].status", set: "failed" },
+						patches.steps.inProgress.decrement(1),
+						patches.steps.completed.increment(1),
+						patches
+							.sequences(args.sequenceIndex)
+							.steps(index)
+							.status.set("completed"),
 					],
 				});
 			}
@@ -190,7 +204,7 @@ export async function startAct(
 
 	await patchAct({
 		...args,
-		patches: [{ path: "status", set: "inProgress" }],
+		patches: [patches.status.set("inProgress")],
 	});
 
 	for (let i = 0; i < act.sequences.length; i++) {
@@ -216,11 +230,11 @@ export async function startAct(
 				patchAct({
 					...args,
 					patches: [
-						{ path: "steps.inProgress", decrement: 1 },
-						{ path: "steps.failed", increment: 1 },
-						{ path: "duration.totalTask", increment: totalTaskDuration },
-						{ path: "status", set: "failed" },
-						{ path: "duration.wallClock", set: Date.now() - flowStart },
+						patches.steps.inProgress.decrement(1),
+						patches.steps.failed.increment(1),
+						patches.duration.totalTask.increment(totalTaskDuration),
+						patches.status.set("failed"),
+						patches.duration.wallClock.set(Date.now() - flowStart),
 					],
 				}),
 			]);
@@ -231,9 +245,9 @@ export async function startAct(
 			patchAct({
 				...args,
 				patches: [
-					{ path: "steps.inProgress", decrement: 1 },
-					{ path: "steps.completed", increment: 1 },
-					{ path: "duration.totalTask", increment: totalTaskDuration },
+					patches.steps.inProgress.decrement(1),
+					patches.steps.completed.increment(1),
+					patches.duration.totalTask.increment(totalTaskDuration),
 				],
 			}),
 		]);
@@ -244,8 +258,8 @@ export async function startAct(
 		context: args.context,
 		actId: args.actId,
 		patches: [
-			{ path: "status", set: "completed" },
-			{ path: "duration.wallClock", set: Date.now() - flowStart },
+			patches.status.set("completed"),
+			patches.duration.wallClock.set(Date.now() - flowStart),
 		],
 	});
 }
