@@ -1,5 +1,6 @@
-import type { Connection, Node, WorkflowId } from "@giselle-sdk/data-type";
+import type { Connection, Node } from "@giselle-sdk/data-type";
 import { describe, expect, test } from "vitest";
+import type { WorkflowId } from "../../../concepts/workflow";
 import { buildSequenceList } from "./helper";
 
 // Sample data for tests based on provided workflow JSON

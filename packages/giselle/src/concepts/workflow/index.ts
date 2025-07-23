@@ -1,7 +1,11 @@
+import {
+	Connection,
+	Node,
+	NodeLike,
+	OperationNode,
+} from "@giselle-sdk/data-type";
 import { createIdGenerator } from "@giselle-sdk/utils";
 import { z } from "zod/v4";
-import { Connection } from "../connection";
-import { Node, NodeLike, OperationNode } from "../node";
 
 export const SequenceId = createIdGenerator("sq");
 export type SequenceId = z.infer<typeof SequenceId.schema>;

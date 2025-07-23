@@ -4,11 +4,13 @@ import {
 	Node,
 	type NodeId,
 	type NodeLike,
+} from "@giselle-sdk/data-type";
+import {
 	type Sequence,
 	SequenceId,
 	type Step,
 	type WorkflowId,
-} from "@giselle-sdk/data-type";
+} from "../../../concepts/workflow";
 
 /**
  * Converts a directed graph into a sequence of sequences with steps based on topological sorting.

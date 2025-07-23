@@ -1,10 +1,6 @@
-import {
-	isTriggerNode,
-	type NodeId,
-	type Workflow,
-	Workspace,
-} from "@giselle-sdk/data-type";
+import { isTriggerNode, type NodeId, Workspace } from "@giselle-sdk/data-type";
 import { beforeEach, describe, expect, it, test } from "vitest";
+import type { Workflow } from "../../../concepts/workflow";
 import { buildWorkflowFromNode } from "./build-workflow-from-node";
 import workspace1 from "./test/fixtures/workspace1.json";
 import workspace2 from "./test/fixtures/workspace2.json";
