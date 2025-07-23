@@ -1,5 +1,8 @@
 import { z } from "zod/v4";
 
+export const DEFAULT_MAX_RESULTS = 20;
+export const DEFAULT_SIMILARITY_THRESHOLD = 0.3;
+
 export const QueryContent = z.object({
 	type: z.literal("query"),
 	query: z.string(),

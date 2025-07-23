@@ -1,4 +1,8 @@
-import type { QueryNode } from "@giselle-sdk/data-type";
+import {
+	DEFAULT_MAX_RESULTS,
+	DEFAULT_SIMILARITY_THRESHOLD,
+	type QueryNode,
+} from "@giselle-sdk/data-type";
 import { useWorkflowDesigner } from "@giselle-sdk/giselle-engine/react";
 import { Slider } from "../../../ui/slider";
 
@@ -10,7 +14,7 @@ export function SettingsPanel({ node }: { node: QueryNode }) {
 			<div className="grid grid-cols-2 gap-[24px]">
 				<Slider
 					label="Max Results"
-					value={node.content.maxResults ?? 10}
+					value={node.content.maxResults ?? DEFAULT_MAX_RESULTS}
 					max={100}
 					min={1}
 					step={1}
@@ -23,7 +27,9 @@ export function SettingsPanel({ node }: { node: QueryNode }) {
 				/>
 				<Slider
 					label="Similarity Threshold"
-					value={node.content.similarityThreshold ?? 0}
+					value={
+						node.content.similarityThreshold ?? DEFAULT_SIMILARITY_THRESHOLD
+					}
 					max={1}
 					min={0}
 					step={0.01}

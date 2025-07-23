@@ -1,4 +1,6 @@
 import {
+	DEFAULT_MAX_RESULTS,
+	DEFAULT_SIMILARITY_THRESHOLD,
 	isQueryNode,
 	isTextNode,
 	NodeId,
@@ -292,9 +294,6 @@ async function queryVectorStore(
 		throw new Error("Query is empty");
 	}
 
-	// Use configurable values or defaults
-	const limit = maxResults ?? 10;
-
 	const results = await Promise.all(
 		vectorStoreNodes
 			.filter(isConfiguredVectorStoreNode)
@@ -319,8 +318,8 @@ async function queryVectorStore(
 						const res = await vectorStoreQueryServices.github.search(
 							query,
 							queryContext,
-							limit,
-							similarityThreshold,
+							maxResults ?? DEFAULT_MAX_RESULTS,
+							similarityThreshold ?? DEFAULT_SIMILARITY_THRESHOLD,
 							telemetry,
 						);
 						return {
