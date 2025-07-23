@@ -36,7 +36,7 @@ export function SettingsPanel({ node }: { node: QueryNode }) {
 					onChange={(value) => {
 						updateNodeDataContent(node, {
 							...node.content,
-							similarityThreshold: value === 0 ? undefined : value,
+							similarityThreshold: value,
 						});
 					}}
 				/>
