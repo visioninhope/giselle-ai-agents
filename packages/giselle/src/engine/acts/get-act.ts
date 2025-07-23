@@ -1,5 +1,5 @@
-import type { ActId } from "../../concepts/identifiers";
 import { Act } from "../../concepts/act";
+import type { ActId } from "../../concepts/identifiers";
 import type { GiselleEngineContext } from "../types";
 import { actPath } from "./object/paths";
 
