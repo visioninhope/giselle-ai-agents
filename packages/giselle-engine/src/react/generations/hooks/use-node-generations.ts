@@ -4,7 +4,7 @@ import useSWR from "swr";
 import {
 	type Generation,
 	GenerationOrigin,
-} from "../../../core/generations/object";
+} from "../../../engine/generations/object";
 import { useFeatureFlag } from "../../feature-flags";
 import { useGiselleEngine } from "../../use-giselle-engine";
 import { useGenerationRunnerSystem } from "../contexts";

@@ -9,22 +9,22 @@ import {
 	WorkspaceId,
 } from "@giselle-sdk/data-type";
 import { z } from "zod/v4";
-import type { GiselleEngine } from "../core";
+import type { GiselleEngine } from "../engine";
 import {
 	ActId,
 	CreateActInputs,
 	CreateAndStartActInputs,
 	type PatchDelta,
-} from "../core/acts";
-import { DataSourceProviderObject } from "../core/data-source";
-import { ConfigureTriggerInput } from "../core/flows";
+} from "../engine/acts";
+import { DataSourceProviderObject } from "../engine/data-source";
+import { ConfigureTriggerInput } from "../engine/flows";
 import {
 	Generation,
 	GenerationId,
 	GenerationOrigin,
 	QueuedGeneration,
 	type TelemetrySettings,
-} from "../core/generations";
+} from "../engine/generations";
 import { JsonResponse } from "../utils";
 import { createHandler, withUsageLimitErrorHandler } from "./create-handler";
 

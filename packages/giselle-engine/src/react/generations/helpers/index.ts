@@ -1,12 +1,12 @@
 import { z } from "zod/v4";
+import type { GenerationId } from "../../../concepts/identifiers";
 import {
 	CancelledGeneration,
 	CompletedGeneration,
 	FailedGeneration,
 	type Generation,
 	RunningGeneration,
-} from "../../../core/generations/object";
-import type { GenerationId } from "../../../core/concepts/identifiers";
+} from "../../../engine/generations/object";
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
