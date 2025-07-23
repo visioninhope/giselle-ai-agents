@@ -160,7 +160,7 @@ describe("patchAct", () => {
 			const act = createTestAct();
 			const result = patchAct(act, {
 				"sequences.[0].status": { set: "completed" },
-			} as any);
+			});
 
 			expect(result.sequences[0].status).toBe("completed");
 			expect(result.sequences[1].status).toBe("queued");
@@ -170,7 +170,7 @@ describe("patchAct", () => {
 			const act = createTestAct();
 			const result = patchAct(act, {
 				"sequences.[0].steps.[1].status": { set: "completed" },
-			} as any);
+			});
 
 			expect(result.sequences[0].steps[1].status).toBe("completed");
 			expect(result.sequences[0].steps[0].status).toBe("queued");
@@ -181,7 +181,7 @@ describe("patchAct", () => {
 			const act = createTestAct();
 			const result = patchAct(act, {
 				"sequences.[0].steps.[2].name": { set: "Updated Step 3" },
-			} as any);
+			});
 
 			expect(result.sequences[0].steps[2].name).toBe("Updated Step 3");
 		});
@@ -191,7 +191,7 @@ describe("patchAct", () => {
 			const result = patchAct(act, {
 				"sequences.[1].status": { set: "running" },
 				"sequences.[0].steps.[0].status": { set: "completed" },
-			} as any);
+			});
 
 			expect(result.sequences[1].status).toBe("running");
 			expect(result.sequences[0].steps[0].status).toBe("completed");
@@ -217,7 +217,7 @@ describe("patchAct", () => {
 			const result = patchAct(act, {
 				"sequences.[0].id": { set: "sqn-updated" },
 				"steps.completed": { increment: 1 },
-			} as any);
+			});
 
 			expect(result.sequences[0].id).toBe("sqn-updated");
 			expect(result.steps.completed).toBe(1);
@@ -236,6 +236,7 @@ describe("patchAct", () => {
 		it("should skip undefined patches", () => {
 			const act = createTestAct();
 			const result = patchAct(act, {
+				// biome-ignore lint/suspicious/noExplicitAny: for testing
 				status: undefined as any,
 			});
 
@@ -247,6 +248,7 @@ describe("patchAct", () => {
 			expect(() => {
 				patchAct(act, {
 					"": { set: "value" },
+					// biome-ignore lint/suspicious/noExplicitAny: for testing
 				} as any);
 			}).toThrow('Invalid dot path: ""');
 		});
@@ -255,7 +257,7 @@ describe("patchAct", () => {
 			const act = createTestAct();
 			const result = patchAct(act, {
 				"sequences.[0].steps.[0].status": { set: "failed" },
-			} as any);
+			});
 
 			expect(result.sequences[0].steps[0].status).toBe("failed");
 		});
@@ -283,7 +285,7 @@ describe("patchAct", () => {
 				status: { set: "completed" },
 				"steps.completed": { increment: 5 },
 				"sequences.[0].status": { set: "completed" },
-			} as any);
+			});
 
 			expect(act).toEqual(original); // Original should remain unchanged
 		});

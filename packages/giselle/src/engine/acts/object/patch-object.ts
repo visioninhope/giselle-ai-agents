@@ -129,29 +129,59 @@ function getArrayIndex(part: string): number {
 }
 
 type IsRecord<T> = T extends Record<string, unknown> ? T : never;
+type IsArray<T> = T extends readonly unknown[] ? T : never;
+
+// Helper to generate array index paths like [0], [1], etc.
+type ArrayIndexPath = `[${number}]`;
+
+// Helper to handle array paths
+type ArrayPaths<T, Prefix extends string = "", Depth extends number = 5> = [
+	Depth,
+] extends [never]
+	? never
+	: T extends readonly (infer U)[]
+		? U extends Record<string, unknown>
+			?
+					| `${Prefix}${ArrayIndexPath}`
+					| DotPaths<U, `${Prefix}${ArrayIndexPath}.`, Decrement[Depth]>
+			: `${Prefix}${ArrayIndexPath}`
+		: never;
 
 type DotPaths<T, Prefix extends string = "", Depth extends number = 5> = [
 	Depth,
 ] extends [never]
 	? never
 	: {
-			[K in keyof T]: IsRecord<T[K]> extends never
-				? `${Prefix}${K & string}`
+			[K in keyof T]: IsArray<T[K]> extends never
+				? IsRecord<T[K]> extends never
+					? `${Prefix}${K & string}`
+					:
+							| `${Prefix}${K & string}`
+							| DotPaths<
+									IsRecord<T[K]>,
+									`${Prefix}${K & string}.`,
+									Decrement[Depth]
+							  >
 				:
 						| `${Prefix}${K & string}`
-						| DotPaths<
-								IsRecord<T[K]>,
-								`${Prefix}${K & string}.`,
-								Decrement[Depth]
-						  >;
+						| ArrayPaths<T[K], `${Prefix}${K & string}.`, Decrement[Depth]>;
 		}[keyof T];
 
 type Decrement = [never, 0, 1, 2, 3, 4, 5];
 
+// Updated Get type to handle array indices
 type Get<T, Path extends string> = Path extends `${infer K}.${infer R}`
-	? K extends keyof T
-		? Get<T[K], R>
-		: never
-	: Path extends keyof T
-		? T[Path]
-		: never;
+	? K extends `[${string}]`
+		? T extends readonly unknown[]
+			? Get<T[number], R>
+			: never
+		: K extends keyof T
+			? Get<T[K], R>
+			: never
+	: Path extends `[${string}]`
+		? T extends readonly unknown[]
+			? T[number]
+			: never
+		: Path extends keyof T
+			? T[Path]
+			: never;
