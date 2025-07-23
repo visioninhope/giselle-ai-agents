@@ -6,8 +6,8 @@ describe("patchAct", () => {
 	// Helper function to create a minimal Act object for testing
 	function createTestAct(): Act {
 		return {
-			id: "act_test123",
-			workspaceId: "ws_test456",
+			id: "act-test123" as const,
+			workspaceId: "wrks-test456" as const,
 			status: "inProgress",
 			steps: {
 				queued: 0,
@@ -32,31 +32,31 @@ describe("patchAct", () => {
 			annotations: [],
 			sequences: [
 				{
-					id: "sqn_001",
+					id: "sqn-001" as const,
 					status: "queued",
 					steps: [
 						{
-							id: "stp_001",
+							id: "stp-001" as const,
 							status: "queued",
 							name: "Step 1",
-							generationId: "gen_001",
+							generationId: "gnr-001" as const,
 						},
 						{
-							id: "stp_002",
-							status: "inProgress",
+							id: "stp-002" as const,
+							status: "running",
 							name: "Step 2",
-							generationId: "gen_002",
+							generationId: "gnr-002" as const,
 						},
 						{
-							id: "stp_003",
+							id: "stp-003" as const,
 							status: "queued",
 							name: "Step 3",
-							generationId: "gen_003",
+							generationId: "gnr-003" as const,
 						},
 					],
 				},
 				{
-					id: "sqn_002",
+					id: "sqn-002" as const,
 					status: "queued",
 					steps: [],
 				},
@@ -160,7 +160,7 @@ describe("patchAct", () => {
 			const act = createTestAct();
 			const result = patchAct(act, {
 				"sequences.[0].status": { set: "completed" },
-			});
+			} as any);
 
 			expect(result.sequences[0].status).toBe("completed");
 			expect(result.sequences[1].status).toBe("queued");
@@ -170,7 +170,7 @@ describe("patchAct", () => {
 			const act = createTestAct();
 			const result = patchAct(act, {
 				"sequences.[0].steps.[1].status": { set: "completed" },
-			});
+			} as any);
 
 			expect(result.sequences[0].steps[1].status).toBe("completed");
 			expect(result.sequences[0].steps[0].status).toBe("queued");
@@ -181,7 +181,7 @@ describe("patchAct", () => {
 			const act = createTestAct();
 			const result = patchAct(act, {
 				"sequences.[0].steps.[2].name": { set: "Updated Step 3" },
-			});
+			} as any);
 
 			expect(result.sequences[0].steps[2].name).toBe("Updated Step 3");
 		});
@@ -189,11 +189,11 @@ describe("patchAct", () => {
 		it("should handle multiple array indices in one path", () => {
 			const act = createTestAct();
 			const result = patchAct(act, {
-				"sequences.[1].status": { set: "inProgress" },
+				"sequences.[1].status": { set: "running" },
 				"sequences.[0].steps.[0].status": { set: "completed" },
-			});
+			} as any);
 
-			expect(result.sequences[1].status).toBe("inProgress");
+			expect(result.sequences[1].status).toBe("running");
 			expect(result.sequences[0].steps[0].status).toBe("completed");
 		});
 	});
@@ -215,11 +215,11 @@ describe("patchAct", () => {
 		it("should handle mixed array and object paths", () => {
 			const act = createTestAct();
 			const result = patchAct(act, {
-				"sequences.[0].id": { set: "sqn_updated" },
+				"sequences.[0].id": { set: "sqn-updated" },
 				"steps.completed": { increment: 1 },
-			});
+			} as any);
 
-			expect(result.sequences[0].id).toBe("sqn_updated");
+			expect(result.sequences[0].id).toBe("sqn-updated");
 			expect(result.steps.completed).toBe(1);
 		});
 	});
@@ -255,7 +255,7 @@ describe("patchAct", () => {
 			const act = createTestAct();
 			const result = patchAct(act, {
 				"sequences.[0].steps.[0].status": { set: "failed" },
-			});
+			} as any);
 
 			expect(result.sequences[0].steps[0].status).toBe("failed");
 		});
@@ -283,7 +283,7 @@ describe("patchAct", () => {
 				status: { set: "completed" },
 				"steps.completed": { increment: 5 },
 				"sequences.[0].status": { set: "completed" },
-			});
+			} as any);
 
 			expect(act).toEqual(original); // Original should remain unchanged
 		});
