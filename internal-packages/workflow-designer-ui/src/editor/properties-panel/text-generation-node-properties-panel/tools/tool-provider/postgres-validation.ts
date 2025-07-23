@@ -1,9 +1,6 @@
 import levenshtein from "fast-levenshtein";
 
-type ValidationResult = {
-	isValid: boolean;
-	error?: string;
-};
+type ValidationResult = { isValid: true } | { isValid: false; error: string };
 
 // Recognized PostgreSQL connection parameters
 const RECOGNIZED_PARAMS = new Set([
@@ -50,6 +47,114 @@ const SSL_MODES = new Set([
 
 // Characters that need percent-encoding in URI components
 const SPECIAL_CHARS_REGEX = /[@:#/?&=%\s[\]]/;
+
+/**
+ * Validates query parameters in URI format
+ * Only validates format and specific known parameters, allows unknown parameters
+ */
+function validateQueryParams(params: string): ValidationResult {
+	const paramPairs = params.split("&");
+	for (const pair of paramPairs) {
+		const [key, value] = pair.split("=");
+		if (!key || !value) {
+			return {
+				isValid: false,
+				error: `Invalid parameter format: '${pair}'. Expected 'key=value'`,
+			};
+		}
+
+		const decodedKey = decodeURIComponent(key);
+		// Only validate known parameters, allow unknown ones
+		if (RECOGNIZED_PARAMS.has(decodedKey)) {
+			// Validate specific parameter values
+			if (
+				decodedKey === "sslmode" &&
+				!SSL_MODES.has(decodeURIComponent(value))
+			) {
+				return {
+					isValid: false,
+					error: `Invalid sslmode value '${decodeURIComponent(value)}'. Valid values are: ${Array.from(SSL_MODES).join(", ")}`,
+				};
+			}
+
+			if (decodedKey === "port") {
+				const portNum = Number(decodeURIComponent(value));
+				if (Number.isNaN(portNum) || portNum < 1 || portNum > 65535) {
+					return {
+						isValid: false,
+						error: `The port '${decodeURIComponent(value)}' is not a valid number.`,
+					};
+				}
+			}
+		}
+	}
+	return { isValid: true };
+}
+
+/**
+ * Parse key-value format with support for quoted values
+ */
+function parseKeyValuePairs(
+	kvString: string,
+): Array<{ key: string; value: string }> {
+	const pairs: Array<{ key: string; value: string }> = [];
+	let currentPos = 0;
+
+	while (currentPos < kvString.length) {
+		// Skip whitespace
+		while (currentPos < kvString.length && /\s/.test(kvString[currentPos])) {
+			currentPos++;
+		}
+
+		if (currentPos >= kvString.length) break;
+
+		// Find key
+		const keyStart = currentPos;
+		while (
+			currentPos < kvString.length &&
+			kvString[currentPos] !== "=" &&
+			!/\s/.test(kvString[currentPos])
+		) {
+			currentPos++;
+		}
+
+		if (currentPos >= kvString.length || kvString[currentPos] !== "=") {
+			// Invalid format - no equals sign
+			return [];
+		}
+
+		const key = kvString.substring(keyStart, currentPos);
+		currentPos++; // Skip '='
+
+		// Find value
+		let value = "";
+		if (kvString[currentPos] === "'") {
+			// Quoted value
+			currentPos++; // Skip opening quote
+			const valueStart = currentPos;
+			while (currentPos < kvString.length && kvString[currentPos] !== "'") {
+				currentPos++;
+			}
+			if (currentPos >= kvString.length) {
+				// Unclosed quote
+				return [];
+			}
+			value = kvString.substring(valueStart, currentPos);
+			currentPos++; // Skip closing quote
+		} else {
+			// Unquoted value
+			const valueStart = currentPos;
+			while (currentPos < kvString.length && !/\s/.test(kvString[currentPos])) {
+				currentPos++;
+			}
+			value = kvString.substring(valueStart, currentPos);
+		}
+
+		pairs.push({ key, value });
+	}
+
+	return pairs;
+}
 
 /**
  * Validates if a URI component contains unencoded special characters
@@ -108,12 +213,9 @@ export function validatePostgreSQLConnectionString(
 
 function validateURIFormat(uri: string): ValidationResult {
 	try {
-		// Basic URI structure validation
-		const uriRegex =
-			/^(postgresql|postgres):\/\/(?:([^:@]+)(?::([^@]+))?@)?([^:/]+)(?::(\d+))?(?:\/([^?]+))?(?:\?(.+))?$/;
-		const match = uri.match(uriRegex);
-
-		if (!match) {
+		// First, check basic format
+		const schemeMatch = uri.match(/^(postgresql|postgres):\/\//);
+		if (!schemeMatch) {
 			return {
 				isValid: false,
 				error:
@@ -121,7 +223,48 @@ function validateURIFormat(uri: string): ValidationResult {
 			};
 		}
 
-		const [, _scheme, user, password, _host, port, database, params] = match;
+		// Remove scheme for parsing
+		const withoutScheme = uri.substring(schemeMatch[0].length);
+
+		// Find the last @ that separates auth from host
+		const lastAtIndex = withoutScheme.lastIndexOf("@");
+
+		let auth = "";
+		let hostPart = withoutScheme;
+
+		if (lastAtIndex !== -1) {
+			auth = withoutScheme.substring(0, lastAtIndex);
+			hostPart = withoutScheme.substring(lastAtIndex + 1);
+		}
+
+		// Parse auth
+		let user: string | undefined;
+		let password: string | undefined;
+		if (auth) {
+			const colonIndex = auth.indexOf(":");
+			if (colonIndex !== -1) {
+				user = auth.substring(0, colonIndex);
+				password = auth.substring(colonIndex + 1);
+			} else {
+				user = auth;
+			}
+		}
+
+		// Parse host part
+		const hostMatch = hostPart.match(
+			/^([^:/?]+)(?::([^/?]+))?(?:\/([^?]+))?(?:\?(.+))?$/,
+		);
+		if (!hostMatch) {
+			return {
+				isValid: false,
+				error:
+					"Invalid connection string format. It should start with `postgresql://`.",
+			};
+		}
+
+		const port = hostMatch[2];
+		const database = hostMatch[3];
+		const params = hostMatch[4];
 
 		// Validate port if present
 		if (
@@ -154,44 +297,9 @@ function validateURIFormat(uri: string): ValidationResult {
 
 		// Validate query parameters if present
 		if (params) {
-			const paramPairs = params.split("&");
-			for (const pair of paramPairs) {
-				const [key, value] = pair.split("=");
-				if (!key || !value) {
-					return {
-						isValid: false,
-						error: `Invalid parameter format: '${pair}'. Expected 'key=value'`,
-					};
-				}
-
-				const decodedKey = decodeURIComponent(key);
-				if (!RECOGNIZED_PARAMS.has(decodedKey)) {
-					return {
-						isValid: false,
-						error: `'${decodedKey}' is not a recognized parameter`,
-					};
-				}
-
-				// Validate specific parameter values
-				if (
-					decodedKey === "sslmode" &&
-					!SSL_MODES.has(decodeURIComponent(value))
-				) {
-					return {
-						isValid: false,
-						error: `Invalid sslmode value '${decodeURIComponent(value)}'. Valid values are: ${Array.from(SSL_MODES).join(", ")}`,
-					};
-				}
-
-				if (decodedKey === "port") {
-					const portNum = Number(decodeURIComponent(value));
-					if (Number.isNaN(portNum) || portNum < 1 || portNum > 65535) {
-						return {
-							isValid: false,
-							error: `The port '${decodeURIComponent(value)}' is not a valid number.`,
-						};
-					}
-				}
+			const paramValidation = validateQueryParams(params);
+			if (!paramValidation.isValid) {
+				return paramValidation;
 			}
 		}
 
@@ -205,26 +313,40 @@ function validateURIFormat(uri: string): ValidationResult {
 }
 
 function validateKeyValueFormat(kvString: string): ValidationResult {
-	const pairs = kvString.split(/\s+/);
+	const pairs = parseKeyValuePairs(kvString);
 
-	for (const pair of pairs) {
-		if (!pair) continue;
-
-		const equalIndex = pair.indexOf("=");
-		if (equalIndex === -1) {
-			return {
-				isValid: false,
-				error: `Invalid format: '${pair}'. Expected 'key=value' pairs separated by spaces`,
-			};
+	if (pairs.length === 0) {
+		// Try simple split to provide better error message
+		const simplePairs = kvString.split(/\s+/).filter((p) => p);
+		if (simplePairs.length > 0) {
+			const firstPair = simplePairs[0];
+			if (!firstPair.includes("=")) {
+				return {
+					isValid: false,
+					error: `Invalid format: '${firstPair}'. Expected 'key=value' pairs separated by spaces`,
+				};
+			} else if (firstPair.includes("'")) {
+				// Check for unclosed quotes
+				const quoteCount = (firstPair.match(/'/g) || []).length;
+				if (quoteCount % 2 !== 0) {
+					return {
+						isValid: false,
+						error: `Invalid format: '${kvString}'. Expected 'key=value' pairs separated by spaces`,
+					};
+				}
+			}
 		}
+		return {
+			isValid: false,
+			error: `Invalid format. Expected 'key=value' pairs separated by spaces`,
+		};
+	}
 
-		const key = pair.substring(0, equalIndex);
-		const value = pair.substring(equalIndex + 1);
-
+	for (const { key, value } of pairs) {
 		if (!key || !value) {
 			return {
 				isValid: false,
-				error: `Invalid parameter format: '${pair}'. Both key and value are required`,
+				error: `Invalid parameter format. Both key and value are required`,
 			};
 		}
 
@@ -233,16 +355,29 @@ function validateKeyValueFormat(kvString: string): ValidationResult {
 			// Find the closest match using fast-levenshtein
 			let closestMatch: string | undefined;
 			let minDistance = Infinity;
-			const threshold = 3;
+			const threshold = 4; // Increased to handle 'db' -> 'dbname'
 
+			// First check for substring matches
 			for (const param of RECOGNIZED_PARAMS) {
-				const distance = levenshtein.get(
-					key.toLowerCase(),
-					param.toLowerCase(),
-				);
-				if (distance < minDistance && distance <= threshold) {
-					minDistance = distance;
-					closestMatch = param;
+				if (param.toLowerCase().includes(key.toLowerCase())) {
+					// Prefer shorter matches (e.g., 'db' matches 'dbname' not 'database')
+					if (!closestMatch || param.length < closestMatch.length) {
+						closestMatch = param;
+					}
+				}
+			}
+
+			// If no substring match, use Levenshtein distance
+			if (!closestMatch) {
+				for (const param of RECOGNIZED_PARAMS) {
+					const distance = levenshtein.get(
+						key.toLowerCase(),
+						param.toLowerCase(),
+					);
+					if (distance < minDistance && distance <= threshold) {
+						minDistance = distance;
+						closestMatch = param;
+					}
 				}
 			}
 
@@ -273,14 +408,6 @@ function validateKeyValueFormat(kvString: string): ValidationResult {
 			return {
 				isValid: false,
 				error: `Invalid sslmode value '${value}'. Valid values are: ${Array.from(SSL_MODES).join(", ")}`,
-			};
-		}
-
-		// Check for special characters that might need escaping in key-value format
-		if (value.includes(" ") && !value.startsWith("'") && !value.endsWith("'")) {
-			return {
-				isValid: false,
-				error: `The value for '${key}' contains spaces and should be quoted with single quotes`,
 			};
 		}
 	}

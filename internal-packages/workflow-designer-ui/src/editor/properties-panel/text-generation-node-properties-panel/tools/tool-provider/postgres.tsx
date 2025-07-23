@@ -88,11 +88,11 @@ function PostgresToolConnectionDialog({
 
 	const handleConnectionStringChange = (value: string) => {
 		setConnectionString(value);
-		if (value.trim()) {
-			const validation = validatePostgreSQLConnectionString(value);
-			setValidationError(validation.isValid ? null : validation.error || null);
-		} else {
+		const validation = validatePostgreSQLConnectionString(value);
+		if (validation.isValid) {
 			setValidationError(null);
+		} else {
+			setValidationError(validation.error);
 		}
 	};
 
