@@ -1,6 +1,6 @@
+import type { Act } from "../../concepts/act";
 import type { ActId } from "../../concepts/identifiers";
 import type { GiselleEngineContext } from "../types";
-import type { Act } from "./object";
 import {
 	type PatchDelta,
 	patchAct as patchActObject,

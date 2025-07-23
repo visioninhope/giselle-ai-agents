@@ -9,9 +9,9 @@ import {
 	WorkspaceId,
 } from "@giselle-sdk/data-type";
 import { z } from "zod/v4";
+import { ActId } from "../concepts/identifiers";
 import type { GiselleEngine } from "../engine";
 import {
-	ActId,
 	CreateActInputs,
 	CreateAndStartActInputs,
 	type PatchDelta,

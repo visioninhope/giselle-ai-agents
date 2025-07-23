@@ -1,5 +1,5 @@
 import type { WorkspaceId } from "@giselle-sdk/data-type";
-import type { ActId } from "./index";
+import type { ActId } from "../../../concepts/identifiers";
 
 export function actPath(actId: ActId) {
 	return `acts/${actId}/act.json`;

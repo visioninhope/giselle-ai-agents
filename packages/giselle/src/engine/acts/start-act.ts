@@ -1,5 +1,6 @@
 import { AISDKError } from "ai";
 import { z } from "zod/v4";
+import { Act, type Sequence } from "../../concepts/act";
 import { ActId } from "../../concepts/identifiers";
 import { resolveTrigger } from "../flows";
 import {
@@ -13,7 +14,6 @@ import {
 import { executeAction } from "../operations";
 import { executeQuery } from "../operations/execute-query";
 import type { GiselleEngineContext } from "../types";
-import { Act, type Sequence } from "./object";
 import { actPath } from "./object/paths";
 import { patchAct } from "./patch-act";
 
