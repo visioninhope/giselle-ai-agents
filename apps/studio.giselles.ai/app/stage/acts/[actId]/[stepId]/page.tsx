@@ -1,8 +1,12 @@
-import { defaultName, type ActId, type Step, type StepId } from "@giselle-sdk/giselle";
+import {
+	type ActId,
+	defaultName,
+	type Step,
+	type StepId,
+} from "@giselle-sdk/giselle";
 import { NodeIcon } from "@giselles-ai/icons/node";
 import { notFound } from "next/navigation";
 import { giselleEngine } from "@/app/giselle-engine";
-import { experimental_storageFlag } from "@/flags";
 import { GenerationView } from "../../../../../../../internal-packages/workflow-designer-ui/src/ui/generation-view";
 
 export default async function ({
@@ -28,10 +32,7 @@ export default async function ({
 	if (step === undefined) {
 		return notFound();
 	}
-	const generation = await giselleEngine.getGeneration(
-		step.generationId,
-		true,
-	);
+	const generation = await giselleEngine.getGeneration(step.generationId, true);
 	if (generation === undefined) {
 		return notFound();
 	}
@@ -47,7 +48,10 @@ export default async function ({
 						/>
 					</div>
 					<div className="flex flex-col">
-            <div className="text-[14px]">{generation.context.operationNode.name ?? defaultName(generation.context.operationNode)}</div>
+						<div className="text-[14px]">
+							{generation.context.operationNode.name ??
+								defaultName(generation.context.operationNode)}
+						</div>
 						<div className="text text-text-muted text-[10px] flex items-center gap-[4px]">
 							<span>gpt-4o</span>
 							<div className="size-[2px] rounded-full bg-text-muted" />
