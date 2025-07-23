@@ -1,7 +1,7 @@
 import { createStorage } from "unstorage";
 import memoryDriver from "unstorage/drivers/memory";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { type GiselleEngine, memoryStorageDriver } from "../core";
+import { type GiselleEngine, memoryStorageDriver } from "../engine";
 import { createHttpHandler } from "./next-giselle-engine";
 
 // Mock the module dependencies

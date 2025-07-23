@@ -1,6 +1,6 @@
 import type { z } from "zod/v4";
-import type { GiselleEngineContext } from "../core";
-import { UsageLimitError } from "../core/error";
+import type { GiselleEngineContext } from "../engine";
+import { UsageLimitError } from "../engine/error";
 
 /**
  * Type definition for handler arguments that conditionally includes input

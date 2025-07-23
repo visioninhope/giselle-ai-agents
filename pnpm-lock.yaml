@@ -653,9 +653,6 @@ importers:
       '@giselle-sdk/text-editor-utils':
         specifier: workspace:^
         version: link:../../packages/text-editor-utils
-      '@giselle-sdk/workflow-utils':
-        specifier: workspace:^
-        version: link:../../packages/workflow-utils
       '@giselle/giselle-sdk-tsconfig':
         specifier: workspace:*
         version: link:../../tools/tsconfig

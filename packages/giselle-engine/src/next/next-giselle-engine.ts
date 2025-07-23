@@ -3,7 +3,11 @@ import {
 	verifyRequest as verifyRequestAsGitHubWebook,
 } from "@giselle-sdk/github-tool";
 import { after } from "next/server";
-import { GenerationId, GiselleEngine, type GiselleEngineConfig } from "../core";
+import {
+	GenerationId,
+	GiselleEngine,
+	type GiselleEngineConfig,
+} from "../engine";
 import {
 	createFormDataRouters,
 	createJsonRouters,
