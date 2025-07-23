@@ -76,9 +76,7 @@ export function Nav({ act }: NavProps) {
 											{step.status === "cancelled" && (
 												<CircleSlashIcon className="text-text-muted size-[12px]" />
 											)}
-											<span>
-												{step.name}
-											</span>
+											<span>{step.name}</span>
 										</div>
 										<span className="opacity-0 group-hover:opacity-100 group-data-[state=active]:hidden transition-opacity">
 											Show
