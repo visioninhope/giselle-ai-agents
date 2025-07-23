@@ -25,7 +25,7 @@ export function createGitHubPullRequestChunkStore(repositoryIndexDbId: number) {
 			repository_index_db_id: repositoryIndexDbId,
 		},
 		requiredColumnOverrides: {
-			version: "file_sha",
+			version: githubRepositoryPullRequestEmbeddings.mergedAt.name,
 		},
 	});
 }

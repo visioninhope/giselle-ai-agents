@@ -20,7 +20,8 @@ export function createGitHubBlobChunkStore(repositoryIndexDbId: number) {
 			repository_index_db_id: repositoryIndexDbId,
 		},
 		requiredColumnOverrides: {
-			version: "mergedAt",
+			documentKey: githubRepositoryEmbeddings.path.name,
+			version: githubRepositoryEmbeddings.fileSha.name,
 		},
 	});
 }
