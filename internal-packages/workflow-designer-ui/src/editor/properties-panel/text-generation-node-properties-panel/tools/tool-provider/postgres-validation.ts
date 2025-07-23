@@ -261,8 +261,7 @@ function validateURIFormat(uri: string): ValidationResult {
 		if (!hostMatch) {
 			return {
 				isValid: false,
-				error:
-					"Invalid connection string format. It should start with `postgresql://`.",
+				error: "Invalid host format in connection string.",
 			};
 		}
 
