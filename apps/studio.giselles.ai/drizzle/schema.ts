@@ -367,7 +367,7 @@ export const githubRepositoryPullRequestEmbeddings = pgTable(
 		dbId: serial("db_id").primaryKey(),
 		repositoryIndexDbId: integer("repository_index_db_id").notNull(),
 		prNumber: integer("pr_number").notNull(),
-		mergedAt: timestamp("pr_merged_at").notNull(),
+		mergedAt: timestamp("merged_at").notNull(),
 		contentType: text("content_type")
 			.$type<GitHubRepositoryPullRequestContentType>()
 			.notNull(),
