@@ -111,12 +111,18 @@ export function useActController() {
 								? [
 										{ path: "steps.failed", increment: stepsCount },
 										{ path: "steps.inProgress", decrement: stepsCount },
-										{ path: "duration.totalTask", increment: durationTotalTasks },
+										{
+											path: "duration.totalTask",
+											increment: durationTotalTasks,
+										},
 									]
 								: [
 										{ path: "steps.completed", increment: stepsCount },
 										{ path: "steps.inProgress", decrement: stepsCount },
-										{ path: "duration.totalTask", increment: durationTotalTasks },
+										{
+											path: "duration.totalTask",
+											increment: durationTotalTasks,
+										},
 									],
 						});
 						return;

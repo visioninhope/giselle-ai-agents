@@ -1,13 +1,13 @@
 import type { Act } from "../../../concepts/act";
 
-// Simple patch types - one for each operation
-export type SimplePatch =
+// Patch types - one for each operation
+export type Patch =
 	| { path: string; set: unknown }
 	| { path: string; increment: number }
 	| { path: string; decrement: number }
 	| { path: string; push: unknown[] };
 
-export function patchAct(act: Act, ...patches: SimplePatch[]): Act {
+export function patchAct(act: Act, ...patches: Patch[]): Act {
 	const result = structuredClone(act);
 
 	for (const patch of patches) {

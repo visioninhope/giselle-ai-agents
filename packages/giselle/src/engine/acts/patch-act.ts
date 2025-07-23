@@ -1,18 +1,15 @@
 import type { Act } from "../../concepts/act";
 import type { ActId } from "../../concepts/identifiers";
 import type { GiselleEngineContext } from "../types";
-import {
-	patchAct as patchActObject,
-	type SimplePatch,
-} from "./object/patch-object";
+import { type Patch, patchAct as patchActObject } from "./object/patch-object";
 import { actPath } from "./object/paths";
 
-export type { SimplePatch };
+export type { Patch };
 
 export async function patchAct(args: {
 	context: GiselleEngineContext;
 	actId: ActId;
-	patches: SimplePatch[];
+	patches: Patch[];
 }) {
 	// Get the current act
 	const currentAct = await args.context.storage.getItem<Act>(
@@ -24,7 +21,7 @@ export async function patchAct(args: {
 	}
 
 	// Always update the updatedAt field
-	const allPatches: SimplePatch[] = [
+	const allPatches: Patch[] = [
 		...args.patches,
 		{ path: "updatedAt", set: Date.now() },
 	];
