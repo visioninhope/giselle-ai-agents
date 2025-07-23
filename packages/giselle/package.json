@@ -63,7 +63,6 @@
 		"@giselle-sdk/language-model": "workspace:^",
 		"@giselle-sdk/text-editor-utils": "workspace:^",
 		"@giselle-sdk/web-search": "workspace:^",
-		"@giselle-sdk/workflow-utils": "workspace:^",
 		"ai": "catalog:",
 		"langfuse": "catalog:",
 		"next": "catalog:",
