@@ -1,6 +1,7 @@
+import type { GenerationId } from "../shared-types";
 import type { GiselleEngineContext } from "../types";
 import { internalSetGeneration } from "./internal/set-generation";
-import type { CancelledGeneration, GenerationId } from "./object";
+import type { CancelledGeneration } from "./object";
 import { getGeneration } from "./utils";
 
 export async function cancelGeneration(args: {

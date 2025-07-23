@@ -21,12 +21,12 @@ import type { CoreMessage, DataContent, FilePart, ImagePart } from "ai";
 import type { Storage } from "unstorage";
 import { parseAndMod } from "../../data-mod";
 import type { GiselleStorage } from "../experimental_storage";
+import type { GenerationId } from "../shared-types";
 import type { GiselleEngineContext } from "../types";
 import {
 	type CompletedGeneration,
 	Generation,
 	GenerationContext,
-	type GenerationId,
 	type GenerationOutput,
 	NodeGenerationIndex,
 } from "./object";

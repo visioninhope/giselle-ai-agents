@@ -10,22 +10,15 @@ import {
 	isOperationNode,
 	isTriggerNode,
 	type NodeLike,
-	type OperationNode,
 } from "@giselle-sdk/data-type";
 import {
 	defaultName,
 	useWorkflowDesigner,
 } from "@giselle-sdk/giselle-engine/react";
-import { buildWorkflowFromNode } from "@giselle-sdk/workflow-utils";
 import { PlayIcon } from "lucide-react";
-import {
-	type ButtonHTMLAttributes,
-	useCallback,
-	useMemo,
-	useState,
-} from "react";
+import { type ButtonHTMLAttributes, useMemo, useState } from "react";
 import { TriggerInputDialog } from "../../../header/ui";
-import { useFlowController } from "../../../hooks/use-flow-controller";
+import { useActController } from "../../../hooks/use-act-controller";
 import { NodeIcon } from "../../../icons/node";
 
 function NodeSelectItem({
@@ -50,7 +43,7 @@ function NodeSelectItem({
 
 export function RunButton() {
 	const { data } = useWorkflowDesigner();
-	const { startFlow } = useFlowController();
+	const { createAndStartAct } = useActController();
 
 	const [openDialogNodeId, setOpenDialogNodeId] = useState<string | null>(null);
 	const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -77,15 +70,6 @@ export function RunButton() {
 		return [...triggerNodes, ...startingOperationNodes];
 	}, [data.nodes, data.connections]);
 
-	const startOperationFlow = useCallback(
-		async (startingNode: OperationNode) => {
-			const flow = buildWorkflowFromNode(startingNode, data);
-
-			await startFlow(flow, [], {});
-		},
-		[startFlow, data],
-	);
-
 	if (startingNodes.length === 0) {
 		return null;
 	}
@@ -96,7 +80,7 @@ export function RunButton() {
 			onOpenChange={setIsDropdownOpen}
 			onSelect={async (_event, startingNode) => {
 				if (!isTriggerNode(startingNode) && isOperationNode(startingNode)) {
-					await startOperationFlow(startingNode);
+					await createAndStartAct({ startNodeId: startingNode.id, inputs: [] });
 				}
 			}}
 			items={startingNodes}

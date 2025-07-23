@@ -11,8 +11,9 @@ import {
 } from "../generations";
 import { executeAction } from "../operations";
 import { executeQuery } from "../operations/execute-query";
+import { ActId } from "../shared-types";
 import type { GiselleEngineContext } from "../types";
-import { Act, ActId, type Sequence } from "./object";
+import { Act, type Sequence } from "./object";
 import { actPath } from "./object/paths";
 import { patchAct } from "./patch-act";
 

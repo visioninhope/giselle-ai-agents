@@ -1,5 +1,6 @@
+import type { ActId } from "../shared-types";
 import type { GiselleEngineContext } from "../types";
-import type { Act, ActId } from "./object";
+import type { Act } from "./object";
 import {
 	type PatchDelta,
 	patchAct as patchActObject,

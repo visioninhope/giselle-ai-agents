@@ -1,10 +1,9 @@
 import { WorkspaceId } from "@giselle-sdk/data-type";
 import { createIdGenerator } from "@giselle-sdk/utils";
 import { z } from "zod/v4";
-import { GenerationId } from "../../generations/object";
+import { ActId, GenerationId } from "../../shared-types";
 
-export const ActId = createIdGenerator("act");
-export type ActId = z.infer<typeof ActId.schema>;
+export { ActId } from "../../shared-types";
 
 const ActAnnotationObject = z.object({
 	level: z.enum(["info", "warning", "error"]),

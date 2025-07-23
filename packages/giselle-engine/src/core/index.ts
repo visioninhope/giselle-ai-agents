@@ -9,7 +9,7 @@ import type {
 	WorkspaceId,
 } from "@giselle-sdk/data-type";
 import {
-	type ActId,
+	ActId,
 	type CreateActInputs,
 	type CreateAndStartActInputs,
 	createAct,
@@ -36,7 +36,7 @@ import {
 import {
 	cancelGeneration,
 	type Generation,
-	type GenerationId,
+	GenerationId,
 	type GenerationOrigin,
 	generateImage,
 	generateText,
@@ -71,6 +71,7 @@ export * from "./experimental_storage";
 export * from "./experimental_vector-store";
 export * from "./generations/object";
 export * from "./integrations";
+export * from "./shared-types";
 export * from "./telemetry";
 export * from "./types";
 export * from "./usage-limits";
@@ -355,5 +356,8 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 }
 
 export type GiselleEngine = ReturnType<typeof GiselleEngine>;
+
+// Re-export value constructors explicitly
+export { ActId, GenerationId };
 
 export * from "./error";

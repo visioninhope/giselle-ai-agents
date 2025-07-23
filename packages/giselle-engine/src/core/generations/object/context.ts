@@ -8,7 +8,7 @@ import {
 } from "@giselle-sdk/data-type";
 import type { WebhookEvent } from "@giselle-sdk/github-tool";
 import { z } from "zod/v4";
-import { ActId } from "../../acts/object";
+import { ActId } from "../../shared-types";
 
 export const GenerationOriginStudio = z.object({
 	workspaceId: WorkspaceId.schema,
