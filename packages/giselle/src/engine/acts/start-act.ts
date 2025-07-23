@@ -165,6 +165,13 @@ export async function startAct(
 		schema: Act,
 	});
 
+	await patchAct({
+		...args,
+		delta: {
+			status: { set: "inProgress" },
+		},
+	});
+
 	for (let i = 0; i < act.sequences.length; i++) {
 		const sequence = act.sequences[i];
 		await args.callbacks?.sequenceStart?.({ sequence });

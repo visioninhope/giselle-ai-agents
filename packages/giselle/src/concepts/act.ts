@@ -1,6 +1,7 @@
 import { WorkspaceId } from "@giselle-sdk/data-type";
 import { createIdGenerator } from "@giselle-sdk/utils";
 import { z } from "zod/v4";
+import { GenerationStatus } from "./generation";
 import { ActId, GenerationId, StepId } from "./identifiers";
 
 // Re-export ActId from identifiers
@@ -11,20 +12,19 @@ const ActAnnotationObject = z.object({
 	message: z.string(),
 });
 
-const StepStatus = z.enum(["success", "in-progress", "failed", "pending"]);
 export const Step = z.object({
 	id: StepId.schema,
-	status: StepStatus,
+	status: GenerationStatus,
+	name: z.string(),
 	generationId: GenerationId.schema,
 });
 export type Step = z.infer<typeof Step>;
 
-const SequenceStatus = z.enum(["success", "in-progress", "failed", "pending"]);
 export const SequenceId = createIdGenerator("sqn");
 export const Sequence = z.object({
 	id: SequenceId.schema,
 	steps: z.array(Step),
-	status: SequenceStatus,
+	status: GenerationStatus,
 });
 export type Sequence = z.infer<typeof Sequence>;
 

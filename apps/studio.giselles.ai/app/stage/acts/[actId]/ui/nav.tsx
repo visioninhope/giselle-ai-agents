@@ -1,7 +1,6 @@
 "use client";
 
-import type { Act, Generation, Sequence, Step } from "@giselle-sdk/giselle";
-import { defaultName } from "@giselle-sdk/giselle/react";
+import type { Act } from "@giselle-sdk/giselle";
 import {
 	CheckIcon,
 	ChevronDownIcon,
@@ -14,18 +13,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Accordion } from "radix-ui";
 
-interface StepWithGeneration extends Step {
-	generation: Generation;
-}
-interface SequenceWithGeneration extends Sequence {
-	steps: StepWithGeneration[];
-}
-interface ActWithGeneration extends Act {
-	sequences: SequenceWithGeneration[];
-}
-
 interface NavProps {
-	act: ActWithGeneration;
+	act: Act;
 }
 
 export function Nav({ act }: NavProps) {
@@ -37,16 +26,16 @@ export function Nav({ act }: NavProps) {
 					<Accordion.Header className="border border-border rounded-[8px] p-[8px] flex justify-between items-center">
 						<div className="flex items-center gap-2">
 							<div className="text-muted-foreground">
-								{sequence.status === "success" && (
+								{sequence.status === "completed" && (
 									<CheckIcon className="text-success size-[16px]" />
 								)}
-								{sequence.status === "in-progress" && (
+								{sequence.status === "running" && (
 									<RefreshCw className="text-info size-[16px] animate-spin" />
 								)}
 								{sequence.status === "failed" && (
 									<XIcon className="text-error size-[16px]" />
 								)}
-								{sequence.status === "pending" && (
+								{sequence.status === "queued" && (
 									<CircleDashedIcon className="text-text-muted size-[16px]" />
 								)}
 							</div>
@@ -72,25 +61,22 @@ export function Nav({ act }: NavProps) {
 										}
 									>
 										<div className="flex items-center gap-[4px] ">
-											{step.generation.status === "queued" && (
+											{step.status === "queued" && (
 												<CircleDashedIcon className="text-text-muted size-[12px]" />
 											)}
-											{step.generation.status === "running" && (
+											{step.status === "running" && (
 												<RefreshCw className="text-info size-[12px] animate-spin" />
 											)}
-											{step.generation.status === "completed" && (
+											{step.status === "completed" && (
 												<CheckIcon className="text-success size-[12px]" />
 											)}
-											{step.generation.status === "failed" && (
+											{step.status === "failed" && (
 												<XIcon className="text-error size-[12px]" />
 											)}
-											{step.generation.status === "cancelled" && (
+											{step.status === "cancelled" && (
 												<CircleSlashIcon className="text-text-muted size-[12px]" />
 											)}
-											<span>
-												{step.generation.context.operationNode.name ??
-													defaultName(step.generation.context.operationNode)}
-											</span>
+											<span>{step.name}</span>
 										</div>
 										<span className="opacity-0 group-hover:opacity-100 group-data-[state=active]:hidden transition-opacity">
 											Show
