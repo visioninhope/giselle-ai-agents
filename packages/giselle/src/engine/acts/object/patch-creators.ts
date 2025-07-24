@@ -4,7 +4,7 @@ import type { Patch } from "./patch-object";
 // Type-safe patch creators for Act fields
 
 // Status patches
-export const status = {
+const status = {
 	set: (value: Act["status"]): Patch => ({
 		path: "status",
 		set: value,
@@ -12,7 +12,7 @@ export const status = {
 } as const;
 
 // Steps patches
-export const steps = {
+const steps = {
 	queued: {
 		set: (value: Act["steps"]["queued"]): Patch => ({
 			path: "steps.queued",
@@ -100,7 +100,7 @@ export const steps = {
 } as const;
 
 // Duration patches
-export const duration = {
+const duration = {
 	wallClock: {
 		set: (value: Act["duration"]["wallClock"]): Patch => ({
 			path: "duration.wallClock",
@@ -132,7 +132,7 @@ export const duration = {
 } as const;
 
 // Usage patches
-export const usage = {
+const usage = {
 	promptTokens: {
 		set: (value: Act["usage"]["promptTokens"]): Patch => ({
 			path: "usage.promptTokens",
@@ -178,7 +178,7 @@ export const usage = {
 } as const;
 
 // Annotations patches
-export const annotations = {
+const annotations = {
 	push: (items: Act["annotations"]): Patch => ({
 		path: "annotations",
 		push: items,
@@ -190,7 +190,7 @@ export const annotations = {
 } as const;
 
 // Sequences patches with dynamic indices
-export const sequences = (index: number) => ({
+const sequences = (index: number) => ({
 	status: {
 		set: (value: Act["sequences"][number]["status"]): Patch => ({
 			path: `sequences.${index}.status`,
@@ -368,11 +368,11 @@ export const sequences = (index: number) => ({
 });
 
 // Other simple fields
-export const trigger = {
+const trigger = {
 	set: (value: Act["trigger"]): Patch => ({ path: "trigger", set: value }),
 } as const;
 
-export const updatedAt = {
+const updatedAt = {
 	set: (value: Act["updatedAt"]): Patch => ({ path: "updatedAt", set: value }),
 } as const;
 
