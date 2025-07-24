@@ -214,9 +214,12 @@ export function Form({
 											label: "No flows available",
 										},
 									]
-								: filteredFlowTriggers
+								: filteredFlowTriggers.map((trigger) => ({
+										id: trigger.id,
+										label: `${trigger.workspaceName} / ${trigger.label}`,
+									}))
 						}
-						renderOption={(o) => `${o.workspaceName} / ${o.label}`}
+						renderOption={(o) => o.label}
 						value={selectedFlowTriggerId}
 						onValueChange={(value) => {
 							const selectedFlowTrigger = filteredFlowTriggers.find(
