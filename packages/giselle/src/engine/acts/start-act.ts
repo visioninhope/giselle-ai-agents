@@ -48,9 +48,11 @@ async function executeStep(args: {
 					...args,
 					useExperimentalStorage: true,
 				});
+				let errorOccurred = false;
 				await result.consumeStream({
 					onError: async (error) => {
 						if (AISDKError.isInstance(error)) {
+							errorOccurred = true;
 							const failedGeneration = {
 								...args.generation,
 								status: "failed",
@@ -76,6 +78,9 @@ async function executeStep(args: {
 						}
 					},
 				});
+				if (errorOccurred) {
+					return;
+				}
 				break;
 			}
 			case "trigger":
