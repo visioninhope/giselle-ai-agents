@@ -251,10 +251,14 @@ export async function startAct(
 		patches: [patches.status.set("inProgress")],
 	});
 
+	let hasFailure = false;
+
 	for (let i = 0; i < act.sequences.length; i++) {
 		const sequence = act.sequences[i];
 
 		await args.callbacks?.sequenceStart?.({ sequence });
+
+		let sequenceFailed = false;
 
 		await actSequence({
 			sequence,
@@ -269,6 +273,8 @@ export async function startAct(
 				});
 			},
 			onError: async (sequence) => {
+				sequenceFailed = true;
+				hasFailure = true;
 				await Promise.all([
 					args.callbacks?.sequenceFail?.({ sequence }),
 					patchAct({
@@ -292,6 +298,12 @@ export async function startAct(
 			},
 		});
 
+		if (sequenceFailed) {
+			// Skip remaining sequences after failure
+			// e.g., if there are 4 sequences and the 2nd one fails,
+			// sequences 3 and 4 will not be executed
+			break;
+		}
 		await args.callbacks?.sequenceComplete?.({ sequence });
 	}
 
@@ -299,7 +311,7 @@ export async function startAct(
 		context: args.context,
 		actId: args.actId,
 		patches: [
-			patches.status.set("completed"),
+			patches.status.set(hasFailure ? "failed" : "completed"),
 			patches.duration.wallClock.set(Date.now() - flowStart),
 		],
 	});
