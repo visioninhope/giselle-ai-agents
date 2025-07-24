@@ -2,7 +2,7 @@ import type { TextGenerationNode } from "@giselle-sdk/data-type";
 import {
 	useNodeGenerations,
 	useWorkflowDesigner,
-} from "@giselle-sdk/giselle-engine/react";
+} from "@giselle-sdk/giselle/react";
 import {
 	isJsonContent,
 	jsonContentToText,
@@ -43,10 +43,10 @@ export function TextGenerationNodePropertiesPanel({
 		setUiNodeState,
 		deleteConnection,
 	} = useWorkflowDesigner();
-	const { createAndStartGeneration, isGenerating, stopGeneration } =
+	const { createAndStartGenerationRunner, isGenerating, stopGenerationRunner } =
 		useNodeGenerations({
 			nodeId: node.id,
-			origin: { type: "workspace", id: data.id },
+			origin: { type: "studio", workspaceId: data.id },
 		});
 	const { all: connectedSources } = useConnectedOutputs(node);
 	const usageLimitsReached = useUsageLimitsReached();
@@ -60,10 +60,10 @@ export function TextGenerationNodePropertiesPanel({
 			return;
 		}
 
-		createAndStartGeneration({
+		createAndStartGenerationRunner({
 			origin: {
-				type: "workspace",
-				id: data.id,
+				type: "studio",
+				workspaceId: data.id,
 			},
 			operationNode: node,
 			sourceNodes: connectedSources.map(
@@ -78,7 +78,7 @@ export function TextGenerationNodePropertiesPanel({
 		data.id,
 		data.connections,
 		node,
-		createAndStartGeneration,
+		createAndStartGenerationRunner,
 		usageLimitsReached,
 		error,
 	]);
@@ -122,7 +122,7 @@ export function TextGenerationNodePropertiesPanel({
 						disabled={disabled}
 						onClick={() => {
 							if (isGenerating) {
-								stopGeneration();
+								stopGenerationRunner();
 							} else {
 								generateText();
 							}

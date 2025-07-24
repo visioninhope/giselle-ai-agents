@@ -32,7 +32,7 @@
 	},
 	"dependencies": {
 		"@giselle-sdk/data-type": "workspace:^",
-		"@giselle-sdk/giselle-engine": "workspace:^",
+		"@giselle-sdk/giselle": "workspace:^",
 		"@giselle-sdk/text-editor-utils": "workspace:^",
 		"@tiptap/extension-placeholder": "catalog:",
 		"@tiptap/react": "catalog:",

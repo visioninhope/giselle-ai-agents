@@ -8303,7 +8303,7 @@ BlueOak-1.0.0 permitted
 
 
 <a name="loupe"></a>
-### loupe v3.1.3
+### loupe v3.1.4
 #### 
 
 ##### Paths
@@ -11343,7 +11343,7 @@ Unknown manually approved
 
 
 <a name="tinyglobby"></a>
-### tinyglobby v0.2.13
+### tinyglobby v0.2.14
 #### 
 
 ##### Paths

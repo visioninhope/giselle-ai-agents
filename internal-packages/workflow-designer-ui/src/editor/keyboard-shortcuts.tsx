@@ -1,5 +1,5 @@
 import type { Node, NodeLike } from "@giselle-sdk/data-type";
-import { useWorkflowDesigner } from "@giselle-sdk/giselle-engine/react";
+import { useWorkflowDesigner } from "@giselle-sdk/giselle/react";
 import { useEffect, useState } from "react";
 import { useDuplicateNode } from "./node";
 import {

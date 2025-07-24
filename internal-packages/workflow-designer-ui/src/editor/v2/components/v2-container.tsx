@@ -16,7 +16,7 @@ import {
 	Panel as XYFlowPanel,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import { useWorkflowDesigner } from "@giselle-sdk/giselle-engine/react";
+import { useWorkflowDesigner } from "@giselle-sdk/giselle/react";
 import clsx from "clsx/lite";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";

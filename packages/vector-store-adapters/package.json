@@ -23,7 +23,7 @@
 		"tsup": "catalog:"
 	},
 	"dependencies": {
-		"@giselle-sdk/giselle-engine": "workspace:^",
+		"@giselle-sdk/giselle": "workspace:^",
 		"openai": "catalog:",
 		"zod": "catalog:"
 	}

@@ -2,7 +2,7 @@ import type { ImageGenerationNode } from "@giselle-sdk/data-type";
 import {
 	useNodeGenerations,
 	useWorkflowDesigner,
-} from "@giselle-sdk/giselle-engine/react";
+} from "@giselle-sdk/giselle/react";
 import clsx from "clsx/lite";
 import { CommandIcon, CornerDownLeft } from "lucide-react";
 import { Tabs } from "radix-ui";
@@ -33,10 +33,10 @@ export function ImageGenerationNodePropertiesPanel({
 }) {
 	const { data, updateNodeDataContent, updateNodeData, setUiNodeState } =
 		useWorkflowDesigner();
-	const { createAndStartGeneration, isGenerating, stopGeneration } =
+	const { createAndStartGenerationRunner, isGenerating, stopGenerationRunner } =
 		useNodeGenerations({
 			nodeId: node.id,
-			origin: { type: "workspace", id: data.id },
+			origin: { type: "studio", workspaceId: data.id },
 		});
 	const { all: connectedSources } = useConnectedSources(node);
 	const usageLimitsReached = useUsageLimitsReached();
@@ -50,10 +50,10 @@ export function ImageGenerationNodePropertiesPanel({
 			return;
 		}
 
-		createAndStartGeneration({
+		createAndStartGenerationRunner({
 			origin: {
-				type: "workspace",
-				id: data.id,
+				type: "studio",
+				workspaceId: data.id,
 			},
 			operationNode: node,
 			sourceNodes: connectedSources.map(
@@ -68,7 +68,7 @@ export function ImageGenerationNodePropertiesPanel({
 		data.id,
 		data.connections,
 		node,
-		createAndStartGeneration,
+		createAndStartGenerationRunner,
 		usageLimitsReached,
 		error,
 	]);
@@ -90,7 +90,7 @@ export function ImageGenerationNodePropertiesPanel({
 						loading={isGenerating}
 						onClick={() => {
 							if (isGenerating) {
-								stopGeneration();
+								stopGenerationRunner();
 							} else {
 								generateText();
 							}

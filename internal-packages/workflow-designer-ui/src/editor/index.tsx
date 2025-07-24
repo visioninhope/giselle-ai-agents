@@ -1,7 +1,7 @@
 "use client";
 
 import "@xyflow/react/dist/style.css";
-import { useWorkflowDesigner } from "@giselle-sdk/giselle-engine/react";
+import { useWorkflowDesigner } from "@giselle-sdk/giselle/react";
 import { useAnimationFrame, useSpring } from "motion/react";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import type { ImperativePanelHandle } from "react-resizable-panels";

@@ -2,7 +2,7 @@ import type { VectorStoreNode } from "@giselle-sdk/data-type";
 import {
 	useVectorStore,
 	useWorkflowDesigner,
-} from "@giselle-sdk/giselle-engine/react";
+} from "@giselle-sdk/giselle/react";
 import { Check, ChevronDown } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";

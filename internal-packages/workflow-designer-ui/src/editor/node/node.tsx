@@ -20,7 +20,7 @@ import {
 	defaultName,
 	useNodeGenerations,
 	useWorkflowDesigner,
-} from "@giselle-sdk/giselle-engine/react";
+} from "@giselle-sdk/giselle/react";
 import {
 	Handle,
 	type NodeProps,
@@ -142,9 +142,9 @@ export function NodeComponent({
 	connectedOutputIds?: OutputId[];
 }) {
 	const { updateNodeData, data } = useWorkflowDesigner();
-	const { stopGeneration, currentGeneration } = useNodeGenerations({
+	const { stopGenerationRunner, currentGeneration } = useNodeGenerations({
 		nodeId: node.id,
-		origin: { type: "workspace", id: data.id },
+		origin: { type: "studio", workspaceId: data.id },
 	});
 	const prevGenerationStatusRef = useRef(currentGeneration?.status);
 	const [showCompleteLabel, startTransition] = useTransition();
@@ -230,7 +230,7 @@ export function NodeComponent({
 								type="button"
 								onClick={(e) => {
 									e.stopPropagation();
-									stopGeneration();
+									stopGenerationRunner();
 								}}
 								className="ml-1 p-1 rounded-full bg-blue-500 hover:bg-blue-600 transition-colors"
 							>

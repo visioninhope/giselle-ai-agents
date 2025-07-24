@@ -1,4 +1,4 @@
-import type { VaultDriver } from "@giselle-sdk/giselle-engine";
+import type { VaultDriver } from "@giselle-sdk/giselle";
 import { createClient } from "@supabase/supabase-js";
 
 interface SupabaseVaultDriverConfig {

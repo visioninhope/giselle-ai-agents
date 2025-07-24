@@ -6,13 +6,13 @@ import {
 	type TriggerNode,
 } from "@giselle-sdk/data-type";
 import { type GitHubTriggerEventId, githubTriggers } from "@giselle-sdk/flow";
-import type { GitHubIntegrationInstallation } from "@giselle-sdk/giselle-engine";
+import type { GitHubIntegrationInstallation } from "@giselle-sdk/giselle";
 import {
 	useFeatureFlag,
 	useGiselleEngine,
 	useIntegration,
 	useWorkflowDesigner,
-} from "@giselle-sdk/giselle-engine/react";
+} from "@giselle-sdk/giselle/react";
 import clsx from "clsx/lite";
 import { InfoIcon } from "lucide-react";
 import {

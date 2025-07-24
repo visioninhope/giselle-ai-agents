@@ -2,7 +2,7 @@ import type { Connection, NodeId } from "@giselle-sdk/data-type";
 import {
 	useNodeGenerations,
 	useWorkflowDesigner,
-} from "@giselle-sdk/giselle-engine/react";
+} from "@giselle-sdk/giselle/react";
 import {
 	BaseEdge,
 	type EdgeProps,
@@ -23,7 +23,7 @@ function ConnectedNodeRunning({
 	const { data } = useWorkflowDesigner();
 	const { currentGeneration: inputNodeCurrentGeneration } = useNodeGenerations({
 		nodeId: inputNodeId,
-		origin: { type: "workspace", id: data.id },
+		origin: { type: "studio", workspaceId: data.id },
 	});
 	if (
 		inputNodeCurrentGeneration?.status === "queued" ||

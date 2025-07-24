@@ -1,9 +1,10 @@
 import type { FlowTriggerId, WorkspaceId } from "@giselle-sdk/data-type";
-import type { ActId } from "@giselle-sdk/giselle-engine";
+import type { ActId } from "@giselle-sdk/giselle";
 import type { GitHubRepositoryIndexId } from "@giselles-ai/types";
 import { relations } from "drizzle-orm";
 import {
 	boolean,
+	foreignKey,
 	index,
 	integer,
 	jsonb,
@@ -17,6 +18,7 @@ import {
 	vector,
 } from "drizzle-orm/pg-core";
 import type { Stripe } from "stripe";
+import type { ContentStatusMetadata } from "@/lib/vector-stores/github/types";
 import type { AgentId } from "@/services/agents/types";
 import type { TeamId } from "@/services/teams/types";
 
@@ -264,12 +266,16 @@ export const githubRepositoryIndex = pgTable(
 			.notNull()
 			.references(() => teams.dbId, { onDelete: "cascade" }),
 		installationId: integer("installation_id").notNull(),
+		/** @deprecated Use githubRepositoryContentStatus table instead */
 		lastIngestedCommitSha: text("last_ingested_commit_sha"),
+		/** @deprecated Use githubRepositoryContentStatus table instead */
 		status: text("status")
 			.notNull()
 			.$type<GitHubRepositoryIndexStatus>()
 			.default("idle"),
+		/** @deprecated Use githubRepositoryContentStatus table instead */
 		errorCode: text("error_code"),
+		/** @deprecated Use githubRepositoryContentStatus table instead */
 		retryAfter: timestamp("retry_after"),
 		createdAt: timestamp("created_at").defaultNow().notNull(),
 		updatedAt: timestamp("updated_at")
@@ -281,6 +287,48 @@ export const githubRepositoryIndex = pgTable(
 		unique().on(table.owner, table.repo, table.teamDbId),
 		index().on(table.teamDbId),
 		index().on(table.status),
+	],
+);
+
+export type GitHubRepositoryContentType = "blob" | "pull_request";
+export const githubRepositoryContentStatus = pgTable(
+	"github_repository_content_status",
+	{
+		dbId: serial("db_id").primaryKey(),
+		repositoryIndexDbId: integer("repository_index_db_id").notNull(),
+		contentType: text("content_type")
+			.$type<GitHubRepositoryContentType>()
+			.notNull(),
+		enabled: boolean("enabled").notNull().default(true),
+		status: text("status")
+			.notNull()
+			.$type<GitHubRepositoryIndexStatus>()
+			.default("idle"),
+		lastSyncedAt: timestamp("last_synced_at"),
+		metadata: jsonb("metadata").$type<ContentStatusMetadata>(),
+		errorCode: text("error_code"),
+		retryAfter: timestamp("retry_after"),
+		updatedAt: timestamp("updated_at")
+			.defaultNow()
+			.notNull()
+			.$onUpdate(() => new Date()),
+	},
+	(table) => [
+		unique("gh_content_status_unique").on(
+			table.repositoryIndexDbId,
+			table.contentType,
+		),
+		foreignKey({
+			columns: [table.repositoryIndexDbId],
+			foreignColumns: [githubRepositoryIndex.dbId],
+			name: "gh_content_status_repo_idx_fk",
+		}).onDelete("cascade"),
+		index("gh_content_status_query_idx").on(
+			table.enabled,
+			table.status,
+			table.updatedAt,
+			table.retryAfter,
+		),
 	],
 );
 
@@ -301,6 +349,56 @@ export const githubRepositoryEmbeddings = pgTable(
 	(table) => [
 		unique().on(table.repositoryIndexDbId, table.path, table.chunkIndex),
 		index().using("hnsw", table.embedding.op("vector_cosine_ops")),
+	],
+);
+
+export type GitHubRepositoryPullRequestContentType =
+	| "title_body"
+	| "comment"
+	| "diff";
+
+// Document key format for GitHub Pull Request embeddings (e.g., "123:title_body", "123:comment:456", "123:diff:path/to/file.ts")
+export type GitHubPullRequestDocumentKey =
+	`${number}:${GitHubRepositoryPullRequestContentType}:${string}`;
+
+export const githubRepositoryPullRequestEmbeddings = pgTable(
+	"github_repository_pull_request_embeddings",
+	{
+		dbId: serial("db_id").primaryKey(),
+		repositoryIndexDbId: integer("repository_index_db_id").notNull(),
+		prNumber: integer("pr_number").notNull(),
+		mergedAt: timestamp("pr_merged_at").notNull(),
+		contentType: text("content_type")
+			.$type<GitHubRepositoryPullRequestContentType>()
+			.notNull(),
+		contentId: text("content_id").notNull(),
+		// Composite key for identifying documents (e.g., "123:title_body", "123:comment:456", "123:diff:path/to/file.ts")
+		documentKey: text("document_key")
+			.$type<GitHubPullRequestDocumentKey>()
+			.notNull(),
+		embedding: vector("embedding", { dimensions: 1536 }).notNull(),
+		chunkContent: text("chunk_content").notNull(),
+		chunkIndex: integer("chunk_index").notNull(),
+		createdAt: timestamp("created_at").defaultNow().notNull(),
+	},
+	(table) => [
+		unique("gh_pr_emb_unique").on(
+			table.repositoryIndexDbId,
+			table.prNumber,
+			table.contentType,
+			table.contentId,
+			table.chunkIndex,
+		),
+		index().using("hnsw", table.embedding.op("vector_cosine_ops")),
+		foreignKey({
+			columns: [table.repositoryIndexDbId],
+			foreignColumns: [githubRepositoryIndex.dbId],
+			name: "gh_pr_embeddings_repo_idx_fk",
+		}).onDelete("cascade"),
+		index("gh_pr_emb_repo_doc_idx").on(
+			table.repositoryIndexDbId,
+			table.documentKey,
+		),
 	],
 );
 

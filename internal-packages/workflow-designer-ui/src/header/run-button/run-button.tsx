@@ -4,11 +4,7 @@ import {
 	type NodeLike,
 	type OperationNode,
 } from "@giselle-sdk/data-type";
-import {
-	defaultName,
-	useWorkflowDesigner,
-} from "@giselle-sdk/giselle-engine/react";
-import { buildWorkflowFromNode } from "@giselle-sdk/workflow-utils";
+import { defaultName, useWorkflowDesigner } from "@giselle-sdk/giselle/react";
 import clsx from "clsx/lite";
 import { CirclePlayIcon } from "lucide-react";
 import { Dialog, DropdownMenu } from "radix-ui";
@@ -18,7 +14,7 @@ import {
 	useMemo,
 	useState,
 } from "react";
-import { useFlowController } from "../../hooks/use-flow-controller";
+import { useActController } from "../../hooks/use-act-controller";
 import { NodeIcon } from "../../icons/node";
 import { TriggerInputDialog } from "../ui";
 import { Button } from "./ui/button";
@@ -45,7 +41,7 @@ function NodeSelectItem({
 
 export function RunButton() {
 	const { data } = useWorkflowDesigner();
-	const { startFlow } = useFlowController();
+	const { createAndStartAct } = useActController();
 
 	const [openDialogNodeId, setOpenDialogNodeId] = useState<string | null>(null);
 	const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -68,11 +64,12 @@ export function RunButton() {
 
 	const startOperationFlow = useCallback(
 		async (startingNode: OperationNode) => {
-			const flow = buildWorkflowFromNode(startingNode, data);
-
-			await startFlow(flow, [], {});
+			await createAndStartAct({
+				startNodeId: startingNode.id,
+				inputs: [],
+			});
 		},
-		[startFlow, data],
+		[createAndStartAct],
 	);
 
 	if (startingNodes.length === 0) {

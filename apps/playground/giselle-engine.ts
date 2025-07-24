@@ -2,9 +2,9 @@ import { WorkspaceId } from "@giselle-sdk/data-type";
 import type {
 	GiselleIntegrationConfig,
 	LanguageModelProvider,
-} from "@giselle-sdk/giselle-engine";
-import { emitTelemetry, fsStorageDriver } from "@giselle-sdk/giselle-engine";
-import { NextGiselleEngine } from "@giselle-sdk/giselle-engine/next-internal";
+} from "@giselle-sdk/giselle";
+import { emitTelemetry, fsStorageDriver } from "@giselle-sdk/giselle";
+import { NextGiselleEngine } from "@giselle-sdk/giselle/next-internal";
 import { supabaseStorageDriver as experimental_supabaseStorageDriver } from "@giselle-sdk/supabase-driver";
 import { createStorage } from "unstorage";
 import fsDriver from "unstorage/drivers/fs";

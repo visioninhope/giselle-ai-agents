@@ -2,7 +2,7 @@ import type { ActionNode, Node } from "@giselle-sdk/data-type";
 import {
 	useNodeGenerations,
 	useWorkflowDesigner,
-} from "@giselle-sdk/giselle-engine/react";
+} from "@giselle-sdk/giselle/react";
 import { useCallback } from "react";
 import { NodeIcon } from "../../../icons/node";
 import { Button } from "../../../ui/button";
@@ -17,9 +17,9 @@ import { useConnectedInputs } from "./lib";
 export function ActionNodePropertiesPanel({ node }: { node: ActionNode }) {
 	const { data, updateNodeData, setUiNodeState } = useWorkflowDesigner();
 	const { isValid, connectedInputs } = useConnectedInputs(node.id, node.inputs);
-	const { createAndStartGeneration } = useNodeGenerations({
+	const { createAndStartGenerationRunner } = useNodeGenerations({
 		nodeId: node.id,
-		origin: { type: "workspace", id: data.id },
+		origin: { type: "studio", workspaceId: data.id },
 	});
 	const handleClick = useCallback(() => {
 		if (!isValid) {
@@ -32,10 +32,10 @@ export function ActionNodePropertiesPanel({ node }: { node: ActionNode }) {
 		setUiNodeState(node.id, {
 			showError: false,
 		});
-		createAndStartGeneration({
+		createAndStartGenerationRunner({
 			origin: {
-				type: "workspace",
-				id: data.id,
+				type: "studio",
+				workspaceId: data.id,
 			},
 			operationNode: node,
 			sourceNodes: connectedInputs
@@ -51,7 +51,7 @@ export function ActionNodePropertiesPanel({ node }: { node: ActionNode }) {
 		node,
 		data.id,
 		data.connections,
-		createAndStartGeneration,
+		createAndStartGenerationRunner,
 		connectedInputs,
 	]);
 	return (

@@ -1,5 +1,5 @@
 import type { FlowTrigger } from "@giselle-sdk/data-type";
-import type { ParameterItem } from "@giselle-sdk/giselle-engine";
+import type { ParameterItem } from "@giselle-sdk/giselle";
 
 /**
  * This code is based on internal-packages/workflow-designer-ui/src/header/ui/trigger-input-dialog/helpers.ts

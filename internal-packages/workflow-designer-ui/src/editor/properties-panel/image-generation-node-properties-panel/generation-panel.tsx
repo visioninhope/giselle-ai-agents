@@ -1,9 +1,9 @@
 import type { ImageGenerationNode } from "@giselle-sdk/data-type";
-import type { Generation } from "@giselle-sdk/giselle-engine";
+import type { Generation } from "@giselle-sdk/giselle";
 import {
 	useNodeGenerations,
 	useWorkflowDesigner,
-} from "@giselle-sdk/giselle-engine/react";
+} from "@giselle-sdk/giselle/react";
 import clsx from "clsx/lite";
 import { useCallback, useEffect, useState } from "react";
 import { StackBlicksIcon } from "../../../icons";
@@ -67,7 +67,7 @@ export function GenerationPanel({
 	const { data } = useWorkflowDesigner();
 	const { generations } = useNodeGenerations({
 		nodeId: node.id,
-		origin: { type: "workspace", id: data.id },
+		origin: { type: "studio", workspaceId: data.id },
 	});
 	const [currentGeneration, setCurrentGeneration] = useState<
 		Generation | undefined

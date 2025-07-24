@@ -2,7 +2,7 @@ import type { QueryNode } from "@giselle-sdk/data-type";
 import {
 	useNodeGenerations,
 	useWorkflowDesigner,
-} from "@giselle-sdk/giselle-engine/react";
+} from "@giselle-sdk/giselle/react";
 import {
 	isJsonContent,
 	jsonContentToText,
@@ -22,14 +22,15 @@ import {
 } from "../ui";
 import { GenerationPanel } from "./generation-panel";
 import { QueryPanel } from "./query-panel";
+import { SettingsPanel } from "./settings-panel";
 import { useConnectedSources } from "./sources";
 
 export function QueryNodePropertiesPanel({ node }: { node: QueryNode }) {
 	const { data, updateNodeData } = useWorkflowDesigner();
-	const { createAndStartGeneration, isGenerating, stopGeneration } =
+	const { createAndStartGenerationRunner, isGenerating, stopGenerationRunner } =
 		useNodeGenerations({
 			nodeId: node.id,
-			origin: { type: "workspace", id: data.id },
+			origin: { type: "studio", workspaceId: data.id },
 		});
 	const { all: connectedSources } = useConnectedSources(node);
 	const { error } = useToasts();
@@ -47,10 +48,10 @@ export function QueryNodePropertiesPanel({ node }: { node: QueryNode }) {
 			error("Query is empty");
 			return;
 		}
-		createAndStartGeneration({
+		createAndStartGenerationRunner({
 			origin: {
-				type: "workspace",
-				id: data.id,
+				type: "studio",
+				workspaceId: data.id,
 			},
 			operationNode: node,
 			sourceNodes: connectedSources.map(
@@ -65,7 +66,7 @@ export function QueryNodePropertiesPanel({ node }: { node: QueryNode }) {
 		data.id,
 		data.connections,
 		node,
-		createAndStartGeneration,
+		createAndStartGenerationRunner,
 		error,
 		query,
 	]);
@@ -84,7 +85,7 @@ export function QueryNodePropertiesPanel({ node }: { node: QueryNode }) {
 						type="button"
 						onClick={() => {
 							if (isGenerating) {
-								stopGeneration();
+								stopGenerationRunner();
 							} else {
 								generate();
 							}
@@ -117,12 +118,19 @@ export function QueryNodePropertiesPanel({ node }: { node: QueryNode }) {
 							>
 								<Tabs.List className="flex gap-[16px] text-[14px] font-accent **:p-[4px] **:border-b **:cursor-pointer **:data-[state=active]:text-white-900 **:data-[state=active]:border-white-900 **:data-[state=inactive]:text-black-400 **:data-[state=inactive]:border-transparent">
 									<Tabs.Trigger value="query">Query</Tabs.Trigger>
+									<Tabs.Trigger value="settings">Settings</Tabs.Trigger>
 								</Tabs.List>
 								<Tabs.Content
 									value="query"
 									className="flex-1 flex flex-col overflow-hidden"
 								>
 									<QueryPanel node={node} />
+								</Tabs.Content>
+								<Tabs.Content
+									value="settings"
+									className="flex-1 flex flex-col overflow-y-auto px-[4px] outline-none"
+								>
+									<SettingsPanel node={node} />
 								</Tabs.Content>
 							</Tabs.Root>
 						</PropertiesPanelContent>

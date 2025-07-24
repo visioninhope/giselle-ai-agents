@@ -1,5 +1,5 @@
 import { OpenAILanguageModelData, type ToolSet } from "@giselle-sdk/data-type";
-import { useUsageLimits } from "@giselle-sdk/giselle-engine/react";
+import { useUsageLimits } from "@giselle-sdk/giselle/react";
 import {
 	Capability,
 	hasCapability,

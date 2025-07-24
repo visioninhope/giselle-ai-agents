@@ -1,4 +1,4 @@
-import type { Generation } from "@giselle-sdk/giselle-engine";
+import type { Generation } from "@giselle-sdk/giselle";
 import clsx from "clsx/lite";
 import { ChevronDownIcon, ChevronRightIcon } from "lucide-react";
 import { useState } from "react";
@@ -39,7 +39,7 @@ function ScoreIndicator({ score }: { score: number }) {
 				/>
 			</div>
 			<span className={clsx("text-[12px] font-medium", getScoreText(score))}>
-				{(score * 100).toFixed(0)}%
+				{score.toFixed(2)}
 			</span>
 		</div>
 	);

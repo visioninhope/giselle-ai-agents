@@ -6,11 +6,10 @@ import {
 } from "@giselle-internal/ui/table";
 import {
 	isTriggerNode,
-	RunId,
 	type Workspace,
 	type WorkspaceId,
 } from "@giselle-sdk/data-type";
-import { defaultName } from "@giselle-sdk/giselle-engine";
+import { defaultName } from "@giselle-sdk/giselle";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { after } from "next/server";
@@ -91,6 +90,7 @@ export default async function StagePage() {
 				performStageAction={async (payloads) => {
 					"use server";
 
+					const experimental_storage = await experimental_storageFlag();
 					const user = await fetchCurrentUser();
 					const build = await giselleEngine.buildWorkflowFromTrigger({
 						triggerId: payloads.flowTrigger.id,
@@ -99,10 +99,16 @@ export default async function StagePage() {
 					if (build === null) {
 						throw new Error("Workflow not found");
 					}
-					const act = await giselleEngine.createAct({
+					const { act } = await giselleEngine.createAct({
 						workspaceId: payloads.flowTrigger.workspaceId,
-						jobsCount: build.workflow.sequences.length,
-						trigger: "studio",
+						startNodeId: payloads.flowTrigger.nodeId,
+						inputs: [
+							{
+								type: "parameters",
+								items: payloads.parameterItems,
+							},
+						],
+						generationOriginType: "stage",
 					});
 
 					const team = await db.query.teams.findFirst({
@@ -120,17 +126,7 @@ export default async function StagePage() {
 					});
 					after(() =>
 						giselleEngine.startAct({
-							flow: build.workflow,
 							actId: act.id,
-							runId: RunId.generate(),
-							workspaceId: payloads.flowTrigger.workspaceId,
-							triggerInputs: [
-								{
-									type: "parameters",
-									items: payloads.parameterItems,
-								},
-							],
-							useExperimentalStorage: experimental_storage,
 						}),
 					);
 				}}
@@ -163,9 +159,7 @@ export default async function StagePage() {
 									<TableCell className="text-center">-</TableCell>
 									<TableCell className="text-right">
 										<div className="flex justify-end">
-											<Link href={`/stage/acts/${task.sdkActId.substring(5)}`}>
-												Details
-											</Link>
+											<Link href={`/stage/acts/${task.sdkActId}`}>Details</Link>
 										</div>
 									</TableCell>
 								</TableRow>

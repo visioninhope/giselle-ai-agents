@@ -14,7 +14,7 @@ import {
 	defaultName,
 	useGiselleEngine,
 	useWorkflowDesigner,
-} from "@giselle-sdk/giselle-engine/react";
+} from "@giselle-sdk/giselle/react";
 import clsx from "clsx/lite";
 import { PlusIcon, TriangleAlert, XIcon } from "lucide-react";
 import { useCallback, useMemo } from "react";

@@ -11,7 +11,7 @@ import {
 	useFlowTrigger,
 	useGiselleEngine,
 	useWorkflowDesigner,
-} from "@giselle-sdk/giselle-engine/react";
+} from "@giselle-sdk/giselle/react";
 import clsx from "clsx/lite";
 import { PlusIcon, TrashIcon } from "lucide-react";
 import {

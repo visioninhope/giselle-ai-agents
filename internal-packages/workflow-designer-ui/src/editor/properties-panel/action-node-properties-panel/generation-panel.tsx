@@ -1,9 +1,9 @@
 import type { ActionNode } from "@giselle-sdk/data-type";
-import type { Generation } from "@giselle-sdk/giselle-engine";
+import type { Generation } from "@giselle-sdk/giselle";
 import {
 	useNodeGenerations,
 	useWorkflowDesigner,
-} from "@giselle-sdk/giselle-engine/react";
+} from "@giselle-sdk/giselle/react";
 import clsx from "clsx/lite";
 import { useEffect, useState } from "react";
 
@@ -11,7 +11,7 @@ export function GenerationPanel({ node }: { node: ActionNode }) {
 	const { data } = useWorkflowDesigner();
 	const { generations } = useNodeGenerations({
 		nodeId: node.id,
-		origin: { type: "workspace", id: data.id },
+		origin: { type: "studio", workspaceId: data.id },
 	});
 	const [currentGeneration, setCurrentGeneration] = useState<
 		Generation | undefined

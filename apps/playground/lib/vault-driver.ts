@@ -4,7 +4,7 @@ import {
 	createHash,
 	randomBytes,
 } from "node:crypto";
-import type { VaultDriver } from "@giselle-sdk/giselle-engine";
+import type { VaultDriver } from "@giselle-sdk/giselle";
 
 interface NodeVaultDriverConfig {
 	/** Secret passphrase used to derive the encryption key */

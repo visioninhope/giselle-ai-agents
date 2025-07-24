@@ -1,16 +1,9 @@
-import {
-	type ActionNode,
-	type Input,
-	isActionNode,
-	type TriggerNode,
-} from "@giselle-sdk/data-type";
-import { useWorkflowDesigner } from "@giselle-sdk/giselle-engine/react";
-import { buildWorkflowFromNode } from "@giselle-sdk/workflow-utils";
+import type { TriggerNode } from "@giselle-sdk/data-type";
 import { clsx } from "clsx/lite";
-import { AlertTriangleIcon, PlayIcon, XIcon } from "lucide-react";
+import { PlayIcon, XIcon } from "lucide-react";
 import { Dialog } from "radix-ui";
 import { type FormEventHandler, useCallback, useMemo, useState } from "react";
-import { useFlowController } from "../../../hooks/use-flow-controller";
+import { useActController } from "../../../hooks/use-act-controller";
 import { useTrigger } from "../../../hooks/use-trigger";
 import { Button } from "./button";
 import {
@@ -28,49 +21,18 @@ export function TriggerInputDialog({
 	onClose: () => void;
 }) {
 	const { data: trigger, isLoading } = useTrigger(node);
-	const { data } = useWorkflowDesigner();
 
 	const inputs = useMemo<FormInput[]>(
 		() => createInputsFromTrigger(trigger),
 		[trigger],
 	);
 
-	const flow = useMemo(() => buildWorkflowFromNode(node, data), [node, data]);
-
-	const requiresActionNodes = useMemo(
-		() =>
-			flow === null
-				? []
-				: flow.nodes
-						.filter((n) => isActionNode(n, "github"))
-						.map((n) => {
-							const notConnectedRequiredInputs = n.inputs.filter(
-								(input) =>
-									input.isRequired &&
-									!data.connections.some(
-										(connection) => connection.inputId === input.id,
-									),
-							);
-							if (notConnectedRequiredInputs.length === 0) {
-								return null;
-							}
-							return {
-								node: n as ActionNode,
-								inputs: notConnectedRequiredInputs,
-							};
-						})
-						.filter(
-							(item): item is { node: ActionNode; inputs: Input[] } =>
-								item !== null,
-						),
-		[flow, data.connections],
-	);
 	const [validationErrors, setValidationErrors] = useState<
 		Record<string, string>
 	>({});
 	const [isSubmitting, setIsSubmitting] = useState(false);
 
-	const { startFlow } = useFlowController();
+	const { createAndStartAct } = useActController();
 
 	const handleSubmit = useCallback<FormEventHandler<HTMLFormElement>>(
 		async (e) => {
@@ -88,15 +50,39 @@ export function TriggerInputDialog({
 			setIsSubmitting(true);
 
 			try {
-				await startFlow(flow, inputs, values, onClose);
+				const parameterItems = Object.entries(values).map(([name, value]) => {
+					if (typeof value === "number") {
+						return {
+							name,
+							type: "number" as const,
+							value,
+						};
+					}
+					return {
+						name,
+						type: "string" as const,
+						value: value as string,
+					};
+				});
+
+				await createAndStartAct({
+					startNodeId: node.id,
+					inputs: [
+						{
+							type: "parameters",
+							items: parameterItems,
+						},
+					],
+				});
+				onClose();
 			} finally {
 				setIsSubmitting(false);
 			}
 		},
-		[inputs, onClose, flow, startFlow],
+		[inputs, onClose, node.id, createAndStartAct],
 	);
 
-	if (isLoading || flow === null) {
+	if (isLoading) {
 		return null;
 	}
 
@@ -125,43 +111,6 @@ export function TriggerInputDialog({
 					<p className="text-[12px] mb-[8px] text-black-400 font-sans font-semibold">
 						Execute this flow with custom input values
 					</p>
-
-					{requiresActionNodes.length > 0 && (
-						<div className="bg-red-50 rounded-[6px] p-[10px]">
-							<div className="flex items-start gap-[8px]">
-								<div className="text-red-500 mt-[2px]">
-									<AlertTriangleIcon className="size-[16px] text-red-700" />
-								</div>
-								<div className="flex-1">
-									<h4 className="text-red-800 font-medium text-[14px] mb-[4px]">
-										Missing Required Connections
-									</h4>
-									<p className="text-red-700 text-[12px] mb-[8px]">
-										The following action nodes have required inputs that are not
-										connected:
-									</p>
-									<ul className="space-y-[4px]">
-										{requiresActionNodes.map((item) => (
-											<li
-												key={item.node.id}
-												className="text-red-700 text-[12px]"
-											>
-												<span className="font-medium">
-													{item.node.name || "Unnamed Action"}
-												</span>{" "}
-												- Missing:{" "}
-												{item.inputs.map((input) => input.label).join(", ")}
-											</li>
-										))}
-									</ul>
-									<p className="text-red-700 text-[12px] mt-[8px]">
-										Please connect all required inputs in the workflow designer
-										before running.
-									</p>
-								</div>
-							</div>
-						</div>
-					)}
 
 					<div className="flex flex-col gap-[8px]">
 						{inputs.map((input) => {
@@ -234,14 +183,9 @@ export function TriggerInputDialog({
 						<Button
 							type="submit"
 							loading={isSubmitting}
-							disabled={requiresActionNodes.length > 0}
 							leftIcon={<PlayIcon className="size-[14px] fill-black-900" />}
 						>
-							{isSubmitting
-								? "Running..."
-								: requiresActionNodes.length > 0
-									? "Fix Connections to Run"
-									: "Run"}
+							{isSubmitting ? "Running..." : "Run"}
 						</Button>
 					</div>
 				</form>

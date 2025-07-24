@@ -1,5 +1,5 @@
 import { GoogleLanguageModelData } from "@giselle-sdk/data-type";
-import { useUsageLimits } from "@giselle-sdk/giselle-engine/react";
+import { useUsageLimits } from "@giselle-sdk/giselle/react";
 import { googleLanguageModels } from "@giselle-sdk/language-model";
 import {
 	Select,
