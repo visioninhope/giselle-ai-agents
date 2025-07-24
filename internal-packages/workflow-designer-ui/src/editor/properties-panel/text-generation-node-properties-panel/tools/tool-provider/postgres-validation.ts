@@ -59,8 +59,24 @@ const SPECIAL_CHARS_REGEX = /[@:#/?&=%\s[\]]/;
 function validateQueryParams(params: string): ValidationResult {
 	const paramPairs = params.split("&");
 	for (const pair of paramPairs) {
-		const [key, value] = pair.split("=");
+		if (!pair.includes("=")) {
+			return {
+				isValid: false,
+				error: `Invalid parameter format. Expected 'key=value'`,
+			};
+		}
+		const eqIndex = pair.indexOf("=");
+		const key = pair.substring(0, eqIndex);
+		const value = pair.substring(eqIndex + 1);
 		if (!key || !value) {
+			return {
+				isValid: false,
+				error: `Invalid parameter format. Expected 'key=value'`,
+			};
+		}
+
+		// Check if value contains spaces (which should be encoded)
+		if (value.includes(" ")) {
 			return {
 				isValid: false,
 				error: `Invalid parameter format. Expected 'key=value'`,
@@ -181,7 +197,7 @@ function validateURIComponent(
 			const specialChar = value.match(SPECIAL_CHARS_REGEX)?.[0];
 			return {
 				isValid: false,
-				error: `The ${fieldName} contains a special character ('${specialChar}') that should be percent-encoded to '${encodeURIComponent(specialChar || "")}'`,
+				error: `The ${fieldName} contains a special character ('${specialChar}') that should be percent-encoded to '${encodeURIComponent(specialChar || "")}'.`,
 			};
 		}
 		return { isValid: true };
@@ -209,6 +225,24 @@ export function validatePostgreSQLConnectionString(
 		trimmed.startsWith("postgres://")
 	) {
 		return validateURIFormat(trimmed);
+	}
+
+	// Check if it looks like a URI but with wrong scheme
+	if (trimmed.includes("://")) {
+		return {
+			isValid: false,
+			error:
+				"Invalid connection string format. It should start with `postgresql://`.",
+		};
+	}
+
+	// Check if it looks like a URI without scheme (contains @ and /)
+	if (trimmed.includes("@") && trimmed.includes("/")) {
+		return {
+			isValid: false,
+			error:
+				"Invalid connection string format. It should start with `postgresql://`.",
+		};
 	}
 
 	// Otherwise, validate as key-value format
@@ -254,10 +288,19 @@ function validateURIFormat(uri: string): ValidationResult {
 			}
 		}
 
-		// Parse host part
-		const hostMatch = hostPart.match(
-			/^([^:/?]+)(?::([^/?]+))?(?:\/([^?]+))?(?:\?(.+))?$/,
-		);
+		// Parse host part - handle IPv6 addresses in brackets
+		let hostMatch: RegExpMatchArray | null = null;
+		if (hostPart.startsWith("[")) {
+			// IPv6 address
+			hostMatch = hostPart.match(
+				/^(\[[^\]]+\])(?::([^/?]+))?(?:\/([^?]+))?(?:\?(.+))?$/,
+			);
+		} else {
+			// Regular hostname or IPv4
+			hostMatch = hostPart.match(
+				/^([^:/?]+)(?::([^/?]+))?(?:\/([^?]+))?(?:\?(.+))?$/,
+			);
+		}
 		if (!hostMatch) {
 			return {
 				isValid: false,
@@ -319,26 +362,6 @@ function validateKeyValueFormat(kvString: string): ValidationResult {
 	const pairs = parseKeyValuePairs(kvString);
 
 	if (pairs.length === 0) {
-		// Try simple split to provide better error message
-		const simplePairs = kvString.split(/\s+/).filter((p) => p);
-		if (simplePairs.length > 0) {
-			const firstPair = simplePairs[0];
-			if (!firstPair.includes("=")) {
-				return {
-					isValid: false,
-					error: `Invalid format. Expected 'key=value' pairs separated by spaces`,
-				};
-			} else if (firstPair.includes("'")) {
-				// Check for unclosed quotes
-				const quoteCount = (firstPair.match(/'/g) || []).length;
-				if (quoteCount % 2 !== 0) {
-					return {
-						isValid: false,
-						error: `Invalid format. Expected 'key=value' pairs separated by spaces`,
-					};
-				}
-			}
-		}
 		return {
 			isValid: false,
 			error: `Invalid format. Expected 'key=value' pairs separated by spaces`,
