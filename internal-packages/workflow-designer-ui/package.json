@@ -5,7 +5,8 @@
 	"scripts": {
 		"clean": "rm -rf node_modules",
 		"check-types": "tsc --noEmit",
-		"format": "biome check --write ."
+		"format": "biome check --write .",
+		"test": "vitest"
 	},
 	"exports": {
 		".": "./src/index.ts"
@@ -44,6 +45,7 @@
 		"@types/react": "catalog:",
 		"@types/react-dom": "catalog:",
 		"tailwindcss": "catalog:",
-		"typescript": "catalog:"
+		"typescript": "catalog:",
+		"vitest": "catalog:"
 	}
 }
