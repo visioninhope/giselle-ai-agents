@@ -386,7 +386,7 @@ export function Toolbar() {
 												</ToggleGroup.Item>
 												<ToggleGroup.Item value="githubVectorStore" data-tool>
 													<GitHubIcon className="w-[20px] h-[20px]" />
-													<p className="text-[14px]">GitHub Vectorstore</p>
+													<p className="text-[14px]">GitHub Vector Store</p>
 												</ToggleGroup.Item>
 												<ToggleGroup.Item value="pdf" data-tool>
 													<PdfFileIcon className="w-[20px] h-[20px]" />
