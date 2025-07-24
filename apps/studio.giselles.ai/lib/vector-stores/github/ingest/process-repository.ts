@@ -5,6 +5,7 @@ import type { TelemetrySettings } from "ai";
 import { and, eq, max } from "drizzle-orm";
 import {
 	db,
+	type GitHubRepositoryContentType,
 	githubRepositoryContentStatus,
 	type githubRepositoryIndex,
 	githubRepositoryPullRequestEmbeddings,
@@ -17,8 +18,64 @@ import { ingestGitHubPullRequests } from "./pull-requests/ingest-github-pull-req
 import { createIngestTelemetrySettings } from "./telemetry";
 
 /**
+ * Content processor configuration
+ */
+type ProcessorConfig = {
+	repositoryIndex: typeof githubRepositoryIndex.$inferSelect;
+	telemetry?: TelemetrySettings;
+};
+
+type ContentProcessor = (config: ProcessorConfig) => Promise<{
+	metadata:
+		| ReturnType<typeof createBlobMetadata>
+		| ReturnType<typeof createPullRequestMetadata>;
+}>;
+
+/**
+ * Content processors by type
+ */
+const CONTENT_PROCESSORS: Record<
+	GitHubRepositoryContentType,
+	ContentProcessor
+> = {
+	blob: async ({ repositoryIndex, telemetry }) => {
+		const { owner, repo, installationId, teamDbId } = repositoryIndex;
+		const octokit = buildOctokit(installationId);
+		const commit = await fetchDefaultBranchHead(octokit, owner, repo);
+
+		await ingestGitHubBlobs({
+			octokitClient: octokit,
+			source: { owner, repo, commitSha: commit.sha },
+			teamDbId,
+			telemetry,
+		});
+
+		return {
+			metadata: createBlobMetadata({ lastIngestedCommitSha: commit.sha }),
+		};
+	},
+
+	pull_request: async ({ repositoryIndex, telemetry }) => {
+		const { owner, repo, installationId, teamDbId, dbId } = repositoryIndex;
+
+		await ingestGitHubPullRequests({
+			githubAuthConfig: buildGitHubAuthConfig(installationId),
+			source: { owner, repo },
+			teamDbId,
+			telemetry,
+		});
+
+		const lastPrNumber = await getLastIngestedPrNumber(dbId);
+		return {
+			metadata: createPullRequestMetadata({
+				lastIngestedPrNumber: lastPrNumber ?? undefined,
+			}),
+		};
+	},
+};
+
+/**
  * Process a GitHub repository for ingestion
- * This is the main entry point for ingesting a repository
  */
 export async function processRepository(
 	repositoryData: RepositoryWithStatuses,
@@ -41,31 +98,23 @@ export async function processRepository(
 				},
 			);
 
-			switch (contentStatus.contentType) {
-				case "blob":
-					await processBlobs({
-						repositoryIndex,
-						telemetry,
-					});
-					break;
-				case "pull_request":
-					await processPullRequests({
-						repositoryIndex,
-						telemetry,
-					});
-					break;
-				default: {
-					const _exhaustiveCheck: never = contentStatus.contentType;
-					throw new Error(`Unknown content type: ${_exhaustiveCheck}`);
-				}
-			}
+			const processor = CONTENT_PROCESSORS[contentStatus.contentType];
+			const { metadata } = await processor({ repositoryIndex, telemetry });
+
+			await updateContentStatus(
+				repositoryIndex.dbId,
+				contentStatus.contentType,
+				{
+					...completedStatus(metadata),
+				},
+			);
 		} catch (error) {
 			console.error(
 				`Failed to ingest ${contentStatus.contentType} for GitHub Repository: teamDbId=${teamDbId}, repository=${owner}/${repo}`,
 				error,
 			);
 
-			const { errorCode, retryAfter } = extractErrorInfo(error);
+			const errorInfo = extractErrorInfo(error);
 
 			captureException(error, {
 				extra: {
@@ -73,8 +122,7 @@ export async function processRepository(
 					repo,
 					teamDbId,
 					contentType: contentStatus.contentType,
-					errorCode,
-					retryAfter,
+					...errorInfo,
 					errorContext:
 						error instanceof DocumentLoaderError ? error.context : undefined,
 				},
@@ -84,9 +132,7 @@ export async function processRepository(
 				repositoryIndex.dbId,
 				contentStatus.contentType,
 				{
-					status: "failed",
-					errorCode,
-					retryAfter,
+					...failedStatus(errorInfo),
 				},
 			);
 		}
@@ -94,77 +140,28 @@ export async function processRepository(
 }
 
 /**
- * Process blob content for a repository
+ * Helper functions for status updates
  */
-async function processBlobs(params: {
-	repositoryIndex: typeof githubRepositoryIndex.$inferSelect;
-	telemetry?: TelemetrySettings;
-}) {
-	const { repositoryIndex, telemetry } = params;
-	const { owner, repo, installationId, teamDbId, dbId } = repositoryIndex;
+const completedStatus = (
+	metadata:
+		| ReturnType<typeof createBlobMetadata>
+		| ReturnType<typeof createPullRequestMetadata>,
+) => ({
+	status: "completed" as const,
+	metadata,
+	lastSyncedAt: new Date(),
+	errorCode: null,
+	retryAfter: null,
+});
 
-	const octokitClient = buildOctokit(installationId);
-	const commit = await fetchDefaultBranchHead(octokitClient, owner, repo);
-	const source = {
-		owner,
-		repo,
-		commitSha: commit.sha,
-	};
-
-	await ingestGitHubBlobs({
-		octokitClient,
-		source,
-		teamDbId,
-		telemetry,
-	});
-
-	await updateContentStatus(dbId, "blob", {
-		status: "completed",
-		metadata: createBlobMetadata({
-			lastIngestedCommitSha: commit.sha,
-		}),
-		lastSyncedAt: new Date(),
-		errorCode: null,
-		retryAfter: null,
-	});
-}
-
-/**
- * Process pull request content for a repository
- */
-async function processPullRequests(params: {
-	repositoryIndex: typeof githubRepositoryIndex.$inferSelect;
-	telemetry?: TelemetrySettings;
-}) {
-	const { repositoryIndex, telemetry } = params;
-	const { owner, repo, installationId, teamDbId, dbId } = repositoryIndex;
-
-	const source = {
-		owner,
-		repo,
-	};
-
-	await ingestGitHubPullRequests({
-		githubAuthConfig: buildGitHubAuthConfig(installationId),
-		source,
-		teamDbId,
-		telemetry,
-	});
-
-	const lastIngestedPrNumber = await getLastIngestedPrNumber(
-		repositoryIndex.dbId,
-	);
-
-	await updateContentStatus(dbId, "pull_request", {
-		status: "completed",
-		metadata: createPullRequestMetadata({
-			lastIngestedPrNumber: lastIngestedPrNumber ?? undefined,
-		}),
-		lastSyncedAt: new Date(),
-		errorCode: null,
-		retryAfter: null,
-	});
-}
+const failedStatus = ({
+	errorCode,
+	retryAfter,
+}: ReturnType<typeof extractErrorInfo>) => ({
+	status: "failed" as const,
+	errorCode,
+	retryAfter,
+});
 
 async function getLastIngestedPrNumber(repositoryIndexDbId: number) {
 	const results = await db
@@ -188,58 +185,44 @@ async function getLastIngestedPrNumber(repositoryIndexDbId: number) {
 }
 
 /**
- * Extract error code and retry time from an error
- * @param error The error to extract information from
- * @returns Error code and retry time
+ * Error retry configuration
+ */
+const ERROR_RETRY_CONFIG = {
+	DOCUMENT_NOT_FOUND: null,
+	DOCUMENT_TOO_LARGE: null,
+	DOCUMENT_RATE_LIMITED: (e: DocumentLoaderError) =>
+		e.getRetryAfterDate() ?? new Date(),
+	DOCUMENT_FETCH_ERROR: () => new Date(),
+} as const;
+
+/**
+ * Extract error information
  */
 function extractErrorInfo(error: unknown): {
 	errorCode: string;
 	retryAfter: Date | null;
 } {
 	if (error instanceof DocumentLoaderError) {
-		const errorCode = error.code;
-
-		let retryAfter: Date | null;
-		switch (error.code) {
-			case "DOCUMENT_NOT_FOUND":
-			case "DOCUMENT_TOO_LARGE":
-				// Not retryable
-				retryAfter = null;
-				break;
-			case "DOCUMENT_RATE_LIMITED":
-				retryAfter = error.getRetryAfterDate() ?? new Date();
-				break;
-			case "DOCUMENT_FETCH_ERROR":
-				retryAfter = new Date();
-				break;
-			default: {
-				const _exhaustiveCheck: never = error.code;
-				throw new Error(`Unknown error code: ${_exhaustiveCheck}`);
-			}
-		}
-
-		return { errorCode, retryAfter };
-	}
-
-	if (error instanceof RagError) {
+		const retryFn = ERROR_RETRY_CONFIG[error.code];
 		return {
 			errorCode: error.code,
-			retryAfter: new Date(),
+			retryAfter: typeof retryFn === "function" ? retryFn(error) : retryFn,
 		};
 	}
 
-	return {
-		errorCode: "UNKNOWN",
-		retryAfter: new Date(),
-	};
+	if (error instanceof RagError) {
+		return { errorCode: error.code, retryAfter: new Date() };
+	}
+
+	return { errorCode: "UNKNOWN", retryAfter: new Date() };
 }
 
 /**
- * Update content status for a specific content type
+ * Update content status
  */
 async function updateContentStatus(
 	repositoryIndexDbId: number,
-	contentType: "blob" | "pull_request",
+	contentType: GitHubRepositoryContentType,
 	update: {
 		status: "running" | "completed" | "failed";
 		metadata?:
@@ -250,38 +233,12 @@ async function updateContentStatus(
 		retryAfter?: Date | null;
 	},
 ) {
-	// For running status, ensure the record exists first
-	if (update.status === "running") {
-		const [existing] = await db
-			.select()
-			.from(githubRepositoryContentStatus)
-			.where(
-				and(
-					eq(
-						githubRepositoryContentStatus.repositoryIndexDbId,
-						repositoryIndexDbId,
-					),
-					eq(githubRepositoryContentStatus.contentType, contentType),
-				),
-			)
-			.limit(1);
-
-		if (!existing) {
-			throw new Error(
-				`${contentType} content status not found for repository dbId: ${repositoryIndexDbId}`,
-			);
-		}
-	}
-
 	await db
 		.update(githubRepositoryContentStatus)
 		.set(update)
 		.where(
 			and(
-				eq(
-					githubRepositoryContentStatus.repositoryIndexDbId,
-					repositoryIndexDbId,
-				),
+				eq(githubRepositoryContentStatus.repositoryIndexDbId, repositoryIndexDbId),
 				eq(githubRepositoryContentStatus.contentType, contentType),
 			),
 		);
