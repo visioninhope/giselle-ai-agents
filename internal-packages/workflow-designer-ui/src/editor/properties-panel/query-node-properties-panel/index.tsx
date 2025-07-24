@@ -1,3 +1,4 @@
+import { useToasts } from "@giselle-internal/ui/toast";
 import type { QueryNode } from "@giselle-sdk/data-type";
 import {
 	useNodeGenerations,
@@ -12,7 +13,6 @@ import { Tabs } from "radix-ui";
 import { useCallback, useMemo } from "react";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { Button } from "../../../ui/button";
-import { useToasts } from "../../../ui/toast";
 import { KeyboardShortcuts } from "../../components/keyboard-shortcuts";
 import {
 	PropertiesPanelContent,

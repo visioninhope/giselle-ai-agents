@@ -1,3 +1,4 @@
+import { useToasts } from "@giselle-internal/ui/toast";
 import {
 	type WebPage,
 	WebPageId,
@@ -15,7 +16,6 @@ import { Dialog } from "radix-ui";
 import { type FormEventHandler, useCallback, useState } from "react";
 import useSWR from "swr";
 import { WebPageFileIcon } from "../../../icons";
-import { useToasts } from "../../../ui/toast";
 import {
 	PropertiesPanelContent,
 	PropertiesPanelHeader,

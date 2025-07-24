@@ -1,3 +1,4 @@
+import { useToasts } from "@giselle-internal/ui/toast";
 import type { CreateActInputs, Generation } from "@giselle-sdk/giselle";
 import {
 	useGenerationRunnerSystem,
@@ -5,7 +6,6 @@ import {
 	useWorkflowDesigner,
 } from "@giselle-sdk/giselle/react";
 import { useCallback, useRef } from "react";
-import { useToasts } from "../ui/toast";
 
 type CreateAndStartActParams = Omit<
 	CreateActInputs,
