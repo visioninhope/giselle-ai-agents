@@ -37,6 +37,10 @@ const components = [
 		id: "toast",
 		name: "Toast",
 	},
+	{
+		id: "status-badge",
+		name: "Status Badge",
+	},
 ];
 export default function ({ children }: { children: React.ReactNode }) {
 	return (
