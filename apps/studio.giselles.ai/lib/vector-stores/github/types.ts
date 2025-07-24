@@ -16,10 +16,10 @@ export type RepositoryWithStatuses = {
 /**
  * Schema for content metadata
  */
-const blobMetadataSchema = z.object({
+const blobContentStatusMetadataSchema = z.object({
 	lastIngestedCommitSha: z.string().optional(),
 });
-const pullRequestMetadataSchema = z.object({
+const pullRequestContentStatusMetadataSchema = z.object({
 	lastIngestedPrNumber: z.number().optional(),
 });
 
@@ -35,23 +35,23 @@ const contentTypeToSchemaKeyMap = {
  * Metadata schema map for each content type
  */
 const metadataSchemaMap = {
-	blob: blobMetadataSchema,
-	pullRequest: pullRequestMetadataSchema,
+	blob: blobContentStatusMetadataSchema,
+	pullRequest: pullRequestContentStatusMetadataSchema,
 } as const;
 
-type ContentMetadataMap = {
-	blob: z.infer<typeof blobMetadataSchema>;
-	pullRequest: z.infer<typeof pullRequestMetadataSchema>;
+type ContentStatusMetadataMap = {
+	blob: z.infer<typeof blobContentStatusMetadataSchema>;
+	pullRequest: z.infer<typeof pullRequestContentStatusMetadataSchema>;
 };
 
 export type ContentStatusMetadata =
-	| ContentMetadataMap[keyof ContentMetadataMap]
+	| ContentStatusMetadataMap[keyof ContentStatusMetadataMap]
 	| null;
 
-type ContentMetadataFor<T extends GitHubRepositoryContentType> =
+type ContentStatusMetadataFor<T extends GitHubRepositoryContentType> =
 	T extends keyof typeof contentTypeToSchemaKeyMap
-		? (typeof contentTypeToSchemaKeyMap)[T] extends keyof ContentMetadataMap
-			? ContentMetadataMap[(typeof contentTypeToSchemaKeyMap)[T]]
+		? (typeof contentTypeToSchemaKeyMap)[T] extends keyof ContentStatusMetadataMap
+			? ContentStatusMetadataMap[(typeof contentTypeToSchemaKeyMap)[T]]
 			: never
 		: never;
 
@@ -61,7 +61,7 @@ export function safeParseContentStatusMetadata<
 	metadata: unknown,
 	contentType: T,
 ):
-	| { success: true; data: ContentMetadataFor<T> | null }
+	| { success: true; data: ContentStatusMetadataFor<T> | null }
 	| { success: false; error: string } {
 	if (metadata === null || metadata === undefined) {
 		return { success: true, data: null };
@@ -89,23 +89,27 @@ export function safeParseContentStatusMetadata<
 	const result = schema.safeParse(metadata);
 
 	if (result.success) {
-		return { success: true, data: result.data as ContentMetadataFor<T> };
+		return { success: true, data: result.data as ContentStatusMetadataFor<T> };
 	} else {
 		return { success: false, error: result.error.message };
 	}
 }
 
-type BlobContentMetadata = z.infer<typeof blobMetadataSchema>;
-type PullRequestContentMetadata = z.infer<typeof pullRequestMetadataSchema>;
+type BlobContentStatusMetadata = z.infer<
+	typeof blobContentStatusMetadataSchema
+>;
+type PullRequestContentStatusMetadata = z.infer<
+	typeof pullRequestContentStatusMetadataSchema
+>;
 
-export function createBlobContentMetadata(
-	data: BlobContentMetadata,
-): ContentMetadataFor<"blob"> {
-	return blobMetadataSchema.parse(data);
+export function createBlobContentStatusMetadata(
+	data: BlobContentStatusMetadata,
+): ContentStatusMetadataFor<"blob"> {
+	return blobContentStatusMetadataSchema.parse(data);
 }
 
-export function createPullRequestContentMetadata(
-	data: PullRequestContentMetadata,
-): ContentMetadataFor<"pull_request"> {
-	return pullRequestMetadataSchema.parse(data);
+export function createPullRequestContentStatusMetadata(
+	data: PullRequestContentStatusMetadata,
+): ContentStatusMetadataFor<"pull_request"> {
+	return pullRequestContentStatusMetadataSchema.parse(data);
 }
