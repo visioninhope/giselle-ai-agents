@@ -10,6 +10,7 @@ import {
 	type WorkspaceId,
 } from "@giselle-sdk/data-type";
 import { defaultName } from "@giselle-sdk/giselle";
+import { revalidatePath } from "next/cache";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { after } from "next/server";
@@ -129,6 +130,7 @@ export default async function StagePage() {
 							actId: act.id,
 						}),
 					);
+					revalidatePath("/stage");
 				}}
 			/>
 			<div className="max-w-[900px] mx-auto space-y-2">
