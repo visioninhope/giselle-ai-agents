@@ -37,6 +37,10 @@ export function patchAct(act: Act, ...patches: Patch[]): Act {
 		// biome-ignore lint/suspicious/noExplicitAny: internal navigation
 		let target: any = result;
 		for (const key of keys) {
+			// Additional check during navigation for defense in depth
+			if (isDangerousKey(key)) {
+				throw new Error(`Dangerous path detected: "${patch.path}"`);
+			}
 			target = target[key];
 			if (target === undefined) {
 				throw new Error(`Path not found: "${patch.path}"`);
@@ -45,18 +49,34 @@ export function patchAct(act: Act, ...patches: Patch[]): Act {
 
 		// Apply the patch
 		if ("set" in patch) {
+			// Additional check before assignment for defense in depth
+			if (isDangerousKey(lastKey)) {
+				throw new Error(`Dangerous path detected: "${patch.path}"`);
+			}
 			target[lastKey] = patch.set;
 		} else if ("increment" in patch) {
+			// Additional check before increment for defense in depth
+			if (isDangerousKey(lastKey)) {
+				throw new Error(`Dangerous path detected: "${patch.path}"`);
+			}
 			if (typeof target[lastKey] !== "number") {
 				throw new Error(`Cannot increment non-number at path: "${patch.path}"`);
 			}
 			target[lastKey] += patch.increment;
 		} else if ("decrement" in patch) {
+			// Additional check before decrement for defense in depth
+			if (isDangerousKey(lastKey)) {
+				throw new Error(`Dangerous path detected: "${patch.path}"`);
+			}
 			if (typeof target[lastKey] !== "number") {
 				throw new Error(`Cannot decrement non-number at path: "${patch.path}"`);
 			}
 			target[lastKey] -= patch.decrement;
 		} else if ("push" in patch) {
+			// Additional check before push for defense in depth
+			if (isDangerousKey(lastKey)) {
+				throw new Error(`Dangerous path detected: "${patch.path}"`);
+			}
 			if (!Array.isArray(target[lastKey])) {
 				throw new Error(`Cannot push to non-array at path: "${patch.path}"`);
 			}

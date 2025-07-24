@@ -377,6 +377,19 @@ describe("patchAct", () => {
 			expect(() => {
 				patchAct(act, { path: "sequences.0.__proto__", set: "bad" });
 			}).toThrow('Dangerous path detected: "sequences.0.__proto__"');
+
+			// Test dangerous keys with other operations
+			expect(() => {
+				patchAct(act, { path: "constructor", increment: 1 });
+			}).toThrow('Dangerous path detected: "constructor"');
+
+			expect(() => {
+				patchAct(act, { path: "__proto__", decrement: 1 });
+			}).toThrow('Dangerous path detected: "__proto__"');
+
+			expect(() => {
+				patchAct(act, { path: "prototype", push: ["item"] });
+			}).toThrow('Dangerous path detected: "prototype"');
 		});
 
 		it("should allow legitimate paths that might look suspicious", () => {
