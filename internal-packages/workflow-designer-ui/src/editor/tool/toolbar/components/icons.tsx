@@ -4,7 +4,6 @@ export {
 	DocumentIcon,
 	GenerateImageIcon,
 	GenerateTextIcon,
-	GenNodeIcon,
 	GitHubIcon,
 	GoogleWhiteIcon,
 	OpenaiIcon,
@@ -13,12 +12,9 @@ export {
 	PictureIcon,
 	PromptIcon,
 	SearchIcon,
-	SourceLinkIcon,
 	TextFileIcon,
 	TriggerIcon,
-	UploadIcon,
 	VideoIcon,
 	WebPageFileIcon,
-	WilliIcon,
 } from "../../../../icons";
 export { ImageGenerationNodeIcon } from "../../../../icons/node";

@@ -9,9 +9,8 @@ export * from "./flux1";
 export * from "./folder";
 export { GenerateImageIcon } from "./generate-image";
 export * from "./generate-text";
-export { GenerateTextIcon, SearchIcon } from "./generate-text";
 export * from "./generated-content";
-export * from "./gennode";
+
 export * from "./giselle-icon";
 export * from "./giselle-logo";
 export * from "./github";
@@ -27,6 +26,7 @@ export * from "./perplexity";
 export * from "./picture";
 export * from "./prompt";
 export * from "./recraft";
+export * from "./search";
 export * from "./source-link";
 export * from "./sparkles";
 export * from "./spinner";
@@ -38,7 +38,7 @@ export * from "./texts";
 export * from "./tool";
 export * from "./triangle-alert";
 export * from "./trigger";
-export * from "./upload";
+
 export * from "./variable";
 export { VideoIcon } from "./video";
 export * from "./view";

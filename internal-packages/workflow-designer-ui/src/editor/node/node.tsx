@@ -4,10 +4,13 @@ import {
 	GitHubNode,
 	ImageGenerationNode,
 	type InputId,
+	isActionNode,
 	isImageGenerationNode,
 	isTextGenerationNode,
 	isTriggerNode,
+	isVectorStoreNode,
 	type Node,
+	type NodeLike,
 	type OutputId,
 	QueryNode,
 	TextGenerationNode,
@@ -37,6 +40,20 @@ import { EditableText } from "../../ui/editable-text";
 import { Tooltip } from "../../ui/tooltip";
 import { GitHubNodeInfo } from "./ui";
 import { GitHubTriggerStatusBadge } from "./ui/github-trigger/status-badge";
+
+// Helper function to check if a GitHub node requires setup
+function isGitHubNodeRequiresSetup(node: NodeLike): boolean {
+	if (isTriggerNode(node, "github")) {
+		return node.content.state.status !== "configured";
+	}
+	if (isActionNode(node, "github")) {
+		return node.content.command.state.status !== "configured";
+	}
+	if (isVectorStoreNode(node, "github")) {
+		return node.content.source.state.status !== "configured";
+	}
+	return false;
+}
 
 type GiselleWorkflowDesignerTextGenerationNode = XYFlowNode<
 	{ nodeData: TextGenerationNode; preview?: boolean },
@@ -175,6 +192,9 @@ export function NodeComponent({
 		tmp.push({ label: node.id.substring(3, 11), tooltip: "Node ID" });
 		return tmp;
 	}, [node]);
+
+	const requiresSetup = isGitHubNodeRequiresSetup(node);
+
 	return (
 		<div
 			data-type={node.type}
@@ -196,16 +216,18 @@ export function NodeComponent({
 				"data-[content-type=textGeneration]:from-generation-node-1] data-[content-type=textGeneration]:to-generation-node-2 data-[content-type=textGeneration]:shadow-generation-node-1",
 				"data-[content-type=imageGeneration]:from-image-generation-node-1] data-[content-type=imageGeneration]:to-image-generation-node-2 data-[content-type=imageGeneration]:shadow-image-generation-node-1",
 				"data-[content-type=github]:from-github-node-1] data-[content-type=github]:to-github-node-2 data-[content-type=github]:shadow-github-node-1",
-				"data-[content-type=vectorStore]:data-[vector-store-source-provider=github]:from-github-node-1] data-[content-type=vectorStore]:data-[vector-store-source-provider=github]:to-github-node-2 data-[content-type=vectorStore]:data-[vector-store-source-provider=github]:shadow-github-node-1",
+				"data-[content-type=vectorStore]:from-vector-store-node-1] data-[content-type=vectorStore]:to-vector-store-node-2 data-[content-type=vectorStore]:shadow-vector-store-node-1",
 				"data-[content-type=webSearch]:from-web-search-node-1] data-[content-type=webSearch]:to-web-search-node-2 data-[content-type=webSearch]:shadow-web-search-node-1",
 				"data-[content-type=audioGeneration]:from-audio-generation-node-1] data-[content-type=audioGeneration]:to-audio-generation-node-2 data-[content-type=audioGeneration]:shadow-audio-generation-node-1",
 				"data-[content-type=videoGeneration]:from-video-generation-node-1] data-[content-type=videoGeneration]:to-video-generation-node-2 data-[content-type=videoGeneration]:shadow-video-generation-node-1",
-				"data-[content-type=trigger]:from-trigger-node-1] data-[content-type=trigger]:to-trigger-node-2 data-[content-type=trigger]:shadow-trigger-node-1",
+				"data-[content-type=trigger]:from-trigger-node-1/60] data-[content-type=trigger]:to-trigger-node-2 data-[content-type=trigger]:shadow-trigger-node-1",
 				"data-[content-type=action]:from-action-node-1] data-[content-type=action]:to-action-node-2 data-[content-type=action]:shadow-action-node-1",
 				"data-[content-type=query]:from-query-node-1] data-[content-type=query]:to-query-node-2 data-[content-type=query]:shadow-query-node-1",
 				"data-[selected=true]:shadow-[0px_0px_16px_0px]",
+				"data-[selected=true]:data-[content-type=trigger]:shadow-[0px_0px_16px_0px_hsl(302,95%,63%)]",
 				"data-[preview=true]:opacity-50",
 				"not-data-preview:min-h-[110px]",
+				requiresSetup && "opacity-80",
 			)}
 		>
 			{currentGeneration?.status === "created" &&
@@ -254,18 +276,21 @@ export function NodeComponent({
 			</AnimatePresence>
 			<div
 				className={clsx(
-					"absolute z-0 rounded-[16px] inset-0 border-[1px] mask-fill bg-gradient-to-br bg-origin-border bg-clip-boarder border-transparent",
+					"absolute z-0 rounded-[16px] inset-0 border-[1px] mask-fill bg-gradient-to-br bg-origin-border bg-clip-boarder",
+					requiresSetup
+						? "border-black/60 border-dashed [border-width:2px]"
+						: "border-transparent",
 					"group-data-[content-type=text]:from-text-node-1/40 group-data-[content-type=text]:to-text-node-1",
 					"group-data-[content-type=file]:from-file-node-1/40 group-data-[content-type=file]:to-file-node-1",
 					"group-data-[content-type=webPage]:from-webPage-node-1/40 group-data-[content-type=webPage]:to-webPage-node-1",
 					"group-data-[content-type=textGeneration]:from-generation-node-1/40 group-data-[content-type=textGeneration]:to-generation-node-1",
 					"group-data-[content-type=imageGeneration]:from-image-generation-node-1/40 group-data-[content-type=imageGeneration]:to-image-generation-node-1",
 					"group-data-[content-type=github]:from-github-node-1/40 group-data-[content-type=github]:to-github-node-1",
-					"group-data-[content-type=vectorStore]:group-data-[vector-store-source-provider=github]:from-github-node-1/40 group-data-[content-type=vectorStore]:group-data-[vector-store-source-provider=github]:to-github-node-1",
+					"group-data-[content-type=vectorStore]:from-vector-store-node-1/40 group-data-[content-type=vectorStore]:to-vector-store-node-1",
 					"group-data-[content-type=webSearch]:from-web-search-node-1/40 group-data-[content-type=webSearch]:to-web-search-node-1",
 					"group-data-[content-type=audioGeneration]:from-audio-generation-node-1/40 group-data-[content-type=audioGeneration]:to-audio-generation-node-1",
 					"group-data-[content-type=videoGeneration]:from-video-generation-node-1/40 group-data-[content-type=videoGeneration]:to-video-generation-node-1",
-					"group-data-[content-type=trigger]:from-trigger-node-1/40 group-data-[content-type=trigger]:to-trigger-node-1",
+					"group-data-[content-type=trigger]:from-trigger-node-1/60 group-data-[content-type=trigger]:to-trigger-node-1",
 					"group-data-[content-type=action]:from-action-node-1/40 group-data-[content-type=action]:to-action-node-1",
 					"group-data-[content-type=query]:from-query-node-1/40 group-data-[content-type=query]:to-query-node-1",
 				)}
@@ -290,7 +315,7 @@ export function NodeComponent({
 							"group-data-[content-type=textGeneration]:bg-generation-node-1",
 							"group-data-[content-type=imageGeneration]:bg-image-generation-node-1",
 							"group-data-[content-type=github]:bg-github-node-1",
-							"group-data-[content-type=vectorStore]:group-data-[vector-store-source-provider=github]:bg-github-node-1",
+							"group-data-[content-type=vectorStore]:bg-vector-store-node-1",
 							"group-data-[content-type=webSearch]:bg-web-search-node-1",
 							"group-data-[content-type=audioGeneration]:bg-audio-generation-node-1",
 							"group-data-[content-type=videoGeneration]:bg-video-generation-node-1",
@@ -302,20 +327,33 @@ export function NodeComponent({
 						<NodeIcon
 							node={node}
 							className={clsx(
-								"w-[16px] h-[16px] stroke-current fill-none",
+								"w-[16px] h-[16px]",
+								"group-data-[content-type=text]:fill-current",
+								"group-data-[content-type=file]:fill-current",
+								"group-data-[content-type=webPage]:fill-current",
+								"group-data-[content-type=textGeneration]:stroke-current fill-none",
+								"group-data-[content-type=imageGeneration]:stroke-current fill-none",
+								"group-data-[content-type=github]:fill-current",
+								"group-data-[content-type=vectorStore]:fill-current",
+								"group-data-[content-type=webSearch]:stroke-current fill-none",
+								"group-data-[content-type=audioGeneration]:stroke-current fill-none",
+								"group-data-[content-type=videoGeneration]:stroke-current fill-none",
+								"group-data-[content-type=trigger]:stroke-current fill-none",
+								"group-data-[content-type=action]:fill-current",
+								"group-data-[content-type=query]:stroke-current fill-none",
 								"group-data-[content-type=text]:text-black-900",
 								"group-data-[content-type=file]:text-black-900",
 								"group-data-[content-type=webPage]:text-black-900",
 								"group-data-[content-type=textGeneration]:text-white-900",
 								"group-data-[content-type=imageGeneration]:text-white-900",
-								"group-data-[content-type=github]:text-white-900",
-								"group-data-[content-type=vectorStore]:group-data-[vector-store-source-provider=github]:text-white-900",
+								"group-data-[content-type=github]:text-black-900",
+								"group-data-[content-type=vectorStore]:text-black-900",
 								"group-data-[content-type=webSearch]:text-white-900",
 								"group-data-[content-type=audioGeneration]:text-white-900",
 								"group-data-[content-type=videoGeneration]:text-white-900",
 								"group-data-[content-type=trigger]:text-white-900",
 								"group-data-[content-type=action]:text-white-900",
-								"group-data-[content-type=query]:text-white-900",
+								"group-data-[content-type=query]:text-black-900",
 							)}
 						/>
 					</div>
@@ -479,7 +517,7 @@ export function NodeComponent({
 										"group-data-[content-type=textGeneration]:!border-generation-node-1",
 										"group-data-[content-type=imageGeneration]:!border-image-generation-node-1",
 										"group-data-[content-type=github]:!border-github-node-1",
-										"group-data-[content-type=vectorStore]:group-data-[vector-store-source-provider=github]:!border-github-node-1",
+										"group-data-[content-type=vectorStore]:!border-vector-store-node-1",
 										"group-data-[content-type=text]:!border-text-node-1",
 										"group-data-[content-type=file]:!border-file-node-1",
 										"group-data-[content-type=webPage]:!border-webPage-node-1",
@@ -493,7 +531,7 @@ export function NodeComponent({
 										"group-data-[state=connected]:group-data-[content-type=textGeneration]:!bg-generation-node-1",
 										"group-data-[state=connected]:group-data-[content-type=imageGeneration]:!bg-image-generation-node-1",
 										"group-data-[state=connected]:group-data-[content-type=github]:!bg-github-node-1",
-										"group-data-[state=connected]:group-data-[content-type=vectorStore]:group-data-[vector-store-source-provider=github]:!bg-github-node-1",
+										"group-data-[state=connected]:group-data-[content-type=vectorStore]:!bg-vector-store-node-1",
 										"group-data-[state=connected]:group-data-[content-type=text]:!bg-text-node-1 group-data-[state=connected]:group-data-[content-type=text]:!border-text-node-1",
 										"group-data-[state=connected]:group-data-[content-type=file]:!bg-file-node-1 group-data-[state=connected]:group-data-[content-type=file]:!border-file-node-1",
 										"group-data-[state=connected]:group-data-[content-type=webPage]:!bg-webPage-node-1 group-data-[state=connected]:group-data-[content-type=webPage]:!border-webPage-node-1",
