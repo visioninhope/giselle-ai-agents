@@ -14,7 +14,7 @@ import {
 import { defaultName, useWorkflowDesigner } from "@giselle-sdk/giselle/react";
 import { PlayIcon } from "lucide-react";
 import { type ButtonHTMLAttributes, useMemo, useState } from "react";
-import { TriggerInputDialog } from "../../../header/ui";
+import { TriggerInputDialog } from "../../../header/ui/trigger-input-dialog";
 import { useActController } from "../../../hooks/use-act-controller";
 import { NodeIcon } from "../../../icons/node";
 
