@@ -86,6 +86,7 @@ export default async function StagePage() {
 				id: tmpFlowTrigger.sdkFlowTriggerId,
 				teamId: team.id,
 				label: node.name ?? defaultName(node),
+				workspaceName: workspace.name ?? "Untitled",
 				sdkData: flowTrigger,
 			});
 		}

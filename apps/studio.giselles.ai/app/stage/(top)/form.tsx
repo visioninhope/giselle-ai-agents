@@ -24,6 +24,7 @@ interface TeamOption {
 export interface FlowTriggerUIItem {
 	id: FlowTriggerId;
 	teamId: TeamId;
+	workspaceName: string;
 	label: string;
 	sdkData: FlowTrigger;
 }
@@ -213,12 +214,9 @@ export function Form({
 											label: "No flows available",
 										},
 									]
-								: filteredFlowTriggers.map((flowTrigger) => ({
-										id: flowTrigger.id,
-										label: flowTrigger.label,
-									}))
+								: filteredFlowTriggers
 						}
-						renderOption={(o) => o.label}
+						renderOption={(o) => `${o.workspaceName} / ${o.label}`}
 						value={selectedFlowTriggerId}
 						onValueChange={(value) => {
 							const selectedFlowTrigger = filteredFlowTriggers.find(
