@@ -15,7 +15,7 @@ import {
 	createAndStartAct,
 	getAct,
 	getWorkspaceActs,
-	type PatchDelta,
+	type Patch,
 	patchAct,
 	type StartActInputs,
 	startAct,
@@ -343,7 +343,7 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 				context,
 			});
 		},
-		patchAct(args: { actId: ActId; delta: PatchDelta }) {
+		patchAct(args: { actId: ActId; patches: Patch[] }) {
 			return patchAct({ ...args, context });
 		},
 		getWorkspaceActs(args: { workspaceId: WorkspaceId }) {

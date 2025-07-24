@@ -1,100 +1,88 @@
 import type { Act } from "../../../concepts/act";
 
-type ActPath = DotPaths<Act>;
+// Patch types - one for each operation
+export type Patch =
+	| { path: string; set: unknown }
+	| { path: string; increment: number }
+	| { path: string; decrement: number }
+	| { path: string; push: unknown[] };
 
-type PatchValue<T> = T extends number
-	? { increment?: number; decrement?: number; set?: number }
-	: T extends string
-		? { set: string }
-		: T extends Array<infer U>
-			? {
-					push?: U[];
-					set?: U[];
-				}
-			: never;
+// Dangerous keys that could lead to prototype pollution
+// These keys are blocked to prevent modification of the prototype chain
+const DANGEROUS_KEYS = ["__proto__", "constructor", "prototype"];
 
-export type PatchDelta = {
-	[P in ActPath]?: PatchValue<Get<Act, P>>;
-};
+function isDangerousKey(key: string): boolean {
+	return DANGEROUS_KEYS.includes(key);
+}
 
-export function patchAct(act: Act, delta: PatchDelta) {
-	const result: Act = structuredClone(act);
+export function patchAct(act: Act, ...patches: Patch[]): Act {
+	const result = structuredClone(act);
 
-	for (const key in delta) {
-		const patch = delta[key as ActPath];
-		if (!patch) continue;
+	for (const patch of patches) {
+		// Support both [0] and .0 notation for arrays
+		const normalizedPath = patch.path.replace(/\[(\d+)\]/g, ".$1");
+		const keys = normalizedPath.split(".");
+		const lastKey = keys.pop();
 
-		const parts = key.split(".");
-		const lastKey = parts.at(-1);
 		if (!lastKey) {
-			throw new Error(`Invalid dot path: "${key}"`);
+			throw new Error(`Invalid path: "${patch.path}"`);
 		}
-		const pathToLast = parts.slice(0, -1);
 
-		// biome-ignore lint: lint/suspicious/noExplicitAny: internal use
+		// Check for dangerous keys to prevent prototype pollution
+		if (keys.some(isDangerousKey) || isDangerousKey(lastKey)) {
+			throw new Error(`Dangerous path detected: "${patch.path}"`);
+		}
+
+		// Navigate to the target object
+		// biome-ignore lint/suspicious/noExplicitAny: internal navigation
 		let target: any = result;
-		for (const part of pathToLast) {
-			target = target[part];
+		for (const key of keys) {
+			// Additional check during navigation for defense in depth
+			if (isDangerousKey(key)) {
+				throw new Error(`Dangerous path detected: "${patch.path}"`);
+			}
+			target = target[key];
+			if (target === undefined) {
+				throw new Error(`Path not found: "${patch.path}"`);
+			}
 		}
 
-		const current = target[lastKey];
-
-		if (typeof current === "number" && typeof patch === "object") {
-			if ("set" in patch) {
-				target[lastKey] = patch.set;
-			} else if ("increment" in patch) {
-				const inc = patch.increment ?? 0;
-				target[lastKey] = current + inc;
-			} else if ("decrement" in patch) {
-				const dec = patch.decrement ?? 0;
-				target[lastKey] = current - dec;
+		// Apply the patch
+		if ("set" in patch) {
+			// Additional check before assignment for defense in depth
+			if (isDangerousKey(lastKey)) {
+				throw new Error(`Dangerous path detected: "${patch.path}"`);
 			}
-		} else if (typeof current === "string" && typeof patch === "object") {
-			if ("set" in patch && patch.set !== undefined) {
-				target[lastKey] = patch.set;
+			target[lastKey] = patch.set;
+		} else if ("increment" in patch) {
+			// Additional check before increment for defense in depth
+			if (isDangerousKey(lastKey)) {
+				throw new Error(`Dangerous path detected: "${patch.path}"`);
 			}
-		} else if (Array.isArray(current) && typeof patch === "object") {
-			if ("set" in patch && patch.set !== undefined) {
-				target[lastKey] = patch.set;
-			} else {
-				const newArray = [...current];
-
-				if ("push" in patch && patch.push) {
-					newArray.push(...patch.push);
-				}
-
-				target[lastKey] = newArray;
+			if (typeof target[lastKey] !== "number") {
+				throw new Error(`Cannot increment non-number at path: "${patch.path}"`);
 			}
+			target[lastKey] += patch.increment;
+		} else if ("decrement" in patch) {
+			// Additional check before decrement for defense in depth
+			if (isDangerousKey(lastKey)) {
+				throw new Error(`Dangerous path detected: "${patch.path}"`);
+			}
+			if (typeof target[lastKey] !== "number") {
+				throw new Error(`Cannot decrement non-number at path: "${patch.path}"`);
+			}
+			target[lastKey] -= patch.decrement;
+		} else if ("push" in patch) {
+			// Additional check before push for defense in depth
+			if (isDangerousKey(lastKey)) {
+				throw new Error(`Dangerous path detected: "${patch.path}"`);
+			}
+			if (!Array.isArray(target[lastKey])) {
+				throw new Error(`Cannot push to non-array at path: "${patch.path}"`);
+			}
+			target[lastKey].push(...patch.push);
 		}
 	}
 
 	return result;
 }
-
-type IsRecord<T> = T extends Record<string, unknown> ? T : never;
-
-type DotPaths<T, Prefix extends string = "", Depth extends number = 5> = [
-	Depth,
-] extends [never]
-	? never
-	: {
-			[K in keyof T]: IsRecord<T[K]> extends never
-				? `${Prefix}${K & string}`
-				:
-						| `${Prefix}${K & string}`
-						| DotPaths<
-								IsRecord<T[K]>,
-								`${Prefix}${K & string}.`,
-								Decrement[Depth]
-						  >;
-		}[keyof T];
-
-type Decrement = [never, 0, 1, 2, 3, 4, 5];
-
-type Get<T, Path extends string> = Path extends `${infer K}.${infer R}`
-	? K extends keyof T
-		? Get<T[K], R>
-		: never
-	: Path extends keyof T
-		? T[Path]
-		: never;

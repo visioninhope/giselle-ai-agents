@@ -6,10 +6,13 @@ import { ActId, GenerationId, StepId } from "./identifiers";
 
 // Re-export ActId from identifiers
 export { ActId } from "./identifiers";
+export const SequenceId = createIdGenerator("sqn");
 
 const ActAnnotationObject = z.object({
 	level: z.enum(["info", "warning", "error"]),
 	message: z.string(),
+	sequenceId: SequenceId.schema,
+	stepId: StepId.schema,
 });
 
 export const Step = z.object({
@@ -17,14 +20,28 @@ export const Step = z.object({
 	status: GenerationStatus,
 	name: z.string(),
 	generationId: GenerationId.schema,
+	duration: z.number(),
+	usage: z.object({
+		promptTokens: z.number(),
+		completionTokens: z.number(),
+		totalTokens: z.number(),
+	}),
 });
 export type Step = z.infer<typeof Step>;
 
-export const SequenceId = createIdGenerator("sqn");
 export const Sequence = z.object({
 	id: SequenceId.schema,
 	steps: z.array(Step),
 	status: GenerationStatus,
+	duration: z.object({
+		wallClock: z.number(),
+		totalTask: z.number(),
+	}),
+	usage: z.object({
+		promptTokens: z.number(),
+		completionTokens: z.number(),
+		totalTokens: z.number(),
+	}),
 });
 export type Sequence = z.infer<typeof Sequence>;
 

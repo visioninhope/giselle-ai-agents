@@ -1,33 +1,30 @@
-import type { Act } from "../../concepts/act";
+import { Act } from "../../concepts/act";
 import type { ActId } from "../../concepts/identifiers";
 import type { GiselleEngineContext } from "../types";
-import {
-	type PatchDelta,
-	patchAct as patchActObject,
-} from "./object/patch-object";
+import { type Patch, patchAct as patchActObject } from "./object/patch-object";
 import { actPath } from "./object/paths";
 
-export type { PatchDelta };
+export type { Patch };
 
 export async function patchAct(args: {
 	context: GiselleEngineContext;
 	actId: ActId;
-	delta: PatchDelta;
+	patches: Patch[];
 }) {
 	// Get the current act
-	const currentAct = await args.context.storage.getItem<Act>(
-		actPath(args.actId),
-	);
-
-	if (!currentAct) {
-		throw new Error(`Act not found: ${args.actId}`);
-	}
-
-	// Apply the patch
-	const updatedAct = patchActObject(currentAct, {
-		...args.delta,
-		updatedAt: { set: Date.now() },
+	const currentAct = await args.context.experimental_storage.getJson({
+		path: actPath(args.actId),
+		schema: Act,
 	});
+
+	// Always update the updatedAt field
+	const allPatches: Patch[] = [
+		...args.patches,
+		{ path: "updatedAt", set: Date.now() },
+	];
+
+	// Apply the patches
+	const updatedAct = patchActObject(currentAct, ...allPatches);
 
 	await args.context.storage.setItem(actPath(args.actId), updatedAct);
 
