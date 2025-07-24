@@ -1,3 +1,4 @@
+import { StatusBadge } from "@giselle-internal/ui/status-badge";
 import {
 	Table,
 	TableBody,
@@ -15,7 +16,6 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { after } from "next/server";
 import { giselleEngine } from "@/app/giselle-engine";
-import { StatusBadge } from "@/components/status-badge";
 import { acts as actsSchema, db } from "@/drizzle";
 import { experimental_storageFlag, stageFlag } from "@/flags";
 import { fetchCurrentUser } from "@/services/accounts";

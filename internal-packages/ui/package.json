@@ -18,7 +18,8 @@
 		"./popover": "./components/popover.tsx",
 		"./toggle": "./components/toggle.tsx",
 		"./input": "./components/input.tsx",
-		"./toast": "./components/toast.tsx"
+		"./toast": "./components/toast.tsx",
+		"./status-badge": "./components/status-badge.tsx"
 	},
 	"dependencies": {
 		"clsx": "catalog:",
