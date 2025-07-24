@@ -1,4 +1,11 @@
 "use client";
+
+import {
+	Dialog,
+	DialogContent,
+	DialogTitle,
+	DialogTrigger,
+} from "@giselle-internal/ui/dialog";
 import {
 	isTriggerNode,
 	type TriggerNode,
@@ -11,7 +18,6 @@ import {
 } from "@giselle-sdk/giselle/react";
 import { PlayIcon } from "lucide-react";
 import Link from "next/link";
-import { Dialog } from "radix-ui";
 import { type ReactNode, useCallback, useMemo, useState } from "react";
 import { EditableText } from "../editor/properties-panel/ui";
 import { GiselleLogo } from "../icons";
@@ -58,7 +64,7 @@ function Trigger() {
 
 	// Use a unified button and dialog approach for both single and multiple triggers
 	return (
-		<Dialog.Root
+		<Dialog
 			open={open}
 			onOpenChange={(isOpen) => {
 				setOpen(isOpen);
@@ -67,65 +73,62 @@ function Trigger() {
 				}
 			}}
 		>
-			<Dialog.Trigger asChild>
+			<DialogTrigger asChild>
 				<Button
 					leftIcon={<PlayIcon className="size-[14px] fill-black-900" />}
 					type="button"
 				>
 					{triggerNodes.length === 1 ? buttonLabel(triggerNodes[0]) : "Run"}
 				</Button>
-			</Dialog.Trigger>
-			<Dialog.Portal>
-				<Dialog.Overlay className="fixed inset-0 bg-black/25 z-50" />
-				<Dialog.Content className="fixed left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] w-[400px] bg-black-900 rounded-[12px] p-[24px] shadow-xl z-50 overflow-hidden border border-black-400 outline-none">
-					<Dialog.Title className="sr-only">
-						Override inputs to test workflow
-					</Dialog.Title>
+			</DialogTrigger>
+			<DialogContent>
+				<DialogTitle className="sr-only">
+					Override inputs to test workflow
+				</DialogTitle>
 
-					{triggerNodes.length === 1 ? (
-						<TriggerInputDialog node={triggerNodes[0]} onClose={handleClose} />
-					) : selectedTriggerNode ? (
-						<TriggerInputDialog
-							node={selectedTriggerNode}
-							onClose={handleClose}
-						/>
-					) : (
-						// Show trigger selection
-						<div className="space-y-4">
-							<h3 className="text-white-900 text-[16px] font-medium mb-2">
-								Select a trigger to execute
-							</h3>
-							<div className="space-y-2">
-								{triggerNodes.map((triggerNode) => (
-									<button
-										type="button"
-										key={triggerNode.id}
-										className="w-full text-left text-white-900 p-3 border border-black-400 rounded-[6px] hover:bg-black-800 flex items-center gap-2"
-										onClick={() => handleTriggerSelect(triggerNode)}
-									>
-										<PlayIcon className="size-[14px] shrink-0 fill-white-900" />
-										<div className="flex flex-col">
-											<span className="font-medium">
-												{triggerNode.name ??
-													triggerNodeDefaultName(
-														triggerNode.content.provider,
-													)}{" "}
-												<span className="text-[10px] text-white-300 font-mono">
-													(id:{triggerNode.id.substring(3, 11)})
-												</span>
+				{triggerNodes.length === 1 ? (
+					<TriggerInputDialog node={triggerNodes[0]} onClose={handleClose} />
+				) : selectedTriggerNode ? (
+					<TriggerInputDialog
+						node={selectedTriggerNode}
+						onClose={handleClose}
+					/>
+				) : (
+					// Show trigger selection
+					<div className="space-y-4">
+						<h3 className="text-white-900 text-[16px] font-medium mb-2">
+							Select a trigger to execute
+						</h3>
+						<div className="space-y-2">
+							{triggerNodes.map((triggerNode) => (
+								<button
+									type="button"
+									key={triggerNode.id}
+									className="w-full text-left text-white-900 p-3 border border-black-400 rounded-[6px] hover:bg-black-800 flex items-center gap-2"
+									onClick={() => handleTriggerSelect(triggerNode)}
+								>
+									<PlayIcon className="size-[14px] shrink-0 fill-white-900" />
+									<div className="flex flex-col">
+										<span className="font-medium">
+											{triggerNode.name ??
+												triggerNodeDefaultName(
+													triggerNode.content.provider,
+												)}{" "}
+											<span className="text-[10px] text-white-300 font-mono">
+												(id:{triggerNode.id.substring(3, 11)})
 											</span>
-											<span className="text-white-700 text-xs">
-												{buttonLabel(triggerNode)}
-											</span>
-										</div>
-									</button>
-								))}
-							</div>
+										</span>
+										<span className="text-white-700 text-xs">
+											{buttonLabel(triggerNode)}
+										</span>
+									</div>
+								</button>
+							))}
 						</div>
-					)}
-				</Dialog.Content>
-			</Dialog.Portal>
-		</Dialog.Root>
+					</div>
+				)}
+			</DialogContent>
+		</Dialog>
 	);
 }
 
