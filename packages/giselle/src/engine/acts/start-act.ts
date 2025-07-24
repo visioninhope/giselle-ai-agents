@@ -44,14 +44,12 @@ async function executeStep(args: {
 				await generateImage({ ...args, useExperimentalStorage: true });
 				break;
 			case "textGeneration": {
-				let hadError = false;
 				const result = await generateText({
 					...args,
 					useExperimentalStorage: true,
 				});
 				await result.consumeStream({
 					onError: async (error) => {
-						hadError = true;
 						if (AISDKError.isInstance(error)) {
 							const failedGeneration = {
 								...args.generation,
@@ -78,7 +76,7 @@ async function executeStep(args: {
 						}
 					},
 				});
-				return hadError;
+				break;
 			}
 			case "trigger":
 				await resolveTrigger(args);
