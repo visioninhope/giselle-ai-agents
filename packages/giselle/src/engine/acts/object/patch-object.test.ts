@@ -354,6 +354,51 @@ describe("patchAct", () => {
 				patchAct(act, { path: "status", push: ["item"] });
 			}).toThrow('Cannot push to non-array at path: "status"');
 		});
+
+		it("should throw error for prototype pollution attempts", () => {
+			const act = createTestAct();
+
+			// Test __proto__ pollution
+			expect(() => {
+				patchAct(act, { path: "__proto__.polluted", set: "bad" });
+			}).toThrow('Dangerous path detected: "__proto__.polluted"');
+
+			// Test constructor pollution
+			expect(() => {
+				patchAct(act, { path: "constructor.prototype.polluted", set: "bad" });
+			}).toThrow('Dangerous path detected: "constructor.prototype.polluted"');
+
+			// Test prototype pollution
+			expect(() => {
+				patchAct(act, { path: "sequences.prototype.polluted", set: "bad" });
+			}).toThrow('Dangerous path detected: "sequences.prototype.polluted"');
+
+			// Test nested dangerous key
+			expect(() => {
+				patchAct(act, { path: "sequences.0.__proto__", set: "bad" });
+			}).toThrow('Dangerous path detected: "sequences.0.__proto__"');
+		});
+
+		it("should allow legitimate paths that might look suspicious", () => {
+			const act = createTestAct();
+
+			// These should work fine
+			const result1 = patchAct(act, { path: "status", set: "completed" });
+			expect(result1.status).toBe("completed");
+
+			const result2 = patchAct(act, {
+				path: "sequences.0.status",
+				set: "running",
+			});
+			expect(result2.sequences[0].status).toBe("running");
+
+			// Property names containing the word "proto" should be fine
+			const result3 = patchAct(act, {
+				path: "trigger",
+				set: "protocol_handler",
+			});
+			expect(result3.trigger).toBe("protocol_handler");
+		});
 	});
 
 	describe("immutability", () => {

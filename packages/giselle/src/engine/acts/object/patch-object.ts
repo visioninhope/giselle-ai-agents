@@ -7,6 +7,14 @@ export type Patch =
 	| { path: string; decrement: number }
 	| { path: string; push: unknown[] };
 
+// Dangerous keys that could lead to prototype pollution
+// These keys are blocked to prevent modification of the prototype chain
+const DANGEROUS_KEYS = ["__proto__", "constructor", "prototype"];
+
+function isDangerousKey(key: string): boolean {
+	return DANGEROUS_KEYS.includes(key);
+}
+
 export function patchAct(act: Act, ...patches: Patch[]): Act {
 	const result = structuredClone(act);
 
@@ -18,6 +26,11 @@ export function patchAct(act: Act, ...patches: Patch[]): Act {
 
 		if (!lastKey) {
 			throw new Error(`Invalid path: "${patch.path}"`);
+		}
+
+		// Check for dangerous keys to prevent prototype pollution
+		if (keys.some(isDangerousKey) || isDangerousKey(lastKey)) {
+			throw new Error(`Dangerous path detected: "${patch.path}"`);
 		}
 
 		// Navigate to the target object
