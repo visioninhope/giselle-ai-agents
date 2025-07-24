@@ -278,7 +278,7 @@ export function RepositoryRegistrationDialog({
 								<ContentTypeToggle
 									icon={GitPullRequest}
 									label="Pull Requests"
-									description="Ingest pull request content and discussions"
+									description="Ingest merged pull request content and discussions"
 									enabled={contentConfig.pullRequests.enabled}
 									onToggle={(enabled) =>
 										setContentConfig({

@@ -103,7 +103,7 @@ export function ConfigureSourcesDialog({
 						<ContentTypeToggle
 							icon={GitPullRequest}
 							label="Pull Requests"
-							description="Ingest pull request content and discussions"
+							description="Ingest merged pull request content and discussions"
 							enabled={config.pullRequests.enabled}
 							onToggle={(enabled) =>
 								setConfig({ ...config, pullRequests: { enabled } })
