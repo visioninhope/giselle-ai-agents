@@ -63,7 +63,7 @@ function validateQueryParams(params: string): ValidationResult {
 		if (!key || !value) {
 			return {
 				isValid: false,
-				error: `Invalid parameter format: '${pair}'. Expected 'key=value'`,
+				error: `Invalid parameter format. Expected 'key=value'`,
 			};
 		}
 
@@ -326,7 +326,7 @@ function validateKeyValueFormat(kvString: string): ValidationResult {
 			if (!firstPair.includes("=")) {
 				return {
 					isValid: false,
-					error: `Invalid format: '${firstPair}'. Expected 'key=value' pairs separated by spaces`,
+					error: `Invalid format. Expected 'key=value' pairs separated by spaces`,
 				};
 			} else if (firstPair.includes("'")) {
 				// Check for unclosed quotes
@@ -334,7 +334,7 @@ function validateKeyValueFormat(kvString: string): ValidationResult {
 				if (quoteCount % 2 !== 0) {
 					return {
 						isValid: false,
-						error: `Invalid format: '${kvString}'. Expected 'key=value' pairs separated by spaces`,
+						error: `Invalid format. Expected 'key=value' pairs separated by spaces`,
 					};
 				}
 			}
