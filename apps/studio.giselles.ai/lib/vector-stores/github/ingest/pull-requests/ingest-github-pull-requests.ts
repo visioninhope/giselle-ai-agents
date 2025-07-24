@@ -119,7 +119,7 @@ async function getRepositoryIndexInfo(
 	const { dbId, contentStatus } = result[0];
 	if (!contentStatus) {
 		throw new Error(
-			`Blob content status not found for repository: ${source.owner}/${source.repo}`,
+			`Pull request content status not found for repository: ${source.owner}/${source.repo}`,
 		);
 	}
 
