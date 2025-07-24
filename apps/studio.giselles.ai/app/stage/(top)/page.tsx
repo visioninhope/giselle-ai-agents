@@ -43,9 +43,14 @@ export default async function StagePage() {
 		dbActs.map(async (dbAct) => {
 			const tmpAct = await giselleEngine.getAct({ actId: dbAct.sdkActId });
 			const team = teams.find((t) => t.dbId === dbAct.teamDbId);
+			const tmpWorkspace = await giselleEngine.getWorkspace(
+				dbAct.sdkWorkspaceId,
+				experimental_storage,
+			);
 			return {
 				...tmpAct,
-				team,
+				teamName: team?.name || "Unknown Team",
+				workspaceName: tmpWorkspace.name ?? "Untitled",
 			};
 		}),
 	);
@@ -164,7 +169,7 @@ export default async function StagePage() {
 											<span>{act.name}</span>
 											<span className="text-[12px] text-black-600">
 												{new Date(act.createdAt).toLocaleString()} ·{" "}
-												{act.team?.name || "Unknown Team"}
+												{act.teamName} · {act.workspaceName}
 											</span>
 										</div>
 									</TableCell>
