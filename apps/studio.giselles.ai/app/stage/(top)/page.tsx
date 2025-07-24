@@ -34,11 +34,21 @@ export default async function StagePage() {
 	const teams = await fetchUserTeams();
 	const teamOptions = teams.map((team) => ({ id: team.id, label: team.name }));
 	const user = await fetchCurrentUser();
-	const acts = await db.query.acts.findMany({
+	const dbActs = await db.query.acts.findMany({
 		where: (acts, { eq }) => eq(acts.directorDbId, user.dbId),
 		orderBy: (acts, { desc }) => [desc(acts.createdAt)],
 		limit: 10,
 	});
+	const acts = await Promise.all(
+		dbActs.map(async (dbAct) => {
+			const tmpAct = await giselleEngine.getAct({ actId: dbAct.sdkActId });
+			const team = teams.find((t) => t.dbId === dbAct.teamDbId);
+			return {
+				...tmpAct,
+				team,
+			};
+		}),
+	);
 	const flowTriggers: Array<FlowTriggerUIItem> = [];
 	for (const team of teams) {
 		const tmpFlowTriggers = await db.query.flowTriggers.findMany({
@@ -145,23 +155,22 @@ export default async function StagePage() {
 				</div>
 				<Table>
 					<TableBody>
-						{acts.map((task) => {
-							const team = teams.find((t) => t.dbId === task.teamDbId);
+						{acts.map((act) => {
 							return (
-								<TableRow key={task.dbId}>
+								<TableRow key={act.id}>
 									<TableCell>
 										<div className="flex flex-col">
-											<span>Act: {task.sdkActId}</span>
+											<span>Act: {act.id}</span>
 											<span className="text-[12px] text-black-600">
-												{task.createdAt.toLocaleString()} ·{" "}
-												{team?.name || "Unknown Team"}
+												{new Date(act.createdAt).toLocaleString()} ·{" "}
+												{act.team?.name || "Unknown Team"}
 											</span>
 										</div>
 									</TableCell>
-									<TableCell className="text-center">-</TableCell>
+									<TableCell className="text-center">{act.status}</TableCell>
 									<TableCell className="text-right">
 										<div className="flex justify-end">
-											<Link href={`/stage/acts/${task.sdkActId}`}>Details</Link>
+											<Link href={`/stage/acts/${act.id}`}>Details</Link>
 										</div>
 									</TableCell>
 								</TableRow>
