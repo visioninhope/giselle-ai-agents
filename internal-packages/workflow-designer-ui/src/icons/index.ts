@@ -9,7 +9,6 @@ export * from "./flux1";
 export * from "./folder";
 export { GenerateImageIcon } from "./generate-image";
 export * from "./generate-text";
-export { SearchIcon } from "./generate-text";
 export * from "./generated-content";
 
 export * from "./giselle-icon";
@@ -27,6 +26,7 @@ export * from "./perplexity";
 export * from "./picture";
 export * from "./prompt";
 export * from "./recraft";
+export * from "./search";
 export * from "./source-link";
 export * from "./sparkles";
 export * from "./spinner";

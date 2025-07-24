@@ -1,7 +1,7 @@
 import clsx from "clsx/lite";
 import type { FC, SVGProps } from "react";
 
-export const GenerateTextIcon: FC<SVGProps<SVGSVGElement>> = (props) => (
+export const SearchIcon: FC<SVGProps<SVGSVGElement>> = (props) => (
 	<svg
 		className={clsx("fill-current", props.className)}
 		width="16"
