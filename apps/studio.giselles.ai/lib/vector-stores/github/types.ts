@@ -44,40 +44,30 @@ const METADATA_SCHEMAS = {
 } as const;
 
 /**
+ * Helper type for metadata based on content type
+ */
+type MetadataForContentType<T extends GitHubRepositoryContentType> =
+	T extends "blob"
+		? BlobMetadata
+		: T extends "pull_request"
+			? PullRequestMetadata
+			: never;
+
+/**
  * Type-safe metadata getter
  */
 export function getContentStatusMetadata<T extends GitHubRepositoryContentType>(
 	metadata: unknown,
 	contentType: T,
-): T extends "blob"
-	? BlobMetadata | null
-	: T extends "pull_request"
-		? PullRequestMetadata | null
-		: never {
+): MetadataForContentType<T> | null {
 	if (!metadata) {
-		return null as T extends "blob"
-			? BlobMetadata | null
-			: T extends "pull_request"
-				? PullRequestMetadata | null
-				: never;
+		return null;
 	}
 
 	const schema = METADATA_SCHEMAS[contentType];
 	const parsed = schema.safeParse(metadata);
 
-	if (!parsed.success) {
-		return null as T extends "blob"
-			? BlobMetadata | null
-			: T extends "pull_request"
-				? PullRequestMetadata | null
-				: never;
-	}
-
-	return parsed.data as T extends "blob"
-		? BlobMetadata
-		: T extends "pull_request"
-			? PullRequestMetadata
-			: never;
+	return parsed.success ? (parsed.data as MetadataForContentType<T>) : null;
 }
 
 /**
