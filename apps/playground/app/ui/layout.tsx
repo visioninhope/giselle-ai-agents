@@ -33,6 +33,10 @@ const components = [
 		id: "table",
 		name: "Table",
 	},
+	{
+		id: "toast",
+		name: "Toast",
+	},
 ];
 export default function ({ children }: { children: React.ReactNode }) {
 	return (
