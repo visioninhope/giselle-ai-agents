@@ -26,7 +26,10 @@ export async function patchAct(args: {
 	// Apply the patches
 	const updatedAct = patchActObject(currentAct, ...allPatches);
 
-	await args.context.storage.setItem(actPath(args.actId), updatedAct);
+	await args.context.experimental_storage.setJson({
+		path: actPath(args.actId),
+		data: updatedAct,
+	});
 
 	return updatedAct;
 }
