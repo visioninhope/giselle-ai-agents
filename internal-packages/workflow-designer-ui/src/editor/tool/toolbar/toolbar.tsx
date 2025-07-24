@@ -42,7 +42,7 @@ import {
 	ZapIcon,
 } from "lucide-react";
 import { Popover, ToggleGroup } from "radix-ui";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Tooltip } from "../../../ui/tooltip";
 import { isToolAction } from "../types";
 import {
@@ -83,6 +83,7 @@ import {
 	selectTriggerTool,
 	useToolbar,
 } from "./state";
+import { useVectorStore } from "@giselle-sdk/giselle/react";
 
 export function Toolbar() {
 	const { setSelectedTool, selectedTool } = useToolbar();
@@ -91,7 +92,12 @@ export function Toolbar() {
 	const [searchQuery, setSearchQuery] = useState<string>("");
 	const [selectedCategory, setSelectedCategory] = useState<string>("All");
 	const { llmProviders } = useWorkflowDesigner();
-	const { webSearchAction } = useFeatureFlag();
+	const { webSearchAction, pullRequestVectorStore } = useFeatureFlag();
+	const vectorStore = useVectorStore();
+	const canUseGithubVectorStore = useMemo(
+		() => !!vectorStore?.github,
+		[vectorStore],
+	);
 
 	const modelsFilteredBySearchOnly = languageModels
 		.filter((model) => llmProviders.includes(model.provider))
@@ -909,6 +915,12 @@ export function Toolbar() {
 														case "webPage":
 															setSelectedTool(addNodeTool(createWebPageNode()));
 															break;
+														case "githubVectorStore":
+															setSelectedTool(addNodeTool(createVectorStoreNode("github")));
+															break;
+														case "githubPullRequestVectorStore":
+															setSelectedTool(addNodeTool(createVectorStoreNode("githubPullRequest")));
+															break;
 													}
 												}}
 											>
@@ -916,6 +928,21 @@ export function Toolbar() {
 													<DatabaseZapIcon className="w-[20px] h-[20px]" />
 													<p className="text-[14px]">Query</p>
 												</ToggleGroup.Item>
+												{canUseGithubVectorStore && (
+													<ToggleGroup.Item value="githubVectorStore" data-tool>
+														<GitHubIcon className="w-[20px] h-[20px]" />
+														<p className="text-[14px]">GitHub (Code)</p>
+													</ToggleGroup.Item>
+												)}
+												{canUseGithubVectorStore && pullRequestVectorStore && (
+													<ToggleGroup.Item
+														value="githubPullRequestVectorStore"
+														data-tool
+													>
+														<GitHubIcon className="w-[20px] h-[20px]" />
+														<p className="text-[14px]">GitHub PR</p>
+													</ToggleGroup.Item>
+												)}
 												<ToggleGroup.Item value="webPage" data-tool>
 													<WebPageFileIcon className="w-[20px] h-[20px]" />
 													<p className="text-[14px]">webPage</p>
