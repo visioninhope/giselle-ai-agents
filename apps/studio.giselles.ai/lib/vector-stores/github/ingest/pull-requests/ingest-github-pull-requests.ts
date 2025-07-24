@@ -3,7 +3,6 @@ import {
 	type GitHubAuthConfig,
 } from "@giselle-sdk/github-tool";
 import { createPipeline } from "@giselle-sdk/rag";
-import { captureException } from "@sentry/nextjs";
 import type { TelemetrySettings } from "ai";
 import { and, eq } from "drizzle-orm";
 import {
@@ -12,6 +11,7 @@ import {
 	githubRepositoryContentStatus,
 	githubRepositoryIndex,
 } from "@/drizzle";
+import { handleIngestErrors } from "../error-handling";
 import { createGitHubPullRequestChunkStore } from "./chunk-store";
 
 /**
@@ -58,23 +58,7 @@ export async function ingestGitHubPullRequests(params: {
 	);
 
 	// Capture errors to Sentry if any documents failed
-	if (result.errors && result.errors.length > 0) {
-		const errorMessage = `Failed to ingest ${result.failedDocuments} out of ${result.totalDocuments} pull request documents for ${params.source.owner}/${params.source.repo}`;
-		console.error(errorMessage, result.errors);
-
-		const aggregatedError = new Error(errorMessage);
-		captureException(aggregatedError, {
-			extra: {
-				owner: params.source.owner,
-				repo: params.source.repo,
-				teamDbId: params.teamDbId,
-				totalDocuments: result.totalDocuments,
-				successfulDocuments: result.successfulDocuments,
-				failedDocuments: result.failedDocuments,
-				errors: result.errors,
-			},
-		});
-	}
+	handleIngestErrors(result, params, "pull request");
 }
 
 /**

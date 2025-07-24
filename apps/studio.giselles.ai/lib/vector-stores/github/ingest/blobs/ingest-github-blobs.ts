@@ -4,7 +4,6 @@ import {
 } from "@giselle-sdk/github-tool";
 import { createPipeline } from "@giselle-sdk/rag";
 import type { Octokit } from "@octokit/core";
-import { captureException } from "@sentry/nextjs";
 import type { TelemetrySettings } from "ai";
 import { and, eq } from "drizzle-orm";
 import {
@@ -13,6 +12,7 @@ import {
 	githubRepositoryIndex,
 } from "@/drizzle";
 import { getContentStatusMetadata } from "../../types";
+import { handleIngestErrors } from "../error-handling";
 import { createGitHubBlobChunkStore } from "./chunk-store";
 
 /**
@@ -58,24 +58,7 @@ export async function ingestGitHubBlobs(params: {
 	);
 
 	// Capture errors to Sentry if any documents failed
-	if (result.errors && result.errors.length > 0) {
-		const errorMessage = `Failed to ingest ${result.failedDocuments} out of ${result.totalDocuments} blob documents for ${params.source.owner}/${params.source.repo}`;
-		console.error(errorMessage, result.errors);
-
-		const aggregatedError = new Error(errorMessage);
-		captureException(aggregatedError, {
-			extra: {
-				owner: params.source.owner,
-				repo: params.source.repo,
-				commitSha: params.source.commitSha,
-				teamDbId: params.teamDbId,
-				totalDocuments: result.totalDocuments,
-				successfulDocuments: result.successfulDocuments,
-				failedDocuments: result.failedDocuments,
-				errors: result.errors,
-			},
-		});
-	}
+	handleIngestErrors(result, params, "blob");
 }
 
 /**
