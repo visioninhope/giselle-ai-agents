@@ -81,6 +81,9 @@ catalogs:
     '@tiptap/starter-kit':
       specifier: 2.11.5
       version: 2.11.5
+    '@types/fast-levenshtein':
+      specifier: 0.0.4
+      version: 0.0.4
     '@types/node':
       specifier: 22.14.0
       version: 22.14.0
@@ -117,6 +120,9 @@ catalogs:
     defuddle:
       specifier: 0.6.4
       version: 0.6.4
+    fast-levenshtein:
+      specifier: 3.0.0
+      version: 3.0.0
     gql.tada:
       specifier: 1.8.10
       version: 1.8.10
@@ -662,6 +668,9 @@ importers:
       clsx:
         specifier: 'catalog:'
         version: 2.1.1
+      fast-levenshtein:
+        specifier: 'catalog:'
+        version: 3.0.0
       lucide-react:
         specifier: 'catalog:'
         version: 0.473.0(react@19.1.0)
@@ -705,6 +714,9 @@ importers:
         specifier: 'catalog:'
         version: 3.25.28
     devDependencies:
+      '@types/fast-levenshtein':
+        specifier: 'catalog:'
+        version: 0.0.4
       '@types/node':
         specifier: 'catalog:'
         version: 22.14.0
@@ -723,6 +735,9 @@ importers:
       typescript:
         specifier: 'catalog:'
         version: 5.7.3
+      vitest:
+        specifier: 'catalog:'
+        version: 3.2.4(@types/debug@4.1.12)(@types/node@22.14.0)(happy-dom@17.6.1)(jiti@2.4.2)(jsdom@26.1.0(bufferutil@4.0.9)(utf-8-validate@6.0.5))(lightningcss@1.30.1)(terser@5.39.0)(yaml@2.7.0)
 
   packages/data-type:
     dependencies:
@@ -4668,6 +4683,9 @@ packages:
   '@types/estree@1.0.7':
     resolution: {integrity: sha512-w28IoSUCJpidD/TGviZwwMJckNESJZXFu7NBZ5YJ4mEUnNraUn9Pm8HSZm/jDF1pDWYKspWE7oVphigUPRakIQ==}
 
+  '@types/fast-levenshtein@0.0.4':
+    resolution: {integrity: sha512-tkDveuitddQCxut1Db8eEFfMahTjOumTJGPHmT9E7KUH+DkVq9WTpVvlfenf3S+uCBeu8j5FP2xik/KfxOEjeA==}
+
   '@types/hast@3.0.4':
     resolution: {integrity: sha512-WPs+bbQw5aCj+x6laNGWLH3wviHtoCv/P3+otBhbOhJgG8qtpdAMlTCxLtsTWA7LH1Oh/bFCHsBn0TPS5m30EQ==}
 
@@ -5651,6 +5669,9 @@ packages:
   fast-json-stable-stringify@2.1.0:
     resolution: {integrity: sha512-lhd/wF+Lk98HZoTCtlVraHtfh5XYijIjalXck7saUtuanSDyLMxnHhSXEDJqHxD7msR8D0uCmqlkwjCV8xvwHw==}
 
+  fast-levenshtein@3.0.0:
+    resolution: {integrity: sha512-hKKNajm46uNmTlhHSyZkmToAc56uZJwYq7yrciZjqOxnlfQwERDQJmHPUp7m1m9wx8vgOe8IaCKZ5Kv2k1DdCQ==}
+
   fast-redact@3.5.0:
     resolution: {integrity: sha512-dwsoQlS7h9hMeYUq1W++23NDcBLV4KqONnITDV9DjfS3q1SgDGVrBdvvTLUotWtPSD7asWDV9/CmsZPy8Hf70A==}
     engines: {node: '>=6'}
@@ -5664,6 +5685,10 @@ packages:
   fast-xml-parser@4.4.1:
     resolution: {integrity: sha512-xkjOecfnKGkSsOwtZ5Pz7Us/T6mrbPQrq0nh+aCO5V9nk5NLWmasAHumTKjiPJPWANe+kAZ84Jc8ooJkzZ88Sw==}
     hasBin: true
+
+  fastest-levenshtein@1.0.16:
+    resolution: {integrity: sha512-eRnCtTTtGZFpQCwhJiUOuxPQWRXVKYDn0b2PeHfXL6/Zi53SLAzAHfVhVWK2AryC/WH05kGfxhFIPvTF0SXQzg==}
+    engines: {node: '>= 4.9.1'}
 
   fastq@1.18.0:
     resolution: {integrity: sha512-QKHXPW0hD8g4UET03SdOdunzSouc9N4AuHdsX8XNcTsuz+yYFILVNIX4l9yHABMhiEI9Db0JTTIpu0wB+Y1QQw==}
@@ -12164,6 +12189,8 @@ snapshots:
 
   '@types/estree@1.0.7': {}
 
+  '@types/fast-levenshtein@0.0.4': {}
+
   '@types/hast@3.0.4':
     dependencies:
       '@types/unist': 3.0.3
@@ -13093,6 +13120,10 @@ snapshots:
 
   fast-json-stable-stringify@2.1.0: {}
 
+  fast-levenshtein@3.0.0:
+    dependencies:
+      fastest-levenshtein: 1.0.16
+
   fast-redact@3.5.0: {}
 
   fast-safe-stringify@2.1.1: {}
@@ -13102,6 +13133,8 @@ snapshots:
   fast-xml-parser@4.4.1:
     dependencies:
       strnum: 1.1.2
+
+  fastest-levenshtein@1.0.16: {}
 
   fastq@1.18.0:
     dependencies:

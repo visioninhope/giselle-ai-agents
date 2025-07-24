@@ -2,7 +2,7 @@
 
 
 ## Summary
-* 826 MIT
+* 829 MIT
 * 185 Apache 2.0
 * 47 ISC
 * 27 New BSD
@@ -4481,6 +4481,17 @@ LGPL-3.0-or-later permitted
 
 
 
+<a name="@types/fast-levenshtein"></a>
+### @types/fast-levenshtein v0.0.4
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
 <a name="@types/hast"></a>
 ### @types/hast v3.0.4
 #### 
@@ -6795,6 +6806,17 @@ BlueOak-1.0.0 permitted
 
 
 
+<a name="fast-levenshtein"></a>
+### fast-levenshtein v3.0.0
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
 <a name="fast-redact"></a>
 ### fast-redact v3.5.0
 #### 
@@ -6830,6 +6852,17 @@ BlueOak-1.0.0 permitted
 
 <a name="fast-xml-parser"></a>
 ### fast-xml-parser v4.4.1
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
+<a name="fastest-levenshtein"></a>
+### fastest-levenshtein v1.0.16
 #### 
 
 ##### Paths
