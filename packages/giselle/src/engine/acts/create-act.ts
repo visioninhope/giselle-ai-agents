@@ -85,12 +85,27 @@ export async function createAct(
 				name: step.node.name ?? defaultName(step.node),
 				status: "created",
 				generationId: generation.id,
+				duration: 0,
+				usage: {
+					promptTokens: 0,
+					completionTokens: 0,
+					totalTokens: 0,
+				},
 			});
 		}
 		sequences.push({
 			id: SequenceId.generate(),
 			status: "created",
 			steps,
+			duration: {
+				wallClock: 0,
+				totalTask: 0,
+			},
+			usage: {
+				promptTokens: 0,
+				completionTokens: 0,
+				totalTokens: 0,
+			},
 		});
 	}
 

@@ -197,6 +197,90 @@ export const sequences = (index: number) => ({
 			set: value,
 		}),
 	},
+	duration: {
+		wallClock: {
+			set: (
+				value: Act["sequences"][number]["duration"]["wallClock"],
+			): Patch => ({
+				path: `sequences.${index}.duration.wallClock`,
+				set: value,
+			}),
+			increment: (value: number): Patch => ({
+				path: `sequences.${index}.duration.wallClock`,
+				increment: value,
+			}),
+			decrement: (value: number): Patch => ({
+				path: `sequences.${index}.duration.wallClock`,
+				decrement: value,
+			}),
+		},
+		totalTask: {
+			set: (
+				value: Act["sequences"][number]["duration"]["totalTask"],
+			): Patch => ({
+				path: `sequences.${index}.duration.totalTask`,
+				set: value,
+			}),
+			increment: (value: number): Patch => ({
+				path: `sequences.${index}.duration.totalTask`,
+				increment: value,
+			}),
+			decrement: (value: number): Patch => ({
+				path: `sequences.${index}.duration.totalTask`,
+				decrement: value,
+			}),
+		},
+	},
+	usage: {
+		promptTokens: {
+			set: (
+				value: Act["sequences"][number]["usage"]["promptTokens"],
+			): Patch => ({
+				path: `sequences.${index}.usage.promptTokens`,
+				set: value,
+			}),
+			increment: (value: number): Patch => ({
+				path: `sequences.${index}.usage.promptTokens`,
+				increment: value,
+			}),
+			decrement: (value: number): Patch => ({
+				path: `sequences.${index}.usage.promptTokens`,
+				decrement: value,
+			}),
+		},
+		completionTokens: {
+			set: (
+				value: Act["sequences"][number]["usage"]["completionTokens"],
+			): Patch => ({
+				path: `sequences.${index}.usage.completionTokens`,
+				set: value,
+			}),
+			increment: (value: number): Patch => ({
+				path: `sequences.${index}.usage.completionTokens`,
+				increment: value,
+			}),
+			decrement: (value: number): Patch => ({
+				path: `sequences.${index}.usage.completionTokens`,
+				decrement: value,
+			}),
+		},
+		totalTokens: {
+			set: (
+				value: Act["sequences"][number]["usage"]["totalTokens"],
+			): Patch => ({
+				path: `sequences.${index}.usage.totalTokens`,
+				set: value,
+			}),
+			increment: (value: number): Patch => ({
+				path: `sequences.${index}.usage.totalTokens`,
+				increment: value,
+			}),
+			decrement: (value: number): Patch => ({
+				path: `sequences.${index}.usage.totalTokens`,
+				decrement: value,
+			}),
+		},
+	},
 	steps: (stepIndex: number) => ({
 		status: {
 			set: (
@@ -213,6 +297,72 @@ export const sequences = (index: number) => ({
 				path: `sequences.${index}.steps.${stepIndex}.name`,
 				set: value,
 			}),
+		},
+		duration: {
+			set: (
+				value: Act["sequences"][number]["steps"][number]["duration"],
+			): Patch => ({
+				path: `sequences.${index}.steps.${stepIndex}.duration`,
+				set: value,
+			}),
+			increment: (value: number): Patch => ({
+				path: `sequences.${index}.steps.${stepIndex}.duration`,
+				increment: value,
+			}),
+			decrement: (value: number): Patch => ({
+				path: `sequences.${index}.steps.${stepIndex}.duration`,
+				decrement: value,
+			}),
+		},
+		usage: {
+			promptTokens: {
+				set: (
+					value: Act["sequences"][number]["steps"][number]["usage"]["promptTokens"],
+				): Patch => ({
+					path: `sequences.${index}.steps.${stepIndex}.usage.promptTokens`,
+					set: value,
+				}),
+				increment: (value: number): Patch => ({
+					path: `sequences.${index}.steps.${stepIndex}.usage.promptTokens`,
+					increment: value,
+				}),
+				decrement: (value: number): Patch => ({
+					path: `sequences.${index}.steps.${stepIndex}.usage.promptTokens`,
+					decrement: value,
+				}),
+			},
+			completionTokens: {
+				set: (
+					value: Act["sequences"][number]["steps"][number]["usage"]["completionTokens"],
+				): Patch => ({
+					path: `sequences.${index}.steps.${stepIndex}.usage.completionTokens`,
+					set: value,
+				}),
+				increment: (value: number): Patch => ({
+					path: `sequences.${index}.steps.${stepIndex}.usage.completionTokens`,
+					increment: value,
+				}),
+				decrement: (value: number): Patch => ({
+					path: `sequences.${index}.steps.${stepIndex}.usage.completionTokens`,
+					decrement: value,
+				}),
+			},
+			totalTokens: {
+				set: (
+					value: Act["sequences"][number]["steps"][number]["usage"]["totalTokens"],
+				): Patch => ({
+					path: `sequences.${index}.steps.${stepIndex}.usage.totalTokens`,
+					set: value,
+				}),
+				increment: (value: number): Patch => ({
+					path: `sequences.${index}.steps.${stepIndex}.usage.totalTokens`,
+					increment: value,
+				}),
+				decrement: (value: number): Patch => ({
+					path: `sequences.${index}.steps.${stepIndex}.usage.totalTokens`,
+					decrement: value,
+				}),
+			},
 		},
 	}),
 });

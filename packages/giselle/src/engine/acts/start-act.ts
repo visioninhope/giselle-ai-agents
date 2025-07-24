@@ -1,6 +1,6 @@
 import { AISDKError } from "ai";
 import { z } from "zod/v4";
-import { Act, type Sequence } from "../../concepts/act";
+import { Act, type Sequence, type Step } from "../../concepts/act";
 import { ActId } from "../../concepts/identifiers";
 import { resolveTrigger } from "../flows";
 import {
@@ -28,71 +28,81 @@ export interface StartActCallbacks {
 async function executeStep(args: {
 	context: GiselleEngineContext;
 	generation: QueuedGeneration;
-	actId: ActId;
-}): Promise<boolean> {
-	switch (args.generation.context.operationNode.content.type) {
-		case "action":
-			await executeAction(args);
-			return false;
-		case "imageGeneration":
-			await generateImage({ ...args, useExperimentalStorage: true });
-			return false;
-		case "textGeneration": {
-			let hadError = false;
-			const result = await generateText({
-				...args,
-				useExperimentalStorage: true,
-			});
-			await result.consumeStream({
-				onError: async (error) => {
-					hadError = true;
-					if (AISDKError.isInstance(error)) {
-						const failedGeneration = {
-							...args.generation,
-							status: "failed",
-							startedAt: Date.now(),
-							failedAt: Date.now(),
-							messages: [],
-							error: {
-								name: error.name,
-								message: error.message,
-							},
-						} satisfies FailedGeneration;
-						await Promise.all([
-							setGeneration({
-								...args,
-								generation: failedGeneration,
-								useExperimentalStorage: true,
-							}),
-							patchAct({
-								...args,
-								patches: [
-									patches.annotations.push([
-										{
-											level: "error",
-											message: error.message,
-										},
-									]),
-								],
-							}),
-						]);
-					}
-				},
-			});
-			return hadError;
+	step: Step;
+	onStart: () => Promise<void>;
+	onError: (error: unknown, step: Step) => Promise<void>;
+	onFinish: (step: Step) => Promise<void>;
+}) {
+	await args.onStart();
+	const startedAt = Date.now();
+	try {
+		switch (args.generation.context.operationNode.content.type) {
+			case "action":
+				await executeAction(args);
+				break;
+			case "imageGeneration":
+				await generateImage({ ...args, useExperimentalStorage: true });
+				break;
+			case "textGeneration": {
+				let hadError = false;
+				const result = await generateText({
+					...args,
+					useExperimentalStorage: true,
+				});
+				await result.consumeStream({
+					onError: async (error) => {
+						hadError = true;
+						if (AISDKError.isInstance(error)) {
+							const failedGeneration = {
+								...args.generation,
+								status: "failed",
+								startedAt: Date.now(),
+								failedAt: Date.now(),
+								messages: [],
+								error: {
+									name: error.name,
+									message: error.message,
+								},
+							} satisfies FailedGeneration;
+							await Promise.all([
+								setGeneration({
+									...args,
+									generation: failedGeneration,
+									useExperimentalStorage: true,
+								}),
+								args.onError(new Error(error.message), {
+									...args.step,
+									duration: Date.now() - startedAt,
+								}),
+							]);
+						}
+					},
+				});
+				return hadError;
+			}
+			case "trigger":
+				await resolveTrigger(args);
+				break;
+			case "query":
+				await executeQuery(args);
+				break;
+			default: {
+				const _exhaustiveCheck: never =
+					args.generation.context.operationNode.content.type;
+				throw new Error(`Unhandled step type: ${_exhaustiveCheck}`);
+			}
 		}
-		case "trigger":
-			await resolveTrigger(args);
-			return false;
-		case "query":
-			await executeQuery(args);
-			return false;
-		default: {
-			const _exhaustiveCheck: never =
-				args.generation.context.operationNode.content.type;
-			throw new Error(`Unhandled step type: ${_exhaustiveCheck}`);
-		}
+	} catch (e) {
+		await args.onError(e, {
+			...args.step,
+			duration: Date.now() - startedAt,
+		});
+		return;
 	}
+	await args.onFinish({
+		...args.step,
+		duration: Date.now() - startedAt,
+	});
 }
 
 async function actSequence(args: {
@@ -100,21 +110,15 @@ async function actSequence(args: {
 	sequenceIndex: number;
 	sequence: Sequence;
 	context: GiselleEngineContext;
+	onStart: () => Promise<void>;
+	onError: (sequence: Sequence) => Promise<void>;
+	onFinish: (sequence: Sequence) => Promise<void>;
 }) {
-	const stepsCount = args.sequence.steps.length;
-	await patchAct({
-		context: args.context,
-		actId: args.actId,
-		patches: [
-			patches.steps.inProgress.increment(stepsCount),
-			patches.steps.queued.decrement(stepsCount),
-			patches.sequences(args.sequenceIndex).status.set("running"),
-		],
-	});
-
-	let hasSequenceError = false;
-
-	const stepDurations = await Promise.all(
+	await args.onStart();
+	const startedAt = Date.now();
+	let totalTask = 0;
+	let hasError = false;
+	await Promise.all(
 		args.sequence.steps.map(async (step, index) => {
 			const generation = await getGeneration({
 				context: args.context,
@@ -130,58 +134,100 @@ async function actSequence(args: {
 				status: "queued",
 				queuedAt: stepStart,
 			};
-			await patchAct({
-				context: args.context,
-				actId: args.actId,
-				patches: [
-					patches
-						.sequences(args.sequenceIndex)
-						.steps(index)
-						.status.set("running"),
-				],
-			});
-			const errored = await executeStep({
+			await executeStep({
 				...args,
 				generation: queuedGeneration,
+				step,
+				onStart: async () => {
+					await patchAct({
+						context: args.context,
+						actId: args.actId,
+						patches: [
+							patches.steps.inProgress.increment(1),
+							patches.steps.queued.decrement(1),
+							patches
+								.sequences(args.sequenceIndex)
+								.steps(index)
+								.status.set("running"),
+						],
+					});
+				},
+				onError: async (_, step) => {
+					hasError = true;
+					totalTask += step.duration;
+					await patchAct({
+						...args,
+						patches: [
+							patches.steps.inProgress.decrement(1),
+							patches.steps.failed.increment(1),
+							patches
+								.sequences(args.sequenceIndex)
+								.steps(index)
+								.status.set("failed"),
+							patches.duration.totalTask.increment(step.duration),
+							patches
+								.sequences(args.sequenceIndex)
+								.steps(index)
+								.duration.set(step.duration),
+							patches
+								.sequences(args.sequenceIndex)
+								.duration.totalTask.increment(step.duration),
+							patches.annotations.push([
+								{
+									level: "error",
+									/** @todo replace real error */
+									message: "error",
+									sequenceId: args.sequence.id,
+									stepId: step.id,
+								},
+							]),
+						],
+					});
+				},
+				onFinish: async (step) => {
+					totalTask += step.duration;
+					await patchAct({
+						context: args.context,
+						actId: args.actId,
+						patches: [
+							patches.steps.inProgress.decrement(1),
+							patches.steps.completed.increment(1),
+							patches.duration.totalTask.increment(step.duration),
+							patches
+								.sequences(args.sequenceIndex)
+								.steps(index)
+								.duration.set(step.duration),
+							patches
+								.sequences(args.sequenceIndex)
+								.duration.totalTask.increment(step.duration),
+							patches
+								.sequences(args.sequenceIndex)
+								.steps(index)
+								.status.set("completed"),
+						],
+					});
+				},
 			});
-			const duration = Date.now() - stepStart;
-
-			if (errored) {
-				hasSequenceError = true;
-				await patchAct({
-					context: args.context,
-					actId: args.actId,
-					patches: [
-						patches.steps.inProgress.decrement(1),
-						patches.steps.failed.increment(1),
-						patches
-							.sequences(args.sequenceIndex)
-							.steps(index)
-							.status.set("failed"),
-					],
-				});
-			} else {
-				await patchAct({
-					context: args.context,
-					actId: args.actId,
-					patches: [
-						patches.steps.inProgress.decrement(1),
-						patches.steps.completed.increment(1),
-						patches
-							.sequences(args.sequenceIndex)
-							.steps(index)
-							.status.set("completed"),
-					],
-				});
-			}
-
-			return duration;
 		}),
 	);
+	if (hasError) {
+		await args.onError({
+			...args.sequence,
+			duration: {
+				totalTask,
+				wallClock: Date.now() - startedAt,
+			},
+		});
+		return;
+	}
 
-	const totalTaskDuration = stepDurations.reduce((sum, d) => sum + d, 0);
-
-	return { hasSequenceError, totalTaskDuration };
+	await args.onFinish({
+		...args.sequence,
+		duration: {
+			totalTask,
+			wallClock: Date.now() - startedAt,
+		},
+	});
 }
 
 export const StartActInputs = z.object({
@@ -209,51 +255,48 @@ export async function startAct(
 
 	for (let i = 0; i < act.sequences.length; i++) {
 		const sequence = act.sequences[i];
+
 		await args.callbacks?.sequenceStart?.({ sequence });
-		const { totalTaskDuration, hasSequenceError } = await actSequence({
+
+		await actSequence({
 			sequence,
 			sequenceIndex: i,
 			context: args.context,
 			actId: args.actId,
+			onStart: async () => {
+				await patchAct({
+					context: args.context,
+					actId: args.actId,
+					patches: [patches.sequences(i).status.set("running")],
+				});
+			},
+			onError: async (sequence) => {
+				await Promise.all([
+					args.callbacks?.sequenceFail?.({ sequence }),
+					patchAct({
+						context: args.context,
+						actId: args.actId,
+						patches: [patches.sequences(i).status.set("failed")],
+					}),
+				]);
+				for (let j = i + 1; j < act.sequences.length; j++) {
+					await args.callbacks?.sequenceSkip?.({
+						sequence: act.sequences[j],
+					});
+				}
+			},
+			onFinish: async () => {
+				await patchAct({
+					context: args.context,
+					actId: args.actId,
+					patches: [patches.sequences(i).status.set("completed")],
+				});
+			},
 		});
 
-		if (hasSequenceError) {
-			// Skip remaining sequences
-			for (let j = i + 1; j < act.sequences.length; j++) {
-				await args.callbacks?.sequenceSkip?.({
-					sequence: act.sequences[j],
-				});
-			}
-
-			await Promise.all([
-				args.callbacks?.sequenceFail?.({ sequence }),
-				patchAct({
-					...args,
-					patches: [
-						patches.steps.inProgress.decrement(1),
-						patches.steps.failed.increment(1),
-						patches.duration.totalTask.increment(totalTaskDuration),
-						patches.status.set("failed"),
-						patches.duration.wallClock.set(Date.now() - flowStart),
-					],
-				}),
-			]);
-			return;
-		}
-		await Promise.all([
-			args.callbacks?.sequenceComplete?.({ sequence }),
-			patchAct({
-				...args,
-				patches: [
-					patches.steps.inProgress.decrement(1),
-					patches.steps.completed.increment(1),
-					patches.duration.totalTask.increment(totalTaskDuration),
-				],
-			}),
-		]);
+		await args.callbacks?.sequenceComplete?.({ sequence });
 	}
 
-	// All sequences completed successfully
 	await patchAct({
 		context: args.context,
 		actId: args.actId,

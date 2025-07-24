@@ -34,30 +34,66 @@ describe("patchAct", () => {
 				{
 					id: "sqn-001" as const,
 					status: "queued",
+					duration: {
+						wallClock: 0,
+						totalTask: 0,
+					},
+					usage: {
+						promptTokens: 0,
+						completionTokens: 0,
+						totalTokens: 0,
+					},
 					steps: [
 						{
 							id: "stp-001" as const,
 							status: "queued",
 							name: "Step 1",
 							generationId: "gnr-001" as const,
+							duration: 0,
+							usage: {
+								promptTokens: 0,
+								completionTokens: 0,
+								totalTokens: 0,
+							},
 						},
 						{
 							id: "stp-002" as const,
 							status: "running",
 							name: "Step 2",
 							generationId: "gnr-002" as const,
+							duration: 0,
+							usage: {
+								promptTokens: 0,
+								completionTokens: 0,
+								totalTokens: 0,
+							},
 						},
 						{
 							id: "stp-003" as const,
 							status: "queued",
 							name: "Step 3",
 							generationId: "gnr-003" as const,
+							duration: 0,
+							usage: {
+								promptTokens: 0,
+								completionTokens: 0,
+								totalTokens: 0,
+							},
 						},
 					],
 				},
 				{
 					id: "sqn-002" as const,
 					status: "queued",
+					duration: {
+						wallClock: 0,
+						totalTask: 0,
+					},
+					usage: {
+						promptTokens: 0,
+						completionTokens: 0,
+						totalTokens: 0,
+					},
 					steps: [],
 				},
 			],
@@ -116,8 +152,18 @@ describe("patchAct", () => {
 			const result = patchAct(act, {
 				path: "annotations",
 				push: [
-					{ level: "info", message: "Test annotation" },
-					{ level: "warning", message: "Another annotation" },
+					{
+						level: "info",
+						message: "Test annotation",
+						sequenceId: "sqn-001" as const,
+						stepId: "stp-001" as const,
+					},
+					{
+						level: "warning",
+						message: "Another annotation",
+						sequenceId: "sqn-001" as const,
+						stepId: "stp-002" as const,
+					},
 				],
 			});
 
@@ -125,6 +171,8 @@ describe("patchAct", () => {
 			expect(result.annotations[0]).toEqual({
 				level: "info",
 				message: "Test annotation",
+				sequenceId: "sqn-001",
+				stepId: "stp-001",
 			});
 		});
 
@@ -132,7 +180,14 @@ describe("patchAct", () => {
 			const act = createTestAct();
 			const result = patchAct(act, {
 				path: "annotations",
-				set: [{ level: "error", message: "Error occurred" }],
+				set: [
+					{
+						level: "error",
+						message: "Error occurred",
+						sequenceId: "sqn-001" as const,
+						stepId: "stp-001" as const,
+					},
+				],
 			});
 
 			expect(result.annotations).toHaveLength(1);

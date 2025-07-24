@@ -77,8 +77,18 @@ describe("patch creators", () => {
 	describe("annotations", () => {
 		it("should create annotations push patch", () => {
 			const items = [
-				{ level: "info" as const, message: "Test info" },
-				{ level: "warning" as const, message: "Test warning" },
+				{
+					level: "info" as const,
+					message: "Test info",
+					sequenceId: "sqn-001" as const,
+					stepId: "stp-001" as const,
+				},
+				{
+					level: "warning" as const,
+					message: "Test warning",
+					sequenceId: "sqn-001" as const,
+					stepId: "stp-002" as const,
+				},
 			];
 			const patch = patches.annotations.push(items);
 			expect(patch).toEqual({
@@ -88,7 +98,14 @@ describe("patch creators", () => {
 		});
 
 		it("should create annotations set patch", () => {
-			const items = [{ level: "error" as const, message: "Test error" }];
+			const items = [
+				{
+					level: "error" as const,
+					message: "Test error",
+					sequenceId: "sqn-001" as const,
+					stepId: "stp-001" as const,
+				},
+			];
 			const patch = patches.annotations.set(items);
 			expect(patch).toEqual({
 				path: "annotations",
@@ -106,6 +123,34 @@ describe("patch creators", () => {
 			});
 		});
 
+		it("should create sequence duration patches", () => {
+			expect(patches.sequences(0).duration.wallClock.set(1000)).toEqual({
+				path: "sequences.0.duration.wallClock",
+				set: 1000,
+			});
+			expect(patches.sequences(0).duration.totalTask.increment(500)).toEqual({
+				path: "sequences.0.duration.totalTask",
+				increment: 500,
+			});
+		});
+
+		it("should create sequence usage patches", () => {
+			expect(patches.sequences(0).usage.promptTokens.set(100)).toEqual({
+				path: "sequences.0.usage.promptTokens",
+				set: 100,
+			});
+			expect(patches.sequences(0).usage.completionTokens.increment(50)).toEqual(
+				{
+					path: "sequences.0.usage.completionTokens",
+					increment: 50,
+				},
+			);
+			expect(patches.sequences(0).usage.totalTokens.decrement(10)).toEqual({
+				path: "sequences.0.usage.totalTokens",
+				decrement: 10,
+			});
+		});
+
 		it("should create sequence step status set patch", () => {
 			const patch = patches.sequences(1).steps(2).status.set("completed");
 			expect(patch).toEqual({
@@ -119,6 +164,38 @@ describe("patch creators", () => {
 			expect(patch).toEqual({
 				path: "sequences.0.steps.1.name",
 				set: "Updated Step",
+			});
+		});
+
+		it("should create sequence step duration patches", () => {
+			expect(patches.sequences(0).steps(1).duration.set(2000)).toEqual({
+				path: "sequences.0.steps.1.duration",
+				set: 2000,
+			});
+			expect(patches.sequences(0).steps(1).duration.increment(100)).toEqual({
+				path: "sequences.0.steps.1.duration",
+				increment: 100,
+			});
+		});
+
+		it("should create sequence step usage patches", () => {
+			expect(patches.sequences(1).steps(0).usage.promptTokens.set(200)).toEqual(
+				{
+					path: "sequences.1.steps.0.usage.promptTokens",
+					set: 200,
+				},
+			);
+			expect(
+				patches.sequences(1).steps(0).usage.completionTokens.increment(75),
+			).toEqual({
+				path: "sequences.1.steps.0.usage.completionTokens",
+				increment: 75,
+			});
+			expect(
+				patches.sequences(1).steps(0).usage.totalTokens.decrement(25),
+			).toEqual({
+				path: "sequences.1.steps.0.usage.totalTokens",
+				decrement: 25,
 			});
 		});
 
@@ -169,12 +246,33 @@ describe("patch creators", () => {
 
 		it("should enforce correct annotation levels", () => {
 			// This should compile
-			patches.annotations.push([{ level: "info", message: "test" }]);
-			patches.annotations.push([{ level: "warning", message: "test" }]);
-			patches.annotations.push([{ level: "error", message: "test" }]);
+			patches.annotations.push([
+				{
+					level: "info",
+					message: "test",
+					sequenceId: "sqn-001" as const,
+					stepId: "stp-001" as const,
+				},
+			]);
+			patches.annotations.push([
+				{
+					level: "warning",
+					message: "test",
+					sequenceId: "sqn-001" as const,
+					stepId: "stp-001" as const,
+				},
+			]);
+			patches.annotations.push([
+				{
+					level: "error",
+					message: "test",
+					sequenceId: "sqn-001" as const,
+					stepId: "stp-001" as const,
+				},
+			]);
 
 			// TypeScript should catch invalid levels at compile time
-			// patches.annotations.push([{ level: "invalid", message: "test" }]); // @ts-expect-error - invalid level
+			// patches.annotations.push([{ level: "invalid", message: "test", sequenceId: "sqn-001", stepId: "stp-001" }]); // @ts-expect-error - invalid level
 		});
 	});
 });
