@@ -41,7 +41,7 @@ export async function ingestGitHubPullRequests(params: {
 			const documentKey: GitHubPullRequestDocumentKey = `${prNumber}:${contentType}:${contentId}`;
 			return documentKey;
 		},
-		documentVersion: (metadata) => metadata.mergedAt,
+		documentVersion: (metadata) => new Date(metadata.mergedAt).toISOString(),
 		metadataTransform: (metadata) => ({
 			repositoryIndexDbId,
 			contentId: metadata.contentId,
