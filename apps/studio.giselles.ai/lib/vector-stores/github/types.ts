@@ -14,102 +14,81 @@ export type RepositoryWithStatuses = {
 };
 
 /**
- * Schema for content metadata
+ * Content status metadata schemas
  */
-const blobContentStatusMetadataSchema = z.object({
+const blobMetadataSchema = z.object({
 	lastIngestedCommitSha: z.string().optional(),
 });
-const pullRequestContentStatusMetadataSchema = z.object({
+
+const pullRequestMetadataSchema = z.object({
 	lastIngestedPrNumber: z.number().optional(),
 });
 
 /**
- * Mapping from database content_type (snake_case) to TypeScript keys (camelCase)
+ * Content status metadata types
  */
-const contentTypeToSchemaKeyMap = {
-	blob: "blob",
-	pull_request: "pullRequest",
-} as const satisfies Record<GitHubRepositoryContentType, string>;
+export type BlobMetadata = z.infer<typeof blobMetadataSchema>;
+export type PullRequestMetadata = z.infer<typeof pullRequestMetadataSchema>;
 
 /**
- * Metadata schema map for each content type
+ * Union type for all metadata
  */
-const metadataSchemaMap = {
-	blob: blobContentStatusMetadataSchema,
-	pullRequest: pullRequestContentStatusMetadataSchema,
+export type ContentStatusMetadata = BlobMetadata | PullRequestMetadata | null;
+
+/**
+ * Map content type to metadata schema
+ */
+const METADATA_SCHEMAS = {
+	blob: blobMetadataSchema,
+	pull_request: pullRequestMetadataSchema,
 } as const;
 
-type ContentStatusMetadataMap = {
-	blob: z.infer<typeof blobContentStatusMetadataSchema>;
-	pullRequest: z.infer<typeof pullRequestContentStatusMetadataSchema>;
-};
-
-export type ContentStatusMetadata =
-	| ContentStatusMetadataMap[keyof ContentStatusMetadataMap]
-	| null;
-
-type ContentStatusMetadataFor<T extends GitHubRepositoryContentType> =
-	T extends keyof typeof contentTypeToSchemaKeyMap
-		? (typeof contentTypeToSchemaKeyMap)[T] extends keyof ContentStatusMetadataMap
-			? ContentStatusMetadataMap[(typeof contentTypeToSchemaKeyMap)[T]]
-			: never
-		: never;
-
-export function safeParseContentStatusMetadata<
-	T extends GitHubRepositoryContentType,
->(
+/**
+ * Type-safe metadata getter
+ */
+export function getContentStatusMetadata<T extends GitHubRepositoryContentType>(
 	metadata: unknown,
 	contentType: T,
-):
-	| { success: true; data: ContentStatusMetadataFor<T> | null }
-	| { success: false; error: string } {
-	if (metadata === null || metadata === undefined) {
-		return { success: true, data: null };
+): T extends "blob"
+	? BlobMetadata | null
+	: T extends "pull_request"
+		? PullRequestMetadata | null
+		: never {
+	if (!metadata) {
+		return null as T extends "blob"
+			? BlobMetadata | null
+			: T extends "pull_request"
+				? PullRequestMetadata | null
+				: never;
 	}
 
-	// Map database content_type to schema key (camelCase)
-	const schemaKey = contentTypeToSchemaKeyMap[contentType];
-	if (!schemaKey) {
-		return {
-			success: false,
-			error: `No schema key mapping defined for content type: ${contentType}`,
-		};
+	const schema = METADATA_SCHEMAS[contentType];
+	const parsed = schema.safeParse(metadata);
+
+	if (!parsed.success) {
+		return null as T extends "blob"
+			? BlobMetadata | null
+			: T extends "pull_request"
+				? PullRequestMetadata | null
+				: never;
 	}
 
-	// Get the appropriate schema for the content type
-	const schema = metadataSchemaMap[schemaKey as keyof typeof metadataSchemaMap];
-
-	if (!schema) {
-		return {
-			success: false,
-			error: `No metadata schema defined for content type: ${contentType}`,
-		};
-	}
-
-	const result = schema.safeParse(metadata);
-
-	if (result.success) {
-		return { success: true, data: result.data as ContentStatusMetadataFor<T> };
-	} else {
-		return { success: false, error: result.error.message };
-	}
+	return parsed.data as T extends "blob"
+		? BlobMetadata
+		: T extends "pull_request"
+			? PullRequestMetadata
+			: never;
 }
 
-type BlobContentStatusMetadata = z.infer<
-	typeof blobContentStatusMetadataSchema
->;
-type PullRequestContentStatusMetadata = z.infer<
-	typeof pullRequestContentStatusMetadataSchema
->;
-
-export function createBlobContentStatusMetadata(
-	data: BlobContentStatusMetadata,
-): ContentStatusMetadataFor<"blob"> {
-	return blobContentStatusMetadataSchema.parse(data);
+/**
+ * Type-safe metadata creators
+ */
+export function createBlobMetadata(data: BlobMetadata): BlobMetadata {
+	return blobMetadataSchema.parse(data);
 }
 
-export function createPullRequestContentStatusMetadata(
-	data: PullRequestContentStatusMetadata,
-): ContentStatusMetadataFor<"pull_request"> {
-	return pullRequestContentStatusMetadataSchema.parse(data);
+export function createPullRequestMetadata(
+	data: PullRequestMetadata,
+): PullRequestMetadata {
+	return pullRequestMetadataSchema.parse(data);
 }

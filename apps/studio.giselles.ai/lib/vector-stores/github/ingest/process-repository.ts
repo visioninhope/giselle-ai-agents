@@ -10,10 +10,7 @@ import {
 	githubRepositoryPullRequestEmbeddings,
 } from "@/drizzle";
 import type { RepositoryWithStatuses } from "../types";
-import {
-	createBlobContentStatusMetadata,
-	createPullRequestContentStatusMetadata,
-} from "../types";
+import { createBlobMetadata, createPullRequestMetadata } from "../types";
 import { ingestGitHubBlobs } from "./blobs/ingest-github-blobs";
 import { buildGitHubAuthConfig, buildOctokit } from "./build-octokit";
 import { ingestGitHubPullRequests } from "./pull-requests/ingest-github-pull-requests";
@@ -123,7 +120,7 @@ async function processBlobs(params: {
 
 	await updateContentStatus(dbId, "blob", {
 		status: "completed",
-		metadata: createBlobContentStatusMetadata({
+		metadata: createBlobMetadata({
 			lastIngestedCommitSha: commit.sha,
 		}),
 		lastSyncedAt: new Date(),
@@ -160,7 +157,7 @@ async function processPullRequests(params: {
 
 	await updateContentStatus(dbId, "pull_request", {
 		status: "completed",
-		metadata: createPullRequestContentStatusMetadata({
+		metadata: createPullRequestMetadata({
 			lastIngestedPrNumber: lastIngestedPrNumber ?? undefined,
 		}),
 		lastSyncedAt: new Date(),
@@ -246,8 +243,8 @@ async function updateContentStatus(
 	update: {
 		status: "running" | "completed" | "failed";
 		metadata?:
-			| ReturnType<typeof createBlobContentStatusMetadata>
-			| ReturnType<typeof createPullRequestContentStatusMetadata>;
+			| ReturnType<typeof createBlobMetadata>
+			| ReturnType<typeof createPullRequestMetadata>;
 		lastSyncedAt?: Date;
 		errorCode?: string | null;
 		retryAfter?: Date | null;

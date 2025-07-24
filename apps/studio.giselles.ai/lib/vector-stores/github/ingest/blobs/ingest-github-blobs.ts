@@ -12,7 +12,7 @@ import {
 	githubRepositoryContentStatus,
 	githubRepositoryIndex,
 } from "@/drizzle";
-import { safeParseContentStatusMetadata } from "../../types";
+import { getContentStatusMetadata } from "../../types";
 import { createGitHubBlobChunkStore } from "./chunk-store";
 
 /**
@@ -125,16 +125,13 @@ async function getRepositoryIndexInfo(
 			`Blob content status not found for repository: ${source.owner}/${source.repo}`,
 		);
 	}
-	const parseResult = safeParseContentStatusMetadata(
+	const metadata = getContentStatusMetadata(
 		contentStatus.metadata,
 		contentType,
 	);
 
-	// If parsing fails or no lastIngestedCommitSha exists, treat as initial ingest
-	const isInitialIngest =
-		!parseResult.success ||
-		!parseResult.data ||
-		!parseResult.data.lastIngestedCommitSha;
+	// If no lastIngestedCommitSha exists, treat as initial ingest
+	const isInitialIngest = !metadata?.lastIngestedCommitSha;
 
 	return { repositoryIndexDbId: dbId, isInitialIngest };
 }
