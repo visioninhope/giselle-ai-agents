@@ -199,13 +199,11 @@ export function RepositoryItem({
 					)}
 
 					{/* Pull Requests Section */}
-					{pullRequestStatus && (
-						<ContentTypeSection
-							contentType="pull_request"
-							status={pullRequestStatus}
-							isIngesting={isIngesting}
-						/>
-					)}
+					<ContentTypeSection
+						contentType="pull_request"
+						status={pullRequestStatus}
+						isIngesting={isIngesting}
+					/>
 				</div>
 			</div>
 
@@ -353,7 +351,7 @@ function formatRetryTime(retryAfter: Date): string {
 // Content Type Section Component
 type ContentTypeSectionProps = {
 	contentType: GitHubRepositoryContentType;
-	status: typeof githubRepositoryContentStatus.$inferSelect;
+	status?: typeof githubRepositoryContentStatus.$inferSelect;
 	isIngesting: boolean;
 	onVerify?: () => void;
 };
@@ -364,6 +362,35 @@ function ContentTypeSection({
 	isIngesting,
 	onVerify,
 }: ContentTypeSectionProps) {
+	// Handle case where status doesn't exist (e.g., pull_request not yet configured)
+	if (!status) {
+		const contentConfig = {
+			blob: { icon: Code, label: "Code" },
+			pull_request: { icon: GitPullRequest, label: "Pull Requests" },
+		};
+		const config = contentConfig[contentType];
+		const Icon = config.icon;
+
+		return (
+			<div className="bg-black-700/50 rounded-lg p-3 opacity-50">
+				<div className="flex items-center justify-between mb-1">
+					<div className="flex items-center gap-2 text-sm font-medium text-gray-300">
+						<Icon size={16} />
+						<span>{config.label}</span>
+					</div>
+					<div className="flex items-center gap-2">
+						<span className="bg-gray-600 text-gray-300 px-2 py-0.5 rounded text-xs">
+							Disabled
+						</span>
+					</div>
+				</div>
+				<div className="text-xs text-gray-500">
+					<span>Not configured</span>
+				</div>
+			</div>
+		);
+	}
+
 	const {
 		enabled,
 		status: syncStatus,
