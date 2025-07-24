@@ -18,8 +18,8 @@ const pullRequestMetadataSchema = z.object({
 	lastIngestedPrNumber: z.number().optional(),
 });
 
-export type BlobMetadata = z.infer<typeof blobMetadataSchema>;
-export type PullRequestMetadata = z.infer<typeof pullRequestMetadataSchema>;
+type BlobMetadata = z.infer<typeof blobMetadataSchema>;
+type PullRequestMetadata = z.infer<typeof pullRequestMetadataSchema>;
 export type ContentStatusMetadata = BlobMetadata | PullRequestMetadata | null;
 
 const METADATA_SCHEMAS = {
