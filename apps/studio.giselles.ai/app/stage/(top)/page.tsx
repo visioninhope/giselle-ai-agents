@@ -15,6 +15,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { after } from "next/server";
 import { giselleEngine } from "@/app/giselle-engine";
+import { StatusBadge } from "@/components/status-badge";
 import { acts as actsSchema, db } from "@/drizzle";
 import { experimental_storageFlag, stageFlag } from "@/flags";
 import { fetchCurrentUser } from "@/services/accounts";
@@ -173,7 +174,20 @@ export default async function StagePage() {
 											</span>
 										</div>
 									</TableCell>
-									<TableCell className="text-center">{act.status}</TableCell>
+									<TableCell className="text-center">
+										{act.status === "inProgress" && (
+											<StatusBadge status="info">Running</StatusBadge>
+										)}
+										{act.status === "completed" && (
+											<StatusBadge status="success">Completed</StatusBadge>
+										)}
+										{act.status === "failed" && (
+											<StatusBadge status="error">Failed</StatusBadge>
+										)}
+										{act.status === "cancelled" && (
+											<StatusBadge status="ignored">Cancelled</StatusBadge>
+										)}
+									</TableCell>
 									<TableCell className="text-right">
 										<div className="flex justify-end">
 											<Link href={`/stage/acts/${act.id}`}>Details</Link>
