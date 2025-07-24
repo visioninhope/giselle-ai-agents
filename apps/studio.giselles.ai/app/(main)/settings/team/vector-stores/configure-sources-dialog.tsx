@@ -17,7 +17,7 @@ import {
 
 type ConfigureSourcesDialogProps = {
 	open: boolean;
-	onOpenChange: (open: boolean) => void;
+	setOpen: (open: boolean) => void;
 	repositoryData: RepositoryWithStatuses;
 	updateRepositoryContentTypesAction: (
 		repositoryIndexId: string,
@@ -30,7 +30,7 @@ type ConfigureSourcesDialogProps = {
 
 export function ConfigureSourcesDialog({
 	open,
-	onOpenChange,
+	setOpen,
 	repositoryData,
 	updateRepositoryContentTypesAction,
 }: ConfigureSourcesDialogProps) {
@@ -66,7 +66,7 @@ export function ConfigureSourcesDialog({
 			);
 
 			if (result.success) {
-				onOpenChange(false);
+				setOpen(false);
 			} else {
 				setError(result.error || "Failed to update configuration");
 			}
@@ -74,15 +74,15 @@ export function ConfigureSourcesDialog({
 	};
 
 	return (
-		<Dialog.Root open={open} onOpenChange={onOpenChange}>
+		<Dialog.Root open={open} onOpenChange={setOpen}>
 			<GlassDialogContent
-				onEscapeKeyDown={() => onOpenChange(false)}
-				onPointerDownOutside={() => onOpenChange(false)}
+				onEscapeKeyDown={() => setOpen(false)}
+				onPointerDownOutside={() => setOpen(false)}
 			>
 				<GlassDialogHeader
 					title="Configure Sources"
 					description={`Select which content types to ingest for ${repositoryIndex.owner}/${repositoryIndex.repo}`}
-					onClose={() => onOpenChange(false)}
+					onClose={() => setOpen(false)}
 				/>
 				<GlassDialogBody>
 					<div className="space-y-6">
@@ -115,7 +115,7 @@ export function ConfigureSourcesDialog({
 					{error && <div className="mt-4 text-sm text-error-500">{error}</div>}
 				</GlassDialogBody>
 				<GlassDialogFooter
-					onCancel={() => onOpenChange(false)}
+					onCancel={() => setOpen(false)}
 					onConfirm={handleSave}
 					confirmLabel="Save Changes"
 					isPending={isPending}

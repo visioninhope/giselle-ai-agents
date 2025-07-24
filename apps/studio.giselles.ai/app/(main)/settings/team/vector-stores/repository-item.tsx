@@ -230,7 +230,7 @@ export function RepositoryItem({
 
 			<ConfigureSourcesDialog
 				open={showConfigureDialog}
-				onOpenChange={setShowConfigureDialog}
+				setOpen={setShowConfigureDialog}
 				repositoryData={repositoryData}
 				updateRepositoryContentTypesAction={updateRepositoryContentTypesAction}
 			/>
