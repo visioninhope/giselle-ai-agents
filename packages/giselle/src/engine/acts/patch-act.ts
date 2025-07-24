@@ -26,8 +26,6 @@ export async function patchAct(args: {
 	// Apply the patches
 	const updatedAct = patchActObject(currentAct, ...allPatches);
 
-	console.log(JSON.stringify(updatedAct, null, 2));
-
 	await args.context.storage.setItem(actPath(args.actId), updatedAct);
 
 	return updatedAct;
