@@ -1,4 +1,4 @@
-import type { Act } from "../../concepts/act";
+import { Act } from "../../concepts/act";
 import type { ActId } from "../../concepts/identifiers";
 import type { GiselleEngineContext } from "../types";
 import { type Patch, patchAct as patchActObject } from "./object/patch-object";
@@ -12,13 +12,10 @@ export async function patchAct(args: {
 	patches: Patch[];
 }) {
 	// Get the current act
-	const currentAct = await args.context.storage.getItem<Act>(
-		actPath(args.actId),
-	);
-
-	if (!currentAct) {
-		throw new Error(`Act not found: ${args.actId}`);
-	}
+	const currentAct = await args.context.experimental_storage.getJson({
+		path: actPath(args.actId),
+		schema: Act,
+	});
 
 	// Always update the updatedAt field
 	const allPatches: Patch[] = [
@@ -28,6 +25,8 @@ export async function patchAct(args: {
 
 	// Apply the patches
 	const updatedAct = patchActObject(currentAct, ...allPatches);
+
+	console.log(JSON.stringify(updatedAct, null, 2));
 
 	await args.context.storage.setItem(actPath(args.actId), updatedAct);
 
