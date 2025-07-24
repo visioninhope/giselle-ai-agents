@@ -48,6 +48,7 @@ async function executeStep(args: {
 					...args,
 					useExperimentalStorage: true,
 				});
+				console.log("consuming....START");
 				await result.consumeStream({
 					onError: async (error) => {
 						if (AISDKError.isInstance(error)) {
@@ -76,6 +77,7 @@ async function executeStep(args: {
 						}
 					},
 				});
+				console.log("consuming....END");
 				break;
 			}
 			case "trigger":
@@ -184,6 +186,7 @@ async function actSequence(args: {
 				},
 				onFinish: async (step) => {
 					totalTask += step.duration;
+					console.log(`step finish: ${step.name}`);
 					await patchAct({
 						context: args.context,
 						actId: args.actId,
