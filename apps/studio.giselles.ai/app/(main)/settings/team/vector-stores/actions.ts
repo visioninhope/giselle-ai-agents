@@ -1,7 +1,7 @@
 "use server";
 
 import { createId } from "@paralleldrive/cuid2";
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { after } from "next/server";
 import {
@@ -457,55 +457,27 @@ export async function updateRepositoryContentTypes(
 			};
 		}
 
-		// Update or create content status records
-		for (const contentType of contentTypes) {
-			const existing = await db
-				.select()
-				.from(githubRepositoryContentStatus)
-				.where(
-					and(
-						eq(
-							githubRepositoryContentStatus.repositoryIndexDbId,
-							repository.dbId,
-						),
-						eq(
-							githubRepositoryContentStatus.contentType,
-							contentType.contentType,
-						),
-					),
-				)
-				.limit(1);
-
-			if (existing.length > 0) {
-				// Update existing record
-				await db
-					.update(githubRepositoryContentStatus)
-					.set({
-						enabled: contentType.enabled,
-						updatedAt: new Date(),
-					})
-					.where(
-						and(
-							eq(
-								githubRepositoryContentStatus.repositoryIndexDbId,
-								repository.dbId,
-							),
-							eq(
-								githubRepositoryContentStatus.contentType,
-								contentType.contentType,
-							),
-						),
-					);
-			} else {
-				// Create new record
-				await db.insert(githubRepositoryContentStatus).values({
+		// Update or create content status records using single upsert
+		await db
+			.insert(githubRepositoryContentStatus)
+			.values(
+				contentTypes.map((contentType) => ({
 					repositoryIndexDbId: repository.dbId,
 					contentType: contentType.contentType,
 					enabled: contentType.enabled,
-					status: "idle",
-				});
-			}
-		}
+					status: "idle" as const,
+				})),
+			)
+			.onConflictDoUpdate({
+				target: [
+					githubRepositoryContentStatus.repositoryIndexDbId,
+					githubRepositoryContentStatus.contentType,
+				],
+				set: {
+					enabled: sql`excluded.enabled`,
+					updatedAt: new Date(),
+				},
+			});
 
 		revalidatePath("/settings/team/vector-stores");
 		return { success: true };
