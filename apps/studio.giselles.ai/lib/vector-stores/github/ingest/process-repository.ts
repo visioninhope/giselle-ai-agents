@@ -17,9 +17,6 @@ import { buildGitHubAuthConfig, buildOctokit } from "./build-octokit";
 import { ingestGitHubPullRequests } from "./pull-requests/ingest-github-pull-requests";
 import { createIngestTelemetrySettings } from "./telemetry";
 
-/**
- * Content processor configuration
- */
 type ProcessorConfig = {
 	repositoryIndex: typeof githubRepositoryIndex.$inferSelect;
 	telemetry?: TelemetrySettings;
@@ -31,9 +28,6 @@ type ContentProcessor = (config: ProcessorConfig) => Promise<{
 		| ReturnType<typeof createPullRequestMetadata>;
 }>;
 
-/**
- * Content processors by type
- */
 const CONTENT_PROCESSORS: Record<
 	GitHubRepositoryContentType,
 	ContentProcessor
@@ -139,29 +133,30 @@ export async function processRepository(
 	}
 }
 
-/**
- * Helper functions for status updates
- */
-const completedStatus = (
+function completedStatus(
 	metadata:
 		| ReturnType<typeof createBlobMetadata>
 		| ReturnType<typeof createPullRequestMetadata>,
-) => ({
-	status: "completed" as const,
-	metadata,
-	lastSyncedAt: new Date(),
-	errorCode: null,
-	retryAfter: null,
-});
+) {
+	return {
+		status: "completed" as const,
+		metadata,
+		lastSyncedAt: new Date(),
+		errorCode: null,
+		retryAfter: null,
+	};
+}
 
-const failedStatus = ({
+function failedStatus({
 	errorCode,
 	retryAfter,
-}: ReturnType<typeof extractErrorInfo>) => ({
-	status: "failed" as const,
-	errorCode,
-	retryAfter,
-});
+}: ReturnType<typeof extractErrorInfo>) {
+	return {
+		status: "failed" as const,
+		errorCode,
+		retryAfter,
+	};
+}
 
 async function getLastIngestedPrNumber(repositoryIndexDbId: number) {
 	const results = await db
@@ -184,9 +179,6 @@ async function getLastIngestedPrNumber(repositoryIndexDbId: number) {
 	return results[0].lastIngestedPrNumber;
 }
 
-/**
- * Error retry configuration
- */
 const ERROR_RETRY_CONFIG = {
 	DOCUMENT_NOT_FOUND: null,
 	DOCUMENT_TOO_LARGE: null,
@@ -195,9 +187,6 @@ const ERROR_RETRY_CONFIG = {
 	DOCUMENT_FETCH_ERROR: () => new Date(),
 } as const;
 
-/**
- * Extract error information
- */
 function extractErrorInfo(error: unknown): {
 	errorCode: string;
 	retryAfter: Date | null;
@@ -217,9 +206,6 @@ function extractErrorInfo(error: unknown): {
 	return { errorCode: "UNKNOWN", retryAfter: new Date() };
 }
 
-/**
- * Update content status
- */
 async function updateContentStatus(
 	repositoryIndexDbId: number,
 	contentType: GitHubRepositoryContentType,
@@ -238,7 +224,10 @@ async function updateContentStatus(
 		.set(update)
 		.where(
 			and(
-				eq(githubRepositoryContentStatus.repositoryIndexDbId, repositoryIndexDbId),
+				eq(
+					githubRepositoryContentStatus.repositoryIndexDbId,
+					repositoryIndexDbId,
+				),
 				eq(githubRepositoryContentStatus.contentType, contentType),
 			),
 		);
