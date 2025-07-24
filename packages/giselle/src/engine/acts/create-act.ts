@@ -113,6 +113,7 @@ export async function createAct(
 		id: ActId.generate(),
 		workspaceId: workspace.id,
 		status: "inProgress",
+		name: startNode.name ?? defaultName(startNode),
 		steps: {
 			queued: generations.length,
 			inProgress: 0,

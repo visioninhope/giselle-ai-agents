@@ -160,7 +160,7 @@ export default async function StagePage() {
 								<TableRow key={act.id}>
 									<TableCell>
 										<div className="flex flex-col">
-											<span>Act: {act.id}</span>
+											<span>{act.name}</span>
 											<span className="text-[12px] text-black-600">
 												{new Date(act.createdAt).toLocaleString()} ·{" "}
 												{act.team?.name || "Unknown Team"}
