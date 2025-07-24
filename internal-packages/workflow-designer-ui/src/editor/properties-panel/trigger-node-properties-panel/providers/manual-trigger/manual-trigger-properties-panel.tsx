@@ -1,5 +1,6 @@
 import { Button } from "@giselle-internal/ui/button";
 import { DropdownMenu } from "@giselle-internal/ui/dropdown-menu";
+import { Toggle } from "@giselle-internal/ui/toggle";
 import {
 	ManualTriggerParameter,
 	ManualTriggerParameterId,
@@ -35,9 +36,9 @@ export function ManualTriggerPropertiesPanel({ node }: { node: TriggerNode }) {
 	const client = useGiselleEngine();
 	const [isPending, startTransition] = useTransition();
 	const [parameters, setParameters] = useState<ManualTriggerParameter[]>([]);
-	const [staged] = useState(false);
+	const [staged, setStaged] = useState(false);
 	const [selectedType, setSelectedType] = useState<string>("text");
-	const { experimental_storage } = useFeatureFlag();
+	const { experimental_storage, stage } = useFeatureFlag();
 	const { callbacks } = useFlowTrigger();
 
 	const handleAddParameter = useCallback<FormEventHandler<HTMLFormElement>>(
@@ -146,11 +147,9 @@ export function ManualTriggerPropertiesPanel({ node }: { node: TriggerNode }) {
 
 	return (
 		<div className="flex flex-col gap-[8px] h-full px-1">
-			<div className="overflow-y-auto flex-1 pr-2 custom-scrollbar h-full relative">
+			<div className="overflow-y-auto flex-1 pr-2 custom-scrollbar h-full relative space-y-[16px]">
 				<div className="space-y-[4px]">
-					<p className="text-[14px] py-[1.5px] text-[#F7F9FD]">
-						Output Parameter
-					</p>
+					<p className="text-[14px] py-[1.5px]">Parameter</p>
 					<div className="px-[4px] py-0 w-full bg-transparent text-[14px]">
 						{parameters.length > 0 ? (
 							<div className="flex flex-col gap-[8px] mb-[16px]">
@@ -177,85 +176,110 @@ export function ManualTriggerPropertiesPanel({ node }: { node: TriggerNode }) {
 								))}
 							</div>
 						) : (
-							<div className="text-[14px] text-white-400 mb-[16px]">
+							<div className="text-[14px] text-text-muted mb-[16px]">
 								No parameters configured yet. Add at least one parameter.
 							</div>
 						)}
 					</div>
+
+					<div className="space-y-[4px] mt-[16px]">
+						<div className="flex flex-col gap-[8px] rounded-[8px]">
+							<form
+								className="flex gap-[8px] items-end"
+								onSubmit={handleAddParameter}
+							>
+								<div className="flex-1">
+									<label
+										htmlFor="param-name"
+										className="text-[12px] text-black-500 mb-[4px] block"
+									>
+										Parameter Name
+									</label>
+									<input
+										id="param-name"
+										name="name"
+										type="text"
+										placeholder="Write the parameter name"
+										className="w-full flex justify-between items-center rounded-[8px] py-[8px] px-[12px] outline-none focus:outline-none border-[1px] border-white-900 text-[14px]"
+										data-1p-ignore
+									/>
+								</div>
+								<div className="w-[100px]">
+									<label
+										htmlFor="param-type"
+										className="text-[12px] text-black-500 mb-[4px] block leading-[16px]"
+									>
+										Type
+									</label>
+									<DropdownMenu
+										trigger={
+											<button
+												type="button"
+												className="w-full px-3 py-2 bg-black-300/20 rounded-[8px] text-white-400 text-[14px] font-geist cursor-pointer text-left flex items-center justify-between"
+											>
+												<span className="text-[#F7F9FD]">
+													{TYPE_OPTIONS.find((opt) => opt.id === selectedType)
+														?.name || "Text"}
+												</span>
+												<ChevronDownIcon className="h-4 w-4 text-white/60" />
+											</button>
+										}
+										items={TYPE_OPTIONS}
+										renderItem={(option) => (
+											<>
+												<span>{option.name}</span>
+												{selectedType === option.id && (
+													<CheckIcon className="h-4 w-4" />
+												)}
+											</>
+										)}
+										onSelect={(_event, option) => setSelectedType(option.id)}
+										align="start"
+										sideOffset={4}
+									/>
+								</div>
+								<div className="w-auto">
+									<label
+										htmlFor="param-required"
+										className="text-[12px] text-black-500 mb-[4px] block leading-[16px]"
+									>
+										Required
+									</label>
+									<div className="flex items-center justify-center h-[37px]">
+										<input
+											id="param-required"
+											type="checkbox"
+											name="required"
+										/>
+									</div>
+								</div>
+								<Button type="submit" variant="filled" size="large">
+									Add
+								</Button>
+							</form>
+						</div>
+					</div>
 				</div>
 
-				<div className="space-y-[4px] mt-[16px]">
-					<div className="flex flex-col gap-[8px] rounded-[8px]">
-						<form
-							className="flex gap-[8px] items-end"
-							onSubmit={handleAddParameter}
-						>
-							<div className="flex-1">
-								<label
-									htmlFor="param-name"
-									className="text-[12px] text-black-500 mb-[4px] block"
-								>
-									Parameter Name
+				<div className="space-y-[4px]">
+					<p className="text-[14px] py-[1.5px]">Staged</p>
+					{stage && (
+						<div className="mt-[8px]">
+							<Toggle
+								name="staged"
+								checked={staged}
+								onCheckedChange={setStaged}
+							>
+								<label className="text-[12px]" htmlFor="staged">
+									Enable this trigger to run in Stage
+									<span className="text-text-muted ml-[8px]">
+										(This can be changed later)
+									</span>
 								</label>
-								<input
-									id="param-name"
-									name="name"
-									type="text"
-									placeholder="Write the parameter name"
-									className="w-full flex justify-between items-center rounded-[8px] py-[8px] px-[12px] outline-none focus:outline-none border-[1px] border-white-900 text-[14px]"
-									data-1p-ignore
-								/>
-							</div>
-							<div className="w-[100px]">
-								<label
-									htmlFor="param-type"
-									className="text-[12px] text-black-500 mb-[4px] block leading-[16px]"
-								>
-									Type
-								</label>
-								<DropdownMenu
-									trigger={
-										<button
-											type="button"
-											className="w-full px-3 py-2 bg-black-300/20 rounded-[8px] text-white-400 text-[14px] font-geist cursor-pointer text-left flex items-center justify-between"
-										>
-											<span className="text-[#F7F9FD]">
-												{TYPE_OPTIONS.find((opt) => opt.id === selectedType)
-													?.name || "Text"}
-											</span>
-											<ChevronDownIcon className="h-4 w-4 text-white/60" />
-										</button>
-									}
-									items={TYPE_OPTIONS}
-									renderItem={(option) => (
-										<>
-											<span>{option.name}</span>
-											{selectedType === option.id && (
-												<CheckIcon className="h-4 w-4" />
-											)}
-										</>
-									)}
-									onSelect={(_event, option) => setSelectedType(option.id)}
-									align="start"
-									sideOffset={4}
-								/>
-							</div>
-							<div className="w-auto">
-								<label
-									htmlFor="param-required"
-									className="text-[12px] text-black-500 mb-[4px] block leading-[16px]"
-								>
-									Required
-								</label>
-								<div className="flex items-center justify-center h-[37px]">
-									<input id="param-required" type="checkbox" name="required" />
-								</div>
-							</div>
-							<Button type="submit" variant="filled" size="large">
-								Add
-							</Button>
-						</form>
-					</div>
+								<div className="flex-grow mx-[12px] h-[1px] bg-element-background" />
+							</Toggle>
+						</div>
+					)}
 				</div>
 
 				<div className="pt-[8px] flex gap-[8px] mt-[12px] px-[4px]">
