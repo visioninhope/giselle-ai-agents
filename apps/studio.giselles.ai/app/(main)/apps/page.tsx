@@ -4,7 +4,7 @@ import { and, desc, eq, isNotNull } from "drizzle-orm";
 import { type ReactNode, Suspense } from "react";
 import { agents, db } from "@/drizzle";
 import { fetchCurrentTeam } from "@/services/teams";
-import { AgentGrid } from "./components/agent-grid";
+import { SearchableAgentList } from "./components/searchable-agent-list";
 
 function _DataList({
 	label,
@@ -49,7 +49,7 @@ async function AgentList() {
 			</div>
 		);
 	}
-	return <AgentGrid agents={dbAgents} />;
+	return <SearchableAgentList agents={dbAgents} />;
 }
 
 export default function AgentListV2Page() {
