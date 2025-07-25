@@ -56,7 +56,7 @@ async function AgentList() {
 export default function AgentListV2Page() {
   return (
     <ToastProvider>
-      <div className="w-full px-4 pt-2 pb-2">
+      <div className="w-full pt-2 pb-2">
         <Suspense fallback={<p className="text-center py-8">Loading...</p>}>
           <AgentList />
         </Suspense>
