@@ -3,20 +3,19 @@
 import clsx from "clsx/lite";
 import { XIcon } from "lucide-react";
 import { Toast as ToastPrimitive } from "radix-ui";
-import {
-	createContext,
-	type ReactNode,
-	useCallback,
-	useContext,
-	useState,
-} from "react";
+import { createContext, useCallback, useContext, useState } from "react";
+import { Button } from "./button";
 
+interface Action {
+	label?: string;
+	onClick?: React.MouseEventHandler<HTMLButtonElement>;
+}
 interface Toast {
 	id: string;
 	message: string;
 	type?: "info" | "success" | "warning" | "error";
 	preserve?: boolean;
-	action?: ReactNode;
+	action?: Action;
 }
 
 type AddToastOption = Pick<Toast, "action">;
@@ -104,7 +103,9 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({
 							<div>
 								{toast.action && (
 									<ToastPrimitive.Action altText="button" asChild>
-										{toast.action}
+										<Button onClick={toast.action.onClick} variant="filled">
+											{toast.action.label}
+										</Button>
 									</ToastPrimitive.Action>
 								)}
 							</div>
