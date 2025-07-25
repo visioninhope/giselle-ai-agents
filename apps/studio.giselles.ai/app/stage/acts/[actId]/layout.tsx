@@ -63,7 +63,7 @@ export default async function ({
 						act={{
 							...act,
 							sequences: act.sequences
-							// Skip the first sequence as it's always a Trigger node and doesn't need to be displayed
+								// Skip the first sequence as it's always a Trigger node and doesn't need to be displayed
 								.filter((_, index) => index > 0)
 								.map((sequence) => ({
 									...sequence,
