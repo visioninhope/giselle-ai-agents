@@ -103,7 +103,7 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({
 							<div>
 								{toast.action && (
 									<ToastPrimitive.Action altText="button" asChild>
-										<Button onClick={toast.action.onClick}>
+										<Button onClick={toast.action.onClick} variant="filled">
 											{toast.action.label}
 										</Button>
 									</ToastPrimitive.Action>
