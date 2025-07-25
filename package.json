@@ -14,7 +14,9 @@
 		"changeset": "changeset",
 		"version": "changeset version",
 		"test": "turbo test",
-		"tidy": "knip --no-config-hints"
+		"tidy": "knip --no-config-hints",
+		"prevd": "pnpm i && pnpm build-sdk",
+		"vd": "vercel dev"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "catalog:",
