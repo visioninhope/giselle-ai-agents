@@ -12,7 +12,6 @@ export * from "./generate-text";
 export * from "./generated-content";
 
 export * from "./giselle-icon";
-export * from "./giselle-logo";
 export * from "./github";
 export * from "./globe";
 export * from "./google";

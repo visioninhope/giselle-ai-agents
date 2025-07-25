@@ -55,17 +55,3 @@ export function ReadOnlyBanner({
 }
 
 // Simple badge version (displayed next to "Text file" in the header)
-export function ReadOnlyBadge({ className }: { className?: string }) {
-	return (
-		<div
-			className={clsx(
-				"inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[rgba(255,229,81,0.20)] border border-[#FFE551]",
-				"text-[12px] font-semibold text-[#FFE551] font-['Geist']",
-				className,
-			)}
-		>
-			<EyeIcon size={12} className="text-[#FFE551]" />
-			<span>Read Only</span>
-		</div>
-	);
-}

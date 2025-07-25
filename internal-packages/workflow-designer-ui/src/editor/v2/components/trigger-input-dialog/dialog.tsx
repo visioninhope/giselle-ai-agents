@@ -3,8 +3,8 @@ import { clsx } from "clsx/lite";
 import { PlayIcon, XIcon } from "lucide-react";
 import { Dialog } from "radix-ui";
 import { type FormEventHandler, useCallback, useMemo, useState } from "react";
-import { useActController } from "../../../hooks/use-act-controller";
-import { useTrigger } from "../../../hooks/use-trigger";
+import { useActController } from "../../../../hooks/use-act-controller";
+import { useTrigger } from "../../../../hooks/use-trigger";
 import { Button } from "./button";
 import {
 	buttonLabel,
