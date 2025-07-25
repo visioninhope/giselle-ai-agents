@@ -4,9 +4,10 @@ import { Button } from "@giselle-internal/ui/button";
 import { Select } from "@giselle-internal/ui/select";
 import type { FlowTrigger, FlowTriggerId } from "@giselle-sdk/data-type";
 import type { ParameterItem } from "@giselle-sdk/giselle";
+import { SpinnerIcon } from "@giselles-ai/icons/spinner";
 import clsx from "clsx/lite";
 import type { InferSelectModel } from "drizzle-orm";
-import { useCallback, useMemo, useState } from "react";
+import { useActionState, useCallback, useMemo, useState } from "react";
 import type { teams } from "@/drizzle";
 import {
 	createInputsFromTrigger,
@@ -78,18 +79,16 @@ export function Form({
 		[selectedFlowTriggerId, filteredFlowTriggers],
 	);
 
-	const handleSubmit = useCallback<React.FormEventHandler<HTMLFormElement>>(
-		async (e) => {
-			e.preventDefault();
+	const formAction = useCallback(
+		async (_prevState: unknown, formData: FormData) => {
 			if (selectedFlowTriggerId === undefined) {
-				return;
+				return null;
 			}
-			const formData = new FormData(e.currentTarget);
 			const { errors, values } = parseFormInputs(inputs, formData);
 
 			if (Object.keys(errors).length > 0) {
 				setValidationErrors(errors);
-				return;
+				return null;
 			}
 
 			setValidationErrors({});
@@ -108,6 +107,7 @@ export function Form({
 				flowTrigger: flowTrigger.sdkData,
 				parameterItems: toParameterItems(inputs, values),
 			});
+			return null;
 		},
 		[
 			inputs,
@@ -118,9 +118,11 @@ export function Form({
 		],
 	);
 
+	const [, action, isPending] = useActionState(formAction, null);
+
 	return (
 		<form
-			onSubmit={handleSubmit}
+			action={action}
 			className="max-w-[800px] mx-auto border border-border bg-panel-background rounded-[4px] p-4 text-[14px] text-text resize-none outline-none"
 		>
 			<div className="flex flex-col gap-[8px] mb-[8px]">
@@ -146,6 +148,7 @@ export function Form({
 											: "border-border",
 										"text-[14px]",
 									)}
+									disabled={isPending}
 								/>
 							)}
 							{input.type === "multiline-text" && (
@@ -161,6 +164,7 @@ export function Form({
 										"text-[14px]",
 									)}
 									rows={4}
+									disabled={isPending}
 								/>
 							)}
 							{input.type === "number" && (
@@ -176,6 +180,7 @@ export function Form({
 											: "border-border",
 										"text-[14px]",
 									)}
+									disabled={isPending}
 								/>
 							)}
 							{validationErrors[input.name] && (
@@ -226,8 +231,18 @@ export function Form({
 						}}
 					/>
 				</div>
-				<Button variant="solid" size="large" type="submit">
-					Start
+				<Button
+					variant="solid"
+					size="large"
+					type="submit"
+					disabled={isPending}
+					leftIcon={
+						isPending && (
+							<SpinnerIcon className="animate-follow-through-overlap-spin size-[18px]" />
+						)
+					}
+				>
+					{isPending ? "Setting the stage…" : "Start"}
 				</Button>
 			</div>
 		</form>
