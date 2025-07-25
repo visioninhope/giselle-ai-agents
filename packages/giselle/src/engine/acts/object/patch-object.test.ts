@@ -8,6 +8,7 @@ describe("patchAct", () => {
 		return {
 			id: "act-test123" as const,
 			workspaceId: "wrks-test456" as const,
+			name: "test",
 			status: "inProgress",
 			steps: {
 				queued: 0,
