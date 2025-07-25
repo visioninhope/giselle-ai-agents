@@ -1,6 +1,5 @@
 "use client";
 
-import { formatTimestamp } from "@giselles-ai/lib/utils";
 import {
 	ArrowDownAZ,
 	ArrowUpAZ,
@@ -10,7 +9,7 @@ import {
 	Search,
 } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
@@ -27,32 +26,11 @@ import type { AgentGridProps } from "./types";
 type SortOption = "name-asc" | "name-desc" | "date-desc" | "date-asc";
 type ViewMode = "grid" | "list";
 
-function ListItem({
-	agent,
-	isFirst,
-}: {
-	agent: AgentGridProps["agents"][0];
-	isFirst: boolean;
-}) {
-	const [relativeTime, setRelativeTime] = useState("");
-
-	useEffect(() => {
-		const update = () => {
-			setRelativeTime(
-				formatTimestamp.toRelativeTime(new Date(agent.updatedAt).getTime()),
-			);
-		};
-		update();
-		const id = setInterval(update, 60_000);
-		return () => clearInterval(id);
-	}, [agent.updatedAt]);
-
+function ListItem({ agent }: { agent: AgentGridProps["agents"][0] }) {
 	return (
 		<Link
 			href={`/workspaces/${agent.workspaceId}`}
-			className={`group flex items-center justify-between px-2 py-3 ${
-				!isFirst ? "border-t-[0.5px] border-white/10" : ""
-			}`}
+			className="group flex items-center justify-between px-2 py-3 first:border-t-0 border-t-[0.5px] border-white/10"
 		>
 			<div className="flex items-center gap-3">
 				{/* Icon */}
@@ -77,7 +55,7 @@ function ListItem({
 						{agent.name || "Untitled"}
 					</p>
 					<p className="text-[12px] font-geist text-white-400">
-						Edited <span suppressHydrationWarning>{relativeTime}</span>
+						Edited {agent.updatedAt.toLocaleDateString()}
 					</p>
 				</div>
 			</div>
@@ -103,38 +81,32 @@ export function SearchableAgentList({ agents }: AgentGridProps) {
 	const [viewMode, setViewMode] = useState<ViewMode>("grid");
 
 	// Filter agents based on search query
-	const filteredAgents = agents.filter((agent) => {
-		if (!searchQuery) return true;
-		const agentName = agent.name?.toLowerCase() || "";
-		return agentName.includes(searchQuery.toLowerCase());
-	});
+	const filteredAgents = useMemo(() => {
+		if (!searchQuery) return agents;
+		const query = searchQuery.toLowerCase();
+		return agents.filter((agent) => {
+			const agentName = agent.name?.toLowerCase() || "";
+			return agentName.includes(query);
+		});
+	}, [agents, searchQuery]);
 
 	// Sort agents based on selected option
-	const sortedAgents = [...filteredAgents].sort((a, b) => {
-		switch (sortOption) {
-			case "name-asc":
-				return (a.name || "").localeCompare(b.name || "");
-			case "name-desc":
-				return (b.name || "").localeCompare(a.name || "");
-			case "date-desc":
-				return b.updatedAt.getTime() - a.updatedAt.getTime();
-			case "date-asc":
-				return a.updatedAt.getTime() - b.updatedAt.getTime();
-			default:
-				return 0;
-		}
-	});
-
-	const getSortIcon = () => {
-		if (sortOption.includes("name")) {
-			return sortOption === "name-asc" ? (
-				<ArrowDownAZ className="h-4 w-4" />
-			) : (
-				<ArrowUpAZ className="h-4 w-4" />
-			);
-		}
-		return <Clock className="h-4 w-4" />;
-	};
+	const sortedAgents = useMemo(() => {
+		return [...filteredAgents].sort((a, b) => {
+			switch (sortOption) {
+				case "name-asc":
+					return (a.name || "").localeCompare(b.name || "");
+				case "name-desc":
+					return (b.name || "").localeCompare(a.name || "");
+				case "date-desc":
+					return b.updatedAt.getTime() - a.updatedAt.getTime();
+				case "date-asc":
+					return a.updatedAt.getTime() - b.updatedAt.getTime();
+				default:
+					return 0;
+			}
+		});
+	}, [filteredAgents, sortOption]);
 
 	const getSortLabel = () => {
 		switch (sortOption) {
@@ -170,9 +142,12 @@ export function SearchableAgentList({ agents }: AgentGridProps) {
 						<DropdownMenuTrigger asChild>
 							<Button
 								variant="link"
-								className="w-auto justify-start gap-2 px-3 py-2 h-10"
+								className="w-auto justify-start gap-2 px-3 py-2 h-10 group [&[data-sort-type='name-asc']_.sort-icon-name-asc]:block [&[data-sort-type='name-desc']_.sort-icon-name-desc]:block [&[data-sort-type='date-desc']_.sort-icon-date]:block [&[data-sort-type='date-asc']_.sort-icon-date]:block"
+								data-sort-type={sortOption}
 							>
-								{getSortIcon()}
+								<ArrowDownAZ className="h-4 w-4 hidden sort-icon-name-asc" />
+								<ArrowUpAZ className="h-4 w-4 hidden sort-icon-name-desc" />
+								<Clock className="h-4 w-4 hidden sort-icon-date" />
 								<span className="text-sm hidden sm:inline">
 									{getSortLabel()}
 								</span>
@@ -276,12 +251,10 @@ export function SearchableAgentList({ agents }: AgentGridProps) {
 							"inset 0 1px 0 0 rgba(255, 255, 255, 0.05), inset 0 0 0 1px rgba(255, 255, 255, 0.03)",
 					}}
 				>
-					{sortedAgents.map((agent, index) => {
+					{sortedAgents.map((agent) => {
 						if (!agent.workspaceId) return null;
 
-						return (
-							<ListItem key={agent.id} agent={agent} isFirst={index === 0} />
-						);
+						return <ListItem key={agent.id} agent={agent} />;
 					})}
 				</div>
 			)}
