@@ -26,9 +26,8 @@ import { ManualTriggerConfiguredView } from "../../ui";
 
 const TYPE_OPTIONS = [
 	{ id: "text", name: "Text" },
+	{ id: "multiline-text", name: "Text (multi-line)" },
 	{ id: "number", name: "Number" },
-	{ id: "boolean", name: "Boolean" },
-	{ id: "json", name: "JSON" },
 ];
 
 export function ManualTriggerPropertiesPanel({ node }: { node: TriggerNode }) {
