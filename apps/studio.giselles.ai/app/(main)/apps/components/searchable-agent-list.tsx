@@ -3,6 +3,7 @@
 import {
   ArrowDownAZ,
   ArrowUpAZ,
+  ChevronDown,
   Clock,
   LayoutGrid,
   LayoutList,
@@ -143,7 +144,7 @@ export function SearchableAgentList({ agents }: AgentGridProps) {
             <DropdownMenuTrigger asChild>
               <Button
                 variant="link"
-                className="w-auto justify-start gap-2 px-3 py-2 h-10 group [&[data-sort-type='name-asc']_.sort-icon-name-asc]:block [&[data-sort-type='name-desc']_.sort-icon-name-desc]:block [&[data-sort-type='date-desc']_.sort-icon-date]:block [&[data-sort-type='date-asc']_.sort-icon-date]:block"
+                className="w-auto justify-start gap-2 px-0 py-2 h-10 border-0 hover:bg-transparent hover:text-current group [&[data-sort-type='name-asc']_.sort-icon-name-asc]:block [&[data-sort-type='name-desc']_.sort-icon-name-desc]:block [&[data-sort-type='date-desc']_.sort-icon-date]:block [&[data-sort-type='date-asc']_.sort-icon-date]:block"
                 data-sort-type={sortOption}
               >
                 <ArrowDownAZ className="h-4 w-4 hidden sort-icon-name-asc" />
@@ -152,49 +153,37 @@ export function SearchableAgentList({ agents }: AgentGridProps) {
                 <span className="text-sm hidden sm:inline">
                   {getSortLabel()}
                 </span>
+                <ChevronDown className="h-4 w-4 opacity-60" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent
               align="end"
-              className="border border-black-600 rounded-lg p-1 min-w-[180px]"
-              style={{
-                background: "rgba(30,35,55,0.95)",
-                backdropFilter: "blur(12px)",
-                WebkitBackdropFilter: "blur(12px)",
-              }}
+              className="p-1 border-[0.25px] border-white/10 rounded-[8px] min-w-[180px] bg-black-900 shadow-none"
             >
               <DropdownMenuItem
                 onClick={() => setSortOption("date-desc")}
-                className={`text-white hover:bg-black-700 cursor-pointer rounded px-3 py-2 ${
-                  sortOption === "date-desc" ? "bg-black-700" : ""
-                }`}
+                className="flex items-center w-full px-3 py-2 text-left text-[14px] leading-[16px] hover:bg-white/5 text-white-400 rounded-md cursor-pointer"
               >
                 <Clock className="mr-3 h-4 w-4" />
                 Updated
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => setSortOption("date-asc")}
-                className={`text-white hover:bg-black-700 cursor-pointer rounded px-3 py-2 ${
-                  sortOption === "date-asc" ? "bg-black-700" : ""
-                }`}
+                className="flex items-center w-full px-3 py-2 text-left text-[14px] leading-[16px] hover:bg-white/5 text-white-400 rounded-md cursor-pointer"
               >
                 <Clock className="mr-3 h-4 w-4" />
                 Oldest
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => setSortOption("name-asc")}
-                className={`text-white hover:bg-black-700 cursor-pointer rounded px-3 py-2 ${
-                  sortOption === "name-asc" ? "bg-black-700" : ""
-                }`}
+                className="flex items-center w-full px-3 py-2 text-left text-[14px] leading-[16px] hover:bg-white/5 text-white-400 rounded-md cursor-pointer"
               >
                 <ArrowDownAZ className="mr-3 h-4 w-4" />
                 Name (A-Z)
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => setSortOption("name-desc")}
-                className={`text-white hover:bg-black-700 cursor-pointer rounded px-3 py-2 ${
-                  sortOption === "name-desc" ? "bg-black-700" : ""
-                }`}
+                className="flex items-center w-full px-3 py-2 text-left text-[14px] leading-[16px] hover:bg-white/5 text-white-400 rounded-md cursor-pointer"
               >
                 <ArrowUpAZ className="mr-3 h-4 w-4" />
                 Name (Z-A)
