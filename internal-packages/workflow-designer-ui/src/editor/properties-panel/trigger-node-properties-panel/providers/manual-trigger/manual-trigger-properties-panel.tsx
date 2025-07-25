@@ -14,7 +14,7 @@ import {
 	useGiselleEngine,
 	useWorkflowDesigner,
 } from "@giselle-sdk/giselle/react";
-import { CheckIcon, ChevronDownIcon, TrashIcon } from "lucide-react";
+import { TrashIcon } from "lucide-react";
 import {
 	type FormEventHandler,
 	useCallback,
