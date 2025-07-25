@@ -36,7 +36,7 @@ export default async function ({
 				</div>
 
 				<div className="mb-[24px]">
-					<h2>Create pull request</h2>
+          <h2>{act.name}</h2>
 					{/* <div className="flex bg-secondary rounded-md p-1 text-sm">
 							<button className="flex-1 text-muted-foreground py-1 px-2 rounded">
 								Steps
