@@ -24,7 +24,6 @@ import {
 	createWebPageNode,
 	triggerNodeDefaultName,
 	useFeatureFlag,
-	useVectorStore,
 	useWorkflowDesigner,
 } from "@giselle-sdk/giselle/react";
 import {
