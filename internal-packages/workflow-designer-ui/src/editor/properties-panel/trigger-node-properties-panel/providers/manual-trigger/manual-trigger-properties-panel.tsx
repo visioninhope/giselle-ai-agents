@@ -1,5 +1,5 @@
 import { Button } from "@giselle-internal/ui/button";
-import { DropdownMenu } from "@giselle-internal/ui/dropdown-menu";
+import { Select } from "@giselle-internal/ui/select";
 import { Toggle } from "@giselle-internal/ui/toggle";
 import {
 	ManualTriggerParameter,
@@ -36,7 +36,6 @@ export function ManualTriggerPropertiesPanel({ node }: { node: TriggerNode }) {
 	const [isPending, startTransition] = useTransition();
 	const [parameters, setParameters] = useState<ManualTriggerParameter[]>([]);
 	const [staged, setStaged] = useState(false);
-	const [selectedType, setSelectedType] = useState<string>("text");
 	const { experimental_storage, stage } = useFeatureFlag();
 	const { callbacks } = useFlowTrigger();
 
@@ -45,12 +44,13 @@ export function ManualTriggerPropertiesPanel({ node }: { node: TriggerNode }) {
 			e.preventDefault();
 			const formData = new FormData(e.currentTarget);
 			const name = formData.get("name") as string;
+			const type = formData.get("type") as string;
 			const required = formData.get("required") !== null;
 
 			const parse = ManualTriggerParameter.safeParse({
 				id: ManualTriggerParameterId.generate(),
 				name,
-				type: selectedType,
+				type,
 				required,
 			});
 			if (!parse.success) {
@@ -59,9 +59,8 @@ export function ManualTriggerPropertiesPanel({ node }: { node: TriggerNode }) {
 			}
 			setParameters((prev) => [...prev, parse.data]);
 			e.currentTarget.reset();
-			setSelectedType("text");
 		},
-		[selectedType],
+		[],
 	);
 
 	const handleRemoveParameter = useCallback((id: string) => {
@@ -210,31 +209,12 @@ export function ManualTriggerPropertiesPanel({ node }: { node: TriggerNode }) {
 									>
 										Type
 									</label>
-									<DropdownMenu
-										trigger={
-											<button
-												type="button"
-												className="w-full px-3 py-2 bg-black-300/20 rounded-[8px] text-white-400 text-[14px] font-geist cursor-pointer text-left flex items-center justify-between"
-											>
-												<span className="text-[#F7F9FD]">
-													{TYPE_OPTIONS.find((opt) => opt.id === selectedType)
-														?.name || "Text"}
-												</span>
-												<ChevronDownIcon className="h-4 w-4 text-white/60" />
-											</button>
-										}
-										items={TYPE_OPTIONS}
-										renderItem={(option) => (
-											<>
-												<span>{option.name}</span>
-												{selectedType === option.id && (
-													<CheckIcon className="h-4 w-4" />
-												)}
-											</>
-										)}
-										onSelect={(_event, option) => setSelectedType(option.id)}
-										align="start"
-										sideOffset={4}
+									<Select
+										name="type"
+										options={TYPE_OPTIONS}
+										renderOption={(option) => option.name}
+										placeholder="Select type..."
+										defaultValue="text"
 									/>
 								</div>
 								<div className="w-auto">
