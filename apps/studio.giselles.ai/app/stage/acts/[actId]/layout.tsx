@@ -36,7 +36,7 @@ export default async function ({
 				</div>
 
 				<div className="mb-[24px]">
-          <h2>{act.name}</h2>
+					<h2>{act.name}</h2>
 					{/* <div className="flex bg-secondary rounded-md p-1 text-sm">
 							<button className="flex-1 text-muted-foreground py-1 px-2 rounded">
 								Steps
@@ -62,23 +62,26 @@ export default async function ({
 					<Nav
 						act={{
 							...act,
-							sequences: act.sequences.map((sequence) => ({
-								...sequence,
-								steps: sequence.steps
-									.map((step) => {
-										const generation = generations.find(
-											(generation) => generation.id === step.generationId,
-										);
-										if (generation === undefined) {
-											return null;
-										}
-										return {
-											...step,
-											generation,
-										};
-									})
-									.filter((step) => step !== null),
-							})),
+							sequences: act.sequences
+							// Skip the first sequence as it's always a Trigger node and doesn't need to be displayed
+								.filter((_, index) => index > 0)
+								.map((sequence) => ({
+									...sequence,
+									steps: sequence.steps
+										.map((step) => {
+											const generation = generations.find(
+												(generation) => generation.id === step.generationId,
+											);
+											if (generation === undefined) {
+												return null;
+											}
+											return {
+												...step,
+												generation,
+											};
+										})
+										.filter((step) => step !== null),
+								})),
 						}}
 					/>
 				</div>
