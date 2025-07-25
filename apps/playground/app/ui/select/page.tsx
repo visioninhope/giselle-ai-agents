@@ -12,6 +12,7 @@ export default function () {
 						{ id: 1, name: "apple" },
 						{ id: 2, name: "banana" },
 						{ id: 3, name: "melon" },
+						{ id: 4, name: "long long long option" },
 					]}
 					renderOption={(option) => option.name}
 					placeholder="Select apple..."

@@ -54,7 +54,7 @@ export function Select<T extends Identifiable>({
 				<SelectPrimitive.Content
 					position="popper"
 					sideOffset={4}
-					className={clsx("w-(--radix-select-trigger-width) z-50")}
+					className={clsx("min-w-(--radix-select-trigger-width) z-50")}
 				>
 					<PopoverContent>
 						<SelectPrimitive.Viewport>
