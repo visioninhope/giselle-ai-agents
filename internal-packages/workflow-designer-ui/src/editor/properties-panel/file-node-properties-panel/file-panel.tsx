@@ -1,10 +1,10 @@
+import { useToasts } from "@giselle-internal/ui/toast";
 import type { FileData } from "@giselle-sdk/data-type";
 import clsx from "clsx/lite";
 import { ArrowUpFromLineIcon, FileXIcon, TrashIcon } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { TriangleAlert } from "../../../icons";
 import { FileNodeIcon } from "../../../icons/node";
-import { useToasts } from "../../../ui/toast";
 import type { FilePanelProps } from "./file-panel-type";
 import { useFileNode } from "./use-file-node";
 

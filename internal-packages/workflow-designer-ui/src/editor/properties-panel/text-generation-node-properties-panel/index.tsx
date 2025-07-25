@@ -1,3 +1,4 @@
+import { useToasts } from "@giselle-internal/ui/toast";
 import type { TextGenerationNode } from "@giselle-sdk/data-type";
 import {
 	useNodeGenerations,
@@ -18,7 +19,6 @@ import {
 	PerplexityIcon,
 } from "../../../icons";
 import { Button } from "../../../ui/button";
-import { useToasts } from "../../../ui/toast";
 import { UsageLimitWarning } from "../../../ui/usage-limit-warning";
 import { KeyboardShortcuts } from "../../components/keyboard-shortcuts";
 import {

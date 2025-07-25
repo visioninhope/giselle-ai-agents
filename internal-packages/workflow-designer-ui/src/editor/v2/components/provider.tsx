@@ -1,8 +1,8 @@
 "use client";
 
+import { ToastProvider } from "@giselle-internal/ui/toast";
 import { ReactFlowProvider } from "@xyflow/react";
 import type { ReactNode } from "react";
-import { ToastProvider } from "../../../ui/toast";
 import { MousePositionProvider, ToolbarContextProvider } from "../../tool";
 
 type ProviderComponent = React.FC<{ children: ReactNode }>;

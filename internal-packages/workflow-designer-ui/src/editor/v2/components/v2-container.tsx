@@ -16,12 +16,12 @@ import {
 	Panel as XYFlowPanel,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
+import { useToasts } from "@giselle-internal/ui/toast";
 import { useWorkflowDesigner } from "@giselle-sdk/giselle/react";
 import clsx from "clsx/lite";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { Background } from "../../../ui/background";
-import { useToasts } from "../../../ui/toast";
 import { edgeTypes } from "../../connector";
 import { type ConnectorType, GradientDef } from "../../connector/component";
 import { ContextMenu } from "../../context-menu";
