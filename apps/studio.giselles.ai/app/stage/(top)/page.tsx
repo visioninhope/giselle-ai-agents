@@ -1,3 +1,4 @@
+import { Button } from "@giselle-internal/ui/button";
 import { StatusBadge } from "@giselle-internal/ui/status-badge";
 import {
 	Table,
@@ -11,6 +12,7 @@ import {
 	type WorkspaceId,
 } from "@giselle-sdk/data-type";
 import { defaultName } from "@giselle-sdk/giselle";
+import { RefreshCw } from "lucide-react";
 import { revalidatePath } from "next/cache";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -25,6 +27,12 @@ import { type FlowTriggerUIItem, Form } from "./form";
 // The maximum duration of server actions on this page is extended to 800 seconds through enabled fluid compute.
 // https://vercel.com/docs/functions/runtimes#max-duration
 export const maxDuration = 800;
+
+async function reloadPage() {
+	"use server";
+	await Promise.resolve();
+	revalidatePath("/stage");
+}
 
 export default async function StagePage() {
 	const enableStage = await stageFlag();
@@ -153,12 +161,20 @@ export default async function StagePage() {
 			<div className="max-w-[900px] mx-auto space-y-2">
 				<div className="flex items-center justify-between px-1">
 					<h2 className="text-[16px] font-sans text-white-100">Acts</h2>
-					<button
-						type="button"
-						className="text-[14px] text-black-70 hover:text-white-100"
-					>
-						Archive
-					</button>
+					<div className="flex items-center gap-3">
+						<form action={reloadPage}>
+							<Button
+								type="submit"
+								variant="subtle"
+								leftIcon={<RefreshCw className="w-4 h-4" />}
+							>
+								Reload
+							</Button>
+						</form>
+						<Button type="button" variant="subtle">
+							Archive
+						</Button>
+					</div>
 				</div>
 				<Table>
 					<TableBody>
