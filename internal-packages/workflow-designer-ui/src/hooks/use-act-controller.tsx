@@ -34,22 +34,17 @@ export function useActController() {
 
 			cancelRef.current = false;
 			info("Workflow submitted successfully", {
-				action: (
-					<button
-						type="button"
-						className="bg-white rounded-[4px] text-black-850 px-[8px] text-[14px] py-[2px] cursor-pointer"
-						onClick={async () => {
-							cancelRef.current = true;
-							await Promise.all(
-								actGenerationsRef.current.map((generation) =>
-									stopGenerationRunner(generation.id),
-								),
-							);
-						}}
-					>
-						Cancel
-					</button>
-				),
+				action: {
+					label: "Cancel",
+					onClick: async () => {
+						cancelRef.current = true;
+						await Promise.all(
+							actGenerationsRef.current.map((generation) =>
+								stopGenerationRunner(generation.id),
+							),
+						);
+					},
+				},
 			});
 			const actStartedAt = Date.now();
 			let hasError = false;

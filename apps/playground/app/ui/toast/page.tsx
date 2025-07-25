@@ -33,15 +33,12 @@ function ToastDemo() {
 					variant="filled"
 					onClick={() =>
 						toast.info("File uploaded successfully", {
-							action: (
-								<Button
-									variant="outline"
-									size="compact"
-									onClick={() => console.log("Undo clicked")}
-								>
-									Undo
-								</Button>
-							),
+							action: {
+								label: "Undo",
+								onClick: () => {
+									console.log("Undo clicked");
+								},
+							},
 						})
 					}
 				>
