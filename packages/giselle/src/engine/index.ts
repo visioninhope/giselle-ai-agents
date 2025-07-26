@@ -69,6 +69,7 @@ export * from "../concepts/generation";
 export * from "../concepts/identifiers";
 export { Workflow, WorkflowId } from "../concepts/workflow";
 export type * from "./acts";
+export * from "./acts";
 export * from "./experimental_storage";
 export * from "./experimental_vector-store";
 export * from "./integrations";

@@ -19,10 +19,8 @@ import { actPath } from "./object/paths";
 import { patchAct } from "./patch-act";
 import {
 	type ActPatchAdapter,
-	createStepCountPatches,
-	createStepCountTransition,
 	type ExecutionContext,
-	executeSequence,
+	executeAct,
 	type GenerationAdapter,
 } from "./shared/act-execution-utils";
 
@@ -170,8 +168,6 @@ export async function startAct(
 		context: GiselleEngineContext;
 	},
 ) {
-	const flowStart = Date.now();
-
 	const act = await args.context.experimental_storage.getJson({
 		path: actPath(args.actId),
 		schema: Act,
@@ -186,106 +182,98 @@ export async function startAct(
 		generationAdapter,
 	};
 
-	await patchAdapter.applyPatches(args.actId, [
-		patches.status.set("inProgress"),
-	]);
-
-	let hasFailure = false;
-
-	for (let i = 0; i < act.sequences.length; i++) {
-		const sequence = act.sequences[i];
-
-		await args.callbacks?.sequenceStart?.({ sequence });
-
-		// Set sequence status to running
-		await patchAdapter.applyPatches(args.actId, [
-			patches.sequences(i).status.set("running"),
-		]);
-
-		const result = await executeSequence(sequence, i, executionContext, {
-			onSequenceStart: async () => {
-				// Already set to running above
+	await executeAct({
+		act,
+		context: executionContext,
+		options: {
+			onActStart: async () => {
+				await patchAdapter.applyPatches(args.actId, [
+					patches.status.set("inProgress"),
+				]);
 			},
-			onSequenceError: async (_error) => {
-				hasFailure = true;
+			onSequenceStart: async (sequence, sequenceIndex) => {
+				await args.callbacks?.sequenceStart?.({ sequence });
+				await patchAdapter.applyPatches(args.actId, [
+					patches.sequences(sequenceIndex).status.set("running"),
+				]);
+			},
+			onSequenceFail: async (sequence, sequenceIndex, _error, result) => {
 				await Promise.all([
 					args.callbacks?.sequenceFail?.({ sequence }),
 					patchAdapter.applyPatches(args.actId, [
-						patches.sequences(i).status.set("failed"),
+						patches.sequences(sequenceIndex).status.set("failed"),
+						patches
+							.sequences(sequenceIndex)
+							.duration.wallClock.set(result.wallClockDuration),
 					]),
 				]);
-				// Skip remaining sequences
-				for (let j = i + 1; j < act.sequences.length; j++) {
-					await args.callbacks?.sequenceSkip?.({
-						sequence: act.sequences[j],
-					});
-				}
 			},
-			onSequenceComplete: async () => {
+			onSequenceComplete: async (sequence, sequenceIndex, result) => {
 				await patchAdapter.applyPatches(args.actId, [
-					patches.sequences(i).status.set("completed"),
+					patches.sequences(sequenceIndex).status.set("completed"),
+					patches
+						.sequences(sequenceIndex)
+						.duration.wallClock.set(result.wallClockDuration),
+				]);
+				await args.callbacks?.sequenceComplete?.({ sequence });
+			},
+			onSequenceSkip: async (sequence) => {
+				await args.callbacks?.sequenceSkip?.({ sequence });
+			},
+			onStepStart: async (_step, sequenceIndex, stepIndex) => {
+				await patchAdapter.applyPatches(args.actId, [
+					patches
+						.sequences(sequenceIndex)
+						.steps(stepIndex)
+						.status.set("running"),
 				]);
 			},
-			onStepStart: async (_step, stepIndex) => {
+			onStepError: async (step, sequenceIndex, stepIndex, error) => {
 				await patchAdapter.applyPatches(args.actId, [
-					...createStepCountPatches([
-						createStepCountTransition("queued", "inProgress", 1),
-					]),
-					patches.sequences(i).steps(stepIndex).status.set("running"),
-				]);
-			},
-			onStepError: async (step, stepIndex, error) => {
-				await patchAdapter.applyPatches(args.actId, [
-					...createStepCountPatches([
-						createStepCountTransition("inProgress", "failed", 1),
-					]),
-					patches.sequences(i).steps(stepIndex).status.set("failed"),
+					patches
+						.sequences(sequenceIndex)
+						.steps(stepIndex)
+						.status.set("failed"),
 					patches.duration.totalTask.increment(step.duration),
-					patches.sequences(i).steps(stepIndex).duration.set(step.duration),
-					patches.sequences(i).duration.totalTask.increment(step.duration),
+					patches
+						.sequences(sequenceIndex)
+						.steps(stepIndex)
+						.duration.set(step.duration),
+					patches
+						.sequences(sequenceIndex)
+						.duration.totalTask.increment(step.duration),
 					patches.annotations.push([
 						{
 							level: "error",
 							message: error instanceof Error ? error.message : "Unknown error",
-							sequenceId: sequence.id,
+							sequenceId: act.sequences[sequenceIndex].id,
 							stepId: step.id,
 						},
 					]),
 				]);
 			},
-			onStepComplete: async (step, stepIndex) => {
+			onStepComplete: async (step, sequenceIndex, stepIndex) => {
 				await patchAdapter.applyPatches(args.actId, [
-					...createStepCountPatches([
-						createStepCountTransition("inProgress", "completed", 1),
-					]),
 					patches.duration.totalTask.increment(step.duration),
-					patches.sequences(i).steps(stepIndex).duration.set(step.duration),
-					patches.sequences(i).duration.totalTask.increment(step.duration),
-					patches.sequences(i).steps(stepIndex).status.set("completed"),
+					patches
+						.sequences(sequenceIndex)
+						.steps(stepIndex)
+						.duration.set(step.duration),
+					patches
+						.sequences(sequenceIndex)
+						.duration.totalTask.increment(step.duration),
+					patches
+						.sequences(sequenceIndex)
+						.steps(stepIndex)
+						.status.set("completed"),
 				]);
 			},
-		});
-
-		if (result.hasError) {
-			hasFailure = true;
-			// Update sequence duration
-			await patchAdapter.applyPatches(args.actId, [
-				patches.sequences(i).duration.wallClock.set(result.wallClockDuration),
-			]);
-			// Skip remaining sequences after failure
-			break;
-		}
-
-		// Update sequence duration for successful completion
-		await patchAdapter.applyPatches(args.actId, [
-			patches.sequences(i).duration.wallClock.set(result.wallClockDuration),
-		]);
-
-		await args.callbacks?.sequenceComplete?.({ sequence });
-	}
-
-	await patchAdapter.applyPatches(args.actId, [
-		patches.status.set(hasFailure ? "failed" : "completed"),
-		patches.duration.wallClock.set(Date.now() - flowStart),
-	]);
+			onActComplete: async (hasError, duration) => {
+				await patchAdapter.applyPatches(args.actId, [
+					patches.status.set(hasError ? "failed" : "completed"),
+					patches.duration.wallClock.set(duration),
+				]);
+			},
+		},
+	});
 }

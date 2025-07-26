@@ -6,12 +6,7 @@ import type {
 	Generation,
 	GenerationAdapter,
 } from "@giselle-sdk/giselle";
-import {
-	createStepCountPatches,
-	createStepCountTransition,
-	executeSequence,
-	type GenerationId,
-} from "@giselle-sdk/giselle";
+import { executeAct, type GenerationId } from "@giselle-sdk/giselle";
 import {
 	useGenerationRunnerSystem,
 	useGiselleEngine,
@@ -89,93 +84,46 @@ export function useActController() {
 				},
 			});
 
-			const actStartedAt = Date.now();
-			let hasError = false;
-
 			const executionContext: ExecutionContext<Generation> = {
 				actId: act.id,
 				patchAdapter,
 				generationAdapter,
 			};
 
-			for (
-				let sequenceIndex = 0;
-				sequenceIndex < act.sequences.length;
-				sequenceIndex++
-			) {
-				const sequence = act.sequences[sequenceIndex];
-				const stepsCount = sequence.steps.length;
-
-				if (hasError) {
-					// Cancel remaining steps
-					await patchAdapter.applyPatches(
-						act.id,
-						createStepCountPatches([
-							createStepCountTransition("queued", "cancelled", stepsCount),
-						]),
-					);
-					return;
-				}
-
-				// Move steps from queued to inProgress
-				await patchAdapter.applyPatches(
-					act.id,
-					createStepCountPatches([
-						createStepCountTransition("queued", "inProgress", stepsCount),
-					]),
-				);
-
-				const result = await executeSequence(
-					sequence,
-					sequenceIndex,
-					executionContext,
-					{
-						onStepComplete: async (step) => {
-							await patchAdapter.applyPatches(
-								act.id,
-								createStepCountPatches([
-									createStepCountTransition("inProgress", "completed", 1),
-								]),
-							);
-							await patchAdapter.applyPatches(act.id, [
-								{ path: "duration.totalTask", increment: step.duration },
-							]);
-						},
-						onStepError: async (step, _, error) => {
-							await patchAdapter.applyPatches(
-								act.id,
-								createStepCountPatches([
-									createStepCountTransition("inProgress", "failed", 1),
-								]),
-							);
-							await patchAdapter.applyPatches(act.id, [
-								{ path: "duration.totalTask", increment: step.duration },
-								{
-									path: "annotations",
-									push: [
-										{
-											level: "error",
-											message:
-												error instanceof Error
-													? error.message
-													: "Unknown error",
-										},
-									],
-								},
-							]);
-						},
-						cancelSignal: cancelRef,
+			await executeAct({
+				act,
+				context: executionContext,
+				options: {
+					onStepComplete: async (step) => {
+						await patchAdapter.applyPatches(act.id, [
+							{ path: "duration.totalTask", increment: step.duration },
+						]);
 					},
-				);
-
-				hasError = result.hasError;
-			}
-
-			// Update final act status
-			await patchAdapter.applyPatches(act.id, [
-				{ path: "status", set: hasError ? "failed" : "completed" },
-				{ path: "duration.wallClock", set: Date.now() - actStartedAt },
-			]);
+					onStepError: async (step, _sequenceIndex, _stepIndex, error) => {
+						await patchAdapter.applyPatches(act.id, [
+							{ path: "duration.totalTask", increment: step.duration },
+							{
+								path: "annotations",
+								push: [
+									{
+										level: "error",
+										message:
+											error instanceof Error ? error.message : "Unknown error",
+									},
+								],
+							},
+						]);
+					},
+					onActComplete: async (hasError, duration) => {
+						// Update final act status
+						await patchAdapter.applyPatches(act.id, [
+							{ path: "status", set: hasError ? "failed" : "completed" },
+							{ path: "duration.wallClock", set: duration },
+						]);
+					},
+					cancelSignal: cancelRef,
+				},
+			});
 		},
 		[
 			data,
