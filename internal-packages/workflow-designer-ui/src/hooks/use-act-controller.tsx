@@ -1,11 +1,23 @@
 import { useToasts } from "@giselle-internal/ui/toast";
-import type { CreateActInputs, Generation } from "@giselle-sdk/giselle";
+import type {
+	ActPatchAdapter,
+	CreateActInputs,
+	ExecutionContext,
+	Generation,
+	GenerationAdapter,
+} from "@giselle-sdk/giselle";
+import {
+	createStepCountPatches,
+	createStepCountTransition,
+	executeSequence,
+	type GenerationId,
+} from "@giselle-sdk/giselle";
 import {
 	useGenerationRunnerSystem,
 	useGiselleEngine,
 	useWorkflowDesigner,
 } from "@giselle-sdk/giselle/react";
-import { useCallback, useRef } from "react";
+import { useCallback, useMemo, useRef } from "react";
 
 type CreateAndStartActParams = Omit<
 	CreateActInputs,
@@ -20,6 +32,36 @@ export function useActController() {
 	const cancelRef = useRef(false);
 	const { info } = useToasts();
 	const actGenerationsRef = useRef<Generation[]>([]);
+
+	// Create adapters for the shared execution utilities
+	const patchAdapter = useMemo<ActPatchAdapter>(
+		() => ({
+			applyPatches: async (actId, patches) => {
+				await client.patchAct({ actId, patches });
+			},
+		}),
+		[client],
+	);
+
+	const generationAdapter = useMemo<GenerationAdapter<Generation>>(
+		() => ({
+			getGeneration: (generationId) => {
+				return Promise.resolve(
+					actGenerationsRef.current.find((g) => g.id === generationId),
+				);
+			},
+			startGeneration: async (generationId, callbacks) => {
+				await startGenerationRunner(generationId as GenerationId, {
+					onGenerationCompleted: callbacks?.onCompleted,
+					onGenerationFailed: callbacks?.onFailed,
+				});
+			},
+			stopGeneration: async (generationId) => {
+				await stopGenerationRunner(generationId as GenerationId);
+			},
+		}),
+		[startGenerationRunner, stopGenerationRunner],
+	);
 
 	const createAndStartAct = useCallback(
 		async ({ startNodeId, inputs }: CreateAndStartActParams) => {
@@ -46,99 +88,103 @@ export function useActController() {
 					},
 				},
 			});
+
 			const actStartedAt = Date.now();
 			let hasError = false;
-			for (const sequence of act.sequences) {
+
+			const executionContext: ExecutionContext<Generation> = {
+				actId: act.id,
+				patchAdapter,
+				generationAdapter,
+			};
+
+			for (
+				let sequenceIndex = 0;
+				sequenceIndex < act.sequences.length;
+				sequenceIndex++
+			) {
+				const sequence = act.sequences[sequenceIndex];
 				const stepsCount = sequence.steps.length;
+
 				if (hasError) {
-					await client.patchAct({
-						actId: act.id,
-						patches: [
-							{ path: "steps.cancelled", increment: stepsCount },
-							{ path: "steps.queued", decrement: stepsCount },
-						],
-					});
+					// Cancel remaining steps
+					await patchAdapter.applyPatches(
+						act.id,
+						createStepCountPatches([
+							createStepCountTransition("queued", "cancelled", stepsCount),
+						]),
+					);
 					return;
 				}
-				await client.patchAct({
-					actId: act.id,
-					patches: [
-						{ path: "steps.inProgress", increment: stepsCount },
-						{ path: "steps.queued", decrement: stepsCount },
-					],
-				});
-				const sequenceStartedAt = Date.now();
-				let durationTotalTasks = 0;
-				await Promise.all(
-					sequence.steps.map(async (step) => {
-						const generation = generations.find(
-							(g) => g.id === step.generationId,
-						);
-						if (generation === undefined || cancelRef.current) {
-							return;
-						}
-						await startGenerationRunner(generation.id, {
-							onGenerationCompleted: () => {
-								durationTotalTasks += Date.now() - sequenceStartedAt;
-							},
-							onGenerationFailed: async (failedGeneration) => {
-								hasError = true;
-								await client.patchAct({
-									actId: act.id,
-									patches: [
-										{
-											path: "annotations",
-											push: [
-												{
-													level: "error",
-													message: failedGeneration.error.message,
-												},
-											],
-										},
-									],
-								});
-							},
-						});
 
-						await client.patchAct({
-							actId: act.id,
-							patches: hasError
-								? [
-										{ path: "steps.failed", increment: stepsCount },
-										{ path: "steps.inProgress", decrement: stepsCount },
+				// Move steps from queued to inProgress
+				await patchAdapter.applyPatches(
+					act.id,
+					createStepCountPatches([
+						createStepCountTransition("queued", "inProgress", stepsCount),
+					]),
+				);
+
+				const result = await executeSequence(
+					sequence,
+					sequenceIndex,
+					executionContext,
+					{
+						onStepComplete: async (step) => {
+							await patchAdapter.applyPatches(
+								act.id,
+								createStepCountPatches([
+									createStepCountTransition("inProgress", "completed", 1),
+								]),
+							);
+							await patchAdapter.applyPatches(act.id, [
+								{ path: "duration.totalTask", increment: step.duration },
+							]);
+						},
+						onStepError: async (step, _, error) => {
+							await patchAdapter.applyPatches(
+								act.id,
+								createStepCountPatches([
+									createStepCountTransition("inProgress", "failed", 1),
+								]),
+							);
+							await patchAdapter.applyPatches(act.id, [
+								{ path: "duration.totalTask", increment: step.duration },
+								{
+									path: "annotations",
+									push: [
 										{
-											path: "duration.totalTask",
-											increment: durationTotalTasks,
-										},
-									]
-								: [
-										{ path: "steps.completed", increment: stepsCount },
-										{ path: "steps.inProgress", decrement: stepsCount },
-										{
-											path: "duration.totalTask",
-											increment: durationTotalTasks,
+											level: "error",
+											message:
+												error instanceof Error
+													? error.message
+													: "Unknown error",
 										},
 									],
-						});
-						return;
-					}),
+								},
+							]);
+						},
+						cancelSignal: cancelRef,
+					},
 				);
-				await client.patchAct({
-					actId: act.id,
-					patches: [
-						{ path: "status", set: hasError ? "failed" : "completed" },
-						{ path: "duration.wallClock", set: Date.now() - actStartedAt },
-					],
-				});
+
+				hasError = result.hasError;
 			}
+
+			// Update final act status
+			await patchAdapter.applyPatches(act.id, [
+				{ path: "status", set: hasError ? "failed" : "completed" },
+				{ path: "duration.wallClock", set: Date.now() - actStartedAt },
+			]);
 		},
 		[
 			data,
 			client,
 			info,
 			addGenerationRunner,
-			startGenerationRunner,
 			stopGenerationRunner,
+			patchAdapter,
+			generationAdapter,
 		],
 	);
 
