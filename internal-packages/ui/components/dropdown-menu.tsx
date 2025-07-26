@@ -5,26 +5,27 @@ import { DropdownMenu as DropdownMenuPrimitive } from "radix-ui";
 import type React from "react";
 import { PopoverContent } from "./popover";
 
-interface Identifiable {
+interface MenuItem {
 	id: string | number;
+	icon?: React.ReactNode;
 }
 
-interface GroupItem<T extends Identifiable> {
+interface MenuGroup<T extends MenuItem> {
 	groupId: string | number;
 	groupLabel: string;
 	items: Array<T>;
 }
 
-type ItemLike = Identifiable | GroupItem<Identifiable>;
+type MenuContent = MenuItem | MenuGroup<MenuItem>;
 
 interface DropdownMenuProps<
-	T extends Array<ItemLike>,
+	T extends Array<MenuContent>,
 	TRenderItemAsChild extends boolean,
 > {
 	items: T;
 	trigger: React.ReactNode;
 	renderItemAsChild?: TRenderItemAsChild;
-	renderItem: T[number] extends GroupItem<infer I>
+	renderItem: T[number] extends MenuGroup<infer I>
 		? (
 				item: I,
 			) => TRenderItemAsChild extends true
@@ -35,7 +36,7 @@ interface DropdownMenuProps<
 			) => TRenderItemAsChild extends true
 				? React.ReactElement
 				: React.ReactNode;
-	onSelect?: T[number] extends GroupItem<infer I>
+	onSelect?: T[number] extends MenuGroup<infer I>
 		? (event: Event, option: I) => void
 		: (event: Event, option: T[number]) => void;
 	widthClassName?: string;
@@ -45,16 +46,16 @@ interface DropdownMenuProps<
 	onOpenChange?: DropdownMenuPrimitive.DropdownMenuProps["onOpenChange"];
 }
 
-function isGroupItem<T extends Identifiable>(
-	option: T | GroupItem<T>,
-): option is GroupItem<T> {
+function isGroupItem<T extends MenuItem>(
+	option: T | MenuGroup<T>,
+): option is MenuGroup<T> {
 	return (
-		"groupLabel" in option && Array.isArray((option as GroupItem<T>).items)
+		"groupLabel" in option && Array.isArray((option as MenuGroup<T>).items)
 	);
 }
 
 export function DropdownMenu<
-	T extends Array<ItemLike>,
+	T extends Array<MenuContent>,
 	TRenderItemAsChild extends boolean = false,
 >({
 	trigger,
@@ -98,7 +99,14 @@ export function DropdownMenu<
 													"flex items-center justify-between gap-[4px]",
 												)}
 											>
-												{renderItem(item)}
+												{item.icon ? (
+													<div className="flex items-center gap-2">
+														<span className="h-4 w-4">{item.icon}</span>
+														{renderItem(item)}
+													</div>
+												) : (
+													renderItem(item)
+												)}
 											</DropdownMenuPrimitive.Item>
 										))}
 									</DropdownMenuPrimitive.Group>
@@ -115,7 +123,14 @@ export function DropdownMenu<
 										"flex items-center justify-between gap-[4px]",
 									)}
 								>
-									{renderItem(option)}
+									{option.icon ? (
+										<div className="flex items-center gap-2">
+											<span className="h-4 w-4">{option.icon}</span>
+											{renderItem(option)}
+										</div>
+									) : (
+										renderItem(option)
+									)}
 								</DropdownMenuPrimitive.Item>
 							);
 						})}

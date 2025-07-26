@@ -4,11 +4,12 @@ import { Select as SelectPrimitive } from "radix-ui";
 import { Button } from "./button";
 import { PopoverContent } from "./popover";
 
-type Identifiable = {
+type SelectOption = {
 	id: string | number;
+	icon?: React.ReactNode;
 };
 
-interface SelectProps<T extends Identifiable> {
+interface SelectProps<T extends SelectOption> {
 	options: Array<T>;
 	renderOption: (option: T) => React.ReactNode;
 	placeholder: string;
@@ -21,7 +22,7 @@ interface SelectProps<T extends Identifiable> {
 	renderValue?: (options: T) => string | number;
 }
 
-export function Select<T extends Identifiable>({
+export function Select<T extends SelectOption>({
 	renderOption,
 	options,
 	placeholder,
@@ -71,7 +72,14 @@ export function Select<T extends Identifiable>({
 									)}
 								>
 									<SelectPrimitive.ItemText>
-										{renderOption(option)}
+										{option.icon ? (
+											<div className="flex items-center gap-2">
+												<span className="h-4 w-4">{option.icon}</span>
+												{renderOption(option)}
+											</div>
+										) : (
+											renderOption(option)
+										)}
 									</SelectPrimitive.ItemText>
 									<SelectPrimitive.ItemIndicator>
 										<CheckIcon className="size-[13px]" />

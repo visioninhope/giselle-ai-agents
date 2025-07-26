@@ -61,18 +61,13 @@ export default function () {
 			<DemoSection label="Icon Demo">
 				<DropdownMenu
 					items={[
-						{ id: 1, name: "Profile", icon: User },
-						{ id: 2, name: "Documents", icon: FileText },
-						{ id: 3, name: "Settings", icon: Settings },
-						{ id: 4, name: "Help", icon: HelpCircle },
-						{ id: 5, name: "Sign Out", icon: LogOut },
+						{ id: 1, name: "Profile", icon: <User /> },
+						{ id: 2, name: "Documents", icon: <FileText /> },
+						{ id: 3, name: "Settings", icon: <Settings /> },
+						{ id: 4, name: "Help", icon: <HelpCircle /> },
+						{ id: 5, name: "Sign Out", icon: <LogOut /> },
 					]}
-					renderItem={(option) => (
-						<div className="flex items-center gap-2">
-							<option.icon className="h-4 w-4" />
-							<span>{option.name}</span>
-						</div>
-					)}
+					renderItem={(option) => option.name}
 					trigger={<Button>Icon Example</Button>}
 				/>
 			</DemoSection>
