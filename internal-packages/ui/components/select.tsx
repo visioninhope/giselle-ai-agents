@@ -5,7 +5,7 @@ import { Button } from "./button";
 import { PopoverContent } from "./popover";
 
 type SelectOption = {
-	id: string | number;
+	value: string | number;
 	icon?: React.ReactNode;
 };
 
@@ -61,9 +61,9 @@ export function Select<T extends SelectOption>({
 						<SelectPrimitive.Viewport>
 							{options.map((option) => (
 								<SelectPrimitive.Item
-									key={option.id}
+									key={option.value}
 									value={
-										renderValue ? `${renderValue(option)}` : `${option.id}`
+										renderValue ? `${renderValue(option)}` : `${option.value}`
 									}
 									className={clsx(
 										"text-text outline-none cursor-pointer hover:bg-ghost-element-hover",

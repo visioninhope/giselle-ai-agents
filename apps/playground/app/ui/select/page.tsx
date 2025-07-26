@@ -10,10 +10,10 @@ export default function () {
 				<Select
 					name="repositoryNodeId"
 					options={[
-						{ id: 1, name: "apple" },
-						{ id: 2, name: "banana" },
-						{ id: 3, name: "melon" },
-						{ id: 4, name: "long long long option" },
+						{ value: 1, name: "apple" },
+						{ value: 2, name: "banana" },
+						{ value: 3, name: "melon" },
+						{ value: 4, name: "long long long option" },
 					]}
 					renderOption={(option) => option.name}
 					placeholder="Select apple..."
@@ -23,11 +23,11 @@ export default function () {
 				<Select
 					name="iconSelect"
 					options={[
-						{ id: 1, icon: <FileText />, name: "Documents" },
-						{ id: 2, icon: <Settings />, name: "Settings" },
-						{ id: 3, icon: <User />, name: "Profile" },
-						{ id: 4, icon: <HelpCircle />, name: "Help" },
-						{ id: 5, icon: <LogOut />, name: "Sign out" },
+						{ value: 1, icon: <FileText />, name: "Documents" },
+						{ value: 2, icon: <Settings />, name: "Settings" },
+						{ value: 3, icon: <User />, name: "Profile" },
+						{ value: 4, icon: <HelpCircle />, name: "Help" },
+						{ value: 5, icon: <LogOut />, name: "Sign out" },
 					]}
 					renderOption={(option) => option.name}
 					placeholder="Select an option..."

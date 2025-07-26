@@ -30,7 +30,7 @@ export function PromptPanel({ node }: { node: ImageGenerationNode }) {
 				<DropdownMenu
 					trigger={<AtSignIcon className="w-[18px]" />}
 					items={connectedSources.map((source) => ({
-						id: source.connection.id,
+						value: source.connection.id,
 						source,
 					}))}
 					renderItem={(item) =>

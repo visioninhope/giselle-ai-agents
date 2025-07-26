@@ -6,7 +6,7 @@ import type React from "react";
 import { PopoverContent } from "./popover";
 
 interface MenuItem {
-	id: string | number;
+	value: string | number;
 	icon?: React.ReactNode;
 }
 
@@ -91,7 +91,7 @@ export function DropdownMenu<
 										{option.items.map((item) => (
 											<DropdownMenuPrimitive.Item
 												asChild={renderItemAsChild}
-												key={item.id}
+												key={item.value}
 												onSelect={(event) => onSelect?.(event, item)}
 												className={clsx(
 													"text-text outline-none cursor-pointer hover:bg-ghost-element-hover",
@@ -115,7 +115,7 @@ export function DropdownMenu<
 							return (
 								<DropdownMenuPrimitive.Item
 									asChild={renderItemAsChild}
-									key={option.id}
+									key={option.value}
 									onSelect={(event) => onSelect?.(event, option)}
 									className={clsx(
 										"text-text outline-none cursor-pointer hover:bg-ghost-element-hover",

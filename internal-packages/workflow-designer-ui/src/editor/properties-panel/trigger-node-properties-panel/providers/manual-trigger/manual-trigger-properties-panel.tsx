@@ -25,9 +25,9 @@ import { SpinnerIcon } from "../../../../../icons";
 import { ManualTriggerConfiguredView } from "../../ui";
 
 const TYPE_OPTIONS = [
-	{ id: "text", name: "Text" },
-	{ id: "multiline-text", name: "Text (multi-line)" },
-	{ id: "number", name: "Number" },
+	{ value: "text", name: "Text" },
+	{ value: "multiline-text", name: "Text (multi-line)" },
+	{ value: "number", name: "Number" },
 ];
 
 export function ManualTriggerPropertiesPanel({ node }: { node: TriggerNode }) {

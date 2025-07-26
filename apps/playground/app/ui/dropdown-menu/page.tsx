@@ -12,9 +12,9 @@ export default function () {
 			<DemoSection label="Basic Demo">
 				<DropdownMenu
 					items={[
-						{ id: 1, name: "apple" },
-						{ id: 2, name: "banana" },
-						{ id: 3, name: "melon" },
+						{ value: 1, name: "apple" },
+						{ value: 2, name: "banana" },
+						{ value: 3, name: "melon" },
 					]}
 					renderItem={(option) => option.name}
 					trigger={<Button>Basic Example</Button>}
@@ -27,27 +27,27 @@ export default function () {
 							groupId: "fruits",
 							groupLabel: "Fruits",
 							items: [
-								{ id: 1, name: "Apple" },
-								{ id: 2, name: "Banana" },
-								{ id: 3, name: "Orange" },
+								{ value: 1, name: "Apple" },
+								{ value: 2, name: "Banana" },
+								{ value: 3, name: "Orange" },
 							],
 						},
 						{
 							groupId: "vegetables",
 							groupLabel: "Vegetables",
 							items: [
-								{ id: 4, name: "Carrot" },
-								{ id: 5, name: "Broccoli" },
-								{ id: 6, name: "Spinach" },
+								{ value: 4, name: "Carrot" },
+								{ value: 5, name: "Broccoli" },
+								{ value: 6, name: "Spinach" },
 							],
 						},
 						{
 							groupId: "grains",
 							groupLabel: "Grains",
 							items: [
-								{ id: 7, name: "Rice" },
-								{ id: 8, name: "Wheat" },
-								{ id: 9, name: "Oats" },
+								{ value: 7, name: "Rice" },
+								{ value: 8, name: "Wheat" },
+								{ value: 9, name: "Oats" },
 							],
 						},
 					]}
@@ -61,11 +61,11 @@ export default function () {
 			<DemoSection label="Icon Demo">
 				<DropdownMenu
 					items={[
-						{ id: 1, name: "Profile", icon: <User /> },
-						{ id: 2, name: "Documents", icon: <FileText /> },
-						{ id: 3, name: "Settings", icon: <Settings /> },
-						{ id: 4, name: "Help", icon: <HelpCircle /> },
-						{ id: 5, name: "Sign Out", icon: <LogOut /> },
+						{ value: 1, name: "Profile", icon: <User /> },
+						{ value: 2, name: "Documents", icon: <FileText /> },
+						{ value: 3, name: "Settings", icon: <Settings /> },
+						{ value: 4, name: "Help", icon: <HelpCircle /> },
+						{ value: 5, name: "Sign Out", icon: <LogOut /> },
 					]}
 					renderItem={(option) => option.name}
 					trigger={<Button>Icon Example</Button>}

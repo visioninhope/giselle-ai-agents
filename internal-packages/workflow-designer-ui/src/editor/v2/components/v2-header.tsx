@@ -82,21 +82,25 @@ export function V2Header({
 						<DropdownMenu
 							items={[
 								{
-									id: "rename",
+									value: "rename",
 									name: "Rename",
 									action: () => editableTextRef.current?.triggerEdit(),
 								},
 								{
-									id: "duplicate",
+									value: "duplicate",
 									name: "Duplicate",
 									action: () => {
 										// TODO: Implement app duplication functionality
 										console.warn("Duplicate functionality not yet implemented");
 									},
 								},
-								{ id: "template", name: "Create a Template", disabled: true },
 								{
-									id: "delete",
+									value: "template",
+									name: "Create a Template",
+									disabled: true,
+								},
+								{
+									value: "delete",
 									name: "Delete",
 									action: () => {
 										// TODO: Implement app deletion functionality
@@ -114,7 +118,7 @@ export function V2Header({
 								</button>
 							}
 							renderItem={(item) =>
-								item.id === "template" ? (
+								item.value === "template" ? (
 									<div className="flex items-center justify-between w-full opacity-50">
 										<span>{item.name}</span>
 										<span className="ml-2 text-[10px] leading-none text-white-600 bg-white/30 px-1.5 py-[1px] rounded-full">
