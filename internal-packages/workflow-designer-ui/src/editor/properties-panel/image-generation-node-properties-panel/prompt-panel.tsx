@@ -31,6 +31,7 @@ export function PromptPanel({ node }: { node: ImageGenerationNode }) {
 					trigger={<AtSignIcon className="w-[18px]" />}
 					items={connectedSources.map((source) => ({
 						value: source.connection.id,
+						label: `${defaultName(source.node)} / ${source.output.label}`,
 						source,
 					}))}
 					renderItem={(item) =>

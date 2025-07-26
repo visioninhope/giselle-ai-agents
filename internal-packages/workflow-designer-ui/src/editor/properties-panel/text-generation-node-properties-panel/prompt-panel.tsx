@@ -23,6 +23,7 @@ export function PromptPanel({ node }: { node: TextGenerationNode }) {
 					trigger={<AtSignIcon className="w-[18px]" />}
 					items={connectedSources.map((source, index) => ({
 						value: index,
+						label: `${defaultName(source.node)} / ${source.label}`,
 						source,
 					}))}
 					renderItem={(item) =>

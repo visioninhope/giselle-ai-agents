@@ -81,7 +81,11 @@ export function RunButton() {
 					await createAndStartAct({ startNodeId: startingNode.id, inputs: [] });
 				}
 			}}
-			items={startingNodes.map((node) => ({ value: node.id, node }))}
+			items={startingNodes.map((node) => ({
+				value: node.id,
+				label: node.name ?? defaultName(node),
+				node,
+			}))}
 			renderItemAsChild
 			renderItem={(item) => {
 				const startingNode = item.node;

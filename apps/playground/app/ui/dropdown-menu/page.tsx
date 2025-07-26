@@ -12,11 +12,10 @@ export default function () {
 			<DemoSection label="Basic Demo">
 				<DropdownMenu
 					items={[
-						{ value: 1, name: "apple" },
-						{ value: 2, name: "banana" },
-						{ value: 3, name: "melon" },
+						{ value: 1, label: "apple" },
+						{ value: 2, label: "banana" },
+						{ value: 3, label: "melon" },
 					]}
-					renderItem={(option) => option.name}
 					trigger={<Button>Basic Example</Button>}
 				/>
 			</DemoSection>
@@ -27,31 +26,30 @@ export default function () {
 							groupId: "fruits",
 							groupLabel: "Fruits",
 							items: [
-								{ value: 1, name: "Apple" },
-								{ value: 2, name: "Banana" },
-								{ value: 3, name: "Orange" },
+								{ value: 1, label: "Apple" },
+								{ value: 2, label: "Banana" },
+								{ value: 3, label: "Orange" },
 							],
 						},
 						{
 							groupId: "vegetables",
 							groupLabel: "Vegetables",
 							items: [
-								{ value: 4, name: "Carrot" },
-								{ value: 5, name: "Broccoli" },
-								{ value: 6, name: "Spinach" },
+								{ value: 4, label: "Carrot" },
+								{ value: 5, label: "Broccoli" },
+								{ value: 6, label: "Spinach" },
 							],
 						},
 						{
 							groupId: "grains",
 							groupLabel: "Grains",
 							items: [
-								{ value: 7, name: "Rice" },
-								{ value: 8, name: "Wheat" },
-								{ value: 9, name: "Oats" },
+								{ value: 7, label: "Rice" },
+								{ value: 8, label: "Wheat" },
+								{ value: 9, label: "Oats" },
 							],
 						},
 					]}
-					renderItem={(option) => option.name}
 					trigger={<Button>Group Example</Button>}
 					onSelect={(_event, option) => {
 						console.log("Selected:", option);
@@ -61,13 +59,12 @@ export default function () {
 			<DemoSection label="Icon Demo">
 				<DropdownMenu
 					items={[
-						{ value: 1, name: "Profile", icon: <User /> },
-						{ value: 2, name: "Documents", icon: <FileText /> },
-						{ value: 3, name: "Settings", icon: <Settings /> },
-						{ value: 4, name: "Help", icon: <HelpCircle /> },
-						{ value: 5, name: "Sign Out", icon: <LogOut /> },
+						{ value: 1, label: "Profile", icon: <User /> },
+						{ value: 2, label: "Documents", icon: <FileText /> },
+						{ value: 3, label: "Settings", icon: <Settings /> },
+						{ value: 4, label: "Help", icon: <HelpCircle /> },
+						{ value: 5, label: "Sign Out", icon: <LogOut /> },
 					]}
-					renderItem={(option) => option.name}
 					trigger={<Button>Icon Example</Button>}
 				/>
 			</DemoSection>

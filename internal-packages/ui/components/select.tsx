@@ -6,12 +6,13 @@ import { PopoverContent } from "./popover";
 
 type SelectOption = {
 	value: string | number;
+	label: string;
 	icon?: React.ReactNode;
 };
 
 interface SelectProps<T extends SelectOption> {
 	options: Array<T>;
-	renderOption: (option: T) => React.ReactNode;
+	renderOption?: (option: T) => React.ReactNode;
 	placeholder: string;
 	value?: string;
 	onValueChange?: (value: string) => void;
@@ -75,10 +76,12 @@ export function Select<T extends SelectOption>({
 										{option.icon ? (
 											<div className="flex items-center gap-2">
 												<span className="h-4 w-4">{option.icon}</span>
-												{renderOption(option)}
+												{renderOption ? renderOption(option) : option.label}
 											</div>
-										) : (
+										) : renderOption ? (
 											renderOption(option)
+										) : (
+											option.label
 										)}
 									</SelectPrimitive.ItemText>
 									<SelectPrimitive.ItemIndicator>

@@ -283,8 +283,9 @@ function SelectOutputPopover({
 				groupId: groupedOutput.label,
 				groupLabel: groupedOutput.label,
 				items: groupedOutput.nodes.map((node) => ({
-					value: node.id,
 					...node,
+					value: node.id,
+					label: `${node.node.name ?? defaultName(node.node)} / ${node.label}`,
 				})),
 			}))}
 			renderItem={(item) => (

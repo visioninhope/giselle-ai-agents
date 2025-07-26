@@ -7,6 +7,7 @@ import { PopoverContent } from "./popover";
 
 interface MenuItem {
 	value: string | number;
+	label: string;
 	icon?: React.ReactNode;
 }
 
@@ -25,7 +26,7 @@ interface DropdownMenuProps<
 	items: T;
 	trigger: React.ReactNode;
 	renderItemAsChild?: TRenderItemAsChild;
-	renderItem: T[number] extends MenuGroup<infer I>
+	renderItem?: T[number] extends MenuGroup<infer I>
 		? (
 				item: I,
 			) => TRenderItemAsChild extends true
@@ -102,10 +103,12 @@ export function DropdownMenu<
 												{item.icon ? (
 													<div className="flex items-center gap-2">
 														<span className="h-4 w-4">{item.icon}</span>
-														{renderItem(item)}
+														{renderItem ? renderItem(item) : item.label}
 													</div>
-												) : (
+												) : renderItem ? (
 													renderItem(item)
+												) : (
+													item.label
 												)}
 											</DropdownMenuPrimitive.Item>
 										))}
@@ -126,10 +129,12 @@ export function DropdownMenu<
 									{option.icon ? (
 										<div className="flex items-center gap-2">
 											<span className="h-4 w-4">{option.icon}</span>
-											{renderItem(option)}
+											{renderItem ? renderItem(option) : option.label}
 										</div>
-									) : (
+									) : renderItem ? (
 										renderItem(option)
+									) : (
+										option.label
 									)}
 								</DropdownMenuPrimitive.Item>
 							);

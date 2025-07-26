@@ -43,10 +43,10 @@ export function GitHubConnectFieldsets() {
 							name="repositoryNodeId"
 							options={value.github.repositories.map((repo) => ({
 								value: repo.node_id,
+								label: repo.full_name,
 								...repo,
 							}))}
 							renderValue={(option) => option.node_id}
-							renderOption={(option) => option.full_name}
 							placeholder="Select provider..."
 						/>
 					</fieldset>
@@ -60,7 +60,6 @@ export function GitHubConnectFieldsets() {
 							name="scope"
 							id="scope"
 							options={[{ value: "code", label: "Code" }]}
-							renderOption={(option) => option.label}
 							placeholder="Select scope..."
 						/>
 

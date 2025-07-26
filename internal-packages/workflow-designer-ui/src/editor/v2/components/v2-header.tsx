@@ -83,12 +83,12 @@ export function V2Header({
 							items={[
 								{
 									value: "rename",
-									name: "Rename",
+									label: "Rename",
 									action: () => editableTextRef.current?.triggerEdit(),
 								},
 								{
 									value: "duplicate",
-									name: "Duplicate",
+									label: "Duplicate",
 									action: () => {
 										// TODO: Implement app duplication functionality
 										console.warn("Duplicate functionality not yet implemented");
@@ -96,12 +96,12 @@ export function V2Header({
 								},
 								{
 									value: "template",
-									name: "Create a Template",
+									label: "Create a Template",
 									disabled: true,
 								},
 								{
 									value: "delete",
-									name: "Delete",
+									label: "Delete",
 									action: () => {
 										// TODO: Implement app deletion functionality
 										console.warn("Delete functionality not yet implemented");
@@ -120,14 +120,14 @@ export function V2Header({
 							renderItem={(item) =>
 								item.value === "template" ? (
 									<div className="flex items-center justify-between w-full opacity-50">
-										<span>{item.name}</span>
+										<span>{item.label}</span>
 										<span className="ml-2 text-[10px] leading-none text-white-600 bg-white/30 px-1.5 py-[1px] rounded-full">
 											Coming&nbsp;soon
 										</span>
 									</div>
 								) : (
 									<span className={item.destructive ? "text-error-900" : ""}>
-										{item.name}
+										{item.label}
 									</span>
 								)
 							}

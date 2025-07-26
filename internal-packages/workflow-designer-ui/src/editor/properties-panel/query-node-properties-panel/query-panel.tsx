@@ -150,6 +150,7 @@ export function QueryPanel({ node }: { node: QueryNode }) {
 							}
 							items={connectedInputsWithoutDatasource.map((source) => ({
 								value: source.connection.id,
+								label: `${defaultName(source.node)} / ${source.output.label}`,
 								source,
 							}))}
 							renderItem={(item) =>
