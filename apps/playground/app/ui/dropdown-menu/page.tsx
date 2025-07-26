@@ -2,6 +2,7 @@
 
 import { Button } from "@giselle-internal/ui/button";
 import { DropdownMenu } from "@giselle-internal/ui/dropdown-menu";
+import { FileText, HelpCircle, LogOut, Settings, User } from "lucide-react";
 import { DemoSection } from "../components/demo-section";
 import { UiPage } from "../components/ui-page";
 
@@ -55,6 +56,24 @@ export default function () {
 					onSelect={(_event, option) => {
 						console.log("Selected:", option);
 					}}
+				/>
+			</DemoSection>
+			<DemoSection label="Icon Demo">
+				<DropdownMenu
+					items={[
+						{ id: 1, name: "Profile", icon: User },
+						{ id: 2, name: "Documents", icon: FileText },
+						{ id: 3, name: "Settings", icon: Settings },
+						{ id: 4, name: "Help", icon: HelpCircle },
+						{ id: 5, name: "Sign Out", icon: LogOut },
+					]}
+					renderItem={(option) => (
+						<div className="flex items-center gap-2">
+							<option.icon className="h-4 w-4" />
+							<span>{option.name}</span>
+						</div>
+					)}
+					trigger={<Button>Icon Example</Button>}
 				/>
 			</DemoSection>
 		</UiPage>
