@@ -1,5 +1,6 @@
 import type { Act, ActId, Sequence, Step } from "../../../concepts/act";
 import type { GenerationStatus } from "../../../concepts/generation";
+import { patches } from "../object/patch-creators";
 import type { Patch } from "../object/patch-object";
 
 /**
@@ -263,17 +264,17 @@ export function calculateRemainingSteps(
  * Options for act execution
  */
 export interface ActExecutorOptions {
-	/** Called when the act starts execution */
+	/** Called when the act starts execution (before status is set to inProgress) */
 	onActStart?: () => void | Promise<void>;
-	/** Called when a sequence starts */
+	/** Called when a sequence starts (before status is set to running) */
 	onSequenceStart?: (sequence: Sequence, index: number) => void | Promise<void>;
-	/** Called when a sequence completes successfully */
+	/** Called when a sequence completes successfully (after status is set to completed) */
 	onSequenceComplete?: (
 		sequence: Sequence,
 		index: number,
 		duration: SequenceExecutionResult,
 	) => void | Promise<void>;
-	/** Called when a sequence fails */
+	/** Called when a sequence fails (after status is set to failed) */
 	onSequenceFail?: (
 		sequence: Sequence,
 		index: number,
@@ -282,29 +283,31 @@ export interface ActExecutorOptions {
 	) => void | Promise<void>;
 	/** Called when a sequence is skipped due to previous failure */
 	onSequenceSkip?: (sequence: Sequence, index: number) => void | Promise<void>;
-	/** Called when a step starts */
+	/** Called when a step starts (after status is set to running) */
 	onStepStart?: (
 		step: Step,
 		sequenceIndex: number,
 		stepIndex: number,
 	) => void | Promise<void>;
-	/** Called when a step completes */
+	/** Called when a step completes (after all patches applied) */
 	onStepComplete?: (
 		step: Step,
 		sequenceIndex: number,
 		stepIndex: number,
 	) => void | Promise<void>;
-	/** Called when a step fails */
+	/** Called when a step fails (after all patches applied) */
 	onStepError?: (
 		step: Step,
 		sequenceIndex: number,
 		stepIndex: number,
 		error: unknown,
 	) => void | Promise<void>;
-	/** Called when the act completes */
+	/** Called when the act completes (after status and duration are set) */
 	onActComplete?: (hasError: boolean, duration: number) => void | Promise<void>;
 	/** Signal to cancel execution */
 	cancelSignal?: { current: boolean };
+	/** Whether to include annotations in error patches */
+	includeErrorAnnotations?: boolean;
 }
 
 /**
@@ -330,6 +333,11 @@ export async function executeAct<TGeneration>(args: {
 
 	// Start act execution
 	await options.onActStart?.();
+
+	// Set act status to inProgress
+	await context.patchAdapter.applyPatches(context.actId, [
+		patches.status.set("inProgress"),
+	]);
 
 	// Execute each sequence
 	for (
@@ -357,7 +365,12 @@ export async function executeAct<TGeneration>(args: {
 			break;
 		}
 
-		// Start sequence
+		// Set sequence status to running
+		await context.patchAdapter.applyPatches(context.actId, [
+			patches.sequences(sequenceIndex).status.set("running"),
+		]);
+
+		// Notify sequence start
 		await options.onSequenceStart?.(sequence, sequenceIndex);
 
 		// Move steps from queued to inProgress
@@ -371,31 +384,93 @@ export async function executeAct<TGeneration>(args: {
 		// Execute the sequence
 		const result = await executeSequence(sequence, sequenceIndex, context, {
 			onStepStart: async (step, stepIndex) => {
+				// Set step status to running
+				await context.patchAdapter.applyPatches(context.actId, [
+					patches
+						.sequences(sequenceIndex)
+						.steps(stepIndex)
+						.status.set("running"),
+				]);
 				await options.onStepStart?.(step, sequenceIndex, stepIndex);
 			},
 			onStepComplete: async (step, stepIndex) => {
-				await context.patchAdapter.applyPatches(
-					context.actId,
-					createStepCountPatches([
+				// Update step counts and durations
+				await context.patchAdapter.applyPatches(context.actId, [
+					...createStepCountPatches([
 						createStepCountTransition("inProgress", "completed", 1),
 					]),
-				);
+					patches.duration.totalTask.increment(step.duration),
+					patches
+						.sequences(sequenceIndex)
+						.steps(stepIndex)
+						.duration.set(step.duration),
+					patches
+						.sequences(sequenceIndex)
+						.duration.totalTask.increment(step.duration),
+					patches
+						.sequences(sequenceIndex)
+						.steps(stepIndex)
+						.status.set("completed"),
+				]);
 				await options.onStepComplete?.(step, sequenceIndex, stepIndex);
 			},
 			onStepError: async (step, stepIndex, error) => {
-				await context.patchAdapter.applyPatches(
-					context.actId,
-					createStepCountPatches([
+				// Update step counts, durations, and add error annotation
+				const errorPatches = [
+					...createStepCountPatches([
 						createStepCountTransition("inProgress", "failed", 1),
 					]),
-				);
+					patches.duration.totalTask.increment(step.duration),
+					patches
+						.sequences(sequenceIndex)
+						.steps(stepIndex)
+						.status.set("failed"),
+					patches
+						.sequences(sequenceIndex)
+						.steps(stepIndex)
+						.duration.set(step.duration),
+					patches
+						.sequences(sequenceIndex)
+						.duration.totalTask.increment(step.duration),
+				];
+
+				// Add error annotation if enabled
+				if (options.includeErrorAnnotations !== false) {
+					errorPatches.push(
+						patches.annotations.push([
+							{
+								level: "error" as const,
+								message:
+									error instanceof Error ? error.message : "Unknown error",
+								sequenceId: sequence.id,
+								stepId: step.id,
+							},
+						]),
+					);
+				}
+
+				await context.patchAdapter.applyPatches(context.actId, errorPatches);
 				await options.onStepError?.(step, sequenceIndex, stepIndex, error);
 			},
 			onSequenceError: async (error) => {
 				hasError = true;
+				// Set sequence status to failed and duration
+				await context.patchAdapter.applyPatches(context.actId, [
+					patches.sequences(sequenceIndex).status.set("failed"),
+					patches
+						.sequences(sequenceIndex)
+						.duration.wallClock.set(result.wallClockDuration),
+				]);
 				await options.onSequenceFail?.(sequence, sequenceIndex, error, result);
 			},
 			onSequenceComplete: async () => {
+				// Set sequence status to completed and duration
+				await context.patchAdapter.applyPatches(context.actId, [
+					patches.sequences(sequenceIndex).status.set("completed"),
+					patches
+						.sequences(sequenceIndex)
+						.duration.wallClock.set(result.wallClockDuration),
+				]);
 				await options.onSequenceComplete?.(sequence, sequenceIndex, result);
 			},
 			cancelSignal: options.cancelSignal,
@@ -406,6 +481,13 @@ export async function executeAct<TGeneration>(args: {
 
 	// Complete act execution
 	const duration = actTracker.getDuration();
+
+	// Set final act status and duration
+	await context.patchAdapter.applyPatches(context.actId, [
+		patches.status.set(hasError ? "failed" : "completed"),
+		patches.duration.wallClock.set(duration),
+	]);
+
 	await options.onActComplete?.(hasError, duration);
 
 	return {

@@ -14,7 +14,6 @@ import {
 import { executeAction } from "../operations";
 import { executeQuery } from "../operations/execute-query";
 import type { GiselleEngineContext } from "../types";
-import { patches } from "./object/patch-creators";
 import { actPath } from "./object/paths";
 import { patchAct } from "./patch-act";
 import {
@@ -186,94 +185,19 @@ export async function startAct(
 		act,
 		context: executionContext,
 		options: {
-			onActStart: async () => {
-				await patchAdapter.applyPatches(args.actId, [
-					patches.status.set("inProgress"),
-				]);
-			},
-			onSequenceStart: async (sequence, sequenceIndex) => {
+			onSequenceStart: async (sequence) => {
 				await args.callbacks?.sequenceStart?.({ sequence });
-				await patchAdapter.applyPatches(args.actId, [
-					patches.sequences(sequenceIndex).status.set("running"),
-				]);
 			},
-			onSequenceFail: async (sequence, sequenceIndex, _error, result) => {
-				await Promise.all([
-					args.callbacks?.sequenceFail?.({ sequence }),
-					patchAdapter.applyPatches(args.actId, [
-						patches.sequences(sequenceIndex).status.set("failed"),
-						patches
-							.sequences(sequenceIndex)
-							.duration.wallClock.set(result.wallClockDuration),
-					]),
-				]);
+			onSequenceFail: async (sequence) => {
+				await args.callbacks?.sequenceFail?.({ sequence });
 			},
-			onSequenceComplete: async (sequence, sequenceIndex, result) => {
-				await patchAdapter.applyPatches(args.actId, [
-					patches.sequences(sequenceIndex).status.set("completed"),
-					patches
-						.sequences(sequenceIndex)
-						.duration.wallClock.set(result.wallClockDuration),
-				]);
+			onSequenceComplete: async (sequence) => {
 				await args.callbacks?.sequenceComplete?.({ sequence });
 			},
 			onSequenceSkip: async (sequence) => {
 				await args.callbacks?.sequenceSkip?.({ sequence });
 			},
-			onStepStart: async (_step, sequenceIndex, stepIndex) => {
-				await patchAdapter.applyPatches(args.actId, [
-					patches
-						.sequences(sequenceIndex)
-						.steps(stepIndex)
-						.status.set("running"),
-				]);
-			},
-			onStepError: async (step, sequenceIndex, stepIndex, error) => {
-				await patchAdapter.applyPatches(args.actId, [
-					patches
-						.sequences(sequenceIndex)
-						.steps(stepIndex)
-						.status.set("failed"),
-					patches.duration.totalTask.increment(step.duration),
-					patches
-						.sequences(sequenceIndex)
-						.steps(stepIndex)
-						.duration.set(step.duration),
-					patches
-						.sequences(sequenceIndex)
-						.duration.totalTask.increment(step.duration),
-					patches.annotations.push([
-						{
-							level: "error",
-							message: error instanceof Error ? error.message : "Unknown error",
-							sequenceId: act.sequences[sequenceIndex].id,
-							stepId: step.id,
-						},
-					]),
-				]);
-			},
-			onStepComplete: async (step, sequenceIndex, stepIndex) => {
-				await patchAdapter.applyPatches(args.actId, [
-					patches.duration.totalTask.increment(step.duration),
-					patches
-						.sequences(sequenceIndex)
-						.steps(stepIndex)
-						.duration.set(step.duration),
-					patches
-						.sequences(sequenceIndex)
-						.duration.totalTask.increment(step.duration),
-					patches
-						.sequences(sequenceIndex)
-						.steps(stepIndex)
-						.status.set("completed"),
-				]);
-			},
-			onActComplete: async (hasError, duration) => {
-				await patchAdapter.applyPatches(args.actId, [
-					patches.status.set(hasError ? "failed" : "completed"),
-					patches.duration.wallClock.set(duration),
-				]);
-			},
+			includeErrorAnnotations: true, // Enable for Node.js since we have sequence/step IDs
 		},
 	});
 }

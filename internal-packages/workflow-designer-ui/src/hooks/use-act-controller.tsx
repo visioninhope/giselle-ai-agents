@@ -94,34 +94,10 @@ export function useActController() {
 				act,
 				context: executionContext,
 				options: {
-					onStepComplete: async (step) => {
-						await patchAdapter.applyPatches(act.id, [
-							{ path: "duration.totalTask", increment: step.duration },
-						]);
-					},
-					onStepError: async (step, _sequenceIndex, _stepIndex, error) => {
-						await patchAdapter.applyPatches(act.id, [
-							{ path: "duration.totalTask", increment: step.duration },
-							{
-								path: "annotations",
-								push: [
-									{
-										level: "error",
-										message:
-											error instanceof Error ? error.message : "Unknown error",
-									},
-								],
-							},
-						]);
-					},
-					onActComplete: async (hasError, duration) => {
-						// Update final act status
-						await patchAdapter.applyPatches(act.id, [
-							{ path: "status", set: hasError ? "failed" : "completed" },
-							{ path: "duration.wallClock", set: duration },
-						]);
-					},
 					cancelSignal: cancelRef,
+					// Note: Error annotations are included by default in shared logic
+					// but without sequenceId and stepId since React doesn't have that context
+					includeErrorAnnotations: false, // Disable for React since we don't have sequence/step IDs
 				},
 			});
 		},
