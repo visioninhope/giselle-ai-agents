@@ -1,9 +1,10 @@
+import { useToasts } from "@giselle-internal/ui/toast";
 import type { TriggerNode } from "@giselle-sdk/data-type";
+import { useActController } from "@giselle-sdk/giselle/react";
 import { clsx } from "clsx/lite";
 import { PlayIcon, XIcon } from "lucide-react";
 import { Dialog } from "radix-ui";
 import { type FormEventHandler, useCallback, useMemo, useState } from "react";
-import { useActController } from "../../../../hooks/use-act-controller";
 import { useTrigger } from "../../../../hooks/use-trigger";
 import { Button } from "./button";
 import {
@@ -33,6 +34,7 @@ export function TriggerInputDialog({
 	const [isSubmitting, setIsSubmitting] = useState(false);
 
 	const { createAndStartAct } = useActController();
+	const { info } = useToasts();
 
 	const handleSubmit = useCallback<FormEventHandler<HTMLFormElement>>(
 		async (e) => {
@@ -73,13 +75,23 @@ export function TriggerInputDialog({
 							items: parameterItems,
 						},
 					],
+					onActStart(cancel) {
+						info("Workflow submitted successfully", {
+							action: {
+								label: "Cancel",
+								onClick: async () => {
+									await cancel();
+								},
+							},
+						});
+					},
 				});
 				onClose();
 			} finally {
 				setIsSubmitting(false);
 			}
 		},
-		[inputs, onClose, node.id, createAndStartAct],
+		[inputs, onClose, node.id, createAndStartAct, info],
 	);
 
 	if (isLoading) {
