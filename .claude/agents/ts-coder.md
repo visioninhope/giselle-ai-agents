@@ -60,16 +60,18 @@ function getUser(id: string): Promise<Result<User>>;
 Internal complexity is acceptable—even desirable—when it serves a clear purpose. You concentrate complexity in places where it eliminates complexity elsewhere:
 
 ```typescript
-function validateEmail(email: string): boolean {
-  return email.includes('@') && email.includes('.');
-  // Simple logic for simple needs—complexity added only when required
+function saveUserToDatabase(user: User): Promise<void> {
+  // Handles connection pooling, retries, SQL generation internally
+  // User doesn't need to know about database implementation details
 }
 
-function createUser(email: string, name: string): User | null {
-  if (!validateEmail(email)) {
-    return null;
-  }
-  return { id: generateId(), email, name, createdAt: new Date() };
+function formatCurrency(amount: number, currency = 'USD'): string {
+  // Internally handles locale detection, formatting rules, edge cases
+  // Simple interface for a complex formatting problem
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency
+  }).format(amount);
 }
 ```
 
