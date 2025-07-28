@@ -37,8 +37,9 @@ function PropertiesPanel({ node }: { node: VectorStoreNode }) {
 		case "githubPullRequest":
 			return <GitHubVectorStoreNodePropertiesPanel node={node} />;
 		default: {
-			const _exhaustiveCheck: never = node.content.source.provider;
-			throw new Error(`Unhandled vector store provider: ${_exhaustiveCheck}`);
+			throw new Error(
+				`Unhandled vector store provider: ${(node.content.source as any).provider}`,
+			);
 		}
 	}
 }

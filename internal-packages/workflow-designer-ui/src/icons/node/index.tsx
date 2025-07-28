@@ -206,8 +206,9 @@ export function NodeIcon({
 						case "githubPullRequest":
 							return <NodeGitHubIcon {...props} data-content-type-icon />;
 						default: {
-							const _exhaustiveCheck: never = node.content.source.provider;
-							throw new Error(`Unhandled node type: ${_exhaustiveCheck}`);
+							throw new Error(
+								`Unhandled node type: ${(node.content.source as any).provider}`,
+							);
 						}
 					}
 				default: {
