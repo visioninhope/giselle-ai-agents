@@ -23,6 +23,14 @@ export function fsStorageDriver(config: FsStorageDriverConfig): GiselleStorage {
 			params: GetJsonParams<T>,
 		): Promise<z.infer<T>> {
 			const fullPath = join(config.root, params.path);
+
+			// Check if file exists before attempting to read
+			try {
+				await fs.access(fullPath);
+			} catch {
+				throw new Error(`File not found: ${params.path}`);
+			}
+
 			const content = await fs.readFile(fullPath, "utf8");
 			const obj = JSON.parse(content);
 			return params.schema ? params.schema.parse(obj) : obj;
