@@ -294,9 +294,3 @@
 		}
 	}
 }
-
-@layer components {
-	.group[data-selected="true"][data-content-type="trigger"] {
-		box-shadow: 0px 0px 16px 0px hsla(220, 15%, 50%, 0.5);
-	}
-}
