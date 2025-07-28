@@ -3,13 +3,15 @@ import { CheckIcon, ChevronDownIcon } from "lucide-react";
 import { Select as SelectPrimitive } from "radix-ui";
 import { PopoverContent } from "./popover";
 
-type Identifiable = {
-	id: string | number;
+type SelectOption = {
+	value: string | number;
+	label: string;
+	icon?: React.ReactNode;
 };
 
-interface SelectProps<T extends Identifiable> {
+interface SelectProps<T extends SelectOption> {
 	options: Array<T>;
-	renderOption: (option: T) => React.ReactNode;
+	renderOption?: (option: T) => React.ReactNode;
 	placeholder: string;
 	value?: string;
 	onValueChange?: (value: string) => void;
@@ -20,7 +22,7 @@ interface SelectProps<T extends Identifiable> {
 	renderValue?: (options: T) => string | number;
 }
 
-export function Select<T extends Identifiable>({
+export function Select<T extends SelectOption>({
 	renderOption,
 	options,
 	placeholder,
@@ -64,9 +66,9 @@ export function Select<T extends Identifiable>({
 						<SelectPrimitive.Viewport>
 							{options.map((option) => (
 								<SelectPrimitive.Item
-									key={option.id}
+									key={option.value}
 									value={
-										renderValue ? `${renderValue(option)}` : `${option.id}`
+										renderValue ? `${renderValue(option)}` : `${option.value}`
 									}
 									className={clsx(
 										"text-text outline-none cursor-pointer hover:bg-ghost-element-hover",
@@ -75,7 +77,16 @@ export function Select<T extends Identifiable>({
 									)}
 								>
 									<SelectPrimitive.ItemText>
-										{renderOption(option)}
+										{option.icon ? (
+											<div className="flex items-center gap-2">
+												<span className="h-4 w-4">{option.icon}</span>
+												{renderOption ? renderOption(option) : option.label}
+											</div>
+										) : renderOption ? (
+											renderOption(option)
+										) : (
+											option.label
+										)}
 									</SelectPrimitive.ItemText>
 									<SelectPrimitive.ItemIndicator>
 										<CheckIcon className="size-[13px]" />

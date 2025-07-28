@@ -6,15 +6,19 @@ import {
 	DialogTrigger,
 } from "@giselle-internal/ui/dialog";
 import { DropdownMenu } from "@giselle-internal/ui/dropdown-menu";
+import { useToasts } from "@giselle-internal/ui/toast";
 import {
 	isOperationNode,
 	isTriggerNode,
 	type NodeLike,
 } from "@giselle-sdk/data-type";
-import { defaultName, useWorkflowDesigner } from "@giselle-sdk/giselle/react";
+import {
+	defaultName,
+	useActController,
+	useWorkflowDesigner,
+} from "@giselle-sdk/giselle/react";
 import { PlayIcon } from "lucide-react";
 import { type ButtonHTMLAttributes, useMemo, useState } from "react";
-import { useActController } from "../../../hooks/use-act-controller";
 import { NodeIcon } from "../../../icons/node";
 import { TriggerInputDialog } from "./trigger-input-dialog";
 
@@ -67,6 +71,8 @@ export function RunButton() {
 		return [...triggerNodes, ...startingOperationNodes];
 	}, [data.nodes, data.connections]);
 
+	const { info } = useToasts();
+
 	if (startingNodes.length === 0) {
 		return null;
 	}
@@ -75,15 +81,34 @@ export function RunButton() {
 		<DropdownMenu
 			open={isDropdownOpen}
 			onOpenChange={setIsDropdownOpen}
-			onSelect={async (_event, startingNode) => {
+			onSelect={async (_event, item) => {
+				const startingNode = item.node;
 				if (!isTriggerNode(startingNode) && isOperationNode(startingNode)) {
-					await createAndStartAct({ startNodeId: startingNode.id, inputs: [] });
+					await createAndStartAct({
+						startNodeId: startingNode.id,
+						inputs: [],
+						onActStart(cancel) {
+							info("Workflow submitted successfully", {
+								action: {
+									label: "Cancel",
+									onClick: async () => {
+										await cancel();
+									},
+								},
+							});
+						},
+					});
 				}
 			}}
-			items={startingNodes}
+			items={startingNodes.map((node) => ({
+				value: node.id,
+				label: node.name ?? defaultName(node),
+				node,
+			}))}
 			renderItemAsChild
-			renderItem={(startingNode) =>
-				isTriggerNode(startingNode) ? (
+			renderItem={(item) => {
+				const startingNode = item.node;
+				return isTriggerNode(startingNode) ? (
 					<Dialog
 						open={openDialogNodeId === startingNode.id}
 						onOpenChange={(isOpen) => {
@@ -112,8 +137,8 @@ export function RunButton() {
 					</Dialog>
 				) : (
 					<NodeSelectItem node={startingNode} />
-				)
-			}
+				);
+			}}
 			trigger={
 				<Button
 					leftIcon={<PlayIcon className="size-[15px] fill-current" />}
