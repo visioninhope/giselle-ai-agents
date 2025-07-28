@@ -83,6 +83,10 @@ export async function processRepository(
 	);
 
 	for (const contentStatus of contentStatuses) {
+		if (!contentStatus.enabled) {
+			continue;
+		}
+
 		try {
 			await updateContentStatus(
 				repositoryIndex.dbId,
