@@ -5,7 +5,7 @@ import type {
 } from "../../engine/vector-store";
 
 export interface VectorStoreContextValue {
-	github: GitHubVectorStoreInfo[];
+	githubCode: GitHubVectorStoreInfo[];
 	githubPullRequest?: GitHubPullRequestVectorStoreInfo[];
 	settingPath: string;
 }

@@ -24,7 +24,7 @@ export function GitHubVectorStoreNodePropertiesPanel({
 	const vectorStoreInfos =
 		node.content.source.provider === "githubPullRequest"
 			? (vectorStore?.githubPullRequest ?? [])
-			: (vectorStore?.github ?? []);
+			: (vectorStore?.githubCode ?? []);
 
 	const { isOrphaned, repositoryId } = useGitHubVectorStoreStatus(node);
 	const [isOpen, setIsOpen] = useState(false);

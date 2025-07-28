@@ -95,7 +95,7 @@ export function Toolbar() {
 	const { webSearchAction, pullRequestVectorStore } = useFeatureFlag();
 	const vectorStore = useVectorStore();
 	const canUseGithubVectorStore = useMemo(
-		() => !!vectorStore?.github,
+		() => !!vectorStore?.githubCode,
 		[vectorStore],
 	);
 

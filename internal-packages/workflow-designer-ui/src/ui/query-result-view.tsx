@@ -108,19 +108,42 @@ type QueryResultData = {
 	records?: QueryResultRecord[];
 };
 
-function getDataSourceDisplayName(result: QueryResultData): string {
+type DataSourceDisplayInfo = {
+	line1: string;
+	line2?: string;
+};
+
+function getDataSourceDisplayInfo(result: QueryResultData): DataSourceDisplayInfo {
 	if (
 		result.source?.provider === "github" &&
 		result.source.state.status === "configured" &&
 		result.source.state.owner &&
 		result.source.state.repo
 	) {
-		return `${result.source.state.owner}/${result.source.state.repo}`;
+		return {
+			line1: `${result.source.state.owner}/${result.source.state.repo}`,
+			line2: "Code"
+		};
+	}
+	if (
+		result.source?.provider === "githubPullRequest" &&
+		result.source.state.status === "configured" &&
+		result.source.state.owner &&
+		result.source.state.repo
+	) {
+		return {
+			line1: `${result.source.state.owner}/${result.source.state.repo}`,
+			line2: "Pull Requests"
+		};
 	}
 	if (result.source?.provider) {
-		return `${result.source.provider} vector store`;
+		return {
+			line1: `${result.source.provider} vector store`
+		};
 	}
-	return "Unknown source";
+	return {
+		line1: "Unknown source"
+	};
 }
 
 function DataSourceTab({
@@ -132,23 +155,30 @@ function DataSourceTab({
 	isActive: boolean;
 	onClick: () => void;
 }) {
-	const displayName = getDataSourceDisplayName(result);
+	const displayInfo = getDataSourceDisplayInfo(result);
 	const recordCount = result.records?.length || 0;
-	const isGitHub = result.source?.provider === "github";
+	const isGitHub =
+		result.source?.provider === "github" ||
+		result.source?.provider === "githubPullRequest";
 
 	return (
 		<button
 			type="button"
 			onClick={onClick}
 			className={clsx(
-				"flex items-center gap-[8px] px-[16px] py-[4px] border-b cursor-pointer",
+				"flex items-center gap-[8px] px-[16px] py-[6px] border-b cursor-pointer",
 				isActive
 					? "text-white-900 border-white-900"
 					: "text-black-400 border-transparent",
 			)}
 		>
 			{isGitHub && <GitHubIcon className="w-[14px] h-[14px]" />}
-			<span className="text-[13px] font-medium">{displayName}</span>
+			<div className="flex flex-col items-start leading-tight">
+				<span className="text-[13px] font-medium">{displayInfo.line1}</span>
+				{displayInfo.line2 && (
+					<span className="text-[11px] opacity-70">{displayInfo.line2}</span>
+				)}
+			</div>
 			<div
 				className={clsx(
 					"flex items-center gap-[4px] px-[6px] py-[1px] rounded-[6px]",

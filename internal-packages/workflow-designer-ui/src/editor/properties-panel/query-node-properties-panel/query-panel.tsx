@@ -13,7 +13,7 @@ function getDataSourceDisplayInfo(input: ConnectedSource) {
 	const node = input.node;
 	if (isVectorStoreNode(node)) {
 		const name = node.name ?? "Vector Store";
-		let description = "";
+		let description: string | { line1: string; line2: string } = "";
 		let icon = <DatabaseZapIcon className="w-[14px] h-[14px]" />;
 
 		switch (node.content.source.provider) {
@@ -21,9 +21,24 @@ function getDataSourceDisplayInfo(input: ConnectedSource) {
 				icon = <GitHubIcon className="w-[14px] h-[14px]" />;
 				if (node.content.source.state.status === "configured") {
 					const { owner, repo } = node.content.source.state;
-					description = `${owner}/${repo}`;
+					description = {
+						line1: `${owner}/${repo}`,
+						line2: "Code"
+					};
 				} else {
 					description = `GitHub: ${node.content.source.state.status}`;
+				}
+				break;
+			case "githubPullRequest":
+				icon = <GitHubIcon className="w-[14px] h-[14px]" />;
+				if (node.content.source.state.status === "configured") {
+					const { owner, repo } = node.content.source.state;
+					description = {
+						line1: `${owner}/${repo}`,
+						line2: "Pull Requests"
+					};
+				} else {
+					description = `GitHub PR: ${node.content.source.state.status}`;
 				}
 				break;
 			default:
@@ -81,7 +96,7 @@ export function QueryPanel({ node }: { node: QueryNode }) {
 									return (
 										<div
 											key={dataSource.connection.id}
-											className="flex items-center gap-[4px] px-[6px] py-[2px] rounded-[4px]"
+											className="flex items-center gap-[6px] px-[8px] py-[4px] rounded-[6px]"
 											style={{
 												backgroundColor: "rgba(131, 157, 195, 0.15)",
 												borderColor: "rgba(131, 157, 195, 0.25)",
@@ -92,13 +107,30 @@ export function QueryPanel({ node }: { node: QueryNode }) {
 											<div className="shrink-0" style={{ color: "#839DC3" }}>
 												{icon}
 											</div>
-											<span
-												className="text-[10px] font-medium"
-												style={{ color: "#839DC3" }}
-												title={`${name} • ${description}`}
-											>
-												{description}
-											</span>
+											{typeof description === "string" ? (
+												<span
+													className="text-[10px] font-medium"
+													style={{ color: "#839DC3" }}
+													title={`${name} • ${typeof description === "string" ? description : `${description.line1} (${description.line2})`}`}
+												>
+													{description}
+												</span>
+											) : (
+												<div className="flex flex-col leading-tight">
+													<span
+														className="text-[10px] font-medium"
+														style={{ color: "#839DC3" }}
+													>
+														{description.line1}
+													</span>
+													<span
+														className="text-[9px] opacity-70"
+														style={{ color: "#839DC3" }}
+													>
+														{description.line2}
+													</span>
+												</div>
+											)}
 											<button
 												type="button"
 												onClick={() =>

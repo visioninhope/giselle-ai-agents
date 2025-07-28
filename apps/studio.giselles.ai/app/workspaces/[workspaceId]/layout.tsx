@@ -68,7 +68,7 @@ export default async function Layout({
 				},
 			}}
 			vectorStore={{
-				github: gitHubVectorStores,
+				githubCode: gitHubVectorStores,
 				githubPullRequest: gitHubPullRequestVectorStores,
 				settingPath: "/settings/team/vector-stores",
 			}}
