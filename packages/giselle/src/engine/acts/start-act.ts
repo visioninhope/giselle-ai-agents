@@ -1,6 +1,6 @@
 import { AISDKError } from "ai";
 import { z } from "zod/v4";
-import { Act, type Sequence, type Step } from "../../concepts/act";
+import type { Sequence } from "../../concepts/act";
 import { ActId } from "../../concepts/identifiers";
 import { resolveTrigger } from "../flows";
 import {
@@ -14,9 +14,9 @@ import {
 import { executeAction } from "../operations";
 import { executeQuery } from "../operations/execute-query";
 import type { GiselleEngineContext } from "../types";
-import { patches } from "./object/patch-creators";
-import { actPath } from "./object/paths";
+import { getAct } from "./get-act";
 import { patchAct } from "./patch-act";
+import { executeAct } from "./shared/act-execution-utils";
 
 export interface StartActCallbacks {
 	sequenceStart?: (args: { sequence: Sequence }) => void | Promise<void>;
@@ -28,13 +28,11 @@ export interface StartActCallbacks {
 async function executeStep(args: {
 	context: GiselleEngineContext;
 	generation: QueuedGeneration;
-	step: Step;
-	onStart: () => Promise<void>;
-	onError: (error: unknown, step: Step) => Promise<void>;
-	onFinish: (step: Step) => Promise<void>;
+	callbacks?: {
+		onCompleted?: () => void | Promise<void>;
+		onFailed?: (generation: QueuedGeneration) => void | Promise<void>;
+	};
 }) {
-	await args.onStart();
-	const startedAt = Date.now();
 	try {
 		switch (args.generation.context.operationNode.content.type) {
 			case "action":
@@ -70,10 +68,7 @@ async function executeStep(args: {
 									generation: failedGeneration,
 									useExperimentalStorage: true,
 								}),
-								args.onError(new Error(error.message), {
-									...args.step,
-									duration: Date.now() - startedAt,
-								}),
+								args.callbacks?.onFailed?.(args.generation),
 							]);
 						}
 					},
@@ -95,142 +90,10 @@ async function executeStep(args: {
 				throw new Error(`Unhandled step type: ${_exhaustiveCheck}`);
 			}
 		}
-	} catch (e) {
-		await args.onError(e, {
-			...args.step,
-			duration: Date.now() - startedAt,
-		});
-		return;
+		await args.callbacks?.onCompleted?.();
+	} catch (_e) {
+		await args.callbacks?.onFailed?.(args.generation);
 	}
-	await args.onFinish({
-		...args.step,
-		duration: Date.now() - startedAt,
-	});
-}
-
-async function actSequence(args: {
-	actId: ActId;
-	sequenceIndex: number;
-	sequence: Sequence;
-	context: GiselleEngineContext;
-	onStart: () => Promise<void>;
-	onError: (sequence: Sequence) => Promise<void>;
-	onFinish: (sequence: Sequence) => Promise<void>;
-}) {
-	await args.onStart();
-	const startedAt = Date.now();
-	let totalTask = 0;
-	let hasError = false;
-	await Promise.all(
-		args.sequence.steps.map(async (step, index) => {
-			const generation = await getGeneration({
-				context: args.context,
-				useExperimentalStorage: true,
-				generationId: step.generationId,
-			});
-			if (generation?.status !== "created") {
-				throw new Error(`Unexpected generation status: ${generation?.status}`);
-			}
-			const stepStart = Date.now();
-			const queuedGeneration: QueuedGeneration = {
-				...generation,
-				status: "queued",
-				queuedAt: stepStart,
-			};
-			await executeStep({
-				...args,
-				generation: queuedGeneration,
-				step,
-				onStart: async () => {
-					await patchAct({
-						context: args.context,
-						actId: args.actId,
-						patches: [
-							patches.steps.inProgress.increment(1),
-							patches.steps.queued.decrement(1),
-							patches
-								.sequences(args.sequenceIndex)
-								.steps(index)
-								.status.set("running"),
-						],
-					});
-				},
-				onError: async (_, step) => {
-					hasError = true;
-					totalTask += step.duration;
-					await patchAct({
-						...args,
-						patches: [
-							patches.steps.inProgress.decrement(1),
-							patches.steps.failed.increment(1),
-							patches
-								.sequences(args.sequenceIndex)
-								.steps(index)
-								.status.set("failed"),
-							patches.duration.totalTask.increment(step.duration),
-							patches
-								.sequences(args.sequenceIndex)
-								.steps(index)
-								.duration.set(step.duration),
-							patches
-								.sequences(args.sequenceIndex)
-								.duration.totalTask.increment(step.duration),
-							patches.annotations.push([
-								{
-									level: "error",
-									/** @todo replace real error */
-									message: "error",
-									sequenceId: args.sequence.id,
-									stepId: step.id,
-								},
-							]),
-						],
-					});
-				},
-				onFinish: async (step) => {
-					totalTask += step.duration;
-					await patchAct({
-						context: args.context,
-						actId: args.actId,
-						patches: [
-							patches.steps.inProgress.decrement(1),
-							patches.steps.completed.increment(1),
-							patches.duration.totalTask.increment(step.duration),
-							patches
-								.sequences(args.sequenceIndex)
-								.steps(index)
-								.duration.set(step.duration),
-							patches
-								.sequences(args.sequenceIndex)
-								.duration.totalTask.increment(step.duration),
-							patches
-								.sequences(args.sequenceIndex)
-								.steps(index)
-								.status.set("completed"),
-						],
-					});
-				},
-			});
-		}),
-	);
-	if (hasError) {
-		await args.onError({
-			...args.sequence,
-			duration: {
-				totalTask,
-				wallClock: Date.now() - startedAt,
-			},
-		});
-		return;
-	}
-
-	await args.onFinish({
-		...args.sequence,
-		duration: {
-			totalTask,
-			wallClock: Date.now() - startedAt,
-		},
-	});
 }
 
 export const StartActInputs = z.object({
@@ -244,80 +107,44 @@ export async function startAct(
 		context: GiselleEngineContext;
 	},
 ) {
-	const flowStart = Date.now();
+	const act = await getAct(args);
 
-	const act = await args.context.experimental_storage.getJson({
-		path: actPath(args.actId),
-		schema: Act,
-	});
-
-	await patchAct({
-		...args,
-		patches: [patches.status.set("inProgress")],
-	});
-
-	let hasFailure = false;
-
-	for (let i = 0; i < act.sequences.length; i++) {
-		const sequence = act.sequences[i];
-
-		await args.callbacks?.sequenceStart?.({ sequence });
-
-		let sequenceFailed = false;
-
-		await actSequence({
-			sequence,
-			sequenceIndex: i,
-			context: args.context,
-			actId: args.actId,
-			onStart: async () => {
-				await patchAct({
-					context: args.context,
-					actId: args.actId,
-					patches: [patches.sequences(i).status.set("running")],
-				});
-			},
-			onError: async (sequence) => {
-				sequenceFailed = true;
-				hasFailure = true;
-				await Promise.all([
-					args.callbacks?.sequenceFail?.({ sequence }),
-					patchAct({
-						context: args.context,
-						actId: args.actId,
-						patches: [patches.sequences(i).status.set("failed")],
-					}),
-				]);
-				for (let j = i + 1; j < act.sequences.length; j++) {
-					await args.callbacks?.sequenceSkip?.({
-						sequence: act.sequences[j],
-					});
-				}
-			},
-			onFinish: async () => {
-				await patchAct({
-					context: args.context,
-					actId: args.actId,
-					patches: [patches.sequences(i).status.set("completed")],
-				});
-			},
-		});
-
-		if (sequenceFailed) {
-			// Skip remaining sequences after failure
-			// e.g., if there are 4 sequences and the 2nd one fails,
-			// sequences 3 and 4 will not be executed
-			break;
-		}
-		await args.callbacks?.sequenceComplete?.({ sequence });
-	}
-
-	await patchAct({
-		context: args.context,
-		actId: args.actId,
-		patches: [
-			patches.status.set(hasFailure ? "failed" : "completed"),
-			patches.duration.wallClock.set(Date.now() - flowStart),
-		],
+	await executeAct({
+		act,
+		applyPatches: async (actId, patches) => {
+			await patchAct({ context: args.context, actId, patches });
+		},
+		startGeneration: async (generationId, callbacks) => {
+			const generation = await getGeneration({
+				context: args.context,
+				useExperimentalStorage: true,
+				generationId,
+			});
+			if (!generation || generation.status !== "created") {
+				return;
+			}
+			const queuedGeneration: QueuedGeneration = {
+				...generation,
+				status: "queued",
+				queuedAt: Date.now(),
+			};
+			await executeStep({
+				context: args.context,
+				generation: queuedGeneration,
+				callbacks,
+			});
+		},
+		onSequenceStart: async (sequence) => {
+			await args.callbacks?.sequenceStart?.({ sequence });
+		},
+		onSequenceError: async (sequence) => {
+			await args.callbacks?.sequenceFail?.({ sequence });
+		},
+		onSequenceComplete: async (sequence) => {
+			await args.callbacks?.sequenceComplete?.({ sequence });
+		},
+		onSequenceSkip: async (sequence) => {
+			await args.callbacks?.sequenceSkip?.({ sequence });
+		},
 	});
 }
