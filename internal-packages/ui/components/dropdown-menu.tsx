@@ -70,6 +70,34 @@ export function DropdownMenu<
 	open,
 	onOpenChange,
 }: DropdownMenuProps<T, TRenderItemAsChild>) {
+	const renderMenuItem = (item: MenuItem) => (
+		<DropdownMenuPrimitive.Item
+			asChild={renderItemAsChild}
+			key={item.value}
+			onSelect={(event) => onSelect?.(event, item)}
+			className={clsx(
+				renderItemAsChild
+					? ""
+					: [
+							"text-text outline-none cursor-pointer hover:bg-ghost-element-hover",
+							"rounded-[4px] px-[8px] py-[6px] text-[14px]",
+							"flex items-center justify-between gap-[4px]",
+						],
+			)}
+		>
+			{item.icon ? (
+				<div className="flex items-center gap-2">
+					<span className="h-4 w-4">{item.icon}</span>
+					{renderItem ? renderItem(item) : item.label}
+				</div>
+			) : renderItem ? (
+				renderItem(item)
+			) : (
+				item.label
+			)}
+		</DropdownMenuPrimitive.Item>
+	);
+
 	return (
 		<DropdownMenuPrimitive.Root open={open} onOpenChange={onOpenChange}>
 			<DropdownMenuPrimitive.Trigger asChild>
@@ -89,63 +117,11 @@ export function DropdownMenu<
 										<DropdownMenuPrimitive.Label className="text-text px-[8px] py-[6px] text-[12px] font-medium">
 											{option.groupLabel}
 										</DropdownMenuPrimitive.Label>
-										{option.items.map((item) => (
-											<DropdownMenuPrimitive.Item
-												asChild={renderItemAsChild}
-												key={item.value}
-												onSelect={(event) => onSelect?.(event, item)}
-												className={clsx(
-													renderItemAsChild
-														? ""
-														: [
-																"text-text outline-none cursor-pointer hover:bg-ghost-element-hover",
-																"rounded-[4px] px-[8px] py-[6px] text-[14px]",
-																"flex items-center justify-between gap-[4px]",
-															],
-												)}
-											>
-												{item.icon ? (
-													<div className="flex items-center gap-2">
-														<span className="h-4 w-4">{item.icon}</span>
-														{renderItem ? renderItem(item) : item.label}
-													</div>
-												) : renderItem ? (
-													renderItem(item)
-												) : (
-													item.label
-												)}
-											</DropdownMenuPrimitive.Item>
-										))}
+										{option.items.map(renderMenuItem)}
 									</DropdownMenuPrimitive.Group>
 								);
 							}
-							return (
-								<DropdownMenuPrimitive.Item
-									asChild={renderItemAsChild}
-									key={option.value}
-									onSelect={(event) => onSelect?.(event, option)}
-									className={clsx(
-										renderItemAsChild
-											? ""
-											: [
-													"text-text outline-none cursor-pointer hover:bg-ghost-element-hover",
-													"rounded-[4px] px-[8px] py-[6px] text-[14px]",
-													"flex items-center justify-between gap-[4px]",
-												],
-									)}
-								>
-									{option.icon ? (
-										<div className="flex items-center gap-2">
-											<span className="h-4 w-4">{option.icon}</span>
-											{renderItem ? renderItem(option) : option.label}
-										</div>
-									) : renderItem ? (
-										renderItem(option)
-									) : (
-										option.label
-									)}
-								</DropdownMenuPrimitive.Item>
-							);
+							return renderMenuItem(option);
 						})}
 					</PopoverContent>
 				</DropdownMenuPrimitive.Content>
