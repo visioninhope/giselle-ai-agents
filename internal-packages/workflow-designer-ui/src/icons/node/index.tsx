@@ -195,22 +195,23 @@ export function NodeIcon({
 					return <WebPageFileIcon {...props} data-content-type-icon />;
 				case "github":
 					return <GitHubIcon {...props} />;
-				case "vectorStore":
+				case "vectorStore": {
 					if (!isVectorStoreNode(node)) {
 						throw new Error(
 							`Expected VectorStoreNode, got ${JSON.stringify(node)}`,
 						);
 					}
-					switch (node.content.source.provider) {
+					const provider = node.content.source.provider;
+					switch (provider) {
 						case "github":
 						case "githubPullRequest":
 							return <NodeGitHubIcon {...props} data-content-type-icon />;
 						default: {
-							throw new Error(
-								`Unhandled node type: ${(node.content.source as any).provider}`,
-							);
+							const _exhaustiveCheck: never = provider;
+							return _exhaustiveCheck;
 						}
 					}
+				}
 				default: {
 					const _exhaustiveCheck: never = node.content.type;
 					throw new Error(`Unhandled node type: ${_exhaustiveCheck}`);

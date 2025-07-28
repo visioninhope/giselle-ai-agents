@@ -32,14 +32,14 @@ export function VectorStoreNodePropertiesPanel({
 }
 
 function PropertiesPanel({ node }: { node: VectorStoreNode }) {
-	switch (node.content.source.provider) {
+	const provider = node.content.source.provider;
+	switch (provider) {
 		case "github":
 		case "githubPullRequest":
 			return <GitHubVectorStoreNodePropertiesPanel node={node} />;
 		default: {
-			throw new Error(
-				`Unhandled vector store provider: ${(node.content.source as any).provider}`,
-			);
+			const _exhaustiveCheck: never = provider;
+			return _exhaustiveCheck;
 		}
 	}
 }
