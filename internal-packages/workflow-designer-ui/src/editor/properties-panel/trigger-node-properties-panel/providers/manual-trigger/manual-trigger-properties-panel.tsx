@@ -216,7 +216,6 @@ export function ManualTriggerPropertiesPanel({ node }: { node: TriggerNode }) {
 								<Select
 									name="type"
 									options={TYPE_OPTIONS}
-									renderOption={(option) => option.name}
 									placeholder="Select type..."
 									defaultValue="text"
 								/>
