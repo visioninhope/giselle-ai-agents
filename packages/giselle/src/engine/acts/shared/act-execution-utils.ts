@@ -206,10 +206,15 @@ export async function executeAct(
 
 		// Skip remaining sequences if we have an error
 		if (hasError) {
-			// Cancel remaining steps
+			// Cancel all remaining steps from all remaining sequences
+			let totalRemainingSteps = 0;
+			for (let j = i; j < opts.act.sequences.length; j++) {
+				totalRemainingSteps += opts.act.sequences[j].steps.length;
+			}
+
 			await opts.applyPatches(
 				opts.act.id,
-				createStepCountPatches("queued", "cancelled", stepCount),
+				createStepCountPatches("queued", "cancelled", totalRemainingSteps),
 			);
 
 			// Notify about skipped sequences
