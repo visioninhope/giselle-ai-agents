@@ -7,119 +7,39 @@ import type {
 import { patches } from "../object/patch-creators";
 import type { Patch } from "../object/patch-object";
 
-/**
- * Utility for tracking duration in act execution
- */
-export interface DurationTracker {
-	startTime: number;
-	getDuration(): number;
-	reset(): void;
+// Valid status transitions for acts
+const VALID_ACT_TRANSITIONS: Record<Act["status"], Act["status"][]> = {
+	inProgress: ["completed", "failed", "cancelled"],
+	completed: [],
+	failed: [],
+	cancelled: [],
+};
+
+// Valid status transitions for sequences and steps
+const VALID_GENERATION_TRANSITIONS: Record<
+	GenerationStatus,
+	GenerationStatus[]
+> = {
+	created: ["queued", "cancelled"],
+	queued: ["running", "cancelled"],
+	running: ["completed", "failed", "cancelled"],
+	completed: [],
+	failed: [],
+	cancelled: [],
+};
+
+export function isValidActTransition(
+	from: Act["status"],
+	to: Act["status"],
+): boolean {
+	return VALID_ACT_TRANSITIONS[from]?.includes(to) ?? false;
 }
 
-export function createDurationTracker(startTime?: number): DurationTracker {
-	let start = startTime ?? Date.now();
-
-	return {
-		startTime: start,
-		getDuration: () => Date.now() - start,
-		reset: () => {
-			start = Date.now();
-		},
-	};
-}
-
-/**
- * Manager for step count transitions
- */
-export interface StepCountTransition {
-	from: keyof Act["steps"];
-	to: keyof Act["steps"];
-	count: number;
-}
-
-export function createStepCountTransition(
-	from: keyof Act["steps"],
-	to: keyof Act["steps"],
-	count: number,
-): StepCountTransition {
-	return { from, to, count };
-}
-
-/**
- * Status state machine for managing act/sequence/step status transitions
- */
-export type ActStatus = Act["status"];
-export type SequenceStatus = GenerationStatus;
-export type StepStatus = GenerationStatus;
-
-export interface StatusTransition<T> {
-	from: T;
-	to: T;
-	isValid: boolean;
-}
-
-export function validateActStatusTransition(
-	from: ActStatus,
-	to: ActStatus,
-): StatusTransition<ActStatus> {
-	const validTransitions: Record<ActStatus, ActStatus[]> = {
-		inProgress: ["completed", "failed", "cancelled"],
-		completed: [],
-		failed: [],
-		cancelled: [],
-	};
-
-	const isValid = validTransitions[from]?.includes(to) ?? false;
-	return { from, to, isValid };
-}
-
-export function validateSequenceStatusTransition(
-	from: SequenceStatus,
-	to: SequenceStatus,
-): StatusTransition<SequenceStatus> {
-	const validTransitions: Record<SequenceStatus, SequenceStatus[]> = {
-		created: ["queued", "cancelled"],
-		queued: ["running", "cancelled"],
-		running: ["completed", "failed", "cancelled"],
-		completed: [],
-		failed: [],
-		cancelled: [],
-	};
-
-	const isValid = validTransitions[from]?.includes(to) ?? false;
-	return { from, to, isValid };
-}
-
-export function validateStepStatusTransition(
-	from: StepStatus,
-	to: StepStatus,
-): StatusTransition<StepStatus> {
-	// Steps use the same status transitions as sequences
-	return validateSequenceStatusTransition(from, to);
-}
-
-/**
- * Adapter interfaces for context-specific implementations
- */
-export interface ActPatchAdapter {
-	applyPatches(actId: ActId, patches: Patch[]): Promise<void>;
-}
-
-export interface GenerationAdapter {
-	startGeneration(
-		generationId: GenerationId,
-		callbacks?: {
-			onCompleted?: () => void | Promise<void>;
-			onFailed?: (generation: Generation) => void | Promise<void>;
-		},
-	): Promise<void>;
-	stopGeneration(generationId: GenerationId): Promise<void>;
-}
-
-export interface SequenceExecutionResult {
-	hasError: boolean;
-	totalTaskDuration: number;
-	wallClockDuration: number;
+export function isValidGenerationTransition(
+	from: GenerationStatus,
+	to: GenerationStatus,
+): boolean {
+	return VALID_GENERATION_TRANSITIONS[from]?.includes(to) ?? false;
 }
 
 interface SequenceExecutionOptions {
@@ -146,10 +66,12 @@ interface SequenceExecutionOptions {
 	onStepComplete?: (step: Step, stepIndex: number) => Promise<void>;
 }
 
-export async function executeSequence(
-	options: SequenceExecutionOptions,
-): Promise<SequenceExecutionResult> {
-	const sequenceTracker = createDurationTracker();
+async function executeSequence(options: SequenceExecutionOptions): Promise<{
+	hasError: boolean;
+	totalTaskDuration: number;
+	wallClockDuration: number;
+}> {
+	const startTime = Date.now();
 	let totalTaskDuration = 0;
 	let hasError = false;
 
@@ -159,30 +81,20 @@ export async function executeSequence(
 	// Execute all steps in parallel
 	await Promise.all(
 		options.sequence.steps.map(async (step, stepIndex) => {
-			// @todo
-			// if (options?.cancelSignal?.current) {
-			// 	return;
-			// }
-
-			const stepTracker = createDurationTracker();
+			const stepStartTime = Date.now();
 
 			try {
 				await options.onStepStart?.(step, stepIndex);
 
-				// @todo
-				// if (options?.cancelSignal?.current) {
-				// 	return;
-				// }
-
 				await options.startGeneration(step.generationId, {
 					onCompleted: async () => {
-						const duration = stepTracker.getDuration();
+						const duration = Date.now() - stepStartTime;
 						totalTaskDuration += duration;
-						await options?.onStepComplete?.({ ...step, duration }, stepIndex);
+						await options.onStepComplete?.({ ...step, duration }, stepIndex);
 					},
 					onFailed: async (failedGeneration) => {
 						hasError = true;
-						const duration = stepTracker.getDuration();
+						const duration = Date.now() - stepStartTime;
 						totalTaskDuration += duration;
 						await options.onStepError?.(
 							{ ...step, duration },
@@ -193,81 +105,56 @@ export async function executeSequence(
 				});
 			} catch (error) {
 				hasError = true;
-				const duration = stepTracker.getDuration();
+				const duration = Date.now() - stepStartTime;
 				totalTaskDuration += duration;
 				await options.onStepError?.({ ...step, duration }, stepIndex, error);
 			}
 		}),
 	);
 
+	const wallClockDuration = Date.now() - startTime;
+	const sequenceWithDuration = {
+		...options.sequence,
+		duration: { totalTask: totalTaskDuration, wallClock: wallClockDuration },
+	};
+
 	// Handle sequence completion
 	if (hasError) {
-		await options.onSequenceError?.(new Error("Sequence execution failed"), {
-			...options.sequence,
-			duration: {
-				totalTask: totalTaskDuration,
-				wallClock: sequenceTracker.getDuration(),
-			},
-		});
+		await options.onSequenceError?.(
+			new Error("Sequence execution failed"),
+			sequenceWithDuration,
+		);
 	} else {
-		await options.onSequenceComplete?.({
-			...options.sequence,
-			duration: {
-				totalTask: totalTaskDuration,
-				wallClock: sequenceTracker.getDuration(),
-			},
-		});
+		await options.onSequenceComplete?.(sequenceWithDuration);
 	}
 
-	return {
-		hasError,
-		totalTaskDuration,
-		wallClockDuration: sequenceTracker.getDuration(),
-	};
+	return { hasError, totalTaskDuration, wallClockDuration };
 }
 
 /**
- * Helper to create step count patches
+ * Create patches to move step counts between states
  */
 export function createStepCountPatches(
-	transitions: StepCountTransition[],
+	from: keyof Act["steps"],
+	to: keyof Act["steps"],
+	count: number,
 ): Patch[] {
-	return transitions.flatMap(({ from, to, count }) => [
-		{ path: `steps.${from}`, decrement: count } as Patch,
-		{ path: `steps.${to}`, increment: count } as Patch,
-	]);
+	return [
+		{ path: `steps.${from}`, decrement: count },
+		{ path: `steps.${to}`, increment: count },
+	];
 }
 
-/**
- * Helper to check if all sequences before a given index have completed
- */
-export function shouldSkipRemainingSequences(
-	sequences: Sequence[],
-	currentIndex: number,
-): boolean {
-	return sequences
-		.slice(0, currentIndex)
-		.some((seq) => seq.status === "failed" || seq.status === "cancelled");
-}
-
-/**
- * Helper to calculate remaining step counts for cancellation
- */
-export function calculateRemainingSteps(
-	sequences: Sequence[],
-	fromIndex: number,
-): number {
-	return sequences
-		.slice(fromIndex)
-		.reduce((sum, seq) => sum + seq.steps.length, 0);
-}
-
-export type ActExecutorOptions = Pick<
-	SequenceExecutionOptions,
-	"startGeneration"
-> & {
+export interface ActExecutorOptions {
 	act: Act;
 	applyPatches(actId: ActId, patches: Patch[]): Promise<void>;
+	startGeneration(
+		generationId: GenerationId,
+		callbacks?: {
+			onCompleted?: () => void | Promise<void>;
+			onFailed?: (generation: Generation) => void | Promise<void>;
+		},
+	): Promise<void>;
 	onActStart?: () => void | Promise<void>;
 	onActComplete?: (hasError: boolean, duration: number) => void | Promise<void>;
 	onSequenceSkip?: (sequence: Sequence, index: number) => void | Promise<void>;
@@ -297,71 +184,51 @@ export type ActExecutorOptions = Pick<
 		stepIndex: number,
 		error: unknown,
 	) => void | Promise<void>;
-};
-
-/**
- * Result of act execution
- */
-export interface ActExecutorResult {
-	hasError: boolean;
-	duration: number;
 }
 
 /**
- * Core act executor that manages the outer loop of sequence execution
- * Used by both React hooks and Node.js engine implementations
+ * Execute an act by running all its sequences in order
  */
 export async function executeAct(
 	opts: ActExecutorOptions,
-): Promise<ActExecutorResult> {
-	const actTracker = createDurationTracker();
+): Promise<{ hasError: boolean; duration: number }> {
+	const startTime = Date.now();
 	let hasError = false;
+
 	// Start act execution
 	await opts.onActStart?.();
-
-	// Set act status to inProgress
 	await opts.applyPatches(opts.act.id, [patches.status.set("inProgress")]);
 
 	// Execute each sequence
-	for (
-		let sequenceIndex = 0;
-		sequenceIndex < opts.act.sequences.length;
-		sequenceIndex++
-	) {
-		const sequence = opts.act.sequences[sequenceIndex];
-		const stepsCount = sequence.steps.length;
+	for (let i = 0; i < opts.act.sequences.length; i++) {
+		const sequence = opts.act.sequences[i];
+		const stepCount = sequence.steps.length;
 
-		// Check if we should skip due to previous error
+		// Skip remaining sequences if we have an error
 		if (hasError) {
-			// Cancel remaining steps in this sequence
+			// Cancel remaining steps
 			await opts.applyPatches(
 				opts.act.id,
-				createStepCountPatches([
-					createStepCountTransition("queued", "cancelled", stepsCount),
-				]),
+				createStepCountPatches("queued", "cancelled", stepCount),
 			);
 
-			// Skip this and all remaining sequences
-			for (let i = sequenceIndex; i < opts.act.sequences.length; i++) {
-				await opts.onSequenceSkip?.(opts.act.sequences[i], i);
+			// Notify about skipped sequences
+			for (let j = i; j < opts.act.sequences.length; j++) {
+				await opts.onSequenceSkip?.(opts.act.sequences[j], j);
 			}
 			break;
 		}
 
-		// Set sequence status to running
+		// Start sequence
 		await opts.applyPatches(opts.act.id, [
-			patches.sequences(sequenceIndex).status.set("running"),
+			patches.sequences(i).status.set("running"),
 		]);
+		await opts.onSequenceStart?.(sequence, i);
 
-		// Notify sequence start
-		await opts.onSequenceStart?.(sequence, sequenceIndex);
-
-		// Move steps from queued to inProgress
+		// Move steps to in progress
 		await opts.applyPatches(
 			opts.act.id,
-			createStepCountPatches([
-				createStepCountTransition("queued", "inProgress", stepsCount),
-			]),
+			createStepCountPatches("queued", "inProgress", stepCount),
 		);
 
 		// Execute the sequence
@@ -369,92 +236,60 @@ export async function executeAct(
 			sequence,
 			startGeneration: opts.startGeneration,
 			onStepStart: async (step, stepIndex) => {
-				// Set step status to running
 				await opts.applyPatches(opts.act.id, [
-					patches
-						.sequences(sequenceIndex)
-						.steps(stepIndex)
-						.status.set("running"),
+					patches.sequences(i).steps(stepIndex).status.set("running"),
 				]);
-				await opts.onStepStart?.(step, sequenceIndex, stepIndex);
+				await opts.onStepStart?.(step, i, stepIndex);
 			},
 			onStepComplete: async (step, stepIndex) => {
-				// Update step counts and durations
 				await opts.applyPatches(opts.act.id, [
-					...createStepCountPatches([
-						createStepCountTransition("inProgress", "completed", 1),
-					]),
+					...createStepCountPatches("inProgress", "completed", 1),
 					patches.duration.totalTask.increment(step.duration),
-					patches
-						.sequences(sequenceIndex)
-						.steps(stepIndex)
-						.duration.set(step.duration),
-					patches
-						.sequences(sequenceIndex)
-						.duration.totalTask.increment(step.duration),
-					patches
-						.sequences(sequenceIndex)
-						.steps(stepIndex)
-						.status.set("completed"),
+					patches.sequences(i).steps(stepIndex).duration.set(step.duration),
+					patches.sequences(i).duration.totalTask.increment(step.duration),
+					patches.sequences(i).steps(stepIndex).status.set("completed"),
 				]);
-				await opts.onStepComplete?.(step, sequenceIndex, stepIndex);
+				await opts.onStepComplete?.(step, i, stepIndex);
 			},
 			onStepError: async (step, stepIndex, error) => {
-				// Update step counts, durations, and add error annotation
-				const errorPatches = [
-					...createStepCountPatches([
-						createStepCountTransition("inProgress", "failed", 1),
-					]),
-					patches.duration.totalTask.increment(step.duration),
-					patches
-						.sequences(sequenceIndex)
-						.steps(stepIndex)
-						.status.set("failed"),
-					patches
-						.sequences(sequenceIndex)
-						.steps(stepIndex)
-						.duration.set(step.duration),
-					patches
-						.sequences(sequenceIndex)
-						.duration.totalTask.increment(step.duration),
-				];
+				const errorMessage =
+					error instanceof Error ? error.message : "Unknown error";
 
-				errorPatches.push(
+				await opts.applyPatches(opts.act.id, [
+					...createStepCountPatches("inProgress", "failed", 1),
+					patches.duration.totalTask.increment(step.duration),
+					patches.sequences(i).steps(stepIndex).status.set("failed"),
+					patches.sequences(i).steps(stepIndex).duration.set(step.duration),
+					patches.sequences(i).duration.totalTask.increment(step.duration),
 					patches.annotations.push([
 						{
 							level: "error" as const,
-							message: error instanceof Error ? error.message : "Unknown error",
+							message: errorMessage,
 							sequenceId: sequence.id,
 							stepId: step.id,
 						},
 					]),
-				);
-
-				await Promise.all([
-					opts.applyPatches(opts.act.id, errorPatches),
-					opts.onStepError?.(step, sequenceIndex, stepIndex, error),
 				]);
+				await opts.onStepError?.(step, i, stepIndex, error);
 			},
-			onSequenceError: async (error, sequence) => {
+			onSequenceError: async (error, sequenceWithDuration) => {
 				hasError = true;
-				// Set sequence status to failed and duration
 				await opts.applyPatches(opts.act.id, [
-					patches.sequences(sequenceIndex).status.set("failed"),
+					patches.sequences(i).status.set("failed"),
 					patches
-						.sequences(sequenceIndex)
-						.duration.wallClock.set(sequence.duration.wallClock),
+						.sequences(i)
+						.duration.wallClock.set(sequenceWithDuration.duration.wallClock),
 				]);
-				await opts.onSequenceError?.(sequence, sequenceIndex, error);
+				await opts.onSequenceError?.(sequenceWithDuration, i, error);
 			},
-			onSequenceComplete: async (completeSequence) => {
-				// Set sequence status to completed and duration
+			onSequenceComplete: async (sequenceWithDuration) => {
 				await opts.applyPatches(opts.act.id, [
-					patches.sequences(sequenceIndex).status.set("completed"),
+					patches.sequences(i).status.set("completed"),
 					patches
-						.sequences(sequenceIndex)
-						.duration.wallClock.set(completeSequence.duration.wallClock),
+						.sequences(i)
+						.duration.wallClock.set(sequenceWithDuration.duration.wallClock),
 				]);
-				await opts.onSequenceComplete?.(completeSequence, sequenceIndex);
+				await opts.onSequenceComplete?.(sequenceWithDuration, i);
 			},
 		});
 
@@ -462,9 +297,7 @@ export async function executeAct(
 	}
 
 	// Complete act execution
-	const duration = actTracker.getDuration();
-
-	// Set final act status and duration
+	const duration = Date.now() - startTime;
 	await opts.applyPatches(opts.act.id, [
 		patches.status.set(hasError ? "failed" : "completed"),
 		patches.duration.wallClock.set(duration),
@@ -472,8 +305,5 @@ export async function executeAct(
 
 	await opts.onActComplete?.(hasError, duration);
 
-	return {
-		hasError,
-		duration,
-	};
+	return { hasError, duration };
 }
