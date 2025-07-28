@@ -931,7 +931,9 @@ export function Toolbar() {
 												{canUseGithubVectorStore && (
 													<ToggleGroup.Item value="githubVectorStore" data-tool>
 														<GitHubIcon className="w-[20px] h-[20px]" />
-														<p className="text-[14px]">GitHub (Code)</p>
+														<p className="text-[14px]">
+															GitHub Vector Store (Code)
+														</p>
 													</ToggleGroup.Item>
 												)}
 												{canUseGithubVectorStore && pullRequestVectorStore && (
@@ -940,7 +942,9 @@ export function Toolbar() {
 														data-tool
 													>
 														<GitHubIcon className="w-[20px] h-[20px]" />
-														<p className="text-[14px]">GitHub PR</p>
+														<p className="text-[14px]">
+															GitHub Vector Store (Pull Request)
+														</p>
 													</ToggleGroup.Item>
 												)}
 												<ToggleGroup.Item value="webPage" data-tool>
