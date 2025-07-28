@@ -283,12 +283,90 @@ describe("executeAct", () => {
 		expect(onSequenceSkip).toHaveBeenCalledWith(currentAct.sequences[1], 1);
 		expect(onSequenceSkip).toHaveBeenCalledWith(currentAct.sequences[2], 2);
 
-		// Verify step counts
-		// The implementation has a bug: it only cancels the first remaining sequence's steps
-		// not all remaining sequences
+		// Verify step counts - implementation is now fixed
 		expect(currentAct.steps.failed).toBe(1);
-		expect(currentAct.steps.cancelled).toBe(1); // Only sequence 2's step is cancelled
-		expect(currentAct.steps.queued).toBe(1); // Sequence 3's step remains queued
+		expect(currentAct.steps.cancelled).toBe(2); // Both remaining sequences' steps are cancelled
+		expect(currentAct.steps.queued).toBe(0); // No steps remain queued
+	});
+
+	it("should cancel ALL remaining sequence steps when a sequence fails", async () => {
+		let currentAct = createTestAct({
+			sequences: [
+				createTestSequence({
+					id: "sqn-1" as const,
+					steps: [createTestStep({ generationId: "gnr-1" as const })],
+				}),
+				createTestSequence({
+					id: "sqn-2" as const,
+					steps: [
+						createTestStep({
+							id: "stp-2a" as const,
+							generationId: "gnr-2a" as const,
+						}),
+						createTestStep({
+							id: "stp-2b" as const,
+							generationId: "gnr-2b" as const,
+						}),
+					],
+				}),
+				createTestSequence({
+					id: "sqn-3" as const,
+					steps: [
+						createTestStep({
+							id: "stp-3a" as const,
+							generationId: "gnr-3a" as const,
+						}),
+						createTestStep({
+							id: "stp-3b" as const,
+							generationId: "gnr-3b" as const,
+						}),
+						createTestStep({
+							id: "stp-3c" as const,
+							generationId: "gnr-3c" as const,
+						}),
+					],
+				}),
+			],
+		});
+
+		const applyPatches = vi.fn((_id: string, patches) => {
+			currentAct = patchAct(currentAct, ...patches);
+			return Promise.resolve();
+		});
+
+		const startGeneration = vi.fn(async (id: string, callbacks?) => {
+			if (id === "gnr-1") {
+				throw new Error("Generation failed");
+			}
+			await callbacks?.onCompleted?.();
+		});
+
+		const onSequenceSkip = vi.fn();
+
+		// Verify initial state
+		expect(currentAct.steps.queued).toBe(6); // 1 + 2 + 3 steps
+		expect(currentAct.steps.inProgress).toBe(0);
+
+		await executeAct({
+			act: currentAct,
+			applyPatches,
+			startGeneration,
+			onSequenceSkip,
+		});
+
+		// Verify act failed
+		expect(currentAct.status).toBe("failed");
+
+		// Verify first sequence failed
+		expect(currentAct.sequences[0].status).toBe("failed");
+
+		// Verify remaining sequences were skipped
+		expect(onSequenceSkip).toHaveBeenCalledTimes(2);
+
+		// Expected behavior: ALL remaining steps should be cancelled
+		expect(currentAct.steps.failed).toBe(1); // Only the failed step
+		expect(currentAct.steps.cancelled).toBe(5); // All 5 remaining steps should be cancelled
+		expect(currentAct.steps.queued).toBe(0); // No steps should remain queued
 	});
 
 	it("executes steps in parallel within a sequence", async () => {
