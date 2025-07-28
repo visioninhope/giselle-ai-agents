@@ -7,36 +7,45 @@ import {
 } from "@giselle-internal/ui/dialog";
 import { DropdownMenu } from "@giselle-internal/ui/dropdown-menu";
 import { useToasts } from "@giselle-internal/ui/toast";
-import {
-	isOperationNode,
-	isTriggerNode,
-	type NodeLike,
-} from "@giselle-sdk/data-type";
+import { isOperationNode, isTriggerNode } from "@giselle-sdk/data-type";
 import {
 	defaultName,
 	useActController,
+	useNodeGroups,
 	useWorkflowDesigner,
 } from "@giselle-sdk/giselle/react";
+import clsx from "clsx/lite";
 import { PlayIcon } from "lucide-react";
-import { type ButtonHTMLAttributes, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { NodeIcon } from "../../../icons/node";
 import { TriggerInputDialog } from "./trigger-input-dialog";
 
-function NodeSelectItem({
-	node,
+function DropdownMenuItem({
+	icon,
+	title,
+	subtitle,
+	className,
 	...props
-}: { node: NodeLike } & ButtonHTMLAttributes<HTMLButtonElement>) {
+}: {
+	icon: React.ReactNode;
+	title: string;
+	subtitle: string;
+} & React.DetailedHTMLProps<
+	React.ButtonHTMLAttributes<HTMLButtonElement>,
+	HTMLButtonElement
+>) {
 	return (
 		<button
-			className="flex items-center py-[8px] px-[12px] gap-[10px] outline-none w-full cursor-pointer"
+			className={clsx(
+				"flex items-center py-[8px] px-[12px] gap-[10px] w-full outline-none cursor-pointer hover:bg-ghost-element-hover rounded-[6px]",
+				className,
+			)}
 			{...props}
 		>
-			<div className="p-[12px] bg-black-800 rounded-[8px]">
-				<NodeIcon node={node} className="size-[16px] text-white-900" />
-			</div>
+			<div className="p-[12px] bg-black-800 rounded-[8px]">{icon}</div>
 			<div className="flex flex-col gap-[0px] text-white-900 items-start">
-				<div className="text-[13px]">{node.name ?? defaultName(node)}</div>
-				<div className="text-[12px] text-white-400">{node.id}</div>
+				<div className="text-[13px]">{title}</div>
+				<div className="text-[12px] text-white-400">{subtitle}</div>
 			</div>
 		</button>
 	);
@@ -48,28 +57,33 @@ export function RunButton() {
 
 	const [openDialogNodeId, setOpenDialogNodeId] = useState<string | null>(null);
 	const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+	const nodeGroups = useNodeGroups();
 	const startingNodes = useMemo(() => {
 		const triggerNodes = data.nodes.filter((node) => isTriggerNode(node));
-		const startingOperationNodes = data.nodes.filter((node) => {
-			if (!isOperationNode(node)) {
-				return false;
-			}
-			if (isTriggerNode(node)) {
-				return false;
-			}
-			if (
-				data.connections.some(
-					(connection) =>
-						connection.outputNode.type === "operation" &&
-						connection.inputNode.id === node.id,
-				)
-			) {
-				return false;
-			}
-			return true;
-		});
-		return [...triggerNodes, ...startingOperationNodes];
-	}, [data.nodes, data.connections]);
+		const operationNodeGroups = nodeGroups.filter(
+			(nodes) => !nodes.some((node) => isTriggerNode(node)),
+		);
+		return [
+			{
+				groupId: "triggerNodes",
+				groupLabel: "Trigger Nodes",
+				items: triggerNodes.map((triggerNode) => ({
+					value: triggerNode.id,
+					label: triggerNode.name ?? defaultName(triggerNode),
+					node: triggerNode,
+				})),
+			},
+			{
+				groupId: "operationNodes",
+				groupLabel: "Node Group",
+				items: operationNodeGroups.map((_nodes, index) => ({
+					value: `opration-node-index-${index}`,
+					label: `Group ${index + 1}`,
+					node: undefined,
+				})),
+			},
+		];
+	}, [data.nodes, nodeGroups]);
 
 	const { info } = useToasts();
 
@@ -83,7 +97,11 @@ export function RunButton() {
 			onOpenChange={setIsDropdownOpen}
 			onSelect={async (_event, item) => {
 				const startingNode = item.node;
-				if (!isTriggerNode(startingNode) && isOperationNode(startingNode)) {
+				if (!startingNode) {
+					// Handle operation node groups
+					return;
+				}
+				if (isOperationNode(startingNode)) {
 					await createAndStartAct({
 						startNodeId: startingNode.id,
 						inputs: [],
@@ -100,15 +118,20 @@ export function RunButton() {
 					});
 				}
 			}}
-			items={startingNodes.map((node) => ({
-				value: node.id,
-				label: node.name ?? defaultName(node),
-				node,
-			}))}
+			items={startingNodes}
 			renderItemAsChild
 			renderItem={(item) => {
 				const startingNode = item.node;
-				return isTriggerNode(startingNode) ? (
+				if (startingNode === undefined || !isTriggerNode(startingNode)) {
+					return (
+						<DropdownMenuItem
+							icon={<div className="bg-ghost-element-background size-[16px]" />}
+							title={item.label}
+							subtitle={item.value}
+						/>
+					);
+				}
+				return (
 					<Dialog
 						open={openDialogNodeId === startingNode.id}
 						onOpenChange={(isOpen) => {
@@ -119,7 +142,16 @@ export function RunButton() {
 						}}
 					>
 						<DialogTrigger asChild>
-							<NodeSelectItem node={startingNode} />
+							<DropdownMenuItem
+								icon={
+									<NodeIcon
+										node={startingNode}
+										className="size-[16px] text-white-900"
+									/>
+								}
+								title={startingNode.name ?? defaultName(startingNode)}
+								subtitle={startingNode.id}
+							/>
 						</DialogTrigger>
 						<DialogContent>
 							<DialogTitle className="sr-only">
@@ -135,8 +167,6 @@ export function RunButton() {
 							/>
 						</DialogContent>
 					</Dialog>
-				) : (
-					<NodeSelectItem node={startingNode} />
 				);
 			}}
 			trigger={
