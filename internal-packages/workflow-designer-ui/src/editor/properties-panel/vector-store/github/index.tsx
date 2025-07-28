@@ -18,9 +18,13 @@ export function GitHubVectorStoreNodePropertiesPanel({
 }: GitHubVectorStoreNodePropertiesPanelProps) {
 	const { updateNodeDataContent } = useWorkflowDesigner();
 	const vectorStore = useVectorStore();
-	const github = vectorStore?.github;
 	const settingPath = vectorStore?.settingPath;
-	const vectorStoreInfos = github ?? [];
+
+	// Select the appropriate repository list based on the provider
+	const vectorStoreInfos =
+		node.content.source.provider === "githubPullRequest"
+			? (vectorStore?.githubPullRequest ?? [])
+			: (vectorStore?.github ?? []);
 
 	const { isOrphaned, repositoryId } = useGitHubVectorStoreStatus(node);
 	const [isOpen, setIsOpen] = useState(false);

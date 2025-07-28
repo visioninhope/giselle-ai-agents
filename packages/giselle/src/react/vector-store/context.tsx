@@ -1,8 +1,12 @@
 import { createContext, type PropsWithChildren, useContext } from "react";
-import type { GitHubVectorStoreInfo } from "../../engine/vector-store";
+import type {
+	GitHubPullRequestVectorStoreInfo,
+	GitHubVectorStoreInfo,
+} from "../../engine/vector-store";
 
 export interface VectorStoreContextValue {
 	github: GitHubVectorStoreInfo[];
+	githubPullRequest?: GitHubPullRequestVectorStoreInfo[];
 	settingPath: string;
 }
 
