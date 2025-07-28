@@ -184,19 +184,17 @@ export function RepositoryItem({
 				{/* Content Type Sections */}
 				<div className="space-y-3">
 					{/* Code Section */}
-					{blobStatus && (
-						<ContentTypeSection
-							contentType="blob"
-							status={blobStatus}
-							isIngesting={isIngesting}
-							onVerify={
-								blobStatus.status === "failed" &&
-								blobStatus.errorCode === "DOCUMENT_NOT_FOUND"
-									? () => setShowDiagnosticModal(true)
-									: undefined
-							}
-						/>
-					)}
+					<ContentTypeSection
+						contentType="blob"
+						status={blobStatus}
+						isIngesting={isIngesting}
+						onVerify={
+							blobStatus?.status === "failed" &&
+							blobStatus?.errorCode === "DOCUMENT_NOT_FOUND"
+								? () => setShowDiagnosticModal(true)
+								: undefined
+						}
+					/>
 
 					{/* Pull Requests Section */}
 					<ContentTypeSection
