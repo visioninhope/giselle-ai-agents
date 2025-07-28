@@ -85,13 +85,13 @@ export function DropdownMenu<
 						],
 			)}
 		>
-			{item.icon ? (
+			{renderItem ? (
+				renderItem(item)
+			) : item.icon ? (
 				<div className="flex items-center gap-2">
 					<span className="h-4 w-4">{item.icon}</span>
-					{renderItem ? renderItem(item) : item.label}
+					{item.label}
 				</div>
-			) : renderItem ? (
-				renderItem(item)
 			) : (
 				item.label
 			)}
