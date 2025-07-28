@@ -4,6 +4,7 @@ import { Select } from "@giselle-internal/ui/select";
 import {
 	ArrowDownAZ,
 	ArrowUpAZ,
+	ChevronDown,
 	Clock,
 	LayoutGrid,
 	LayoutList,
@@ -12,6 +13,7 @@ import {
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { Input } from "@/components/ui/input";
+import { Card } from "../../settings/components/card";
 import { AgentGrid } from "./agent-grid";
 import { DeleteAgentButton } from "./delete-agent-button";
 import { DuplicateAgentButton } from "./duplicate-agent-button";
@@ -104,7 +106,7 @@ export function SearchableAgentList({ agents }: AgentGridProps) {
 
 	return (
 		<>
-			<div className="mb-6 flex flex-col sm:flex-row gap-3 items-center">
+			<div className="mb-2 flex flex-col sm:flex-row gap-3 items-center">
 				<div className="relative flex-1 w-full">
 					<Search className="absolute left-4 top-1/2 -translate-y-1/2 text-black-300 h-4 w-4" />
 					<Input
@@ -175,7 +177,7 @@ export function SearchableAgentList({ agents }: AgentGridProps) {
 			</div>
 
 			{sortedAgents.length === 0 && searchQuery ? (
-				<div className="flex justify-center items-center h-full">
+				<div className="flex justify-center items-center h-full mt-12">
 					<div className="grid gap-[8px] justify-center text-center">
 						<h3 className="text-[18px] font-geist font-bold text-black-400">
 							No apps found.
@@ -188,19 +190,13 @@ export function SearchableAgentList({ agents }: AgentGridProps) {
 			) : viewMode === "grid" ? (
 				<AgentGrid agents={sortedAgents} />
 			) : (
-				<div
-					className="rounded-[12px] border-[0.5px] border-white/8 bg-white/[0.02] backdrop-blur-sm px-[24px] pt-[16px] pb-[24px]"
-					style={{
-						boxShadow:
-							"inset 0 1px 0 0 rgba(255, 255, 255, 0.05), inset 0 0 0 1px rgba(255, 255, 255, 0.03)",
-					}}
-				>
+				<Card className="gap-0 py-2">
 					{sortedAgents.map((agent) => {
 						if (!agent.workspaceId) return null;
 
 						return <ListItem key={agent.id} agent={agent} />;
 					})}
-				</div>
+				</Card>
 			)}
 		</>
 	);
