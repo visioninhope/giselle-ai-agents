@@ -203,6 +203,7 @@ export function NodeIcon({
 					}
 					switch (node.content.source.provider) {
 						case "github":
+						case "githubPullRequest":
 							return <NodeGitHubIcon {...props} data-content-type-icon />;
 						default: {
 							const _exhaustiveCheck: never = node.content.source.provider;

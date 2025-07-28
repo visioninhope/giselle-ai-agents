@@ -34,6 +34,7 @@ export function VectorStoreNodePropertiesPanel({
 function PropertiesPanel({ node }: { node: VectorStoreNode }) {
 	switch (node.content.source.provider) {
 		case "github":
+		case "githubPullRequest":
 			return <GitHubVectorStoreNodePropertiesPanel node={node} />;
 		default: {
 			const _exhaustiveCheck: never = node.content.source.provider;
