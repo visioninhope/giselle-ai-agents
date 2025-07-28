@@ -16,7 +16,7 @@ export async function getNodeGenerations(args: {
 		experimental_storage: args.context.experimental_storage,
 		useExperimentalStorage: args.useExperimentalStorage,
 		nodeId: args.nodeId,
-	});
+	}).catch(() => undefined);
 	if (nodeGenerationIndexes === undefined) {
 		return [];
 	}
