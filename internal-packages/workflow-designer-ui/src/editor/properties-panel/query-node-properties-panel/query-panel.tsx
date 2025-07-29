@@ -56,13 +56,10 @@ function getDataSourceDisplayInfo(input: ConnectedSource): {
 					icon,
 				};
 			}
-			default:
-				// This case should never be reached due to exhaustive type checking
-				return {
-					name,
-					description: "Unknown vector store",
-					icon: <DatabaseZapIcon className="w-[14px] h-[14px]" />,
-				};
+			default: {
+				const _exhaustiveCheck: never = node.content.source;
+				throw new Error(`Unhandled provider: ${_exhaustiveCheck}`);
+			}
 		}
 	}
 

@@ -3,6 +3,10 @@ import {
 	useVectorStore,
 	useWorkflowDesigner,
 } from "@giselle-sdk/giselle/react";
+import type {
+	GitHubVectorStoreInfo,
+	GitHubPullRequestVectorStoreInfo,
+} from "@giselle-sdk/giselle";
 import { Check, ChevronDown } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
@@ -21,10 +25,19 @@ export function GitHubVectorStoreNodePropertiesPanel({
 	const settingPath = vectorStore?.settingPath;
 
 	// Select the appropriate repository list based on the provider
-	const vectorStoreInfos =
-		node.content.source.provider === "githubPullRequest"
-			? (vectorStore?.githubPullRequest ?? [])
-			: (vectorStore?.githubCode ?? []);
+	let vectorStoreInfos: GitHubVectorStoreInfo[] | GitHubPullRequestVectorStoreInfo[];
+	switch (node.content.source.provider) {
+		case "github":
+			vectorStoreInfos = vectorStore?.githubCode ?? [];
+			break;
+		case "githubPullRequest":
+			vectorStoreInfos = vectorStore?.githubPullRequest ?? [];
+			break;
+		default: {
+			const _exhaustiveCheck: never = node.content.source.provider;
+			throw new Error(`Unhandled provider: ${_exhaustiveCheck}`);
+		}
+	}
 
 	const { isOrphaned, repositoryId } = useGitHubVectorStoreStatus(node);
 	const [isOpen, setIsOpen] = useState(false);
