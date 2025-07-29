@@ -11,11 +11,12 @@ export function useNodeGroups() {
 
 	return useMemo(
 		() =>
-			groupNodes(data).map((group) =>
-				group
+			groupNodes(data).map((group) => ({
+				...group,
+				nodes: group.nodeIds
 					.map((nodeId) => data.nodes.find((node) => node.id === nodeId))
 					.filter((node) => node !== undefined),
-			),
+			})),
 		[data],
 	);
 }

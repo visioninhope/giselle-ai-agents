@@ -11,6 +11,7 @@ import { isOperationNode, isTriggerNode } from "@giselle-sdk/data-type";
 import {
 	defaultName,
 	useActController,
+	useAllTriggerDAGs,
 	useNodeGroups,
 	useWorkflowDesigner,
 } from "@giselle-sdk/giselle/react";
@@ -52,38 +53,47 @@ function DropdownMenuItem({
 }
 
 export function RunButton() {
-	const { data } = useWorkflowDesigner();
+	const { data, setUiNodeState } = useWorkflowDesigner();
 	const { createAndStartAct } = useActController();
 
 	const [openDialogNodeId, setOpenDialogNodeId] = useState<string | null>(null);
 	const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 	const nodeGroups = useNodeGroups();
+	const triggerDags = useAllTriggerDAGs();
 	const startingNodes = useMemo(() => {
-		const triggerNodes = data.nodes.filter((node) => isTriggerNode(node));
 		const operationNodeGroups = nodeGroups.filter(
-			(nodes) => !nodes.some((node) => isTriggerNode(node)),
+			(nodeGroup) => !nodeGroup.nodes.some((node) => isTriggerNode(node)),
 		);
 		return [
 			{
 				groupId: "triggerNodes",
 				groupLabel: "Trigger Nodes",
-				items: triggerNodes.map((triggerNode) => ({
-					value: triggerNode.id,
-					label: triggerNode.name ?? defaultName(triggerNode),
-					node: triggerNode,
+				items: triggerDags.map((triggerDag) => ({
+					type: "triggerNode",
+					value: triggerDag.triggerNodeId,
+					label:
+						triggerDag.triggerNode.name ?? defaultName(triggerDag.triggerNode),
+					node: triggerDag.triggerNode,
+					nodeIds: triggerDag.dag.nodeIds,
+					connectionIds: triggerDag.dag.connectionIds,
+					index: undefined,
 				})),
 			},
 			{
 				groupId: "operationNodes",
 				groupLabel: "Node Group",
-				items: operationNodeGroups.map((_nodes, index) => ({
+				items: operationNodeGroups.map((nodeGroup, index) => ({
+					type: "nodeGroup",
 					value: `opration-node-index-${index}`,
 					label: `Group ${index + 1}`,
 					node: undefined,
+					nodeIds: nodeGroup.nodeIds,
+					connectionIds: nodeGroup.connectionIds,
+					index,
 				})),
 			},
 		];
-	}, [data.nodes, nodeGroups]);
+	}, [nodeGroups, triggerDags]);
 
 	const { info } = useToasts();
 
@@ -118,9 +128,17 @@ export function RunButton() {
 					});
 				}
 			}}
+			onItemHover={(item, isHovered) => {
+				for (const node of data.nodes) {
+					if (!item.nodeIds.includes(node.id)) {
+						continue;
+					}
+					setUiNodeState(node.id, { highlighted: isHovered });
+				}
+			}}
 			items={startingNodes}
 			renderItemAsChild
-			renderItem={(item) => {
+			renderItem={(item, props) => {
 				const startingNode = item.node;
 				if (startingNode === undefined || !isTriggerNode(startingNode)) {
 					return (
@@ -151,6 +169,7 @@ export function RunButton() {
 								}
 								title={startingNode.name ?? defaultName(startingNode)}
 								subtitle={startingNode.id}
+								{...props}
 							/>
 						</DialogTrigger>
 						<DialogContent>
