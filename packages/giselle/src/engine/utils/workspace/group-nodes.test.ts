@@ -8,8 +8,11 @@ describe("groupNodes", () => {
 
 		// Sort groups by size for consistent testing
 		const sortedGroups = groups
-			.map((group) => group.sort())
-			.sort((a, b) => b.length - a.length);
+			.map((group) => ({
+				...group,
+				nodeIds: [...group.nodeIds].sort(),
+			}))
+			.sort((a, b) => b.nodeIds.length - a.nodeIds.length);
 
 		// Based on the connections in workspace1:
 		// Group 1: CFgMwrVsMDKy68ju -> GSCigvQfU7lbDsvy -> k7ii9Cge2s9XF5JF <- 7bpl4Q81Z97VgDlt <- OEac8DMOLd0bwsOe
@@ -20,20 +23,26 @@ describe("groupNodes", () => {
 		expect(sortedGroups).toHaveLength(2);
 
 		// Verify the large connected component has 8 nodes
-		expect(sortedGroups[0]).toHaveLength(8);
-		expect(sortedGroups[0]).toContain("nd-CFgMwrVsMDKy68ju");
-		expect(sortedGroups[0]).toContain("nd-omdTu2flqJHhMuo8");
-		expect(sortedGroups[0]).toContain("nd-GSCigvQfU7lbDsvy");
-		expect(sortedGroups[0]).toContain("nd-Y7Uh3GvPRIQwfSGE");
-		expect(sortedGroups[0]).toContain("nd-OEac8DMOLd0bwsOe");
-		expect(sortedGroups[0]).toContain("nd-7bpl4Q81Z97VgDlt");
-		expect(sortedGroups[0]).toContain("nd-k7ii9Cge2s9XF5JF");
-		expect(sortedGroups[0]).toContain("nd-w0tHiwkN3n2ZIP2v");
+		expect(sortedGroups[0].nodeIds).toHaveLength(8);
+		expect(sortedGroups[0].nodeIds).toContain("nd-CFgMwrVsMDKy68ju");
+		expect(sortedGroups[0].nodeIds).toContain("nd-omdTu2flqJHhMuo8");
+		expect(sortedGroups[0].nodeIds).toContain("nd-GSCigvQfU7lbDsvy");
+		expect(sortedGroups[0].nodeIds).toContain("nd-Y7Uh3GvPRIQwfSGE");
+		expect(sortedGroups[0].nodeIds).toContain("nd-OEac8DMOLd0bwsOe");
+		expect(sortedGroups[0].nodeIds).toContain("nd-7bpl4Q81Z97VgDlt");
+		expect(sortedGroups[0].nodeIds).toContain("nd-k7ii9Cge2s9XF5JF");
+		expect(sortedGroups[0].nodeIds).toContain("nd-w0tHiwkN3n2ZIP2v");
 
 		// Verify the smaller component has 2 nodes
-		expect(sortedGroups[1]).toHaveLength(2);
-		expect(sortedGroups[1]).toContain("nd-CH7NalFDDDbHQcr7");
-		expect(sortedGroups[1]).toContain("nd-YkXO5rkuczwTmnmv");
+		expect(sortedGroups[1].nodeIds).toHaveLength(2);
+		expect(sortedGroups[1].nodeIds).toContain("nd-CH7NalFDDDbHQcr7");
+		expect(sortedGroups[1].nodeIds).toContain("nd-YkXO5rkuczwTmnmv");
+
+		// Verify connectionIds are populated correctly
+		// Group 1 should have 7 connections based on the comment above
+		expect(sortedGroups[0].connectionIds.length).toBeGreaterThan(0);
+		// Group 2 should have 1 connection
+		expect(sortedGroups[1].connectionIds).toHaveLength(1);
 	});
 
 	it("should handle workspace with no connections", () => {
@@ -47,7 +56,8 @@ describe("groupNodes", () => {
 		// Each node should be in its own group
 		expect(groups).toHaveLength(workspace.nodes.length);
 		groups.forEach((group) => {
-			expect(group).toHaveLength(1);
+			expect(group.nodeIds).toHaveLength(1);
+			expect(group.connectionIds).toHaveLength(0);
 		});
 	});
 
@@ -82,5 +92,12 @@ describe("groupNodes", () => {
 
 		// Self-loop doesn't create additional groups
 		expect(groups).toHaveLength(2);
+
+		// Find the group with the self-loop
+		const selfLoopGroup = groups.find((g) =>
+			g.nodeIds.includes(workspace1.nodes[0].id),
+		);
+		expect(selfLoopGroup?.connectionIds).toHaveLength(1);
+		expect(selfLoopGroup?.connectionIds[0]).toBe("cnnc-self");
 	});
 });

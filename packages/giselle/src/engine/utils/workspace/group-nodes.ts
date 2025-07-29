@@ -1,10 +1,15 @@
-import type { NodeId, Workspace } from "@giselle-sdk/data-type";
+import type { ConnectionId, NodeId, Workspace } from "@giselle-sdk/data-type";
+
+interface NodeGroup {
+	nodeIds: NodeId[];
+	connectionIds: ConnectionId[];
+}
 
 /**
  * Groups connected nodes in a workspace using Union-Find algorithm.
- * Returns an array of node groups, where each group is an array of connected node IDs.
+ * Returns an array of node groups with their nodeIds and internal connectionIds.
  */
-export function groupNodes(workspace: Workspace) {
+export function groupNodes(workspace: Workspace): NodeGroup[] {
 	const nodeIds = workspace.nodes.map((node) => node.id);
 
 	// Initialize parent map - each node is its own parent initially
@@ -40,14 +45,29 @@ export function groupNodes(workspace: Workspace) {
 	}
 
 	// Group nodes by their root
-	const groups = new Map<NodeId, NodeId[]>();
+	const groups = new Map<NodeId, Set<NodeId>>();
 	for (const nodeId of nodeIds) {
 		const root = findRoot(nodeId);
-		const group = groups.get(root) || [];
-		group.push(nodeId);
-		groups.set(root, group);
+		if (!groups.has(root)) {
+			groups.set(root, new Set());
+		}
+		groups.get(root)?.add(nodeId);
 	}
 
-	// Return groups as arrays
-	return Array.from(groups.values());
+	// Build NodeGroup objects with connectionIds
+	const nodeGroups: NodeGroup[] = [];
+	for (const nodeIdSet of groups.values()) {
+		const nodeIds = Array.from(nodeIdSet);
+		const connectionIds = workspace.connections
+			.filter(
+				(connection) =>
+					nodeIdSet.has(connection.outputNode.id) &&
+					nodeIdSet.has(connection.inputNode.id),
+			)
+			.map((connection) => connection.id);
+
+		nodeGroups.push({ nodeIds, connectionIds });
+	}
+
+	return nodeGroups;
 }
