@@ -1,19 +1,14 @@
 import type { GitHubQueryContext } from "@giselle-sdk/giselle";
 import { and, eq } from "drizzle-orm";
-import {
-	agents,
-	db,
-	githubRepositoryEmbeddings,
-	githubRepositoryIndex,
-	teams,
-} from "@/drizzle";
+import { agents, db, githubRepositoryIndex, teams } from "@/drizzle";
 
 /**
- * Context resolver - handles complex DB resolution logic for GitHub queries
+ * Resolves GitHub repository index from workspace context
+ * Flow: workspace -> team -> repository index
  */
-export async function resolveGitHubEmbeddingFilter(
+export async function resolveGitHubRepositoryIndex(
 	context: GitHubQueryContext,
-): Promise<Record<string, unknown>> {
+): Promise<number> {
 	const { workspaceId, owner, repo } = context;
 
 	// Input validation
@@ -57,9 +52,5 @@ export async function resolveGitHubEmbeddingFilter(
 		throw new Error("Repository index not found");
 	}
 
-	// Return DB-level filters
-	return {
-		[githubRepositoryEmbeddings.repositoryIndexDbId.name]:
-			repositoryIndex[0].dbId,
-	};
+	return repositoryIndex[0].dbId;
 }

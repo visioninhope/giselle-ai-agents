@@ -338,6 +338,43 @@ async function queryVectorStore(
 							})),
 						};
 					}
+					case "githubPullRequest": {
+						const { owner, repo } = state;
+
+						if (!vectorStoreQueryServices?.githubPullRequest) {
+							throw new Error(
+								"No github pull request vector store query service provided",
+							);
+						}
+
+						const queryContext: GitHubQueryContext = {
+							workspaceId,
+							owner,
+							repo,
+						};
+						const res = await vectorStoreQueryServices.githubPullRequest.search(
+							query,
+							queryContext,
+							maxResults ?? DEFAULT_MAX_RESULTS,
+							similarityThreshold ?? DEFAULT_SIMILARITY_THRESHOLD,
+							telemetry,
+						);
+						return {
+							type: "vector-store" as const,
+							source,
+							records: res.map((result) => ({
+								chunkContent: result.chunk.content,
+								chunkIndex: result.chunk.index,
+								score: result.similarity,
+								metadata: Object.fromEntries(
+									Object.entries(result.metadata ?? {}).map(([k, v]) => [
+										k,
+										String(v),
+									]),
+								),
+							})),
+						};
+					}
 					default: {
 						const _exhaustiveCheck: never = provider;
 						throw new Error(

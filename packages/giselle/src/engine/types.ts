@@ -31,6 +31,7 @@ export interface GiselleEngineContext {
 	vault: Vault;
 	vectorStoreQueryServices?: {
 		github?: GitHubVectorStoreQueryService<Record<string, unknown>>;
+		githubPullRequest?: GitHubVectorStoreQueryService<Record<string, unknown>>;
 	};
 	callbacks?: {
 		generationComplete: (
@@ -107,6 +108,7 @@ export interface GiselleEngineConfig {
 	vault: Vault;
 	vectorStoreQueryServices?: {
 		github?: GitHubVectorStoreQueryService<Record<string, unknown>>;
+		githubPullRequest?: GitHubVectorStoreQueryService<Record<string, unknown>>;
 	};
 	callbacks?: {
 		generationComplete: (
