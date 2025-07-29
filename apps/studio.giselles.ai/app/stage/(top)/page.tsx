@@ -130,7 +130,15 @@ export default async function StagePage() {
 					}
 					const { act } = await giselleEngine.createAct({
 						workspaceId: payloads.flowTrigger.workspaceId,
-						startNodeId: payloads.flowTrigger.nodeId,
+						connectionIds: build.workspace.connections
+							.filter(
+								(conn) =>
+									build.workflow.nodes.some(
+										(n) => n.id === conn.outputNode.id,
+									) &&
+									build.workflow.nodes.some((n) => n.id === conn.inputNode.id),
+							)
+							.map((conn) => conn.id),
 						inputs: [
 							{
 								type: "parameters",

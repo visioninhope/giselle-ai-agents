@@ -11,6 +11,7 @@ export async function patchAct(args: {
 	actId: ActId;
 	patches: Patch[];
 }) {
+	console.log(actPath(args.actId));
 	// Get the current act
 	const currentAct = await args.context.experimental_storage.getJson({
 		path: actPath(args.actId),

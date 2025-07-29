@@ -712,7 +712,7 @@ describe("GitHub Event Handlers", () => {
 			expect(testDeps.createAndStartAct).toHaveBeenCalledWith(
 				expect.objectContaining({
 					context: expect.anything(),
-					startNodeId: "nd-test",
+					connectionIds: expect.any(Array),
 					workspace: expect.objectContaining({
 						id: "wrks-test",
 					}),

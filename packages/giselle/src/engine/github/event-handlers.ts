@@ -13,6 +13,7 @@ import type {
 } from "@giselle-sdk/github-tool";
 import type { createAndStartAct } from "../acts";
 import type { GiselleEngineContext } from "../types";
+import { calculateDAGFromTrigger } from "../utils/workspace/calculate-dag-from-trigger";
 import type { parseCommand } from "./utils";
 
 // Since we can't access node information from the new Act structure,
@@ -378,9 +379,14 @@ export async function processEvent<TEventName extends WebhookEventName>(
 			useExperimentalStorage: true,
 		});
 
+		const { connectionIds } = calculateDAGFromTrigger(
+			args.trigger.nodeId,
+			workspace.connections,
+		);
+
 		await deps.createAndStartAct({
 			context: args.context,
-			startNodeId: args.trigger.nodeId,
+			connectionIds,
 			workspace,
 			generationOriginType: "github-app",
 			inputs: [

@@ -172,6 +172,7 @@ export function RunButton() {
 
 							<TriggerInputDialog
 								node={startingNode}
+								connectionIds={item.connectionIds}
 								onClose={() => {
 									setIsDropdownOpen(false);
 									setOpenDialogNodeId(null);
