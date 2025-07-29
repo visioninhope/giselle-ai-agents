@@ -2,8 +2,9 @@ import {
 	type Connection,
 	ConnectionId,
 	isOperationNode,
+	isTriggerNode,
 	Node,
-	NodeId,
+	type NodeId,
 	type NodeLike,
 	Workspace,
 	WorkspaceId,
@@ -90,7 +91,6 @@ function buildLevels(nodes: NodeLike[], connections: Connection[]) {
 export const CreateActInputs = z.object({
 	workspaceId: z.optional(WorkspaceId.schema),
 	workspace: z.optional(Workspace),
-	startNodeId: NodeId.schema,
 	connectionIds: z.array(ConnectionId.schema),
 	inputs: z.array(GenerationContextInput),
 	generationOriginType: z.enum(
@@ -114,22 +114,15 @@ export async function createAct(
 	if (workspace === undefined) {
 		throw new Error("workspace or workspaceId is required");
 	}
-	const startNode = workspace.nodes.find(
-		(node) => node.id === args.startNodeId,
+	const connections = workspace.connections.filter(
+		(connection) => args.connectionIds?.includes(connection.id) ?? false,
 	);
-	if (startNode === undefined) {
-		throw new Error(`Node with id ${args.startNodeId} not found`);
-	}
-
 	const nodes = workspace.nodes.filter((node) =>
-		workspace.connections.some(
+		connections.some(
 			(connection) =>
 				connection.inputNode.id === node.id ||
 				connection.outputNode.id === node.id,
 		),
-	);
-	const connections = workspace.connections.filter(
-		(connection) => args.connectionIds?.includes(connection.id) ?? false,
 	);
 
 	const actId = ActId.generate();
@@ -214,11 +207,15 @@ export async function createAct(
 		});
 	}
 
+	const triggerNode = nodes.find((node) => isTriggerNode(node));
+
 	const act: Act = {
 		id: ActId.generate(),
 		workspaceId: workspace.id,
 		status: "inProgress",
-		name: startNode.name ?? defaultName(startNode),
+		name: triggerNode
+			? (triggerNode.name ?? defaultName(triggerNode))
+			: "Untitled Act",
 		steps: {
 			queued: generations.length,
 			inProgress: 0,

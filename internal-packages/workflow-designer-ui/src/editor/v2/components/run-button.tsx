@@ -106,27 +106,20 @@ export function RunButton() {
 			open={isDropdownOpen}
 			onOpenChange={setIsDropdownOpen}
 			onSelect={async (_event, item) => {
-				const startingNode = item.node;
-				if (!startingNode) {
-					// Handle operation node groups
-					return;
-				}
-				if (isOperationNode(startingNode)) {
-					await createAndStartAct({
-						startNodeId: startingNode.id,
-						inputs: [],
-						onActStart(cancel) {
-							info("Workflow submitted successfully", {
-								action: {
-									label: "Cancel",
-									onClick: async () => {
-										await cancel();
-									},
+				await createAndStartAct({
+					connectionIds: item.connectionIds,
+					inputs: [],
+					onActStart(cancel) {
+						info("Workflow submitted successfully", {
+							action: {
+								label: "Cancel",
+								onClick: async () => {
+									await cancel();
 								},
-							});
-						},
-					});
-				}
+							},
+						});
+					},
+				});
 			}}
 			onItemHover={(item, isHovered) => {
 				for (const node of data.nodes) {
