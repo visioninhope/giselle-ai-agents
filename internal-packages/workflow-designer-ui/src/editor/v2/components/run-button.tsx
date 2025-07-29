@@ -7,7 +7,7 @@ import {
 } from "@giselle-internal/ui/dialog";
 import { DropdownMenu } from "@giselle-internal/ui/dropdown-menu";
 import { useToasts } from "@giselle-internal/ui/toast";
-import { isOperationNode, isTriggerNode } from "@giselle-sdk/data-type";
+import { isTriggerNode } from "@giselle-sdk/data-type";
 import {
 	defaultName,
 	useActController,
