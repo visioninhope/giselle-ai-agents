@@ -24,6 +24,7 @@ import {
 	createWebPageNode,
 	triggerNodeDefaultName,
 	useFeatureFlag,
+	useVectorStore,
 	useWorkflowDesigner,
 } from "@giselle-sdk/giselle/react";
 import {
@@ -83,7 +84,6 @@ import {
 	selectTriggerTool,
 	useToolbar,
 } from "./state";
-import { useVectorStore } from "@giselle-sdk/giselle/react";
 
 export function Toolbar() {
 	const { setSelectedTool, selectedTool } = useToolbar();
@@ -916,10 +916,16 @@ export function Toolbar() {
 															setSelectedTool(addNodeTool(createWebPageNode()));
 															break;
 														case "githubVectorStore":
-															setSelectedTool(addNodeTool(createVectorStoreNode("github")));
+															setSelectedTool(
+																addNodeTool(createVectorStoreNode("github")),
+															);
 															break;
 														case "githubPullRequestVectorStore":
-															setSelectedTool(addNodeTool(createVectorStoreNode("githubPullRequest")));
+															setSelectedTool(
+																addNodeTool(
+																	createVectorStoreNode("githubPullRequest"),
+																),
+															);
 															break;
 													}
 												}}

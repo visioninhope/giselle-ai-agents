@@ -113,7 +113,9 @@ type DataSourceDisplayInfo = {
 	line2?: string;
 };
 
-function getDataSourceDisplayInfo(result: QueryResultData): DataSourceDisplayInfo {
+function getDataSourceDisplayInfo(
+	result: QueryResultData,
+): DataSourceDisplayInfo {
 	if (
 		result.source?.provider === "github" &&
 		result.source.state.status === "configured" &&
@@ -122,7 +124,7 @@ function getDataSourceDisplayInfo(result: QueryResultData): DataSourceDisplayInf
 	) {
 		return {
 			line1: `${result.source.state.owner}/${result.source.state.repo}`,
-			line2: "Code"
+			line2: "Code",
 		};
 	}
 	if (
@@ -133,16 +135,16 @@ function getDataSourceDisplayInfo(result: QueryResultData): DataSourceDisplayInf
 	) {
 		return {
 			line1: `${result.source.state.owner}/${result.source.state.repo}`,
-			line2: "Pull Requests"
+			line2: "Pull Requests",
 		};
 	}
 	if (result.source?.provider) {
 		return {
-			line1: `${result.source.provider} vector store`
+			line1: `${result.source.provider} vector store`,
 		};
 	}
 	return {
-		line1: "Unknown source"
+		line1: "Unknown source",
 	};
 }
 

@@ -9,43 +9,61 @@ import { useMemo } from "react";
 import { GitHubIcon } from "../../../icons";
 import { type ConnectedSource, useConnectedSources } from "./sources";
 
-function getDataSourceDisplayInfo(input: ConnectedSource) {
+function getDataSourceDisplayInfo(input: ConnectedSource): {
+	name: string;
+	description: string | { line1: string; line2: string };
+	icon: React.ReactElement;
+} {
 	const node = input.node;
 	if (isVectorStoreNode(node)) {
 		const name = node.name ?? "Vector Store";
-		let description: string | { line1: string; line2: string } = "";
-		let icon = <DatabaseZapIcon className="w-[14px] h-[14px]" />;
+		const icon = <GitHubIcon className="w-[14px] h-[14px]" />;
 
 		switch (node.content.source.provider) {
-			case "github":
-				icon = <GitHubIcon className="w-[14px] h-[14px]" />;
+			case "github": {
 				if (node.content.source.state.status === "configured") {
 					const { owner, repo } = node.content.source.state;
-					description = {
-						line1: `${owner}/${repo}`,
-						line2: "Code"
+					return {
+						name,
+						description: {
+							line1: `${owner}/${repo}`,
+							line2: "Code",
+						},
+						icon,
 					};
-				} else {
-					description = `GitHub: ${node.content.source.state.status}`;
 				}
-				break;
-			case "githubPullRequest":
-				icon = <GitHubIcon className="w-[14px] h-[14px]" />;
+				return {
+					name,
+					description: `GitHub: ${node.content.source.state.status}`,
+					icon,
+				};
+			}
+			case "githubPullRequest": {
 				if (node.content.source.state.status === "configured") {
 					const { owner, repo } = node.content.source.state;
-					description = {
-						line1: `${owner}/${repo}`,
-						line2: "Pull Requests"
+					return {
+						name,
+						description: {
+							line1: `${owner}/${repo}`,
+							line2: "Pull Requests",
+						},
+						icon,
 					};
-				} else {
-					description = `GitHub PR: ${node.content.source.state.status}`;
 				}
-				break;
+				return {
+					name,
+					description: `GitHub PR: ${node.content.source.state.status}`,
+					icon,
+				};
+			}
 			default:
-				description = `${node.content.source.provider} vector store`;
+				// This case should never be reached due to exhaustive type checking
+				return {
+					name,
+					description: "Unknown vector store",
+					icon: <DatabaseZapIcon className="w-[14px] h-[14px]" />,
+				};
 		}
-
-		return { name, description, icon };
 	}
 
 	return {
@@ -93,6 +111,7 @@ export function QueryPanel({ node }: { node: QueryNode }) {
 								{connectedDatasourceInputs.map((dataSource) => {
 									const { name, description, icon } =
 										getDataSourceDisplayInfo(dataSource);
+									const desc = description as string | { line1: string; line2: string };
 									return (
 										<div
 											key={dataSource.connection.id}
@@ -107,13 +126,13 @@ export function QueryPanel({ node }: { node: QueryNode }) {
 											<div className="shrink-0" style={{ color: "#839DC3" }}>
 												{icon}
 											</div>
-											{typeof description === "string" ? (
+											{typeof desc === "string" ? (
 												<span
 													className="text-[10px] font-medium"
 													style={{ color: "#839DC3" }}
-													title={`${name} • ${typeof description === "string" ? description : `${description.line1} (${description.line2})`}`}
+													title={`${name} • ${desc}`}
 												>
-													{description}
+													{desc}
 												</span>
 											) : (
 												<div className="flex flex-col leading-tight">
@@ -121,13 +140,13 @@ export function QueryPanel({ node }: { node: QueryNode }) {
 														className="text-[10px] font-medium"
 														style={{ color: "#839DC3" }}
 													>
-														{description.line1}
+														{desc.line1}
 													</span>
 													<span
 														className="text-[9px] opacity-70"
 														style={{ color: "#839DC3" }}
 													>
-														{description.line2}
+														{desc.line2}
 													</span>
 												</div>
 											)}
