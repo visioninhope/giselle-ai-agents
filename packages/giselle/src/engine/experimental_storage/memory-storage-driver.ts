@@ -82,5 +82,9 @@ export function memoryStorageDriver(
 			blobStore.delete(path);
 			return Promise.resolve();
 		},
+
+		exists(path: string): Promise<boolean> {
+			return Promise.resolve(jsonStore.has(path) || blobStore.has(path));
+		},
 	};
 }
