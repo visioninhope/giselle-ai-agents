@@ -111,7 +111,9 @@ export function QueryPanel({ node }: { node: QueryNode }) {
 								{connectedDatasourceInputs.map((dataSource) => {
 									const { name, description, icon } =
 										getDataSourceDisplayInfo(dataSource);
-									const desc = description as string | { line1: string; line2: string };
+									const desc = description as
+										| string
+										| { line1: string; line2: string };
 									return (
 										<div
 											key={dataSource.connection.id}
