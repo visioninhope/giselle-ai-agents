@@ -42,7 +42,7 @@ import {
 	ZapIcon,
 } from "lucide-react";
 import { Popover, ToggleGroup } from "radix-ui";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Tooltip } from "../../../ui/tooltip";
 import { isToolAction } from "../types";
 import {

@@ -49,7 +49,10 @@ function isGitHubNodeRequiresSetup(node: NodeLike): boolean {
 	if (isActionNode(node, "github")) {
 		return node.content.command.state.status !== "configured";
 	}
-	if (isVectorStoreNode(node, "github") || isVectorStoreNode(node, "githubPullRequest")) {
+	if (
+		isVectorStoreNode(node, "github") ||
+		isVectorStoreNode(node, "githubPullRequest")
+	) {
 		return node.content.source.state.status !== "configured";
 	}
 	return false;
