@@ -40,6 +40,9 @@ interface DropdownMenuProps<
 	onSelect?: T[number] extends MenuGroup<infer I>
 		? (event: Event, option: I) => void
 		: (event: Event, option: T[number]) => void;
+	onItemHover?: T[number] extends MenuGroup<infer I>
+		? (item: I | null | undefined) => void
+		: (item: T[number] | null | undefined) => void;
 	widthClassName?: string;
 	sideOffset?: DropdownMenuPrimitive.DropdownMenuContentProps["sideOffset"];
 	align?: DropdownMenuPrimitive.DropdownMenuContentProps["align"];
@@ -64,6 +67,7 @@ export function DropdownMenu<
 	renderItem,
 	renderItemAsChild,
 	onSelect,
+	onItemHover,
 	widthClassName,
 	sideOffset,
 	align,
@@ -75,6 +79,8 @@ export function DropdownMenu<
 			asChild={renderItemAsChild}
 			key={item.value}
 			onSelect={(event) => onSelect?.(event, item)}
+			onMouseEnter={() => onItemHover?.(item)}
+			onMouseLeave={() => onItemHover?.(null)}
 			className={clsx(
 				renderItemAsChild
 					? ""
