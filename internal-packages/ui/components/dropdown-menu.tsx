@@ -19,6 +19,10 @@ interface MenuGroup<T extends MenuItem> {
 
 type MenuContent = MenuItem | MenuGroup<MenuItem>;
 
+interface DropdownMenuItemProps {
+	onMouseEnter: React.MouseEventHandler<HTMLButtonElement>;
+	onMouseLeave: React.MouseEventHandler<HTMLButtonElement>;
+}
 interface DropdownMenuProps<
 	T extends Array<MenuContent>,
 	TRenderItemAsChild extends boolean,
@@ -29,11 +33,13 @@ interface DropdownMenuProps<
 	renderItem?: T[number] extends MenuGroup<infer I>
 		? (
 				item: I,
+				props: DropdownMenuItemProps,
 			) => TRenderItemAsChild extends true
 				? React.ReactElement
 				: React.ReactNode
 		: (
 				item: T[number],
+				props: DropdownMenuItemProps,
 			) => TRenderItemAsChild extends true
 				? React.ReactElement
 				: React.ReactNode;
@@ -41,8 +47,8 @@ interface DropdownMenuProps<
 		? (event: Event, option: I) => void
 		: (event: Event, option: T[number]) => void;
 	onItemHover?: T[number] extends MenuGroup<infer I>
-		? (item: I | null | undefined) => void
-		: (item: T[number] | null | undefined) => void;
+		? (item: I, isHovered: boolean) => void
+		: (item: T[number], isHovered: boolean) => void;
 	widthClassName?: string;
 	sideOffset?: DropdownMenuPrimitive.DropdownMenuContentProps["sideOffset"];
 	align?: DropdownMenuPrimitive.DropdownMenuContentProps["align"];
@@ -79,8 +85,8 @@ export function DropdownMenu<
 			asChild={renderItemAsChild}
 			key={item.value}
 			onSelect={(event) => onSelect?.(event, item)}
-			onMouseEnter={() => onItemHover?.(item)}
-			onMouseLeave={() => onItemHover?.(null)}
+			onMouseEnter={() => onItemHover?.(item, true)}
+			onMouseLeave={() => onItemHover?.(item, false)}
 			className={clsx(
 				renderItemAsChild
 					? ""
@@ -92,7 +98,10 @@ export function DropdownMenu<
 			)}
 		>
 			{renderItem ? (
-				renderItem(item)
+				renderItem(item, {
+					onMouseEnter: () => onItemHover?.(item, true),
+					onMouseLeave: () => onItemHover?.(item, false),
+				})
 			) : item.icon ? (
 				<div className="flex items-center gap-2">
 					<span className="h-4 w-4">{item.icon}</span>
