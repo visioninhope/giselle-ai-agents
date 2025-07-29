@@ -363,6 +363,14 @@ export function Toolbar() {
 														setSelectedTool(
 															addNodeTool(createVectorStoreNode("github")),
 														);
+													} else if (
+														sourceType === "githubPullRequestVectorStore"
+													) {
+														setSelectedTool(
+															addNodeTool(
+																createVectorStoreNode("githubPullRequest"),
+															),
+														);
 													} else if (sourceType === "pdf") {
 														setSelectedTool(
 															addNodeTool(
@@ -388,10 +396,25 @@ export function Toolbar() {
 													<PromptIcon className="w-[20px] h-[20px]" />
 													<p className="text-[14px]">Plain Text</p>
 												</ToggleGroup.Item>
-												<ToggleGroup.Item value="githubVectorStore" data-tool>
-													<GitHubIcon className="w-[20px] h-[20px]" />
-													<p className="text-[14px]">GitHub Vector Store</p>
-												</ToggleGroup.Item>
+												{canUseGithubVectorStore && (
+													<ToggleGroup.Item value="githubVectorStore" data-tool>
+														<GitHubIcon className="w-[20px] h-[20px]" />
+														<p className="text-[14px]">
+															GitHub Vector Store (Code)
+														</p>
+													</ToggleGroup.Item>
+												)}
+												{canUseGithubVectorStore && pullRequestVectorStore && (
+													<ToggleGroup.Item
+														value="githubPullRequestVectorStore"
+														data-tool
+													>
+														<GitHubIcon className="w-[20px] h-[20px]" />
+														<p className="text-[14px]">
+															GitHub Vector Store (Pull Request)
+														</p>
+													</ToggleGroup.Item>
+												)}
 												<ToggleGroup.Item value="pdf" data-tool>
 													<PdfFileIcon className="w-[20px] h-[20px]" />
 													<p className="text-[14px]">PDF Upload</p>
@@ -915,18 +938,6 @@ export function Toolbar() {
 														case "webPage":
 															setSelectedTool(addNodeTool(createWebPageNode()));
 															break;
-														case "githubVectorStore":
-															setSelectedTool(
-																addNodeTool(createVectorStoreNode("github")),
-															);
-															break;
-														case "githubPullRequestVectorStore":
-															setSelectedTool(
-																addNodeTool(
-																	createVectorStoreNode("githubPullRequest"),
-																),
-															);
-															break;
 													}
 												}}
 											>
@@ -934,25 +945,6 @@ export function Toolbar() {
 													<DatabaseZapIcon className="w-[20px] h-[20px]" />
 													<p className="text-[14px]">Query</p>
 												</ToggleGroup.Item>
-												{canUseGithubVectorStore && (
-													<ToggleGroup.Item value="githubVectorStore" data-tool>
-														<GitHubIcon className="w-[20px] h-[20px]" />
-														<p className="text-[14px]">
-															GitHub Vector Store (Code)
-														</p>
-													</ToggleGroup.Item>
-												)}
-												{canUseGithubVectorStore && pullRequestVectorStore && (
-													<ToggleGroup.Item
-														value="githubPullRequestVectorStore"
-														data-tool
-													>
-														<GitHubIcon className="w-[20px] h-[20px]" />
-														<p className="text-[14px]">
-															GitHub Vector Store (Pull Request)
-														</p>
-													</ToggleGroup.Item>
-												)}
 												<ToggleGroup.Item value="webPage" data-tool>
 													<WebPageFileIcon className="w-[20px] h-[20px]" />
 													<p className="text-[14px]">webPage</p>
