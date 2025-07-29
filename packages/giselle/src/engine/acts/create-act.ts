@@ -2,6 +2,7 @@ import {
 	type Connection,
 	ConnectionId,
 	isOperationNode,
+	Node,
 	NodeId,
 	type NodeLike,
 	Workspace,
@@ -25,12 +26,11 @@ import { GenerationId, StepId } from "../../concepts/identifiers";
 import { defaultName } from "../../utils";
 import { setGeneration } from "../generations";
 import type { GiselleEngineContext } from "../types";
-import { sliceGraphFromNode } from "../utils/workflow/slice-graph-from-node";
 import { addWorkspaceIndexItem } from "../utils/workspace-index";
 import { getWorkspace } from "../workspaces";
 import { actPath, workspaceActPath } from "./object/paths";
 
-function buildActSequences(nodes: NodeLike[], connections: Connection[]) {
+function buildLevels(nodes: NodeLike[], connections: Connection[]) {
 	const operationNodes = nodes.filter(isOperationNode);
 	const operationConnections = connections.filter(
 		(conn) =>
@@ -84,53 +84,14 @@ function buildActSequences(nodes: NodeLike[], connections: Connection[]) {
 		}
 	}
 
-	// Build sequences with steps containing node, sourceNodes, and connections
-	const sequences = [];
-
-	for (const level of levels) {
-		const steps = [];
-
-		for (const nodeId of level) {
-			const node = operationNodes.find((n) => n.id === nodeId);
-			if (!node) continue;
-
-			// Find connections to this node
-			const nodeConnections = connections.filter(
-				(conn) => conn.inputNode.id === nodeId,
-			);
-
-			// Map inputs to source nodes
-			const sourceNodes = node.inputs
-				.map((input) => {
-					const connection = nodeConnections.find(
-						(conn) => conn.inputId === input.id,
-					);
-					if (!connection) return undefined;
-
-					return nodes.find((n) => n.id === connection.outputNode.id);
-				})
-				.filter((n): n is NodeLike => n !== undefined);
-
-			steps.push({
-				node,
-				sourceNodes,
-				connections: nodeConnections,
-			});
-		}
-
-		sequences.push({
-			steps,
-		});
-	}
-
-	return sequences;
+	return levels;
 }
 
 export const CreateActInputs = z.object({
 	workspaceId: z.optional(WorkspaceId.schema),
 	workspace: z.optional(Workspace),
 	startNodeId: NodeId.schema,
-	connectionIds: z.optional(z.array(ConnectionId.schema)),
+	connectionIds: z.array(ConnectionId.schema),
 	inputs: z.array(GenerationContextInput),
 	generationOriginType: z.enum(
 		GenerationOrigin.options.map((option) => option.shape.type.value),
@@ -160,36 +121,53 @@ export async function createAct(
 		throw new Error(`Node with id ${args.startNodeId} not found`);
 	}
 
-	let nodes: NodeLike[];
-	let connections: Connection[];
-
-	if (args.connectionIds) {
-		// If connectionIds are provided, use them
-		nodes = workspace.nodes.filter((node) =>
-			workspace.connections.some(
-				(connection) =>
-					connection.inputNode.id === node.id ||
-					connection.outputNode.id === node.id,
-			),
-		);
-		connections = workspace.connections.filter(
-			(connection) => args.connectionIds?.includes(connection.id) ?? false,
-		);
-	} else {
-		// Otherwise, compute them from the start node
-		const sliced = sliceGraphFromNode(startNode, workspace);
-		nodes = sliced.nodes;
-		connections = sliced.connections;
-	}
-
-	const actSequencesOutline = buildActSequences(nodes, connections);
+	const nodes = workspace.nodes.filter((node) =>
+		workspace.connections.some(
+			(connection) =>
+				connection.inputNode.id === node.id ||
+				connection.outputNode.id === node.id,
+		),
+	);
+	const connections = workspace.connections.filter(
+		(connection) => args.connectionIds?.includes(connection.id) ?? false,
+	);
 
 	const actId = ActId.generate();
+	const levels = buildLevels(nodes, connections);
+
 	const generations: CreatedGeneration[] = [];
 	const sequences: Sequence[] = [];
-	for (const sequence of actSequencesOutline) {
+	for (const level of levels) {
 		const steps: Step[] = [];
-		for (const step of sequence.steps) {
+		for (const nodeId of level) {
+			const node = nodes.find((node) => node.id === nodeId);
+			if (node === undefined || !isOperationNode(node)) {
+				continue;
+			}
+			const connectedConnections = connections.filter(
+				(connection) => connection.inputNode.id === nodeId,
+			);
+
+			// Map through each input to find source nodes, preserving duplicates
+			const sourceNodes = node.inputs
+				.map((input) => {
+					// Find connections for this specific input
+					const inputConnections = connectedConnections.filter(
+						(connection) => connection.inputId === input.id,
+					);
+					// For each input connection, find the corresponding source node
+					if (inputConnections.length > 0) {
+						const sourceNodeId = inputConnections[0].outputNode.id;
+						const node = nodes.find((n) => n.id === sourceNodeId);
+						const parseResult = Node.safeParse(node);
+						if (parseResult.success) {
+							return parseResult.data;
+						}
+						return undefined;
+					}
+					return undefined;
+				})
+				.filter((node) => node !== undefined);
 			const generation: CreatedGeneration = {
 				id: GenerationId.generate(),
 				status: "created",
@@ -201,15 +179,15 @@ export async function createAct(
 						actId,
 					},
 					inputs: args.inputs,
-					operationNode: step.node,
-					sourceNodes: step.sourceNodes,
-					connections: step.connections,
+					operationNode: node,
+					sourceNodes,
+					connections: connectedConnections,
 				},
 			};
 			generations.push(generation);
 			steps.push({
 				id: StepId.generate(),
-				name: step.node.name ?? defaultName(step.node),
+				name: node.name ?? defaultName(node),
 				status: "created",
 				generationId: generation.id,
 				duration: 0,
