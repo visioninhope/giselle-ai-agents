@@ -1,6 +1,6 @@
 import type { GitHubQueryContext } from "@giselle-sdk/giselle";
 import { githubRepositoryEmbeddings } from "@/drizzle";
-import { resolveGitHubRepositoryIndex } from "./shared-resolver";
+import { resolveGitHubRepositoryIndex } from "../resolve-github-repository-index";
 
 /**
  * Context resolver - handles complex DB resolution logic for GitHub blob queries

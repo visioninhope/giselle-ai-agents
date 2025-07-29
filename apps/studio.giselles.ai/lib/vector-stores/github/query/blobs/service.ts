@@ -2,7 +2,7 @@ import { createPostgresQueryService } from "@giselle-sdk/rag";
 import { getTableName } from "drizzle-orm";
 import z from "zod/v4";
 import { githubRepositoryEmbeddings } from "@/drizzle";
-import { createDatabaseConfig } from "../database";
+import { createDatabaseConfig } from "../../database";
 import { resolveGitHubEmbeddingFilter } from "./resolver";
 
 /**

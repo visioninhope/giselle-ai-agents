@@ -3,8 +3,8 @@ import { and, eq } from "drizzle-orm";
 import { agents, db, githubRepositoryIndex, teams } from "@/drizzle";
 
 /**
- * Shared resolver for GitHub vector store queries
- * Resolves workspace -> team -> repository index
+ * Resolves GitHub repository index from workspace context
+ * Flow: workspace -> team -> repository index
  */
 export async function resolveGitHubRepositoryIndex(
 	context: GitHubQueryContext,
