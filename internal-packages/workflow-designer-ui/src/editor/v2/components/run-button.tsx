@@ -106,6 +106,9 @@ export function RunButton() {
 			open={isDropdownOpen}
 			onOpenChange={setIsDropdownOpen}
 			onSelect={async (_event, item) => {
+				for (const nodeId of item.nodeIds) {
+					setUiNodeState(nodeId, { highlighted: false });
+				}
 				await createAndStartAct({
 					connectionIds: item.connectionIds,
 					inputs: [],
