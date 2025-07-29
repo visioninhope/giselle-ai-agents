@@ -208,7 +208,7 @@ export function NodeIcon({
 							return <NodeGitHubIcon {...props} data-content-type-icon />;
 						default: {
 							const _exhaustiveCheck: never = provider;
-							return _exhaustiveCheck;
+							throw new Error(`Unknown provider: ${_exhaustiveCheck}`);
 						}
 					}
 				}

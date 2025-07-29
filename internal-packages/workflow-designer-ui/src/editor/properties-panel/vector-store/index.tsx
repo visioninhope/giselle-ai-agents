@@ -39,7 +39,7 @@ function PropertiesPanel({ node }: { node: VectorStoreNode }) {
 			return <GitHubVectorStoreNodePropertiesPanel node={node} />;
 		default: {
 			const _exhaustiveCheck: never = provider;
-			return _exhaustiveCheck;
+			throw new Error(`Unknown provider: ${_exhaustiveCheck}`);
 		}
 	}
 }
