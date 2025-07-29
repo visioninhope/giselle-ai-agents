@@ -19,36 +19,44 @@ export type DiffFetchContext = {
 	repo: string;
 };
 
-// Retrieve the diff for the entire pull request using the REST API and split it by file
 export async function fetchDiffs(
 	ctx: DiffFetchContext,
 	prNumber: number,
 ): Promise<Map<string, string>> {
-	const response = await executeRestRequest(
-		() =>
-			ctx.octokit.request("GET /repos/{owner}/{repo}/pulls/{pull_number}", {
-				owner: ctx.owner,
-				repo: ctx.repo,
-				pull_number: prNumber,
-				headers: {
-					accept: "application/vnd.github.v3.diff",
-				},
-			}),
-		"Pull Request Diff",
-		`${ctx.owner}/${ctx.repo}/pulls/${prNumber}`,
-	);
-
-	const diffText = response.data as unknown as string;
 	const fileDiffs = new Map<string, string>();
+	let page = 1;
 
-	const fileChunks = diffText.split(/^diff --git /m).slice(1);
+	while (true) {
+		const response = await executeRestRequest(
+			() =>
+				ctx.octokit.request(
+					"GET /repos/{owner}/{repo}/pulls/{pull_number}/files",
+					{
+						owner: ctx.owner,
+						repo: ctx.repo,
+						pull_number: prNumber,
+						per_page: 100,
+						page,
+					},
+				),
+			"Pull Request Files",
+			`${ctx.owner}/${ctx.repo}/pulls/${prNumber}/files?page=${page}`,
+		);
 
-	for (const chunk of fileChunks) {
-		const filenameMatch = chunk.match(/^a\/(.+?) b\//);
-		if (!filenameMatch) continue;
+		const files = response.data;
 
-		const filename = filenameMatch[1];
-		fileDiffs.set(filename, `diff --git ${chunk}`);
+		for (const file of files) {
+			if (!file.patch) {
+				continue;
+			}
+			fileDiffs.set(file.filename, file.patch);
+		}
+
+		const linkHeader = response.headers.link;
+		if (!linkHeader || !linkHeader.includes('rel="next"')) {
+			break;
+		}
+		page++;
 	}
 
 	return fileDiffs;
