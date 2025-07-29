@@ -11,7 +11,7 @@ import { type ConnectedSource, useConnectedSources } from "./sources";
 
 function getDataSourceDisplayInfo(input: ConnectedSource): {
 	name: string;
-	description: string | { line1: string; line2: string };
+	description: { line1: string; line2?: string };
 	icon: React.ReactElement;
 } {
 	const node = input.node;
@@ -34,7 +34,10 @@ function getDataSourceDisplayInfo(input: ConnectedSource): {
 				}
 				return {
 					name,
-					description: `GitHub: ${node.content.source.state.status}`,
+					description: {
+						line1: `GitHub: ${node.content.source.state.status}`,
+						line2: "Code",
+					},
 					icon,
 				};
 			}
@@ -52,7 +55,10 @@ function getDataSourceDisplayInfo(input: ConnectedSource): {
 				}
 				return {
 					name,
-					description: `GitHub PR: ${node.content.source.state.status}`,
+					description: {
+						line1: `GitHub: ${node.content.source.state.status}`,
+						line2: "Pull Requests",
+					},
 					icon,
 				};
 			}
@@ -65,7 +71,9 @@ function getDataSourceDisplayInfo(input: ConnectedSource): {
 
 	return {
 		name: node.name ?? "Unknown",
-		description: "Unknown source",
+		description: {
+			line1: "Unknown source",
+		},
 		icon: <DatabaseZapIcon className="w-[14px] h-[14px]" />,
 	};
 }
@@ -108,9 +116,7 @@ export function QueryPanel({ node }: { node: QueryNode }) {
 								{connectedDatasourceInputs.map((dataSource) => {
 									const { name, description, icon } =
 										getDataSourceDisplayInfo(dataSource);
-									const desc = description as
-										| string
-										| { line1: string; line2: string };
+
 									return (
 										<div
 											key={dataSource.connection.id}
@@ -125,30 +131,23 @@ export function QueryPanel({ node }: { node: QueryNode }) {
 											<div className="shrink-0" style={{ color: "#839DC3" }}>
 												{icon}
 											</div>
-											{typeof desc === "string" ? (
+											<div className="flex flex-col leading-tight">
 												<span
 													className="text-[10px] font-medium"
 													style={{ color: "#839DC3" }}
-													title={`${name} • ${desc}`}
+													title={`${name} • ${description.line1}${description.line2 ? ` • ${description.line2}` : ""}`}
 												>
-													{desc}
+													{description.line1}
 												</span>
-											) : (
-												<div className="flex flex-col leading-tight">
-													<span
-														className="text-[10px] font-medium"
-														style={{ color: "#839DC3" }}
-													>
-														{desc.line1}
-													</span>
+												{description.line2 && (
 													<span
 														className="text-[9px] opacity-70"
 														style={{ color: "#839DC3" }}
 													>
-														{desc.line2}
+														{description.line2}
 													</span>
-												</div>
-											)}
+												)}
+											</div>
 											<button
 												type="button"
 												onClick={() =>
