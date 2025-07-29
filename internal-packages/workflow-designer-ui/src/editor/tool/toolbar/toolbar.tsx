@@ -24,7 +24,6 @@ import {
 	createWebPageNode,
 	triggerNodeDefaultName,
 	useFeatureFlag,
-	useVectorStore,
 	useWorkflowDesigner,
 } from "@giselle-sdk/giselle/react";
 import {
@@ -93,11 +92,6 @@ export function Toolbar() {
 	const [selectedCategory, setSelectedCategory] = useState<string>("All");
 	const { llmProviders } = useWorkflowDesigner();
 	const { webSearchAction, pullRequestVectorStore } = useFeatureFlag();
-	const vectorStore = useVectorStore();
-	const canUseGithubVectorStore = useMemo(
-		() => !!vectorStore?.githubCode,
-		[vectorStore],
-	);
 
 	const modelsFilteredBySearchOnly = languageModels
 		.filter((model) => llmProviders.includes(model.provider))
@@ -408,15 +402,13 @@ export function Toolbar() {
 													<TextFileIcon className="w-[20px] h-[20px]" />
 													<p className="text-[14px]">Text Upload</p>
 												</ToggleGroup.Item>
-												{canUseGithubVectorStore && (
-													<ToggleGroup.Item value="githubVectorStore" data-tool>
-														<GitHubIcon className="w-[20px] h-[20px]" />
-														<p className="text-[14px]">
-															GitHub Vector Store (Code)
-														</p>
-													</ToggleGroup.Item>
-												)}
-												{canUseGithubVectorStore && pullRequestVectorStore && (
+												<ToggleGroup.Item value="githubVectorStore" data-tool>
+													<GitHubIcon className="w-[20px] h-[20px]" />
+													<p className="text-[14px]">
+														GitHub Vector Store (Code)
+													</p>
+												</ToggleGroup.Item>
+												{pullRequestVectorStore && (
 													<ToggleGroup.Item
 														value="githubPullRequestVectorStore"
 														data-tool
