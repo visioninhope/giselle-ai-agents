@@ -396,6 +396,18 @@ export function Toolbar() {
 													<PromptIcon className="w-[20px] h-[20px]" />
 													<p className="text-[14px]">Plain Text</p>
 												</ToggleGroup.Item>
+												<ToggleGroup.Item value="pdf" data-tool>
+													<PdfFileIcon className="w-[20px] h-[20px]" />
+													<p className="text-[14px]">PDF Upload</p>
+												</ToggleGroup.Item>
+												<ToggleGroup.Item value="image" data-tool>
+													<PictureIcon className="w-[20px] h-[20px]" />
+													<p className="text-[14px]">Image Upload</p>
+												</ToggleGroup.Item>
+												<ToggleGroup.Item value="textFile" data-tool>
+													<TextFileIcon className="w-[20px] h-[20px]" />
+													<p className="text-[14px]">Text Upload</p>
+												</ToggleGroup.Item>
 												{canUseGithubVectorStore && (
 													<ToggleGroup.Item value="githubVectorStore" data-tool>
 														<GitHubIcon className="w-[20px] h-[20px]" />
@@ -415,18 +427,6 @@ export function Toolbar() {
 														</p>
 													</ToggleGroup.Item>
 												)}
-												<ToggleGroup.Item value="pdf" data-tool>
-													<PdfFileIcon className="w-[20px] h-[20px]" />
-													<p className="text-[14px]">PDF Upload</p>
-												</ToggleGroup.Item>
-												<ToggleGroup.Item value="image" data-tool>
-													<PictureIcon className="w-[20px] h-[20px]" />
-													<p className="text-[14px]">Image Upload</p>
-												</ToggleGroup.Item>
-												<ToggleGroup.Item value="textFile" data-tool>
-													<TextFileIcon className="w-[20px] h-[20px]" />
-													<p className="text-[14px]">Text Upload</p>
-												</ToggleGroup.Item>
 											</ToggleGroup.Root>
 										</div>
 									</Popover.Content>
