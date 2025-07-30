@@ -13,8 +13,6 @@ import type {
 } from "@giselle-sdk/github-tool";
 import type { createAndStartAct } from "../acts";
 import type { GiselleEngineContext } from "../types";
-import { groupNodes } from "../utils/workspace/group-nodes";
-import { getWorkspace } from "../workspaces";
 import type { parseCommand } from "./utils";
 
 // Since we can't access node information from the new Act structure,
@@ -372,22 +370,17 @@ export async function processEvent<TEventName extends WebhookEventName>(
 		let progressTableData: ProgressTableData = [];
 		let hasFlowError = false;
 
+		// Fetch workspace for createAndStartAct
+		const { getWorkspace } = await import("../workspaces");
 		const workspace = await getWorkspace({
 			context: args.context,
 			workspaceId: args.trigger.workspaceId,
 			useExperimentalStorage: true,
 		});
 
-		const triggerNodeGroup = groupNodes(workspace).find((group) =>
-			group.nodeIds.some((nodeId) => nodeId === args.trigger.nodeId),
-		);
-		if (triggerNodeGroup === undefined) {
-			throw new Error(`Trigger node group not found`);
-		}
-
 		await deps.createAndStartAct({
 			context: args.context,
-			connectionIds: triggerNodeGroup.connectionIds,
+			startNodeId: args.trigger.nodeId,
 			workspace,
 			generationOriginType: "github-app",
 			inputs: [

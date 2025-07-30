@@ -1,7 +1,7 @@
 import { Workspace } from "@giselle-sdk/data-type";
 import { describe, expect, test } from "vitest";
-import workspace4 from "../__fixtures__/workspace4.json";
 import { sliceGraphFromNode } from "./slice-graph-from-node";
+import workspace4 from "./test/fixtures/workspace4.json";
 import { testWorkspace1 } from "./test/test-data";
 
 describe("slice-graph-from-node", () => {

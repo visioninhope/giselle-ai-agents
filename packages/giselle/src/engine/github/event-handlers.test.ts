@@ -1,5 +1,5 @@
 import type { FlowTrigger } from "@giselle-sdk/data-type";
-import { FlowTriggerId, NodeId } from "@giselle-sdk/data-type";
+import { FlowTriggerId } from "@giselle-sdk/data-type";
 import type {
 	ensureWebhookEvent,
 	GitHubAuthConfig,
@@ -9,7 +9,6 @@ import type {
 import { createStorage } from "unstorage";
 import memoryDriver from "unstorage/drivers/memory";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { createTriggerNode } from "../../utils/node-factories";
 import type { GiselleEngineContext } from "../types";
 import {
 	type EventHandlerArgs,
@@ -641,7 +640,6 @@ describe("GitHub Event Handlers", () => {
 	describe("processEvent", () => {
 		it("should process event and run flow when handler returns shouldRun=true", async () => {
 			// Arrange
-			const testNodeId = NodeId.generate();
 			const event = {
 				name: "issues.opened",
 				data: {
@@ -656,7 +654,7 @@ describe("GitHub Event Handlers", () => {
 			const trigger = {
 				id: mockFlowTriggerId,
 				workspaceId: "wrks-test",
-				nodeId: testNodeId,
+				nodeId: "nd-test",
 				enable: true,
 				configuration: {
 					provider: "github",
@@ -685,13 +683,7 @@ describe("GitHub Event Handlers", () => {
 						getJson: vi.fn().mockResolvedValue({
 							id: "wrks-test",
 							name: "Test Workspace",
-							nodes: [
-								{
-									...createTriggerNode("github"),
-									id: testNodeId,
-									name: "GitHub Trigger",
-								},
-							],
+							nodes: [],
 							connections: [],
 						}),
 					},
@@ -720,7 +712,7 @@ describe("GitHub Event Handlers", () => {
 			expect(testDeps.createAndStartAct).toHaveBeenCalledWith(
 				expect.objectContaining({
 					context: expect.anything(),
-					connectionIds: expect.any(Array),
+					startNodeId: "nd-test",
 					workspace: expect.objectContaining({
 						id: "wrks-test",
 					}),

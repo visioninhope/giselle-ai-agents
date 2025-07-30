@@ -72,7 +72,7 @@ export function WorkspaceProvider({
 			}}
 		>
 			<TelemetryProvider settings={telemetry}>
-				<FlowTriggerContext value={flowTrigger ?? {}}>
+				<FlowTriggerContext value={flowTrigger}>
 					<UsageLimitsProvider limits={usageLimits}>
 						<IntegrationProvider {...integration}>
 							<VectorStoreProvider value={vectorStore}>
