@@ -30,7 +30,7 @@ export function PropertiesPanel() {
 				.filter(([_, nodeState]) => nodeState?.selected)
 				.map(([nodeId]) => data.nodes.find((node) => node.id === nodeId))
 				.filter((node) => node !== undefined),
-		[data],
+		[data.ui, data.nodes],
 	);
 	return (
 		<div className={clsx("h-full text-white-900")}>

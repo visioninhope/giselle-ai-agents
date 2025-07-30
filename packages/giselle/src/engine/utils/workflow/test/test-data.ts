@@ -1,4 +1,4 @@
-import type { Connection, Node } from "@giselle-sdk/data-type";
+import type { Connection, Node, Workspace } from "@giselle-sdk/data-type";
 
 /**
  * Test workspace with multiple workflow chains
@@ -288,4 +288,12 @@ export const testWorkspace1 = {
 			inputId: "inp-76KjIOKSj4XNuN7w",
 		},
 	] satisfies Connection[],
-};
+	ui: {
+		viewport: {
+			x: 0,
+			y: 0,
+			zoom: 1,
+		},
+		nodeState: {},
+	},
+} satisfies Workspace;
