@@ -79,7 +79,7 @@ export function RunButton() {
 				groupLabel: "Node Group",
 				items: nodeGroups.operationNodeGroups.map((nodeGroup, index) => ({
 					type: "nodeGroup",
-					value: `opration-node-index-${index}`,
+					value: `operation-node-index-${index}`,
 					label: `Group ${index + 1}`,
 					node: undefined,
 					nodeIds: nodeGroup.nodeIds,
