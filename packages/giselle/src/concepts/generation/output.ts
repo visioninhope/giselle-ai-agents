@@ -1,8 +1,4 @@
-import {
-	GitHubPullRequestVectorStoreSource,
-	GitHubVectorStoreSource,
-	OutputId,
-} from "@giselle-sdk/data-type";
+import { GitHubVectorStoreSource, OutputId } from "@giselle-sdk/data-type";
 import { createIdGenerator } from "@giselle-sdk/utils";
 import type { ProviderMetadata } from "ai";
 import { z } from "zod/v4";
@@ -58,10 +54,7 @@ export const SourceOutput = GenerationOutputBase.extend({
 	sources: z.array(UrlSource),
 });
 
-const VectorStoreSource = z.discriminatedUnion("provider", [
-	GitHubVectorStoreSource,
-	GitHubPullRequestVectorStoreSource,
-]);
+const VectorStoreSource = GitHubVectorStoreSource;
 const VectorStoreQueryResultRecord = z.object({
 	chunkContent: z.string(),
 	chunkIndex: z.number(),
