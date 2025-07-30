@@ -21,7 +21,10 @@ export function handleIngestErrors<T extends BaseIngestParams>(
 		const errorMessage = `Failed to ingest ${result.failedDocuments} out of ${result.totalDocuments} ${documentType} documents for ${params.source.owner}/${params.source.repo}`;
 		console.error(errorMessage, result.errors);
 
-		const aggregatedError = new Error(errorMessage);
+		const aggregatedError = new AggregateError(
+			result.errors.map((e) => e.error),
+			errorMessage,
+		);
 		captureException(aggregatedError, {
 			extra: {
 				...params.source,
@@ -29,7 +32,7 @@ export function handleIngestErrors<T extends BaseIngestParams>(
 				totalDocuments: result.totalDocuments,
 				successfulDocuments: result.successfulDocuments,
 				failedDocuments: result.failedDocuments,
-				errors: result.errors,
+				failedDocumentKeys: result.errors.map((e) => e.document),
 			},
 		});
 	}
