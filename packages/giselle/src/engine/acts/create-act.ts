@@ -4,7 +4,7 @@ import {
 	isOperationNode,
 	isTriggerNode,
 	Node,
-	type NodeId,
+	NodeId,
 	type NodeLike,
 	Workspace,
 	WorkspaceId,
@@ -91,7 +91,8 @@ function buildLevels(nodes: NodeLike[], connections: Connection[]) {
 export const CreateActInputs = z.object({
 	workspaceId: z.optional(WorkspaceId.schema),
 	workspace: z.optional(Workspace),
-	connectionIds: z.array(ConnectionId.schema),
+	connectionIds: z.optional(z.array(ConnectionId.schema)),
+	nodeId: z.optional(NodeId.schema),
 	inputs: z.array(GenerationContextInput),
 	generationOriginType: z.enum(
 		GenerationOrigin.options.map((option) => option.shape.type.value),
@@ -114,8 +115,30 @@ export async function createAct(
 	if (workspace === undefined) {
 		throw new Error("workspace or workspaceId is required");
 	}
-	const connections = workspace.connections.filter(
-		(connection) => args.connectionIds?.includes(connection.id) ?? false,
+
+	// Determine connectionIds based on input
+	let connectionIds: ConnectionId[];
+	if (args.connectionIds !== undefined) {
+		// Use provided connectionIds directly
+		connectionIds = args.connectionIds;
+	} else if (args.nodeId !== undefined) {
+		// Derive connectionIds from nodeId using node groups
+		const nodeId = args.nodeId;
+		const nodeGroups = groupNodes(workspace);
+		const nodeGroup = nodeGroups.find((group) =>
+			group.nodeIds.includes(nodeId),
+		);
+		if (!nodeGroup) {
+			throw new Error(`Node ${nodeId} is not part of any node group`);
+		}
+		connectionIds = nodeGroup.connectionIds;
+	} else {
+		// This should not happen due to schema validation, but adding for safety
+		throw new Error("Either connectionIds or nodeId must be provided");
+	}
+
+	const connections = workspace.connections.filter((connection) =>
+		connectionIds.includes(connection.id),
 	);
 	const nodes = workspace.nodes.filter((node) =>
 		connections.some(
