@@ -1,5 +1,6 @@
 import { Workspace } from "@giselle-sdk/data-type";
 import { describe, expect, test } from "vitest";
+import { backwardTraversalFixture } from "../__fixtures__/backward-traversal";
 import workspace4 from "../__fixtures__/workspace4.json";
 import { sliceGraphFromNode } from "./slice-graph-from-node";
 import { testWorkspace1 } from "./test/test-data";
