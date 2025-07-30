@@ -168,14 +168,14 @@ function DataSourceTab({
 			type="button"
 			onClick={onClick}
 			className={clsx(
-				"flex items-center gap-[8px] px-[16px] py-[6px] border-b cursor-pointer",
+				"flex items-center gap-[8px] px-[16px] py-[6px] border-b cursor-pointer min-w-fit flex-shrink-0",
 				isActive
 					? "text-white-900 border-white-900"
 					: "text-black-400 border-transparent",
 			)}
 		>
-			{isGitHub && <GitHubIcon className="w-[14px] h-[14px]" />}
-			<div className="flex flex-col items-start leading-tight">
+			{isGitHub && <GitHubIcon className="w-[14px] h-[14px] flex-shrink-0" />}
+			<div className="flex flex-col items-start leading-tight whitespace-nowrap">
 				<span className="text-[13px] font-medium">{displayInfo.line1}</span>
 				{displayInfo.line2 && (
 					<span className="text-[11px] opacity-70">{displayInfo.line2}</span>
@@ -183,7 +183,7 @@ function DataSourceTab({
 			</div>
 			<div
 				className={clsx(
-					"flex items-center gap-[4px] px-[6px] py-[1px] rounded-[6px]",
+					"flex items-center gap-[4px] px-[6px] py-[1px] rounded-[6px] flex-shrink-0",
 					isActive
 						? "bg-blue-500/20 text-blue-300"
 						: "bg-white-900/10 text-white-700",
@@ -324,18 +324,16 @@ export function QueryResultView({ generation }: { generation: Generation }) {
 			</div>
 
 			{/* Tab Navigation */}
-			<div>
-				<div className="overflow-x-auto">
-					<div className="flex gap-[0px] min-w-full">
-						{queryResults.map((result, index) => (
-							<DataSourceTab
-								key={`datasource-${index}-${result.source?.provider || "unknown"}-${result.source?.state?.owner || ""}-${result.source?.state?.repo || ""}`}
-								result={result}
-								isActive={activeTabIndex === index}
-								onClick={() => setActiveTabIndex(index)}
-							/>
-						))}
-					</div>
+			<div className="overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+				<div className="flex gap-[0px] flex-nowrap">
+					{queryResults.map((result, index) => (
+						<DataSourceTab
+							key={`datasource-${index}-${result.source?.provider || "unknown"}-${result.source?.state?.owner || ""}-${result.source?.state?.repo || ""}`}
+							result={result}
+							isActive={activeTabIndex === index}
+							onClick={() => setActiveTabIndex(index)}
+						/>
+					))}
 				</div>
 			</div>
 
