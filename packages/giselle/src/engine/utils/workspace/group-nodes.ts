@@ -9,7 +9,9 @@ export interface NodeGroup {
  * Groups connected nodes in a workspace using Union-Find algorithm.
  * Returns an array of node groups with their nodeIds and internal connectionIds.
  */
-export function groupNodes(workspace: Workspace): NodeGroup[] {
+export function groupNodes(
+	workspace: Pick<Workspace, "nodes" | "connections">,
+): NodeGroup[] {
 	const nodeIds = workspace.nodes.map((node) => node.id);
 
 	// Initialize parent map - each node is its own parent initially
