@@ -11,7 +11,6 @@ import { isTriggerNode } from "@giselle-sdk/data-type";
 import {
 	defaultName,
 	useActController,
-	useAllTriggerDAGs,
 	useNodeGroups,
 	useWorkflowDesigner,
 } from "@giselle-sdk/giselle/react";
@@ -59,30 +58,26 @@ export function RunButton() {
 	const [openDialogNodeId, setOpenDialogNodeId] = useState<string | null>(null);
 	const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 	const nodeGroups = useNodeGroups();
-	const triggerDags = useAllTriggerDAGs();
 	const startingNodes = useMemo(() => {
-		const operationNodeGroups = nodeGroups.filter(
-			(nodeGroup) => !nodeGroup.nodes.some((node) => isTriggerNode(node)),
-		);
 		return [
 			{
 				groupId: "triggerNodes",
 				groupLabel: "Trigger Nodes",
-				items: triggerDags.map((triggerDag) => ({
+				items: nodeGroups.triggerNodeGroups.map((triggerNodeGroup) => ({
 					type: "triggerNode",
-					value: triggerDag.triggerNodeId,
+					value: triggerNodeGroup.node.id,
 					label:
-						triggerDag.triggerNode.name ?? defaultName(triggerDag.triggerNode),
-					node: triggerDag.triggerNode,
-					nodeIds: triggerDag.dag.nodeIds,
-					connectionIds: triggerDag.dag.connectionIds,
+						triggerNodeGroup.node.name ?? defaultName(triggerNodeGroup.node),
+					node: triggerNodeGroup.node,
+					nodeIds: triggerNodeGroup.nodeGroup.nodeIds,
+					connectionIds: triggerNodeGroup.nodeGroup.connectionIds,
 					index: undefined,
 				})),
 			},
 			{
 				groupId: "operationNodes",
 				groupLabel: "Node Group",
-				items: operationNodeGroups.map((nodeGroup, index) => ({
+				items: nodeGroups.operationNodeGroups.map((nodeGroup, index) => ({
 					type: "nodeGroup",
 					value: `opration-node-index-${index}`,
 					label: `Group ${index + 1}`,
@@ -93,7 +88,7 @@ export function RunButton() {
 				})),
 			},
 		];
-	}, [nodeGroups, triggerDags]);
+	}, [nodeGroups]);
 
 	const { info } = useToasts();
 

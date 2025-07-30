@@ -1,6 +1,6 @@
 import type { ConnectionId, NodeId, Workspace } from "@giselle-sdk/data-type";
 
-interface NodeGroup {
+export interface NodeGroup {
 	nodeIds: NodeId[];
 	connectionIds: ConnectionId[];
 }
