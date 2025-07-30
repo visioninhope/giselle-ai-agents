@@ -27,6 +27,7 @@ import { GenerationId, StepId } from "../../concepts/identifiers";
 import { defaultName } from "../../utils";
 import { setGeneration } from "../generations";
 import type { GiselleEngineContext } from "../types";
+import { groupNodes } from "../utils/workspace/group-nodes";
 import { addWorkspaceIndexItem } from "../utils/workspace-index";
 import { getWorkspace } from "../workspaces";
 import { actPath, workspaceActPath } from "./object/paths";
