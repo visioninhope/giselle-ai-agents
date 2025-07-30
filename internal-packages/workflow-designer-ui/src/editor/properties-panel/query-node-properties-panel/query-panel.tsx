@@ -9,33 +9,71 @@ import { useMemo } from "react";
 import { GitHubIcon } from "../../../icons";
 import { type ConnectedSource, useConnectedSources } from "./sources";
 
-function getDataSourceDisplayInfo(input: ConnectedSource) {
+function getDataSourceDisplayInfo(input: ConnectedSource): {
+	name: string;
+	description: { line1: string; line2?: string };
+	icon: React.ReactElement;
+} {
 	const node = input.node;
 	if (isVectorStoreNode(node)) {
 		const name = node.name ?? "Vector Store";
-		let description = "";
-		let icon = <DatabaseZapIcon className="w-[14px] h-[14px]" />;
+		const icon = <GitHubIcon className="w-[14px] h-[14px]" />;
 
 		switch (node.content.source.provider) {
-			case "github":
-				icon = <GitHubIcon className="w-[14px] h-[14px]" />;
+			case "github": {
 				if (node.content.source.state.status === "configured") {
 					const { owner, repo } = node.content.source.state;
-					description = `${owner}/${repo}`;
-				} else {
-					description = `GitHub: ${node.content.source.state.status}`;
+					return {
+						name,
+						description: {
+							line1: `${owner}/${repo}`,
+							line2: "Code",
+						},
+						icon,
+					};
 				}
-				break;
-			default:
-				description = `${node.content.source.provider} vector store`;
+				return {
+					name,
+					description: {
+						line1: `GitHub: ${node.content.source.state.status}`,
+						line2: "Code",
+					},
+					icon,
+				};
+			}
+			case "githubPullRequest": {
+				if (node.content.source.state.status === "configured") {
+					const { owner, repo } = node.content.source.state;
+					return {
+						name,
+						description: {
+							line1: `${owner}/${repo}`,
+							line2: "Pull Requests",
+						},
+						icon,
+					};
+				}
+				return {
+					name,
+					description: {
+						line1: `GitHub: ${node.content.source.state.status}`,
+						line2: "Pull Requests",
+					},
+					icon,
+				};
+			}
+			default: {
+				const _exhaustiveCheck: never = node.content.source;
+				throw new Error(`Unhandled provider: ${_exhaustiveCheck}`);
+			}
 		}
-
-		return { name, description, icon };
 	}
 
 	return {
 		name: node.name ?? "Unknown",
-		description: "Unknown source",
+		description: {
+			line1: "Unknown source",
+		},
 		icon: <DatabaseZapIcon className="w-[14px] h-[14px]" />,
 	};
 }
@@ -78,10 +116,11 @@ export function QueryPanel({ node }: { node: QueryNode }) {
 								{connectedDatasourceInputs.map((dataSource) => {
 									const { name, description, icon } =
 										getDataSourceDisplayInfo(dataSource);
+
 									return (
 										<div
 											key={dataSource.connection.id}
-											className="flex items-center gap-[4px] px-[6px] py-[2px] rounded-[4px]"
+											className="flex items-center gap-[6px] px-[8px] py-[4px] rounded-[6px]"
 											style={{
 												backgroundColor: "rgba(131, 157, 195, 0.15)",
 												borderColor: "rgba(131, 157, 195, 0.25)",
@@ -92,13 +131,23 @@ export function QueryPanel({ node }: { node: QueryNode }) {
 											<div className="shrink-0" style={{ color: "#839DC3" }}>
 												{icon}
 											</div>
-											<span
-												className="text-[10px] font-medium"
-												style={{ color: "#839DC3" }}
-												title={`${name} • ${description}`}
-											>
-												{description}
-											</span>
+											<div className="flex flex-col leading-tight">
+												<span
+													className="text-[10px] font-medium"
+													style={{ color: "#839DC3" }}
+													title={`${name} • ${description.line1}${description.line2 ? ` • ${description.line2}` : ""}`}
+												>
+													{description.line1}
+												</span>
+												{description.line2 && (
+													<span
+														className="text-[9px] opacity-70"
+														style={{ color: "#839DC3" }}
+													>
+														{description.line2}
+													</span>
+												)}
+											</div>
 											<button
 												type="button"
 												onClick={() =>

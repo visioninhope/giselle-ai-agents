@@ -32,13 +32,13 @@ export const vectorStoreProviderLabel: Record<
 	VectorStoreSourceProvider,
 	string
 > = {
-	github: "GitHub",
-	githubPullRequest: "GitHub PR",
+	github: "GitHub Vector Store (Code)",
+	githubPullRequest: "GitHub Vector Store (Pull Request)",
 };
 export function vectorStoreNodeDefaultName(
 	vectorStoreProvider: VectorStoreSourceProvider,
 ) {
-	return `${vectorStoreProviderLabel[vectorStoreProvider]} Vector Store`;
+	return vectorStoreProviderLabel[vectorStoreProvider];
 }
 
 export function defaultName(node: NodeLike) {

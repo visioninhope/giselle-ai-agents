@@ -1,4 +1,8 @@
 import type { VectorStoreNode } from "@giselle-sdk/data-type";
+import type {
+	GitHubPullRequestVectorStoreInfo,
+	GitHubVectorStoreInfo,
+} from "@giselle-sdk/giselle";
 import {
 	useVectorStore,
 	useWorkflowDesigner,
@@ -18,9 +22,24 @@ export function GitHubVectorStoreNodePropertiesPanel({
 }: GitHubVectorStoreNodePropertiesPanelProps) {
 	const { updateNodeDataContent } = useWorkflowDesigner();
 	const vectorStore = useVectorStore();
-	const github = vectorStore?.github;
 	const settingPath = vectorStore?.settingPath;
-	const vectorStoreInfos = github ?? [];
+
+	// Select the appropriate repository list based on the provider
+	let vectorStoreInfos:
+		| GitHubVectorStoreInfo[]
+		| GitHubPullRequestVectorStoreInfo[];
+	switch (node.content.source.provider) {
+		case "github":
+			vectorStoreInfos = vectorStore?.githubCode ?? [];
+			break;
+		case "githubPullRequest":
+			vectorStoreInfos = vectorStore?.githubPullRequest ?? [];
+			break;
+		default: {
+			const _exhaustiveCheck: never = node.content.source;
+			throw new Error(`Unhandled provider: ${_exhaustiveCheck}`);
+		}
+	}
 
 	const { isOrphaned, repositoryId } = useGitHubVectorStoreStatus(node);
 	const [isOpen, setIsOpen] = useState(false);
