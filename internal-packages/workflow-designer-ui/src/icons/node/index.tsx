@@ -201,16 +201,7 @@ export function NodeIcon({
 							`Expected VectorStoreNode, got ${JSON.stringify(node)}`,
 						);
 					}
-					const provider = node.content.source.provider;
-					switch (provider) {
-						case "github":
-						case "githubPullRequest":
-							return <NodeGitHubIcon {...props} data-content-type-icon />;
-						default: {
-							const _exhaustiveCheck: never = provider;
-							throw new Error(`Unknown provider: ${_exhaustiveCheck}`);
-						}
-					}
+					return <NodeGitHubIcon {...props} data-content-type-icon />;
 				}
 				default: {
 					const _exhaustiveCheck: never = node.content.type;

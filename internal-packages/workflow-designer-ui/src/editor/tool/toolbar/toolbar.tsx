@@ -91,7 +91,7 @@ export function Toolbar() {
 	const [searchQuery, setSearchQuery] = useState<string>("");
 	const [selectedCategory, setSelectedCategory] = useState<string>("All");
 	const { llmProviders } = useWorkflowDesigner();
-	const { webSearchAction, pullRequestVectorStore } = useFeatureFlag();
+	const { webSearchAction } = useFeatureFlag();
 
 	const modelsFilteredBySearchOnly = languageModels
 		.filter((model) => llmProviders.includes(model.provider))
@@ -357,14 +357,6 @@ export function Toolbar() {
 														setSelectedTool(
 															addNodeTool(createVectorStoreNode("github")),
 														);
-													} else if (
-														sourceType === "githubPullRequestVectorStore"
-													) {
-														setSelectedTool(
-															addNodeTool(
-																createVectorStoreNode("githubPullRequest"),
-															),
-														);
 													} else if (sourceType === "pdf") {
 														setSelectedTool(
 															addNodeTool(
@@ -404,21 +396,8 @@ export function Toolbar() {
 												</ToggleGroup.Item>
 												<ToggleGroup.Item value="githubVectorStore" data-tool>
 													<GitHubIcon className="w-[20px] h-[20px]" />
-													<p className="text-[14px]">
-														GitHub Vector Store (Code)
-													</p>
+													<p className="text-[14px]">GitHub Vector Store</p>
 												</ToggleGroup.Item>
-												{pullRequestVectorStore && (
-													<ToggleGroup.Item
-														value="githubPullRequestVectorStore"
-														data-tool
-													>
-														<GitHubIcon className="w-[20px] h-[20px]" />
-														<p className="text-[14px]">
-															GitHub Vector Store (Pull Request)
-														</p>
-													</ToggleGroup.Item>
-												)}
 											</ToggleGroup.Root>
 										</div>
 									</Popover.Content>

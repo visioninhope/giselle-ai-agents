@@ -5,32 +5,29 @@ import { useMemo } from "react";
 
 export function useGitHubVectorStoreStatus(node: Node) {
 	const vectorStore = useVectorStore();
-	const githubCode = vectorStore?.githubCode;
-	const githubPullRequest = vectorStore?.githubPullRequest;
+	const githubRepositoryIndexes = vectorStore?.githubRepositoryIndexes ?? [];
 
 	return useMemo(() => {
 		if (
-			(!isVectorStoreNode(node, "github") &&
-				!isVectorStoreNode(node, "githubPullRequest")) ||
+			!isVectorStoreNode(node, "github") ||
 			node.content.source.state.status !== "configured"
 		) {
 			return { isOrphaned: false, repositoryId: undefined };
 		}
 
 		const { owner, repo } = node.content.source.state;
+		const contentType = node.content.source.state.contentType;
 
-		// Select the appropriate repository list based on the provider
-		const vectorStoreInfos = isVectorStoreNode(node, "githubPullRequest")
-			? (githubPullRequest ?? [])
-			: (githubCode ?? []);
-
-		const foundInfo = vectorStoreInfos.find(
-			(info) => info.reference.owner === owner && info.reference.repo === repo,
+		const foundInfo = githubRepositoryIndexes.find(
+			(info) =>
+				info.owner === owner &&
+				info.repo === repo &&
+				info.availableContentTypes.includes(contentType),
 		);
 
 		return {
 			isOrphaned: !foundInfo,
 			repositoryId: foundInfo?.id,
 		};
-	}, [node, githubCode, githubPullRequest]);
+	}, [node, githubRepositoryIndexes]);
 }

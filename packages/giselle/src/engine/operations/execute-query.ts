@@ -262,6 +262,9 @@ function isConfiguredVectorStoreNode(
 		source: {
 			state: {
 				status: "configured";
+				owner: string;
+				repo: string;
+				contentType: "blob" | "pull_request";
 			};
 		};
 	};
@@ -304,55 +307,52 @@ async function queryVectorStore(
 
 				switch (provider) {
 					case "github": {
-						const { owner, repo } = state;
+						const { owner, repo, contentType } = state;
 
+						const queryContext: GitHubQueryContext = {
+							workspaceId,
+							owner,
+							repo,
+						};
+
+						if (contentType === "pull_request") {
+							if (!vectorStoreQueryServices?.githubPullRequest) {
+								throw new Error(
+									"No github pull request vector store query service provided",
+								);
+							}
+
+							const res =
+								await vectorStoreQueryServices.githubPullRequest.search(
+									query,
+									queryContext,
+									maxResults ?? DEFAULT_MAX_RESULTS,
+									similarityThreshold ?? DEFAULT_SIMILARITY_THRESHOLD,
+									telemetry,
+								);
+							return {
+								type: "vector-store" as const,
+								source,
+								records: res.map((result) => ({
+									chunkContent: result.chunk.content,
+									chunkIndex: result.chunk.index,
+									score: result.similarity,
+									metadata: Object.fromEntries(
+										Object.entries(result.metadata ?? {}).map(([k, v]) => [
+											k,
+											String(v),
+										]),
+									),
+								})),
+							};
+						}
+
+						// Default to blob content type
 						if (!vectorStoreQueryServices?.github) {
 							throw new Error("No github vector store query service provided");
 						}
 
-						const queryContext: GitHubQueryContext = {
-							workspaceId,
-							owner,
-							repo,
-						};
 						const res = await vectorStoreQueryServices.github.search(
-							query,
-							queryContext,
-							maxResults ?? DEFAULT_MAX_RESULTS,
-							similarityThreshold ?? DEFAULT_SIMILARITY_THRESHOLD,
-							telemetry,
-						);
-						return {
-							type: "vector-store" as const,
-							source,
-							records: res.map((result) => ({
-								chunkContent: result.chunk.content,
-								chunkIndex: result.chunk.index,
-								score: result.similarity,
-								metadata: Object.fromEntries(
-									Object.entries(result.metadata ?? {}).map(([k, v]) => [
-										k,
-										String(v),
-									]),
-								),
-							})),
-						};
-					}
-					case "githubPullRequest": {
-						const { owner, repo } = state;
-
-						if (!vectorStoreQueryServices?.githubPullRequest) {
-							throw new Error(
-								"No github pull request vector store query service provided",
-							);
-						}
-
-						const queryContext: GitHubQueryContext = {
-							workspaceId,
-							owner,
-							repo,
-						};
-						const res = await vectorStoreQueryServices.githubPullRequest.search(
 							query,
 							queryContext,
 							maxResults ?? DEFAULT_MAX_RESULTS,

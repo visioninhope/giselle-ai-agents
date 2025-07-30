@@ -22,12 +22,14 @@ function getDataSourceDisplayInfo(input: ConnectedSource): {
 		switch (node.content.source.provider) {
 			case "github": {
 				if (node.content.source.state.status === "configured") {
-					const { owner, repo } = node.content.source.state;
+					const { owner, repo, contentType } = node.content.source.state;
+					const typeLabel =
+						contentType === "pull_request" ? "Pull Requests" : "Code";
 					return {
 						name,
 						description: {
 							line1: `${owner}/${repo}`,
-							line2: "Code",
+							line2: typeLabel,
 						},
 						icon,
 					};
@@ -36,34 +38,13 @@ function getDataSourceDisplayInfo(input: ConnectedSource): {
 					name,
 					description: {
 						line1: `GitHub: ${node.content.source.state.status}`,
-						line2: "Code",
-					},
-					icon,
-				};
-			}
-			case "githubPullRequest": {
-				if (node.content.source.state.status === "configured") {
-					const { owner, repo } = node.content.source.state;
-					return {
-						name,
-						description: {
-							line1: `${owner}/${repo}`,
-							line2: "Pull Requests",
-						},
-						icon,
-					};
-				}
-				return {
-					name,
-					description: {
-						line1: `GitHub: ${node.content.source.state.status}`,
-						line2: "Pull Requests",
+						line2: "",
 					},
 					icon,
 				};
 			}
 			default: {
-				const _exhaustiveCheck: never = node.content.source;
+				const _exhaustiveCheck: never = node.content.source.provider;
 				throw new Error(`Unhandled provider: ${_exhaustiveCheck}`);
 			}
 		}

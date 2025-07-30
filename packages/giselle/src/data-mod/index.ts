@@ -4,6 +4,7 @@ import { addAccessorToInput } from "./mods/add-accessor-to-input";
 import { fixTypoAccesorToAccessor } from "./mods/fix-typo-accesor-to-accessor";
 import { fixTypoQuquedAtToQueuedAt } from "./mods/fix-typo-ququedAt-queuedAt";
 import { renameActionToOperation } from "./mods/rename-action-to-operation";
+import { unifyGitHubVectorStore } from "./mods/unify-github-vector-store";
 
 function dataMod(data: unknown, issue: $ZodIssue) {
 	let modData = data;
@@ -11,6 +12,7 @@ function dataMod(data: unknown, issue: $ZodIssue) {
 	modData = fixTypoQuquedAtToQueuedAt(modData, issue);
 	modData = renameActionToOperation(modData, issue);
 	modData = addAccessorToInput(modData, issue);
+	modData = unifyGitHubVectorStore(modData, issue);
 	return modData;
 }
 
