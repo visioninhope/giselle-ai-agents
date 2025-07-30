@@ -9,7 +9,7 @@ import { createLineChunker } from "./line-chunker";
 export const DEFAULT_CHUNKER_CONFIG = {
 	maxLines: 150,
 	overlap: 30,
-	maxChars: 10000,
+	maxChars: 6000,
 } as const;
 
 /**
