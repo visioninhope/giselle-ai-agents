@@ -63,5 +63,15 @@ export function fsStorageDriver(config: FsStorageDriverConfig): GiselleStorage {
 			const fullPath = join(config.root, path);
 			await fs.rm(fullPath, { recursive: true, force: true });
 		},
+
+		async exists(path: string): Promise<boolean> {
+			const fullPath = join(config.root, path);
+			try {
+				await fs.access(fullPath);
+				return true;
+			} catch {
+				return false;
+			}
+		},
 	};
 }

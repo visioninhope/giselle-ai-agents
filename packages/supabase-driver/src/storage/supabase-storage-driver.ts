@@ -3,6 +3,7 @@ import {
 	CopyObjectCommand,
 	DeleteObjectCommand,
 	GetObjectCommand,
+	HeadObjectCommand,
 	PutObjectCommand,
 	S3Client,
 } from "@aws-sdk/client-s3";
@@ -123,6 +124,29 @@ export function supabaseStorageDriver(
 			await client.send(
 				new DeleteObjectCommand({ Bucket: config.bucket, Key: path }),
 			);
+		},
+
+		async exists(path: string): Promise<boolean> {
+			try {
+				await client.send(
+					new HeadObjectCommand({ Bucket: config.bucket, Key: path }),
+				);
+				return true;
+			} catch (err) {
+				// AWS SDK v3 typically throws errors with $metadata.httpStatusCode
+				// Both 404 (not found) and 403 (forbidden when object doesn't exist) indicate non-existence
+				if (err && typeof err === "object" && "$metadata" in err) {
+					const metadata = err.$metadata as { httpStatusCode?: number };
+					if (
+						metadata.httpStatusCode === 404 ||
+						metadata.httpStatusCode === 403
+					) {
+						return false;
+					}
+				}
+				// Re-throw other errors
+				throw err;
+			}
 		},
 	};
 }

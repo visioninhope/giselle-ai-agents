@@ -30,6 +30,8 @@ type Copy = (source: string, destination: string) => Promise<void>;
 
 type Remove = (path: string) => Promise<void>;
 
+type Exists = (path: string) => Promise<boolean>;
+
 export interface GiselleStorage {
 	getJson: GetJson;
 	setJson: SetJson;
@@ -37,4 +39,5 @@ export interface GiselleStorage {
 	setBlob: SetBlob;
 	copy: Copy;
 	remove: Remove;
+	exists: Exists;
 }
