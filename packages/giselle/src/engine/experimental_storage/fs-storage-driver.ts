@@ -23,8 +23,32 @@ export function fsStorageDriver(config: FsStorageDriverConfig): GiselleStorage {
 			params: GetJsonParams<T>,
 		): Promise<z.infer<T>> {
 			const fullPath = join(config.root, params.path);
-			const content = await fs.readFile(fullPath, "utf8");
-			const obj = JSON.parse(content);
+
+			await fs.access(fullPath);
+
+			let obj = {};
+			const maxRetries = 5;
+			let lastError: unknown;
+
+			for (let attempt = 0; attempt < maxRetries; attempt++) {
+				try {
+					// Re-read the file on each attempt
+					const content = await fs.readFile(fullPath, "utf8");
+					obj = JSON.parse(content);
+					break;
+				} catch (error) {
+					lastError = error;
+					if (attempt < maxRetries - 1) {
+						const delay = 2 ** attempt * 100;
+						await new Promise((resolve) => setTimeout(resolve, delay));
+					}
+				}
+			}
+
+			if (Object.keys(obj).length === 0 && lastError) {
+				throw lastError;
+			}
+
 			return params.schema ? params.schema.parse(obj) : obj;
 		},
 
