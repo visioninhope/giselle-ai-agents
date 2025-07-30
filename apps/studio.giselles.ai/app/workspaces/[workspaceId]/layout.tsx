@@ -11,10 +11,7 @@ import {
 	stageFlag,
 	webSearchActionFlag,
 } from "@/flags";
-import {
-	getGitHubPullRequestVectorStores,
-	getGitHubVectorStores,
-} from "@/lib/vector-stores/github";
+import { getGitHubRepositoryIndexes } from "@/lib/vector-stores/github";
 import { getGitHubIntegrationState } from "@/packages/lib/github";
 import { getUsageLimitsForTeam } from "@/packages/lib/usage-limits";
 import { fetchCurrentUser } from "@/services/accounts";
@@ -44,8 +41,7 @@ export default async function Layout({
 		return notFound();
 	}
 	const usageLimits = await getUsageLimitsForTeam(currentTeam);
-	const gitHubVectorStores = await getGitHubVectorStores(currentTeam.dbId);
-	const gitHubPullRequestVectorStores = await getGitHubPullRequestVectorStores(
+	const gitHubRepositoryIndexes = await getGitHubRepositoryIndexes(
 		currentTeam.dbId,
 	);
 	const runV3 = await runV3Flag();
@@ -68,8 +64,7 @@ export default async function Layout({
 				},
 			}}
 			vectorStore={{
-				githubCode: gitHubVectorStores,
-				githubPullRequest: gitHubPullRequestVectorStores,
+				githubRepositoryIndexes: gitHubRepositoryIndexes,
 				settingPath: "/settings/team/vector-stores",
 			}}
 			usageLimits={usageLimits}
