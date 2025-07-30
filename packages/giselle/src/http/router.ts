@@ -324,17 +324,6 @@ export const createJsonRouters = {
 				return new Response(null, { status: 204 });
 			},
 		}),
-	buildWorkflowFromTrigger: (giselleEngine: GiselleEngine) =>
-		createHandler({
-			input: z.object({
-				triggerId: FlowTriggerId.schema,
-				useExperimentalStorage: z.boolean(),
-			}),
-			handler: async ({ input }) =>
-				JsonResponse.json({
-					result: await giselleEngine.buildWorkflowFromTrigger(input),
-				}),
-		}),
 	executeQuery: (giselleEngine: GiselleEngine) =>
 		createHandler({
 			input: z.object({
