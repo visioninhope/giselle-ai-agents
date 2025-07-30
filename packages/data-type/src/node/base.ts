@@ -52,7 +52,6 @@ export const NodeUIState = z.object({
 	selected: z.boolean().default(false).optional(),
 	tab: z.string().optional(),
 	showError: z.boolean().default(false).optional(),
-	highlighted: z.boolean().default(false).optional(),
 });
 export type NodeUIState = z.infer<typeof NodeUIState>;
 

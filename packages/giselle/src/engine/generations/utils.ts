@@ -348,13 +348,6 @@ export async function getNodeGenerationIndexes(params: {
 	nodeId: NodeId;
 }) {
 	if (params.useExperimentalStorage) {
-		if (
-			!(await params.experimental_storage.exists(
-				nodeGenerationIndexPath(params.nodeId),
-			))
-		) {
-			return undefined;
-		}
 		return await params.experimental_storage.getJson({
 			path: nodeGenerationIndexPath(params.nodeId),
 			schema: NodeGenerationIndex.array(),

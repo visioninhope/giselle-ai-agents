@@ -1,5 +1,5 @@
 import { useToasts } from "@giselle-internal/ui/toast";
-import type { ConnectionId, TriggerNode } from "@giselle-sdk/data-type";
+import type { TriggerNode } from "@giselle-sdk/data-type";
 import { useActController } from "@giselle-sdk/giselle/react";
 import { clsx } from "clsx/lite";
 import { PlayIcon, XIcon } from "lucide-react";
@@ -16,11 +16,9 @@ import {
 
 export function TriggerInputDialog({
 	node,
-	connectionIds,
 	onClose,
 }: {
 	node: TriggerNode;
-	connectionIds: ConnectionId[];
 	onClose: () => void;
 }) {
 	const { data: trigger, isLoading } = useTrigger(node);
@@ -70,7 +68,7 @@ export function TriggerInputDialog({
 				});
 
 				await createAndStartAct({
-					connectionIds,
+					startNodeId: node.id,
 					inputs: [
 						{
 							type: "parameters",
@@ -93,7 +91,7 @@ export function TriggerInputDialog({
 				setIsSubmitting(false);
 			}
 		},
-		[inputs, onClose, connectionIds, createAndStartAct, info],
+		[inputs, onClose, node.id, createAndStartAct, info],
 	);
 
 	if (isLoading) {

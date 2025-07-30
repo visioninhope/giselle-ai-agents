@@ -30,9 +30,9 @@ export function useActController() {
 	const actGenerationsRef = useRef<Generation[]>([]);
 
 	const createAndStartAct = useCallback(
-		async ({ connectionIds, inputs, ...options }: CreateAndStartActParams) => {
+		async ({ startNodeId, inputs, ...options }: CreateAndStartActParams) => {
 			const { act, generations } = await client.createAct({
-				connectionIds,
+				startNodeId,
 				workspaceId: data.id,
 				generationOriginType: "studio",
 				inputs,

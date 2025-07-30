@@ -137,16 +137,11 @@ function CustomXyFlowNode({
 				.map((connection) => connection.outputId),
 		[workspace, data.nodeData.id],
 	);
-	const highlighted = useMemo(
-		() => workspace.ui.nodeState?.[data.nodeData.id]?.highlighted ?? false,
-		[workspace, data.nodeData.id],
-	);
 
 	return (
 		<NodeComponent
 			node={data.nodeData}
 			selected={selected}
-			highlighted={highlighted}
 			connectedInputIds={connectedInputIds}
 			connectedOutputIds={connectedOutputIds}
 		/>
@@ -156,7 +151,6 @@ function CustomXyFlowNode({
 export function NodeComponent({
 	node,
 	selected,
-	highlighted,
 	connectedInputIds,
 	connectedOutputIds,
 	preview = false,
@@ -164,7 +158,6 @@ export function NodeComponent({
 	node: Node;
 	selected?: boolean;
 	preview?: boolean;
-	highlighted?: boolean;
 	connectedInputIds?: InputId[];
 	connectedOutputIds?: OutputId[];
 }) {
@@ -210,7 +203,6 @@ export function NodeComponent({
 			data-type={node.type}
 			data-content-type={node.content.type}
 			data-selected={selected}
-			data-highlighted={highlighted}
 			data-preview={preview}
 			data-current-generation-status={currentGeneration?.status}
 			data-vector-store-source-provider={
@@ -237,8 +229,6 @@ export function NodeComponent({
 				"data-[content-type=query]:from-query-node-1] data-[content-type=query]:to-query-node-2 data-[content-type=query]:shadow-query-node-1",
 				"data-[selected=true]:shadow-[0px_0px_16px_0px]",
 				"data-[selected=true]:data-[content-type=trigger]:shadow-[0px_0px_16px_0px_hsl(220,15%,50%)]",
-				"data-[highlighted=true]:shadow-[0px_0px_16px_0px]",
-				"data-[highlighted=true]:data-[content-type=trigger]:shadow-[0px_0px_16px_0px_hsl(220,15%,50%)]",
 				"data-[preview=true]:opacity-50",
 				"not-data-preview:min-h-[110px]",
 				requiresSetup && "opacity-80",
