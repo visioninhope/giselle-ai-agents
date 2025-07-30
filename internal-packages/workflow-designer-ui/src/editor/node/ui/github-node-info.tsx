@@ -8,9 +8,9 @@ import { CircleAlertIcon } from "lucide-react";
 import type { ReactElement } from "react";
 import { useGitHubVectorStoreStatus } from "../../lib/use-github-vector-store-status";
 import {
-	GitHubRepositoryBadgeWithType,
 	GitHubRepositoryBadgeFromRepo,
 	GitHubRepositoryBadgeFromTrigger,
+	GitHubRepositoryBadgeWithType,
 } from "./";
 
 function RequiresSetupBadge(): ReactElement {
