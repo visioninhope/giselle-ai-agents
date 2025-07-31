@@ -119,15 +119,7 @@ export default async function StagePage() {
 				performStageAction={async (payloads) => {
 					"use server";
 
-					const experimental_storage = await experimental_storageFlag();
 					const user = await fetchCurrentUser();
-					const build = await giselleEngine.buildWorkflowFromTrigger({
-						triggerId: payloads.flowTrigger.id,
-						useExperimentalStorage: experimental_storage,
-					});
-					if (build === null) {
-						throw new Error("Workflow not found");
-					}
 					const { act } = await giselleEngine.createAct({
 						workspaceId: payloads.flowTrigger.workspaceId,
 						nodeId: payloads.flowTrigger.nodeId,

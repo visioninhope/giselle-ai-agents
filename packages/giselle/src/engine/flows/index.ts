@@ -1,4 +1,3 @@
-export * from "./build-workflow-from-trigger";
 export * from "./configure-trigger";
 export * from "./delete-trigger";
 export * from "./get-trigger";
