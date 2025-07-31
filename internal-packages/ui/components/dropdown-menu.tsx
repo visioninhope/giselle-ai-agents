@@ -87,15 +87,15 @@ export function DropdownMenu<
 			onSelect={(event) => onSelect?.(event, item)}
 			onMouseEnter={() => onItemHover?.(item, true)}
 			onMouseLeave={() => onItemHover?.(item, false)}
-			className={clsx(
+			className={
 				renderItemAsChild
 					? ""
-					: [
+					: clsx(
 							"text-text outline-none cursor-pointer hover:bg-ghost-element-hover",
 							"rounded-[4px] px-[8px] py-[6px] text-[14px]",
 							"flex items-center justify-between gap-[4px]",
-						],
-			)}
+						)
+			}
 		>
 			{renderItem ? (
 				renderItem(item, {

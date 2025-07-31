@@ -26,9 +26,6 @@ export function PromptPanel({ node }: { node: TextGenerationNode }) {
 						label: `${defaultName(source.node)} / ${source.label}`,
 						source,
 					}))}
-					renderItem={(item) =>
-						`${defaultName(item.source.node)} / ${item.source.label}`
-					}
 					onSelect={(_, item) => {
 						const connectedSource = item.source;
 						const embedNode = {
