@@ -1,20 +1,11 @@
 import type { NodeId } from "@giselle-sdk/data-type";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo } from "react";
 import useSWR from "swr";
-import {
-	type Generation,
-	GenerationOrigin,
-} from "../../../concepts/generation";
+import type { GenerationOrigin } from "../../../concepts/generation";
 import { useFeatureFlag } from "../../feature-flags";
 import { useGiselleEngine } from "../../use-giselle-engine";
 import { useGenerationRunnerSystem } from "../contexts";
 
-/**
- * Hook to fetch and manage node generations.
- * Uses object destructuring with nested destructuring in the parameters to avoid
- * reference equality issues that could cause infinite re-renders.
- * Provides generations filtered by nodeId and origin (id and type), sorted by creation time.
- */
 export function useNodeGenerations({
 	nodeId,
 	origin,
@@ -23,25 +14,21 @@ export function useNodeGenerations({
 	origin: GenerationOrigin;
 }) {
 	const {
-		generations: allGenerations,
+		generations,
 		createGenerationRunner,
 		startGenerationRunner,
 		createAndStartGenerationRunner,
 		stopGenerationRunner: stopGenerationSystem,
-		setGenerations,
 	} = useGenerationRunnerSystem();
 	const client = useGiselleEngine();
 	const { experimental_storage } = useFeatureFlag();
 	/** @todo fetch on server */
-	const { data, isLoading } = useSWR(
-		() => {
-			const parsedOrigin = GenerationOrigin.parse(origin);
-			return {
-				api: "node-generations",
-				origin: parsedOrigin,
-				nodeId,
-				useExperimentalStorage: experimental_storage,
-			};
+	const { data } = useSWR(
+		{
+			api: "node-generations",
+			origin,
+			nodeId,
+			useExperimentalStorage: experimental_storage,
 		},
 		(args) => client.getNodeGenerations(args),
 		{
@@ -50,75 +37,40 @@ export function useNodeGenerations({
 			revalidateOnReconnect: false,
 		},
 	);
-	useEffect(() => {
-		if (isLoading || data === undefined) {
-			return;
-		}
-		const excludeCancelled = data.filter(
-			(generation) => generation.status !== "cancelled",
+	const currentGeneration = useMemo(() => {
+		const fetchGenerations = data ?? [];
+		const createdGenerations = generations.filter(
+			(generation) =>
+				generation.context.operationNode.id === nodeId &&
+				generation.context.origin.type === origin.type &&
+				(origin.type === "studio"
+					? generation.context.origin.type === "studio" &&
+						generation.context.origin.workspaceId === origin.workspaceId
+					: generation.context.origin.type !== "studio" &&
+						generation.context.origin.actId === origin.actId),
 		);
-		setGenerations((prev) => {
-			const filtered = prev.filter(
-				(p) => !excludeCancelled.some((g) => g.id === p.id),
-			);
-			return [...filtered, ...excludeCancelled].sort(
-				(a, b) => a.createdAt - b.createdAt,
-			);
-		});
-	}, [isLoading, data, setGenerations]);
+		const allGenerations = [...fetchGenerations, ...createdGenerations].sort(
+			(a, b) =>
+				new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+		);
+		return allGenerations[0];
+	}, [generations, data, nodeId, origin]);
 
-	const [currentGeneration, setCurrentGeneration] = useState<
-		Generation | undefined
-	>();
-
-	const generations = useMemo(
+	const isGenerating = useMemo(
 		() =>
-			allGenerations
-				.filter(
-					(generation) =>
-						generation.context.operationNode.id === nodeId &&
-						generation.context.origin.type === origin.type &&
-						(origin.type === "studio"
-							? generation.context.origin.type === "studio" &&
-								generation.context.origin.workspaceId === origin.workspaceId
-							: generation.context.origin.type !== "studio" &&
-								generation.context.origin.actId === origin.actId),
-				)
-				.sort(
-					(a, b) =>
-						new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
-				),
-		[allGenerations, nodeId, origin],
+			currentGeneration?.status === "running" ||
+			currentGeneration?.status === "created" ||
+			currentGeneration?.status === "queued",
+		[currentGeneration],
 	);
 
-	useEffect(() => {
-		if (generations.length === 0) {
-			setCurrentGeneration(undefined);
-		} else {
-			// Since generations are sorted by creation time, the last one is the latest
-			const latestGeneration = generations[generations.length - 1];
-			setCurrentGeneration(latestGeneration);
-		}
-	}, [generations]);
-
-	const isGenerating = useMemo(() => {
-		const latestGeneration = generations[generations.length - 1];
-		return (
-			latestGeneration?.status === "running" ||
-			latestGeneration?.status === "created" ||
-			latestGeneration?.status === "queued"
-		);
-	}, [generations]);
-
 	const stopGenerationRunner = useCallback(() => {
-		const latestGeneration = generations[generations.length - 1];
-		if (latestGeneration !== undefined) {
-			stopGenerationSystem(latestGeneration.id);
+		if (currentGeneration !== undefined) {
+			stopGenerationSystem(currentGeneration.id);
 		}
-	}, [generations, stopGenerationSystem]);
+	}, [currentGeneration, stopGenerationSystem]);
 
 	return {
-		generations,
 		createGenerationRunner,
 		startGenerationRunner,
 		createAndStartGenerationRunner,
