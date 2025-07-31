@@ -6,7 +6,7 @@ import {
 } from "@giselle-sdk/giselle/react";
 import clsx from "clsx/lite";
 import { ArrowDownIcon, ArrowUpIcon, TimerIcon } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback } from "react";
 import { StackBlicksIcon } from "../../../icons";
 import ClipboardButton from "../../../ui/clipboard-button";
 import { EmptyState } from "../../../ui/empty-state";
