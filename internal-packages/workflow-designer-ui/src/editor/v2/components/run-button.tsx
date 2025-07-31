@@ -312,6 +312,11 @@ export function RunButton() {
 
 	const totalRuns = triggerRuns.length + nodeGroupRuns.length;
 
+	// No runnable items
+	if (totalRuns === 0) {
+		return null;
+	}
+
 	// Single trigger node
 	if (totalRuns === 1 && triggerRuns.length === 1) {
 		return <SingleTriggerRunButton triggerRun={triggerRuns[0]} />;
