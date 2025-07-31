@@ -7,7 +7,11 @@ import {
 } from "@giselle-internal/ui/dialog";
 import { DropdownMenu } from "@giselle-internal/ui/dropdown-menu";
 import { useToasts } from "@giselle-internal/ui/toast";
-import { isTriggerNode } from "@giselle-sdk/data-type";
+import {
+	type ConnectionId,
+	isTriggerNode,
+	type NodeId,
+} from "@giselle-sdk/data-type";
 import {
 	defaultName,
 	useActController,
@@ -58,95 +62,161 @@ export function RunButton() {
 	const [openDialogNodeId, setOpenDialogNodeId] = useState<string | null>(null);
 	const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 	const nodeGroups = useNodeGroups();
-	const startingNodes = useMemo(() => {
+	const { runGroups, singleRunItem } = useMemo(() => {
 		const triggerNodeItems = nodeGroups.triggerNodeGroups.map(
-			(triggerNodeGroup) => ({
-				type: "triggerNode",
-				value: triggerNodeGroup.node.id,
-				label: triggerNodeGroup.node.name ?? defaultName(triggerNodeGroup.node),
-				node: triggerNodeGroup.node,
-				nodeIds: triggerNodeGroup.nodeGroup.nodeIds,
-				connectionIds: triggerNodeGroup.nodeGroup.connectionIds,
-				index: undefined,
-			}),
+			(triggerNodeGroup) =>
+				({
+					type: "triggerNode",
+					value: triggerNodeGroup.node.id,
+					label:
+						triggerNodeGroup.node.name ?? defaultName(triggerNodeGroup.node),
+					node: triggerNodeGroup.node,
+					nodeIds: triggerNodeGroup.nodeGroup.nodeIds,
+					connectionIds: triggerNodeGroup.nodeGroup.connectionIds,
+					index: undefined,
+				}) as const,
 		);
 		const operationNodeItems = nodeGroups.operationNodeGroups.map(
-			(operationNodeGroup, index) => ({
-				type: "nodeGroup",
-				value: `operation-node-index-${index}`,
-				label: `Group ${index + 1}`,
-				node: undefined,
-				nodeIds: operationNodeGroup.nodeIds,
-				connectionIds: operationNodeGroup.connectionIds,
-				index,
-			}),
+			(operationNodeGroup, index) =>
+				({
+					type: "nodeGroup",
+					value: `operation-node-index-${index}`,
+					label: `Group ${index + 1}`,
+					node: undefined,
+					nodeIds: operationNodeGroup.nodeIds,
+					connectionIds: operationNodeGroup.connectionIds,
+					index,
+				}) as const,
 		);
 
-		const groups = [];
+		const runGroups = [];
 		if (triggerNodeItems.length > 0) {
-			groups.push({
+			runGroups.push({
 				groupId: "triggerNodes",
 				groupLabel: "Trigger Nodes",
 				items: triggerNodeItems,
 			});
 		}
 		if (operationNodeItems.length > 0) {
-			groups.push({
+			runGroups.push({
 				groupId: "operationNodes",
 				groupLabel: "Node Group",
 				items: operationNodeItems,
 			});
 		}
-		return groups;
+		const runItems = [...triggerNodeItems, ...operationNodeItems];
+		return {
+			singleRunItem: runItems.length === 1 ? runItems[0] : undefined,
+			runGroups,
+		};
 	}, [nodeGroups]);
 
 	const { info } = useToasts();
 
-	if (startingNodes.length === 0) {
-		return null;
+	const startAct = async (item: {
+		nodeIds: NodeId[];
+		connectionIds: ConnectionId[];
+	}) => {
+		for (const nodeId of item.nodeIds) {
+			setUiNodeState(nodeId, { highlighted: false });
+		}
+		await createAndStartAct({
+			connectionIds: item.connectionIds,
+			inputs: [],
+			onActStart(cancel) {
+				info("Workflow submitted successfully", {
+					action: {
+						label: "Cancel",
+						onClick: async () => {
+							await cancel();
+						},
+					},
+				});
+			},
+		});
+	};
+
+	if (singleRunItem !== undefined) {
+		switch (singleRunItem.type) {
+			case "nodeGroup":
+				return (
+					<Button
+						leftIcon={<PlayIcon className="size-[15px] fill-current" />}
+						variant="glass"
+						size="large"
+						onClick={() => startAct(singleRunItem)}
+					>
+						Run
+					</Button>
+				);
+			case "triggerNode":
+				return (
+					<Dialog
+						open={openDialogNodeId === singleRunItem.node.id}
+						onOpenChange={(isOpen) => {
+							setOpenDialogNodeId(
+								isOpen && singleRunItem.node ? singleRunItem.node.id : null,
+							);
+						}}
+					>
+						<DialogTrigger asChild>
+							<Button
+								leftIcon={<PlayIcon className="size-[15px] fill-current" />}
+								variant="glass"
+								size="large"
+							>
+								Run
+							</Button>
+						</DialogTrigger>
+						<DialogContent>
+							<DialogTitle className="sr-only">
+								Override inputs to test workflow
+							</DialogTitle>
+							<TriggerInputDialog
+								node={singleRunItem.node}
+								connectionIds={singleRunItem.connectionIds}
+								onClose={() => {
+									setOpenDialogNodeId(null);
+								}}
+							/>
+						</DialogContent>
+					</Dialog>
+				);
+			default: {
+				const _exhaustiveCheck: never = singleRunItem;
+				throw new Error(`Unhandled type: ${_exhaustiveCheck}`);
+			}
+		}
 	}
 
+	// Multiple items: use dropdown behavior
 	return (
 		<DropdownMenu
 			open={isDropdownOpen}
 			onOpenChange={setIsDropdownOpen}
 			onSelect={async (_event, item) => {
-				for (const nodeId of item.nodeIds) {
-					setUiNodeState(nodeId, { highlighted: false });
-				}
-				await createAndStartAct({
-					connectionIds: item.connectionIds,
-					inputs: [],
-					onActStart(cancel) {
-						info("Workflow submitted successfully", {
-							action: {
-								label: "Cancel",
-								onClick: async () => {
-									await cancel();
-								},
-							},
-						});
-					},
-				});
+				await startAct(item);
 			}}
 			onItemHover={(item, isHovered) => {
+				const itemData = item;
 				for (const node of data.nodes) {
-					if (!item.nodeIds.includes(node.id)) {
+					if (!itemData.nodeIds.includes(node.id)) {
 						continue;
 					}
 					setUiNodeState(node.id, { highlighted: isHovered });
 				}
 			}}
-			items={startingNodes}
+			items={runGroups}
 			renderItemAsChild
 			renderItem={(item, props) => {
-				const startingNode = item.node;
+				const itemData = item;
+				const startingNode = itemData.node;
 				if (startingNode === undefined || !isTriggerNode(startingNode)) {
 					return (
 						<DropdownMenuItem
 							icon={<div className="bg-ghost-element-background size-[16px]" />}
-							title={item.label}
-							subtitle={item.value}
+							title={itemData.label}
+							subtitle={String(itemData.value)}
 						/>
 					);
 				}
@@ -180,7 +250,7 @@ export function RunButton() {
 
 							<TriggerInputDialog
 								node={startingNode}
-								connectionIds={item.connectionIds}
+								connectionIds={itemData.connectionIds}
 								onClose={() => {
 									setIsDropdownOpen(false);
 									setOpenDialogNodeId(null);
