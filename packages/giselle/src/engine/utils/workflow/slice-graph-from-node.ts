@@ -32,6 +32,53 @@ export function sliceGraphFromNode(
 	const queue: NodeId[] = [node.id];
 	sliceNodeMap.set(node.id, node);
 
+	// First, traverse backward from the starting node
+	const backwardQueue: NodeId[] = [node.id];
+	const processedBackward = new Set<NodeId>();
+
+	while (backwardQueue.length > 0) {
+		const current = backwardQueue.shift();
+		if (current === undefined || processedBackward.has(current)) {
+			continue;
+		}
+		processedBackward.add(current);
+
+		const currentNode = nodeMap.get(current);
+		if (currentNode === undefined) {
+			continue;
+		}
+
+		// Get nodes that output to the current node (backward traversal)
+		const predecessors = referenceMap.get(current) ?? [];
+		for (const pred of predecessors) {
+			const predNode = nodeMap.get(pred);
+			if (predNode === undefined) {
+				continue;
+			}
+
+			const connection = graph.connections.find(
+				(connection) =>
+					connection.outputNode.id === predNode.id &&
+					connection.inputNode.id === currentNode.id,
+			);
+			if (connection === undefined) {
+				continue;
+			}
+
+			if (!visited.has(connection.id)) {
+				sliceConnections.push(connection);
+				sliceNodeMap.set(predNode.id, predNode);
+				sliceNodeMap.set(currentNode.id, currentNode);
+				visited.add(connection.id);
+			}
+
+			// Continue backward traversal from operation nodes
+			if (predNode.type === "operation") {
+				backwardQueue.push(pred);
+			}
+		}
+	}
+
 	while (queue.length > 0) {
 		const current = queue.shift();
 		if (current === undefined) {
@@ -63,10 +110,11 @@ export function sliceGraphFromNode(
 				visited.add(connection.id);
 			}
 
-			if (nextNode.type === "operation") {
+			if (nextNode.type === "operation" && !processedBackward.has(next)) {
 				queue.push(next);
 			}
 
+			// Also perform backward traversal from nodes found during forward traversal
 			const referencing = referenceMap.get(next) ?? [];
 			for (const ref of referencing) {
 				const refNode = nodeMap.get(ref);
@@ -82,13 +130,11 @@ export function sliceGraphFromNode(
 					continue;
 				}
 
-				if (refNode.type === "variable") {
-					if (!visited.has(refConnection.id)) {
-						sliceConnections.push(refConnection);
-						sliceNodeMap.set(currentNode.id, currentNode);
-						sliceNodeMap.set(refNode.id, refNode);
-						visited.add(refConnection.id);
-					}
+				if (!visited.has(refConnection.id)) {
+					sliceConnections.push(refConnection);
+					sliceNodeMap.set(nextNode.id, nextNode);
+					sliceNodeMap.set(refNode.id, refNode);
+					visited.add(refConnection.id);
 				}
 			}
 		}

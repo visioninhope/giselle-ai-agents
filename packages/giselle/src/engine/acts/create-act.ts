@@ -1,4 +1,14 @@
-import { NodeId, Workspace, WorkspaceId } from "@giselle-sdk/data-type";
+import {
+	type Connection,
+	ConnectionId,
+	isOperationNode,
+	isTriggerNode,
+	Node,
+	NodeId,
+	type NodeLike,
+	Workspace,
+	WorkspaceId,
+} from "@giselle-sdk/data-type";
 import { z } from "zod/v4";
 import {
 	type Act,
@@ -17,15 +27,73 @@ import { GenerationId, StepId } from "../../concepts/identifiers";
 import { defaultName } from "../../utils";
 import { setGeneration } from "../generations";
 import type { GiselleEngineContext } from "../types";
-import { buildWorkflowFromNode } from "../utils/workflow/build-workflow-from-node";
+import { groupNodes } from "../utils/workspace/group-nodes";
 import { addWorkspaceIndexItem } from "../utils/workspace-index";
 import { getWorkspace } from "../workspaces";
 import { actPath, workspaceActPath } from "./object/paths";
 
+function buildLevels(nodes: NodeLike[], connections: Connection[]) {
+	const operationNodes = nodes.filter(isOperationNode);
+	const operationConnections = connections.filter(
+		(conn) =>
+			conn.outputNode.type === "operation" &&
+			conn.inputNode.type === "operation",
+	);
+
+	// Calculate in-degrees for topological sort
+	const inDegrees: Record<NodeId, number> = {};
+	for (const node of operationNodes) {
+		inDegrees[node.id] = 0;
+	}
+
+	// Track processed connections to handle duplicates
+	const processedEdges = new Set<string>();
+	for (const conn of operationConnections) {
+		const edgeKey = `${conn.outputNode.id}-${conn.inputNode.id}`;
+		if (!processedEdges.has(edgeKey)) {
+			processedEdges.add(edgeKey);
+			inDegrees[conn.inputNode.id] = (inDegrees[conn.inputNode.id] || 0) + 1;
+		}
+	}
+
+	// Find nodes by level using topological sort
+	const levels: NodeId[][] = [];
+	const remainingNodes = new Set(operationNodes.map((n) => n.id));
+
+	while (remainingNodes.size > 0) {
+		const currentLevel: NodeId[] = [];
+
+		for (const nodeId of remainingNodes) {
+			if (inDegrees[nodeId] === 0) {
+				currentLevel.push(nodeId);
+			}
+		}
+
+		if (currentLevel.length === 0) break; // Prevent infinite loop on cycles
+
+		levels.push(currentLevel);
+
+		// Remove processed nodes and update in-degrees
+		for (const nodeId of currentLevel) {
+			remainingNodes.delete(nodeId);
+
+			// Decrease in-degree of children
+			for (const conn of operationConnections) {
+				if (conn.outputNode.id === nodeId) {
+					inDegrees[conn.inputNode.id]--;
+				}
+			}
+		}
+	}
+
+	return levels;
+}
+
 export const CreateActInputs = z.object({
 	workspaceId: z.optional(WorkspaceId.schema),
 	workspace: z.optional(Workspace),
-	startNodeId: NodeId.schema,
+	connectionIds: z.optional(z.array(ConnectionId.schema)),
+	nodeId: z.optional(NodeId.schema),
 	inputs: z.array(GenerationContextInput),
 	generationOriginType: z.enum(
 		GenerationOrigin.options.map((option) => option.shape.type.value),
@@ -48,21 +116,75 @@ export async function createAct(
 	if (workspace === undefined) {
 		throw new Error("workspace or workspaceId is required");
 	}
-	const startNode = workspace.nodes.find(
-		(node) => node.id === args.startNodeId,
-	);
-	if (startNode === undefined) {
-		throw new Error(`Node with id ${args.startNodeId} not found`);
+
+	// Determine connectionIds based on input
+	let connectionIds: ConnectionId[];
+	if (args.connectionIds !== undefined) {
+		// Use provided connectionIds directly
+		connectionIds = args.connectionIds;
+	} else if (args.nodeId !== undefined) {
+		// Derive connectionIds from nodeId using node groups
+		const nodeId = args.nodeId;
+		const nodeGroups = groupNodes(workspace);
+		const nodeGroup = nodeGroups.find((group) =>
+			group.nodeIds.includes(nodeId),
+		);
+		if (!nodeGroup) {
+			throw new Error(`Node ${nodeId} is not part of any node group`);
+		}
+		connectionIds = nodeGroup.connectionIds;
+	} else {
+		// This should not happen due to schema validation, but adding for safety
+		throw new Error("Either connectionIds or nodeId must be provided");
 	}
 
-	const flow = buildWorkflowFromNode(startNode, workspace);
+	const connections = workspace.connections.filter((connection) =>
+		connectionIds.includes(connection.id),
+	);
+	const nodes = workspace.nodes.filter((node) =>
+		connections.some(
+			(connection) =>
+				connection.inputNode.id === node.id ||
+				connection.outputNode.id === node.id,
+		),
+	);
 
 	const actId = ActId.generate();
+	const levels = buildLevels(nodes, connections);
+
 	const generations: CreatedGeneration[] = [];
 	const sequences: Sequence[] = [];
-	for (const sequence of flow.sequences) {
+	for (const level of levels) {
 		const steps: Step[] = [];
-		for (const step of sequence.steps) {
+		for (const nodeId of level) {
+			const node = nodes.find((node) => node.id === nodeId);
+			if (node === undefined || !isOperationNode(node)) {
+				continue;
+			}
+			const connectedConnections = connections.filter(
+				(connection) => connection.inputNode.id === nodeId,
+			);
+
+			// Map through each input to find source nodes, preserving duplicates
+			const sourceNodes = node.inputs
+				.map((input) => {
+					// Find connections for this specific input
+					const inputConnections = connectedConnections.filter(
+						(connection) => connection.inputId === input.id,
+					);
+					// For each input connection, find the corresponding source node
+					if (inputConnections.length > 0) {
+						const sourceNodeId = inputConnections[0].outputNode.id;
+						const node = nodes.find((n) => n.id === sourceNodeId);
+						const parseResult = Node.safeParse(node);
+						if (parseResult.success) {
+							return parseResult.data;
+						}
+						return undefined;
+					}
+					return undefined;
+				})
+				.filter((node) => node !== undefined);
 			const generation: CreatedGeneration = {
 				id: GenerationId.generate(),
 				status: "created",
@@ -74,15 +196,15 @@ export async function createAct(
 						actId,
 					},
 					inputs: args.inputs,
-					operationNode: step.node,
-					sourceNodes: step.sourceNodes,
-					connections: step.connections,
+					operationNode: node,
+					sourceNodes,
+					connections: connectedConnections,
 				},
 			};
 			generations.push(generation);
 			steps.push({
 				id: StepId.generate(),
-				name: step.node.name ?? defaultName(step.node),
+				name: node.name ?? defaultName(node),
 				status: "created",
 				generationId: generation.id,
 				duration: 0,
@@ -109,11 +231,15 @@ export async function createAct(
 		});
 	}
 
+	const triggerNode = nodes.find((node) => isTriggerNode(node));
+
 	const act: Act = {
 		id: ActId.generate(),
 		workspaceId: workspace.id,
 		status: "inProgress",
-		name: startNode.name ?? defaultName(startNode),
+		name: triggerNode
+			? (triggerNode.name ?? defaultName(triggerNode))
+			: "Untitled Act",
 		steps: {
 			queued: generations.length,
 			inProgress: 0,
