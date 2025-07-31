@@ -10,7 +10,6 @@ import {
 	type Connection,
 	type Edge,
 	type IsValidConnection,
-	type OnBeforeDelete,
 	ReactFlow,
 	useReactFlow,
 	useUpdateNodeInternals,
