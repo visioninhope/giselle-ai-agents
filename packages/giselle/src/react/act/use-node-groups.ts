@@ -4,11 +4,11 @@ import {
 	type TriggerNode,
 } from "@giselle-sdk/data-type";
 import { useMemo } from "react";
-import { sliceGraphFromNode } from "../../engine/utils/workflow/slice-graph-from-node";
 import {
 	groupNodes,
 	type NodeGroup,
 } from "../../engine/utils/workspace/group-nodes";
+import { sliceGraphFromNode } from "../../engine/utils/workspace/slice-graph-from-node";
 import { useWorkflowDesigner } from "../flow";
 
 /**

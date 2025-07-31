@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { workspace1 } from "./__fixtures__/workspace1";
+import { gourpNodesFixture } from "../__fixtures__/group-nodes";
 import { groupNodes } from "./group-nodes";
 
 describe("groupNodes", () => {
 	it("should group connected nodes in workspace1", () => {
-		const groups = groupNodes(workspace1);
+		const groups = groupNodes(gourpNodesFixture);
 
 		// Sort groups by size for consistent testing
 		const sortedGroups = groups
@@ -47,7 +47,7 @@ describe("groupNodes", () => {
 
 	it("should handle workspace with no connections", () => {
 		const workspace = {
-			...workspace1,
+			...gourpNodesFixture,
 			connections: [],
 		};
 
@@ -63,7 +63,7 @@ describe("groupNodes", () => {
 
 	it("should handle empty workspace", () => {
 		const workspace = {
-			...workspace1,
+			...gourpNodesFixture,
 			nodes: [],
 			connections: [],
 		};
@@ -75,14 +75,14 @@ describe("groupNodes", () => {
 
 	it("should handle self-loops correctly", () => {
 		const workspace = {
-			...workspace1,
-			nodes: workspace1.nodes.slice(0, 2),
+			...gourpNodesFixture,
+			nodes: gourpNodesFixture.nodes.slice(0, 2),
 			connections: [
 				{
 					id: "cnnc-self" as const,
-					outputNode: workspace1.nodes[0],
+					outputNode: gourpNodesFixture.nodes[0],
 					outputId: "otp-jzfjEdlrL0Uxtz9G" as const,
-					inputNode: workspace1.nodes[0],
+					inputNode: gourpNodesFixture.nodes[0],
 					inputId: "inp-self" as const,
 				},
 			],
@@ -95,7 +95,7 @@ describe("groupNodes", () => {
 
 		// Find the group with the self-loop
 		const selfLoopGroup = groups.find((g) =>
-			g.nodeIds.includes(workspace1.nodes[0].id),
+			g.nodeIds.includes(gourpNodesFixture.nodes[0].id),
 		);
 		expect(selfLoopGroup?.connectionIds).toHaveLength(1);
 		expect(selfLoopGroup?.connectionIds[0]).toBe("cnnc-self");
