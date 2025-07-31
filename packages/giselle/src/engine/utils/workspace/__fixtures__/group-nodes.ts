@@ -1,6 +1,59 @@
 import type { Workspace } from "@giselle-sdk/data-type";
 
-export const workspace1: Workspace = {
+/**
+ * Group Nodes Test Fixture
+ *
+ * Node Structure - Two Separate Connected Components:
+ *
+ * GROUP 1 (8 nodes, 7 connections) - Large Connected Component:
+ *
+ *    ┌────────────────┐    ┌────────────────┐
+ *    │ CFgMwrVsMDKy68ju│    │ Y7Uh3GvPRIQwfSGE│
+ *    │ TextGen (no inp)│    │ TextGen (no inp)│
+ *    └────────┬───────┘    └────────┬───────┘
+ *             │                     │
+ *             ▼                     ▼
+ *    ┌────────────────┐    ┌────────────────┐
+ *    │ GSCigvQfU7lbDsvy│◄───┤ omdTu2flqJHhMuo8│
+ *    │ TextGen (2 inp) │    │ TextGen (1 inp) │
+ *    └────────┬───────┘    └─────────────────┘
+ *             │
+ *             ├─────────────────────────────────────┐
+ *             ▼                                     ▼
+ *    ┌────────────────┐                   ┌────────────────┐
+ *    │ k7ii9Cge2s9XF5JF│                   │ w0tHiwkN3n2ZIP2v│
+ *    │ TextGen (2 inp) │                   │ TextGen (1 inp) │
+ *    └────────▲───────┘                   └─────────────────┘
+ *             │
+ *             │
+ *    ┌────────────────┐
+ *    │ 7bpl4Q81Z97VgDlt│
+ *    │ TextGen (1 inp) │
+ *    └────────▲───────┘
+ *             │
+ *             │
+ *    ┌────────────────┐
+ *    │ OEac8DMOLd0bwsOe│
+ *    │ TextGen (no inp)│
+ *    └─────────────────┘
+ *
+ *
+ * GROUP 2 (2 nodes, 1 connection) - Simple Chain:
+ *
+ *    ┌────────────────┐     ┌────────────────┐
+ *    │ CH7NalFDDDbHQcr7│────▶│ YkXO5rkuczwTmnmv│
+ *    │ TextGen (no inp)│     │ TextGen (1 inp) │
+ *    └─────────────────┘     └─────────────────┘
+ *
+ * Key Points:
+ * - Group 1 forms one connected component with complex branching
+ * - Group 2 is completely isolated from Group 1
+ * - GSCigvQfU7lbDsvy acts as a hub receiving from CFgMwrVsMDKy68ju and omdTu2flqJHhMuo8
+ * - GSCigvQfU7lbDsvy then branches to both k7ii9Cge2s9XF5JF and w0tHiwkN3n2ZIP2v
+ * - A separate chain: OEac8DMOLd0bwsOe → 7bpl4Q81Z97VgDlt → k7ii9Cge2s9XF5JF
+ * - Y7Uh3GvPRIQwfSGE → omdTu2flqJHhMuo8 connects to the main flow
+ */
+export const gourpNodesFixture: Workspace = {
 	id: "wrks-Fa6GSJtQLp2B5kjm",
 	schemaVersion: "20250221",
 	nodes: [
