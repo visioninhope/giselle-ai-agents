@@ -1325,7 +1325,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@jridgewell/source-map"></a>
-### @jridgewell/source-map v0.3.6
+### @jridgewell/source-map v0.3.10
 #### 
 
 ##### Paths
@@ -11046,7 +11046,7 @@ Unknown manually approved
 
 
 <a name="stripe"></a>
-### stripe v18.3.0
+### stripe v18.4.0
 #### 
 
 ##### Paths
@@ -11222,7 +11222,7 @@ Unknown manually approved
 
 
 <a name="terser"></a>
-### terser v5.39.0
+### terser v5.43.1
 #### 
 
 ##### Paths
@@ -12018,7 +12018,7 @@ Unknown manually approved
 
 
 <a name="watchpack"></a>
-### watchpack v2.4.2
+### watchpack v2.4.4
 #### 
 
 ##### Paths
