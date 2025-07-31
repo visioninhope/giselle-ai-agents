@@ -7,7 +7,7 @@ import {
 } from "@giselle-internal/ui/dialog";
 import { DropdownMenu } from "@giselle-internal/ui/dropdown-menu";
 import { useToasts } from "@giselle-internal/ui/toast";
-import { isTriggerNode } from "@giselle-sdk/data-type";
+import type { ConnectionId, NodeId, TriggerNode } from "@giselle-sdk/data-type";
 import {
 	defaultName,
 	useActController,
@@ -20,7 +20,34 @@ import { useMemo, useState } from "react";
 import { NodeIcon } from "../../../icons/node";
 import { TriggerInputDialog } from "./trigger-input-dialog";
 
-function DropdownMenuItem({
+type RunItem = {
+	nodeIds: NodeId[];
+	connectionIds: ConnectionId[];
+};
+
+type TriggerRunItem = RunItem & {
+	node: TriggerNode;
+};
+
+type NodeGroupRunItem = RunItem & {
+	label: string;
+};
+
+type TriggerMenuItem = {
+	value: string;
+	label: string;
+	type: "trigger";
+	run: TriggerRunItem;
+};
+
+type NodeGroupMenuItem = {
+	value: string;
+	label: string;
+	type: "nodeGroup";
+	run: NodeGroupRunItem;
+};
+
+function RunOptionItem({
 	icon,
 	title,
 	subtitle,
@@ -51,115 +78,182 @@ function DropdownMenuItem({
 	);
 }
 
-export function RunButton() {
-	const { data, setUiNodeState } = useWorkflowDesigner();
+function useRunAct() {
+	const { setUiNodeState } = useWorkflowDesigner();
 	const { createAndStartAct } = useActController();
-
-	const [openDialogNodeId, setOpenDialogNodeId] = useState<string | null>(null);
-	const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-	const nodeGroups = useNodeGroups();
-	const startingNodes = useMemo(() => {
-		return [
-			{
-				groupId: "triggerNodes",
-				groupLabel: "Trigger Nodes",
-				items: nodeGroups.triggerNodeGroups.map((triggerNodeGroup) => ({
-					type: "triggerNode",
-					value: triggerNodeGroup.node.id,
-					label:
-						triggerNodeGroup.node.name ?? defaultName(triggerNodeGroup.node),
-					node: triggerNodeGroup.node,
-					nodeIds: triggerNodeGroup.nodeGroup.nodeIds,
-					connectionIds: triggerNodeGroup.nodeGroup.connectionIds,
-					index: undefined,
-				})),
-			},
-			{
-				groupId: "operationNodes",
-				groupLabel: "Node Group",
-				items: nodeGroups.operationNodeGroups.map((nodeGroup, index) => ({
-					type: "nodeGroup",
-					value: `operation-node-index-${index}`,
-					label: `Group ${index + 1}`,
-					node: undefined,
-					nodeIds: nodeGroup.nodeIds,
-					connectionIds: nodeGroup.connectionIds,
-					index,
-				})),
-			},
-		];
-	}, [nodeGroups]);
-
 	const { info } = useToasts();
 
-	if (startingNodes.length === 0) {
-		return null;
-	}
+	return async (item: RunItem) => {
+		for (const nodeId of item.nodeIds) {
+			setUiNodeState(nodeId, { highlighted: false });
+		}
+		await createAndStartAct({
+			connectionIds: item.connectionIds,
+			inputs: [],
+			onActStart(cancel) {
+				info("Workflow submitted successfully", {
+					action: {
+						label: "Cancel",
+						onClick: async () => {
+							await cancel();
+						},
+					},
+				});
+			},
+		});
+	};
+}
+
+function SingleTriggerRunButton({
+	triggerRun,
+}: {
+	triggerRun: TriggerRunItem;
+}) {
+	const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+	return (
+		<Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+			<DialogTrigger asChild>
+				<Button
+					leftIcon={<PlayIcon className="size-[15px] fill-current" />}
+					variant="glass"
+					size="large"
+				>
+					Run
+				</Button>
+			</DialogTrigger>
+			<DialogContent>
+				<DialogTitle className="sr-only">
+					Override inputs to test workflow
+				</DialogTitle>
+				<TriggerInputDialog
+					node={triggerRun.node}
+					connectionIds={triggerRun.connectionIds}
+					onClose={() => setIsDialogOpen(false)}
+				/>
+			</DialogContent>
+		</Dialog>
+	);
+}
+
+function SingleNodeGroupRunButton({
+	nodeGroupRun,
+}: {
+	nodeGroupRun: NodeGroupRunItem;
+}) {
+	const runAct = useRunAct();
+
+	return (
+		<Button
+			leftIcon={<PlayIcon className="size-[15px] fill-current" />}
+			variant="glass"
+			size="large"
+			onClick={() => runAct(nodeGroupRun)}
+		>
+			Run
+		</Button>
+	);
+}
+
+function MultipleRunsDropdown({
+	triggerRuns,
+	nodeGroupRuns,
+}: {
+	triggerRuns: TriggerRunItem[];
+	nodeGroupRuns: NodeGroupRunItem[];
+}) {
+	const { data, setUiNodeState } = useWorkflowDesigner();
+	const runAct = useRunAct();
+	const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+	const [openDialogNodeId, setOpenDialogNodeId] = useState<string | null>(null);
+
+	const runGroups = useMemo(() => {
+		const groups = [];
+		if (triggerRuns.length > 0) {
+			groups.push({
+				groupId: "triggerNodes",
+				groupLabel: "Trigger Nodes",
+				items: triggerRuns.map((run) => ({
+					value: run.node.id,
+					label: run.node.name ?? defaultName(run.node),
+					type: "trigger" as const,
+					run,
+				})),
+			});
+		}
+		if (nodeGroupRuns.length > 0) {
+			groups.push({
+				groupId: "nodeGroups",
+				groupLabel: "Node Groups",
+				items: nodeGroupRuns.map((run, index) => ({
+					value: `nodeGroup-${index}`,
+					label: run.label,
+					type: "nodeGroup" as const,
+					run,
+				})),
+			});
+		}
+		return groups;
+	}, [triggerRuns, nodeGroupRuns]);
+
+	const highlightNodes = (runItem: RunItem, isHovered: boolean) => {
+		for (const node of data.nodes) {
+			if (runItem.nodeIds.includes(node.id)) {
+				setUiNodeState(node.id, { highlighted: isHovered });
+			}
+		}
+	};
 
 	return (
 		<DropdownMenu
 			open={isDropdownOpen}
 			onOpenChange={setIsDropdownOpen}
 			onSelect={async (_event, item) => {
-				for (const nodeId of item.nodeIds) {
-					setUiNodeState(nodeId, { highlighted: false });
+				const menuItem = item as TriggerMenuItem | NodeGroupMenuItem;
+				if (menuItem.type === "nodeGroup") {
+					await runAct(menuItem.run);
 				}
-				await createAndStartAct({
-					connectionIds: item.connectionIds,
-					inputs: [],
-					onActStart(cancel) {
-						info("Workflow submitted successfully", {
-							action: {
-								label: "Cancel",
-								onClick: async () => {
-									await cancel();
-								},
-							},
-						});
-					},
-				});
 			}}
 			onItemHover={(item, isHovered) => {
-				for (const node of data.nodes) {
-					if (!item.nodeIds.includes(node.id)) {
-						continue;
-					}
-					setUiNodeState(node.id, { highlighted: isHovered });
-				}
+				const menuItem = item as TriggerMenuItem | NodeGroupMenuItem;
+				highlightNodes(menuItem.run, isHovered);
 			}}
-			items={startingNodes}
+			items={runGroups}
 			renderItemAsChild
 			renderItem={(item, props) => {
-				const startingNode = item.node;
-				if (startingNode === undefined || !isTriggerNode(startingNode)) {
+				const menuItem = item as TriggerMenuItem | NodeGroupMenuItem;
+				if (menuItem.type === "nodeGroup") {
 					return (
-						<DropdownMenuItem
+						<RunOptionItem
 							icon={<div className="bg-ghost-element-background size-[16px]" />}
-							title={item.label}
-							subtitle={item.value}
+							title={menuItem.run.label}
+							subtitle={menuItem.value}
+							{...props}
 						/>
 					);
 				}
+
+				const triggerNode = menuItem.run.node;
 				return (
 					<Dialog
-						open={openDialogNodeId === startingNode.id}
+						open={openDialogNodeId === triggerNode.id}
 						onOpenChange={(isOpen) => {
-							setOpenDialogNodeId(isOpen ? startingNode.id : null);
+							setOpenDialogNodeId(isOpen ? triggerNode.id : null);
 							if (!isOpen) {
 								setIsDropdownOpen(false);
 							}
 						}}
 					>
 						<DialogTrigger asChild>
-							<DropdownMenuItem
+							<RunOptionItem
 								icon={
 									<NodeIcon
-										node={startingNode}
+										node={triggerNode}
 										className="size-[16px] text-white-900"
 									/>
 								}
-								title={startingNode.name ?? defaultName(startingNode)}
-								subtitle={startingNode.id}
+								title={triggerNode.name ?? defaultName(triggerNode)}
+								subtitle={triggerNode.id}
 								{...props}
 							/>
 						</DialogTrigger>
@@ -167,10 +261,9 @@ export function RunButton() {
 							<DialogTitle className="sr-only">
 								Override inputs to test workflow
 							</DialogTitle>
-
 							<TriggerInputDialog
-								node={startingNode}
-								connectionIds={item.connectionIds}
+								node={triggerNode}
+								connectionIds={menuItem.run.connectionIds}
 								onClose={() => {
 									setIsDropdownOpen(false);
 									setOpenDialogNodeId(null);
@@ -191,6 +284,49 @@ export function RunButton() {
 			}
 			sideOffset={4}
 			align="end"
+		/>
+	);
+}
+
+export function RunButton() {
+	const nodeGroups = useNodeGroups();
+
+	const { triggerRuns, nodeGroupRuns } = useMemo(() => {
+		const triggerRuns: TriggerRunItem[] = nodeGroups.triggerNodeGroups.map(
+			(group) => ({
+				node: group.node,
+				nodeIds: group.nodeGroup.nodeIds,
+				connectionIds: group.nodeGroup.connectionIds,
+			}),
+		);
+
+		const nodeGroupRuns: NodeGroupRunItem[] =
+			nodeGroups.operationNodeGroups.map((group, index) => ({
+				label: `Group ${index + 1}`,
+				nodeIds: group.nodeIds,
+				connectionIds: group.connectionIds,
+			}));
+
+		return { triggerRuns, nodeGroupRuns };
+	}, [nodeGroups]);
+
+	const totalRuns = triggerRuns.length + nodeGroupRuns.length;
+
+	// Single trigger node
+	if (totalRuns === 1 && triggerRuns.length === 1) {
+		return <SingleTriggerRunButton triggerRun={triggerRuns[0]} />;
+	}
+
+	// Single node group
+	if (totalRuns === 1 && nodeGroupRuns.length === 1) {
+		return <SingleNodeGroupRunButton nodeGroupRun={nodeGroupRuns[0]} />;
+	}
+
+	// Multiple options
+	return (
+		<MultipleRunsDropdown
+			triggerRuns={triggerRuns}
+			nodeGroupRuns={nodeGroupRuns}
 		/>
 	);
 }
