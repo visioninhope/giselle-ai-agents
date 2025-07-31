@@ -59,33 +59,56 @@ export function RunButton() {
 	const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 	const nodeGroups = useNodeGroups();
 	const startingNodes = useMemo(() => {
+		const triggerNodeItems = nodeGroups.triggerNodeGroups.map(
+			(triggerNodeGroup) => ({
+				type: "triggerNode",
+				value: triggerNodeGroup.node.id,
+				label: triggerNodeGroup.node.name ?? defaultName(triggerNodeGroup.node),
+				node: triggerNodeGroup.node,
+				nodeIds: triggerNodeGroup.nodeGroup.nodeIds,
+				connectionIds: triggerNodeGroup.nodeGroup.connectionIds,
+				index: undefined,
+			}),
+		);
+		const operationNodeItems = nodeGroups.operationNodeGroups.map(
+			(operationNodeGroup, index) => ({
+				type: "nodeGroup",
+				value: `operation-node-index-${index}`,
+				label: `Group ${index + 1}`,
+				node: undefined,
+				nodeIds: operationNodeGroup.nodeIds,
+				connectionIds: operationNodeGroup.connectionIds,
+				index,
+			}),
+		);
+		if (triggerNodeItems.length === 0) {
+			return [
+				{
+					groupId: "operationNodes",
+					groupLabel: "Node Group",
+					items: operationNodeItems,
+				},
+			];
+		}
+		if (operationNodeItems.length === 0) {
+			return [
+				{
+					groupId: "triggerNodes",
+					groupLabel: "Trigger Nodes",
+					items: triggerNodeItems,
+				},
+			];
+		}
 		return [
 			{
 				groupId: "triggerNodes",
 				groupLabel: "Trigger Nodes",
-				items: nodeGroups.triggerNodeGroups.map((triggerNodeGroup) => ({
-					type: "triggerNode",
-					value: triggerNodeGroup.node.id,
-					label:
-						triggerNodeGroup.node.name ?? defaultName(triggerNodeGroup.node),
-					node: triggerNodeGroup.node,
-					nodeIds: triggerNodeGroup.nodeGroup.nodeIds,
-					connectionIds: triggerNodeGroup.nodeGroup.connectionIds,
-					index: undefined,
-				})),
+				items: triggerNodeItems,
 			},
 			{
 				groupId: "operationNodes",
 				groupLabel: "Node Group",
-				items: nodeGroups.operationNodeGroups.map((nodeGroup, index) => ({
-					type: "nodeGroup",
-					value: `operation-node-index-${index}`,
-					label: `Group ${index + 1}`,
-					node: undefined,
-					nodeIds: nodeGroup.nodeIds,
-					connectionIds: nodeGroup.connectionIds,
-					index,
-				})),
+				items: operationNodeItems,
 			},
 		];
 	}, [nodeGroups]);
