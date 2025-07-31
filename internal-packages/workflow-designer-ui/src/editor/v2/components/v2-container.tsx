@@ -180,14 +180,6 @@ function V2NodeCanvas() {
 		[data.nodes, data.connections, deleteConnection, updateNodeData],
 	);
 
-	const handleBeforeDelete: OnBeforeDelete<
-		GiselleWorkflowDesignerNode,
-		ConnectorType
-	> = () =>
-		Promise.resolve(
-			window.confirm("Are you sure you want to delete the selected item(s)?"),
-		);
-
 	const isValidConnection: IsValidConnection<ConnectorType> = (connection) => {
 		if (
 			!connection.sourceHandle ||
@@ -217,7 +209,6 @@ function V2NodeCanvas() {
 			defaultViewport={data.ui.viewport}
 			onConnect={handleConnect}
 			onEdgesDelete={handleEdgesDelete}
-			onBeforeDelete={handleBeforeDelete}
 			isValidConnection={isValidConnection}
 			panOnScroll={true}
 			zoomOnScroll={false}
