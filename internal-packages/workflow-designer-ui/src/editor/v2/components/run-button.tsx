@@ -81,36 +81,23 @@ export function RunButton() {
 				index,
 			}),
 		);
-		if (triggerNodeItems.length === 0) {
-			return [
-				{
-					groupId: "operationNodes",
-					groupLabel: "Node Group",
-					items: operationNodeItems,
-				},
-			];
-		}
-		if (operationNodeItems.length === 0) {
-			return [
-				{
-					groupId: "triggerNodes",
-					groupLabel: "Trigger Nodes",
-					items: triggerNodeItems,
-				},
-			];
-		}
-		return [
-			{
+
+		const groups = [];
+		if (triggerNodeItems.length > 0) {
+			groups.push({
 				groupId: "triggerNodes",
 				groupLabel: "Trigger Nodes",
 				items: triggerNodeItems,
-			},
-			{
+			});
+		}
+		if (operationNodeItems.length > 0) {
+			groups.push({
 				groupId: "operationNodes",
 				groupLabel: "Node Group",
 				items: operationNodeItems,
-			},
-		];
+			});
+		}
+		return groups;
 	}, [nodeGroups]);
 
 	const { info } = useToasts();
