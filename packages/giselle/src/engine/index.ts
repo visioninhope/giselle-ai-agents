@@ -66,7 +66,6 @@ import {
 export * from "../concepts/act";
 export * from "../concepts/generation";
 export * from "../concepts/identifiers";
-export { Workflow, WorkflowId } from "../concepts/workflow";
 export type * from "./acts";
 export * from "./acts";
 export * from "./experimental_storage";
