@@ -1,7 +1,5 @@
-import type { Node, NodeLike } from "@giselle-sdk/data-type";
-import { useWorkflowDesigner } from "@giselle-sdk/giselle/react";
-import { useEffect, useState } from "react";
-import { useDuplicateNode } from "./node";
+import { useEffect } from "react";
+import { useCopyPasteNode, useDuplicateNode } from "./node";
 import {
 	moveTool,
 	selectFileNodeCategoryTool,
@@ -14,9 +12,8 @@ import {
 const ignoredTags = ["INPUT", "TEXTAREA", "SELECT"];
 
 export function KeyboardShortcuts() {
-	const { data, copyNode } = useWorkflowDesigner();
 	const duplicateNode = useDuplicateNode();
-	const [copiedNode, setCopiedNode] = useState<NodeLike | null>(null);
+	const { copy, paste } = useCopyPasteNode();
 	const toolbar = useToolbar();
 
 	useEffect(() => {
@@ -39,33 +36,13 @@ export function KeyboardShortcuts() {
 
 			if ((event.metaKey || event.ctrlKey) && event.key === "c") {
 				event.preventDefault();
-				const selectedNode = data.nodes.find(
-					(node) => data.ui.nodeState[node.id]?.selected,
-				);
-				if (selectedNode) {
-					setCopiedNode(selectedNode);
-				}
+				copy();
 				return;
 			}
 
 			if ((event.metaKey || event.ctrlKey) && event.key === "v") {
 				event.preventDefault();
-				if (copiedNode) {
-					const nodeState = data.ui.nodeState[copiedNode.id];
-					if (nodeState) {
-						const position = {
-							x: nodeState.position.x + 200,
-							y: nodeState.position.y + 100,
-						};
-						// Type guard: ensure copiedNode is a proper Node, not just NodeLike
-						if (
-							copiedNode.type === "operation" ||
-							copiedNode.type === "variable"
-						) {
-							copyNode(copiedNode as Node, { ui: { position } });
-						}
-					}
-				}
+				paste();
 				return;
 			}
 
@@ -92,7 +69,7 @@ export function KeyboardShortcuts() {
 		};
 		window.addEventListener("keydown", handleKeyDown);
 		return () => window.removeEventListener("keydown", handleKeyDown);
-	}, [duplicateNode, data, copyNode, copiedNode, toolbar]);
+	}, [duplicateNode, copy, paste, toolbar]);
 
 	return null;
 }
