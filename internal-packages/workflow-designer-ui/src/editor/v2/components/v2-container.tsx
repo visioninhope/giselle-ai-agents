@@ -60,11 +60,12 @@ function V2NodeCanvas() {
 	const updateNodeInternals = useUpdateNodeInternals();
 	const { selectedTool, reset } = useToolbar();
 	const toast = useToasts();
-	const handleKeyDown = useKeyboardShortcuts();
 	const [menu, setMenu] = useState<Omit<ContextMenuProps, "onClose"> | null>(
 		null,
 	);
 	const reactFlowRef = useRef<HTMLDivElement>(null);
+
+	useKeyboardShortcuts();
 
 	useEffect(() => {
 		reactFlowInstance.setNodes(
@@ -290,7 +291,6 @@ function V2NodeCanvas() {
 							: undefined,
 				});
 			}}
-			onKeyDown={handleKeyDown}
 		>
 			<Background />
 			{selectedTool?.action === "addNode" && (
