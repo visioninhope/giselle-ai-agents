@@ -26,7 +26,7 @@ import { defaultName } from "../../utils";
 import { setGeneration } from "../generations";
 import type { GiselleEngineContext } from "../types";
 import { buildLevels } from "../utils/build-levels";
-import { groupNodes } from "../utils/workspace/group-nodes";
+import { findNodeGroupByNodeId } from "../utils/workspace/group-nodes";
 import { addWorkspaceIndexItem } from "../utils/workspace-index";
 import { getWorkspace } from "../workspaces";
 import { actPath, workspaceActPath } from "./object/paths";
@@ -66,26 +66,10 @@ export async function createAct(
 		connectionIds = args.connectionIds;
 	} else if (args.nodeId !== undefined) {
 		// Derive connectionIds from nodeId using node groups
-		const nodeId = args.nodeId;
-		const groupedNodes = groupNodes(workspace);
-
-		// Search in operation node groups first
-		let nodeGroup = groupedNodes.operationNodeGroups.find((group) =>
-			group.nodeIds.includes(nodeId),
-		);
-
-		// If not found, search in trigger node groups
-		if (!nodeGroup) {
-			const triggerGroup = groupedNodes.triggerNodeGroups.find((group) =>
-				group.nodeGroup.nodeIds.includes(nodeId),
-			);
-			if (triggerGroup) {
-				nodeGroup = triggerGroup.nodeGroup;
-			}
-		}
+		const nodeGroup = findNodeGroupByNodeId(workspace, args.nodeId);
 
 		if (!nodeGroup) {
-			throw new Error(`Node ${nodeId} is not part of any node group`);
+			throw new Error(`Node ${args.nodeId} is not part of any node group`);
 		}
 		connectionIds = nodeGroup.connectionIds;
 	} else {

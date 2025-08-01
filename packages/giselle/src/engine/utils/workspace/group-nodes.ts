@@ -135,3 +135,19 @@ export function groupNodes(
 		triggerNodeGroups,
 	};
 }
+
+/**
+ * Find the node group containing the specified nodeId
+ */
+export function findNodeGroupByNodeId(
+	workspace: Pick<Workspace, "nodes" | "connections">,
+	nodeId: NodeId,
+): NodeGroup | undefined {
+	const groupedNodes = groupNodes(workspace);
+	return (
+		groupedNodes.operationNodeGroups.find((g) => g.nodeIds.includes(nodeId)) ??
+		groupedNodes.triggerNodeGroups.find((g) =>
+			g.nodeGroup.nodeIds.includes(nodeId),
+		)?.nodeGroup
+	);
+}

@@ -13,7 +13,6 @@ import type {
 } from "@giselle-sdk/github-tool";
 import type { createAndStartAct } from "../acts";
 import type { GiselleEngineContext } from "../types";
-import { groupNodes } from "../utils/workspace/group-nodes";
 import { getWorkspace } from "../workspaces";
 import type { parseCommand } from "./utils";
 
