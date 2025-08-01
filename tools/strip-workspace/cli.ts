@@ -1,90 +1,125 @@
 #!/usr/bin/env node --experimental-strip-types
 
+interface Connection {
+	readonly id: string;
+	readonly sourceNodeId: string;
+	readonly targetNodeId: string;
+}
+
+interface NodeContent {
+	readonly type: string;
+	readonly prompt?: string;
+	readonly text?: string;
+}
+
 interface Node {
-	id: string;
-	name: string;
-	type: string;
-	// biome-ignore lint/suspicious/noExplicitAny: dev tool
-	inputs: any[];
-	// biome-ignore lint/suspicious/noExplicitAny: dev tool
-	outputs: any[];
-	content: {
-		type: string;
-		prompt?: string;
-		// biome-ignore lint/suspicious/noExplicitAny: dev tool
-		[key: string]: any;
-	};
+	readonly id: string;
+	readonly name: string;
+	readonly type: string;
+	readonly inputs: readonly unknown[];
+	readonly outputs: readonly unknown[];
+	readonly content: NodeContent;
+}
+
+interface UIState {
+	readonly nodeState?: Record<string, unknown>;
+	readonly [key: string]: unknown;
 }
 
 interface Workspace {
-	id: string;
-	name: string;
-	schemaVersion: string;
-	nodes: Node[];
-	// biome-ignore lint/suspicious/noExplicitAny: dev tool
-	connections: any[];
-	// biome-ignore lint/suspicious/noExplicitAny: dev tool
-	ui: any;
+	readonly id: string;
+	readonly name: string;
+	readonly schemaVersion: string;
+	readonly nodes: readonly Node[];
+	readonly connections: readonly Connection[];
+	readonly ui?: UIState;
 }
 
-function convertNodePrompts(workspace: Workspace): Workspace {
-	// Create a deep copy of the workspace to avoid mutating the original
-	const updatedWorkspace = JSON.parse(JSON.stringify(workspace));
-
-	// Iterate through all nodes
-	updatedWorkspace.nodes.forEach((node: Node) => {
-		// Check if the node has content with a prompt property
-		if (node.content && node.content.prompt !== undefined) {
-			// Replace the prompt with {nodeid.nodename} format
-			node.content.prompt = `id: ${node.id}, name: ${node.name}`;
-		}
-		// Check if the node has content with a text property
-		if (node.content && node.content.text !== undefined) {
-			// Replace the prompt with {nodeid.nodename} format
-			node.content.text = `id: ${node.id}, name: ${node.name}`;
-		}
-	});
-
-	// Strip UI nodeState to minimal empty object
-	if (updatedWorkspace.ui) {
-		updatedWorkspace.ui = { ...updatedWorkspace.ui, nodeState: {} };
+class WorkspaceProcessingError extends Error {
+	constructor(message: string, cause?: Error) {
+		super(message);
+		this.name = "WorkspaceProcessingError";
+		this.cause = cause;
 	}
-
-	return updatedWorkspace;
 }
 
-// CLI function to read from stdin and write to stdout
-async function cli(): Promise<void> {
+class InvalidJSONError extends WorkspaceProcessingError {
+	constructor(cause: Error) {
+		super("Invalid JSON format in workspace data", cause);
+		this.name = "InvalidJSONError";
+	}
+}
+
+const createNodeIdentifier = (node: Node): string =>
+	`id: ${node.id}, name: ${node.name}`;
+
+const stripNodeContent = (node: Node): Node => ({
+	...node,
+	content: {
+		...node.content,
+		...(node.content.prompt !== undefined && {
+			prompt: createNodeIdentifier(node),
+		}),
+		...(node.content.text !== undefined && {
+			text: createNodeIdentifier(node),
+		}),
+	},
+});
+
+const stripUIState = (ui: UIState | undefined): UIState | undefined =>
+	ui ? { ...ui, nodeState: {} } : undefined;
+
+const stripWorkspace = (workspace: Workspace): Workspace => ({
+	...workspace,
+	nodes: workspace.nodes.map(stripNodeContent),
+	ui: stripUIState(workspace.ui),
+});
+
+const parseWorkspace = (input: string): Workspace => {
 	try {
-		// Read from stdin
-		let inputData = "";
-
-		process.stdin.setEncoding("utf8");
-
-		for await (const chunk of process.stdin) {
-			inputData += chunk;
-		}
-
-		// Parse the JSON
-		const workspace: Workspace = JSON.parse(inputData);
-
-		// Convert the prompts
-		const updatedWorkspace = convertNodePrompts(workspace);
-
-		// Output to stdout
-		console.log(JSON.stringify(updatedWorkspace, null, 2));
+		return JSON.parse(input) as Workspace;
 	} catch (error) {
-		console.error(
-			"Error:",
-			error instanceof Error ? error.message : "Unknown error",
-		);
-		process.exit(1);
+		throw new InvalidJSONError(error as Error);
+	}
+};
+
+const readStdin = async (): Promise<string> => {
+	process.stdin.setEncoding("utf8");
+	let data = "";
+
+	for await (const chunk of process.stdin) {
+		data += chunk;
+	}
+
+	return data;
+};
+
+const processWorkspace = async (): Promise<string> => {
+	const inputData = await readStdin();
+	const workspace = parseWorkspace(inputData);
+	const strippedWorkspace = stripWorkspace(workspace);
+
+	return JSON.stringify(strippedWorkspace, null, 2);
+};
+
+const handleError = (error: unknown): never => {
+	const message =
+		error instanceof Error ? error.message : "Unknown error occurred";
+	console.error("Error:", message);
+	process.exit(1);
+};
+
+async function main(): Promise<void> {
+	try {
+		const result = await processWorkspace();
+		console.log(result);
+	} catch (error) {
+		handleError(error);
 	}
 }
 
-// Run CLI if this is the main module
 if (import.meta.url.startsWith("file:")) {
-	cli();
+	main();
 }
 
-export type { Workspace, Node };
+export type { Workspace, Node, Connection, NodeContent, UIState };
