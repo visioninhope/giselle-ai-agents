@@ -1,3 +1,111 @@
+import type { Workspace } from "@giselle-sdk/data-type";
+
+/**
+ * Two Trigger Test Fixture - GitHub Pull Request QA Workflow
+ *
+ * Node Structure - Two Parallel GitHub Trigger Flows:
+ *
+ * FLOW 1: Pull Request Ready for Review → Manual QA → Comment
+ * ┌─────────────────────────────────────────────────────────────────────┐
+ * │ nd-5JoATar9nEGbObfu                                                │
+ * │ "On Pull Request Ready for Review" (GitHub Trigger)                │
+ * │ Outputs: title, body, number, diff, pullRequestUrl                 │
+ * └───┬─────────────────────────┬─────────────────────┬─────────────────┘
+ *     │                         │                     │
+ *     │ title                   │ body                │ diff
+ *     │                         │                     │
+ *     ▼                         ▼                     ▼
+ * ┌───────────────────────┐ ┌───────────────────────┐ │
+ * │ nd-ySQi0YbUMoNsELO3  │ │ nd-0RVsikMQqKwRMWuZ  │ │
+ * │ "Manual QA"          │ │ "Prompt for AI Agents"│ │
+ * │ (TextGen)            │ │ (TextGen)             │ │
+ * └───────┬───────────────┘ └───────┬───────────────┘ │
+ *         │                         │                 │
+ *         │ generated-text          │ generated-text  │
+ *         │   ┌─────────────────────┘                 │
+ *         │   │   ┌─────────────────────────────────────┘
+ *         │   │   │
+ *         │   │   │   ┌─────────────────────────────────┐
+ *         │   │   │   │ nd-xcv9NFBilDvWKyYG            │
+ *         │   │   │   │ "Template for commenting..."   │
+ *         │   │   │   │ (Variable)                     │
+ *         │   │   │   └───────┬─────────────────────────┘
+ *         │   │   │           │ text
+ *         ▼   ▼   ▼           ▼
+ *     ┌─────────────────────────────────┐
+ *     │ nd-worigWCbqYT9Ofye             │
+ *     │ "Create a Comment for PR"       │
+ *     │ (TextGen)                       │
+ *     └─────────────┬───────────────────┘
+ *                   │ generated-text
+ *                   ▼
+ *     ┌─────────────────────────────────┐
+ *     │ nd-Dd7brCDUvMmBK9De             │◄─── number (from trigger)
+ *     │ "Create Pull Request Comment"   │
+ *     │ (GitHub Action)                 │
+ *     └─────────────────────────────────┘
+ *
+ *
+ * FLOW 2: Pull Request Opened → Manual QA → Comment
+ * ┌─────────────────────────────────────────────────────────────────────┐
+ * │ nd-FoP9shtlUFMU5zcI                                                │
+ * │ "On Pull Request Opened" (GitHub Trigger)                          │
+ * │ Outputs: title, body, number, diff, pullRequestUrl                 │
+ * └───┬─────────────────────────┬─────────────────────┬─────────────────┘
+ *     │                         │                     │
+ *     │ title                   │ body                │ diff & pullRequestUrl
+ *     │                         │                     │
+ *     ▼                         ▼                     ▼
+ * ┌───────────────────────┐ ┌───────────────────────┐ │
+ * │ nd-ZEMYDrI7lolEeMEJ  │ │ nd-pLEJoQT8VDAJ1Ewx  │ │
+ * │ "Manual QA"          │ │ "Prompt for AI Agents"│ │
+ * │ (TextGen)            │ │ (TextGen)             │ │
+ * └───────┬───────────────┘ └───────┬───────────────┘ │
+ *         │                         │                 │
+ *         │ generated-text          │ generated-text  │
+ *         │   ┌─────────────────────┘                 │
+ *         │   │   ┌─────────────────────────────────────┘
+ *         │   │   │
+ *         │   │   │   ┌─────────────────────────────────┐
+ *         │   │   │   │ nd-xcv9NFBilDvWKyYG            │
+ *         │   │   │   │ "Template for commenting..."   │
+ *         │   │   │   │ (Variable) - SHARED             │
+ *         │   │   │   └───────┬─────────────────────────┘
+ *         │   │   │           │ text
+ *         ▼   ▼   ▼           ▼
+ *     ┌─────────────────────────────────┐
+ *     │ nd-tvQwRmbPhKA69OgT             │
+ *     │ "Create a Comment for PR"       │
+ *     │ (TextGen)                       │
+ *     └─────────────┬───────────────────┘
+ *                   │ generated-text
+ *                   ▼
+ *     ┌─────────────────────────────────┐
+ *     │ nd-le8wUlKPyfeueTTP             │◄─── number (from trigger)
+ *     │ "Create Pull Request Comment"   │
+ *     │ (GitHub Action)                 │
+ *     └─────────────────────────────────┘
+ *
+ *
+ * SHARED TEMPLATES:
+ * ┌─────────────────────────────────┐     ┌─────────────────────────────────┐
+ * │ nd-0gHqrsQ63D3oD6H9             │     │ nd-SP2PD7natQF8f2yH             │
+ * │ "Template - Manual QA"          │────▶│ "Template - Prompt for AI..."   │
+ * │ (Variable)                      │     │ (Variable)                      │
+ * └─────────────────────────────────┘     └─────────────────────────────────┘
+ *           │                                       │
+ *           ▼                                       ▼
+ *    Both Manual QA nodes                   Both Prompt nodes
+ *    use this template                      use this template
+ *
+ * Key Points:
+ * - Two independent GitHub triggers handle different PR events
+ * - Each trigger flows through parallel QA processing (Manual + AI Agents)
+ * - Both flows converge on creating PR comments via GitHub Actions
+ * - Template variables are shared between both flows for consistency
+ * - Flow 1: Ready for Review → processes 3 trigger outputs → creates comment
+ * - Flow 2: PR Opened → processes 4 trigger outputs → creates comment
+ */
 export const twoTriggerFixture = {
 	id: "wrks-v1mMsUkpKvxzltN8",
 	name: "QA Testing Agents - gh/giselles-ai/giselle",
