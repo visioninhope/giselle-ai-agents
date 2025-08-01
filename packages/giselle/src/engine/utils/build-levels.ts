@@ -59,10 +59,23 @@ export function buildLevels(
 		}
 
 		if (currentLevel.length === 0) {
-			// If no nodes have in-degree 0, we have a cycle or disconnected components
-			// Add all remaining nodes to break the cycle
+			// If no nodes have in-degree 0, we have a cycle
+			// Break the cycle by selecting one node with the minimum in-degree
+			let minInDegree = Infinity;
+			let nodeToAdd: NodeId | null = null;
+
 			for (const nodeId of remainingNodes) {
-				currentLevel.push(nodeId);
+				const degree = inDegrees[nodeId];
+				if (degree < minInDegree) {
+					minInDegree = degree;
+					nodeToAdd = nodeId;
+				}
+			}
+
+			if (nodeToAdd) {
+				currentLevel.push(nodeToAdd);
+				// Artificially set in-degree to 0 to process this node
+				inDegrees[nodeToAdd] = 0;
 			}
 		}
 

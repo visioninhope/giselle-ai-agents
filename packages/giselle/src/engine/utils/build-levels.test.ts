@@ -470,5 +470,210 @@ describe("buildLevels", () => {
 			expect(levels).toBeDefined();
 			expect(Array.isArray(levels)).toBe(true);
 		});
+
+		it("should not place cyclic nodes in the same level", () => {
+			// Create a simple cycle: A -> B -> A
+			const nodes: NodeLike[] = [
+				{
+					id: "nd-cycleA",
+					name: "Cycle Node A",
+					type: "operation",
+					inputs: [{ id: "inp-a", label: "Input", accessor: "input" }],
+					outputs: [{ id: "otp-a", label: "Output", accessor: "output" }],
+					content: { type: "textGeneration" },
+				},
+				{
+					id: "nd-cycleB",
+					name: "Cycle Node B",
+					type: "operation",
+					inputs: [{ id: "inp-b", label: "Input", accessor: "input" }],
+					outputs: [{ id: "otp-b", label: "Output", accessor: "output" }],
+					content: { type: "textGeneration" },
+				},
+			];
+
+			const connections: Connection[] = [
+				{
+					id: "cnnc-AtoB",
+					outputNode: {
+						id: "nd-cycleA",
+						type: "operation",
+						content: { type: "textGeneration" },
+					},
+					outputId: "otp-a",
+					inputNode: {
+						id: "nd-cycleB",
+						type: "operation",
+						content: { type: "textGeneration" },
+					},
+					inputId: "inp-b",
+				},
+				{
+					id: "cnnc-BtoA",
+					outputNode: {
+						id: "nd-cycleB",
+						type: "operation",
+						content: { type: "textGeneration" },
+					},
+					outputId: "otp-b",
+					inputNode: {
+						id: "nd-cycleA",
+						type: "operation",
+						content: { type: "textGeneration" },
+					},
+					inputId: "inp-a",
+				},
+			];
+
+			const levels = buildLevels(nodes, connections);
+
+			// Nodes in a cycle should NOT be in the same level
+			expect(levels.length).toBe(2);
+			expect(levels[0].length).toBe(1);
+			expect(levels[1].length).toBe(1);
+
+			// Verify both nodes are included but in different levels
+			const allNodes = levels.flat();
+			expect(allNodes).toContain("nd-cycleA");
+			expect(allNodes).toContain("nd-cycleB");
+		});
+
+		it("should handle complex cycles with multiple nodes", () => {
+			// Create a more complex cycle: A -> B -> C -> A, with D -> B
+			const nodes: NodeLike[] = [
+				{
+					id: "nd-complexA",
+					name: "Complex A",
+					type: "operation",
+					inputs: [{ id: "inp-complexA", label: "Input", accessor: "input" }],
+					outputs: [
+						{ id: "otp-complexA", label: "Output", accessor: "output" },
+					],
+					content: { type: "textGeneration" },
+				},
+				{
+					id: "nd-complexB",
+					name: "Complex B",
+					type: "operation",
+					inputs: [
+						{ id: "inp-complexB", label: "Input", accessor: "input" },
+						{ id: "inp-complexB2", label: "Input 2", accessor: "input2" },
+					],
+					outputs: [
+						{ id: "otp-complexB", label: "Output", accessor: "output" },
+					],
+					content: { type: "textGeneration" },
+				},
+				{
+					id: "nd-complexC",
+					name: "Complex C",
+					type: "operation",
+					inputs: [{ id: "inp-complexC", label: "Input", accessor: "input" }],
+					outputs: [
+						{ id: "otp-complexC", label: "Output", accessor: "output" },
+					],
+					content: { type: "textGeneration" },
+				},
+				{
+					id: "nd-complexD",
+					name: "Complex D",
+					type: "operation",
+					inputs: [],
+					outputs: [
+						{ id: "otp-complexD", label: "Output", accessor: "output" },
+					],
+					content: { type: "textGeneration" },
+				},
+			];
+
+			const connections: Connection[] = [
+				{
+					id: "cnnc-AtoB",
+					outputNode: {
+						id: "nd-complexA",
+						type: "operation",
+						content: { type: "textGeneration" },
+					},
+					outputId: "otp-complexA",
+					inputNode: {
+						id: "nd-complexB",
+						type: "operation",
+						content: { type: "textGeneration" },
+					},
+					inputId: "inp-complexB",
+				},
+				{
+					id: "cnnc-BtoC",
+					outputNode: {
+						id: "nd-complexB",
+						type: "operation",
+						content: { type: "textGeneration" },
+					},
+					outputId: "otp-complexB",
+					inputNode: {
+						id: "nd-complexC",
+						type: "operation",
+						content: { type: "textGeneration" },
+					},
+					inputId: "inp-complexC",
+				},
+				{
+					id: "cnnc-CtoA",
+					outputNode: {
+						id: "nd-complexC",
+						type: "operation",
+						content: { type: "textGeneration" },
+					},
+					outputId: "otp-complexC",
+					inputNode: {
+						id: "nd-complexA",
+						type: "operation",
+						content: { type: "textGeneration" },
+					},
+					inputId: "inp-complexA",
+				},
+				{
+					id: "cnnc-DtoB",
+					outputNode: {
+						id: "nd-complexD",
+						type: "operation",
+						content: { type: "textGeneration" },
+					},
+					outputId: "otp-complexD",
+					inputNode: {
+						id: "nd-complexB",
+						type: "operation",
+						content: { type: "textGeneration" },
+					},
+					inputId: "inp-complexB2",
+				},
+			];
+
+			const levels = buildLevels(nodes, connections);
+
+			// D should be in the first level (no dependencies)
+			expect(levels[0]).toContain("nd-complexD");
+
+			// The cycle nodes (A, B, C) should be in different levels
+			const levelMap = new Map<string, number>();
+			for (let i = 0; i < levels.length; i++) {
+				for (const nodeId of levels[i]) {
+					levelMap.set(nodeId, i);
+				}
+			}
+
+			// All nodes should be included
+			expect(levelMap.size).toBe(4);
+
+			// Nodes in the cycle should not all be in the same level
+			const cycleNodeLevels = [
+				levelMap.get("nd-complexA"),
+				levelMap.get("nd-complexB"),
+				levelMap.get("nd-complexC"),
+			].filter((l) => l !== undefined);
+
+			const uniqueLevels = new Set(cycleNodeLevels);
+			expect(uniqueLevels.size).toBeGreaterThan(1);
+		});
 	});
 });
