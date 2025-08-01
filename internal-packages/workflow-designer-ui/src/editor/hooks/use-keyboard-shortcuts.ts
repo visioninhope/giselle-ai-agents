@@ -1,5 +1,5 @@
-import { useEffect } from "react";
-import { useCopyPasteNode, useDuplicateNode } from "./node";
+import { useCallback } from "react";
+import { useCopyPasteNode, useDuplicateNode } from "../node";
 import {
 	moveTool,
 	selectFileNodeCategoryTool,
@@ -7,19 +7,20 @@ import {
 	selectRetrievalCategoryTool,
 	selectSourceCategoryTool,
 	useToolbar,
-} from "./tool/toolbar";
+} from "../tool/toolbar";
 
 const ignoredTags = ["INPUT", "TEXTAREA", "SELECT"];
 
-export function KeyboardShortcuts() {
+export function useKeyboardShortcuts() {
 	const duplicateNode = useDuplicateNode();
 	const { copy, paste } = useCopyPasteNode();
 	const toolbar = useToolbar();
 
-	useEffect(() => {
-		const handleKeyDown = (event: KeyboardEvent) => {
+	return useCallback(
+		(event: React.KeyboardEvent) => {
 			const activeElement = document.activeElement as HTMLElement | null;
 
+			// Ignore shortcuts when typing in inputs or editable elements
 			if (
 				activeElement &&
 				(ignoredTags.includes(activeElement.tagName) ||
@@ -28,6 +29,7 @@ export function KeyboardShortcuts() {
 				return;
 			}
 
+			// Copy, Paste, Duplicate shortcuts
 			if ((event.metaKey || event.ctrlKey) && event.key === "d") {
 				event.preventDefault();
 				duplicateNode();
@@ -66,10 +68,7 @@ export function KeyboardShortcuts() {
 					toolbar.setSelectedTool(moveTool());
 				}
 			}
-		};
-		window.addEventListener("keydown", handleKeyDown);
-		return () => window.removeEventListener("keydown", handleKeyDown);
-	}, [duplicateNode, copy, paste, toolbar]);
-
-	return null;
+		},
+		[duplicateNode, copy, paste, toolbar],
+	);
 }

@@ -27,6 +27,7 @@ import { type ConnectorType, GradientDef } from "../../connector/component";
 import { ContextMenu } from "../../context-menu";
 import type { ContextMenuProps } from "../../context-menu/types";
 import { DataSourceTable } from "../../data-source";
+import { useKeyboardShortcuts } from "../../hooks/use-keyboard-shortcuts";
 import { type GiselleWorkflowDesignerNode, nodeTypes } from "../../node";
 import { PropertiesPanel } from "../../properties-panel";
 import { RunHistoryTable } from "../../run-history/run-history-table";
@@ -59,6 +60,7 @@ function V2NodeCanvas() {
 	const updateNodeInternals = useUpdateNodeInternals();
 	const { selectedTool, reset } = useToolbar();
 	const toast = useToasts();
+	const handleKeyDown = useKeyboardShortcuts();
 	const [menu, setMenu] = useState<Omit<ContextMenuProps, "onClose"> | null>(
 		null,
 	);
@@ -288,6 +290,7 @@ function V2NodeCanvas() {
 							: undefined,
 				});
 			}}
+			onKeyDown={handleKeyDown}
 		>
 			<Background />
 			{selectedTool?.action === "addNode" && (
