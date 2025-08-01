@@ -1,5 +1,8 @@
 import { useMemo } from "react";
-import { groupNodes } from "../../engine/utils/workspace/group-nodes";
+import {
+	type GroupedNodes,
+	groupNodes,
+} from "../../engine/utils/workspace/group-nodes";
 import { useWorkflowDesigner } from "../flow";
 
 /**
@@ -9,5 +12,5 @@ import { useWorkflowDesigner } from "../flow";
 export function useNodeGroups() {
 	const { data } = useWorkflowDesigner();
 
-	return useMemo(() => groupNodes(data), [data]);
+	return useMemo<GroupedNodes>(() => groupNodes(data), [data]);
 }

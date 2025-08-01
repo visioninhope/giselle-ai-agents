@@ -12,7 +12,7 @@ interface NodeGroup {
 	connectionIds: ConnectionId[];
 }
 
-interface GroupedNodes {
+export interface GroupedNodes {
 	operationNodeGroups: NodeGroup[];
 	triggerNodeGroups: {
 		node: TriggerNode;
