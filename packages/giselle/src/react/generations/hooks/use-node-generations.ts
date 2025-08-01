@@ -1,7 +1,10 @@
 import type { NodeId } from "@giselle-sdk/data-type";
 import { useCallback, useMemo } from "react";
 import useSWR from "swr";
-import type { GenerationOrigin } from "../../../concepts/generation";
+import type {
+	Generation,
+	GenerationOrigin,
+} from "../../../concepts/generation";
 import { useFeatureFlag } from "../../feature-flags";
 import { useGiselleEngine } from "../../use-giselle-engine";
 import { useGenerationRunnerSystem } from "../contexts";
@@ -22,6 +25,7 @@ export function useNodeGenerations({
 	} = useGenerationRunnerSystem();
 	const client = useGiselleEngine();
 	const { experimental_storage } = useFeatureFlag();
+
 	/** @todo fetch on server */
 	const { data } = useSWR(
 		{
@@ -37,7 +41,7 @@ export function useNodeGenerations({
 			revalidateOnReconnect: false,
 		},
 	);
-	const currentGeneration = useMemo(() => {
+	const currentGeneration = useMemo<Generation>(() => {
 		const fetchGenerations = data ?? [];
 		const createdGenerations = generations.filter(
 			(generation) =>
@@ -49,10 +53,21 @@ export function useNodeGenerations({
 					: generation.context.origin.type !== "studio" &&
 						generation.context.origin.actId === origin.actId),
 		);
-		const allGenerations = [...fetchGenerations, ...createdGenerations].sort(
-			(a, b) =>
-				new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+		// Deduplicate generations by filtering out fetched generations from created ones
+		const deduplicatedCreatedGenerations = createdGenerations.filter(
+			(created) =>
+				!fetchGenerations.some((fetched) => fetched.id === created.id),
 		);
+		// Filter out cancelled generations from both sources after deduplication
+		const allGenerations = [
+			...fetchGenerations,
+			...deduplicatedCreatedGenerations,
+		]
+			.filter((generation) => generation.status !== "cancelled")
+			.sort(
+				(a, b) =>
+					new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+			);
 		return allGenerations[0];
 	}, [generations, data, nodeId, origin]);
 
