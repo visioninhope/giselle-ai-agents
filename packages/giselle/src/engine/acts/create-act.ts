@@ -67,10 +67,23 @@ export async function createAct(
 	} else if (args.nodeId !== undefined) {
 		// Derive connectionIds from nodeId using node groups
 		const nodeId = args.nodeId;
-		const nodeGroups = groupNodes(workspace);
-		const nodeGroup = nodeGroups.find((group) =>
+		const groupedNodes = groupNodes(workspace);
+
+		// Search in operation node groups first
+		let nodeGroup = groupedNodes.operationNodeGroups.find((group) =>
 			group.nodeIds.includes(nodeId),
 		);
+
+		// If not found, search in trigger node groups
+		if (!nodeGroup) {
+			const triggerGroup = groupedNodes.triggerNodeGroups.find((group) =>
+				group.nodeGroup.nodeIds.includes(nodeId),
+			);
+			if (triggerGroup) {
+				nodeGroup = triggerGroup.nodeGroup;
+			}
+		}
+
 		if (!nodeGroup) {
 			throw new Error(`Node ${nodeId} is not part of any node group`);
 		}

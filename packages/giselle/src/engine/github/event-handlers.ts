@@ -378,16 +378,9 @@ export async function processEvent<TEventName extends WebhookEventName>(
 			useExperimentalStorage: true,
 		});
 
-		const triggerNodeGroup = groupNodes(workspace).find((group) =>
-			group.nodeIds.some((nodeId) => nodeId === args.trigger.nodeId),
-		);
-		if (triggerNodeGroup === undefined) {
-			throw new Error(`Trigger node group not found`);
-		}
-
 		await deps.createAndStartAct({
 			context: args.context,
-			connectionIds: triggerNodeGroup.connectionIds,
+			nodeId: args.trigger.nodeId,
 			workspace,
 			generationOriginType: "github-app",
 			inputs: [

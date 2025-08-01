@@ -1,17 +1,32 @@
-import type { ConnectionId, NodeId, Workspace } from "@giselle-sdk/data-type";
+import type {
+	ConnectionId,
+	NodeId,
+	TriggerNode,
+	Workspace,
+} from "@giselle-sdk/data-type";
+import { isOperationNode, isTriggerNode } from "@giselle-sdk/data-type";
+import { sliceGraphFromNode } from "./slice-graph-from-node";
 
 export interface NodeGroup {
 	nodeIds: NodeId[];
 	connectionIds: ConnectionId[];
 }
 
+export interface GroupedNodes {
+	operationNodeGroups: NodeGroup[];
+	triggerNodeGroups: {
+		node: TriggerNode;
+		nodeGroup: NodeGroup;
+	}[];
+}
+
 /**
  * Groups connected nodes in a workspace using Union-Find algorithm.
- * Returns an array of node groups with their nodeIds and internal connectionIds.
+ * Splits groups by trigger nodes and returns structured object with operation and trigger node groups.
  */
 export function groupNodes(
 	workspace: Pick<Workspace, "nodes" | "connections">,
-): NodeGroup[] {
+): GroupedNodes {
 	const nodeIds = workspace.nodes.map((node) => node.id);
 
 	// Initialize parent map - each node is its own parent initially
@@ -71,5 +86,52 @@ export function groupNodes(
 		nodeGroups.push({ nodeIds, connectionIds });
 	}
 
-	return nodeGroups;
+	// Split groups by trigger nodes
+	const operationNodeGroups: NodeGroup[] = [];
+	const triggerNodeGroups: {
+		node: TriggerNode;
+		nodeGroup: NodeGroup;
+	}[] = [];
+
+	for (const group of nodeGroups) {
+		const nodes = group.nodeIds
+			.map((nodeId) => workspace.nodes.find((node) => node.id === nodeId))
+			.filter((node) => node !== undefined);
+		const connections = group.connectionIds
+			.map((connectionId) =>
+				workspace.connections.find(
+					(connection) => connection.id === connectionId,
+				),
+			)
+			.filter((connection) => connection !== undefined);
+		const existOperationNode = nodes.find((node) => isOperationNode(node));
+		if (!existOperationNode) {
+			continue;
+		}
+		const triggerNodes = nodes.filter((node) => isTriggerNode(node));
+		if (triggerNodes.length === 0) {
+			operationNodeGroups.push(group);
+			continue;
+		}
+		for (const triggerNode of triggerNodes) {
+			const sliceGraph = sliceGraphFromNode(triggerNode, {
+				nodes,
+				connections,
+			});
+			triggerNodeGroups.push({
+				node: triggerNode,
+				nodeGroup: {
+					nodeIds: sliceGraph.nodes.map((node) => node.id),
+					connectionIds: sliceGraph.connections.map(
+						(connection) => connection.id,
+					),
+				},
+			});
+		}
+	}
+
+	return {
+		operationNodeGroups,
+		triggerNodeGroups,
+	};
 }
