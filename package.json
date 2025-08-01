@@ -15,6 +15,7 @@
 		"version": "changeset version",
 		"test": "turbo test",
 		"tidy": "knip --no-config-hints",
+		"strip-workspace": "pnpm -F strip-workspace strip-workspace",
 		"prevd": "pnpm i && pnpm build-sdk",
 		"vd": "vercel dev"
 	},
