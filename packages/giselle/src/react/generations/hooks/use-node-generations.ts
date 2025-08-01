@@ -39,9 +39,7 @@ export function useNodeGenerations({
 		},
 	);
 	const currentGeneration = useMemo(() => {
-		const fetchGenerations = (data ?? []).filter(
-			(generation) => generation.status !== "cancelled",
-		);
+		const fetchGenerations = data ?? [];
 		const createdGenerations = generations.filter(
 			(generation) =>
 				generation.context.operationNode.id === nodeId &&
@@ -57,13 +55,16 @@ export function useNodeGenerations({
 			(created) =>
 				!fetchGenerations.some((fetched) => fetched.id === created.id),
 		);
+		// Filter out cancelled generations from both sources after deduplication
 		const allGenerations = [
 			...fetchGenerations,
 			...deduplicatedCreatedGenerations,
-		].sort(
-			(a, b) =>
-				new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-		);
+		]
+			.filter((generation) => generation.status !== "cancelled")
+			.sort(
+				(a, b) =>
+					new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+			);
 		return allGenerations[0];
 	}, [generations, data, nodeId, origin]);
 
