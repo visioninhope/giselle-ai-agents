@@ -22,6 +22,7 @@ export function useNodeGenerations({
 	} = useGenerationRunnerSystem();
 	const client = useGiselleEngine();
 	const { experimental_storage } = useFeatureFlag();
+
 	/** @todo fetch on server */
 	const { data } = useSWR(
 		{
@@ -38,7 +39,9 @@ export function useNodeGenerations({
 		},
 	);
 	const currentGeneration = useMemo(() => {
-		const fetchGenerations = data ?? [];
+		const fetchGenerations = (data ?? []).filter(
+			(generation) => generation.status !== "cancelled",
+		);
 		const createdGenerations = generations.filter(
 			(generation) =>
 				generation.context.operationNode.id === nodeId &&
@@ -49,7 +52,15 @@ export function useNodeGenerations({
 					: generation.context.origin.type !== "studio" &&
 						generation.context.origin.actId === origin.actId),
 		);
-		const allGenerations = [...fetchGenerations, ...createdGenerations].sort(
+		// Deduplicate generations by filtering out fetched generations from created ones
+		const deduplicatedCreatedGenerations = createdGenerations.filter(
+			(created) =>
+				!fetchGenerations.some((fetched) => fetched.id === created.id),
+		);
+		const allGenerations = [
+			...fetchGenerations,
+			...deduplicatedCreatedGenerations,
+		].sort(
 			(a, b) =>
 				new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
 		);
