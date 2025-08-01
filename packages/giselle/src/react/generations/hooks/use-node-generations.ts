@@ -1,7 +1,10 @@
 import type { NodeId } from "@giselle-sdk/data-type";
 import { useCallback, useMemo } from "react";
 import useSWR from "swr";
-import type { GenerationOrigin } from "../../../concepts/generation";
+import type {
+	Generation,
+	GenerationOrigin,
+} from "../../../concepts/generation";
 import { useFeatureFlag } from "../../feature-flags";
 import { useGiselleEngine } from "../../use-giselle-engine";
 import { useGenerationRunnerSystem } from "../contexts";
@@ -38,7 +41,7 @@ export function useNodeGenerations({
 			revalidateOnReconnect: false,
 		},
 	);
-	const currentGeneration = useMemo(() => {
+	const currentGeneration = useMemo<Generation>(() => {
 		const fetchGenerations = data ?? [];
 		const createdGenerations = generations.filter(
 			(generation) =>
