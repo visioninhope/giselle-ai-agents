@@ -1,5 +1,7 @@
 #!/usr/bin/env node --experimental-strip-types
 
+import { pathToFileURL } from "node:url";
+
 interface Connection {
 	readonly id: string;
 	readonly sourceNodeId: string;
@@ -118,7 +120,7 @@ async function main(): Promise<void> {
 	}
 }
 
-if (import.meta.url.startsWith("file:")) {
+if (import.meta.url === pathToFileURL(process.argv[1]).href) {
 	main();
 }
 
