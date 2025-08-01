@@ -1121,4 +1121,4 @@ export const twoTriggerFixture = {
 			zoom: 0.5173435218723061,
 		},
 	},
-};
+} satisfies Workspace;
