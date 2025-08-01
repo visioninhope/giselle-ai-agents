@@ -6,7 +6,7 @@ import {
 } from "@giselle-sdk/giselle/react";
 import clsx from "clsx/lite";
 import { ArrowDownIcon, ArrowUpIcon, TimerIcon } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback } from "react";
 import { StackBlicksIcon } from "../../../icons";
 import ClipboardButton from "../../../ui/clipboard-button";
 import { EmptyState } from "../../../ui/empty-state";
@@ -106,22 +106,10 @@ export function GenerationPanel({
 	onClickGenerateButton?: () => void;
 }) {
 	const { data } = useWorkflowDesigner();
-	const { generations } = useNodeGenerations({
+	const { currentGeneration } = useNodeGenerations({
 		nodeId: node.id,
 		origin: { type: "studio", workspaceId: data.id },
 	});
-	const [currentGeneration, setCurrentGeneration] = useState<
-		Generation | undefined
-	>();
-
-	useEffect(() => {
-		if (generations.length === 0) {
-			setCurrentGeneration(undefined);
-		} else {
-			const latestGeneration = generations[generations.length - 1];
-			setCurrentGeneration(latestGeneration);
-		}
-	}, [generations]);
 
 	const handleGenerate = useCallback(() => {
 		if (onClickGenerateButton) {
