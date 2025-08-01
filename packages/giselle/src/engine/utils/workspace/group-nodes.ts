@@ -7,12 +7,12 @@ import type {
 import { isOperationNode, isTriggerNode } from "@giselle-sdk/data-type";
 import { sliceGraphFromNode } from "./slice-graph-from-node";
 
-export interface NodeGroup {
+interface NodeGroup {
 	nodeIds: NodeId[];
 	connectionIds: ConnectionId[];
 }
 
-export interface GroupedNodes {
+interface GroupedNodes {
 	operationNodeGroups: NodeGroup[];
 	triggerNodeGroups: {
 		node: TriggerNode;
