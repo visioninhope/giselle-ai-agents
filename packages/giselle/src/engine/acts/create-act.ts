@@ -1,11 +1,9 @@
 import {
-	type Connection,
 	ConnectionId,
 	isOperationNode,
 	isTriggerNode,
 	Node,
 	NodeId,
-	type NodeLike,
 	Workspace,
 	WorkspaceId,
 } from "@giselle-sdk/data-type";
@@ -27,67 +25,11 @@ import { GenerationId, StepId } from "../../concepts/identifiers";
 import { defaultName } from "../../utils";
 import { setGeneration } from "../generations";
 import type { GiselleEngineContext } from "../types";
-import { groupNodes } from "../utils/workspace/group-nodes";
+import { buildLevels } from "../utils/build-levels";
+import { findNodeGroupByNodeId } from "../utils/workspace/group-nodes";
 import { addWorkspaceIndexItem } from "../utils/workspace-index";
 import { getWorkspace } from "../workspaces";
 import { actPath, workspaceActPath } from "./object/paths";
-
-function buildLevels(nodes: NodeLike[], connections: Connection[]) {
-	const operationNodes = nodes.filter(isOperationNode);
-	const operationConnections = connections.filter(
-		(conn) =>
-			conn.outputNode.type === "operation" &&
-			conn.inputNode.type === "operation",
-	);
-
-	// Calculate in-degrees for topological sort
-	const inDegrees: Record<NodeId, number> = {};
-	for (const node of operationNodes) {
-		inDegrees[node.id] = 0;
-	}
-
-	// Track processed connections to handle duplicates
-	const processedEdges = new Set<string>();
-	for (const conn of operationConnections) {
-		const edgeKey = `${conn.outputNode.id}-${conn.inputNode.id}`;
-		if (!processedEdges.has(edgeKey)) {
-			processedEdges.add(edgeKey);
-			inDegrees[conn.inputNode.id] = (inDegrees[conn.inputNode.id] || 0) + 1;
-		}
-	}
-
-	// Find nodes by level using topological sort
-	const levels: NodeId[][] = [];
-	const remainingNodes = new Set(operationNodes.map((n) => n.id));
-
-	while (remainingNodes.size > 0) {
-		const currentLevel: NodeId[] = [];
-
-		for (const nodeId of remainingNodes) {
-			if (inDegrees[nodeId] === 0) {
-				currentLevel.push(nodeId);
-			}
-		}
-
-		if (currentLevel.length === 0) break; // Prevent infinite loop on cycles
-
-		levels.push(currentLevel);
-
-		// Remove processed nodes and update in-degrees
-		for (const nodeId of currentLevel) {
-			remainingNodes.delete(nodeId);
-
-			// Decrease in-degree of children
-			for (const conn of operationConnections) {
-				if (conn.outputNode.id === nodeId) {
-					inDegrees[conn.inputNode.id]--;
-				}
-			}
-		}
-	}
-
-	return levels;
-}
 
 export const CreateActInputs = z.object({
 	workspaceId: z.optional(WorkspaceId.schema),
@@ -124,13 +66,10 @@ export async function createAct(
 		connectionIds = args.connectionIds;
 	} else if (args.nodeId !== undefined) {
 		// Derive connectionIds from nodeId using node groups
-		const nodeId = args.nodeId;
-		const nodeGroups = groupNodes(workspace);
-		const nodeGroup = nodeGroups.find((group) =>
-			group.nodeIds.includes(nodeId),
-		);
+		const nodeGroup = findNodeGroupByNodeId(workspace, args.nodeId);
+
 		if (!nodeGroup) {
-			throw new Error(`Node ${nodeId} is not part of any node group`);
+			throw new Error(`Node ${args.nodeId} is not part of any node group`);
 		}
 		connectionIds = nodeGroup.connectionIds;
 	} else {

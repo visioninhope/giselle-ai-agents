@@ -4,7 +4,11 @@ import { groupNodes } from "./group-nodes";
 
 describe("groupNodes", () => {
 	it("should group connected nodes in workspace1", () => {
-		const groups = groupNodes(gourpNodesFixture);
+		const result = groupNodes(gourpNodesFixture);
+
+		// Since fixture only has operation nodes, all groups should be in operationNodeGroups
+		expect(result.triggerNodeGroups).toHaveLength(0);
+		const groups = result.operationNodeGroups;
 
 		// Sort groups by size for consistent testing
 		const sortedGroups = groups
@@ -51,7 +55,11 @@ describe("groupNodes", () => {
 			connections: [],
 		};
 
-		const groups = groupNodes(workspace);
+		const result = groupNodes(workspace);
+
+		// Since fixture only has operation nodes, all groups should be in operationNodeGroups
+		expect(result.triggerNodeGroups).toHaveLength(0);
+		const groups = result.operationNodeGroups;
 
 		// Each node should be in its own group
 		expect(groups).toHaveLength(workspace.nodes.length);
@@ -68,9 +76,12 @@ describe("groupNodes", () => {
 			connections: [],
 		};
 
-		const groups = groupNodes(workspace);
+		const result = groupNodes(workspace);
 
-		expect(groups).toEqual([]);
+		expect(result).toEqual({
+			operationNodeGroups: [],
+			triggerNodeGroups: [],
+		});
 	});
 
 	it("should handle self-loops correctly", () => {
@@ -88,7 +99,11 @@ describe("groupNodes", () => {
 			],
 		};
 
-		const groups = groupNodes(workspace);
+		const result = groupNodes(workspace);
+
+		// Since fixture only has operation nodes, all groups should be in operationNodeGroups
+		expect(result.triggerNodeGroups).toHaveLength(0);
+		const groups = result.operationNodeGroups;
 
 		// Self-loop doesn't create additional groups
 		expect(groups).toHaveLength(2);
