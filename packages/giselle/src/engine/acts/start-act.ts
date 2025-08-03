@@ -15,6 +15,14 @@ import { getAct } from "./get-act";
 import { patchAct } from "./patch-act";
 import { executeAct } from "./shared/act-execution-utils";
 
+function createStreamConsumer(): WritableStream {
+	return new WritableStream({
+		write() {},
+		close() {},
+		abort() {},
+	});
+}
+
 export interface StartActCallbacks {
 	sequenceStart?: (args: { sequence: Sequence }) => void | Promise<void>;
 	sequenceFail?: (args: { sequence: Sequence }) => void | Promise<void>;
@@ -44,12 +52,8 @@ async function executeStep(args: {
 					useExperimentalStorage: true,
 				});
 
-				const sink = new WritableStream({
-					write() {},
-					close() {},
-					abort() {},
-				});
-				await generateTextStream.pipeTo(sink);
+				// Consume the stream to trigger completion callbacks and persist generation results
+				await generateTextStream.pipeTo(createStreamConsumer());
 				break;
 			}
 			case "trigger":
