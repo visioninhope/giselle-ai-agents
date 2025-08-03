@@ -22,12 +22,6 @@ export interface StartActCallbacks {
 	sequenceSkip?: (args: { sequence: Sequence }) => void | Promise<void>;
 }
 
-const sink = new WritableStream({
-	write() {},
-	close() {},
-	abort() {},
-});
-
 async function executeStep(args: {
 	context: GiselleEngineContext;
 	generation: QueuedGeneration;
@@ -49,6 +43,12 @@ async function executeStep(args: {
 					...args,
 					useExperimentalStorage: true,
 				});
+
+				const sink = new WritableStream({
+					write() {},
+					close() {},
+					abort() {},
+				});
 				await generateTextStream.pipeTo(sink);
 				break;
 			}
@@ -66,6 +66,7 @@ async function executeStep(args: {
 		}
 		await args.callbacks?.onCompleted?.();
 	} catch (_e) {
+		console.log(_e);
 		await args.callbacks?.onFailed?.(args.generation);
 	}
 }
