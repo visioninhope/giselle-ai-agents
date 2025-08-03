@@ -158,7 +158,7 @@ export function generateText(args: {
 					...preparedToolSet,
 					toolSet: {
 						...preparedToolSet.toolSet,
-						openaiWebSearch: openai.tools.webSearchPreview(
+						web_search_preview: openai.tools.webSearchPreview(
 							operationNode.content.tools.openaiWebSearch,
 						),
 					},
