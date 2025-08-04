@@ -131,7 +131,7 @@ export async function startAct(
 			},
 		});
 	} catch (error) {
-			executionError = error as Error;
+		executionError = error as Error;
 	}
 	try {
 		await patchQueue.cleanup();
