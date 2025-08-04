@@ -1,5 +1,6 @@
 "use client";
 
+import { StatusBadge } from "@giselle-internal/ui/status-badge";
 import * as Dialog from "@radix-ui/react-dialog";
 import {
 	Code,
@@ -276,7 +277,7 @@ const STATUS_CONFIG = {
 	failed: { dotColor: "bg-[#FF3D71]", label: "Error" },
 } as const;
 
-function StatusBadge({
+function SyncStatusBadge({
 	status,
 	onVerify,
 }: {
@@ -377,9 +378,7 @@ function ContentTypeSection({
 						<span>{config.label}</span>
 					</div>
 					<div className="flex items-center gap-2">
-						<span className="bg-gray-600 text-gray-300 px-2 py-0.5 rounded text-xs">
-							Disabled
-						</span>
+						<StatusBadge status="ignored">Disabled</StatusBadge>
 					</div>
 				</div>
 				<div className="text-xs text-gray-500">
@@ -436,16 +435,12 @@ function ContentTypeSection({
 				</div>
 				<div className="flex items-center gap-2">
 					{enabled ? (
-						<span className="bg-green-700 text-white px-2 py-0.5 rounded text-xs">
-							Enabled
-						</span>
+						<StatusBadge status="success">Enabled</StatusBadge>
 					) : (
-						<span className="bg-gray-600 text-gray-300 px-2 py-0.5 rounded text-xs">
-							Disabled
-						</span>
+						<StatusBadge status="ignored">Disabled</StatusBadge>
 					)}
 					{enabled && (
-						<StatusBadge
+						<SyncStatusBadge
 							status={displayStatus}
 							onVerify={
 								syncStatus === "failed" && onVerify ? onVerify : undefined
