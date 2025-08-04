@@ -6,7 +6,6 @@ import { db, flowTriggers } from "@/drizzle";
 import {
 	experimental_storageFlag,
 	layoutV3Flag,
-	pullRequestVectorStoreFlag,
 	runV3Flag,
 	stageFlag,
 	webSearchActionFlag,
@@ -46,7 +45,6 @@ export default async function Layout({
 	);
 	const runV3 = await runV3Flag();
 	const webSearchAction = await webSearchActionFlag();
-	const pullRequestVectorStore = await pullRequestVectorStoreFlag();
 	const layoutV3 = await layoutV3Flag();
 	const experimental_storage = await experimental_storageFlag();
 	const stage = await stageFlag();
@@ -79,7 +77,6 @@ export default async function Layout({
 			featureFlag={{
 				runV3,
 				webSearchAction,
-				pullRequestVectorStore,
 				layoutV3,
 				experimental_storage,
 				stage,
