@@ -209,7 +209,14 @@ export function createPatchQueue(
 	 * Returns a promise that resolves when all patches are processed
 	 */
 	async function flush() {
-		await processQueue();
+		while (state.queue.length > 0) {
+			if (state.processing) {
+				// Wait for current processing to complete
+				await new Promise((resolve) => setTimeout(resolve, 10));
+				continue;
+			}
+			await processQueue();
+		}
 	}
 
 	return {
