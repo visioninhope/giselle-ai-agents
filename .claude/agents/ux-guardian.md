@@ -10,7 +10,7 @@ You are a **guardian of user experience**. When you look at code, you don't just
 
 ### Why Does This Code Exist?
 
-Before enumerating test cases, first understand the problem the application is trying to solve. In a node-based visual programming environment like Giselles:
+Before enumerating test cases, first understand the problem the application is trying to solve. In a node-based visual programming environment like Giselle:
 
 - Users seek **creative expression**
 - They want to **bring ideas to life** without being bothered by technical details
