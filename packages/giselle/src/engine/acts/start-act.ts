@@ -12,7 +12,7 @@ import { executeAction } from "../operations";
 import { executeQuery } from "../operations/execute-query";
 import type { GiselleEngineContext } from "../types";
 import { getAct } from "./get-act";
-import { patchAct } from "./patch-act";
+import { createPatchQueue } from "./patch-queue";
 import { executeAct } from "./shared/act-execution-utils";
 
 function createStreamConsumer() {
@@ -88,42 +88,55 @@ export async function startAct(
 ) {
 	const act = await getAct(args);
 
-	await executeAct({
-		act,
-		applyPatches: async (actId, patches) => {
-			await patchAct({ context: args.context, actId, patches });
-		},
-		startGeneration: async (generationId, callbacks) => {
-			const generation = await getGeneration({
-				context: args.context,
-				useExperimentalStorage: true,
-				generationId,
-			});
-			if (!generation || generation.status !== "created") {
-				return;
-			}
-			const queuedGeneration: QueuedGeneration = {
-				...generation,
-				status: "queued",
-				queuedAt: Date.now(),
-			};
-			await executeStep({
-				context: args.context,
-				generation: queuedGeneration,
-				callbacks,
-			});
-		},
-		onSequenceStart: async (sequence) => {
-			await args.callbacks?.sequenceStart?.({ sequence });
-		},
-		onSequenceError: async (sequence) => {
-			await args.callbacks?.sequenceFail?.({ sequence });
-		},
-		onSequenceComplete: async (sequence) => {
-			await args.callbacks?.sequenceComplete?.({ sequence });
-		},
-		onSequenceSkip: async (sequence) => {
-			await args.callbacks?.sequenceSkip?.({ sequence });
-		},
-	});
+	// Create patch queue for this act execution
+	const patchQueue = createPatchQueue(args.context);
+	const applyPatches = patchQueue.createApplyPatches();
+
+	let executionError: Error | null = null;
+	try {
+		await executeAct({
+			act,
+			applyPatches,
+			startGeneration: async (generationId, callbacks) => {
+				const generation = await getGeneration({
+					context: args.context,
+					useExperimentalStorage: true,
+					generationId,
+				});
+				if (!generation || generation.status !== "created") {
+					return;
+				}
+				const queuedGeneration: QueuedGeneration = {
+					...generation,
+					status: "queued",
+					queuedAt: Date.now(),
+				};
+				await executeStep({
+					context: args.context,
+					generation: queuedGeneration,
+					callbacks,
+				});
+			},
+			onSequenceStart: async (sequence) => {
+				await args.callbacks?.sequenceStart?.({ sequence });
+			},
+			onSequenceError: async (sequence) => {
+				await args.callbacks?.sequenceFail?.({ sequence });
+			},
+			onSequenceComplete: async (sequence) => {
+				await args.callbacks?.sequenceComplete?.({ sequence });
+			},
+			onSequenceSkip: async (sequence) => {
+				await args.callbacks?.sequenceSkip?.({ sequence });
+			},
+		});
+	} catch (error) {
+		executionError = error as Error;
+	}
+
+	patchQueue.cleanup();
+	if (executionError !== null) {
+		console.error("Execution failed:", executionError);
+		throw executionError;
+	}
 }

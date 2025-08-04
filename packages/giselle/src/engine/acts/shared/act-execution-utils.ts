@@ -147,7 +147,7 @@ export function createStepCountPatches(
 
 export interface ActExecutorOptions {
 	act: Act;
-	applyPatches(actId: ActId, patches: Patch[]): Promise<void>;
+	applyPatches(actId: ActId, patches: Patch[]): void | Promise<void>;
 	startGeneration(
 		generationId: GenerationId,
 		callbacks?: {
