@@ -1,15 +1,12 @@
-import { AISDKError } from "ai";
 import { z } from "zod/v4";
 import type { Sequence } from "../../concepts/act";
 import { ActId } from "../../concepts/identifiers";
 import { resolveTrigger } from "../flows";
 import {
-	type FailedGeneration,
 	generateImage,
 	generateText,
 	getGeneration,
 	type QueuedGeneration,
-	setGeneration,
 } from "../generations";
 import { executeAction } from "../operations";
 import { executeQuery } from "../operations/execute-query";
@@ -17,6 +14,14 @@ import type { GiselleEngineContext } from "../types";
 import { getAct } from "./get-act";
 import { patchAct } from "./patch-act";
 import { executeAct } from "./shared/act-execution-utils";
+
+function createStreamConsumer(): WritableStream {
+	return new WritableStream({
+		write() {},
+		close() {},
+		abort() {},
+	});
+}
 
 export interface StartActCallbacks {
 	sequenceStart?: (args: { sequence: Sequence }) => void | Promise<void>;
@@ -42,40 +47,13 @@ async function executeStep(args: {
 				await generateImage({ ...args, useExperimentalStorage: true });
 				break;
 			case "textGeneration": {
-				const result = await generateText({
+				const generateTextStream = await generateText({
 					...args,
 					useExperimentalStorage: true,
 				});
-				let errorOccurred = false;
-				await result.consumeStream({
-					onError: async (error) => {
-						if (AISDKError.isInstance(error)) {
-							errorOccurred = true;
-							const failedGeneration = {
-								...args.generation,
-								status: "failed",
-								startedAt: Date.now(),
-								failedAt: Date.now(),
-								messages: [],
-								error: {
-									name: error.name,
-									message: error.message,
-								},
-							} satisfies FailedGeneration;
-							await Promise.all([
-								setGeneration({
-									...args,
-									generation: failedGeneration,
-									useExperimentalStorage: true,
-								}),
-								args.callbacks?.onFailed?.(args.generation),
-							]);
-						}
-					},
-				});
-				if (errorOccurred) {
-					return;
-				}
+
+				// Consume the stream to trigger completion callbacks and persist generation results
+				await generateTextStream.pipeTo(createStreamConsumer());
 				break;
 			}
 			case "trigger":
@@ -92,6 +70,7 @@ async function executeStep(args: {
 		}
 		await args.callbacks?.onCompleted?.();
 	} catch (_e) {
+		console.log(_e);
 		await args.callbacks?.onFailed?.(args.generation);
 	}
 }

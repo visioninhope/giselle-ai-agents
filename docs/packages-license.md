@@ -3,7 +3,7 @@
 
 ## Summary
 * 829 MIT
-* 185 Apache 2.0
+* 184 Apache 2.0
 * 47 ISC
 * 27 New BSD
 * 13 Simplified BSD
@@ -49,7 +49,7 @@
 
 
 <a name="@ai-sdk/anthropic"></a>
-### @ai-sdk/anthropic v1.2.10
+### @ai-sdk/anthropic v2.0.0
 #### 
 
 ##### Paths
@@ -60,7 +60,18 @@
 
 
 <a name="@ai-sdk/fal"></a>
-### @ai-sdk/fal v0.1.8
+### @ai-sdk/fal v1.0.0
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
+
+
+
+<a name="@ai-sdk/gateway"></a>
+### @ai-sdk/gateway v1.0.0
 #### 
 
 ##### Paths
@@ -71,7 +82,7 @@
 
 
 <a name="@ai-sdk/google"></a>
-### @ai-sdk/google v1.2.13
+### @ai-sdk/google v2.0.0
 #### 
 
 ##### Paths
@@ -82,7 +93,7 @@
 
 
 <a name="@ai-sdk/openai"></a>
-### @ai-sdk/openai v1.3.18
+### @ai-sdk/openai v2.0.0
 #### 
 
 ##### Paths
@@ -93,7 +104,7 @@
 
 
 <a name="@ai-sdk/perplexity"></a>
-### @ai-sdk/perplexity v1.1.7
+### @ai-sdk/perplexity v2.0.0
 #### 
 
 ##### Paths
@@ -104,7 +115,7 @@
 
 
 <a name="@ai-sdk/provider"></a>
-### @ai-sdk/provider v1.1.3
+### @ai-sdk/provider v2.0.0
 #### 
 
 ##### Paths
@@ -115,7 +126,7 @@
 
 
 <a name="@ai-sdk/provider-utils"></a>
-### @ai-sdk/provider-utils v2.2.7
+### @ai-sdk/provider-utils v3.0.0
 #### 
 
 ##### Paths
@@ -126,18 +137,7 @@
 
 
 <a name="@ai-sdk/react"></a>
-### @ai-sdk/react v1.2.9
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
-
-
-
-<a name="@ai-sdk/ui-utils"></a>
-### @ai-sdk/ui-utils v1.2.8
+### @ai-sdk/react v2.0.0
 #### 
 
 ##### Paths
@@ -3832,6 +3832,17 @@ LGPL-3.0-or-later permitted
 
 
 
+<a name="@standard-schema/spec"></a>
+### @standard-schema/spec v1.0.0
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
 <a name="@supabase/auth-js"></a>
 ### @supabase/auth-js v2.70.0
 #### 
@@ -4417,17 +4428,6 @@ LGPL-3.0-or-later permitted
 
 <a name="@types/deep-eql"></a>
 ### @types/deep-eql v4.0.2
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-
-
-<a name="@types/diff-match-patch"></a>
-### @types/diff-match-patch v1.0.36
 #### 
 
 ##### Paths
@@ -5219,7 +5219,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="ai"></a>
-### ai v4.3.9
+### ai v5.0.0
 #### 
 
 ##### Paths
@@ -6366,17 +6366,6 @@ BlueOak-1.0.0 permitted
 
 
 
-<a name="diff-match-patch"></a>
-### diff-match-patch v1.0.5
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
-
-
-
 <a name="dir-glob"></a>
 ### dir-glob v3.0.1
 #### 
@@ -6698,6 +6687,17 @@ BlueOak-1.0.0 permitted
 
 <a name="events"></a>
 ### events v3.3.0
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
+<a name="eventsource-parser"></a>
+### eventsource-parser v3.0.3
 #### 
 
 ##### Paths
@@ -8018,17 +8018,6 @@ BlueOak-1.0.0 permitted
 
 <a name="json5"></a>
 ### json5 v2.2.3
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-
-
-<a name="jsondiffpatch"></a>
-### jsondiffpatch v0.6.0
 #### 
 
 ##### Paths

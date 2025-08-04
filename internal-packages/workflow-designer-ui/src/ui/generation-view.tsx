@@ -90,7 +90,7 @@ export function GenerationView({ generation }: { generation: Generation }) {
 													</span>
 												</Accordion.Trigger>
 												<Accordion.Content className="markdown-renderer overflow-hidden italic text-[14px] text-white-400 ml-[8px] pl-[12px] mb-[8px] data-[state=closed]:animate-slideUp data-[state=open]:animate-slideDown border-l border-l-white-400/20">
-													<MemoizedMarkdown content={part.reasoning} />
+													<MemoizedMarkdown content={part.text} />
 												</Accordion.Content>
 											</Accordion.Item>
 										</Accordion.Root>
@@ -115,7 +115,7 @@ export function GenerationView({ generation }: { generation: Generation }) {
 												<span>Thinking Process</span>
 											</Accordion.Trigger>
 											<Accordion.Content className="markdown-renderer overflow-hidden italic text-[14px] text-white-400 ml-[8px] pl-[12px] mb-[8px] data-[state=closed]:animate-slideUp data-[state=open]:animate-slideDown border-l border-l-white-400/20">
-												<MemoizedMarkdown content={part.reasoning} />
+												<MemoizedMarkdown content={part.text} />
 											</Accordion.Content>
 										</Accordion.Item>
 									</Accordion.Root>
@@ -130,27 +130,14 @@ export function GenerationView({ generation }: { generation: Generation }) {
 										<MemoizedMarkdown content={part.text} />
 									</div>
 								);
-							case "tool-invocation":
-								/** @todo Tool invocation */
-								return null;
-							case "source":
-								/** @todo Source */
-								return null;
-							case "file":
-								/** @todo File parts */
-								return null;
-							case "step-start":
-								/** @todo Step start */
-								return null;
 							default: {
-								const _exhaustiveCheck: never = part;
-								throw new Error(`Unhandled part type: ${_exhaustiveCheck}`);
+								console.warn("unsupport part type");
+								return null;
 							}
 						}
 					})}
 				</div>
 			))}
-
 			{generation.status !== "completed" &&
 				generation.status !== "cancelled" &&
 				// Show the spinner only when there is no reasoning part

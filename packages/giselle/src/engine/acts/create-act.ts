@@ -148,8 +148,8 @@ export async function createAct(
 				generationId: generation.id,
 				duration: 0,
 				usage: {
-					promptTokens: 0,
-					completionTokens: 0,
+					inputTokens: 0,
+					outputTokens: 0,
 					totalTokens: 0,
 				},
 			});
@@ -163,8 +163,8 @@ export async function createAct(
 				totalTask: 0,
 			},
 			usage: {
-				promptTokens: 0,
-				completionTokens: 0,
+				inputTokens: 0,
+				outputTokens: 0,
 				totalTokens: 0,
 			},
 		});
@@ -193,8 +193,8 @@ export async function createAct(
 			totalTask: 0,
 		},
 		usage: {
-			promptTokens: 0,
-			completionTokens: 0,
+			inputTokens: 0,
+			outputTokens: 0,
 			totalTokens: 0,
 		},
 		createdAt: Date.now(),

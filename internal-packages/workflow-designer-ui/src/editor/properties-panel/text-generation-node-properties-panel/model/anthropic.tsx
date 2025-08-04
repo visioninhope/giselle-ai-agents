@@ -48,8 +48,8 @@ export function AnthropicModelPanel({
 					id: value,
 					configurations: {
 						...anthropicLanguageModel.configurations,
-						reasoning:
-							anthropicLanguageModel.configurations.reasoning &&
+						reasoningText:
+							anthropicLanguageModel.configurations.reasoningText &&
 							hasCapability(newLanguageModel, Capability.Reasoning),
 					},
 				}),
@@ -126,14 +126,14 @@ export function AnthropicModelPanel({
 						<Switch
 							label="Reasoning"
 							name="reasoning"
-							checked={anthropicLanguageModel.configurations.reasoning}
+							checked={anthropicLanguageModel.configurations.reasoningText}
 							onCheckedChange={(checked) => {
 								onModelChange(
 									AnthropicLanguageModelData.parse({
 										...anthropicLanguageModel,
 										configurations: {
 											...anthropicLanguageModel.configurations,
-											reasoning: checked,
+											reasoningText: checked,
 										},
 									}),
 								);
