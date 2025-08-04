@@ -32,9 +32,7 @@ export function memoryStorageDriver(
 			if (data === undefined) {
 				return Promise.reject(new Error(`No JSON stored at ${params.path}`));
 			}
-			const parsed = params.schema
-				? params.schema.parse(data)
-				: (data as z.infer<T>);
+			const parsed = params.schema.parse(data);
 			return Promise.resolve(parsed);
 		},
 
