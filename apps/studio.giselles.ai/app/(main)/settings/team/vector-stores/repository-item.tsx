@@ -182,8 +182,11 @@ export function RepositoryItem({
 					</div>
 				</div>
 
+				{/* Divider below repository name */}
+				<div className="border-t border-white/10 my-3"></div>
+
 				{/* Content Type Sections */}
-				<div className="space-y-3">
+				<div className="space-y-0">
 					{/* Code Section */}
 					<ContentTypeSection
 						contentType="blob"
@@ -196,6 +199,9 @@ export function RepositoryItem({
 								: undefined
 						}
 					/>
+
+					{/* Divider between Code and Pull Requests */}
+					<div className="border-t border-white/10 my-3"></div>
 
 					{/* Pull Requests Section */}
 					<ContentTypeSection
