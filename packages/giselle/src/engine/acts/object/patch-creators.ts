@@ -236,15 +236,15 @@ const sequences = (index: number) => ({
 			set: (
 				value: Act["sequences"][number]["usage"]["inputTokens"],
 			): Patch => ({
-				path: `sequences.${index}.usage.promptTokens`,
+				path: `sequences.${index}.usage.inputTokens`,
 				set: value,
 			}),
 			increment: (value: number): Patch => ({
-				path: `sequences.${index}.usage.promptTokens`,
+				path: `sequences.${index}.usage.inputTokens`,
 				increment: value,
 			}),
 			decrement: (value: number): Patch => ({
-				path: `sequences.${index}.usage.promptTokens`,
+				path: `sequences.${index}.usage.inputTokens`,
 				decrement: value,
 			}),
 		},
@@ -252,15 +252,15 @@ const sequences = (index: number) => ({
 			set: (
 				value: Act["sequences"][number]["usage"]["outputTokens"],
 			): Patch => ({
-				path: `sequences.${index}.usage.completionTokens`,
+				path: `sequences.${index}.usage.outputTokens`,
 				set: value,
 			}),
 			increment: (value: number): Patch => ({
-				path: `sequences.${index}.usage.completionTokens`,
+				path: `sequences.${index}.usage.outputTokens`,
 				increment: value,
 			}),
 			decrement: (value: number): Patch => ({
-				path: `sequences.${index}.usage.completionTokens`,
+				path: `sequences.${index}.usage.outputTokens`,
 				decrement: value,
 			}),
 		},
@@ -319,15 +319,15 @@ const sequences = (index: number) => ({
 				set: (
 					value: Act["sequences"][number]["steps"][number]["usage"]["inputTokens"],
 				): Patch => ({
-					path: `sequences.${index}.steps.${stepIndex}.usage.promptTokens`,
+					path: `sequences.${index}.steps.${stepIndex}.usage.inputTokens`,
 					set: value,
 				}),
 				increment: (value: number): Patch => ({
-					path: `sequences.${index}.steps.${stepIndex}.usage.promptTokens`,
+					path: `sequences.${index}.steps.${stepIndex}.usage.inputTokens`,
 					increment: value,
 				}),
 				decrement: (value: number): Patch => ({
-					path: `sequences.${index}.steps.${stepIndex}.usage.promptTokens`,
+					path: `sequences.${index}.steps.${stepIndex}.usage.inputTokens`,
 					decrement: value,
 				}),
 			},
@@ -335,15 +335,15 @@ const sequences = (index: number) => ({
 				set: (
 					value: Act["sequences"][number]["steps"][number]["usage"]["outputTokens"],
 				): Patch => ({
-					path: `sequences.${index}.steps.${stepIndex}.usage.completionTokens`,
+					path: `sequences.${index}.steps.${stepIndex}.usage.outputTokens`,
 					set: value,
 				}),
 				increment: (value: number): Patch => ({
-					path: `sequences.${index}.steps.${stepIndex}.usage.completionTokens`,
+					path: `sequences.${index}.steps.${stepIndex}.usage.outputTokens`,
 					increment: value,
 				}),
 				decrement: (value: number): Patch => ({
-					path: `sequences.${index}.steps.${stepIndex}.usage.completionTokens`,
+					path: `sequences.${index}.steps.${stepIndex}.usage.outputTokens`,
 					decrement: value,
 				}),
 			},
