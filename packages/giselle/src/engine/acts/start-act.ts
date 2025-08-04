@@ -15,7 +15,7 @@ import { getAct } from "./get-act";
 import { patchAct } from "./patch-act";
 import { executeAct } from "./shared/act-execution-utils";
 
-function createStreamConsumer(): WritableStream {
+function createStreamConsumer() {
 	return new WritableStream({
 		write() {},
 		close() {},
