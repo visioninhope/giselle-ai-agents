@@ -15,7 +15,7 @@ import {
 	useWorkflowDesigner,
 } from "@giselle-sdk/giselle/react";
 import clsx from "clsx/lite";
-import { PlayIcon } from "lucide-react";
+import { PlayIcon, UngroupIcon } from "lucide-react";
 import { useMemo, useState } from "react";
 import { NodeIcon } from "../../../icons/node";
 import { TriggerInputDialog } from "./trigger-input-dialog";
@@ -225,7 +225,7 @@ function MultipleRunsDropdown({
 				if (menuItem.type === "nodeGroup") {
 					return (
 						<RunOptionItem
-							icon={<div className="bg-ghost-element-background size-[16px]" />}
+							icon={<UngroupIcon className="size-[16px]" />}
 							title={menuItem.run.label}
 							subtitle={menuItem.value}
 							{...props}
