@@ -67,17 +67,17 @@
 	--color-conflict: #dec184;
 	--color-created: #a1c181;
 	--color-deleted: #d07277;
-	--color-error: #d07277;
+	--color-error: #ff3d71;
 	--color-hidden: #878a98;
 	--color-hint: #788ca6;
 	--color-ignored: #878a98;
-	--color-info: #74ade8;
+	--color-info: #367bfd;
 	--color-modified: #dec184;
 	--color-predictive: #5a6a87;
 	--color-renamed: #74ade8;
-	--color-success: #a1c181;
+	--color-success: #39ff7f;
 	--color-unreachable: #a9afbc;
-	--color-warning: #dec184;
+	--color-warning: #ffe551;
 
 	/* glass common */
 	--glass-highlight-bg: linear-gradient(
@@ -97,8 +97,7 @@
 		0 8px 20px rgba(107, 143, 240, 0.2),
 		0 3px 10px rgba(107, 143, 240, 0.15),
 		inset 0 1px 0 rgba(255, 255, 255, 0.25),
-		inset 0 -1px 0 rgba(0, 0, 0, 0.15),
-		0 0 0 1px rgba(255, 255, 255, 0.08);
+		inset 0 -1px 0 rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.08);
 	--color-glass-border: var(--color-white);
 	--color-glass-highlight: var(--color-white);
 

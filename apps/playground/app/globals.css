@@ -108,6 +108,20 @@
 
 	--color-error-900: var(--color-red-900);
 
+	/* Status colors for badges */
+	--color-error: #ff3d71;
+	--color-success: #39ff7f;
+	--color-warning: #ffe551;
+	--color-info: #367bfd;
+	--color-ignored: #878a98;
+
+	/* RGB values for transparency */
+	--color-error-rgb: 255, 61, 113;
+	--color-success-rgb: 57, 255, 127;
+	--color-warning-rgb: 255, 229, 81;
+	--color-info-rgb: 54, 123, 253;
+	--color-ignored-rgb: 135, 138, 152;
+
 	--font-accent: var(--font-dm-sans);
 	--font-sans: var(--font-dm-sans);
 	--font-mono: var(--font-dm-mono);

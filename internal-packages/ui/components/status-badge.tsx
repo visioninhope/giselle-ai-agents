@@ -1,7 +1,7 @@
 import clsx from "clsx/lite";
 
 interface StatusBadgeProps {
-	status: "error" | "success" | "ignored" | "info";
+	status: "error" | "success" | "ignored" | "info" | "warning";
 	className?: string;
 	leftIcon?: React.ReactNode;
 	rightIcon?: React.ReactNode;
@@ -18,13 +18,14 @@ export function StatusBadge({
 		<div
 			className={clsx(
 				"px-[8px] py-[2px] rounded-[4px] text-[12px] w-fit flex items-center gap-[4px]",
-				"data-[variant=error]:bg-error/40 data-[variant=error]:text-error",
-				"data-[variant=success]:bg-success/40 data-[variant=success]:text-success",
-				"data-[variant=info]:bg-info/40 data-[variant=info]:text-info",
-				"data-[variant=ignored]:bg-ignored/40 data-[variant=ignored]:text-ignored",
 				className,
 			)}
 			data-variant={status}
+			style={{
+				backgroundColor: `color-mix(in srgb, var(--color-${status}) 5%, transparent)`,
+				color: `var(--color-${status})`,
+				border: `1px solid color-mix(in srgb, var(--color-${status}) 10%, transparent)`,
+			}}
 		>
 			{leftIcon && <div className="*:size-[12px]">{leftIcon}</div>}
 			{children}
