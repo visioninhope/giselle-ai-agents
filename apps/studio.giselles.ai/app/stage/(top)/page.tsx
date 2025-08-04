@@ -51,86 +51,73 @@ export default async function StagePage() {
 		orderBy: (acts, { desc }) => [desc(acts.createdAt)],
 		limit: 10,
 	});
-	const acts = await Promise.all(
-		dbActs.map(async (dbAct) => {
-			// This feature is currently under development and data structures change destructively,
-			// so parsing of legacy data frequently fails. We're using a rough try-catch to ignore
-			// data that fails to parse. This should be properly handled when the feature flag is removed.
-			try {
-				const tmpAct = await giselleEngine.getAct({ actId: dbAct.sdkActId });
-				const team = teams.find((t) => t.dbId === dbAct.teamDbId);
-				const tmpWorkspace = await giselleEngine.getWorkspace(
-					dbAct.sdkWorkspaceId,
-					experimental_storage,
-				);
+	async function enrichActWithNavigationData(dbAct: (typeof dbActs)[0]) {
+		// This feature is currently under development and data structures change destructively,
+		// so parsing of legacy data frequently fails. We're using a rough try-catch to ignore
+		// data that fails to parse. This should be properly handled when the feature flag is removed.
+		try {
+			const tmpAct = await giselleEngine.getAct({ actId: dbAct.sdkActId });
+			const team = teams.find((t) => t.dbId === dbAct.teamDbId);
+			const tmpWorkspace = await giselleEngine.getWorkspace(
+				dbAct.sdkWorkspaceId,
+				experimental_storage,
+			);
 
-				let link = `/stage/acts/${tmpAct.id}`;
-				let find = false;
-				switch (tmpAct.status) {
-					case "inProgress":
-						for (const sequence of tmpAct.sequences) {
-							for (const step of sequence.steps) {
-								if (step.status === "running") {
-									find = true;
-									link += `/${step.id}`;
-									break;
-								}
-							}
-							if (find) {
-								break;
-							}
+			const findStepByStatus = (status: string) => {
+				for (const sequence of tmpAct.sequences) {
+					for (const step of sequence.steps) {
+						if (step.status === status) {
+							return step;
 						}
-						break;
-					case "completed": {
-						const lastSequence = tmpAct.sequences[tmpAct.sequences.length - 1];
-						const lastStep = lastSequence.steps[lastSequence.steps.length - 1];
-						link += `/${lastStep.id}`;
-						break;
-					}
-					case "cancelled":
-						for (const sequence of tmpAct.sequences) {
-							for (const step of sequence.steps) {
-								if (step.status === "cancelled") {
-									find = true;
-									link += `/${step.id}`;
-									break;
-								}
-							}
-							if (find) {
-								break;
-							}
-						}
-						break;
-					case "failed":
-						for (const sequence of tmpAct.sequences) {
-							for (const step of sequence.steps) {
-								if (step.status === "failed") {
-									find = true;
-									link += `/${step.id}`;
-									break;
-								}
-							}
-							if (find) {
-								break;
-							}
-						}
-						break;
-					default: {
-						const _exhaustiveCheck: never = tmpAct.status;
-						throw new Error(`Unhandled status: ${_exhaustiveCheck}`);
 					}
 				}
-				return {
-					...tmpAct,
-					link,
-					teamName: team?.name || "Unknown Team",
-					workspaceName: tmpWorkspace.name ?? "Untitled",
-				};
-			} catch {
 				return null;
+			};
+
+			const getLastStep = () => {
+				const lastSequence = tmpAct.sequences[tmpAct.sequences.length - 1];
+				return lastSequence.steps[lastSequence.steps.length - 1];
+			};
+
+			let link = `/stage/acts/${tmpAct.id}`;
+			let targetStep = null;
+
+			switch (tmpAct.status) {
+				case "inProgress":
+					targetStep = findStepByStatus("running");
+					break;
+				case "completed":
+					targetStep = getLastStep();
+					break;
+				case "cancelled":
+					targetStep = findStepByStatus("cancelled");
+					break;
+				case "failed":
+					targetStep = findStepByStatus("failed");
+					break;
+				default: {
+					const _exhaustiveCheck: never = tmpAct.status;
+					throw new Error(`Unhandled status: ${_exhaustiveCheck}`);
+				}
 			}
-		}),
-	).then((tmp) => tmp.filter((actOrNull) => actOrNull !== null));
+
+			if (targetStep) {
+				link += `/${targetStep.id}`;
+			}
+			return {
+				...tmpAct,
+				link,
+				teamName: team?.name || "Unknown Team",
+				workspaceName: tmpWorkspace.name ?? "Untitled",
+			};
+		} catch {
+			return null;
+		}
+	}
+
+	const acts = await Promise.all(dbActs.map(enrichActWithNavigationData)).then(
+		(tmp) => tmp.filter((actOrNull) => actOrNull !== null),
+	);
 	const flowTriggers: Array<FlowTriggerUIItem> = [];
 	for (const team of teams) {
 		const tmpFlowTriggers = await db.query.flowTriggers.findMany({
