@@ -1,5 +1,4 @@
 import { ExternalLink } from "lucide-react";
-import { pullRequestVectorStoreFlag } from "@/flags";
 import { getGitHubIdentityState } from "@/services/accounts";
 import {
 	deleteRepositoryIndex,
@@ -38,12 +37,10 @@ export default async function TeamVectorStorePage() {
 		return <GitHubAppInstallRequiredCard />;
 	}
 
-	const [installationsWithRepos, repositoryIndexes, isPullRequestEnabled] =
-		await Promise.all([
-			getInstallationsWithRepos(),
-			getGitHubRepositoryIndexes(),
-			pullRequestVectorStoreFlag(),
-		]);
+	const [installationsWithRepos, repositoryIndexes] = await Promise.all([
+		getInstallationsWithRepos(),
+		getGitHubRepositoryIndexes(),
+	]);
 
 	return (
 		<div className="flex flex-col gap-[24px]">
@@ -69,7 +66,6 @@ export default async function TeamVectorStorePage() {
 					<RepositoryRegistrationDialog
 						installationsWithRepos={installationsWithRepos}
 						registerRepositoryIndexAction={registerRepositoryIndex}
-						isPullRequestEnabled={isPullRequestEnabled}
 					/>
 				</div>
 			</div>
@@ -79,7 +75,6 @@ export default async function TeamVectorStorePage() {
 				deleteRepositoryIndexAction={deleteRepositoryIndex}
 				triggerManualIngestAction={triggerManualIngest}
 				updateRepositoryContentTypesAction={updateRepositoryContentTypes}
-				isPullRequestEnabled={isPullRequestEnabled}
 			/>
 		</div>
 	);

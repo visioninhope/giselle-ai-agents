@@ -3,7 +3,6 @@ import { createContext, useContext } from "react";
 export interface FeatureFlagContextValue {
 	runV3: boolean;
 	webSearchAction: boolean;
-	pullRequestVectorStore: boolean;
 	layoutV3: boolean;
 	experimental_storage: boolean;
 	stage: boolean;

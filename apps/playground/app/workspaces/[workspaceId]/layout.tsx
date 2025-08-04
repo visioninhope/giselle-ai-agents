@@ -16,7 +16,6 @@ export default async function Layout({
 			featureFlag={{
 				runV3: true,
 				webSearchAction: false,
-				pullRequestVectorStore: true,
 				layoutV3: true,
 				experimental_storage: true,
 				stage: true,

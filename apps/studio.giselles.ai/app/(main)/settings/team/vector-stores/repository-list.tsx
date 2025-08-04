@@ -3,7 +3,6 @@ import type { GitHubRepositoryContentType } from "@/drizzle";
 import type { RepositoryWithStatuses } from "@/lib/vector-stores/github";
 import type { GitHubRepositoryIndexId } from "@/packages/types";
 import { RepositoryItem } from "./repository-item";
-import { RepositoryItemBlobOnly } from "./repository-item-blob-only";
 
 type RepositoryListProps = {
 	repositories: RepositoryWithStatuses[];
@@ -20,7 +19,6 @@ type RepositoryListProps = {
 			enabled: boolean;
 		}[],
 	) => Promise<{ success: boolean; error?: string }>;
-	isPullRequestEnabled: boolean;
 };
 
 export function RepositoryList({
@@ -28,7 +26,6 @@ export function RepositoryList({
 	deleteRepositoryIndexAction,
 	triggerManualIngestAction,
 	updateRepositoryContentTypesAction,
-	isPullRequestEnabled,
 }: RepositoryListProps) {
 	return (
 		<div className="flex flex-col gap-y-[16px]">
@@ -47,26 +44,17 @@ export function RepositoryList({
 
 				{repositories.length > 0 ? (
 					<div className="space-y-4">
-						{repositories.map((repo) =>
-							isPullRequestEnabled ? (
-								<RepositoryItem
-									key={repo.repositoryIndex.id}
-									repositoryData={repo}
-									deleteRepositoryIndexAction={deleteRepositoryIndexAction}
-									triggerManualIngestAction={triggerManualIngestAction}
-									updateRepositoryContentTypesAction={
-										updateRepositoryContentTypesAction
-									}
-								/>
-							) : (
-								<RepositoryItemBlobOnly
-									key={repo.repositoryIndex.id}
-									repositoryData={repo}
-									deleteRepositoryIndexAction={deleteRepositoryIndexAction}
-									triggerManualIngestAction={triggerManualIngestAction}
-								/>
-							),
-						)}
+						{repositories.map((repo) => (
+							<RepositoryItem
+								key={repo.repositoryIndex.id}
+								repositoryData={repo}
+								deleteRepositoryIndexAction={deleteRepositoryIndexAction}
+								triggerManualIngestAction={triggerManualIngestAction}
+								updateRepositoryContentTypesAction={
+									updateRepositoryContentTypesAction
+								}
+							/>
+						))}
 					</div>
 				) : (
 					<EmptyRepositoryCard />
