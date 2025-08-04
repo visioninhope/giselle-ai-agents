@@ -19,7 +19,6 @@ import { notFound } from "next/navigation";
 import { after } from "next/server";
 import { giselleEngine } from "@/app/giselle-engine";
 import { acts as actsSchema, db } from "@/drizzle";
-import { experimental_storageFlag, stageFlag } from "@/flags";
 import { fetchCurrentUser } from "@/services/accounts";
 import { fetchUserTeams } from "@/services/teams";
 import { type FlowTriggerUIItem, Form } from "./form";
@@ -109,7 +108,6 @@ export default async function StagePage() {
 	if (!enableStage) {
 		return notFound();
 	}
-	const experimental_storage = await experimental_storageFlag();
 	const teams = await fetchUserTeams();
 	const teamOptions = teams.map((team) => ({
 		value: team.id,
@@ -134,7 +132,7 @@ export default async function StagePage() {
 			if (!workspaceMap.has(tmpFlowTrigger.sdkWorkspaceId)) {
 				const tmpWorkspace = await giselleEngine.getWorkspace(
 					tmpFlowTrigger.sdkWorkspaceId,
-					experimental_storage,
+					true,
 				);
 				workspaceMap.set(tmpFlowTrigger.sdkWorkspaceId, tmpWorkspace);
 			}
