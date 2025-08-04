@@ -5,13 +5,15 @@ import type {
 	OutputId,
 	WorkspaceId,
 } from "@giselle-sdk/data-type";
-import type { DataContent, Message } from "ai";
+import type { DataContent } from "ai";
 import {
 	type CompletedGeneration,
 	type Generation,
 	GenerationContext,
 	type GenerationOutput,
+	type GenerationUsage,
 	isCompletedGeneration,
+	type Message,
 	type QueuedGeneration,
 	type RunningGeneration,
 } from "../../../concepts/generation";
@@ -46,11 +48,7 @@ export async function useGenerationExecutor<T>(args: {
 		telemetry?: TelemetrySettings;
 		completeGeneration: (args: {
 			outputs: GenerationOutput[];
-			usage?: {
-				promptTokens: number;
-				completionTokens: number;
-				totalTokens: number;
-			};
+			usage?: GenerationUsage;
 			messages?: Message[];
 		}) => Promise<CompletedGeneration>;
 	}) => Promise<T>;
@@ -174,11 +172,7 @@ export async function useGenerationExecutor<T>(args: {
 		messages,
 	}: {
 		outputs: GenerationOutput[];
-		usage?: {
-			promptTokens: number;
-			completionTokens: number;
-			totalTokens: number;
-		};
+		usage?: GenerationUsage;
 		messages?: Message[];
 	}): Promise<CompletedGeneration> {
 		const completedGeneration = {
@@ -186,7 +180,7 @@ export async function useGenerationExecutor<T>(args: {
 			status: "completed",
 			completedAt: Date.now(),
 			outputs: outputs,
-			usage: usage,
+			usage,
 			messages: messages ?? [],
 		} satisfies CompletedGeneration;
 

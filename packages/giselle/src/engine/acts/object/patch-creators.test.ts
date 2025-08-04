@@ -58,7 +58,7 @@ describe("patch creators", () => {
 
 	describe("usage", () => {
 		it("should create usage.promptTokens increment patch", () => {
-			const patch = patches.usage.promptTokens.increment(50);
+			const patch = patches.usage.inputTokens.increment(50);
 			expect(patch).toEqual({
 				path: "usage.promptTokens",
 				increment: 50,
@@ -135,16 +135,14 @@ describe("patch creators", () => {
 		});
 
 		it("should create sequence usage patches", () => {
-			expect(patches.sequences(0).usage.promptTokens.set(100)).toEqual({
-				path: "sequences.0.usage.promptTokens",
+			expect(patches.sequences(0).usage.inputTokens.set(100)).toEqual({
+				path: "sequences.0.usage.inputTokens",
 				set: 100,
 			});
-			expect(patches.sequences(0).usage.completionTokens.increment(50)).toEqual(
-				{
-					path: "sequences.0.usage.completionTokens",
-					increment: 50,
-				},
-			);
+			expect(patches.sequences(0).usage.outputTokens.increment(50)).toEqual({
+				path: "sequences.0.usage.outputTokens",
+				increment: 50,
+			});
 			expect(patches.sequences(0).usage.totalTokens.decrement(10)).toEqual({
 				path: "sequences.0.usage.totalTokens",
 				decrement: 10,
@@ -179,16 +177,14 @@ describe("patch creators", () => {
 		});
 
 		it("should create sequence step usage patches", () => {
-			expect(patches.sequences(1).steps(0).usage.promptTokens.set(200)).toEqual(
-				{
-					path: "sequences.1.steps.0.usage.promptTokens",
-					set: 200,
-				},
-			);
+			expect(patches.sequences(1).steps(0).usage.inputTokens.set(200)).toEqual({
+				path: "sequences.1.steps.0.usage.inputTokens",
+				set: 200,
+			});
 			expect(
-				patches.sequences(1).steps(0).usage.completionTokens.increment(75),
+				patches.sequences(1).steps(0).usage.outputTokens.increment(75),
 			).toEqual({
-				path: "sequences.1.steps.0.usage.completionTokens",
+				path: "sequences.1.steps.0.usage.outputTokens",
 				increment: 75,
 			});
 			expect(

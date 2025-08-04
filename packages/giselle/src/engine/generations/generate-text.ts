@@ -13,12 +13,12 @@ import {
 	hasCapability,
 	languageModels,
 } from "@giselle-sdk/language-model";
-import { AISDKError, appendResponseMessages, streamText } from "ai";
+import { AISDKError, streamText } from "ai";
 import type {
 	FailedGeneration,
 	GenerationOutput,
+	GenerationUsage,
 	QueuedGeneration,
-	UrlSource,
 } from "../../concepts/generation";
 import { decryptSecret } from "../secrets";
 import { generateTelemetryTags } from "../telemetry";
@@ -45,12 +45,12 @@ export function generateText(args: {
 		telemetry: args.telemetry,
 		useExperimentalStorage: args.useExperimentalStorage,
 		execute: async ({
+			completeGeneration,
 			runningGeneration,
 			generationContext,
 			setGeneration,
 			fileResolver,
 			generationContentResolver,
-			completeGeneration,
 		}) => {
 			const operationNode = generationContext.operationNode;
 			if (!isTextGenerationNode(operationNode)) {
@@ -158,22 +158,35 @@ export function generateText(args: {
 					...preparedToolSet,
 					toolSet: {
 						...preparedToolSet.toolSet,
-						openaiWebSearch: openai.tools.webSearchPreview(
+						web_search_preview: openai.tools.webSearchPreview(
 							operationNode.content.tools.openaiWebSearch,
 						),
+					},
+				};
+			}
+			if (
+				operationNode.content.llm.provider === "google" &&
+				operationNode.content.llm.configurations.searchGrounding &&
+				hasCapability(languageModel, Capability.OptionalSearchGrounding)
+			) {
+				preparedToolSet = {
+					...preparedToolSet,
+					toolSet: {
+						...preparedToolSet.toolSet,
+						googleWebSearch: google.tools.googleSearch({}),
 					},
 				};
 			}
 
 			const providerOptions = getProviderOptions(operationNode.content.llm);
 
+			const generationOutputs: GenerationOutput[] = [];
+			let usage: GenerationUsage | undefined;
 			const streamTextResult = streamText({
 				model: generationModel(operationNode.content.llm),
 				providerOptions,
 				messages,
-				maxSteps: 5, // enable multi-step calls
 				tools: preparedToolSet.toolSet,
-				experimental_continueSteps: true,
 				onError: async ({ error }) => {
 					if (AISDKError.isInstance(error)) {
 						const failedGeneration = {
@@ -196,7 +209,6 @@ export function generateText(args: {
 					);
 				},
 				async onFinish(event) {
-					const generationOutputs: GenerationOutput[] = [];
 					const generatedTextOutput =
 						generationContext.operationNode.outputs.find(
 							(output: Output) => output.accessor === "generated-text",
@@ -212,10 +224,13 @@ export function generateText(args: {
 					const reasoningOutput = generationContext.operationNode.outputs.find(
 						(output: Output) => output.accessor === "reasoning",
 					);
-					if (reasoningOutput !== undefined && event.reasoning !== undefined) {
+					if (
+						reasoningOutput !== undefined &&
+						event.reasoningText !== undefined
+					) {
 						generationOutputs.push({
 							type: "reasoning",
-							content: event.reasoning,
+							content: event.reasoningText,
 							outputId: reasoningOutput.id,
 						});
 					}
@@ -223,38 +238,13 @@ export function generateText(args: {
 						(output: Output) => output.accessor === "source",
 					);
 					if (sourceOutput !== undefined && event.sources.length > 0) {
-						const sources = await Promise.all(
-							event.sources.map((source) => {
-								return {
-									sourceType: "url",
-									id: source.id,
-									url: source.url,
-									title: source.title ?? source.url,
-									providerMetadata: source.providerMetadata,
-								} satisfies UrlSource;
-							}),
-						);
 						generationOutputs.push({
 							type: "source",
 							outputId: sourceOutput.id,
-							sources,
+							sources: event.sources,
 						});
 					}
-					const _completedGeneration = await completeGeneration({
-						outputs: generationOutputs,
-						usage: event.usage,
-						messages: appendResponseMessages({
-							messages: [
-								{
-									id: "id",
-									role: "user",
-									content: "",
-								},
-							],
-							responseMessages: event.response.messages,
-						}),
-					});
-
+					usage = event.usage;
 					try {
 						await Promise.all(
 							preparedToolSet.cleanupFunctions.map((cleanupFunction) =>
@@ -285,7 +275,16 @@ export function generateText(args: {
 					},
 				},
 			});
-			return streamTextResult;
+			return streamTextResult.toUIMessageStream({
+				sendReasoning: true,
+				onFinish: async ({ messages }) => {
+					await completeGeneration({
+						outputs: generationOutputs,
+						usage,
+						messages,
+					});
+				},
+			});
 		},
 	});
 }
@@ -300,9 +299,7 @@ function generationModel(languageModel: TextGenerationLanguageModelData) {
 			return openai.responses(languageModel.id);
 		}
 		case "google": {
-			return google(languageModel.id, {
-				useSearchGrounding: languageModel.configurations.searchGrounding,
-			});
+			return google(languageModel.id);
 		}
 		case "perplexity": {
 			return perplexity(languageModel.id);
@@ -326,7 +323,7 @@ function getProviderOptions(languageModelData: TextGenerationLanguageModelData):
 	if (
 		languageModel &&
 		languageModelData.provider === "anthropic" &&
-		languageModelData.configurations.reasoning &&
+		languageModelData.configurations.reasoningText &&
 		hasCapability(languageModel, Capability.Reasoning)
 	) {
 		return {

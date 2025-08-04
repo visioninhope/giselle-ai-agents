@@ -157,24 +157,18 @@ export function GenerationPanel({
 										</span>
 									)}
 
-								<span className="flex items-center gap-[2px]">
-									<ArrowUpIcon className="text-black-400 size-[12px]" />
-									{(
-										currentGeneration as unknown as {
-											usage: { promptTokens: number };
-										}
-									).usage.promptTokens.toLocaleString()}
-									t
-								</span>
-								<span className="flex items-center gap-[2px]">
-									<ArrowDownIcon className="text-black-400 size-[12px]" />
-									{(
-										currentGeneration as unknown as {
-											usage: { completionTokens: number };
-										}
-									).usage.completionTokens.toLocaleString()}
-									t
-								</span>
+								{currentGeneration.usage.inputTokens && (
+									<span className="flex items-center gap-[2px]">
+										<ArrowUpIcon className="text-black-400 size-[12px]" />
+										{currentGeneration.usage.inputTokens.toLocaleString()}t
+									</span>
+								)}
+								{currentGeneration.usage.outputTokens && (
+									<span className="flex items-center gap-[2px]">
+										<ArrowDownIcon className="text-black-400 size-[12px]" />
+										{currentGeneration.usage.outputTokens.toLocaleString()}t
+									</span>
+								)}
 							</div>
 						)}
 				</div>

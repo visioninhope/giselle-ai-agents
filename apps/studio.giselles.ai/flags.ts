@@ -115,22 +115,3 @@ export const stageFlag = flag<boolean>({
 		{ value: true, label: "Enable" },
 	],
 });
-
-export const pullRequestVectorStoreFlag = flag<boolean>({
-	key: "pull-request-vector-store",
-	async decide() {
-		if (process.env.NODE_ENV === "development") {
-			return takeLocalEnv("PULL_REQUEST_VECTOR_STORE_FLAG");
-		}
-		const edgeConfig = await get(`flag__${this.key}`);
-		if (edgeConfig === undefined) {
-			return false;
-		}
-		return edgeConfig === true || edgeConfig === "true";
-	},
-	description: "Enable Pull Request Vector Store",
-	options: [
-		{ value: false, label: "disable" },
-		{ value: true, label: "Enable" },
-	],
-});

@@ -3,7 +3,6 @@ import type {
 	BlobLike,
 	GetJsonParams,
 	GiselleStorage,
-	JsonSchema,
 	SetJsonParams,
 } from "./types";
 
@@ -26,20 +25,18 @@ export function memoryStorageDriver(
 	);
 
 	return {
-		getJson<T extends JsonSchema>(
+		getJson<T extends z.ZodType>(
 			params: GetJsonParams<T>,
 		): Promise<z.infer<T>> {
 			const data = jsonStore.get(params.path);
 			if (data === undefined) {
 				return Promise.reject(new Error(`No JSON stored at ${params.path}`));
 			}
-			const parsed = params.schema
-				? params.schema.parse(data)
-				: (data as z.infer<T>);
+			const parsed = params.schema.parse(data);
 			return Promise.resolve(parsed);
 		},
 
-		setJson<T extends JsonSchema>(params: SetJsonParams<T>): Promise<void> {
+		setJson<T extends z.ZodType>(params: SetJsonParams<T>): Promise<void> {
 			const parsed = params.schema
 				? params.schema.parse(params.data)
 				: params.data;

@@ -53,19 +53,26 @@ export default async function StagePage() {
 	});
 	const acts = await Promise.all(
 		dbActs.map(async (dbAct) => {
-			const tmpAct = await giselleEngine.getAct({ actId: dbAct.sdkActId });
-			const team = teams.find((t) => t.dbId === dbAct.teamDbId);
-			const tmpWorkspace = await giselleEngine.getWorkspace(
-				dbAct.sdkWorkspaceId,
-				experimental_storage,
-			);
-			return {
-				...tmpAct,
-				teamName: team?.name || "Unknown Team",
-				workspaceName: tmpWorkspace.name ?? "Untitled",
-			};
+			// This feature is currently under development and data structures change destructively,
+			// so parsing of legacy data frequently fails. We're using a rough try-catch to ignore
+			// data that fails to parse. This should be properly handled when the feature flag is removed.
+			try {
+				const tmpAct = await giselleEngine.getAct({ actId: dbAct.sdkActId });
+				const team = teams.find((t) => t.dbId === dbAct.teamDbId);
+				const tmpWorkspace = await giselleEngine.getWorkspace(
+					dbAct.sdkWorkspaceId,
+					experimental_storage,
+				);
+				return {
+					...tmpAct,
+					teamName: team?.name || "Unknown Team",
+					workspaceName: tmpWorkspace.name ?? "Untitled",
+				};
+			} catch {
+				return null;
+			}
 		}),
-	);
+	).then((tmp) => tmp.filter((actOrNull) => actOrNull !== null));
 	const flowTriggers: Array<FlowTriggerUIItem> = [];
 	for (const team of teams) {
 		const tmpFlowTriggers = await db.query.flowTriggers.findMany({
