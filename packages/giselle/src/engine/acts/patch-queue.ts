@@ -94,8 +94,11 @@ export function createPatchQueue(
 			return [];
 		}
 
-		// Group patches by actId while preserving order
-		const actGroups = new Map<string, { actId: ActId; patches: Patch[] }>();
+		// Group patches by actId while preserving order and tracking retry counts
+		const actGroups = new Map<
+			string,
+			{ actId: ActId; patches: Patch[]; maxRetryCount: number }
+		>();
 
 		for (const item of state.queue) {
 			const actIdStr = item.actId;
@@ -103,10 +106,16 @@ export function createPatchQueue(
 
 			if (existing) {
 				existing.patches.push(...item.patches);
+				// Keep the maximum retry count when batching items
+				existing.maxRetryCount = Math.max(
+					existing.maxRetryCount,
+					item.retryCount,
+				);
 			} else {
 				actGroups.set(actIdStr, {
 					actId: item.actId,
 					patches: [...item.patches],
+					maxRetryCount: item.retryCount,
 				});
 			}
 		}
@@ -120,7 +129,7 @@ export function createPatchQueue(
 					actId: group.actId,
 					patches: mergedPatches,
 					timestamp: Date.now(),
-					retryCount: 0,
+					retryCount: group.maxRetryCount,
 				});
 			}
 		}
