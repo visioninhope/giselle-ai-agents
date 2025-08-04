@@ -204,9 +204,18 @@ export function createPatchQueue(
 		};
 	}
 
+	/**
+	 * Immediately processes all queued patches
+	 * Returns a promise that resolves when all patches are processed
+	 */
+	async function flush() {
+		await processQueue();
+	}
+
 	return {
 		createApplyPatches,
 		cleanup,
+		flush,
 		// Exposed for testing
 		_internal: {
 			getQueueLength: () => state.queue.length,
