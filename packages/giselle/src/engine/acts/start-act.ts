@@ -129,8 +129,9 @@ export async function startAct(
 				await args.callbacks?.sequenceSkip?.({ sequence });
 			},
 		});
-	} finally {
-		// Ensure proper cleanup of the patch queue
-		patchQueue.cleanup();
+	} catch (error) {
+		await patchQueue.cleanup();
+		throw error;
 	}
+	await patchQueue.cleanup();
 }
