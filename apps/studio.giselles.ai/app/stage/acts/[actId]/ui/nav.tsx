@@ -28,7 +28,7 @@ function SequenceBlock({ children }: React.PropsWithChildren) {
 export function Nav({ act }: NavProps) {
 	const pathname = usePathname();
 	return (
-		<Accordion.Root type="multiple" className="flex flex-col gap-[8px]">
+		<Accordion.Root type="multiple" className="flex flex-col gap-[8px]" defaultValue={act.sequences.map((sequence) =>sequence.id)}>
 			{act.sequences.map((sequence, index) => (
 				<Accordion.Item key={sequence.id} value={sequence.id}>
 					<Accordion.Header asChild>
