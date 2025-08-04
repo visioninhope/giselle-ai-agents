@@ -51,7 +51,7 @@ Consider what should happen and what must not happen at each stage.
 
 ### 2. Follow the Web of Interactions
 
-In node-based systems like Giselles, individual nodes may appear independent but actually exist within a complex web of interactions:
+In node-based systems like Giselle, individual nodes may appear independent but actually exist within a complex web of interactions:
 
 - Data flow between nodes
 - Execution order dependencies
