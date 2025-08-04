@@ -79,6 +79,13 @@
 	--color-unreachable: #a9afbc;
 	--color-warning: #ffe551;
 
+	/* RGB values for transparency */
+	--color-error-rgb: 255, 61, 113;
+	--color-success-rgb: 57, 255, 127;
+	--color-warning-rgb: 255, 229, 81;
+	--color-info-rgb: 54, 123, 253;
+	--color-ignored-rgb: 135, 138, 152;
+
 	/* glass common */
 	--glass-highlight-bg: linear-gradient(
 		to right,
