@@ -166,18 +166,22 @@ export function createPatchQueue(context: GiselleEngineContext) {
 
 	/**
 	 * Stops the batch processing and cleans up resources
+	 * Waits for all remaining patches to be processed before returning
 	 */
-	function cleanup() {
+	async function cleanup() {
 		if (state.intervalId !== null) {
 			clearInterval(state.intervalId);
 			state.intervalId = null;
 		}
 
-		// Process any remaining patches synchronously before cleanup
+		// Process any remaining patches before cleanup
 		if (state.queue.length > 0) {
-			processQueue().catch((error) => {
+			try {
+				await processQueue();
+			} catch (error) {
 				console.error("Error processing final patch batch:", error);
-			});
+				throw error; // Re-throw to ensure caller is aware of the failure
+			}
 		}
 	}
 
