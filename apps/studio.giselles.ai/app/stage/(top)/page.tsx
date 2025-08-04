@@ -19,7 +19,7 @@ import { notFound } from "next/navigation";
 import { after } from "next/server";
 import { giselleEngine } from "@/app/giselle-engine";
 import { acts as actsSchema, db } from "@/drizzle";
-import { experimental_storageFlag, stageFlag } from "@/flags";
+import { stageFlag } from "@/flags";
 import { fetchCurrentUser } from "@/services/accounts";
 import { fetchUserTeams } from "@/services/teams";
 import { type FlowTriggerUIItem, Form } from "./form";
@@ -27,6 +27,82 @@ import { type FlowTriggerUIItem, Form } from "./form";
 // The maximum duration of server actions on this page is extended to 800 seconds through enabled fluid compute.
 // https://vercel.com/docs/functions/runtimes#max-duration
 export const maxDuration = 800;
+
+// This feature is currently under development and data structures change destructively,
+// so parsing of legacy data frequently fails. We're using a rough try-catch to ignore
+// data that fails to parse. This should be properly handled when the feature flag is removed.
+async function enrichActWithNavigationData(
+	act: typeof actsSchema.$inferSelect,
+	teams: { dbId: number; name: string }[],
+) {
+	try {
+		const tmpAct = await giselleEngine.getAct({ actId: act.sdkActId });
+		const team = teams.find((t) => t.dbId === act.teamDbId);
+		if (team === undefined) {
+			throw new Error("Team not found");
+		}
+		const tmpWorkspace = await giselleEngine.getWorkspace(
+			act.sdkWorkspaceId,
+			true,
+		);
+
+		const findStepByStatus = (status: string) => {
+			for (const sequence of tmpAct.sequences) {
+				for (const step of sequence.steps) {
+					if (step.status === status) {
+						return step;
+					}
+				}
+			}
+			return null;
+		};
+
+		const getLastStep = () => {
+			if (tmpAct.sequences.length === 0) {
+				return null;
+			}
+			const lastSequence = tmpAct.sequences[tmpAct.sequences.length - 1];
+			if (lastSequence.steps.length === 0) {
+				return null;
+			}
+			return lastSequence.steps[lastSequence.steps.length - 1];
+		};
+
+		let link = `/stage/acts/${tmpAct.id}`;
+		let targetStep = null;
+
+		switch (tmpAct.status) {
+			case "inProgress":
+				targetStep = findStepByStatus("running");
+				break;
+			case "completed":
+				targetStep = getLastStep();
+				break;
+			case "cancelled":
+				targetStep = findStepByStatus("cancelled");
+				break;
+			case "failed":
+				targetStep = findStepByStatus("failed");
+				break;
+			default: {
+				const _exhaustiveCheck: never = tmpAct.status;
+				throw new Error(`Unhandled status: ${_exhaustiveCheck}`);
+			}
+		}
+
+		if (targetStep) {
+			link += `/${targetStep.id}`;
+		}
+		return {
+			...tmpAct,
+			link,
+			teamName: team.name,
+			workspaceName: tmpWorkspace.name ?? "Untitled",
+		};
+	} catch {
+		return null;
+	}
+}
 
 async function reloadPage() {
 	"use server";
@@ -39,7 +115,6 @@ export default async function StagePage() {
 	if (!enableStage) {
 		return notFound();
 	}
-	const experimental_storage = await experimental_storageFlag();
 	const teams = await fetchUserTeams();
 	const teamOptions = teams.map((team) => ({
 		value: team.id,
@@ -52,26 +127,7 @@ export default async function StagePage() {
 		limit: 10,
 	});
 	const acts = await Promise.all(
-		dbActs.map(async (dbAct) => {
-			// This feature is currently under development and data structures change destructively,
-			// so parsing of legacy data frequently fails. We're using a rough try-catch to ignore
-			// data that fails to parse. This should be properly handled when the feature flag is removed.
-			try {
-				const tmpAct = await giselleEngine.getAct({ actId: dbAct.sdkActId });
-				const team = teams.find((t) => t.dbId === dbAct.teamDbId);
-				const tmpWorkspace = await giselleEngine.getWorkspace(
-					dbAct.sdkWorkspaceId,
-					experimental_storage,
-				);
-				return {
-					...tmpAct,
-					teamName: team?.name || "Unknown Team",
-					workspaceName: tmpWorkspace.name ?? "Untitled",
-				};
-			} catch {
-				return null;
-			}
-		}),
+		dbActs.map((dbAct) => enrichActWithNavigationData(dbAct, teams)),
 	).then((tmp) => tmp.filter((actOrNull) => actOrNull !== null));
 	const flowTriggers: Array<FlowTriggerUIItem> = [];
 	for (const team of teams) {
@@ -83,7 +139,7 @@ export default async function StagePage() {
 			if (!workspaceMap.has(tmpFlowTrigger.sdkWorkspaceId)) {
 				const tmpWorkspace = await giselleEngine.getWorkspace(
 					tmpFlowTrigger.sdkWorkspaceId,
-					experimental_storage,
+					true,
 				);
 				workspaceMap.set(tmpFlowTrigger.sdkWorkspaceId, tmpWorkspace);
 			}
@@ -208,7 +264,7 @@ export default async function StagePage() {
 									</TableCell>
 									<TableCell className="text-right">
 										<div className="flex justify-end">
-											<Link href={`/stage/acts/${act.id}`}>Details</Link>
+											<Link href={act.link}>Details</Link>
 										</div>
 									</TableCell>
 								</TableRow>
