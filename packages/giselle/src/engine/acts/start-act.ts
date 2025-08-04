@@ -92,6 +92,7 @@ export async function startAct(
 	const patchQueue = createPatchQueue(args.context);
 	const applyPatches = patchQueue.createApplyPatches();
 
+	let executionError: Error | null = null;
 	try {
 		await executeAct({
 			act,
@@ -130,8 +131,19 @@ export async function startAct(
 			},
 		});
 	} catch (error) {
-		await patchQueue.cleanup();
-		throw error;
+			executionError = error as Error;
 	}
-	await patchQueue.cleanup();
+	try {
+		await patchQueue.cleanup();
+	} catch (cleanupError) {
+		if (executionError !== null) {
+			console.error("Cleanup failed after execution error:", cleanupError);
+			throw executionError;
+		}
+		throw cleanupError as Error;
+	}
+	if (executionError !== null) {
+		console.error("Execution failed:", executionError);
+		throw executionError;
+	}
 }
