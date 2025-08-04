@@ -12,7 +12,6 @@ import {
 	type WorkspaceId,
 } from "@giselle-sdk/data-type";
 import { defaultName } from "@giselle-sdk/giselle";
-import { RefreshCw } from "lucide-react";
 import { revalidatePath } from "next/cache";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -23,6 +22,7 @@ import { stageFlag } from "@/flags";
 import { fetchCurrentUser } from "@/services/accounts";
 import { fetchUserTeams } from "@/services/teams";
 import { type FlowTriggerUIItem, Form } from "./form";
+import { ReloadButton } from "./reload-button";
 
 // The maximum duration of server actions on this page is extended to 800 seconds through enabled fluid compute.
 // https://vercel.com/docs/functions/runtimes#max-duration
@@ -220,15 +220,7 @@ export default async function StagePage() {
 				<div className="flex items-center justify-between px-1">
 					<h2 className="text-[16px] font-sans text-white-100">Acts</h2>
 					<div className="flex items-center gap-3">
-						<form action={reloadPage}>
-							<Button
-								type="submit"
-								variant="subtle"
-								leftIcon={<RefreshCw className="w-4 h-4" />}
-							>
-								Reload
-							</Button>
-						</form>
+						<ReloadButton reloadAction={reloadPage} />
 						<Button type="button" variant="subtle">
 							Archive
 						</Button>
