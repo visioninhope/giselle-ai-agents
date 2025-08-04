@@ -41,55 +41,9 @@ export function createPatchQueue(
 	};
 
 	/**
-	 * Merges patches for the same actId to optimize database operations
-	 * Keeps patches in the order they were received for consistency
+	 * Groups queued patches by actId without merging
 	 */
-	function mergePatchesForAct(patches: Patch[]): Patch[] {
-		const pathMap = new Map<string, Patch>();
-
-		for (const patch of patches) {
-			const existing = pathMap.get(patch.path);
-
-			if (!existing) {
-				pathMap.set(patch.path, patch);
-				continue;
-			}
-
-			// Merge patches for the same path
-			if ("set" in patch && "set" in existing) {
-				// Later set operations override earlier ones
-				pathMap.set(patch.path, patch);
-			} else if ("increment" in patch && "increment" in existing) {
-				// Combine increment operations
-				pathMap.set(patch.path, {
-					path: patch.path,
-					increment: existing.increment + patch.increment,
-				});
-			} else if ("decrement" in patch && "decrement" in existing) {
-				// Combine decrement operations
-				pathMap.set(patch.path, {
-					path: patch.path,
-					decrement: existing.decrement + patch.decrement,
-				});
-			} else if ("push" in patch && "push" in existing) {
-				// Combine push operations
-				pathMap.set(patch.path, {
-					path: patch.path,
-					push: [...existing.push, ...patch.push],
-				});
-			} else {
-				// Different operation types - keep the later one
-				pathMap.set(patch.path, patch);
-			}
-		}
-
-		return Array.from(pathMap.values());
-	}
-
-	/**
-	 * Groups and merges queued patches by actId
-	 */
-	function processBatch(): QueuedPatch[] {
+	function processBatch() {
 		if (state.queue.length === 0) {
 			return [];
 		}
@@ -120,19 +74,14 @@ export function createPatchQueue(
 			}
 		}
 
-		// Merge patches for each act and create batch
-		const batch: QueuedPatch[] = [];
-		for (const group of actGroups.values()) {
-			const mergedPatches = mergePatchesForAct(group.patches);
-			if (mergedPatches.length > 0) {
-				batch.push({
-					actId: group.actId,
-					patches: mergedPatches,
-					timestamp: Date.now(),
-					retryCount: group.maxRetryCount,
-				});
-			}
-		}
+		const batch = Array.from(actGroups.values()).map(
+			(group) => ({
+				actId: group.actId,
+				patches: group.patches,
+				timestamp: Date.now(),
+				retryCount: group.maxRetryCount,
+			}),
+		);
 
 		// Clear the queue
 		state.queue = [];
