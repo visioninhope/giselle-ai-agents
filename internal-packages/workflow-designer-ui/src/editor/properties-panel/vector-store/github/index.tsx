@@ -265,7 +265,7 @@ export function GitHubVectorStoreNodePropertiesPanel({
 													</span>
 													<Info className="w-3 h-3 text-white-400/50 cursor-help" />
 													<div className="absolute left-0 bottom-full mb-2 px-3 py-2 bg-black-800/80 backdrop-blur-md border border-white/10 text-white text-xs rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 shadow-lg">
-														Enable Pull Requests for {selectedRepoKey} in Vector
+														Enable Pull Requests for that repository in Vector
 														Store settings
 													</div>
 												</div>
