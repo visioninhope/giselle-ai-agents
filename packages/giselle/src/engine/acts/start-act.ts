@@ -133,15 +133,8 @@ export async function startAct(
 	} catch (error) {
 		executionError = error as Error;
 	}
-	try {
-		await patchQueue.cleanup();
-	} catch (cleanupError) {
-		if (executionError !== null) {
-			console.error("Cleanup failed after execution error:", cleanupError);
-			throw executionError;
-		}
-		throw cleanupError as Error;
-	}
+
+	patchQueue.cleanup();
 	if (executionError !== null) {
 		console.error("Execution failed:", executionError);
 		throw executionError;

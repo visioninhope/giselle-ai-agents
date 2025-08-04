@@ -74,14 +74,12 @@ export function createPatchQueue(
 			}
 		}
 
-		const batch = Array.from(actGroups.values()).map(
-			(group) => ({
-				actId: group.actId,
-				patches: group.patches,
-				timestamp: Date.now(),
-				retryCount: group.maxRetryCount,
-			}),
-		);
+		const batch = Array.from(actGroups.values()).map((group) => ({
+			actId: group.actId,
+			patches: group.patches,
+			timestamp: Date.now(),
+			retryCount: group.maxRetryCount,
+		}));
 
 		// Clear the queue
 		state.queue = [];
@@ -159,23 +157,23 @@ export function createPatchQueue(
 
 	/**
 	 * Stops the batch processing and cleans up resources
-	 * Waits for all remaining patches to be processed before returning
+	 * Discards any remaining patches without processing them
 	 */
-	async function cleanup() {
+	function cleanup() {
 		if (state.intervalId !== null) {
 			clearInterval(state.intervalId);
 			state.intervalId = null;
 		}
 
-		// Process any remaining patches before cleanup
+		// Clear the queue without processing remaining patches
+		// Since cleanup indicates end of act execution, remaining patches
+		// likely represent incomplete or invalid state changes
 		if (state.queue.length > 0) {
-			try {
-				await processQueue();
-			} catch (error) {
-				console.error("Error processing final patch batch:", error);
-				throw error; // Re-throw to ensure caller is aware of the failure
-			}
+			console.warn(
+				`Discarding ${state.queue.length} unprocessed patches during cleanup`,
+			);
 		}
+		state.queue = [];
 	}
 
 	/**
