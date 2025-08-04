@@ -6,6 +6,7 @@ interface QueuedPatch {
 	actId: ActId;
 	patches: Patch[];
 	timestamp: number;
+	retryCount: number;
 }
 
 interface PatchQueueState {
@@ -13,20 +14,30 @@ interface PatchQueueState {
 	processing: boolean;
 	intervalId: NodeJS.Timeout | null;
 	context: GiselleEngineContext;
+	retryConfig: RetryConfig;
 }
 
 const BATCH_INTERVAL_MS = 50; // Process batches every 50ms
+const DEFAULT_MAX_RETRIES = 3; // Maximum number of retry attempts
+
+interface RetryConfig {
+	maxRetries: number;
+}
 
 /**
  * Creates a patch queue system for managing concurrent patch operations
  * Ensures patches are applied in FIFO order and prevents race conditions
  */
-export function createPatchQueue(context: GiselleEngineContext) {
+export function createPatchQueue(
+	context: GiselleEngineContext,
+	retryConfig: RetryConfig = { maxRetries: DEFAULT_MAX_RETRIES },
+) {
 	const state: PatchQueueState = {
 		queue: [],
 		processing: false,
 		intervalId: null,
 		context,
+		retryConfig,
 	};
 
 	/**
@@ -109,6 +120,7 @@ export function createPatchQueue(context: GiselleEngineContext) {
 					actId: group.actId,
 					patches: mergedPatches,
 					timestamp: Date.now(),
+					retryCount: 0,
 				});
 			}
 		}
@@ -134,16 +146,39 @@ export function createPatchQueue(context: GiselleEngineContext) {
 
 			// Process each act's patches sequentially to maintain order
 			for (const item of batch) {
-				await patchAct({
-					context: state.context,
-					actId: item.actId,
-					patches: item.patches,
-				});
+				try {
+					await patchAct({
+						context: state.context,
+						actId: item.actId,
+						patches: item.patches,
+					});
+				} catch (error) {
+					// Handle individual patch failures
+					if (item.retryCount < state.retryConfig.maxRetries) {
+						// Re-queue at the front with incremented retry count
+						const retryItem: QueuedPatch = {
+							...item,
+							retryCount: item.retryCount + 1,
+							timestamp: Date.now(),
+						};
+						state.queue.unshift(retryItem);
+						console.warn(
+							`Patch failed for act ${item.actId}, retry ${item.retryCount + 1}/${state.retryConfig.maxRetries}:`,
+							error,
+						);
+					} else {
+						// Permanent failure - log with severe warning
+						console.error(
+							`Patch permanently failed for act ${item.actId} after ${state.retryConfig.maxRetries} retries. Data loss may occur:`,
+							error,
+							"Failed patches:",
+							item.patches,
+						);
+					}
+				}
 			}
 		} catch (error) {
 			console.error("Error processing patch queue:", error);
-			// Re-queue failed patches at the front to maintain order
-			// In a production system, you might want more sophisticated error handling
 		} finally {
 			state.processing = false;
 		}
@@ -197,6 +232,7 @@ export function createPatchQueue(context: GiselleEngineContext) {
 			actId,
 			patches,
 			timestamp: Date.now(),
+			retryCount: 0,
 		});
 
 		// Start processing if not already started
