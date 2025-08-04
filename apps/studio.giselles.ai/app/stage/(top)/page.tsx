@@ -63,8 +63,66 @@ export default async function StagePage() {
 					dbAct.sdkWorkspaceId,
 					experimental_storage,
 				);
+
+				let link = `/stage/acts/${tmpAct.id}`;
+				let find = false;
+				switch (tmpAct.status) {
+					case "inProgress":
+						for (const sequence of tmpAct.sequences) {
+							for (const step of sequence.steps) {
+								if (step.status === "running") {
+									find = true;
+									link += `/${step.id}`;
+									break;
+								}
+							}
+							if (find) {
+								break;
+							}
+						}
+						break;
+					case "completed": {
+						const lastSequence = tmpAct.sequences[tmpAct.sequences.length - 1];
+						const lastStep = lastSequence.steps[lastSequence.steps.length - 1];
+						link += `/${lastStep.id}`;
+						break;
+					}
+					case "cancelled":
+						for (const sequence of tmpAct.sequences) {
+							for (const step of sequence.steps) {
+								if (step.status === "cancelled") {
+									find = true;
+									link += `/${step.id}`;
+									break;
+								}
+							}
+							if (find) {
+								break;
+							}
+						}
+						break;
+					case "failed":
+						for (const sequence of tmpAct.sequences) {
+							for (const step of sequence.steps) {
+								if (step.status === "failed") {
+									find = true;
+									link += `/${step.id}`;
+									break;
+								}
+							}
+							if (find) {
+								break;
+							}
+						}
+						break;
+					default: {
+						const _exhaustiveCheck: never = tmpAct.status;
+						throw new Error(`Unhandled status: ${_exhaustiveCheck}`);
+					}
+				}
 				return {
 					...tmpAct,
+					link,
 					teamName: team?.name || "Unknown Team",
 					workspaceName: tmpWorkspace.name ?? "Untitled",
 				};
@@ -208,7 +266,7 @@ export default async function StagePage() {
 									</TableCell>
 									<TableCell className="text-right">
 										<div className="flex justify-end">
-											<Link href={`/stage/acts/${act.id}`}>Details</Link>
+											<Link href={act.link}>Details</Link>
 										</div>
 									</TableCell>
 								</TableRow>
