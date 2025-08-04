@@ -58,7 +58,13 @@ async function enrichActWithNavigationData(
 		};
 
 		const getLastStep = () => {
+			if (tmpAct.sequences.length === 0) {
+				return null;
+			}
 			const lastSequence = tmpAct.sequences[tmpAct.sequences.length - 1];
+			if (lastSequence.steps.length === 0) {
+				return null;
+			}
 			return lastSequence.steps[lastSequence.steps.length - 1];
 		};
 
