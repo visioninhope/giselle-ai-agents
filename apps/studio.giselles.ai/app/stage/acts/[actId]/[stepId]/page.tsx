@@ -8,6 +8,7 @@ import { NodeIcon } from "@giselles-ai/icons/node";
 import { notFound } from "next/navigation";
 import { giselleEngine } from "@/app/giselle-engine";
 import { GenerationView } from "../../../../../../../internal-packages/workflow-designer-ui/src/ui/generation-view";
+import { StepLayout } from "./ui/step-layout";
 
 export default async function ({
 	params,
@@ -38,8 +39,8 @@ export default async function ({
 	}
 
 	return (
-		<div className="flex flex-col w-full">
-			<header className="bg-tab-active-background p-[16px] flex items-center">
+		<StepLayout
+			header={
 				<div className="flex items-center gap-[6px]">
 					<div className="p-[8px] bg-element-active rounded-[4px]">
 						<NodeIcon
@@ -59,12 +60,9 @@ export default async function ({
 						</div>
 					</div>
 				</div>
-			</header>
-			<main className="p-[16px] overflow-y-auto">
-				<div className="max-w-[600px] mx-auto">
-					<GenerationView generation={generation} />
-				</div>
-			</main>
-		</div>
+			}
+		>
+			<GenerationView generation={generation} />
+		</StepLayout>
 	);
 }
