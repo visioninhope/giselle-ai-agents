@@ -18,7 +18,6 @@ import {
 	type Patch,
 	patchAct,
 	type StartActInputs,
-	type StreamActOptions,
 	startAct,
 	streamAct,
 } from "./acts";
@@ -347,7 +346,7 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 		getAct(args: { actId: ActId }) {
 			return getAct({ ...args, context });
 		},
-		streamAct(args: { actId: ActId; options?: StreamActOptions }) {
+		streamAct(args: { actId: ActId }) {
 			return streamAct({ ...args, context });
 		},
 		deleteSecret(args: { workspaceId: WorkspaceId; secretId: SecretId }) {
