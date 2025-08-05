@@ -1,14 +1,11 @@
 import z from "zod/v4";
 import { Act } from "../../concepts/act";
-import { Generation } from "../../concepts/generation";
 import type { ActId } from "../../concepts/identifiers";
-import { getGeneration } from "../generations/get-generation";
 import type { GiselleEngineContext } from "../types";
 import { getAct } from "./get-act";
 
 export const StreamData = z.object({
 	act: Act,
-	generations: z.array(Generation),
 });
 export type StreamData = z.infer<typeof StreamData>;
 
@@ -31,39 +28,14 @@ async function fetchActAndGenerations(args: {
 	context: GiselleEngineContext;
 }): Promise<StreamData> {
 	const act = await getAct({ actId: args.actId, context: args.context });
-	const generations: Generation[] = await Promise.all(
-		act.sequences.flatMap((sequence) =>
-			sequence.steps.map((step) =>
-				getGeneration({
-					context: args.context,
-					generationId: step.generationId,
-					useExperimentalStorage: true,
-				}),
-			),
-		),
-	).then((generations) =>
-		generations.filter((generation) => generation !== undefined),
-	);
 
-	return { act, generations };
+	return { act };
 }
 
 function createDataHash(data: StreamData): string {
 	// Create a simple hash of the data to detect changes
 	return JSON.stringify({
 		actUpdatedAt: data.act.updatedAt,
-		generationsHash: data.generations.map((g) => ({
-			id: g.id,
-			status: g.status,
-			// Use different timestamp fields based on generation status
-			createdAt: g.createdAt,
-			...(g.status === "queued" && "queuedAt" in g && { queuedAt: g.queuedAt }),
-			...(g.status === "running" &&
-				"startedAt" in g && { startedAt: g.startedAt }),
-			...(g.status === "completed" &&
-				"completedAt" in g && { completedAt: g.completedAt }),
-			...(g.status === "failed" && "failedAt" in g && { failedAt: g.failedAt }),
-		})),
 	});
 }
 
