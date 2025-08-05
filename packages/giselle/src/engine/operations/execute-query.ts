@@ -343,6 +343,7 @@ async function queryVectorStore(
 											String(v),
 										]),
 									),
+									additional: result.additional,
 								})),
 							};
 						}
@@ -372,6 +373,7 @@ async function queryVectorStore(
 										String(v),
 									]),
 								),
+								additional: undefined,
 							})),
 						};
 					}
