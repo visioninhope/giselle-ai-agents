@@ -1,6 +1,9 @@
 "use client";
 
-import { useWorkflowDesigner } from "@giselle-sdk/giselle/react";
+import {
+	useFeatureFlag,
+	useWorkflowDesigner,
+} from "@giselle-sdk/giselle/react";
 import { useCallback, useState } from "react";
 import { ReadOnlyBanner } from "../../ui/read-only-banner";
 import { FloatingChat } from "../chat";
@@ -57,6 +60,8 @@ export function V2Placeholder({
 		setIsChatOpen(false);
 	}, []);
 
+	const { layoutV3 } = useFeatureFlag();
+
 	return (
 		<div className="flex-1 overflow-hidden font-sans flex flex-col">
 			{showReadOnlyBanner && isReadOnly && (
@@ -69,13 +74,25 @@ export function V2Placeholder({
 
 			<RootProvider>
 				<V2Header onNameChange={onNameChange} />
-				<V2Container {...layoutState} onLeftPanelClose={handleLeftPanelClose} />
-				<V2Footer
-					onLeftPaelValueChange={handleLeftPanelValueChange}
-					onChatToggle={handleChatToggle}
-					activePanel={layoutState.leftPanel}
-					isChatOpen={isChatOpen}
-				/>
+				{layoutV3 ? (
+					<>
+						<V2Container
+							{...layoutState}
+							onLeftPanelClose={handleLeftPanelClose}
+						/>
+						<V2Footer
+							onLeftPaelValueChange={handleLeftPanelValueChange}
+							onChatToggle={handleChatToggle}
+							activePanel={layoutState.leftPanel}
+							isChatOpen={isChatOpen}
+						/>
+					</>
+				) : (
+					<V2Container
+						{...layoutState}
+						onLeftPanelClose={handleLeftPanelClose}
+					/>
+				)}
 				<KeyboardShortcuts />
 			</RootProvider>
 			<WorkspaceTour
