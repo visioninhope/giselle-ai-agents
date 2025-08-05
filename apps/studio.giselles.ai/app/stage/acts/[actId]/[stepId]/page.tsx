@@ -8,8 +8,6 @@ import { NodeIcon } from "@giselles-ai/icons/node";
 import { notFound } from "next/navigation";
 import { giselleEngine } from "@/app/giselle-engine";
 import { GenerationView } from "../../../../../../../internal-packages/workflow-designer-ui/src/ui/generation-view";
-// import { ActStreamReader } from "@giselle-sdk/giselle/react";
-import { ActStreamReader } from "../../../../../../../packages/giselle/src/react";
 
 export default async function ({
 	params,
@@ -64,13 +62,6 @@ export default async function ({
 			</header>
 			<main className="p-[16px] overflow-y-auto">
 				<div className="max-w-[600px] mx-auto">
-					<ActStreamReader
-						actId={actId}
-						onUpdateAction={async (data) => {
-							"use server";
-							console.log(data);
-						}}
-					/>
 					<GenerationView generation={generation} />
 				</div>
 			</main>
