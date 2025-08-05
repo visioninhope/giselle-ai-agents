@@ -1,26 +1,21 @@
 "use client";
 
+import {
+  GiselleIcon,
+  Tooltip,
+  WilliIcon,
+} from "@giselle-internal/workflow-designer-ui";
 import clsx from "clsx/lite";
 import {
-  Home,
-  Plus,
-  Library,
-  Search,
-  Radio,
-  Compass,
-  Bell,
-  Gift,
-  Sparkles,
-  MoreHorizontal,
   Book,
+  ChevronDown,
   ChevronLeft,
+  Home,
+  Library,
+  Sparkles,
 } from "lucide-react";
 import Link from "next/link";
-import { ChevronDown } from "lucide-react";
 import { useState } from "react";
-import { GiselleIcon, WilliIcon } from "@giselle-internal/workflow-designer-ui";
-import { Tooltip } from "@giselle-internal/workflow-designer-ui";
-import { AvatarImage } from "@/services/accounts/components/user-button/avatar-image";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -29,6 +24,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { AvatarImage } from "@/services/accounts/components/user-button/avatar-image";
 
 interface StageSidebarProps {
   user?: {
@@ -38,15 +34,29 @@ interface StageSidebarProps {
   };
 }
 
+interface MenuItem {
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+  href: string;
+  active?: boolean;
+}
+
+interface BottomItem {
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+  href: string;
+}
+
 export function StageSidebar({ user }: StageSidebarProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const menuItems = [
+
+  const menuItems: MenuItem[] = [
     { icon: Sparkles, label: "Generation", href: "/stage", active: true },
     { icon: Library, label: "Showcase", href: "/showcase", active: false },
     { icon: WilliIcon, label: "Acts", href: "/acts", active: false },
   ];
 
-  const bottomItems = [
+  const bottomItems: BottomItem[] = [
     {
       icon: Book,
       label: "Docs",
@@ -54,6 +64,60 @@ export function StageSidebar({ user }: StageSidebarProps) {
     },
     { icon: Home, label: "Lobby", href: "/apps" },
   ];
+
+  const renderIcon = (
+    IconComponent: React.ComponentType<{ className?: string }>,
+    label: string,
+  ) => {
+    const icon = <IconComponent className="w-5 h-5" />;
+    return isCollapsed ? (
+      <Tooltip text={label} side="right" variant="light">
+        {icon}
+      </Tooltip>
+    ) : (
+      icon
+    );
+  };
+
+  const renderBottomItem = (item: BottomItem) => {
+    const isExternalLink = item.href.startsWith("http");
+    const commonClassName = clsx(
+      "flex items-center text-sm text-white-700 hover:text-white-900 hover:bg-white/5 transition-colors",
+      isCollapsed ? "justify-center px-2 py-3" : "gap-3 px-4 py-3",
+    );
+
+    const content = (
+      <>
+        {renderIcon(item.icon, item.label)}
+        {!isCollapsed && <span>{item.label}</span>}
+      </>
+    );
+
+    if (isExternalLink) {
+      return (
+        <a
+          key={item.label}
+          href={item.href}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={commonClassName}
+        >
+          {content}
+        </a>
+      );
+    }
+
+    return (
+      <Link
+        key={item.label}
+        href={item.href}
+        className={commonClassName}
+        title={isCollapsed ? item.label : undefined}
+      >
+        {content}
+      </Link>
+    );
+  };
 
   return (
     <div
@@ -76,6 +140,7 @@ export function StageSidebar({ user }: StageSidebarProps) {
                 <GiselleIcon className="text-white-900 w-[24px] h-[24px] flex-shrink-0" />
               </div>
               <button
+                type="button"
                 onClick={() => setIsCollapsed(!isCollapsed)}
                 className="absolute top-[6px] right-[-10px] text-white-700 hover:text-white-900 transition-colors"
               >
@@ -91,6 +156,7 @@ export function StageSidebar({ user }: StageSidebarProps) {
                 </span>
               </div>
               <button
+                type="button"
                 onClick={() => setIsCollapsed(!isCollapsed)}
                 className="text-white-700 hover:text-white-900 transition-colors"
               >
@@ -121,7 +187,7 @@ export function StageSidebar({ user }: StageSidebarProps) {
                   >
                     <AvatarImage
                       className="w-8 h-8 rounded-full"
-                      avatarUrl={user.avatarUrl}
+                      avatarUrl={user.avatarUrl ?? null}
                       width={32}
                       height={32}
                       alt={user.displayName || user.email || "User"}
@@ -130,7 +196,7 @@ export function StageSidebar({ user }: StageSidebarProps) {
                 ) : (
                   <AvatarImage
                     className="w-8 h-8 rounded-full"
-                    avatarUrl={user.avatarUrl}
+                    avatarUrl={user.avatarUrl ?? null}
                     width={32}
                     height={32}
                     alt={user.displayName || user.email || "User"}
@@ -196,114 +262,27 @@ export function StageSidebar({ user }: StageSidebarProps) {
       {/* Navigation Menu */}
       <div className="flex-1 py-4">
         <nav>
-          {menuItems.map((item) => {
-            const IconComponent = item.icon;
-            return (
-              <Link
-                key={item.label}
-                href={item.href}
-                className={clsx(
-                  "flex items-center text-sm transition-colors",
-                  isCollapsed ? "justify-center px-2 py-3" : "gap-3 px-4 py-3",
-                  item.active
-                    ? "text-[color:var(--color-text-nav-active)]"
-                    : "text-[color:var(--color-text-nav-inactive)] hover:text-[color:var(--color-text-nav-active)]",
-                )}
-              >
-                {isCollapsed ? (
-                  <Tooltip text={item.label} side="right" variant="light">
-                    <IconComponent className="w-5 h-5" />
-                  </Tooltip>
-                ) : (
-                  <IconComponent className="w-5 h-5" />
-                )}
-                {!isCollapsed && <span>{item.label}</span>}
-              </Link>
-            );
-          })}
-        </nav>
-      </div>
-
-      {/* Bottom Section */}
-      <div className="py-4">
-        {bottomItems.map((item) => {
-          const IconComponent = item.icon;
-          const isExternalLink = item.href.startsWith("http");
-
-          if (isExternalLink) {
-            return (
-              <a
-                key={item.label}
-                href={item.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={clsx(
-                  "flex items-center text-sm text-white-700 hover:text-white-900 hover:bg-white/5 transition-colors",
-                  isCollapsed
-                    ? "justify-center px-2 py-3"
-                    : "justify-between px-4 py-3",
-                )}
-              >
-                <div
-                  className={clsx(
-                    "flex items-center",
-                    isCollapsed ? "justify-center" : "gap-3",
-                  )}
-                >
-                  {isCollapsed ? (
-                    <Tooltip text={item.label} side="right" variant="light">
-                      <IconComponent className="w-5 h-5" />
-                    </Tooltip>
-                  ) : (
-                    <IconComponent className="w-5 h-5" />
-                  )}
-                  {!isCollapsed && <span>{item.label}</span>}
-                </div>
-                {!isCollapsed && item.badge && (
-                  <span className="bg-white/20 text-white-900 text-xs px-2 py-1 rounded-full">
-                    {item.badge}
-                  </span>
-                )}
-              </a>
-            );
-          }
-
-          return (
+          {menuItems.map((item) => (
             <Link
               key={item.label}
               href={item.href}
               className={clsx(
-                "flex items-center text-sm text-white-700 hover:text-white-900 hover:bg-white/5 transition-colors",
-                isCollapsed
-                  ? "justify-center px-2 py-3"
-                  : "justify-between px-4 py-3",
+                "flex items-center text-sm transition-colors",
+                isCollapsed ? "justify-center px-2 py-3" : "gap-3 px-4 py-3",
+                item.active
+                  ? "text-[color:var(--color-text-nav-active)]"
+                  : "text-[color:var(--color-text-nav-inactive)] hover:text-[color:var(--color-text-nav-active)]",
               )}
-              title={isCollapsed ? item.label : undefined}
             >
-              <div
-                className={clsx(
-                  "flex items-center",
-                  isCollapsed ? "justify-center" : "gap-3",
-                )}
-              >
-                {isCollapsed ? (
-                  <Tooltip text={item.label} side="right" variant="light">
-                    <IconComponent className="w-5 h-5" />
-                  </Tooltip>
-                ) : (
-                  <IconComponent className="w-5 h-5" />
-                )}
-                {!isCollapsed && <span>{item.label}</span>}
-              </div>
-              {!isCollapsed && item.badge && (
-                <span className="bg-white/20 text-white-900 text-xs px-2 py-1 rounded-full">
-                  {item.badge}
-                </span>
-              )}
+              {renderIcon(item.icon, item.label)}
+              {!isCollapsed && <span>{item.label}</span>}
             </Link>
-          );
-        })}
+          ))}
+        </nav>
       </div>
+
+      {/* Bottom Section */}
+      <div className="py-4">{bottomItems.map(renderBottomItem)}</div>
     </div>
   );
 }

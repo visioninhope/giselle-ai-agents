@@ -16,12 +16,12 @@ import { revalidatePath } from "next/cache";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { after } from "next/server";
+import { getAccountInfo } from "@/app/(main)/settings/account/actions";
 import { giselleEngine } from "@/app/giselle-engine";
 import { acts as actsSchema, db } from "@/drizzle";
 import { stageFlag } from "@/flags";
 import { fetchCurrentUser } from "@/services/accounts";
 import { fetchUserTeams } from "@/services/teams";
-import { getAccountInfo } from "@/app/(main)/settings/account/actions";
 import { type FlowTriggerUIItem, Form } from "./form";
 import { ReloadButton } from "./reload-button";
 import { StageSidebar } from "./stage-sidebar";
@@ -178,9 +178,9 @@ export default async function StagePage() {
     <div className="flex h-screen bg-black-900">
       <StageSidebar
         user={{
-          displayName: accountInfo.displayName,
-          email: accountInfo.email,
-          avatarUrl: accountInfo.avatarUrl,
+          displayName: accountInfo.displayName ?? undefined,
+          email: accountInfo.email ?? undefined,
+          avatarUrl: accountInfo.avatarUrl ?? undefined,
         }}
       />
       <div className="flex-1 flex flex-col">
