@@ -47,10 +47,27 @@ export function streamAct(args: {
 }) {
 	const encoder = new TextEncoder();
 
+	let pollIntervalId: ReturnType<typeof setInterval> | null = null;
+	let timeoutId: ReturnType<typeof setTimeout> | null = null;
+	let polling = true;
+
+	const cleanupResources = () => {
+		polling = false;
+
+		if (pollIntervalId) {
+			clearInterval(pollIntervalId);
+			pollIntervalId = null;
+		}
+
+		if (timeoutId) {
+			clearTimeout(timeoutId);
+			timeoutId = null;
+		}
+	};
+
 	return new ReadableStream({
 		async start(controller) {
 			let lastDataHash = "";
-			let polling = true;
 			let lastFetchedData: StreamData | null = null;
 
 			// Send connection established event
@@ -103,8 +120,7 @@ export function streamAct(args: {
 			};
 
 			const cleanup = () => {
-				polling = false;
-				clearInterval(pollIntervalId);
+				cleanupResources();
 
 				// Send end message and close if controller is still active
 				if (controller.desiredSize !== null) {
@@ -125,14 +141,18 @@ export function streamAct(args: {
 				}
 			};
 
-			// Execute immediately first, then set up regular polling
+			// Execute immediately first
 			await poll();
 
-			// Create polling interval for subsequent executions
-			const pollIntervalId = setInterval(poll, 500);
+			// Only set up polling if we haven't cleaned up already
+			if (polling) {
+				pollIntervalId = setInterval(poll, 500);
+				timeoutId = setTimeout(cleanup, 20 * 60 * 1000);
+			}
+		},
 
-			// Wait for 20 minutes before cleanup
-			setTimeout(cleanup, 20 * 60 * 1000);
+		cancel() {
+			cleanupResources();
 		},
 	});
 }
