@@ -25,6 +25,11 @@ import { type StreamData, StreamEvent } from "../../engine/acts/stream-act";
  * - "end": Stream completed naturally
  * - "error": Error occurred in stream
  *
+ * SSE Message Handling:
+ * - Buffers partial messages across stream chunks
+ * - Splits chunks by "\n\n" to extract complete SSE messages
+ * - Handles network/browser chunk boundaries gracefully
+ *
  * Cleanup Strategy:
  * - AbortController: Cancels fetch request on unmount/dependency change
  * - cancelled flag: Stops stream processing loop safely
@@ -66,6 +71,9 @@ export function ActStreamReader({
 					.pipeThrough(new TextDecoderStream())
 					.getReader();
 
+				// Buffer to handle partial messages across chunks
+				let buffer = "";
+
 				try {
 					// === STREAM PROCESSING PHASE ===
 					// Read chunks from the SSE stream until completion or cancellation
@@ -73,43 +81,61 @@ export function ActStreamReader({
 						const { value, done } = await reader.read();
 						if (done || cancelled) break; // Stream ended or component unmounted
 
+						// Append new chunk to buffer
+						buffer += value;
+
 						// === MESSAGE PARSING PHASE ===
-						// SSE format: "data: {json}\n\n"
-						const trimmed = value.trim();
-						if (!trimmed.startsWith("data:")) continue; // Skip non-data lines
+						// Split by double newline to get complete SSE messages
+						const messages = buffer.split("\n\n");
 
-						// Extract JSON payload from SSE message
-						const json = trimmed.slice(5).trim(); // Remove "data:" prefix
-						const parsed = JSON.parse(json);
-						const streamEvent = StreamEvent.parse(parsed); // Validate structure
+						// Keep the last part (potentially incomplete message) in buffer
+						buffer = messages.pop() || "";
 
-						if (cancelled) break; // Double-check cancellation before processing
+						// Process each complete message
+						for (const message of messages) {
+							const trimmed = message.trim();
+							if (!trimmed || !trimmed.startsWith("data:")) continue; // Skip empty or non-data lines
 
-						// === EVENT HANDLING PHASE ===
-						// Route different event types to appropriate handlers
-						switch (streamEvent.type) {
-							case "connected":
-								// Connection established - log in development
-								if (process.env.NODE_ENV === "development") {
-									console.log(`Stream event: ${streamEvent.type}`);
+							console.log(trimmed);
+
+							try {
+								// Extract JSON payload from SSE message
+								const json = trimmed.slice(5).trim(); // Remove "data:" prefix
+								const parsed = JSON.parse(json);
+								const streamEvent = StreamEvent.parse(parsed); // Validate structure
+
+								if (cancelled) break; // Double-check cancellation before processing
+
+								// === EVENT HANDLING PHASE ===
+								// Route different event types to appropriate handlers
+								switch (streamEvent.type) {
+									case "connected":
+										// Connection established - log in development
+										if (process.env.NODE_ENV === "development") {
+											console.log(`Stream event: ${streamEvent.type}`);
+										}
+										break;
+									case "data":
+										// New act data received - notify parent component
+										onUpdateAction(streamEvent.data);
+										break;
+									case "end":
+										// Stream completed naturally - no action needed
+										break;
+									case "error":
+										// Server reported an error - throw to catch block
+										throw new Error(streamEvent.message);
+									default: {
+										// TypeScript exhaustiveness check
+										const _exhaustiveCheck: never = streamEvent;
+										throw new Error(
+											`Unhandled stream event type: ${_exhaustiveCheck}`,
+										);
+									}
 								}
-								break;
-							case "data":
-								// New act data received - notify parent component
-								onUpdateAction(streamEvent.data);
-								break;
-							case "end":
-								// Stream completed naturally - no action needed
-								break;
-							case "error":
-								// Server reported an error - throw to catch block
-								throw new Error(streamEvent.message);
-							default: {
-								// TypeScript exhaustiveness check
-								const _exhaustiveCheck: never = streamEvent;
-								throw new Error(
-									`Unhandled stream event type: ${_exhaustiveCheck}`,
-								);
+							} catch (parseError) {
+								// Log parsing errors but continue processing other messages
+								console.error("Failed to parse SSE message:", parseError);
 							}
 						}
 					}
