@@ -48,6 +48,16 @@ export function ChatPanel() {
 	const messagesEndRef = useRef<HTMLDivElement>(null);
 	const inputRef = useRef<HTMLTextAreaElement>(null);
 
+	// Demo message patterns
+	const demoMessages = [
+		// Long message
+		"Thanks for your question! I'll help you with that. For more information about nodes, check out our documentation at https://docs.giselles.ai/nodes or visit our GitHub repository at https://github.com/giselles-ai/giselle for examples. You can also explore different node types, configure their settings, and connect them to build powerful workflows. Feel free to experiment with the visual editor and don't hesitate to ask if you need guidance!",
+		// Short message
+		"Got it! Check our docs at https://docs.giselles.ai/nodes for more info.",
+		// Greeting message
+		"Hello! 👋 I'm here to help you with your workflow. What would you like to know about nodes and connections?",
+	];
+
 	// Show typing indicator and then welcome message
 	useEffect(() => {
 		const timer = setTimeout(() => {
@@ -104,10 +114,11 @@ export function ChatPanel() {
 				// Show final response
 				setTimeout(() => {
 					setIsThinking(false);
+					const randomMessage =
+						demoMessages[Math.floor(Math.random() * demoMessages.length)];
 					const assistantMessage: Message = {
 						id: `assistant-${Date.now()}`,
-						content:
-							"Thanks for your question! I'll help you with that. For more information about nodes, check out our documentation at https://docs.giselles.ai/nodes or visit our GitHub repository at https://github.com/giselles-ai/giselle for examples.",
+						content: randomMessage,
 						sender: "assistant",
 						timestamp: new Date(),
 					};
@@ -133,12 +144,12 @@ export function ChatPanel() {
 	};
 
 	return (
-		<div className="h-[480px] w-[320px] flex flex-col relative">
+		<div className="h-[600px] w-[320px] flex flex-col relative">
 			{/* Header */}
 
 			{/* Messages Area */}
 			<div
-				className="flex-1 overflow-y-auto p-4 flex flex-col justify-end relative"
+				className="flex-1 overflow-y-auto py-2 px-4 flex flex-col relative thin-scrollbar"
 				style={{
 					maskImage:
 						"linear-gradient(to bottom, transparent 0%, black 20%, black 100%)",
@@ -146,7 +157,8 @@ export function ChatPanel() {
 						"linear-gradient(to bottom, transparent 0%, black 20%, black 100%)",
 				}}
 			>
-				<div className="flex flex-col space-y-2">
+				<div className="flex-grow" />
+				<div className="flex flex-col space-y-2 min-h-fit">
 					{messages.map((message, index) => {
 						// Calculate opacity based on message age (newest = 100%, older = progressively less)
 						const totalMessages = messages.length;
@@ -172,7 +184,7 @@ export function ChatPanel() {
 								<div
 									className={`max-w-[80%] min-w-0 px-4 py-3 text-sm font-mono ${
 										message.sender === "user"
-											? "font-light bg-[#6B8FF0] text-white rounded-[8px] rounded-br-[4px] shadow-sm"
+											? "font-light bg-[#4A6FD8] text-white rounded-[8px] rounded-br-[4px] shadow-sm"
 											: "font-light bg-[#6B8FF0]/20 text-white rounded-[8px] rounded-bl-[4px] border border-[#6B8FF0]/80 shadow-[0_0_10px_rgba(107,143,240,0.3),0_0_20px_rgba(107,143,240,0.2),inset_0_0_20px_rgba(107,143,240,0.1)] backdrop-blur-sm animate-[slideUpFromLeft_0.4s_ease-out]"
 									}`}
 									style={
@@ -217,7 +229,7 @@ export function ChatPanel() {
 			</div>
 
 			{/* Input Area */}
-			<div className="p-3 flex-shrink-0">
+			<div className="p-2 flex-shrink-0">
 				<div className="relative">
 					<textarea
 						ref={inputRef}
@@ -243,7 +255,10 @@ export function ChatPanel() {
 				</div>
 				<div className="text-left -mt-1">
 					<span className="text-[10px] text-gray-500">
-						Chat will reset when closed
+						Chat will reset when closed •{" "}
+						<span className="inline-block px-0.5 text-[9px] text-gray-300 rounded border border-gray-600 font-mono">
+							Esc
+						</span>
 					</span>
 				</div>
 			</div>
@@ -258,6 +273,23 @@ export function ChatPanel() {
             opacity: 1;
             transform: translateY(0) translateX(0) scale(1);
           }
+        }
+
+        .thin-scrollbar::-webkit-scrollbar {
+          width: 4px;
+        }
+
+        .thin-scrollbar::-webkit-scrollbar-track {
+          background: transparent;
+        }
+
+        .thin-scrollbar::-webkit-scrollbar-thumb {
+          background: #6b8ff0;
+          border-radius: 2px;
+        }
+
+        .thin-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: #5a7ee8;
         }
       `}</style>
 		</div>

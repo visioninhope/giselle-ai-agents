@@ -11,15 +11,17 @@ import { Tooltip } from "../../../ui/tooltip";
 import type { LeftPanelValue } from "../state";
 
 interface V2FooterProps {
-	onLeftPaelValueChange: (leftMenu: LeftPanelValue) => void;
+	onLeftPaelValueChange?: (value: LeftPanelValue) => void;
 	onChatToggle?: () => void;
 	activePanel?: LeftPanelValue | null;
+	isChatOpen?: boolean;
 }
 
 export function V2Footer({
 	onLeftPaelValueChange,
 	onChatToggle,
 	activePanel,
+	isChatOpen,
 }: V2FooterProps) {
 	return (
 		<footer className="h-[30px] border-t border-white/10 px-4 flex items-center">
@@ -35,7 +37,7 @@ export function V2Footer({
 					>
 						<button
 							type="button"
-							onClick={() => onLeftPaelValueChange("run-history")}
+							onClick={() => onLeftPaelValueChange?.("run-history")}
 							data-panel-trigger="run-history"
 							className={`cursor-pointer ${
 								activePanel === "run-history"
@@ -56,7 +58,7 @@ export function V2Footer({
 					>
 						<button
 							type="button"
-							onClick={() => onLeftPaelValueChange("secret")}
+							onClick={() => onLeftPaelValueChange?.("secret")}
 							data-panel-trigger="secret"
 							className={`cursor-pointer ${
 								activePanel === "secret"
@@ -77,7 +79,7 @@ export function V2Footer({
 					>
 						<button
 							type="button"
-							onClick={() => onLeftPaelValueChange("data-source")}
+							onClick={() => onLeftPaelValueChange?.("data-source")}
 							data-panel-trigger="data-source"
 							className={`cursor-pointer ${
 								activePanel === "data-source"
@@ -103,7 +105,7 @@ export function V2Footer({
 							onClick={onChatToggle}
 							data-panel-trigger="chat"
 							className={`cursor-pointer ${
-								activePanel === "chat"
+								isChatOpen
 									? "text-[#6B8FF0]"
 									: "text-white-900 hover:text-[#6B8FF0]"
 							}`}

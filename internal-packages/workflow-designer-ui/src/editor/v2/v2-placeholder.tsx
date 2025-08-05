@@ -78,7 +78,8 @@ export function V2Placeholder({
 				<V2Footer
 					onLeftPaelValueChange={handleLeftPanelValueChange}
 					onChatToggle={handleChatToggle}
-					activePanel={isChatOpen ? "chat" : layoutState.leftPanel}
+					activePanel={layoutState.leftPanel}
+					isChatOpen={isChatOpen}
 				/>
 				<KeyboardShortcuts />
 			</RootProvider>
