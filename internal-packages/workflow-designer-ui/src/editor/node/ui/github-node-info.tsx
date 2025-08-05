@@ -60,7 +60,6 @@ export function GitHubNodeInfo({ node }: { node: Node }): ReactElement | null {
 				<GitHubRepositoryBadgeWithType
 					owner={node.content.source.state.owner}
 					repo={node.content.source.state.repo}
-					contentType={node.content.source.state.contentType}
 				/>
 			</div>
 		) : (
