@@ -4,14 +4,14 @@ import { useCallback, useEffect } from "react";
 import type { ActId } from "../../concepts/act";
 import { type StreamData, StreamEvent } from "../../engine/acts/stream-act";
 
-interface ConsumeOptions {
-	onUpdateAction: (data: StreamData) => void;
-}
-
 export function ActStreamReader({
 	actId,
 	onUpdateAction,
-}: { actId: ActId } & ConsumeOptions) {
+	children,
+}: React.PropsWithChildren<{
+	actId: ActId;
+	onUpdateAction: (data: StreamData) => void;
+}>) {
 	const obtainAPIResponse = useCallback(async () => {
 		// Initiate the first call to connect to SSE API
 		const apiResponse = await fetch(`/api/giselle/streamAct`, {
@@ -29,51 +29,45 @@ export function ActStreamReader({
 			.pipeThrough(new TextDecoderStream())
 			.getReader();
 
-		while (true) {
-			const { value, done } = await reader.read();
-			if (done) break;
+		try {
+			while (true) {
+				const { value, done } = await reader.read();
+				if (done) break;
 
-			try {
 				const trimmed = value.trim();
-				if (!trimmed.startsWith("data:")) return;
+				if (!trimmed.startsWith("data:")) continue;
 
 				const json = trimmed.slice(5).trim();
 				const parsed = JSON.parse(json);
 
-				// Handle different event types - some events might not match StreamEvent schema
-				if (
-					parsed.type === "connected" ||
-					parsed.type === "error" ||
-					parsed.type === "end"
-				) {
-					console.log(`Stream event: ${parsed.type}`, parsed);
-					return;
-				}
-
 				const streamEvent = StreamEvent.parse(parsed);
 				switch (streamEvent.type) {
+					case "connected":
+						if (process.env.NODE_ENV === "development") {
+							console.log(`Stream event: ${streamEvent.type}`);
+						}
+						break;
 					case "data":
-						console.log(streamEvent.data);
 						onUpdateAction(streamEvent.data);
 						break;
-					case "complete":
-						onUpdateAction(streamEvent.data);
+					case "end":
 						break;
+					case "error":
+						throw new Error(streamEvent.message);
 					default: {
 						const _exhaustiveCheck: never = streamEvent;
 						throw new Error(`Unhandled stream event type: ${_exhaustiveCheck}`);
 					}
 				}
-			} catch (e) {
-				console.warn("Invalid stream chunk:", e);
 			}
+		} finally {
+			await reader.cancel();
 		}
 	}, [actId, onUpdateAction]);
 
 	useEffect(() => {
-		console.log("load");
 		obtainAPIResponse();
 	}, [obtainAPIResponse]);
 
-	return null;
+	return children;
 }

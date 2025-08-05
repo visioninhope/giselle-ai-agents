@@ -9,18 +9,26 @@ export const StreamData = z.object({
 });
 export type StreamData = z.infer<typeof StreamData>;
 
+const ConnectedEvent = z.object({
+	type: z.literal("connected"),
+});
 const DataEvent = z.object({
 	type: z.literal("data"),
 	data: StreamData,
 });
-const CompleteEvent = z.object({
-	type: z.literal("complete"),
-	data: StreamData,
+const EndEvent = z.object({
+	type: z.literal("end"),
+});
+const ErrorEvent = z.object({
+	type: z.literal("error"),
+	message: z.string(),
 });
 
 export const StreamEvent = z.discriminatedUnion("type", [
+	ConnectedEvent,
 	DataEvent,
-	CompleteEvent,
+	EndEvent,
+	ErrorEvent,
 ]);
 
 async function fetchActAndGenerations(args: {
@@ -37,6 +45,10 @@ function createDataHash(data: StreamData): string {
 	return JSON.stringify({
 		actUpdatedAt: data.act.updatedAt,
 	});
+}
+
+export function formatStreamData(event: z.infer<typeof StreamEvent>): string {
+	return `data: ${JSON.stringify(event)}\n\n`;
 }
 
 export interface StreamActOptions {
@@ -66,7 +78,7 @@ export function streamAct(args: {
 
 			// Send connection established event
 			controller.enqueue(
-				encoder.encode(`data: ${JSON.stringify({ type: "connected" })}\n\n`),
+				encoder.encode(formatStreamData({ type: "connected" })),
 			);
 
 			// Function to send data updates
@@ -91,9 +103,7 @@ export function streamAct(args: {
 							data,
 						});
 
-						controller.enqueue(
-							encoder.encode(`data: ${JSON.stringify(payload)}\n\n`),
-						);
+						controller.enqueue(encoder.encode(formatStreamData(payload)));
 
 						// Return true if act is completed to stop polling
 						if (isCompleted) {
@@ -110,10 +120,10 @@ export function streamAct(args: {
 					try {
 						controller.enqueue(
 							encoder.encode(
-								`data: ${JSON.stringify({
+								formatStreamData({
 									type: "error",
 									message: "Failed to fetch data",
-								})}\n\n`,
+								}),
 							),
 						);
 					} catch {
@@ -127,9 +137,7 @@ export function streamAct(args: {
 			const initiallyCompleted = await sendUpdate();
 			if (initiallyCompleted) {
 				// Act is already completed, just close the stream
-				controller.enqueue(
-					encoder.encode(`data: ${JSON.stringify({ type: "end" })}\n\n`),
-				);
+				controller.enqueue(encoder.encode(formatStreamData({ type: "end" })));
 				controller.close();
 				return;
 			}
