@@ -23,7 +23,7 @@ function SequenceBlock({ children }: React.PropsWithChildren) {
 	);
 }
 
-export function NavV2({ act: defaultActPromise }: { act: Promise<Act> }) {
+export function Sidebar({ act: defaultActPromise }: { act: Promise<Act> }) {
 	const defaultAct = use(defaultActPromise);
 	const [act] = useState(defaultAct);
 	const pathname = usePathname();
