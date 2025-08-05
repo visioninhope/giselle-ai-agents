@@ -82,10 +82,10 @@ export function streamAct(args: {
 			);
 
 			// Function to send data updates
-			const sendUpdate = async (): Promise<boolean> => {
+			const sendUpdate = async () => {
 				// Early exit if not polling or controller is closed
 				if (!polling || controller.desiredSize === null) {
-					return true; // Stop polling
+					return;
 				}
 
 				try {
@@ -104,15 +104,7 @@ export function streamAct(args: {
 						});
 
 						controller.enqueue(encoder.encode(formatStreamData(payload)));
-
-						// Return true if act is completed to stop polling
-						if (isCompleted) {
-							return true;
-						}
 					}
-
-					// Also check for completion even if data hasn't changed
-					return data.act.status === "completed";
 				} catch (error) {
 					console.error("Error fetching act and generations:", error);
 
@@ -129,18 +121,8 @@ export function streamAct(args: {
 					} catch {
 						// Ignore if controller is already closed
 					}
-					return false;
 				}
 			};
-
-			// Send initial data and check if already completed
-			const initiallyCompleted = await sendUpdate();
-			if (initiallyCompleted) {
-				// Act is already completed, just close the stream
-				controller.enqueue(encoder.encode(formatStreamData({ type: "end" })));
-				controller.close();
-				return;
-			}
 
 			// Unified cleanup function
 			const cleanup = () => {
@@ -149,25 +131,35 @@ export function streamAct(args: {
 
 				// Send end message and close if controller is still active
 				if (controller.desiredSize !== null) {
-					controller.enqueue(
-						encoder.encode(`data: ${JSON.stringify({ type: "end" })}\n\n`),
-					);
+					controller.enqueue(encoder.encode(formatStreamData({ type: "end" })));
 					controller.close();
 				}
 			};
 
-			// Create polling interval
-			const pollIntervalId = setInterval(async () => {
+			// Unified polling function
+			const poll = async () => {
 				if (!polling || controller.desiredSize === null) {
-					clearInterval(pollIntervalId);
 					return;
 				}
 
-				const isCompleted = await sendUpdate();
-				if (isCompleted) {
-					cleanup();
+				await sendUpdate();
+
+				// Check if polling should stop
+				try {
+					const data = await fetchActAndGenerations({ actId, context });
+					if (data.act.status === "completed") {
+						cleanup();
+					}
+				} catch (_error) {
+					// On error, continue polling to retry
 				}
-			}, pollInterval);
+			};
+
+			// Execute immediately first, then set up regular polling
+			await poll();
+
+			// Create polling interval for subsequent executions
+			const pollIntervalId = setInterval(poll, pollInterval);
 
 			// Handle client disconnect
 			signal?.addEventListener("abort", cleanup);
