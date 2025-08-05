@@ -1,8 +1,48 @@
 import type { Generation } from "@giselle-sdk/giselle";
 import clsx from "clsx/lite";
-import { ChevronDownIcon, ChevronRightIcon } from "lucide-react";
-import { useState } from "react";
+import {
+	ChevronDownIcon,
+	ChevronRightIcon,
+	GitPullRequestIcon,
+} from "lucide-react";
+import { useMemo, useState } from "react";
+import { z } from "zod/v4";
 import { GitHubIcon, WilliIcon } from "../icons";
+
+const VectorStoreQueryResultRecord = z.object({
+	chunkContent: z.string(),
+	chunkIndex: z.number(),
+	score: z.number(),
+	metadata: z.record(z.string(), z.string()),
+	additional: z.record(z.string(), z.unknown()).optional(),
+});
+
+const GitHubVectorStoreSource = z.object({
+	provider: z.literal("github"),
+	state: z.discriminatedUnion("status", [
+		z.object({
+			status: z.literal("configured"),
+			owner: z.string(),
+			repo: z.string(),
+			contentType: z.enum(["blob", "pull_request"]),
+		}),
+		z.object({
+			status: z.literal("unconfigured"),
+		}),
+	]),
+});
+
+const VectorStoreQueryResult = z.object({
+	type: z.literal("vector-store"),
+	source: GitHubVectorStoreSource,
+	records: z.array(VectorStoreQueryResultRecord),
+});
+
+type QueryResultData = z.infer<typeof VectorStoreQueryResult>;
+
+const gitHubPRContextSchema = z.object({
+	prContext: z.string().optional(),
+});
 
 function Spinner() {
 	return (
@@ -88,25 +128,102 @@ function ContentPreview({
 	);
 }
 
-type QueryResultRecord = {
-	chunkContent: string;
-	chunkIndex: number;
-	score: number;
+function PRContextDisplay({
+	metadata,
+	additional,
+}: {
 	metadata: Record<string, string>;
-};
+	additional?: Record<string, unknown>;
+}) {
+	const [isExpanded, setIsExpanded] = useState(false);
 
-type QueryResultData = {
-	type: string;
-	source?: {
-		provider: string;
-		state: {
-			status: string;
-			owner?: string;
-			repo?: string;
+	const additionalPRContext = additional
+		? gitHubPRContextSchema.safeParse(additional).data
+		: null;
+
+	const prNumber = metadata.prNumber;
+	const contentType = metadata.contentType;
+	// Check both metadata and additional for prContext
+	const prContextContent = additionalPRContext?.prContext;
+
+	const parsedContext = useMemo(() => {
+		if (!prContextContent) {
+			return { title: "", body: null };
+		}
+		const [title, ...bodyParts] = prContextContent.split("\n\n");
+		return {
+			title: title || "",
+			body: bodyParts.length > 0 ? bodyParts.join("\n\n") : null,
 		};
-	};
-	records?: QueryResultRecord[];
-};
+	}, [prContextContent]);
+
+	if (!prNumber || !prContextContent) {
+		return null;
+	}
+
+	const contentTypeLabel =
+		contentType === "comment"
+			? "Comment"
+			: contentType === "diff"
+				? "Diff"
+				: contentType === "title_body"
+					? "Title & Body"
+					: "Unknown";
+
+	return (
+		<div className="mt-[8px] p-[8px] bg-blue-500/10 rounded-[6px] border border-blue-500/20">
+			<div className="flex items-start gap-[8px]">
+				<GitPullRequestIcon className="w-[14px] h-[14px] text-blue-400 flex-shrink-0 mt-[2px]" />
+				<div className="flex-1 space-y-[4px]">
+					<div className="flex items-center gap-[6px] flex-wrap">
+						<span className="text-[11px] font-medium text-blue-400">
+							PR #{prNumber}
+						</span>
+						<span className="text-[11px] text-white-500">•</span>
+						<span className="text-[11px] text-white-600">
+							{contentTypeLabel}
+						</span>
+					</div>
+
+					{parsedContext.title && (
+						<p className="text-[12px] font-medium text-white-800 leading-snug">
+							{parsedContext.title}
+						</p>
+					)}
+
+					{parsedContext.body && (
+						<div>
+							<button
+								type="button"
+								onClick={() => setIsExpanded(!isExpanded)}
+								className="flex items-center gap-[4px] text-[11px] text-blue-400 hover:text-blue-300 transition-colors"
+							>
+								{isExpanded ? (
+									<>
+										<ChevronDownIcon className="w-[12px] h-[12px]" />
+										Hide PR description
+									</>
+								) : (
+									<>
+										<ChevronRightIcon className="w-[12px] h-[12px]" />
+										Show PR description
+									</>
+								)}
+							</button>
+							{isExpanded && (
+								<div className="mt-[6px] p-[8px] bg-black-900/30 rounded-[4px]">
+									<pre className="text-[11px] text-white-700 whitespace-pre-wrap font-mono leading-relaxed">
+										{parsedContext.body}
+									</pre>
+								</div>
+							)}
+						</div>
+					)}
+				</div>
+			</div>
+		</div>
+	);
+}
 
 type DataSourceDisplayInfo = {
 	line1: string;
@@ -117,34 +234,19 @@ function getDataSourceDisplayInfo(
 	result: QueryResultData,
 ): DataSourceDisplayInfo {
 	if (
-		result.source?.provider === "github" &&
-		result.source.state.status === "configured" &&
-		result.source.state.owner &&
-		result.source.state.repo
+		result.source.provider === "github" &&
+		result.source.state.status === "configured"
 	) {
 		return {
 			line1: `${result.source.state.owner}/${result.source.state.repo}`,
-			line2: "Code",
-		};
-	}
-	if (
-		result.source?.provider === "githubPullRequest" &&
-		result.source.state.status === "configured" &&
-		result.source.state.owner &&
-		result.source.state.repo
-	) {
-		return {
-			line1: `${result.source.state.owner}/${result.source.state.repo}`,
-			line2: "Pull Requests",
-		};
-	}
-	if (result.source?.provider) {
-		return {
-			line1: `${result.source.provider} vector store`,
+			line2:
+				result.source.state.contentType === "pull_request"
+					? "Pull Requests"
+					: "Code",
 		};
 	}
 	return {
-		line1: "Unknown source",
+		line1: "GitHub vector store",
 	};
 }
 
@@ -159,9 +261,7 @@ function DataSourceTab({
 }) {
 	const displayInfo = getDataSourceDisplayInfo(result);
 	const recordCount = result.records?.length || 0;
-	const isGitHub =
-		result.source?.provider === "github" ||
-		result.source?.provider === "githubPullRequest";
+	const isGitHub = result.source?.provider === "github";
 
 	return (
 		<button
@@ -253,6 +353,11 @@ function QueryResultCard({ result }: { result: QueryResultData }) {
 						onToggle={() => toggleRecord(recordIndex)}
 					/>
 
+					<PRContextDisplay
+						metadata={record.metadata}
+						additional={record.additional}
+					/>
+
 					{Object.keys(record.metadata).length > 0 && (
 						<details className="text-[11px] text-white-500">
 							<summary className="cursor-pointer hover:text-white-400">
@@ -328,7 +433,7 @@ export function QueryResultView({ generation }: { generation: Generation }) {
 				<div className="flex gap-[0px] flex-nowrap">
 					{queryResults.map((result, index) => (
 						<DataSourceTab
-							key={`datasource-${index}-${result.source?.provider || "unknown"}-${result.source?.state?.owner || ""}-${result.source?.state?.repo || ""}`}
+							key={`datasource-${index}-github-${result.source.state.status === "configured" ? `${result.source.state.owner}-${result.source.state.repo}` : "unconfigured"}`}
 							result={result}
 							isActive={activeTabIndex === index}
 							onClick={() => setActiveTabIndex(index)}
@@ -351,11 +456,15 @@ function getGenerationQueryResult(generation: Generation): QueryResultData[] {
 		(output) => output.type === "query-result",
 	);
 
-	// Flatten all query results from all outputs
 	const allResults: QueryResultData[] = [];
 	for (const output of queryResultOutputs) {
 		if (output.type === "query-result") {
-			allResults.push(...output.content);
+			for (const item of output.content) {
+				const parsed = VectorStoreQueryResult.safeParse(item);
+				if (parsed.success) {
+					allResults.push(parsed.data);
+				}
+			}
 		}
 	}
 
