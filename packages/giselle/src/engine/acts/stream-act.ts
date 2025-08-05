@@ -82,7 +82,7 @@ export function streamAct(args: {
 	const {
 		signal,
 		pollInterval = 2000,
-		maxConnectionTime = 10 * 60 * 1000, // 10 minutes
+		maxConnectionTime, // Optional safety measure
 	} = options;
 
 	const encoder = new TextEncoder();
@@ -98,7 +98,7 @@ export function streamAct(args: {
 			);
 
 			// Function to send data updates
-			const sendUpdate = async () => {
+			const sendUpdate = async (): Promise<boolean> => {
 				try {
 					const data = await fetchActAndGenerations({ actId, context });
 					const currentHash = createDataHash(data);
@@ -107,14 +107,24 @@ export function streamAct(args: {
 					if (currentHash !== lastDataHash) {
 						lastDataHash = currentHash;
 
+						// Check if act is completed
+						const isCompleted = data.act.status === "completed";
 						const payload = StreamEvent.parse({
-							type: "data",
+							type: isCompleted ? "complete" : "data",
 							data,
 						});
 						controller.enqueue(
 							encoder.encode(`data: ${JSON.stringify(payload)}\n\n`),
 						);
+
+						// Return true if act is completed to stop polling
+						if (isCompleted) {
+							return true;
+						}
 					}
+
+					// Also check for completion even if data hasn't changed
+					return data.act.status === "completed";
 				} catch (error) {
 					console.error("Error fetching act and generations:", error);
 					controller.enqueue(
@@ -125,19 +135,44 @@ export function streamAct(args: {
 							})}\n\n`,
 						),
 					);
+					return false;
 				}
 			};
 
-			// Send initial data
-			await sendUpdate();
+			// Send initial data and check if already completed
+			const initiallyCompleted = await sendUpdate();
+			if (initiallyCompleted) {
+				// Act is already completed, just close the stream
+				try {
+					controller.enqueue(
+						encoder.encode(`data: ${JSON.stringify({ type: "end" })}\n\n`),
+					);
+					controller.close();
+				} catch (_error) {
+					// Controller may already be closed
+				}
+				return;
+			}
 
-			// Set up polling to check for updates
+			// Create cleanup function and set up polling
 			const pollIntervalId = setInterval(async () => {
 				if (!polling) return;
-				await sendUpdate();
+				const isCompleted = await sendUpdate();
+				if (isCompleted) {
+					polling = false;
+					clearInterval(pollIntervalId);
+					try {
+						controller.enqueue(
+							encoder.encode(`data: ${JSON.stringify({ type: "end" })}\n\n`),
+						);
+						controller.close();
+					} catch (_error) {
+						// Controller may already be closed
+					}
+				}
 			}, pollInterval);
 
-			// Cleanup when connection is closed
+			// Cleanup function for external triggers
 			const cleanup = () => {
 				polling = false;
 				clearInterval(pollIntervalId);
@@ -157,8 +192,10 @@ export function streamAct(args: {
 			// Handle client disconnect
 			signal?.addEventListener("abort", cleanup);
 
-			// Auto-cleanup after a certain time to prevent long-running connections
-			setTimeout(cleanup, maxConnectionTime);
+			// Auto-cleanup after maxConnectionTime if specified (safety measure)
+			if (maxConnectionTime) {
+				setTimeout(cleanup, maxConnectionTime);
+			}
 		},
 	});
 }
