@@ -7,6 +7,7 @@ export interface QueryResult<
 	chunk: Chunk;
 	similarity: number;
 	metadata: TMetadata;
+	additional?: Record<string, unknown>;
 }
 
 export interface QueryService<
