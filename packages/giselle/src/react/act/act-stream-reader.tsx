@@ -98,8 +98,6 @@ export function ActStreamReader({
 							const trimmed = message.trim();
 							if (!trimmed || !trimmed.startsWith("data:")) continue; // Skip empty or non-data lines
 
-							console.log(trimmed);
-
 							try {
 								// Extract JSON payload from SSE message
 								const json = trimmed.slice(5).trim(); // Remove "data:" prefix
