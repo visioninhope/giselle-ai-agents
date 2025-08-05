@@ -5,3 +5,4 @@ export * from "./get-workspace-acts";
 export * from "./patch-act";
 export * from "./shared/act-execution-utils";
 export * from "./start-act";
+export * from "./stream-act";
