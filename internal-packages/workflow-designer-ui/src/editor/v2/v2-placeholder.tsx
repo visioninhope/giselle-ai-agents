@@ -1,9 +1,6 @@
 "use client";
 
-import {
-	useFeatureFlag,
-	useWorkflowDesigner,
-} from "@giselle-sdk/giselle/react";
+import { useWorkflowDesigner } from "@giselle-sdk/giselle/react";
 import { useCallback, useState } from "react";
 import { ReadOnlyBanner } from "../../ui/read-only-banner";
 import { FloatingChat } from "../chat";
@@ -59,8 +56,6 @@ export function V2Placeholder({
 	const handleChatClose = useCallback(() => {
 		setIsChatOpen(false);
 	}, []);
-
-	const { layoutV3 } = useFeatureFlag();
 
 	return (
 		<div className="flex-1 overflow-hidden font-sans flex flex-col">
