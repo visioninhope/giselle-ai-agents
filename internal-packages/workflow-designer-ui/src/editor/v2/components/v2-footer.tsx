@@ -12,11 +12,13 @@ import type { LeftPanelValue } from "../state";
 
 interface V2FooterProps {
 	onLeftPaelValueChange: (leftMenu: LeftPanelValue) => void;
+	onChatToggle?: () => void;
 	activePanel?: LeftPanelValue | null;
 }
 
 export function V2Footer({
 	onLeftPaelValueChange,
+	onChatToggle,
 	activePanel,
 }: V2FooterProps) {
 	return (
@@ -98,7 +100,13 @@ export function V2Footer({
 					>
 						<button
 							type="button"
-							className="text-white-900 hover:text-[#6B8FF0] cursor-pointer"
+							onClick={onChatToggle}
+							data-panel-trigger="chat"
+							className={`cursor-pointer ${
+								activePanel === "chat"
+									? "text-[#6B8FF0]"
+									: "text-white-900 hover:text-[#6B8FF0]"
+							}`}
 						>
 							<MessageCircleIcon className="w-[14px] h-[14px]" />
 						</button>
