@@ -1,6 +1,10 @@
 "use client";
 
 import {
+	ActStreamReader,
+	type StreamDataEventHandler,
+} from "@giselle-sdk/giselle/react";
+import {
 	ArrowLeftIcon,
 	CheckIcon,
 	ChevronDownIcon,
@@ -12,7 +16,7 @@ import {
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Accordion } from "radix-ui";
-import { use, useState } from "react";
+import { use, useCallback, useState } from "react";
 import type { Act } from "../../../../../../../packages/giselle/src/concepts/act";
 
 function SequenceBlock({ children }: React.PropsWithChildren) {
@@ -25,97 +29,106 @@ function SequenceBlock({ children }: React.PropsWithChildren) {
 
 export function Sidebar({ act: defaultActPromise }: { act: Promise<Act> }) {
 	const defaultAct = use(defaultActPromise);
-	const [act] = useState(defaultAct);
+	const [act, setAct] = useState(defaultAct);
 	const pathname = usePathname();
+	const updateAct = useCallback<StreamDataEventHandler>((data) => {
+		setAct(data.act);
+	}, []);
+
 	return (
-		<aside className="w-[300px] flex flex-col pl-[24px] border-[2px] border-transparent my-[8px]">
-			<div className="text-[12px] text-text-muted mb-[4px] pt-[16px]">
-				<Link href="/stage" className="flex items-center gap-[2px] -ml-[12px]">
-					<ArrowLeftIcon className="size-[12px]" />
-					<span>Back</span>
-				</Link>
-			</div>
+		<ActStreamReader actId={defaultAct.id} onUpdateAction={updateAct}>
+			<aside className="w-[300px] flex flex-col pl-[24px] border-[2px] border-transparent my-[8px]">
+				<div className="text-[12px] text-text-muted mb-[4px] pt-[16px]">
+					<Link
+						href="/stage"
+						className="flex items-center gap-[2px] -ml-[12px]"
+					>
+						<ArrowLeftIcon className="size-[12px]" />
+						<span>Back</span>
+					</Link>
+				</div>
 
-			<div className="mb-[24px]">
-				<h2>{act.name}</h2>
-			</div>
-			<div className="flex-grow space-y-2 overflow-y-auto">
-				<Accordion.Root
-					type="multiple"
-					className="flex flex-col gap-[8px]"
-					defaultValue={act.sequences.map((sequence) => sequence.id)}
-				>
-					{act.sequences.map((sequence, index) => (
-						<Accordion.Item key={sequence.id} value={sequence.id}>
-							<Accordion.Header asChild>
-								<SequenceBlock>
-									<div className="flex items-center gap-2">
-										<div className="text-muted-foreground">
-											{sequence.status === "completed" && (
-												<CheckIcon className="text-success size-[16px]" />
-											)}
-											{sequence.status === "running" && (
-												<RefreshCw className="text-info size-[16px] animate-spin" />
-											)}
-											{sequence.status === "failed" && (
-												<XIcon className="text-error size-[16px]" />
-											)}
-											{sequence.status === "queued" && (
-												<CircleDashedIcon className="text-text-muted size-[16px]" />
-											)}
+				<div className="mb-[24px]">
+					<h2>{act.name}</h2>
+				</div>
+				<div className="flex-grow space-y-2 overflow-y-auto">
+					<Accordion.Root
+						type="multiple"
+						className="flex flex-col gap-[8px]"
+						defaultValue={act.sequences.map((sequence) => sequence.id)}
+					>
+						{act.sequences.map((sequence, index) => (
+							<Accordion.Item key={sequence.id} value={sequence.id}>
+								<Accordion.Header asChild>
+									<SequenceBlock>
+										<div className="flex items-center gap-2">
+											<div className="text-muted-foreground">
+												{sequence.status === "completed" && (
+													<CheckIcon className="text-success size-[16px]" />
+												)}
+												{sequence.status === "running" && (
+													<RefreshCw className="text-info size-[16px] animate-spin" />
+												)}
+												{sequence.status === "failed" && (
+													<XIcon className="text-error size-[16px]" />
+												)}
+												{sequence.status === "queued" && (
+													<CircleDashedIcon className="text-text-muted size-[16px]" />
+												)}
+											</div>
+											<span>Sequence {index + 1}</span>
 										</div>
-										<span>Sequence {index + 1}</span>
-									</div>
-									<Accordion.Trigger className="group p-[2px] hover:bg-ghost-element-hover rounded-[4px] cursor-pointer outline-none data-[state=open]:bg-ghost-element-active">
-										<ChevronDownIcon className="text-text-muted size-[14px] group-data-[state=open]:rotate-180 transition-transform" />
-									</Accordion.Trigger>
-								</SequenceBlock>
-							</Accordion.Header>
+										<Accordion.Trigger className="group p-[2px] hover:bg-ghost-element-hover rounded-[4px] cursor-pointer outline-none data-[state=open]:bg-ghost-element-active">
+											<ChevronDownIcon className="text-text-muted size-[14px] group-data-[state=open]:rotate-180 transition-transform" />
+										</Accordion.Trigger>
+									</SequenceBlock>
+								</Accordion.Header>
 
-							<Accordion.Content className="pl-[2px] ml-[10px] border-l border-border overflow-hidden data-[state=closed]:animate-slideUp data-[state=open]:animate-slideDown">
-								<div className="py-[8px]">
-									<div className="space-y-2 pl-[8px]">
-										{sequence.steps.map((step) => (
-											<Link
-												href={`/stage/acts/${act.id}/${step.id}`}
-												key={step.id}
-												className="group flex items-center justify-between text-[11px] text-text-muted bg-transparent hover:bg-ghost-element-hover rounded-[4px] px-[4px] py-[2px] transition-colors data-[state=active]:bg-ghost-element-active"
-												data-state={
-													pathname === `/stage/acts/${act.id}/${step.id}`
-														? "active"
-														: ""
-												}
-											>
-												<div className="flex items-center gap-[4px] ">
-													{step.status === "queued" && (
-														<CircleDashedIcon className="text-text-muted size-[12px]" />
-													)}
-													{step.status === "running" && (
-														<RefreshCw className="text-info size-[12px] animate-spin" />
-													)}
-													{step.status === "completed" && (
-														<CheckIcon className="text-success size-[12px]" />
-													)}
-													{step.status === "failed" && (
-														<XIcon className="text-error size-[12px]" />
-													)}
-													{step.status === "cancelled" && (
-														<CircleSlashIcon className="text-text-muted size-[12px]" />
-													)}
-													<span>{step.name}</span>
-												</div>
-												<span className="opacity-0 group-hover:opacity-100 group-data-[state=active]:hidden transition-opacity">
-													Show
-												</span>
-											</Link>
-										))}
+								<Accordion.Content className="pl-[2px] ml-[10px] border-l border-border overflow-hidden data-[state=closed]:animate-slideUp data-[state=open]:animate-slideDown">
+									<div className="py-[8px]">
+										<div className="space-y-2 pl-[8px]">
+											{sequence.steps.map((step) => (
+												<Link
+													href={`/stage/acts/${act.id}/${step.id}`}
+													key={step.id}
+													className="group flex items-center justify-between text-[11px] text-text-muted bg-transparent hover:bg-ghost-element-hover rounded-[4px] px-[4px] py-[2px] transition-colors data-[state=active]:bg-ghost-element-active"
+													data-state={
+														pathname === `/stage/acts/${act.id}/${step.id}`
+															? "active"
+															: ""
+													}
+												>
+													<div className="flex items-center gap-[4px] ">
+														{step.status === "queued" && (
+															<CircleDashedIcon className="text-text-muted size-[12px]" />
+														)}
+														{step.status === "running" && (
+															<RefreshCw className="text-info size-[12px] animate-spin" />
+														)}
+														{step.status === "completed" && (
+															<CheckIcon className="text-success size-[12px]" />
+														)}
+														{step.status === "failed" && (
+															<XIcon className="text-error size-[12px]" />
+														)}
+														{step.status === "cancelled" && (
+															<CircleSlashIcon className="text-text-muted size-[12px]" />
+														)}
+														<span>{step.name}</span>
+													</div>
+													<span className="opacity-0 group-hover:opacity-100 group-data-[state=active]:hidden transition-opacity">
+														Show
+													</span>
+												</Link>
+											))}
+										</div>
 									</div>
-								</div>
-							</Accordion.Content>
-						</Accordion.Item>
-					))}
-				</Accordion.Root>
-			</div>
-		</aside>
+								</Accordion.Content>
+							</Accordion.Item>
+						))}
+					</Accordion.Root>
+				</div>
+			</aside>
+		</ActStreamReader>
 	);
 }
