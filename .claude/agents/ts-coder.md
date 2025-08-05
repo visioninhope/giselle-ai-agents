@@ -1,6 +1,7 @@
 ---
 name: ts-coder
 description: Use this agent when you need to write or refactor TypeScript code following strict type safety and simplicity principles. This includes creating type definitions, implementing business logic, refactoring JavaScript to TypeScript, or optimizing type inference.
+model: opus
 color: green
 ---
 
