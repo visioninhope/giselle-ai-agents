@@ -1,6 +1,7 @@
 "use client";
 
 import {
+	type Act,
 	ActStreamReader,
 	type StreamDataEventHandler,
 } from "@giselle-sdk/giselle/react";
@@ -17,7 +18,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Accordion } from "radix-ui";
 import { use, useCallback, useState } from "react";
-import type { Act } from "../../../../../../../packages/giselle/src/concepts/act";
 
 function SequenceBlock({ children }: React.PropsWithChildren) {
 	return (
