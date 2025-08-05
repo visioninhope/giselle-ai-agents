@@ -4,6 +4,8 @@ import { useEffect } from "react";
 import type { ActId } from "../../concepts/act";
 import { type StreamData, StreamEvent } from "../../engine/acts/stream-act";
 
+export type StreamDataEventHandler = (data: StreamData) => void;
+
 /**
  * ActStreamReader - Server-Sent Events (SSE) Stream Handler
  *
@@ -41,7 +43,7 @@ export function ActStreamReader({
 	children,
 }: React.PropsWithChildren<{
 	actId: ActId;
-	onUpdateAction: (data: StreamData) => void;
+	onUpdateAction: StreamDataEventHandler;
 }>) {
 	useEffect(() => {
 		// === SETUP PHASE ===
