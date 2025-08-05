@@ -129,6 +129,9 @@ export async function startAct(
 			onSequenceSkip: async (sequence) => {
 				await args.callbacks?.sequenceSkip?.({ sequence });
 			},
+			onActComplete: async () => {
+				await patchQueue.flush();
+			},
 		});
 	} catch (error) {
 		executionError = error as Error;
