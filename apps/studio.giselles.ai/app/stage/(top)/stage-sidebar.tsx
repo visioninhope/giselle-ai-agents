@@ -69,17 +69,19 @@ export function StageSidebar({ user }: StageSidebarProps) {
           isCollapsed ? "px-2" : "px-4",
         )}
       >
-        <div className="mb-4">
+        <div className="mb-4 relative">
           {isCollapsed ? (
-            <div className="flex items-center justify-center gap-1">
-              <GiselleIcon className="text-white-900 w-[24px] h-[24px] flex-shrink-0" />
+            <>
+              <div className="flex items-center justify-center">
+                <GiselleIcon className="text-white-900 w-[24px] h-[24px] flex-shrink-0" />
+              </div>
               <button
                 onClick={() => setIsCollapsed(!isCollapsed)}
-                className="text-white-700 hover:text-white-900 transition-colors"
+                className="absolute top-[6px] right-[-10px] text-white-700 hover:text-white-900 transition-colors"
               >
                 <ChevronLeft className="w-4 h-4 transition-transform duration-300 rotate-180" />
               </button>
-            </div>
+            </>
           ) : (
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-[3px]">
