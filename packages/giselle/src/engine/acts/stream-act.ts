@@ -58,33 +58,33 @@ export function streamAct(args: {
 				encoder.encode(formatStreamData({ type: "connected" })),
 			);
 
-			// Function to send data updates
 			const sendUpdate = async () => {
-				// Early exit if not polling or controller is closed
 				if (!polling || controller.desiredSize === null) {
 					return;
 				}
 
 				try {
-					lastFetchedData = { act: await getAct(args) }; // Store fetched data
+					lastFetchedData = {
+						act: await getAct({ actId: args.actId, context: args.context }),
+					};
 					const currentHash = createDataHash(lastFetchedData);
 
-					// Only send if data has changed or this is the first fetch
-					if (currentHash !== lastDataHash) {
-						lastDataHash = currentHash;
-
-						// Check if act is completed
-						const isCompleted = lastFetchedData.act.status === "completed";
-						const payload = StreamEvent.parse({
-							type: isCompleted ? "complete" : "data",
-							data: lastFetchedData,
-						});
-
-						controller.enqueue(encoder.encode(formatStreamData(payload)));
+					if (currentHash === lastDataHash) {
+						return;
 					}
+					lastDataHash = currentHash;
+
+					controller.enqueue(
+						encoder.encode(
+							formatStreamData({
+								type: "data",
+								data: lastFetchedData,
+							}),
+						),
+					);
 				} catch (error) {
 					console.error("Error fetching act and generations:", error);
-					lastFetchedData = null; // Clear data on error
+					lastFetchedData = null;
 
 					// Only send error if controller is still active
 					try {
@@ -102,7 +102,6 @@ export function streamAct(args: {
 				}
 			};
 
-			// Unified cleanup function
 			const cleanup = () => {
 				polling = false;
 				clearInterval(pollIntervalId);
@@ -114,7 +113,6 @@ export function streamAct(args: {
 				}
 			};
 
-			// Unified polling function
 			const poll = async () => {
 				if (!polling || controller.desiredSize === null) {
 					return;
@@ -122,8 +120,7 @@ export function streamAct(args: {
 
 				await sendUpdate();
 
-				// Check if polling should stop using already fetched data
-				if (lastFetchedData && lastFetchedData.act.status === "completed") {
+				if (lastFetchedData?.act.status === "completed") {
 					cleanup();
 				}
 			};
