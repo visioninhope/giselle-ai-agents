@@ -3,7 +3,6 @@ import { Act } from "../../concepts/act";
 import type { ActId } from "../../concepts/identifiers";
 import type { GiselleEngineContext } from "../types";
 import { getAct } from "./get-act";
-
 export const StreamData = z.object({
 	act: Act,
 });
@@ -31,15 +30,6 @@ export const StreamEvent = z.discriminatedUnion("type", [
 	ErrorEvent,
 ]);
 
-async function fetchActAndGenerations(args: {
-	actId: ActId;
-	context: GiselleEngineContext;
-}): Promise<StreamData> {
-	const act = await getAct({ actId: args.actId, context: args.context });
-
-	return { act };
-}
-
 function createDataHash(data: StreamData): string {
 	// Create a simple hash of the data to detect changes
 	return JSON.stringify({
@@ -51,30 +41,17 @@ export function formatStreamData(event: z.infer<typeof StreamEvent>): string {
 	return `data: ${JSON.stringify(event)}\n\n`;
 }
 
-export interface StreamActOptions {
-	signal?: AbortSignal;
-	pollInterval?: number;
-	maxConnectionTime?: number;
-}
-
 export function streamAct(args: {
 	actId: ActId;
 	context: GiselleEngineContext;
-	options?: StreamActOptions;
 }) {
-	const { actId, context, options = {} } = args;
-	const {
-		signal,
-		pollInterval = 2000,
-		maxConnectionTime, // Optional safety measure
-	} = options;
-
 	const encoder = new TextEncoder();
 
 	return new ReadableStream({
 		async start(controller) {
 			let lastDataHash = "";
 			let polling = true;
+			let lastFetchedData: StreamData | null = null;
 
 			// Send connection established event
 			controller.enqueue(
@@ -89,24 +66,25 @@ export function streamAct(args: {
 				}
 
 				try {
-					const data = await fetchActAndGenerations({ actId, context });
-					const currentHash = createDataHash(data);
+					lastFetchedData = { act: await getAct(args) }; // Store fetched data
+					const currentHash = createDataHash(lastFetchedData);
 
 					// Only send if data has changed or this is the first fetch
 					if (currentHash !== lastDataHash) {
 						lastDataHash = currentHash;
 
 						// Check if act is completed
-						const isCompleted = data.act.status === "completed";
+						const isCompleted = lastFetchedData.act.status === "completed";
 						const payload = StreamEvent.parse({
 							type: isCompleted ? "complete" : "data",
-							data,
+							data: lastFetchedData,
 						});
 
 						controller.enqueue(encoder.encode(formatStreamData(payload)));
 					}
 				} catch (error) {
 					console.error("Error fetching act and generations:", error);
+					lastFetchedData = null; // Clear data on error
 
 					// Only send error if controller is still active
 					try {
@@ -144,14 +122,9 @@ export function streamAct(args: {
 
 				await sendUpdate();
 
-				// Check if polling should stop
-				try {
-					const data = await fetchActAndGenerations({ actId, context });
-					if (data.act.status === "completed") {
-						cleanup();
-					}
-				} catch (_error) {
-					// On error, continue polling to retry
+				// Check if polling should stop using already fetched data
+				if (lastFetchedData && lastFetchedData.act.status === "completed") {
+					cleanup();
 				}
 			};
 
@@ -159,15 +132,10 @@ export function streamAct(args: {
 			await poll();
 
 			// Create polling interval for subsequent executions
-			const pollIntervalId = setInterval(poll, pollInterval);
+			const pollIntervalId = setInterval(poll, 500);
 
-			// Handle client disconnect
-			signal?.addEventListener("abort", cleanup);
-
-			// Auto-cleanup after maxConnectionTime if specified (safety measure)
-			if (maxConnectionTime) {
-				setTimeout(cleanup, maxConnectionTime);
-			}
+			// Wait for 20 minutes before cleanup
+			setTimeout(cleanup, 20 * 60 * 1000);
 		},
 	});
 }
