@@ -10,13 +10,23 @@ interface Message {
 	timestamp: Date;
 }
 
+// Helper function to validate URLs (allow only http and https)
+function isSafeUrl(url: string): boolean {
+	try {
+		const parsed = new URL(url);
+		return parsed.protocol === "http:" || parsed.protocol === "https:";
+	} catch {
+		return false;
+	}
+}
+
 // Function to render message content with URL styling
 const renderMessageWithUrls = (content: string) => {
 	const urlRegex = /(https?:\/\/[^\s]+)/g;
 	const parts = content.split(urlRegex);
 
 	return parts.map((part, index) => {
-		if (urlRegex.test(part)) {
+		if (urlRegex.test(part) && isSafeUrl(part)) {
 			// Truncate long URLs for display
 			const displayUrl =
 				part.length > 50
