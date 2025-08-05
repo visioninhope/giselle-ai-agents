@@ -162,25 +162,7 @@ export function streamAct(args: {
 				return;
 			}
 
-			// Create cleanup function and set up polling
-			const pollIntervalId = setInterval(async () => {
-				if (!polling || controller.desiredSize === null) {
-					clearInterval(pollIntervalId);
-					return;
-				}
-
-				const isCompleted = await sendUpdate();
-				if (isCompleted) {
-					polling = false;
-					clearInterval(pollIntervalId);
-					controller.enqueue(
-						encoder.encode(`data: ${JSON.stringify({ type: "end" })}\n\n`),
-					);
-					controller.close();
-				}
-			}, pollInterval);
-
-			// Cleanup function for external triggers
+			// Unified cleanup function
 			const cleanup = () => {
 				polling = false;
 				clearInterval(pollIntervalId);
@@ -193,6 +175,19 @@ export function streamAct(args: {
 					controller.close();
 				}
 			};
+
+			// Create polling interval
+			const pollIntervalId = setInterval(async () => {
+				if (!polling || controller.desiredSize === null) {
+					clearInterval(pollIntervalId);
+					return;
+				}
+
+				const isCompleted = await sendUpdate();
+				if (isCompleted) {
+					cleanup();
+				}
+			}, pollInterval);
 
 			// Handle client disconnect
 			signal?.addEventListener("abort", cleanup);
