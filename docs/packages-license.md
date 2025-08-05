@@ -2,7 +2,7 @@
 
 
 ## Summary
-* 829 MIT
+* 816 MIT
 * 184 Apache 2.0
 * 47 ISC
 * 27 New BSD
@@ -4591,17 +4591,6 @@ LGPL-3.0-or-later permitted
 
 
 
-<a name="@types/node-fetch"></a>
-### @types/node-fetch v2.6.12
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-
-
 <a name="@types/nodemailer"></a>
 ### @types/nodemailer v6.4.17
 #### 
@@ -5152,17 +5141,6 @@ LGPL-3.0-or-later permitted
 
 
 
-<a name="abort-controller"></a>
-### abort-controller v3.0.0
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-
-
 <a name="acorn"></a>
 ### acorn v8.14.0
 #### 
@@ -5198,17 +5176,6 @@ LGPL-3.0-or-later permitted
 
 <a name="agent-base"></a>
 ### agent-base v6.0.2
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-
-
-<a name="agentkeepalive"></a>
-### agentkeepalive v4.6.0
 #### 
 
 ##### Paths
@@ -5378,17 +5345,6 @@ Python-2.0 manually approved
 
 <a name="async-retry"></a>
 ### async-retry v1.3.3
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-
-
-<a name="asynckit"></a>
-### asynckit v0.4.0
 #### 
 
 ##### Paths
@@ -5915,17 +5871,6 @@ BlueOak-1.0.0 permitted
 
 
 
-<a name="combined-stream"></a>
-### combined-stream v1.0.8
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-
-
 <a name="comma-separated-tokens"></a>
 ### comma-separated-tokens v2.0.3
 #### 
@@ -6280,17 +6225,6 @@ BlueOak-1.0.0 permitted
 
 <a name="defuddle"></a>
 ### defuddle v0.6.4
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-
-
-<a name="delayed-stream"></a>
-### delayed-stream v1.0.0
 #### 
 
 ##### Paths
@@ -6674,17 +6608,6 @@ BlueOak-1.0.0 permitted
 
 
 
-<a name="event-target-shim"></a>
-### event-target-shim v5.0.1
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-
-
 <a name="events"></a>
 ### events v3.3.0
 #### 
@@ -6960,41 +6883,8 @@ BlueOak-1.0.0 permitted
 
 
 
-<a name="form-data"></a>
-### form-data v4.0.1
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-
-
-<a name="form-data-encoder"></a>
-### form-data-encoder v1.7.2
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-
-
 <a name="formatly"></a>
 ### formatly v0.2.4
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-
-
-<a name="formdata-node"></a>
-### formdata-node v4.4.1
 #### 
 
 ##### Paths
@@ -7545,17 +7435,6 @@ BlueOak-1.0.0 permitted
 
 <a name="human-id"></a>
 ### human-id v4.1.1
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-
-
-<a name="humanize-ms"></a>
-### humanize-ms v1.2.1
 #### 
 
 ##### Paths
@@ -9149,17 +9028,6 @@ BlueOak-1.0.0 permitted
 
 
 
-<a name="node-domexception"></a>
-### node-domexception v1.0.0
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-
-
 <a name="node-fetch"></a>
 ### node-fetch v2.7.0
 #### 
@@ -9326,7 +9194,7 @@ MIT-0 permitted
 
 
 <a name="openai"></a>
-### openai v4.64.0
+### openai v5.11.0
 #### 
 
 ##### Paths
@@ -11651,7 +11519,7 @@ Unknown manually approved
 
 
 <a name="undici-types"></a>
-### undici-types v5.26.5
+### undici-types v6.21.0
 #### 
 
 ##### Paths
@@ -12030,17 +11898,6 @@ Unknown manually approved
 
 <a name="web-namespaces"></a>
 ### web-namespaces v2.0.1
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-
-
-<a name="web-streams-polyfill"></a>
-### web-streams-polyfill v4.0.0-beta.3
 #### 
 
 ##### Paths
