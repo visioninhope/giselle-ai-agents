@@ -442,6 +442,22 @@ export const createJsonRouters = {
 				return new Response(null, { status: 204 });
 			},
 		}),
+	streamAct: (giselleEngine: GiselleEngine) =>
+		createHandler({
+			input: z.object({
+				actId: ActId.schema,
+			}),
+			handler: ({ input }) => {
+				const stream = giselleEngine.streamAct(input);
+				return new Response(stream, {
+					headers: {
+						"Content-Type": "text/event-stream",
+						"Cache-Control": "no-cache, no-transform",
+						Connection: "keep-alive",
+					},
+				});
+			},
+		}),
 } as const;
 
 // Export the types at module level
