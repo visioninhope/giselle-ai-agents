@@ -28,7 +28,7 @@ export default function ErrorPage({
 				</div>
 
 				<div className="space-y-3">
-					<Button onClick={reset} variant="primary" className="w-full">
+					<Button onClick={reset} variant="filled" className="w-full">
 						Try again
 					</Button>
 

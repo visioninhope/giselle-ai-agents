@@ -1,7 +1,6 @@
 "use client";
 
 import { Button } from "@giselle-internal/ui/button";
-import Link from "next/link";
 
 export default function NotFound() {
 	return (
@@ -18,12 +17,24 @@ export default function NotFound() {
 				</div>
 
 				<div className="space-y-3">
-					<Button asChild variant="primary" className="w-full">
-						<Link href="/stage">Go to Stage</Link>
+					<Button
+						onClick={() => {
+							window.location.assign("/stage");
+						}}
+						variant="filled"
+						className="w-full"
+					>
+						Go to Stage
 					</Button>
 
-					<Button asChild variant="subtle" className="w-full">
-						<Link href="/apps">Go to Apps</Link>
+					<Button
+						onClick={() => {
+							window.location.assign("/apps");
+						}}
+						variant="subtle"
+						className="w-full"
+					>
+						Go to Apps
 					</Button>
 				</div>
 			</div>
