@@ -99,6 +99,11 @@ export function streamAct(args: {
 
 			// Function to send data updates
 			const sendUpdate = async (): Promise<boolean> => {
+				// Early exit if not polling or controller is closed
+				if (!polling || controller.desiredSize === null) {
+					return true; // Stop polling
+				}
+
 				try {
 					const data = await fetchActAndGenerations({ actId, context });
 					const currentHash = createDataHash(data);
@@ -113,6 +118,7 @@ export function streamAct(args: {
 							type: isCompleted ? "complete" : "data",
 							data,
 						});
+
 						controller.enqueue(
 							encoder.encode(`data: ${JSON.stringify(payload)}\n\n`),
 						);
@@ -127,14 +133,20 @@ export function streamAct(args: {
 					return data.act.status === "completed";
 				} catch (error) {
 					console.error("Error fetching act and generations:", error);
-					controller.enqueue(
-						encoder.encode(
-							`data: ${JSON.stringify({
-								type: "error",
-								message: "Failed to fetch data",
-							})}\n\n`,
-						),
-					);
+
+					// Only send error if controller is still active
+					try {
+						controller.enqueue(
+							encoder.encode(
+								`data: ${JSON.stringify({
+									type: "error",
+									message: "Failed to fetch data",
+								})}\n\n`,
+							),
+						);
+					} catch {
+						// Ignore if controller is already closed
+					}
 					return false;
 				}
 			};
@@ -143,32 +155,28 @@ export function streamAct(args: {
 			const initiallyCompleted = await sendUpdate();
 			if (initiallyCompleted) {
 				// Act is already completed, just close the stream
-				try {
-					controller.enqueue(
-						encoder.encode(`data: ${JSON.stringify({ type: "end" })}\n\n`),
-					);
-					controller.close();
-				} catch (_error) {
-					// Controller may already be closed
-				}
+				controller.enqueue(
+					encoder.encode(`data: ${JSON.stringify({ type: "end" })}\n\n`),
+				);
+				controller.close();
 				return;
 			}
 
 			// Create cleanup function and set up polling
 			const pollIntervalId = setInterval(async () => {
-				if (!polling) return;
+				if (!polling || controller.desiredSize === null) {
+					clearInterval(pollIntervalId);
+					return;
+				}
+
 				const isCompleted = await sendUpdate();
 				if (isCompleted) {
 					polling = false;
 					clearInterval(pollIntervalId);
-					try {
-						controller.enqueue(
-							encoder.encode(`data: ${JSON.stringify({ type: "end" })}\n\n`),
-						);
-						controller.close();
-					} catch (_error) {
-						// Controller may already be closed
-					}
+					controller.enqueue(
+						encoder.encode(`data: ${JSON.stringify({ type: "end" })}\n\n`),
+					);
+					controller.close();
 				}
 			}, pollInterval);
 
@@ -176,16 +184,13 @@ export function streamAct(args: {
 			const cleanup = () => {
 				polling = false;
 				clearInterval(pollIntervalId);
-				if (!controller.desiredSize || controller.desiredSize <= 0) {
-					return;
-				}
-				try {
+
+				// Send end message and close if controller is still active
+				if (controller.desiredSize !== null) {
 					controller.enqueue(
 						encoder.encode(`data: ${JSON.stringify({ type: "end" })}\n\n`),
 					);
 					controller.close();
-				} catch (_error) {
-					// Controller may already be closed
 				}
 			};
 
