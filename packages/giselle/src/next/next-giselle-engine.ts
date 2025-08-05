@@ -3,6 +3,7 @@ import {
 	verifyRequest as verifyRequestAsGitHubWebook,
 } from "@giselle-sdk/github-tool";
 import { after } from "next/server";
+import { ZodError } from "zod";
 import {
 	GenerationId,
 	GiselleEngine,
@@ -112,10 +113,17 @@ export function createHttpHandler({
 		}
 
 		if (isJsonRouterPath(routerPath)) {
-			return await jsonRouter[routerPath]({
-				// @ts-expect-error
-				input: await getBody(request),
-			});
+			try {
+				return await jsonRouter[routerPath]({
+					// @ts-expect-error
+					input: await getBody(request),
+				});
+			} catch (e) {
+				if (e instanceof ZodError) {
+					return new Response(e.message, { status: 400 });
+				}
+				return new Response("Internal Server Error", { status: 500 });
+			}
 		}
 		if (isFormDataRouterPath(routerPath)) {
 			return await formDataRouter[routerPath]({
