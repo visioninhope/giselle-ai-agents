@@ -4,6 +4,32 @@ import { useEffect } from "react";
 import type { ActId } from "../../concepts/act";
 import { type StreamData, StreamEvent } from "../../engine/acts/stream-act";
 
+/**
+ * ActStreamReader - Server-Sent Events (SSE) Stream Handler
+ *
+ * Flow Diagram:
+ * ┌─────────┐    HTTP POST     ┌───────────────┐    SSE Stream    ┌─────────────┐
+ * │ Client  │ ─────────────── ▶│ /streamAct    │ ─────────────── ▶│ Stream      │
+ * │ React   │                  │ API           │                  │ Processing  │
+ * └─────────┘                  └───────────────┘                  └─────────────┘
+ *      ▲                              │                                 │
+ *      │                              ▼                                 ▼
+ *      │                       ┌───────────────┐                 ┌─────────────┐
+ *      └───────────────────────│ onUpdateAction│◀────────────────│ Parse Events│
+ *                              │ Callback      │                 │ & Handle    │
+ *                              └───────────────┘                 └─────────────┘
+ *
+ * Event Types:
+ * - "connected": Initial connection established
+ * - "data": New act data available → triggers onUpdateAction
+ * - "end": Stream completed naturally
+ * - "error": Error occurred in stream
+ *
+ * Cleanup Strategy:
+ * - AbortController: Cancels fetch request on unmount/dependency change
+ * - cancelled flag: Stops stream processing loop safely
+ * - reader.cancel(): Releases ReadableStream resources
+ */
 export function ActStreamReader({
 	actId,
 	onUpdateAction,
@@ -13,56 +39,73 @@ export function ActStreamReader({
 	onUpdateAction: (data: StreamData) => void;
 }>) {
 	useEffect(() => {
-		let cancelled = false;
-		const controller = new AbortController();
+		// === SETUP PHASE ===
+		// Cancellation mechanisms to prevent memory leaks
+		let cancelled = false; // Flag to stop processing on cleanup
+		const controller = new AbortController(); // Cancels HTTP request
 
 		const obtainAPIResponse = async () => {
 			try {
-				// Initiate the first call to connect to SSE API
+				// === FETCH PHASE ===
+				// Establish SSE connection to streaming endpoint
 				const apiResponse = await fetch(`/api/giselle/streamAct`, {
 					method: "POST",
 					headers: {
 						"Content-Type": "application/json",
 					},
 					body: JSON.stringify({ actId }),
-					signal: controller.signal,
+					signal: controller.signal, // Enable request cancellation
 				});
 
+				// Early exit if request was cancelled or no response body
 				if (!apiResponse.body || cancelled) return;
 
-				// To recieve data as a string we use TextDecoderStream class in pipethrough
+				// === STREAM SETUP PHASE ===
+				// Convert binary stream to text using TextDecoderStream
 				const reader = apiResponse.body
 					.pipeThrough(new TextDecoderStream())
 					.getReader();
 
 				try {
+					// === STREAM PROCESSING PHASE ===
+					// Read chunks from the SSE stream until completion or cancellation
 					while (!cancelled) {
 						const { value, done } = await reader.read();
-						if (done || cancelled) break;
+						if (done || cancelled) break; // Stream ended or component unmounted
 
+						// === MESSAGE PARSING PHASE ===
+						// SSE format: "data: {json}\n\n"
 						const trimmed = value.trim();
-						if (!trimmed.startsWith("data:")) continue;
+						if (!trimmed.startsWith("data:")) continue; // Skip non-data lines
 
-						const json = trimmed.slice(5).trim();
+						// Extract JSON payload from SSE message
+						const json = trimmed.slice(5).trim(); // Remove "data:" prefix
 						const parsed = JSON.parse(json);
+						const streamEvent = StreamEvent.parse(parsed); // Validate structure
 
-						const streamEvent = StreamEvent.parse(parsed);
-						if (cancelled) break;
+						if (cancelled) break; // Double-check cancellation before processing
 
+						// === EVENT HANDLING PHASE ===
+						// Route different event types to appropriate handlers
 						switch (streamEvent.type) {
 							case "connected":
+								// Connection established - log in development
 								if (process.env.NODE_ENV === "development") {
 									console.log(`Stream event: ${streamEvent.type}`);
 								}
 								break;
 							case "data":
+								// New act data received - notify parent component
 								onUpdateAction(streamEvent.data);
 								break;
 							case "end":
+								// Stream completed naturally - no action needed
 								break;
 							case "error":
+								// Server reported an error - throw to catch block
 								throw new Error(streamEvent.message);
 							default: {
+								// TypeScript exhaustiveness check
 								const _exhaustiveCheck: never = streamEvent;
 								throw new Error(
 									`Unhandled stream event type: ${_exhaustiveCheck}`,
@@ -71,29 +114,37 @@ export function ActStreamReader({
 						}
 					}
 				} finally {
+					// === CLEANUP PHASE ===
+					// Always cancel the reader to release resources
 					await reader.cancel();
 				}
 			} catch (error) {
+				// === ERROR HANDLING PHASE ===
+				// Only log errors if component is still mounted and error is not from abort
 				if (
 					!cancelled &&
 					error instanceof Error &&
-					error.name !== "AbortError"
+					error.name !== "AbortError" // AbortError is expected during cleanup
 				) {
 					console.error("Stream error:", error);
 				} else if (!cancelled && !(error instanceof Error)) {
+					// Handle non-Error objects (though rare in this context)
 					console.error("Stream error:", error);
 				}
+				// Note: AbortErrors and errors after cancellation are silently ignored
 			}
 		};
 
+		// Start the streaming process
 		obtainAPIResponse();
 
-		// Cleanup function
+		// === CLEANUP FUNCTION ===
+		// Called when component unmounts or dependencies change
 		return () => {
-			cancelled = true;
-			controller.abort();
+			cancelled = true; // Stop processing new messages
+			controller.abort(); // Cancel ongoing HTTP request
 		};
-	}, [actId, onUpdateAction]);
+	}, [actId, onUpdateAction]); // Re-establish stream when actId or callback changes
 
 	return children;
 }
