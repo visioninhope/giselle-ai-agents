@@ -1,4 +1,4 @@
-import z from "zod/v4";
+import * as z from "zod/v4";
 import { Act } from "../../concepts/act";
 import type { ActId } from "../../concepts/identifiers";
 import type { GiselleEngineContext } from "../types";
