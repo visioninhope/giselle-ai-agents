@@ -120,7 +120,9 @@ export function createHttpHandler({
 				});
 			} catch (e) {
 				if (e instanceof ZodError) {
-					return new Response(e.message, { status: 400 });
+					// @todo replace logger
+					console.log(e.message);
+					return new Response("Invalid request body", { status: 400 });
 				}
 				return new Response("Internal Server Error", { status: 500 });
 			}
