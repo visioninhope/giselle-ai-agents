@@ -36,7 +36,12 @@ export async function scrapeUrl(
 	} catch {
 		throw new Error(`Invalid URL: ${url}`);
 	}
-	const res = await fetch(url);
+	const res = await fetch(url, {
+		headers: {
+			"User-Agent":
+				"Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compatible; Giselle-User/1.0; +support@giselles.ai)",
+		},
+	});
 	if (!res.ok) {
 		throw new Error(`Failed to fetch: ${res.status} ${res.statusText}`);
 	}
