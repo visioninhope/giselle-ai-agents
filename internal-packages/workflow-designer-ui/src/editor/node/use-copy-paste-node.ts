@@ -1,4 +1,4 @@
-import type { Node, NodeLike } from "@giselle-sdk/data-type";
+import { Node, type NodeLike } from "@giselle-sdk/data-type";
 import { useWorkflowDesigner } from "@giselle-sdk/giselle/react";
 import { useCallback, useState } from "react";
 
@@ -33,20 +33,21 @@ export function useCopyPasteNode() {
 				return;
 			}
 
+			// Position offset constants for better maintainability
+			const PASTE_OFFSET_X = 200;
+			const PASTE_OFFSET_Y = 100;
+
 			const position = {
-				x: nodeState.position.x + 200,
-				y: nodeState.position.y + 100,
+				x: nodeState.position.x + PASTE_OFFSET_X,
+				y: nodeState.position.y + PASTE_OFFSET_Y,
 			};
 
-			// Type guard: ensure copiedNode is a proper Node, not just NodeLike
-			if (copiedNode.type === "operation" || copiedNode.type === "variable") {
-				try {
-					copyNode(copiedNode as Node, { ui: { position } });
-				} catch (error) {
-					console.error("Failed to paste node:", error, copiedNode);
-					onError?.();
-				}
-			} else {
+			// Validate the copied node using Zod schema
+			try {
+				const validatedNode = Node.parse(copiedNode);
+				copyNode(validatedNode, { ui: { position } });
+			} catch (error) {
+				console.error("Failed to paste node - validation error:", error);
 				onError?.();
 			}
 		},
