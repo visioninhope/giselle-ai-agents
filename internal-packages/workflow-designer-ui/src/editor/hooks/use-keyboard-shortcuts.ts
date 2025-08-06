@@ -1,7 +1,6 @@
-import type { FileNode } from "@giselle-sdk/data-type";
 import { useWorkflowDesigner } from "@giselle-sdk/giselle/react";
 import { useKeyPress } from "@xyflow/react";
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { useCopyPasteNode, useDuplicateNode } from "../node";
 import {
 	moveTool,
@@ -12,157 +11,114 @@ import {
 	useToolbar,
 } from "../tool/toolbar";
 
-const ignoredTags = ["INPUT", "TEXTAREA", "SELECT"];
-
-function isInputActive(): boolean {
-	const activeElement = document.activeElement as HTMLElement | null;
-	return !!(
-		activeElement &&
-		(ignoredTags.includes(activeElement.tagName) ||
-			activeElement.isContentEditable)
-	);
-}
-
-function isImageFileNode(node: unknown): node is FileNode {
-	return (
-		node !== null &&
-		typeof node === "object" &&
-		"type" in node &&
-		node.type === "variable" &&
-		"source" in node &&
-		node.source === "file" &&
-		"content" in node &&
-		typeof node.content === "object" &&
-		node.content !== null &&
-		"category" in node.content &&
-		node.content.category === "image"
-	);
-}
-
 export function useKeyboardShortcuts() {
 	const duplicateNode = useDuplicateNode();
-	const { copy, paste } = useCopyPasteNode();
 	const toolbar = useToolbar();
 	const { data } = useWorkflowDesigner();
+	const { copy: handleCopy, paste: handlePaste } = useCopyPasteNode();
 
-	// Track previous key states to prevent infinite loops
-	const previousKeyStates = useRef({
-		g: false,
-		s: false,
-		u: false,
-		r: false,
-		escape: false,
-		copy: false,
-		paste: false,
-		duplicate: false,
+	// Keep track of key press state to detect keydown (not held)
+	const wasPressed = useRef<{ [key: string]: boolean }>({});
+
+	// Use React Flow's useKeyPress hook with proper options
+	const gPressed = useKeyPress("g", { actInsideInputWithModifier: false });
+	const sPressed = useKeyPress("s", { actInsideInputWithModifier: false });
+	const uPressed = useKeyPress("u", { actInsideInputWithModifier: false });
+	const rPressed = useKeyPress("r", { actInsideInputWithModifier: false });
+	const escapePressed = useKeyPress("Escape", {
+		actInsideInputWithModifier: false,
 	});
 
-	// Keyboard shortcuts using useKeyPress hook
-	const gPressed = useKeyPress("g");
-	const sPressed = useKeyPress("s");
-	const uPressed = useKeyPress("u");
-	const rPressed = useKeyPress("r");
-	const escapePressed = useKeyPress("Escape");
-	const copyPressed = useKeyPress(["Meta+c", "Control+c"]);
-	const pastePressed = useKeyPress(["Meta+v", "Control+v"]);
-	const duplicatePressed = useKeyPress(["Meta+d", "Control+d"]);
+	// Only use keyboard shortcuts when canvas is focused
+	const canUseShortcuts = data.ui.focusedArea === "canvas";
 
-	// Handle tool selection shortcuts
+	// For modifier key shortcuts - conditionally use them
+	const cmdCPressed = useKeyPress(
+		canUseShortcuts ? ["Meta+c", "Control+c"] : null,
+		{ actInsideInputWithModifier: false },
+	);
+	const cmdVPressed = useKeyPress(
+		canUseShortcuts ? ["Meta+v", "Control+v"] : null,
+		{ actInsideInputWithModifier: false },
+	);
+	const cmdDPressed = useKeyPress(
+		canUseShortcuts ? ["Meta+d", "Control+d"] : null,
+		{ actInsideInputWithModifier: false },
+	);
+
+	// Handle tool shortcuts
 	useEffect(() => {
-		if (
-			gPressed &&
-			!previousKeyStates.current.g &&
-			!isInputActive() &&
-			toolbar
-		) {
+		if (data.ui.focusedArea !== "canvas" || !toolbar) return;
+
+		if (gPressed && !wasPressed.current.g) {
 			toolbar.setSelectedTool(selectLanguageModelTool());
-		}
-		previousKeyStates.current.g = gPressed;
-	}, [gPressed, toolbar]);
-
-	useEffect(() => {
-		if (
-			sPressed &&
-			!previousKeyStates.current.s &&
-			!isInputActive() &&
-			toolbar
-		) {
+		} else if (sPressed && !wasPressed.current.s) {
 			toolbar.setSelectedTool(selectSourceCategoryTool());
-		}
-		previousKeyStates.current.s = sPressed;
-	}, [sPressed, toolbar]);
-
-	useEffect(() => {
-		if (
-			uPressed &&
-			!previousKeyStates.current.u &&
-			!isInputActive() &&
-			toolbar
-		) {
+		} else if (uPressed && !wasPressed.current.u) {
 			toolbar.setSelectedTool(selectFileNodeCategoryTool());
-		}
-		previousKeyStates.current.u = uPressed;
-	}, [uPressed, toolbar]);
-
-	useEffect(() => {
-		if (
-			rPressed &&
-			!previousKeyStates.current.r &&
-			!isInputActive() &&
-			toolbar
-		) {
+		} else if (rPressed && !wasPressed.current.r) {
 			toolbar.setSelectedTool(selectRetrievalCategoryTool());
-		}
-		previousKeyStates.current.r = rPressed;
-	}, [rPressed, toolbar]);
-
-	useEffect(() => {
-		if (
-			escapePressed &&
-			!previousKeyStates.current.escape &&
-			!isInputActive() &&
-			toolbar
-		) {
+		} else if (escapePressed && !wasPressed.current.escape) {
 			toolbar.setSelectedTool(moveTool());
 		}
-		previousKeyStates.current.escape = escapePressed;
-	}, [escapePressed, toolbar]);
+
+		// Update pressed state
+		wasPressed.current.g = gPressed;
+		wasPressed.current.s = sPressed;
+		wasPressed.current.u = uPressed;
+		wasPressed.current.r = rPressed;
+		wasPressed.current.escape = escapePressed;
+	}, [
+		gPressed,
+		sPressed,
+		uPressed,
+		rPressed,
+		escapePressed,
+		toolbar,
+		data.ui.focusedArea,
+	]);
 
 	// Handle copy/paste/duplicate shortcuts
 	useEffect(() => {
-		if (copyPressed && !previousKeyStates.current.copy && !isInputActive()) {
-			copy();
-		}
-		previousKeyStates.current.copy = copyPressed;
-	}, [copyPressed, copy]);
+		// Only handle shortcuts when canvas is focused
+		if (data.ui.focusedArea !== "canvas") return;
 
-	useEffect(() => {
-		if (pastePressed && !previousKeyStates.current.paste && !isInputActive()) {
-			// Check if the currently selected node is an Image File Node
-			const selectedNode = data.nodes.find(
-				(node) => data.ui.nodeState[node.id]?.selected,
-			);
-
-			// If it's an Image File Node, don't intercept the paste event
-			// to allow the file panel's paste handler to work
-			if (selectedNode && isImageFileNode(selectedNode)) {
-				// Don't handle paste for Image File Nodes
-				return;
-			}
-
-			paste();
-		}
-		previousKeyStates.current.paste = pastePressed;
-	}, [pastePressed, paste, data.nodes, data.ui.nodeState]);
-
-	useEffect(() => {
-		if (
-			duplicatePressed &&
-			!previousKeyStates.current.duplicate &&
-			!isInputActive()
-		) {
+		if (cmdCPressed && !wasPressed.current.cmdC) {
+			handleCopy();
+		} else if (cmdVPressed && !wasPressed.current.cmdV) {
+			handlePaste();
+		} else if (cmdDPressed && !wasPressed.current.cmdD) {
 			duplicateNode();
 		}
-		previousKeyStates.current.duplicate = duplicatePressed;
-	}, [duplicatePressed, duplicateNode]);
+
+		// Update pressed state
+		wasPressed.current.cmdC = cmdCPressed;
+		wasPressed.current.cmdV = cmdVPressed;
+		wasPressed.current.cmdD = cmdDPressed;
+	}, [
+		cmdCPressed,
+		cmdVPressed,
+		cmdDPressed,
+		handleCopy,
+		handlePaste,
+		duplicateNode,
+		data.ui.focusedArea,
+	]);
+
+	// Return handler for preventing default on Cmd+D
+	const handleKeyDown = useCallback(
+		(event: React.KeyboardEvent) => {
+			// Only handle Cmd+D when focused on canvas
+			if (
+				data.ui.focusedArea === "canvas" &&
+				(event.metaKey || event.ctrlKey) &&
+				event.key.toLowerCase() === "d"
+			) {
+				event.preventDefault();
+			}
+		},
+		[data.ui.focusedArea],
+	);
+
+	return { handleKeyDown };
 }

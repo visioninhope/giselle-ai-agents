@@ -46,6 +46,7 @@ function V2NodeCanvas() {
 		data,
 		setUiNodeState,
 		setUiViewport,
+		setUiFocusedArea,
 		deleteNode,
 		deleteConnection,
 		updateNodeData,
@@ -65,7 +66,7 @@ function V2NodeCanvas() {
 	);
 	const reactFlowRef = useRef<HTMLDivElement>(null);
 
-	useKeyboardShortcuts();
+	const { handleKeyDown } = useKeyboardShortcuts();
 
 	useEffect(() => {
 		reactFlowInstance.setNodes(
@@ -253,6 +254,8 @@ function V2NodeCanvas() {
 				for (const node of data.nodes) {
 					setUiNodeState(node.id, { selected: node.id === nodeClicked.id });
 				}
+				// Always maintain canvas focus when clicking nodes
+				setUiFocusedArea("canvas");
 			}}
 			onNodeDragStop={(_, __, nodes) => {
 				for (const node of nodes) {
@@ -272,7 +275,11 @@ function V2NodeCanvas() {
 					addNode(selectedTool.node, { ui: { position } });
 				}
 				reset();
+				// Set canvas focus when clicking on canvas
+				setUiFocusedArea("canvas");
 			}}
+			onKeyDown={handleKeyDown}
+			tabIndex={0}
 			onNodeContextMenu={(event, node) => {
 				event.preventDefault();
 				const pane = reactFlowRef.current?.getBoundingClientRect();
