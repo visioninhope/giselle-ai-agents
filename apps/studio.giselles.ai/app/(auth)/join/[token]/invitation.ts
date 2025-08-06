@@ -6,6 +6,7 @@ import {
 	db,
 	db as dbInstance,
 	invitations,
+	subscriptions,
 	supabaseUserMappings,
 	type TeamRole,
 	teamMemberships,
@@ -13,7 +14,8 @@ import {
 	users,
 } from "@/drizzle";
 import { getUser } from "@/lib/supabase/get-user";
-import type { TeamId } from "@/services/teams";
+import type { CurrentTeam, TeamId } from "@/services/teams";
+import { handleMemberChange } from "@/services/teams/member-change";
 import type * as schema from "../../../../drizzle/schema";
 import { JoinError } from "./errors";
 
@@ -119,5 +121,36 @@ export async function acceptInvitation(token: string) {
 			.update(invitations)
 			.set({ revokedAt: new Date() })
 			.where(eq(invitations.token, token));
+
+		// Get active subscription for the team
+		const [team] = await tx
+			.select({
+				id: teams.id,
+				dbId: teams.dbId,
+				name: teams.name,
+				type: teams.type,
+				activeSubscriptionId: subscriptions.id,
+			})
+			.from(teams)
+			.leftJoin(
+				subscriptions,
+				and(
+					eq(teams.dbId, subscriptions.teamDbId),
+					eq(subscriptions.status, "active"),
+				),
+			)
+			.where(eq(teams.dbId, invitation.teamDbId));
+
+		if (team) {
+			const currentTeam: CurrentTeam = {
+				id: team.id as TeamId,
+				dbId: team.dbId,
+				name: team.name,
+				type: team.type,
+				activeSubscriptionId: team.activeSubscriptionId,
+			};
+			// Handle member change for usage-based billing
+			await handleMemberChange(currentTeam);
+		}
 	});
 }
