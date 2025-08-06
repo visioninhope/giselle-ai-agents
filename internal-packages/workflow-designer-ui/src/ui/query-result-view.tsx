@@ -9,37 +9,6 @@ import { useMemo, useState } from "react";
 import { z } from "zod/v4";
 import { GitHubIcon, WilliIcon } from "../icons";
 
-const VectorStoreQueryResultRecord = z.object({
-	chunkContent: z.string(),
-	chunkIndex: z.number(),
-	score: z.number(),
-	metadata: z.record(z.string(), z.string()),
-	additional: z.record(z.string(), z.unknown()).optional(),
-});
-
-const GitHubVectorStoreSource = z.object({
-	provider: z.literal("github"),
-	state: z.discriminatedUnion("status", [
-		z.object({
-			status: z.literal("configured"),
-			owner: z.string(),
-			repo: z.string(),
-			contentType: z.enum(["blob", "pull_request"]),
-		}),
-		z.object({
-			status: z.literal("unconfigured"),
-		}),
-	]),
-});
-
-const VectorStoreQueryResult = z.object({
-	type: z.literal("vector-store"),
-	source: GitHubVectorStoreSource,
-	records: z.array(VectorStoreQueryResultRecord),
-});
-
-type QueryResultData = z.infer<typeof VectorStoreQueryResult>;
-
 const gitHubPRContextSchema = z.object({
 	prContext: z.string().optional(),
 });
@@ -231,7 +200,7 @@ type DataSourceDisplayInfo = {
 };
 
 function getDataSourceDisplayInfo(
-	result: QueryResultData,
+	result: ReturnType<typeof getGenerationQueryResult>[number],
 ): DataSourceDisplayInfo {
 	if (
 		result.source.provider === "github" &&
@@ -255,7 +224,7 @@ function DataSourceTab({
 	isActive,
 	onClick,
 }: {
-	result: QueryResultData;
+	result: ReturnType<typeof getGenerationQueryResult>[number];
 	isActive: boolean;
 	onClick: () => void;
 }) {
@@ -295,7 +264,11 @@ function DataSourceTab({
 	);
 }
 
-function QueryResultCard({ result }: { result: QueryResultData }) {
+function QueryResultCard({
+	result,
+}: {
+	result: ReturnType<typeof getGenerationQueryResult>[number];
+}) {
 	const [expandedRecords, setExpandedRecords] = useState<Set<number>>(
 		new Set(),
 	);
@@ -448,7 +421,7 @@ export function QueryResultView({ generation }: { generation: Generation }) {
 	);
 }
 
-function getGenerationQueryResult(generation: Generation): QueryResultData[] {
+function getGenerationQueryResult(generation: Generation) {
 	if (generation.status !== "completed") {
 		throw new Error("Generation is not completed");
 	}
@@ -456,14 +429,11 @@ function getGenerationQueryResult(generation: Generation): QueryResultData[] {
 		(output) => output.type === "query-result",
 	);
 
-	const allResults: QueryResultData[] = [];
+	const allResults = [];
 	for (const output of queryResultOutputs) {
 		if (output.type === "query-result") {
 			for (const item of output.content) {
-				const parsed = VectorStoreQueryResult.safeParse(item);
-				if (parsed.success) {
-					allResults.push(parsed.data);
-				}
+				allResults.push(item);
 			}
 		}
 	}
