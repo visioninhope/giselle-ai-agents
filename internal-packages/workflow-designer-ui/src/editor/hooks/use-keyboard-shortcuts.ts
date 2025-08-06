@@ -27,7 +27,17 @@ export function useKeyboardShortcuts() {
 	const { copy: handleCopy, paste: handlePaste } = useCopyPasteNode();
 
 	// Keep track of key press state to detect keydown (not held)
-	const wasPressed = useRef<{ [key: string]: boolean }>({});
+	const wasPressed = useRef<{ [key: string]: boolean }>({
+		t: false,
+		i: false,
+		g: false,
+		r: false,
+		d: false,
+		escape: false,
+		modC: false,
+		modV: false,
+		modD: false,
+	});
 
 	// Use React Flow's useKeyPress hook with proper options
 	const tPressed = useKeyPress("t", { actInsideInputWithModifier: false });
