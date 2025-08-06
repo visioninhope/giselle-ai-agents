@@ -12,6 +12,14 @@ import {
 	useToolbar,
 } from "../tool/toolbar";
 
+// Browser shortcuts that should be prevented when canvas is focused
+const BROWSER_SHORTCUTS_TO_PREVENT = [
+	{ key: "d", modifiers: ["meta", "ctrl"] }, // Bookmark
+	// Add more shortcuts here as needed:
+	// { key: 's', modifiers: ['meta', 'ctrl'] }, // Save page
+	// { key: 'p', modifiers: ['meta', 'ctrl'] }, // Print
+];
+
 export function useKeyboardShortcuts() {
 	const duplicateNode = useDuplicateNode();
 	const toolbar = useToolbar();
@@ -111,15 +119,23 @@ export function useKeyboardShortcuts() {
 		data.ui.focusedArea,
 	]);
 
-	// Return handler for preventing default on Cmd+D
+	// Return handler for preventing browser default shortcuts
 	const handleKeyDown = useCallback(
 		(event: React.KeyboardEvent) => {
-			// Only handle Cmd+D when focused on canvas
-			if (
-				data.ui.focusedArea === "canvas" &&
-				(event.metaKey || event.ctrlKey) &&
-				event.key.toLowerCase() === "d"
-			) {
+			// Only prevent defaults when focused on canvas
+			if (data.ui.focusedArea !== "canvas") return;
+
+			const shouldPrevent = BROWSER_SHORTCUTS_TO_PREVENT.some((shortcut) => {
+				const keyMatches = event.key.toLowerCase() === shortcut.key;
+				const modifierMatches = shortcut.modifiers.some((mod) => {
+					if (mod === "meta") return event.metaKey;
+					if (mod === "ctrl") return event.ctrlKey;
+					return false;
+				});
+				return keyMatches && modifierMatches;
+			});
+
+			if (shouldPrevent) {
 				event.preventDefault();
 			}
 		},
