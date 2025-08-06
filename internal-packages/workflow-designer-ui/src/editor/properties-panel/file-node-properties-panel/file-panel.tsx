@@ -1,5 +1,6 @@
 import { useToasts } from "@giselle-internal/ui/toast";
 import type { FileData } from "@giselle-sdk/data-type";
+import { useWorkflowDesigner } from "@giselle-sdk/giselle/react";
 import clsx from "clsx/lite";
 import { ArrowUpFromLineIcon, FileXIcon, TrashIcon } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -78,6 +79,7 @@ export function FilePanel({ node, config }: FilePanelProps) {
 	const [isDragging, setIsDragging] = useState(false);
 	const [isValidFile, setIsValidFile] = useState(true);
 	const { addFiles: addFilesInternal, removeFile } = useFileNode(node);
+	const { setUiFocusedArea } = useWorkflowDesigner();
 	const toasts = useToasts();
 	const maxFileSize = config.maxSize ?? defaultMaxSize;
 	const panelRef = useRef<HTMLDivElement>(null);
@@ -233,8 +235,6 @@ export function FilePanel({ node, config }: FilePanelProps) {
 		// Only add paste listener for image file nodes
 		if (node.content.category === "image" && panelRef.current) {
 			const panelEl = panelRef.current;
-			// Focus the panel when it's mounted to enable paste without clicking
-			panelEl.focus();
 			panelEl.addEventListener("paste", handlePaste);
 			return () => {
 				panelEl.removeEventListener("paste", handlePaste);
@@ -243,10 +243,17 @@ export function FilePanel({ node, config }: FilePanelProps) {
 	}, [handlePaste, node.content.category]);
 
 	return (
-		<div
+		<section
 			ref={panelRef}
 			className="relative z-10 flex flex-col gap-[2px] h-full text-[14px] text-black-300 outline-none"
+			onFocus={() => setUiFocusedArea("properties-panel")}
+			onBlur={(e) => {
+				if (!e.currentTarget.contains(e.relatedTarget)) {
+					setUiFocusedArea("none");
+				}
+			}}
 			tabIndex={-1}
+			aria-label="File upload panel"
 		>
 			<div>
 				<div>
@@ -307,7 +314,8 @@ export function FilePanel({ node, config }: FilePanelProps) {
 										<p>Drop {config.label} files here to upload.</p>
 										{node.content.category === "image" && (
 											<p className="text-[12px] text-black-400">
-												You can also paste images from clipboard (Ctrl/Cmd + V)
+												Click here and paste images from clipboard (Ctrl/Cmd +
+												V)
 											</p>
 										)}
 										<div className="flex gap-[8px] justify-center items-center">
@@ -347,7 +355,7 @@ export function FilePanel({ node, config }: FilePanelProps) {
 					</div>
 				)}
 			</div>
-		</div>
+		</section>
 	);
 }
 
