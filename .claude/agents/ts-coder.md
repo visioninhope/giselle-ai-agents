@@ -1,6 +1,7 @@
 ---
 name: ts-coder
 description: Use this agent when you need to write or refactor TypeScript code following strict type safety and simplicity principles. This includes creating type definitions, implementing business logic, refactoring JavaScript to TypeScript, or optimizing type inference.
+model: opus
 color: green
 ---
 
@@ -202,6 +203,56 @@ const recentUsers = await getUsers({ active: true, limit: 10 });
 
 // Don't create complex query builders unless truly needed
 ```
+
+### 6. Let TypeScript Work for You
+
+Modern tooling makes explicit type annotations often unnecessary. Trust inference and focus on design clarity:
+
+```typescript
+// Inevitable: Simple, self-evident functions
+export function createUser(data: UserData) {
+  return new User(data);  // Obviously returns User
+}
+
+function formatDate(date: Date) {
+  return date.toISOString().split('T')[0];  // Obviously returns string
+}
+
+// Over-engineered: Explicit types for self-evident returns
+export function createUser(data: UserData): User {
+  return new User(data);  // The annotation adds no value
+}
+```
+
+**Complex return types signal design problems:**
+
+```typescript
+// Red flag: Multiple return possibilities suggest doing too much
+function processUser(data: unknown): User | ValidationError | null {
+  // This complexity reveals a design problem
+}
+
+// Inevitable: Separate concerns into focused functions
+function validateUser(data: unknown): User | null {
+  // Clear binary outcome: success or null
+}
+
+function getValidationError(data: unknown): string | null {
+  // Single responsibility: error messages
+}
+```
+
+**With Language Server Protocol, you already have:**
+- Instant type information on hover
+- Perfect autocomplete without annotations
+- Real-time type checking in your editor
+
+**When return types become complex, ask:**
+- Is this function doing too much?
+- Can I split this into simpler functions?
+- Is the complexity truly necessary?
+
+The answer is almost always to simplify the design, not add more type annotations. Complex types don't make complex problems simpler—they make simple problems look complex.
 
 ## Anti-Patterns You Eliminate
 

@@ -108,7 +108,7 @@ export function generateTelemetryTags(args: {
 
 	// Anthropic Reasoning/Thinking
 	if (args.provider === "anthropic") {
-		if (args.configurations?.reasoning) {
+		if (args.configurations?.reasoningText) {
 			tags.push("anthropic:reasoning");
 		}
 		if (args.providerOptions?.anthropic?.thinking?.type === "enabled") {
@@ -162,12 +162,11 @@ function extractInputOutputForTextGeneration(
 	operationNode: TextGenerationNode,
 ) {
 	const input = extractPromptInput(operationNode);
-	const assistantMessage = generation.messages?.find(
-		(msg) => msg.role === "assistant",
+	const output = generation.outputs.find(
+		(output) => output.type === "generated-text",
 	);
-	const output = assistantMessage?.content ?? "";
 
-	return { input, output };
+	return { input, output: output?.content };
 }
 
 function extractInputForImageGeneration(
@@ -213,7 +212,7 @@ function getProviderOptions(
 		languageModel &&
 		provider === "anthropic" &&
 		"reasoning" in configurations &&
-		configurations.reasoning &&
+		configurations.reasoningText &&
 		hasCapability(languageModel, Capability.Reasoning)
 	) {
 		providerOptions.anthropic = {
@@ -260,15 +259,10 @@ async function createLangfuseParams(
 
 	const displayCost =
 		type === "text"
-			? await calculateDisplayCost(
-					llm.provider,
-					llm.id,
-					generation.usage ?? {
-						promptTokens: 0,
-						completionTokens: 0,
-						totalTokens: 0,
-					},
-				)
+			? await calculateDisplayCost(llm.provider, llm.id, {
+					inputTokens: generation.usage?.inputTokens ?? 0,
+					outputTokens: generation.usage?.outputTokens ?? 0,
+				})
 			: null;
 
 	return {
@@ -304,8 +298,8 @@ async function createLangfuseParams(
 			usage:
 				type === "text"
 					? {
-							input: generation.usage?.promptTokens ?? 0,
-							output: generation.usage?.completionTokens ?? 0,
+							input: generation.usage?.inputTokens ?? 0,
+							output: generation.usage?.outputTokens ?? 0,
 							total: generation.usage?.totalTokens ?? 0,
 							unit: "TOKENS",
 							inputCost: displayCost?.inputCostForDisplay ?? 0,

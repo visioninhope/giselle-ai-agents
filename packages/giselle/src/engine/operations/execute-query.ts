@@ -343,6 +343,7 @@ async function queryVectorStore(
 											String(v),
 										]),
 									),
+									additional: result.additional,
 								})),
 							};
 						}

@@ -29,13 +29,11 @@ type RepositoryRegistrationDialogProps = {
 			enabled: boolean;
 		}[],
 	) => Promise<ActionResult>;
-	isPullRequestEnabled: boolean;
 };
 
 export function RepositoryRegistrationDialog({
 	installationsWithRepos,
 	registerRepositoryIndexAction,
-	isPullRequestEnabled,
 }: RepositoryRegistrationDialogProps) {
 	const [isOpen, setIsOpen] = useState(false);
 	const [ownerId, setOwnerId] = useState<string>("");
@@ -83,15 +81,13 @@ export function RepositoryRegistrationDialog({
 			const contentTypes: {
 				contentType: GitHubRepositoryContentType;
 				enabled: boolean;
-			}[] = isPullRequestEnabled
-				? [
-						{ contentType: "blob", enabled: contentConfig.code.enabled },
-						{
-							contentType: "pull_request",
-							enabled: contentConfig.pullRequests.enabled,
-						},
-					]
-				: [{ contentType: "blob", enabled: true }];
+			}[] = [
+				{ contentType: "blob", enabled: contentConfig.code.enabled },
+				{
+					contentType: "pull_request",
+					enabled: contentConfig.pullRequests.enabled,
+				},
+			];
 
 			const result = await registerRepositoryIndexAction(
 				owner,
@@ -260,41 +256,39 @@ export function RepositoryRegistrationDialog({
 						</div>
 
 						{/* Sources to Ingest Section */}
-						{isPullRequestEnabled && (
-							<div className="flex flex-col gap-y-2">
-								<div className="text-white-400 text-[14px] leading-[16.8px] font-sans">
-									Sources to Ingest
-								</div>
-
-								<div className="space-y-3">
-									{/* Code Configuration */}
-									<ContentTypeToggle
-										icon={Code}
-										label="Code"
-										description="Ingest source code files from the repository"
-										enabled={contentConfig.code.enabled}
-										onToggle={(enabled) =>
-											setContentConfig({ ...contentConfig, code: { enabled } })
-										}
-										disabled={true} // Code is mandatory
-									/>
-
-									{/* Pull Requests Configuration */}
-									<ContentTypeToggle
-										icon={GitPullRequest}
-										label="Pull Requests"
-										description="Ingest merged pull request content and discussions"
-										enabled={contentConfig.pullRequests.enabled}
-										onToggle={(enabled) =>
-											setContentConfig({
-												...contentConfig,
-												pullRequests: { enabled },
-											})
-										}
-									/>
-								</div>
+						<div className="flex flex-col gap-y-2">
+							<div className="text-white-400 text-[14px] leading-[16.8px] font-sans">
+								Sources to Ingest
 							</div>
-						)}
+
+							<div className="space-y-3">
+								{/* Code Configuration */}
+								<ContentTypeToggle
+									icon={Code}
+									label="Code"
+									description="Ingest source code files from the repository"
+									enabled={contentConfig.code.enabled}
+									onToggle={(enabled) =>
+										setContentConfig({ ...contentConfig, code: { enabled } })
+									}
+									disabled={true} // Code is mandatory
+								/>
+
+								{/* Pull Requests Configuration */}
+								<ContentTypeToggle
+									icon={GitPullRequest}
+									label="Pull Requests"
+									description="Ingest merged pull request content and discussions"
+									enabled={contentConfig.pullRequests.enabled}
+									onToggle={(enabled) =>
+										setContentConfig({
+											...contentConfig,
+											pullRequests: { enabled },
+										})
+									}
+								/>
+							</div>
+						</div>
 
 						{error && (
 							<div className="mt-1 text-sm text-error-500">{error}</div>

@@ -8,6 +8,7 @@ import {
 	Workspace,
 	WorkspaceId,
 } from "@giselle-sdk/data-type";
+import { createUIMessageStreamResponse } from "ai";
 import { z } from "zod/v4";
 import { ActId } from "../concepts/identifiers";
 import type { GiselleEngine } from "../engine";
@@ -89,9 +90,7 @@ export const createJsonRouters = {
 						input.useExperimentalStorage,
 						input.telemetry,
 					);
-					return stream.toDataStreamResponse({
-						sendReasoning: true,
-					});
+					return createUIMessageStreamResponse({ stream });
 				},
 			}),
 		),
@@ -441,6 +440,22 @@ export const createJsonRouters = {
 			handler: async ({ input }) => {
 				await giselleEngine.deleteSecret(input);
 				return new Response(null, { status: 204 });
+			},
+		}),
+	streamAct: (giselleEngine: GiselleEngine) =>
+		createHandler({
+			input: z.object({
+				actId: ActId.schema,
+			}),
+			handler: ({ input }) => {
+				const stream = giselleEngine.streamAct(input);
+				return new Response(stream, {
+					headers: {
+						"Content-Type": "text/event-stream",
+						"Cache-Control": "no-cache, no-transform",
+						Connection: "keep-alive",
+					},
+				});
 			},
 		}),
 } as const;
