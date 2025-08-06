@@ -6,8 +6,46 @@ import { resolveGitHubRepositoryIndex } from "../resolve-github-repository-index
 import type { GitHubPullRequestMetadata } from "./schema";
 
 /**
- * Fetches PR context (title and body) for the given PR numbers
+ * Adds PR context to query results for comment/diff chunks
  */
+export async function addPRContextToResults(
+	results: QueryResult<GitHubPullRequestMetadata>[],
+	context: GitHubQueryContext,
+): Promise<QueryResult<GitHubPullRequestMetadata>[]> {
+	// Find PR numbers that need context (comment/diff chunks)
+	const prNumbersNeedingContext: number[] = [
+		...new Set(
+			results
+				.filter((r) => r.metadata.contentType !== "title_body")
+				.map((r) => r.metadata.prNumber),
+		),
+	];
+	if (prNumbersNeedingContext.length === 0) {
+		return results;
+	}
+
+	const repositoryIndexDbId = await resolveGitHubRepositoryIndex(context);
+	const prContextMap = await fetchPRContexts(
+		repositoryIndexDbId,
+		prNumbersNeedingContext,
+	);
+	return results.map((result) => {
+		// if the content type is title_body, we don't need to add context
+		if (result.metadata.contentType === "title_body") {
+			return result;
+		}
+
+		const context = prContextMap.get(result.metadata.prNumber);
+		if (context) {
+			return {
+				...result,
+				additional: { prContext: context.content },
+			};
+		}
+		return result;
+	});
+}
+
 async function fetchPRContexts(
 	repositoryIndexDbId: number,
 	prNumbers: number[],
@@ -37,47 +75,4 @@ async function fetchPRContexts(
 	}
 
 	return prContextMap;
-}
-
-/**
- * Adds PR context to query results for comment/diff chunks
- */
-export async function addPRContextToResults(
-	results: QueryResult<GitHubPullRequestMetadata>[],
-	context: GitHubQueryContext,
-): Promise<QueryResult<GitHubPullRequestMetadata>[]> {
-	// Find PR numbers that need context (comment/diff chunks)
-	const prNumbersNeedingContext: number[] = [
-		...new Set(
-			results
-				.filter((r) => r.metadata.contentType !== "title_body")
-				.map((r) => r.metadata.prNumber),
-		),
-	];
-
-	// If no PR contexts needed, return results as-is
-	if (prNumbersNeedingContext.length === 0) {
-		return results;
-	}
-
-	// Fetch PR contexts
-	const repositoryIndexDbId = await resolveGitHubRepositoryIndex(context);
-	const prContextMap = await fetchPRContexts(
-		repositoryIndexDbId,
-		prNumbersNeedingContext,
-	);
-
-	// Add PR context to results that need it
-	return results.map((result) => {
-		if (result.metadata.contentType !== "title_body") {
-			const context = prContextMap.get(result.metadata.prNumber);
-			if (context) {
-				return {
-					...result,
-					additional: { prContext: context.content },
-				};
-			}
-		}
-		return result;
-	});
 }
