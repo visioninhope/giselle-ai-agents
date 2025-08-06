@@ -4,10 +4,11 @@ import { useCallback, useEffect, useRef } from "react";
 import { useCopyPasteNode, useDuplicateNode } from "../node";
 import {
 	moveTool,
-	selectFileNodeCategoryTool,
+	selectActionTool,
 	selectLanguageModelTool,
 	selectRetrievalCategoryTool,
 	selectSourceCategoryTool,
+	selectTriggerTool,
 	useToolbar,
 } from "../tool/toolbar";
 
@@ -21,10 +22,11 @@ export function useKeyboardShortcuts() {
 	const wasPressed = useRef<{ [key: string]: boolean }>({});
 
 	// Use React Flow's useKeyPress hook with proper options
+	const tPressed = useKeyPress("t", { actInsideInputWithModifier: false });
+	const iPressed = useKeyPress("i", { actInsideInputWithModifier: false });
 	const gPressed = useKeyPress("g", { actInsideInputWithModifier: false });
-	const sPressed = useKeyPress("s", { actInsideInputWithModifier: false });
-	const uPressed = useKeyPress("u", { actInsideInputWithModifier: false });
 	const rPressed = useKeyPress("r", { actInsideInputWithModifier: false });
+	const dPressed = useKeyPress("d", { actInsideInputWithModifier: false });
 	const escapePressed = useKeyPress("Escape", {
 		actInsideInputWithModifier: false,
 	});
@@ -50,29 +52,33 @@ export function useKeyboardShortcuts() {
 	useEffect(() => {
 		if (data.ui.focusedArea !== "canvas" || !toolbar) return;
 
-		if (gPressed && !wasPressed.current.g) {
-			toolbar.setSelectedTool(selectLanguageModelTool());
-		} else if (sPressed && !wasPressed.current.s) {
+		if (tPressed && !wasPressed.current.t) {
+			toolbar.setSelectedTool(selectTriggerTool());
+		} else if (iPressed && !wasPressed.current.i) {
 			toolbar.setSelectedTool(selectSourceCategoryTool());
-		} else if (uPressed && !wasPressed.current.u) {
-			toolbar.setSelectedTool(selectFileNodeCategoryTool());
+		} else if (gPressed && !wasPressed.current.g) {
+			toolbar.setSelectedTool(selectLanguageModelTool());
 		} else if (rPressed && !wasPressed.current.r) {
 			toolbar.setSelectedTool(selectRetrievalCategoryTool());
+		} else if (dPressed && !wasPressed.current.d) {
+			toolbar.setSelectedTool(selectActionTool());
 		} else if (escapePressed && !wasPressed.current.escape) {
 			toolbar.setSelectedTool(moveTool());
 		}
 
 		// Update pressed state
+		wasPressed.current.t = tPressed;
+		wasPressed.current.i = iPressed;
 		wasPressed.current.g = gPressed;
-		wasPressed.current.s = sPressed;
-		wasPressed.current.u = uPressed;
 		wasPressed.current.r = rPressed;
+		wasPressed.current.d = dPressed;
 		wasPressed.current.escape = escapePressed;
 	}, [
+		tPressed,
+		iPressed,
 		gPressed,
-		sPressed,
-		uPressed,
 		rPressed,
+		dPressed,
 		escapePressed,
 		toolbar,
 		data.ui.focusedArea,
