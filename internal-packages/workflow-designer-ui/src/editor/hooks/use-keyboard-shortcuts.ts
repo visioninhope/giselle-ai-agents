@@ -43,15 +43,15 @@ export function useKeyboardShortcuts() {
 	const canUseShortcuts = data.ui.focusedArea === "canvas";
 
 	// For modifier key shortcuts - conditionally use them
-	const cmdCPressed = useKeyPress(
+	const modCPressed = useKeyPress(
 		canUseShortcuts ? ["Meta+c", "Control+c"] : null,
 		{ actInsideInputWithModifier: false },
 	);
-	const cmdVPressed = useKeyPress(
+	const modVPressed = useKeyPress(
 		canUseShortcuts ? ["Meta+v", "Control+v"] : null,
 		{ actInsideInputWithModifier: false },
 	);
-	const cmdDPressed = useKeyPress(
+	const modDPressed = useKeyPress(
 		canUseShortcuts ? ["Meta+d", "Control+d"] : null,
 		{ actInsideInputWithModifier: false },
 	);
@@ -97,22 +97,22 @@ export function useKeyboardShortcuts() {
 		// Only handle shortcuts when canvas is focused
 		if (data.ui.focusedArea !== "canvas") return;
 
-		if (cmdCPressed && !wasPressed.current.cmdC) {
+		if (modCPressed && !wasPressed.current.modC) {
 			handleCopy();
-		} else if (cmdVPressed && !wasPressed.current.cmdV) {
+		} else if (modVPressed && !wasPressed.current.modV) {
 			handlePaste();
-		} else if (cmdDPressed && !wasPressed.current.cmdD) {
+		} else if (modDPressed && !wasPressed.current.modD) {
 			duplicateNode();
 		}
 
 		// Update pressed state
-		wasPressed.current.cmdC = cmdCPressed;
-		wasPressed.current.cmdV = cmdVPressed;
-		wasPressed.current.cmdD = cmdDPressed;
+		wasPressed.current.modC = modCPressed;
+		wasPressed.current.modV = modVPressed;
+		wasPressed.current.modD = modDPressed;
 	}, [
-		cmdCPressed,
-		cmdVPressed,
-		cmdDPressed,
+		modCPressed,
+		modVPressed,
+		modDPressed,
 		handleCopy,
 		handlePaste,
 		duplicateNode,
