@@ -1,21 +1,18 @@
 import { createPostgresQueryService } from "@giselle-sdk/rag";
 import { getTableName } from "drizzle-orm";
-import z from "zod/v4";
 import { githubRepositoryPullRequestEmbeddings } from "@/drizzle";
 import { createDatabaseConfig } from "../../database";
+import { addPRContextToResults } from "./pr-context-utils";
 import { resolveGitHubPullRequestEmbeddingFilter } from "./resolver";
+import { gitHubPullRequestMetadataSchema } from "./schema";
 
 /**
- * Pre-configured GitHub Pull Request query service instance
+ * GitHub Pull Request query service with additional context
  */
 export const gitHubPullRequestQueryService = createPostgresQueryService({
 	database: createDatabaseConfig(),
 	tableName: getTableName(githubRepositoryPullRequestEmbeddings),
-	metadataSchema: z.object({
-		prNumber: z.number(),
-		mergedAt: z.date(),
-		contentType: z.string(),
-		contentId: z.string(),
-	}),
+	metadataSchema: gitHubPullRequestMetadataSchema,
 	contextToFilter: resolveGitHubPullRequestEmbeddingFilter,
+	additionalResolver: addPRContextToResults,
 });

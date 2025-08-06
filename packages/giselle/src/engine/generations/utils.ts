@@ -779,6 +779,23 @@ export function queryResultToText(
 					recordSections.push(`*Source: ${metadataEntries}*`);
 				}
 
+				// Include additional data if present
+				if (record.additional && Object.keys(record.additional).length > 0) {
+					for (const [key, value] of Object.entries(record.additional)) {
+						if (typeof value === "string") {
+							if (value.includes("\n") || value.includes("#")) {
+								recordSections.push(`#### Additional: ${key}\n${value}`);
+							} else {
+								recordSections.push(`*${key}:* ${value}`);
+							}
+						} else {
+							recordSections.push(
+								`*${key}:* ${typeof value === "object" ? JSON.stringify(value) : value}`,
+							);
+						}
+					}
+				}
+
 				sections.push(recordSections.join("\n\n"));
 			}
 		}

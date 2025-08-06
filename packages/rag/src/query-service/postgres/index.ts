@@ -87,6 +87,10 @@ export function createPostgresQueryService<
 		context: TContext,
 	) => Record<string, unknown> | Promise<Record<string, unknown>>;
 	metadataSchema: TSchema;
+	additionalResolver?: (
+		results: QueryResult<z.infer<TSchema>>[],
+		context: TContext,
+	) => Promise<QueryResult<z.infer<TSchema>>[]>;
 }) {
 	const database = validateDatabase(config.database);
 	const columnMapping = createColumnMapping({
@@ -126,9 +130,16 @@ export function createPostgresQueryService<
 			});
 
 			const result = await pool.query(sql, values);
-			return result.rows.map((row) =>
+			const mappedResults = result.rows.map((row) =>
 				mapRowToResult(row, columnMapping, config.metadataSchema),
 			);
+
+			// Apply additional resolver if provided
+			if (config.additionalResolver) {
+				return await config.additionalResolver(mappedResults, context);
+			}
+
+			return mappedResults;
 		} catch (error) {
 			if (error instanceof EmbeddingError || error instanceof ValidationError) {
 				throw error;
