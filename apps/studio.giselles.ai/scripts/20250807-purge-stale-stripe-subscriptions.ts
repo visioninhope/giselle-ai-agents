@@ -22,7 +22,9 @@ if (!process.env.STRIPE_SECRET_KEY) {
 // Safety check: Prevent running in production
 if (process.env.STRIPE_SECRET_KEY.includes("sk_live_")) {
 	console.error("❌ ERROR: This script is for development/sandbox use only!");
-	console.error("Production environment detected. Aborting to prevent data loss.");
+	console.error(
+		"Production environment detected. Aborting to prevent data loss.",
+	);
 	process.exit(1);
 }
 
