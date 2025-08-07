@@ -19,6 +19,13 @@ if (!process.env.STRIPE_SECRET_KEY) {
 	throw new Error("STRIPE_SECRET_KEY is not set in environment variables");
 }
 
+// Safety check: Prevent running in production
+if (process.env.STRIPE_SECRET_KEY.includes("sk_live_")) {
+	console.error("❌ ERROR: This script is for development/sandbox use only!");
+	console.error("Production environment detected. Aborting to prevent data loss.");
+	process.exit(1);
+}
+
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
 	apiVersion: "2025-07-30.basil",
 });
