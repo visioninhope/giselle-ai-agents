@@ -1,6 +1,7 @@
 import { StatusBadge } from "@giselle-internal/ui/status-badge";
 import {
 	AlertCircle,
+	AlertTriangle,
 	CheckCircle,
 	Info,
 	MinusCircle,
@@ -15,6 +16,7 @@ export default function () {
 			<DemoSection label="Status Variants">
 				<StatusBadge status="success">Success</StatusBadge>
 				<StatusBadge status="error">Error</StatusBadge>
+				<StatusBadge status="warning">Warning</StatusBadge>
 				<StatusBadge status="info">Info</StatusBadge>
 				<StatusBadge status="ignored">Ignored</StatusBadge>
 			</DemoSection>
@@ -24,6 +26,9 @@ export default function () {
 				</StatusBadge>
 				<StatusBadge status="error" leftIcon={<XCircle />}>
 					Error
+				</StatusBadge>
+				<StatusBadge status="warning" leftIcon={<AlertTriangle />}>
+					Warning
 				</StatusBadge>
 				<StatusBadge status="info" leftIcon={<Info />}>
 					Info
@@ -38,6 +43,9 @@ export default function () {
 				</StatusBadge>
 				<StatusBadge status="error" rightIcon={<AlertCircle />}>
 					Alert
+				</StatusBadge>
+				<StatusBadge status="warning" rightIcon={<AlertTriangle />}>
+					Caution
 				</StatusBadge>
 				<StatusBadge status="info" rightIcon={<Info />}>
 					Details
@@ -61,6 +69,13 @@ export default function () {
 				>
 					Failed
 				</StatusBadge>
+				<StatusBadge
+					status="warning"
+					leftIcon={<AlertTriangle />}
+					rightIcon={<AlertTriangle />}
+				>
+					Caution
+				</StatusBadge>
 				<StatusBadge status="info" leftIcon={<Info />} rightIcon={<Info />}>
 					Information
 				</StatusBadge>
@@ -75,12 +90,14 @@ export default function () {
 			<DemoSection label="Different Text Lengths">
 				<StatusBadge status="success">OK</StatusBadge>
 				<StatusBadge status="error">Authentication Failed</StatusBadge>
+				<StatusBadge status="warning">Deprecated Feature</StatusBadge>
 				<StatusBadge status="info">In Progress...</StatusBadge>
 				<StatusBadge status="ignored">Not Applicable</StatusBadge>
 			</DemoSection>
 			<DemoSection label="With Custom Content">
 				<StatusBadge status="success">✓ Completed</StatusBadge>
 				<StatusBadge status="error">✗ Failed</StatusBadge>
+				<StatusBadge status="warning">⚠ Warning</StatusBadge>
 				<StatusBadge status="info">ℹ Processing</StatusBadge>
 				<StatusBadge status="ignored">— Skipped</StatusBadge>
 			</DemoSection>
