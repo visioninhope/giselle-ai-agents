@@ -184,7 +184,7 @@ export default async function StagePage() {
   }
   return (
     <div className="p-[24px] space-y-6 min-h-screen bg-[var(--color-stage-background)]">
-      <div className="text-center text-[24px] font-mono font-light text-white-100">
+      <div className="text-center text-[24px] font-mono font-light text-white-100 bg-transparent">
         What are we perform next ?
       </div>
       <Form

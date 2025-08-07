@@ -19,6 +19,18 @@ export function TeamCard({ team }: TeamCardProps) {
       }}
     >
       <div className="space-y-1">
+        <div
+          className="text-[10px] text-white-900 leading-tight overflow-hidden text-left"
+          style={{
+            display: "-webkit-box",
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: "vertical" as any,
+            wordBreak: "break-word",
+            height: "24px", // 12px * 2 lines with spacing
+          }}
+        >
+          {team?.name || "team name"}
+        </div>
         <div className="flex justify-center">
           <div
             className="bg-gray-600 rounded-sm overflow-hidden flex items-center justify-center"
@@ -39,18 +51,6 @@ export function TeamCard({ team }: TeamCardProps) {
               </div>
             )}
           </div>
-        </div>
-        <div
-          className="text-[10px] text-white-900 leading-tight overflow-hidden text-left"
-          style={{
-            display: "-webkit-box",
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: "vertical" as any,
-            wordBreak: "break-word",
-            height: "24px", // 12px * 2 lines with spacing
-          }}
-        >
-          {team?.name || "team name"}
         </div>
       </div>
     </div>

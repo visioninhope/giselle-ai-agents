@@ -128,28 +128,73 @@ export function Form({
 
   return (
     <div className="max-w-[800px] mx-auto space-y-6">
-      <div className="flex gap-4 overflow-x-auto pb-2">
-        {teamOptions.map((team) => (
-          <div key={team.value} className="flex-shrink-0">
-            <button
-              type="button"
-              onClick={() => setSelectedTeamId(team.value)}
-              className={`transition-all duration-200 ${
-                selectedTeamId === team.value
-                  ? "ring-2 ring-blue-400"
-                  : "hover:ring-1 hover:ring-white/20"
-              }`}
-            >
-              <TeamCard
-                team={{
-                  id: team.value,
-                  name: team.label,
-                  profileImageUrl: undefined, // TODO: Add profileImageUrl to teamOptions when available
-                }}
-              />
-            </button>
+      {/* Team Selection Container */}
+      <div className="flex justify-end">
+        <div
+          style={{
+            width: "fit-content",
+            minWidth: "auto",
+            ["--team-bg" as any]: "rgba(255, 255, 255, 0.05)",
+            ["--team-hover" as any]: "rgba(255, 255, 255, 0.1)",
+          }}
+        >
+          <style
+            dangerouslySetInnerHTML={{
+              __html: `
+              .team-select button[type="button"] {
+                background-color: rgba(255, 255, 255, 0.05) !important;
+                border: none !important;
+                color: white !important;
+              }
+              .team-select button[type="button"]:hover {
+                background-color: rgba(255, 255, 255, 0.1) !important;
+              }
+              .team-select button[type="button"] svg {
+                margin-left: 8px !important;
+              }
+            `,
+            }}
+          />
+          <div className="team-select">
+            <Select
+              id="team"
+              placeholder="Select team"
+              options={teamOptions}
+              renderOption={(o) => o.label}
+              value={selectedTeamId}
+              onValueChange={(value) => setSelectedTeamId(value as TeamId)}
+              className="[&>button]:text-[12px] [&>button]:px-2 [&>button]:py-1 [&>button]:rounded-sm [&>button]:gap-2"
+              style={{ width: "fit-content", minWidth: "auto" } as any}
+            />
           </div>
-        ))}
+        </div>
+      </div>
+
+      {/* App Selection Container */}
+      <div>
+        <div className="flex gap-4 overflow-x-auto pb-2">
+          {filteredFlowTriggers.map((trigger) => (
+            <div key={trigger.id} className="flex-shrink-0">
+              <button
+                type="button"
+                onClick={() => setSelectedFlowTriggerId(trigger.id)}
+                className={`transition-all duration-200 ${
+                  selectedFlowTriggerId === trigger.id
+                    ? "ring-2 ring-blue-400"
+                    : "hover:ring-1 hover:ring-white/20"
+                }`}
+              >
+                <TeamCard
+                  team={{
+                    id: trigger.id,
+                    name: trigger.workspaceName,
+                    profileImageUrl: undefined, // TODO: Add app image when available
+                  }}
+                />
+              </button>
+            </div>
+          ))}
+        </div>
       </div>
       <form
         action={action}
@@ -195,7 +240,7 @@ export function Form({
                       "w-full flex justify-between items-center rounded-[8px] py-[8px] px-[12px] outline-none focus:outline-none border",
                       validationErrors[input.name]
                         ? "border-error"
-                        : "border-border",
+                        : "border-white/5",
                       "text-[14px]",
                     )}
                     disabled={isPending}
@@ -210,7 +255,7 @@ export function Form({
                       "border-[1px]",
                       validationErrors[input.name]
                         ? "border-error"
-                        : "border-border",
+                        : "border-white/5",
                       "text-[14px]",
                     )}
                     rows={4}
@@ -227,7 +272,7 @@ export function Form({
                       "border-[1px]",
                       validationErrors[input.name]
                         ? "border-error"
-                        : "border-border",
+                        : "border-white/5",
                       "text-[14px]",
                     )}
                     disabled={isPending}
@@ -242,42 +287,13 @@ export function Form({
             );
           })}
         </div>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2 justify-center">
-            <Select
-              id="flow"
-              placeholder="Select flow"
-              options={
-                filteredFlowTriggers.length === 0
-                  ? [
-                      {
-                        value: "no-flow",
-                        label: "No flows available",
-                      },
-                    ]
-                  : filteredFlowTriggers.map((trigger) => ({
-                      value: trigger.id,
-                      label: `${trigger.workspaceName} / ${trigger.label}`,
-                    }))
-              }
-              renderOption={(o) => o.label}
-              value={selectedFlowTriggerId}
-              onValueChange={(value) => {
-                const selectedFlowTrigger = filteredFlowTriggers.find(
-                  (flowTrigger) => flowTrigger.id === (value as FlowTriggerId),
-                );
-                if (selectedFlowTrigger === undefined) {
-                  return;
-                }
-                setSelectedFlowTriggerId(selectedFlowTrigger.id);
-              }}
-            />
-          </div>
+        <div className="flex items-center justify-end gap-3">
           <Button
-            variant="solid"
+            variant="filled"
             size="large"
             type="submit"
             disabled={isPending}
+            className="!bg-blue-600 hover:!bg-blue-700 !border-blue-600 hover:!border-blue-700 [&_div]:text-[14px] [&_.size-[18px]]:text-[18px]"
             leftIcon={
               isPending && (
                 <SpinnerIcon className="animate-follow-through-overlap-spin size-[18px]" />
