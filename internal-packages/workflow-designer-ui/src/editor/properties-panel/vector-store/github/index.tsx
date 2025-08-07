@@ -16,7 +16,7 @@ type GitHubVectorStoreNodePropertiesPanelProps = {
 export function GitHubVectorStoreNodePropertiesPanel({
 	node,
 }: GitHubVectorStoreNodePropertiesPanelProps) {
-	const { updateNodeDataContent } = useWorkflowDesigner();
+	const { updateNodeData } = useWorkflowDesigner();
 	const vectorStore = useVectorStore();
 	const settingPath = vectorStore?.settingPath;
 
@@ -55,13 +55,26 @@ export function GitHubVectorStoreNodePropertiesPanel({
 		if (selectedRepo) {
 			// Reset content type selection when repository changes
 			setSelectedContentType(undefined);
+
+			// Reset output label to default
+			const updatedOutputs = [...node.outputs];
+			if (updatedOutputs[0]) {
+				updatedOutputs[0] = {
+					...updatedOutputs[0],
+					label: "Output",
+				};
+			}
+
 			// Update to unconfigured state until content type is selected
-			updateNodeDataContent(node, {
-				...node.content,
-				source: {
-					...node.content.source,
-					state: {
-						status: "unconfigured",
+			updateNodeData(node, {
+				outputs: updatedOutputs,
+				content: {
+					...node.content,
+					source: {
+						...node.content.source,
+						state: {
+							status: "unconfigured",
+						},
 					},
 				},
 			});
@@ -82,15 +95,28 @@ export function GitHubVectorStoreNodePropertiesPanel({
 		);
 		if (selectedRepo) {
 			setSelectedContentType(contentType);
-			updateNodeDataContent(node, {
-				...node.content,
-				source: {
-					...node.content.source,
-					state: {
-						status: "configured",
-						owner: selectedRepo.owner,
-						repo: selectedRepo.repo,
-						contentType,
+
+			// Update output label based on content type
+			const updatedOutputs = [...node.outputs];
+			if (updatedOutputs[0]) {
+				updatedOutputs[0] = {
+					...updatedOutputs[0],
+					label: contentType === "pull_request" ? "Pull Requests" : "Code",
+				};
+			}
+
+			updateNodeData(node, {
+				outputs: updatedOutputs,
+				content: {
+					...node.content,
+					source: {
+						...node.content.source,
+						state: {
+							status: "configured",
+							owner: selectedRepo.owner,
+							repo: selectedRepo.repo,
+							contentType,
+						},
 					},
 				},
 			});
