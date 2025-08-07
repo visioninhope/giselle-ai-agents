@@ -27,7 +27,7 @@ function isSafeUrl(url: string): boolean {
 
 // Function to render message content with URL styling
 const renderMessageWithUrls = (content: string) => {
-	const urlRegex = /(https?:\/\/[^\s]+)/g;
+	const urlRegex = /(https?:\/\/[^\s]+)/;
 	const parts = content.split(urlRegex);
 
 	return parts.map((part, index) => {
