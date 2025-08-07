@@ -25,12 +25,15 @@ import {
 
 const secretTags = ["github-access-token"];
 
-// GitHub Personal Access Token validation
+// GitHub token validation
 function isValidGitHubPAT(token: string): boolean {
-	// GitHub PAT formats (personal access tokens only):
+	// GitHub token formats:
 	// Classic PAT: ghp_ followed by 36 alphanumeric characters (total 40 chars)
 	// Fine-grained PAT: github_pat_ followed by 82 alphanumeric characters (total 93 chars)
-	return /^(ghp_[a-zA-Z0-9]{36}|github_pat_[a-zA-Z0-9_]{82})$/.test(token);
+	// OAuth token: gho_ followed by 36 alphanumeric characters (total 40 chars)
+	return /^(ghp_[a-zA-Z0-9]{36}|github_pat_[a-zA-Z0-9_]{82}|gho_[a-zA-Z0-9]{36})$/.test(
+		token,
+	);
 }
 
 export function GitHubToolConfigurationDialog({
@@ -108,7 +111,7 @@ function GitHubToolConnectionDialog({
 
 		if (value && !isValidGitHubPAT(value)) {
 			setTokenError(
-				"Invalid token format. GitHub Personal Access Tokens should start with ghp_ (classic) or github_pat_ (fine-grained)",
+				"Invalid token format. GitHub tokens should start with ghp_ (classic), github_pat_ (fine-grained), or gho_ (OAuth)",
 			);
 		} else {
 			setTokenError(null);
