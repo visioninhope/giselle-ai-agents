@@ -147,7 +147,7 @@ export function ChatPanel() {
 		}, 500);
 	};
 
-	const handleKeyPress = (e: React.KeyboardEvent) => {
+	const handleKeyDown = (e: React.KeyboardEvent) => {
 		if (e.key === "Enter" && !e.shiftKey) {
 			e.preventDefault();
 			handleSendMessage();
@@ -238,7 +238,7 @@ export function ChatPanel() {
 						ref={inputRef}
 						value={inputValue}
 						onChange={handleInputChange}
-						onKeyPress={handleKeyPress}
+						onKeyDown={handleKeyDown}
 						placeholder="Ask about your workflow..."
 						rows={1}
 						className="w-full bg-black-700/80 border border-white/20 rounded-[8px] px-3 py-2 pr-12 text-white-900 placeholder-white-600 text-sm font-mono font-light focus:outline-none focus:ring-1 focus:ring-[#6B8FF0] focus:border-transparent resize-none min-h-[40px] max-h-[120px] overflow-y-auto"
