@@ -8,9 +8,9 @@ import { CircleAlertIcon } from "lucide-react";
 import type { ReactElement } from "react";
 import { useGitHubVectorStoreStatus } from "../../lib/use-github-vector-store-status";
 import {
+	GitHubRepositoryBadge,
 	GitHubRepositoryBadgeFromRepo,
 	GitHubRepositoryBadgeFromTrigger,
-	GitHubRepositoryBadgeWithType,
 } from "./";
 
 function RequiresSetupBadge(): ReactElement {
@@ -57,7 +57,7 @@ export function GitHubNodeInfo({ node }: { node: Node }): ReactElement | null {
 		return node.content.source.state.status === "configured" &&
 			!isVectorStoreOrphaned ? (
 			<div className="px-[16px] relative">
-				<GitHubRepositoryBadgeWithType
+				<GitHubRepositoryBadge
 					owner={node.content.source.state.owner}
 					repo={node.content.source.state.repo}
 				/>
