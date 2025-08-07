@@ -1,6 +1,5 @@
 import { useToasts } from "@giselle-internal/ui/toast";
 import type { FileData } from "@giselle-sdk/data-type";
-import { useWorkflowDesigner } from "@giselle-sdk/giselle/react";
 import clsx from "clsx/lite";
 import { ArrowUpFromLineIcon, FileXIcon, TrashIcon } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -79,7 +78,6 @@ export function FilePanel({ node, config }: FilePanelProps) {
 	const [isDragging, setIsDragging] = useState(false);
 	const [isValidFile, setIsValidFile] = useState(true);
 	const { addFiles: addFilesInternal, removeFile } = useFileNode(node);
-	const { setUiFocusedArea } = useWorkflowDesigner();
 	const toasts = useToasts();
 	const maxFileSize = config.maxSize ?? defaultMaxSize;
 	const panelRef = useRef<HTMLDivElement>(null);
@@ -243,17 +241,10 @@ export function FilePanel({ node, config }: FilePanelProps) {
 	}, [handlePaste, node.content.category]);
 
 	return (
-		<section
+		<div
 			ref={panelRef}
 			className="relative z-10 flex flex-col gap-[2px] h-full text-[14px] text-black-300 outline-none"
-			onFocus={() => setUiFocusedArea("properties-panel")}
-			onBlur={(e) => {
-				if (!e.currentTarget.contains(e.relatedTarget)) {
-					setUiFocusedArea("none");
-				}
-			}}
 			tabIndex={-1}
-			aria-label="File upload panel"
 		>
 			<div>
 				<div>
@@ -355,7 +346,7 @@ export function FilePanel({ node, config }: FilePanelProps) {
 					</div>
 				)}
 			</div>
-		</section>
+		</div>
 	);
 }
 
