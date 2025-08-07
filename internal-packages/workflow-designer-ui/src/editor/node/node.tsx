@@ -568,12 +568,7 @@ export function NodeComponent({
 										"group-data-[state=connected]:text-white-900 group-data-[state=disconnected]:text-black-400",
 									)}
 								>
-									{isVectorStoreNode(node, "github") &&
-									node.content.source.state.status === "configured"
-										? node.content.source.state.contentType === "pull_request"
-											? "Pull Requests"
-											: "Code"
-										: output.label}
+									{output.label}
 								</div>
 							</div>
 						))}
