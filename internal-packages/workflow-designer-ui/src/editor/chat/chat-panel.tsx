@@ -10,10 +10,15 @@ interface Message {
 	timestamp: Date;
 }
 
-// Helper function to validate URLs (allow only http and https)
+// Simple and secure URL validation - allowlist approach
 function isSafeUrl(url: string): boolean {
+	if (!url || typeof url !== "string") {
+		return false;
+	}
+
 	try {
-		const parsed = new URL(url);
+		const parsed = new URL(url.trim());
+		// Only allow HTTP and HTTPS - simple allowlist
 		return parsed.protocol === "http:" || parsed.protocol === "https:";
 	} catch {
 		return false;
@@ -26,7 +31,11 @@ const renderMessageWithUrls = (content: string) => {
 	const parts = content.split(urlRegex);
 
 	return parts.map((part, index) => {
-		if (urlRegex.test(part) && isSafeUrl(part)) {
+		if (urlRegex.test(part)) {
+			if (!isSafeUrl(part)) {
+				return part;
+			}
+
 			// Truncate long URLs for display
 			const displayUrl =
 				part.length > 50
