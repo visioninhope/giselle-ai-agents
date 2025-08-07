@@ -128,17 +128,29 @@ export function Form({
 
   return (
     <div className="max-w-[800px] mx-auto space-y-6">
-      <TeamCard
-        team={
-          selectedTeam
-            ? {
-                id: selectedTeam.value,
-                name: selectedTeam.label,
-                profileImageUrl: undefined, // TODO: Add profileImageUrl to teamOptions when available
-              }
-            : undefined
-        }
-      />
+      <div className="flex gap-4 overflow-x-auto pb-2">
+        {teamOptions.map((team) => (
+          <div key={team.value} className="flex-shrink-0">
+            <button
+              type="button"
+              onClick={() => setSelectedTeamId(team.value)}
+              className={`transition-all duration-200 ${
+                selectedTeamId === team.value
+                  ? "ring-2 ring-blue-400"
+                  : "hover:ring-1 hover:ring-white/20"
+              }`}
+            >
+              <TeamCard
+                team={{
+                  id: team.value,
+                  name: team.label,
+                  profileImageUrl: undefined, // TODO: Add profileImageUrl to teamOptions when available
+                }}
+              />
+            </button>
+          </div>
+        ))}
+      </div>
       <form
         action={action}
         className="bg-[var(--color-stage-form-background)] rounded-xl border border-white/10 p-4 text-[14px] text-text resize-none outline-none"
@@ -232,14 +244,6 @@ export function Form({
         </div>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 justify-center">
-            <Select
-              id="team"
-              placeholder="Select team"
-              options={teamOptions}
-              renderOption={(o) => o.label}
-              value={selectedTeamId}
-              onValueChange={(value) => setSelectedTeamId(value as TeamId)}
-            />
             <Select
               id="flow"
               placeholder="Select flow"

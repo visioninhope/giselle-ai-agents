@@ -11,35 +11,37 @@ interface TeamCardProps {
 export function TeamCard({ team }: TeamCardProps) {
   return (
     <div
-      className="bg-[var(--color-stage-form-background)] border border-white/10 p-2"
+      className="bg-[var(--color-stage-form-background)] border border-white/10 p-3"
       style={{
         width: "96px",
         height: "128px",
         borderRadius: "4px 4px 16px 4px",
       }}
     >
-      <div className="space-y-1 flex flex-col items-center">
-        <div
-          className="bg-gray-600 rounded-sm overflow-hidden flex items-center justify-center"
-          style={{
-            width: "72px",
-            height: "72px",
-          }}
-        >
-          {team?.profileImageUrl ? (
-            <img
-              src={team.profileImageUrl}
-              alt={`${team.name} profile`}
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <div className="text-gray-400 text-[12px] text-center">
-              No Image
-            </div>
-          )}
+      <div className="space-y-1">
+        <div className="flex justify-center">
+          <div
+            className="bg-gray-600 rounded-sm overflow-hidden flex items-center justify-center"
+            style={{
+              width: "72px",
+              height: "72px",
+            }}
+          >
+            {team?.profileImageUrl ? (
+              <img
+                src={team.profileImageUrl}
+                alt={`${team.name} profile`}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="text-gray-400 text-[12px] text-center">
+                No Image
+              </div>
+            )}
+          </div>
         </div>
         <div
-          className="text-[10px] text-white-900 leading-tight overflow-hidden text-center"
+          className="text-[10px] text-white-900 leading-tight overflow-hidden text-left"
           style={{
             display: "-webkit-box",
             WebkitLineClamp: 2,
