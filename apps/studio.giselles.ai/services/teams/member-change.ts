@@ -1,4 +1,6 @@
-import { stripe } from "@/services/external/stripe";
+import { eq } from "drizzle-orm";
+import { db } from "@/drizzle";
+import { subscriptions } from "@/drizzle/schema";
 import { reportUserSeatUsage } from "@/services/usage-based-billing";
 import type { CurrentTeam } from "./types";
 
@@ -12,12 +14,17 @@ export async function handleMemberChange(currentTeam: CurrentTeam) {
 		// No active subscription, nothing to do
 		return;
 	}
+	const customerId = await fetchCustomerId(subscriptionId);
+	await reportUserSeatUsage(subscriptionId, customerId);
+}
 
-	// FIXME: If we have customer in subscriptions table, we don't have to query to Stripe here.
-	const subscription = await stripe.subscriptions.retrieve(subscriptionId);
-	const customer =
-		typeof subscription.customer === "string"
-			? subscription.customer
-			: subscription.customer.id;
-	await reportUserSeatUsage(subscriptionId, customer);
+async function fetchCustomerId(subscriptionId: string) {
+	const [subscription] = await db
+		.select({ customerId: subscriptions.customerId })
+		.from(subscriptions)
+		.where(eq(subscriptions.id, subscriptionId));
+	if (!subscription) {
+		throw new Error(`Subscription ${subscriptionId} not found`);
+	}
+	return subscription.customerId;
 }
