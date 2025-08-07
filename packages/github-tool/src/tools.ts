@@ -330,29 +330,6 @@ export function githubTools(octokit: Octokit) {
 				return response.data;
 			},
 		}),
-		forkRepository: tool({
-			description:
-				"Fork a GitHub repository to your account or specified organization",
-			inputSchema: z.object({
-				organization: z.string().describe("Organization to fork to").optional(),
-				owner: z.string().describe("Repository owner"),
-				repo: z.string().describe("Repository name"),
-			}),
-			execute: async (params) => {
-				const { organization, owner, repo } = params;
-
-				const response = await octokit.request(
-					"POST /repos/{owner}/{repo}/forks",
-					{
-						owner,
-						repo,
-						organization,
-					},
-				);
-
-				return response.data;
-			},
-		}),
 		getCodeScanningAlert: tool({
 			description:
 				"Get details of a specific code scanning alert in a GitHub repository.",
