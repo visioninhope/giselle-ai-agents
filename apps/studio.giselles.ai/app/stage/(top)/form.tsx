@@ -122,167 +122,148 @@ export function Form({
   const [, action, isPending] = useActionState(formAction, null);
 
   return (
-    <div className="max-w-[800px] mx-auto relative">
-      <div
-        className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 w-3/4 h-8 rounded-full opacity-60"
-        style={{
-          background:
-            "radial-gradient(ellipse, rgba(59, 130, 246, 0.4) 0%, transparent 70%)",
-          filter: "blur(8px)",
-        }}
-      />
-      <div
-        className="absolute -bottom-4 left-1/2 transform -translate-x-1/2 w-1/2 h-4 rounded-full opacity-80"
-        style={{
-          background:
-            "radial-gradient(ellipse, rgba(59, 130, 246, 0.6) 0%, transparent 70%)",
-          filter: "blur(4px)",
-        }}
-      />
-      <form
-        action={action}
-        className="relative bg-[var(--color-stage-form-background)] rounded-xl shadow-[var(--shadow-stage-form)] border border-white/10 p-4 text-[14px] text-text resize-none outline-none"
-        style={{
-          boxShadow: `
-            var(--shadow-stage-form),
-            0 0 0 1px rgba(59, 130, 246, 0.1),
-            0 0 20px rgba(59, 130, 246, 0.1),
-            0 0 40px rgba(59, 130, 246, 0.05),
-            inset 0 -1px 0 rgba(59, 130, 246, 0.3)
+    <form
+      action={action}
+      className="max-w-[800px] mx-auto bg-[var(--color-stage-form-background)] rounded-xl border border-white/10 p-4 text-[14px] text-text resize-none outline-none"
+      style={{
+        boxShadow: `
+            0 4px 12px rgba(0, 0, 0, 0.15),
+            0 2px 4px rgba(0, 0, 0, 0.1),
+            inset 0 -1px 4px -2px rgba(35, 133, 255, 0.1),
+            inset 0 -4px 20px -6px rgba(255, 255, 255, 0.08),
+            inset 0 -8px 30px -8px rgba(102, 148, 255, 0.15),
+            inset 0 -15px 50px -20px rgba(20, 76, 205, 1)
           `,
+      }}
+    >
+      <div
+        className="absolute inset-x-0 bottom-0 h-[2px] rounded-b-xl"
+        style={{
+          background:
+            "linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.6), transparent)",
+          filter: "blur(1px)",
         }}
-      >
-        <div
-          className="absolute inset-x-0 bottom-0 h-[2px] rounded-b-xl"
-          style={{
-            background:
-              "linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.6), transparent)",
-            filter: "blur(1px)",
-          }}
-        />
-        <div className="flex flex-col gap-[8px] mb-[8px]">
-          {inputs.map((input) => {
-            return (
-              <fieldset key={input.name} className={clsx("grid gap-2")}>
-                <label
-                  className="text-[14px] font-medium text-white-900"
-                  htmlFor={input.name}
-                >
-                  {input.label}
-                  {input.required && (
-                    <span className="text-red-500 ml-1">*</span>
+      />
+      <div className="flex flex-col gap-[8px] mb-[8px]">
+        {inputs.map((input) => {
+          return (
+            <fieldset key={input.name} className={clsx("grid gap-2")}>
+              <label
+                className="text-[14px] font-medium text-white-900"
+                htmlFor={input.name}
+              >
+                {input.label}
+                {input.required && <span className="text-red-500 ml-1">*</span>}
+              </label>
+              {input.type === "text" && (
+                <input
+                  type="text"
+                  name={input.name}
+                  id={input.name}
+                  className={clsx(
+                    "w-full flex justify-between items-center rounded-[8px] py-[8px] px-[12px] outline-none focus:outline-none border",
+                    validationErrors[input.name]
+                      ? "border-error"
+                      : "border-border",
+                    "text-[14px]",
                   )}
-                </label>
-                {input.type === "text" && (
-                  <input
-                    type="text"
-                    name={input.name}
-                    id={input.name}
-                    className={clsx(
-                      "w-full flex justify-between items-center rounded-[8px] py-[8px] px-[12px] outline-none focus:outline-none border",
-                      validationErrors[input.name]
-                        ? "border-error"
-                        : "border-border",
-                      "text-[14px]",
-                    )}
-                    disabled={isPending}
-                  />
-                )}
-                {input.type === "multiline-text" && (
-                  <textarea
-                    name={input.name}
-                    id={input.name}
-                    className={clsx(
-                      "w-full flex justify-between items-center rounded-[8px] py-[8px] px-[12px] outline-none focus:outline-none",
-                      "border-[1px]",
-                      validationErrors[input.name]
-                        ? "border-error"
-                        : "border-border",
-                      "text-[14px]",
-                    )}
-                    rows={4}
-                    disabled={isPending}
-                  />
-                )}
-                {input.type === "number" && (
-                  <input
-                    type="number"
-                    name={input.name}
-                    id={input.name}
-                    className={clsx(
-                      "w-full flex justify-between items-center rounded-[8px] py-[8px] px-[12px] outline-none focus:outline-none",
-                      "border-[1px]",
-                      validationErrors[input.name]
-                        ? "border-error"
-                        : "border-border",
-                      "text-[14px]",
-                    )}
-                    disabled={isPending}
-                  />
-                )}
-                {validationErrors[input.name] && (
-                  <span className="text-error text-[12px] font-medium">
-                    {validationErrors[input.name]}
-                  </span>
-                )}
-              </fieldset>
-            );
-          })}
-        </div>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2 justify-center">
-            <Select
-              id="team"
-              placeholder="Select team"
-              options={teamOptions}
-              renderOption={(o) => o.label}
-              value={selectedTeamId}
-              onValueChange={(value) => setSelectedTeamId(value as TeamId)}
-            />
-            <Select
-              id="flow"
-              placeholder="Select flow"
-              options={
-                filteredFlowTriggers.length === 0
-                  ? [
-                      {
-                        value: "no-flow",
-                        label: "No flows available",
-                      },
-                    ]
-                  : filteredFlowTriggers.map((trigger) => ({
-                      value: trigger.id,
-                      label: `${trigger.workspaceName} / ${trigger.label}`,
-                    }))
-              }
-              renderOption={(o) => o.label}
-              value={selectedFlowTriggerId}
-              onValueChange={(value) => {
-                const selectedFlowTrigger = filteredFlowTriggers.find(
-                  (flowTrigger) => flowTrigger.id === (value as FlowTriggerId),
-                );
-                if (selectedFlowTrigger === undefined) {
-                  return;
-                }
-                setSelectedFlowTriggerId(selectedFlowTrigger.id);
-              }}
-            />
-          </div>
-          <Button
-            variant="solid"
-            size="large"
-            type="submit"
-            disabled={isPending}
-            leftIcon={
-              isPending && (
-                <SpinnerIcon className="animate-follow-through-overlap-spin size-[18px]" />
-              )
+                  disabled={isPending}
+                />
+              )}
+              {input.type === "multiline-text" && (
+                <textarea
+                  name={input.name}
+                  id={input.name}
+                  className={clsx(
+                    "w-full flex justify-between items-center rounded-[8px] py-[8px] px-[12px] outline-none focus:outline-none",
+                    "border-[1px]",
+                    validationErrors[input.name]
+                      ? "border-error"
+                      : "border-border",
+                    "text-[14px]",
+                  )}
+                  rows={4}
+                  disabled={isPending}
+                />
+              )}
+              {input.type === "number" && (
+                <input
+                  type="number"
+                  name={input.name}
+                  id={input.name}
+                  className={clsx(
+                    "w-full flex justify-between items-center rounded-[8px] py-[8px] px-[12px] outline-none focus:outline-none",
+                    "border-[1px]",
+                    validationErrors[input.name]
+                      ? "border-error"
+                      : "border-border",
+                    "text-[14px]",
+                  )}
+                  disabled={isPending}
+                />
+              )}
+              {validationErrors[input.name] && (
+                <span className="text-error text-[12px] font-medium">
+                  {validationErrors[input.name]}
+                </span>
+              )}
+            </fieldset>
+          );
+        })}
+      </div>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2 justify-center">
+          <Select
+            id="team"
+            placeholder="Select team"
+            options={teamOptions}
+            renderOption={(o) => o.label}
+            value={selectedTeamId}
+            onValueChange={(value) => setSelectedTeamId(value as TeamId)}
+          />
+          <Select
+            id="flow"
+            placeholder="Select flow"
+            options={
+              filteredFlowTriggers.length === 0
+                ? [
+                    {
+                      value: "no-flow",
+                      label: "No flows available",
+                    },
+                  ]
+                : filteredFlowTriggers.map((trigger) => ({
+                    value: trigger.id,
+                    label: `${trigger.workspaceName} / ${trigger.label}`,
+                  }))
             }
-          >
-            {isPending ? "Setting the stage…" : "Start"}
-          </Button>
+            renderOption={(o) => o.label}
+            value={selectedFlowTriggerId}
+            onValueChange={(value) => {
+              const selectedFlowTrigger = filteredFlowTriggers.find(
+                (flowTrigger) => flowTrigger.id === (value as FlowTriggerId),
+              );
+              if (selectedFlowTrigger === undefined) {
+                return;
+              }
+              setSelectedFlowTriggerId(selectedFlowTrigger.id);
+            }}
+          />
         </div>
-      </form>
-    </div>
+        <Button
+          variant="solid"
+          size="large"
+          type="submit"
+          disabled={isPending}
+          leftIcon={
+            isPending && (
+              <SpinnerIcon className="animate-follow-through-overlap-spin size-[18px]" />
+            )
+          }
+        >
+          {isPending ? "Setting the stage…" : "Start"}
+        </Button>
+      </div>
+    </form>
   );
 }
