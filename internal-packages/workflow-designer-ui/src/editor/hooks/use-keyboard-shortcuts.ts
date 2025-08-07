@@ -44,6 +44,7 @@ export function useKeyboardShortcuts(
 		modC: false,
 		modV: false,
 		modD: false,
+		modEnter: false,
 	});
 
 	// Use React Flow's useKeyPress hook with proper options
@@ -80,7 +81,7 @@ export function useKeyboardShortcuts(
 		canUsePropertiesShortcuts && onGenerate
 			? ["Meta+Enter", "Control+Enter"]
 			: null,
-		{ actInsideInputWithModifier: false },
+		{ actInsideInputWithModifier: true },
 	);
 
 	// Handle tool shortcuts
