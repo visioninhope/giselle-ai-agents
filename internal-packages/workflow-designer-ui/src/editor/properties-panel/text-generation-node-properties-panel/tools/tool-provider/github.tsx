@@ -259,12 +259,7 @@ function GitHubToolConnectionDialog({
 const githubToolCatalog = [
 	{
 		label: "Repository",
-		tools: [
-			"createRepository",
-			"forkRepository",
-			"getFileContents",
-			"listBranches",
-		],
+		tools: ["forkRepository", "getFileContents", "listBranches"],
 	},
 	{
 		label: "Issues",
