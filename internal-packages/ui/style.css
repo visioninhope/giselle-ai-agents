@@ -1,129 +1,136 @@
 @import "tailwindcss";
 
 @theme {
-	/* v2 theme */
+    /* v2 theme */
 
-	/* border */
-	--color-border: rgba(255, 255, 255, 0.1);
-	--color-light-border: rgba(255, 255, 255, 0.15);
-	--color-dark-border: rgba(0, 0, 0, 0.25);
-	--color-border-variant: #363c46;
-	--color-border-focused: #47679e;
-	--color-border-selected: #293b5b;
-	--color-border-transparent: #000000;
-	--color-border-disabled: #414754;
+    /* border */
+    --color-border: rgba(255, 255, 255, 0.1);
+    --color-light-border: rgba(255, 255, 255, 0.15);
+    --color-dark-border: rgba(0, 0, 0, 0.25);
+    --color-border-variant: #363c46;
+    --color-border-focused: #47679e;
+    --color-border-selected: #293b5b;
+    --color-border-transparent: #000000;
+    --color-border-disabled: #414754;
 
-	/* surface */
-	--color-elevated-surface-background: #2f343e;
-	--color-surface-background: #2f343e;
-	--color-background: #00020b;
+    /* surface */
+    --color-elevated-surface-background: #2f343e;
+    --color-surface-background: #2f343e;
+    --color-background: #00020b;
 
-	/* element */
-	--color-element-background: #2e343e;
-	--color-element-hover: #363c46;
-	--color-element-active: #454a56;
-	--color-element-selected: #454a56;
-	--color-element-disabled: #2e343e;
+    /* element */
+    --color-element-background: #2e343e;
+    --color-element-hover: #363c46;
+    --color-element-active: #454a56;
+    --color-element-selected: #454a56;
+    --color-element-disabled: #2e343e;
 
-	/* tab */
-	--color-tabbar-background: #2f343e;
-	--color-tab-inactive-background: #2f343e;
-	--color-tab-active-background: #282c33;
+    /* tab */
+    --color-tabbar-background: #2f343e;
+    --color-tab-inactive-background: #2f343e;
+    --color-tab-active-background: #282c33;
 
-	/* text */
-	--color-text: #f7f9fd;
-	--color-text-muted: #a9afbc;
-	--color-text-placeholder: #878a98;
-	--color-text-disabled: #878a98;
-	--color-text-accent: #74ade8;
+    /* text */
+    --color-text: #f7f9fd;
+    --color-text-muted: #a9afbc;
+    --color-text-placeholder: #878a98;
+    --color-text-disabled: #878a98;
+    --color-text-accent: #74ade8;
 
-	/* panel */
-	--color-panel-background: #2f343e;
+    /* panel */
+    --color-panel-background: #2f343e;
 
-	/* editor */
-	--color-editor-foreground: #acb2be;
-	--color-editor-background: #00020b;
-	--color-editor-gutter-background: #282c33;
-	--color-editor-subheader-background: #2f343e;
-	--color-editor-active-line-background: #2f343e;
-	--color-editor-highlighted-line-background: #2f343e;
-	--color-editor-line-number: #4e5a5f;
-	--color-editor-active-line-number: #d0d4da;
-	--color-editor-hover-line-number: #acb0b4;
-	--color-editor-invisible: #878a98;
-	--color-editor-wrap-guide: #c8ccd4;
-	--color-editor-active-wrap-guide: #c8ccd4;
-	--color-editor-document-highlight-read-background: #74ade8;
-	--color-editor-document-highlight-write-background: #555a63;
+    /* stage */
+    --color-stage-background: #06091a;
+    --color-stage-form-background: #101520;
+    --shadow-stage-form:
+        0 4px 12px rgba(0, 0, 0, 0.15), 0 2px 6px rgba(0, 0, 0, 0.1),
+        0 0 20px rgba(59, 130, 246, 0.15), 0 0 40px rgba(59, 130, 246, 0.1),
+        inset 0 -1px 0 rgba(59, 130, 246, 0.2);
 
-	/* ghost */
-	--color-ghost-element-background: #000000;
-	--color-ghost-element-hover: #363c46;
-	--color-ghost-element-active: #454a56;
-	--color-ghost-element-selected: #454a56;
-	--color-ghost-element-disabled: #2e343e;
+    /* editor */
+    --color-editor-foreground: #acb2be;
+    --color-editor-background: #00020b;
+    --color-editor-gutter-background: #282c33;
+    --color-editor-subheader-background: #2f343e;
+    --color-editor-active-line-background: #2f343e;
+    --color-editor-highlighted-line-background: #2f343e;
+    --color-editor-line-number: #4e5a5f;
+    --color-editor-active-line-number: #d0d4da;
+    --color-editor-hover-line-number: #acb0b4;
+    --color-editor-invisible: #878a98;
+    --color-editor-wrap-guide: #c8ccd4;
+    --color-editor-active-wrap-guide: #c8ccd4;
+    --color-editor-document-highlight-read-background: #74ade8;
+    --color-editor-document-highlight-write-background: #555a63;
 
-	/* status */
-	--color-conflict: #dec184;
-	--color-created: #a1c181;
-	--color-deleted: #d07277;
-	--color-error: #d07277;
-	--color-hidden: #878a98;
-	--color-hint: #788ca6;
-	--color-ignored: #878a98;
-	--color-info: #74ade8;
-	--color-modified: #dec184;
-	--color-predictive: #5a6a87;
-	--color-renamed: #74ade8;
-	--color-success: #a1c181;
-	--color-unreachable: #a9afbc;
-	--color-warning: #dec184;
+    /* ghost */
+    --color-ghost-element-background: #000000;
+    --color-ghost-element-hover: #363c46;
+    --color-ghost-element-active: #454a56;
+    --color-ghost-element-selected: #454a56;
+    --color-ghost-element-disabled: #2e343e;
 
-	/* glass common */
-	--glass-highlight-bg: linear-gradient(
-		to right,
-		transparent,
-		rgba(255, 255, 255, 0.4),
-		transparent
-	);
-	--glass-bg: linear-gradient(
-		135deg,
-		rgba(150, 150, 150, 0.03) 0%,
-		rgba(60, 90, 160, 0.12) 100%
-	);
+    /* status */
+    --color-conflict: #dec184;
+    --color-created: #a1c181;
+    --color-deleted: #d07277;
+    --color-error: #d07277;
+    --color-hidden: #878a98;
+    --color-hint: #788ca6;
+    --color-ignored: #878a98;
+    --color-info: #74ade8;
+    --color-modified: #dec184;
+    --color-predictive: #5a6a87;
+    --color-renamed: #74ade8;
+    --color-success: #a1c181;
+    --color-unreachable: #a9afbc;
+    --color-warning: #dec184;
 
-	/* glass button */
-	--shadow-glass:
-		0 8px 20px rgba(107, 143, 240, 0.2),
-		0 3px 10px rgba(107, 143, 240, 0.15),
-		inset 0 1px 0 rgba(255, 255, 255, 0.25),
-		inset 0 -1px 0 rgba(0, 0, 0, 0.15),
-		0 0 0 1px rgba(255, 255, 255, 0.08);
-	--color-glass-border: var(--color-white);
-	--color-glass-highlight: var(--color-white);
+    /* glass common */
+    --glass-highlight-bg: linear-gradient(
+        to right,
+        transparent,
+        rgba(255, 255, 255, 0.4),
+        transparent
+    );
+    --glass-bg: linear-gradient(
+        135deg,
+        rgba(150, 150, 150, 0.03) 0%,
+        rgba(60, 90, 160, 0.12) 100%
+    );
 
-	--glass-button-bg: linear-gradient(
-		135deg,
-		rgba(255, 255, 255, 0.15) 0%,
-		rgba(107, 143, 240, 0.1) 50%,
-		rgba(107, 143, 240, 0.2) 100%
-	);
-	--glass-button-bg-hover: linear-gradient(
-		to top,
-		transparent,
-		rgba(255, 255, 255, 0.1)
-	);
+    /* glass button */
+    --shadow-glass:
+        0 8px 20px rgba(107, 143, 240, 0.2),
+        0 3px 10px rgba(107, 143, 240, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.25),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.08);
+    --color-glass-border: var(--color-white);
+    --color-glass-highlight: var(--color-white);
 
-	/* solid button */
-	--solid-button-bg: linear-gradient(180deg, #202530 0%, #12151f 100%);
-	--color-button-solid-border: rgba(0, 0, 0, 0.7);
-	--solid-button-shadow:
-		inset 0 1px 1px rgba(255, 255, 255, 0.05), 0 2px 8px rgba(5, 10, 20, 0.4), 0
-		1px 2px rgba(0, 0, 0, 0.3);
+    --glass-button-bg: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.15) 0%,
+        rgba(107, 143, 240, 0.1) 50%,
+        rgba(107, 143, 240, 0.2) 100%
+    );
+    --glass-button-bg-hover: linear-gradient(
+        to top,
+        transparent,
+        rgba(255, 255, 255, 0.1)
+    );
 
-	/* outline button */
-	--shadow-outline-button:
-		0 1px 0 rgba(255, 255, 255, 0.05) inset, 0 -1px 0 rgba(0, 0, 0, 0.2) inset,
-		0 0 0 1px rgba(255, 255, 255, 0.08);
-	--color-outline-button-bg: var(--color-black);
+    /* solid button */
+    --solid-button-bg: linear-gradient(180deg, #202530 0%, #12151f 100%);
+    --color-button-solid-border: rgba(0, 0, 0, 0.7);
+    --solid-button-shadow:
+        inset 0 1px 1px rgba(255, 255, 255, 0.05),
+        0 2px 8px rgba(5, 10, 20, 0.4), 0 1px 2px rgba(0, 0, 0, 0.3);
+
+    /* outline button */
+    --shadow-outline-button:
+        0 1px 0 rgba(255, 255, 255, 0.05) inset,
+        0 -1px 0 rgba(0, 0, 0, 0.2) inset, 0 0 0 1px rgba(255, 255, 255, 0.08);
+    --color-outline-button-bg: var(--color-black);
 }
