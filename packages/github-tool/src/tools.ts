@@ -330,30 +330,6 @@ export function githubTools(octokit: Octokit) {
 				return response.data;
 			},
 		}),
-		createRepository: tool({
-			description: "Create a new GitHub repository in your account",
-			inputSchema: z.object({
-				autoInit: z.boolean().describe("Initialize with README").optional(),
-				description: z.string().describe("Repository description").optional(),
-				name: z.string().describe("Repository name"),
-				private: z
-					.boolean()
-					.describe("Whether repo should be private")
-					.optional(),
-			}),
-			execute: async (params) => {
-				const { autoInit, description, name, private: isPrivate } = params;
-
-				const response = await octokit.request("POST /user/repos", {
-					name,
-					description,
-					private: isPrivate,
-					auto_init: autoInit,
-				});
-
-				return response.data;
-			},
-		}),
 		forkRepository: tool({
 			description:
 				"Fork a GitHub repository to your account or specified organization",
