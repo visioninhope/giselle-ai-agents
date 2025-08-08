@@ -48,32 +48,20 @@ export function FloatingChat({ isOpen, onClose }: FloatingChatProps) {
 	if (!isOpen) return null;
 
 	return (
-		<div className="fixed inset-0 z-50 pointer-events-none">
+		<div
+			className="fixed inset-0 z-50 pointer-events-none"
+			role="dialog"
+			aria-modal="true"
+		>
 			<div
 				ref={chatRef}
-				className="absolute bottom-12 right-6 pointer-events-auto"
-				style={{
-					animation: isOpen ? "fadeInSlideUp 0.2s ease-out" : undefined,
-				}}
+				className="absolute bottom-12 right-6 pointer-events-auto animate-fade-in-up"
 			>
 				<div className="relative">
 					{/* Chat Panel */}
 					<ChatPanel />
 				</div>
 			</div>
-
-			<style jsx>{`
-        @keyframes fadeInSlideUp {
-          from {
-            opacity: 0;
-            transform: translateY(10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-      `}</style>
 		</div>
 	);
 }
