@@ -7,6 +7,51 @@ type GoogleModelId = LanguageModel["id"];
 
 export const openAiTokenPricing: ModelPriceTable = {
 	// https://platform.openai.com/docs/pricing#latest-models
+	"gpt-5": {
+		prices: [
+			{
+				validFrom: "2025-08-08T00:00:00Z",
+				price: {
+					input: {
+						costPerMegaToken: 1.25,
+					},
+					output: {
+						costPerMegaToken: 10.0,
+					},
+				},
+			},
+		],
+	},
+	"gpt-5-mini": {
+		prices: [
+			{
+				validFrom: "2025-08-08T00:00:00Z",
+				price: {
+					input: {
+						costPerMegaToken: 0.25,
+					},
+					output: {
+						costPerMegaToken: 2.0,
+					},
+				},
+			},
+		],
+	},
+	"gpt-5-nano": {
+		prices: [
+			{
+				validFrom: "2025-08-08T00:00:00Z",
+				price: {
+					input: {
+						costPerMegaToken: 0.05,
+					},
+					output: {
+						costPerMegaToken: 0.4,
+					},
+				},
+			},
+		],
+	},
 	"gpt-4.1": {
 		prices: [
 			{
