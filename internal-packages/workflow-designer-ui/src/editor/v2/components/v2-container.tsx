@@ -26,7 +26,6 @@ import { edgeTypes } from "../../connector";
 import { type ConnectorType, GradientDef } from "../../connector/component";
 import { ContextMenu } from "../../context-menu";
 import type { ContextMenuProps } from "../../context-menu/types";
-
 import { DataSourceTable } from "../../data-source";
 import { type GiselleWorkflowDesignerNode, nodeTypes } from "../../node";
 import { PropertiesPanel } from "../../properties-panel";

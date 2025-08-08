@@ -81,10 +81,9 @@ export function V2Placeholder({
 							onLeftPanelClose={handleLeftPanelClose}
 						/>
 						<V2Footer
-							onLeftPaelValueChange={handleLeftPanelValueChange}
-							onChatToggle={handleChatToggle}
+							onLeftPanelValueChange={handleLeftPanelValueChange}
 							activePanel={layoutState.leftPanel}
-							isChatOpen={isChatOpen}
+							chat={{ onToggle: handleChatToggle, isOpen: isChatOpen }}
 						/>
 					</>
 				) : (
