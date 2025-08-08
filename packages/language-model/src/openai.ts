@@ -21,7 +21,17 @@ const defaultConfigurations: OpenAILanguageModelConfigurations = {
 };
 
 export const OpenAILanguageModelId = z
-	.enum(["gpt-4o", "o3", "o4-mini", "gpt-4.1", "gpt-4.1-mini", "gpt-4.1-nano"])
+	.enum([
+		"gpt-5",
+		"gpt-5-mini",
+		"gpt-5-nano",
+		"gpt-4o",
+		"o3",
+		"o4-mini",
+		"gpt-4.1",
+		"gpt-4.1-mini",
+		"gpt-4.1-nano",
+	])
 	.catch((ctx) => {
 		if (typeof ctx.value !== "string") {
 			return "gpt-4.1-nano";
@@ -112,7 +122,47 @@ const gpt41nano: OpenAILanguageModel = {
 	configurations: defaultConfigurations,
 };
 
-export const models = [gpt4o, o3, o4Mini, gpt41, gpt41mini, gpt41nano];
+const gpt5: OpenAILanguageModel = {
+	provider: "openai",
+	id: "gpt-5",
+	capabilities:
+		Capability.ImageFileInput |
+		Capability.TextGeneration |
+		Capability.OptionalSearchGrounding,
+	tier: Tier.enum.pro,
+	configurations: defaultConfigurations,
+};
+
+const gpt5mini: OpenAILanguageModel = {
+	provider: "openai",
+	id: "gpt-5-mini",
+	capabilities:
+		Capability.ImageFileInput |
+		Capability.TextGeneration |
+		Capability.OptionalSearchGrounding,
+	tier: Tier.enum.free,
+	configurations: defaultConfigurations,
+};
+
+const gpt5nano: OpenAILanguageModel = {
+	provider: "openai",
+	id: "gpt-5-nano",
+	capabilities: Capability.ImageFileInput | Capability.TextGeneration,
+	tier: Tier.enum.free,
+	configurations: defaultConfigurations,
+};
+
+export const models = [
+	gpt5,
+	gpt5mini,
+	gpt5nano,
+	gpt4o,
+	o3,
+	o4Mini,
+	gpt41,
+	gpt41mini,
+	gpt41nano,
+];
 
 export const LanguageModel = OpenAILanguageModel;
 export type LanguageModel = OpenAILanguageModel;

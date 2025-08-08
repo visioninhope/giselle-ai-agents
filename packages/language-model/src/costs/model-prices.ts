@@ -7,6 +7,51 @@ type GoogleModelId = LanguageModel["id"];
 
 export const openAiTokenPricing: ModelPriceTable = {
 	// https://platform.openai.com/docs/pricing#latest-models
+	"gpt-5": {
+		prices: [
+			{
+				validFrom: "2025-08-08T00:00:00Z",
+				price: {
+					input: {
+						costPerMegaToken: 1.25,
+					},
+					output: {
+						costPerMegaToken: 10.0,
+					},
+				},
+			},
+		],
+	},
+	"gpt-5-mini": {
+		prices: [
+			{
+				validFrom: "2025-08-08T00:00:00Z",
+				price: {
+					input: {
+						costPerMegaToken: 0.25,
+					},
+					output: {
+						costPerMegaToken: 2.0,
+					},
+				},
+			},
+		],
+	},
+	"gpt-5-nano": {
+		prices: [
+			{
+				validFrom: "2025-08-08T00:00:00Z",
+				price: {
+					input: {
+						costPerMegaToken: 0.05,
+					},
+					output: {
+						costPerMegaToken: 0.4,
+					},
+				},
+			},
+		],
+	},
 	"gpt-4.1": {
 		prices: [
 			{
@@ -112,6 +157,21 @@ export const openAiTokenPricing: ModelPriceTable = {
 
 export const anthropicTokenPricing: ModelPriceTable = {
 	// https://www.anthropic.com/pricing
+	"claude-opus-4-1-20250805": {
+		prices: [
+			{
+				validFrom: "2025-08-06T00:00:00Z",
+				price: {
+					input: {
+						costPerMegaToken: 15.0,
+					},
+					output: {
+						costPerMegaToken: 75.0,
+					},
+				},
+			},
+		],
+	},
 	"claude-4-opus-20250514": {
 		prices: [
 			{

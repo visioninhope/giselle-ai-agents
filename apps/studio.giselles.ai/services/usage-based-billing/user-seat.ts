@@ -1,32 +1,18 @@
 import { createId } from "@paralleldrive/cuid2";
-import {
-	and,
-	desc,
-	type ExtractTablesWithRelations,
-	eq,
-	gte,
-	lt,
-} from "drizzle-orm";
-import type { PgTransaction } from "drizzle-orm/pg-core";
-import type { VercelPgQueryResultHKT } from "drizzle-orm/vercel-postgres";
+import { eq } from "drizzle-orm";
 import {
 	db,
 	subscriptions,
 	teamMemberships,
 	userSeatUsageReports,
 } from "@/drizzle";
-import type * as schema from "../../drizzle/schema";
 import { stripe } from "../external/stripe";
 
-const USER_SEAT_METER_NAME = "user_seat";
+const USER_SEAT_METER_NAME = "user_seat_v2";
 
 /**
  * Reports user seat usage to Stripe's metering system for usage-based billing.
- * This function handles both initial reporting and delta-based updates of user seat usage.
- *
- * The function first checks if there's an existing usage report for the current billing period.
- * If no report exists, it creates a new report with the current total number of seats.
- * If a report exists, it calculates and reports the delta (change) in seat usage. If members are not changed, it will not report.
+ * Uses Stripe's "last" aggregation formula to directly report the current member count.
  *
  * @param subscriptionId - The Stripe subscription ID to report usage for
  * @param customerId - The Stripe customer ID associated with the subscription
@@ -37,191 +23,65 @@ export async function reportUserSeatUsage(
 	subscriptionId: string,
 	customerId: string,
 ): Promise<void> {
-	// Reporting to Stripe is executed within a transaction to ensure data consistency between Stripe and our database.
-	// Although this includes an external API call which may slow down the transaction,
-	// it's acceptable since the lock scope is minimal (only one subscription record).
-	await db.transaction(async (tx) => {
-		const subscriptionRecord = await findSubscriptionWithLock(
-			tx,
-			subscriptionId,
-		);
-		const teamDbId = subscriptionRecord.teamDbId;
-		const periodStart = subscriptionRecord.currentPeriodStart;
-		const periodEnd = subscriptionRecord.currentPeriodEnd;
-
-		const lastReport = await tx
-			.select()
-			.from(userSeatUsageReports)
-			.where(
-				and(
-					eq(userSeatUsageReports.teamDbId, teamDbId),
-					gte(userSeatUsageReports.createdAt, periodStart),
-					lt(userSeatUsageReports.createdAt, periodEnd),
-				),
-			)
-			.orderBy(desc(userSeatUsageReports.createdAt))
-			.limit(1);
-
-		if (lastReport.length === 0) {
-			// If record is not exists, we will report the current count
-			await reportCurrentUserSeatUsage(tx, teamDbId, customerId);
-			return;
-		}
-
-		// If record is exists in the database, we will report delta
-		await reportDeltaUserSeatUsage(tx, teamDbId, customerId, lastReport[0]);
-	});
-}
-
-async function reportCurrentUserSeatUsage(
-	tx:
-		| PgTransaction<
-				VercelPgQueryResultHKT,
-				typeof schema,
-				ExtractTablesWithRelations<typeof schema>
-		  >
-		| typeof db,
-	teamDbId: number,
-	customerId: string,
-) {
-	const teamMembers = await listTeamMembers(tx, teamDbId);
+	const teamDbId = await findTeamDbId(subscriptionId);
+	const teamMembers = await listTeamMembers(teamDbId);
 	const currentMemberCount = teamMembers.length;
-	const meterEventId = createId();
 
+	const stripeEvent = await reportToStripe(customerId, currentMemberCount);
+
+	await saveUserSeatUsage({
+		stripeMeterEventId: stripeEvent.identifier,
+		teamDbId,
+		createdAt: new Date(stripeEvent.timestamp),
+		userDbIdList: teamMembers,
+		value: currentMemberCount,
+		isDelta: false, // Always false with "last" aggregation
+	});
+}
+
+async function reportToStripe(customerId: string, currentMemberCount: number) {
+	const meterEventId = createId();
 	const timestamp = new Date();
-	const value = currentMemberCount;
+
 	const stripeEvent = await stripe.v2.billing.meterEvents.create({
 		event_name: USER_SEAT_METER_NAME,
 		payload: {
-			value: value.toString(),
+			value: currentMemberCount.toString(),
 			stripe_customer_id: customerId,
 		},
 		identifier: meterEventId,
 		timestamp: timestamp.toISOString(),
 	});
 
-	// Save report to the database
-	await saveUserSeatUsage(tx, {
-		stripeMeterEventId: stripeEvent.identifier,
-		teamDbId,
-		createdAt: timestamp,
-		userDbIdList: teamMembers,
-		value,
-		isDelta: false,
-	});
+	return stripeEvent;
 }
 
-async function reportDeltaUserSeatUsage(
-	tx:
-		| PgTransaction<
-				VercelPgQueryResultHKT,
-				typeof schema,
-				ExtractTablesWithRelations<typeof schema>
-		  >
-		| typeof db,
-	teamDbId: number,
-	customerId: string,
-	lastReport: typeof userSeatUsageReports.$inferSelect,
-) {
-	const teamMembers = await listTeamMembers(tx, teamDbId);
-	if (areNumberArraysEqualWithEvery(teamMembers, lastReport.userDbIdList)) {
-		// No change in the team members
-		return;
-	}
-	const delta = teamMembers.length - lastReport.userDbIdList.length;
-	const meterEventId = createId();
-
-	const timestamp = new Date();
-	const stripeEvent = await stripe.v2.billing.meterEvents.create({
-		event_name: USER_SEAT_METER_NAME,
-		payload: {
-			value: delta.toString(),
-			stripe_customer_id: customerId,
-		},
-		identifier: meterEventId,
-		timestamp: timestamp.toISOString(),
-	});
-
-	// Save report to the database
-	await saveUserSeatUsage(tx, {
-		stripeMeterEventId: stripeEvent.identifier,
-		teamDbId,
-		createdAt: timestamp,
-		userDbIdList: teamMembers,
-		value: delta,
-		isDelta: true,
-	});
+async function saveUserSeatUsage(params: {
+	stripeMeterEventId: string;
+	teamDbId: number;
+	createdAt: Date;
+	userDbIdList: number[];
+	value: number;
+	isDelta: boolean;
+}) {
+	await db.insert(userSeatUsageReports).values(params);
 }
 
-async function saveUserSeatUsage(
-	tx:
-		| PgTransaction<
-				VercelPgQueryResultHKT,
-				typeof schema,
-				ExtractTablesWithRelations<typeof schema>
-		  >
-		| typeof db,
-	params: {
-		stripeMeterEventId: string;
-		teamDbId: number;
-		createdAt: Date;
-		userDbIdList: number[];
-		value: number;
-		isDelta: boolean;
-	},
-) {
-	await tx.insert(userSeatUsageReports).values(params);
-}
-
-async function findSubscriptionWithLock(
-	tx:
-		| PgTransaction<
-				VercelPgQueryResultHKT,
-				typeof schema,
-				ExtractTablesWithRelations<typeof schema>
-		  >
-		| typeof db,
-	subscriptionId: string,
-) {
-	const record = await tx
-		.select({
-			dbid: subscriptions.dbId,
-			teamDbId: subscriptions.teamDbId,
-			currentPeriodEnd: subscriptions.currentPeriodEnd,
-			currentPeriodStart: subscriptions.currentPeriodStart,
-		})
+async function findTeamDbId(subscriptionId: string): Promise<number> {
+	const record = await db
+		.select({ teamDbId: subscriptions.teamDbId })
 		.from(subscriptions)
-		.for("update")
 		.where(eq(subscriptions.id, subscriptionId));
 	if (record.length === 0) {
 		throw new Error(`Subscription not found: ${subscriptionId}`);
 	}
-	return record[0];
+	return record[0].teamDbId;
 }
 
-async function listTeamMembers(
-	tx:
-		| PgTransaction<
-				VercelPgQueryResultHKT,
-				typeof schema,
-				ExtractTablesWithRelations<typeof schema>
-		  >
-		| typeof db,
-	teamDbId: number,
-) {
-	const teamMembers = await tx
+async function listTeamMembers(teamDbId: number) {
+	const teamMembers = await db
 		.select({ userDbId: teamMemberships.userDbId })
 		.from(teamMemberships)
 		.where(eq(teamMemberships.teamDbId, teamDbId));
 	return teamMembers.map((member) => member.userDbId);
-}
-
-function areNumberArraysEqualWithEvery(
-	arr1: number[],
-	arr2: number[],
-): boolean {
-	if (arr1.length !== arr2.length) {
-		return false;
-	}
-	return arr1.every((value, index) => value === arr2[index]);
 }
