@@ -149,7 +149,7 @@ function ImageGenerationRunner({ generation }: { generation: Generation }) {
 			})
 			.then(async () => {
 				updateGenerationStatusToRunning(generation.id);
-				
+
 				try {
 					await client.generateImage(
 						{
@@ -168,7 +168,7 @@ function ImageGenerationRunner({ generation }: { generation: Generation }) {
 					) {
 						return;
 					}
-					
+
 					console.error("Failed to generate image:", error);
 					updateGenerationStatusToFailure(generation.id);
 				}
