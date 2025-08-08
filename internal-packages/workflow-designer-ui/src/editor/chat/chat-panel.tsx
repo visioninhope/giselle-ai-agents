@@ -10,18 +10,17 @@ interface Message {
 	timestamp: Date;
 }
 
-// Simple and secure URL validation - allowlist approach
-function isSafeUrl(url: string): boolean {
-	if (!url || typeof url !== "string") {
-		return false;
-	}
-
+// Normalize and validate a URL for link usage (http/https only). Returns URL or null.
+function toSafeLinkUrl(raw: string): URL | null {
+	if (!raw || typeof raw !== "string") return null;
 	try {
-		const parsed = new URL(url.trim());
-		// Only allow HTTP and HTTPS - simple allowlist
-		return parsed.protocol === "http:" || parsed.protocol === "https:";
+		const parsed = new URL(raw.trim());
+		if (parsed.protocol === "http:" || parsed.protocol === "https:") {
+			return parsed;
+		}
+		return null;
 	} catch {
-		return false;
+		return null;
 	}
 }
 
@@ -32,23 +31,23 @@ const renderMessageWithUrls = (content: string) => {
 
 	return parts.map((part, index) => {
 		if (urlRegex.test(part)) {
-			if (!isSafeUrl(part)) {
-				return part;
-			}
+			const safeUrl = toSafeLinkUrl(part);
+			if (!safeUrl) return part;
+			const href = safeUrl.toString();
 
-			// Truncate long URLs for display
+			// Truncate long URLs for display based on original text (trimmed)
+			const displaySource = part.trim();
 			const displayUrl =
-				part.length > 50
-					? `${part.substring(0, 30)}...${part.substring(part.length - 15)}`
-					: part;
-
+				displaySource.length > 50
+					? `${displaySource.substring(0, 30)}...${displaySource.substring(displaySource.length - 15)}`
+					: displaySource;
 			return (
 				<a
 					key={`url-${index}-${part.substring(0, 10)}`}
-					href={part}
+					href={href}
 					target="_blank"
 					rel="noopener noreferrer"
-					title={part}
+					title={displayUrl}
 					className="underline text-[#6B8FF0] hover:text-[#5A7EE8] transition-colors duration-200 break-all"
 				>
 					{displayUrl}
