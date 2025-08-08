@@ -167,15 +167,7 @@ export function ChatPanel() {
 			{/* Header */}
 
 			{/* Messages Area */}
-			<div
-				className="flex-1 overflow-y-auto py-2 px-4 flex flex-col relative thin-scrollbar"
-				style={{
-					maskImage:
-						"linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.5) 50%, black 100%)",
-					WebkitMaskImage:
-						"linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.5) 50%, black 100%)",
-				}}
-			>
+			<div className="flex-1 overflow-y-auto py-2 px-4 flex flex-col relative thin-scrollbar mask-fade-b">
 				<div className="flex-grow" />
 				<div className="flex flex-col space-y-2 min-h-fit">
 					{messages.map((message, _index) => {
@@ -188,15 +180,8 @@ export function ChatPanel() {
 									className={`max-w-[80%] min-w-0 px-4 py-3 text-sm font-mono ${
 										message.sender === "user"
 											? "font-light bg-[#4A6FD8] text-white rounded-[8px] rounded-br-[4px] shadow-sm"
-											: "font-light bg-[#6B8FF0]/20 text-white rounded-[8px] rounded-bl-[4px] border border-[#6B8FF0]/80 shadow-[0_0_10px_rgba(107,143,240,0.3),0_0_20px_rgba(107,143,240,0.2),inset_0_0_20px_rgba(107,143,240,0.1)] backdrop-blur-sm animate-[slideUpFromLeft_0.4s_ease-out]"
+											: "font-light bg-[#6B8FF0]/20 text-white rounded-[8px] rounded-bl-[4px] border border-[#6B8FF0]/80 shadow-[0_0_10px_rgba(107,143,240,0.3),0_0_20px_rgba(107,143,240,0.2),inset_0_0_20px_rgba(107,143,240,0.1)] backdrop-blur-sm animate-slide-up-left"
 									}`}
-									style={
-										message.sender === "assistant"
-											? {
-													animation: "slideUpFromLeft 0.4s ease-out",
-												}
-											: undefined
-									}
 								>
 									<div className="whitespace-pre-wrap leading-relaxed break-words overflow-wrap-anywhere">
 										{renderMessageWithUrls(message.content)}
@@ -213,14 +198,8 @@ export function ChatPanel() {
 								<div className="flex items-center space-x-1">
 									<div className="flex space-x-1">
 										<div className="w-1.5 h-1.5 bg-white rounded-full animate-bounce"></div>
-										<div
-											className="w-1.5 h-1.5 bg-white rounded-full animate-bounce"
-											style={{ animationDelay: "0.1s" }}
-										></div>
-										<div
-											className="w-1.5 h-1.5 bg-white rounded-full animate-bounce"
-											style={{ animationDelay: "0.2s" }}
-										></div>
+										<div className="w-1.5 h-1.5 bg-white rounded-full animate-bounce animate-delay-100"></div>
+										<div className="w-1.5 h-1.5 bg-white rounded-full animate-bounce animate-delay-200"></div>
 									</div>
 								</div>
 							</div>
@@ -265,36 +244,6 @@ export function ChatPanel() {
 					</span>
 				</div>
 			</div>
-
-			<style jsx>{`
-        @keyframes slideUpFromLeft {
-          from {
-            opacity: 0;
-            transform: translateY(20px) translateX(-10px) scale(0.9);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0) translateX(0) scale(1);
-          }
-        }
-
-        .thin-scrollbar::-webkit-scrollbar {
-          width: 4px;
-        }
-
-        .thin-scrollbar::-webkit-scrollbar-track {
-          background: transparent;
-        }
-
-        .thin-scrollbar::-webkit-scrollbar-thumb {
-          background: #6b8ff0;
-          border-radius: 2px;
-        }
-
-        .thin-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: #5a7ee8;
-        }
-      `}</style>
 		</div>
 	);
 }

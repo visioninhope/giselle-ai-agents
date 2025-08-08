@@ -162,3 +162,62 @@
 	--language-model-toggle-group-popover-width: 400px;
 	--language-model-detail-panel-width: 350px;
 }
+
+/* Chat panel utilities and animations */
+@keyframes slideUpFromLeft {
+	from {
+		opacity: 0;
+		transform: translateY(20px) translateX(-10px) scale(0.9);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0) translateX(0) scale(1);
+	}
+}
+
+@layer utilities {
+	/* Apply a bottom fade mask for scroll areas */
+	.mask-fade-b {
+		/* WebKit prefix for Safari */
+		-webkit-mask-image: linear-gradient(
+			to bottom,
+			transparent 0%,
+			rgba(0, 0, 0, 0.5) 50%,
+			black 100%
+		);
+		mask-image: linear-gradient(
+			to bottom,
+			transparent 0%,
+			rgba(0, 0, 0, 0.5) 50%,
+			black 100%
+		);
+	}
+
+	/* Simple animation delay helpers */
+	.animate-delay-100 {
+		animation-delay: 0.1s;
+	}
+	.animate-delay-200 {
+		animation-delay: 0.2s;
+	}
+
+	/* Slide-up-from-left animation helper */
+	.animate-slide-up-left {
+		animation: slideUpFromLeft 0.4s ease-out both;
+	}
+
+	/* Thin scrollbar styling for WebKit */
+	.thin-scrollbar::-webkit-scrollbar {
+		width: 4px;
+	}
+	.thin-scrollbar::-webkit-scrollbar-track {
+		background: transparent;
+	}
+	.thin-scrollbar::-webkit-scrollbar-thumb {
+		background: #6b8ff0;
+		border-radius: 2px;
+	}
+	.thin-scrollbar::-webkit-scrollbar-thumb:hover {
+		background: #5a7ee8;
+	}
+}
