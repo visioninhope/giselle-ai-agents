@@ -6,6 +6,7 @@ import {
 } from "@giselle-sdk/giselle/react";
 import { useCallback, useState } from "react";
 import { ReadOnlyBanner } from "../../ui/read-only-banner";
+import { FloatingChat } from "../chat";
 import { tourSteps, WorkspaceTour } from "../workspace-tour";
 import { V2Container, V2Footer, V2Header } from "./components";
 import { RootProvider } from "./components/provider";
