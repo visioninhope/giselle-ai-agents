@@ -3,7 +3,7 @@ import {
 	useVectorStore,
 	useWorkflowDesigner,
 } from "@giselle-sdk/giselle/react";
-import { Check, ChevronDown } from "lucide-react";
+import { Check, ChevronDown, Info } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { TriangleAlert } from "../../../../icons";
@@ -16,7 +16,7 @@ type GitHubVectorStoreNodePropertiesPanelProps = {
 export function GitHubVectorStoreNodePropertiesPanel({
 	node,
 }: GitHubVectorStoreNodePropertiesPanelProps) {
-	const { updateNodeDataContent } = useWorkflowDesigner();
+	const { updateNodeData } = useWorkflowDesigner();
 	const vectorStore = useVectorStore();
 	const settingPath = vectorStore?.settingPath;
 
@@ -55,13 +55,26 @@ export function GitHubVectorStoreNodePropertiesPanel({
 		if (selectedRepo) {
 			// Reset content type selection when repository changes
 			setSelectedContentType(undefined);
+
+			// Reset output label to default
+			const updatedOutputs = [...node.outputs];
+			if (updatedOutputs[0]) {
+				updatedOutputs[0] = {
+					...updatedOutputs[0],
+					label: "Output",
+				};
+			}
+
 			// Update to unconfigured state until content type is selected
-			updateNodeDataContent(node, {
-				...node.content,
-				source: {
-					...node.content.source,
-					state: {
-						status: "unconfigured",
+			updateNodeData(node, {
+				outputs: updatedOutputs,
+				content: {
+					...node.content,
+					source: {
+						...node.content.source,
+						state: {
+							status: "unconfigured",
+						},
 					},
 				},
 			});
@@ -82,15 +95,28 @@ export function GitHubVectorStoreNodePropertiesPanel({
 		);
 		if (selectedRepo) {
 			setSelectedContentType(contentType);
-			updateNodeDataContent(node, {
-				...node.content,
-				source: {
-					...node.content.source,
-					state: {
-						status: "configured",
-						owner: selectedRepo.owner,
-						repo: selectedRepo.repo,
-						contentType,
+
+			// Update output label based on content type
+			const updatedOutputs = [...node.outputs];
+			if (updatedOutputs[0]) {
+				updatedOutputs[0] = {
+					...updatedOutputs[0],
+					label: contentType === "pull_request" ? "Pull Requests" : "Code",
+				};
+			}
+
+			updateNodeData(node, {
+				outputs: updatedOutputs,
+				content: {
+					...node.content,
+					source: {
+						...node.content.source,
+						state: {
+							status: "configured",
+							owner: selectedRepo.owner,
+							repo: selectedRepo.repo,
+							contentType,
+						},
 					},
 				},
 			});
@@ -227,9 +253,16 @@ export function GitHubVectorStoreNodePropertiesPanel({
 											/>
 											<span className="text-[14px] text-white-400">Code</span>
 											{!hasBlobContent && (
-												<span className="text-[12px] text-white-400/50">
-													(Not configured)
-												</span>
+												<div className="flex items-center gap-1 group relative">
+													<span className="text-[12px] text-white-400/50">
+														Not configured
+													</span>
+													<Info className="w-3 h-3 text-white-400/50 cursor-help" />
+													<div className="absolute left-0 bottom-full mb-2 px-3 py-2 bg-black-800/80 backdrop-blur-md border border-white/10 text-white text-xs rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 shadow-lg">
+														Enable Code for {selectedRepoKey} in Vector Store
+														settings
+													</div>
+												</div>
 											)}
 										</label>
 										<label
@@ -252,9 +285,16 @@ export function GitHubVectorStoreNodePropertiesPanel({
 												Pull Requests
 											</span>
 											{!hasPullRequestContent && (
-												<span className="text-[12px] text-white-400/50">
-													(Not configured)
-												</span>
+												<div className="flex items-center gap-1 group relative">
+													<span className="text-[12px] text-white-400/50">
+														Not configured
+													</span>
+													<Info className="w-3 h-3 text-white-400/50 cursor-help" />
+													<div className="absolute left-0 bottom-full mb-2 px-3 py-2 bg-black-800/80 backdrop-blur-md border border-white/10 text-white text-xs rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 shadow-lg">
+														Enable Pull Requests for that repository in Vector
+														Store settings
+													</div>
+												</div>
 											)}
 										</label>
 									</>

@@ -21,6 +21,12 @@ describe("openai llm", () => {
 			expect(OpenAILanguageModelId.parse("gpt-4.1-nano")).toBe("gpt-4.1-nano");
 		});
 
+		it("should map GPT-5 models correctly", () => {
+			expect(OpenAILanguageModelId.parse("gpt-5")).toBe("gpt-5");
+			expect(OpenAILanguageModelId.parse("gpt-5-mini")).toBe("gpt-5-mini");
+			expect(OpenAILanguageModelId.parse("gpt-5-nano")).toBe("gpt-5-nano");
+		});
+
 		it("should map gpt-4o-mini to gpt-4.1-mini", () => {
 			expect(OpenAILanguageModelId.parse("gpt-4o-mini")).toBe("gpt-4.1-mini");
 		});

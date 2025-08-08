@@ -26,6 +26,7 @@ export function V2Placeholder({
 		leftPanel: null,
 	});
 	const [isTourOpen, setIsTourOpen] = useState(data.nodes.length === 0);
+	const [isChatOpen, setIsChatOpen] = useState(false);
 
 	const handleDismissBanner = useCallback(() => {
 		setShowReadOnlyBanner(false);
@@ -42,11 +43,19 @@ export function V2Placeholder({
 		[],
 	);
 
+	const handleChatToggle = useCallback(() => {
+		setIsChatOpen((prev) => !prev);
+	}, []);
+
 	const handleLeftPanelClose = useCallback(() => {
 		setLayoutState((prev) => ({
 			...prev,
 			leftPanel: null,
 		}));
+	}, []);
+
+	const handleChatClose = useCallback(() => {
+		setIsChatOpen(false);
 	}, []);
 
 	const { layoutV3 } = useFeatureFlag();
@@ -70,8 +79,9 @@ export function V2Placeholder({
 							onLeftPanelClose={handleLeftPanelClose}
 						/>
 						<V2Footer
-							onLeftPaelValueChange={handleLeftPanelValueChange}
+							onLeftPanelValueChange={handleLeftPanelValueChange}
 							activePanel={layoutState.leftPanel}
+							chat={{ onToggle: handleChatToggle, isOpen: isChatOpen }}
 						/>
 					</>
 				) : (
@@ -86,6 +96,7 @@ export function V2Placeholder({
 				isOpen={isTourOpen}
 				onOpenChange={setIsTourOpen}
 			/>
+			<FloatingChat isOpen={isChatOpen} onClose={handleChatClose} />
 		</div>
 	);
 }

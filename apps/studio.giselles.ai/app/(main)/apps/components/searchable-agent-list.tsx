@@ -147,11 +147,11 @@ export function SearchableAgentList({ agents }: AgentGridProps) {
 					/>
 
 					{/* View Mode Toggle */}
-					<div className="flex rounded-lg border border-black-600 overflow-hidden">
+					<div className="flex rounded-lg border border-black-600 overflow-hidden shrink-0">
 						<button
 							type="button"
 							onClick={() => setViewMode("grid")}
-							className={`w-10 h-10 flex items-center justify-center transition-colors ${
+							className={`p-3 flex items-center justify-center transition-colors ${
 								viewMode === "grid"
 									? "bg-black-600 text-white"
 									: "bg-black-700/50 text-black-300 hover:text-white"
@@ -163,7 +163,7 @@ export function SearchableAgentList({ agents }: AgentGridProps) {
 						<button
 							type="button"
 							onClick={() => setViewMode("list")}
-							className={`w-10 h-10 flex items-center justify-center transition-colors ${
+							className={`p-3 flex items-center justify-center transition-colors ${
 								viewMode === "list"
 									? "bg-black-600 text-white"
 									: "bg-black-700/50 text-black-300 hover:text-white"

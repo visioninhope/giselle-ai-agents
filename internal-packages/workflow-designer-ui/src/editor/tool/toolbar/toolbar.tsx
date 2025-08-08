@@ -127,7 +127,7 @@ export function Toolbar() {
 
 	// Recommended models for each provider
 	const openaiModels = getAvailableModels(
-		["gpt-4o", "gpt-4", "gpt-4-turbo"],
+		["gpt-5"],
 		"openai",
 		llmProviders,
 		languageModels,
