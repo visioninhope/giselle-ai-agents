@@ -10,6 +10,10 @@ import { createTeamId } from "@/services/teams/utils";
 import { stripe } from "../config";
 
 const timestampToDateTime = (timestamp: number) => new Date(timestamp * 1000);
+const getCustomerId = (subscription: Stripe.Subscription) =>
+	typeof subscription.customer === "string"
+		? subscription.customer
+		: subscription.customer.id;
 
 export const upsertSubscription = async (subscriptionId: string) => {
 	const subscription = await stripe.subscriptions.retrieve(subscriptionId);
@@ -121,6 +125,7 @@ async function insertSubscription(
 	await tx.insert(subscriptions).values({
 		id: subscription.id,
 		teamDbId: teamDbId,
+		customerId: getCustomerId(subscription),
 		status: subscription.status,
 		cancelAtPeriodEnd: subscription.cancel_at_period_end,
 		cancelAt:
@@ -155,6 +160,7 @@ async function updateSubscription(subscription: Stripe.Subscription) {
 	await db
 		.update(subscriptions)
 		.set({
+			customerId: getCustomerId(subscription),
 			status: subscription.status,
 			cancelAtPeriodEnd: subscription.cancel_at_period_end,
 			cancelAt:

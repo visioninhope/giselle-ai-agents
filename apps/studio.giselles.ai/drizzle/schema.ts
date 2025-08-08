@@ -30,7 +30,7 @@ export const subscriptions = pgTable("subscriptions", {
 		.notNull()
 		.references(() => teams.dbId, { onDelete: "cascade" }),
 	// Customer ID from Stripe, e.g. cus_xxx.
-	customerId: text("customer_id"),
+	customerId: text("customer_id").notNull(),
 	status: text("status").$type<Stripe.Subscription.Status>().notNull(),
 	cancelAtPeriodEnd: boolean("cancel_at_period_end").notNull(),
 	cancelAt: timestamp("cancel_at"),
