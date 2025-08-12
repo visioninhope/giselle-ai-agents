@@ -64,28 +64,22 @@ export function useNodeManipulation() {
 				return;
 			}
 
-			let targetNode: Node;
 			try {
-				targetNode = Node.parse(targetNodeLike);
+				const targetNode = Node.parse(targetNodeLike);
+				const nodeState = data.ui.nodeState[targetNode.id];
+				if (!nodeState) {
+					onError?.();
+					return;
+				}
+				const position = {
+					x: nodeState.position.x + OFFSET_X,
+					y: nodeState.position.y + OFFSET_Y,
+				};
+				copyNode(targetNode, { ui: { position } });
 			} catch (error) {
-				console.error(
-					"Failed to parse target node for duplication:",
-					error,
-					targetNodeLike,
-				);
+				console.error("Failed to duplicate node:", error);
 				onError?.();
-				return;
 			}
-
-			const nodeState = data.ui.nodeState[targetNode.id];
-			if (!nodeState) return;
-
-			const position = {
-				x: nodeState.position.x + OFFSET_X,
-				y: nodeState.position.y + OFFSET_Y,
-			};
-
-			copyNode(targetNode, { ui: { position } });
 		},
 		[data, copyNode],
 	);
