@@ -59,6 +59,12 @@ export function useKeyboardShortcuts(
 	// Properties panel shortcuts
 	const canUsePropertiesShortcuts = data.ui.focusedArea === "properties-panel";
 
+	console.log("Keyboard shortcuts state:", {
+		focusedArea: data.ui.focusedArea,
+		canUsePropertiesShortcuts,
+		hasOnGenerate: !!onGenerate,
+	});
+
 	// Tool shortcuts using the custom hook
 	useKeyAction(
 		"t",
@@ -94,7 +100,13 @@ export function useKeyboardShortcuts(
 	// Generate shortcut for properties panel
 	useKeyAction(
 		["Meta+Enter", "Control+Enter"],
-		() => onGenerate?.(),
+		() => {
+			console.log("Generate shortcut triggered", {
+				onGenerate: !!onGenerate,
+				canUsePropertiesShortcuts,
+			});
+			onGenerate?.();
+		},
 		canUsePropertiesShortcuts && !!onGenerate,
 	);
 
