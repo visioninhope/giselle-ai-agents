@@ -37,14 +37,14 @@ const cachedFetchCurrentTeam = cache(fetchCurrentTeam);
 export { cachedFetchCurrentTeam as fetchCurrentTeam };
 
 async function fetchTeam(teamId: TeamId, supabaseUserId: string) {
-	// Try with profileImageUrl first, fallback if column doesn't exist
+	// Try with avatarUrl first, fallback if column doesn't exist
 	try {
 		const result = await db
 			.select({
 				id: teams.id,
 				dbId: teams.dbId,
 				name: teams.name,
-				profileImageUrl: teams.profileImageUrl,
+				avatarUrl: teams.avatarUrl,
 				type: teams.type,
 				activeSubscriptionId: subscriptions.id,
 			})
@@ -73,7 +73,7 @@ async function fetchTeam(teamId: TeamId, supabaseUserId: string) {
 		}
 		return result[0];
 	} catch (_error) {
-		// Fallback without profileImageUrl if column doesn't exist
+		// Fallback without avatarUrl if column doesn't exist
 		const result = await db
 			.select({
 				id: teams.id,
@@ -107,20 +107,20 @@ async function fetchTeam(teamId: TeamId, supabaseUserId: string) {
 		}
 		return {
 			...result[0],
-			profileImageUrl: null as string | null,
+			avatarUrl: null as string | null,
 		};
 	}
 }
 
 async function fetchFirstTeam(supabaseUserId: string) {
-	// Try with profileImageUrl first, fallback if column doesn't exist
+	// Try with avatarUrl first, fallback if column doesn't exist
 	try {
 		const team = await db
 			.select({
 				id: teams.id,
 				dbId: teams.dbId,
 				name: teams.name,
-				profileImageUrl: teams.profileImageUrl,
+				avatarUrl: teams.avatarUrl,
 				type: teams.type,
 				activeSubscriptionId: subscriptions.id,
 			})
@@ -146,7 +146,7 @@ async function fetchFirstTeam(supabaseUserId: string) {
 		}
 		return team[0];
 	} catch (_error) {
-		// Fallback without profileImageUrl if column doesn't exist
+		// Fallback without avatarUrl if column doesn't exist
 		const team = await db
 			.select({
 				id: teams.id,
@@ -177,7 +177,7 @@ async function fetchFirstTeam(supabaseUserId: string) {
 		}
 		return {
 			...team[0],
-			profileImageUrl: null as string | null,
+			avatarUrl: null as string | null,
 		};
 	}
 }

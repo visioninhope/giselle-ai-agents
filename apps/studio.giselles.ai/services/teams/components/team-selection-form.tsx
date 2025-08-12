@@ -61,7 +61,7 @@ export function TeamSelectionForm({
 						) : (
 							<>
 								<TeamAvatarImage
-									profileImageUrl={currentTeam.profileImageUrl}
+									avatarUrl={currentTeam.avatarUrl}
 									teamName={currentTeam.name}
 									width={24}
 									height={24}
@@ -93,7 +93,7 @@ export function TeamSelectionForm({
 							>
 								<div className="flex items-center gap-1.5 w-full">
 									<TeamAvatarImage
-										profileImageUrl={team.profileImageUrl}
+										avatarUrl={team.avatarUrl}
 										teamName={team.name}
 										width={24}
 										height={24}

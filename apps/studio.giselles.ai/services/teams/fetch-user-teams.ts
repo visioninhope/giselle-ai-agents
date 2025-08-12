@@ -14,14 +14,14 @@ import { getUser } from "@/lib/supabase";
 export async function fetchUserTeams() {
 	const user = await getUser();
 
-	// Try with profileImageUrl first, fallback if column doesn't exist
+	// Try with avatarUrl first, fallback if column doesn't exist
 	try {
 		const records = await db
 			.select({
 				id: teams.id,
 				dbId: teams.dbId,
 				name: teams.name,
-				profileImageUrl: teams.profileImageUrl,
+				avatarUrl: teams.avatarUrl,
 				type: teams.type,
 				activeSubscriptionId: subscriptions.id,
 				role: teamMemberships.role,
@@ -46,7 +46,7 @@ export async function fetchUserTeams() {
 		}
 		return records;
 	} catch (_error) {
-		// Fallback without profileImageUrl if column doesn't exist
+		// Fallback without avatarUrl if column doesn't exist
 		const records = await db
 			.select({
 				id: teams.id,
@@ -76,7 +76,7 @@ export async function fetchUserTeams() {
 		}
 		return records.map((record) => ({
 			...record,
-			profileImageUrl: null as string | null,
+			avatarUrl: null as string | null,
 		}));
 	}
 }
