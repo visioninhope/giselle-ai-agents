@@ -137,7 +137,7 @@ export async function updateTeamAvatar(teamId: TeamId, formData: FormData) {
 		const avatarUrl = await uploadAvatar(file, filePath);
 
 		// Delete old avatar if exists
-		await deleteOldAvatar(currentTeam.avatarUrl, avatarUrl);
+		await deleteOldAvatar(currentTeam.avatarUrl, filePath);
 
 		// Update database
 		await db.transaction(async (tx) => {

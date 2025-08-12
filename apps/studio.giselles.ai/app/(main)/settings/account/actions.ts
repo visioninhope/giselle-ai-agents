@@ -182,7 +182,7 @@ export async function updateAvatar(formData: FormData) {
 		const avatarUrl = await uploadAvatar(file, filePath);
 
 		// Delete old avatar if exists
-		await deleteOldAvatar(currentUser?.avatarUrl, avatarUrl);
+		await deleteOldAvatar(currentUser?.avatarUrl, filePath);
 
 		const userDbIdSubquery = db
 			.select({ userDbId: supabaseUserMappings.userDbId })

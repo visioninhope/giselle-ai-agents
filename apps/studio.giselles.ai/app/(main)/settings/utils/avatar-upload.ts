@@ -71,7 +71,7 @@ export async function deleteOldAvatar(
 	currentAvatarUrl: string | null | undefined,
 	newFilePath: string,
 ): Promise<void> {
-	if (!currentAvatarUrl || currentAvatarUrl === newFilePath) {
+	if (!currentAvatarUrl) {
 		return;
 	}
 
@@ -80,6 +80,11 @@ export async function deleteOldAvatar(
 		// From: https://xxx.supabase.co/storage/v1/object/public/public-assets/avatars/user-id.jpg
 		// To: avatars/user-id.jpg
 		const oldPath = currentAvatarUrl.split("/public-assets/")[1];
+
+		// Don't delete if it's the same file
+		if (oldPath === newFilePath) {
+			return;
+		}
 
 		if (oldPath) {
 			await publicStorage.removeItem(oldPath);
