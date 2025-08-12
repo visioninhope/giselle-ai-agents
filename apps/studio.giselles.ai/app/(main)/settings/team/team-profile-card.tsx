@@ -7,15 +7,15 @@ import { Button } from "../components/button";
 import { Card } from "../components/card";
 import { TeamProfileEditModal } from "./team-profile-edit-modal";
 
-interface TeamNameFormProps extends Team {
+interface TeamProfileCardProps extends Team {
 	avatarUrl?: string | null;
 }
 
-export function TeamNameForm({
+export function TeamProfileCard({
 	id: teamId,
 	name,
 	avatarUrl,
-}: TeamNameFormProps) {
+}: TeamProfileCardProps) {
 	const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
 	return (
