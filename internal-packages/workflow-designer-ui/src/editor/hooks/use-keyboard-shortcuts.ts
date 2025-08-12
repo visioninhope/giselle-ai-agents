@@ -20,114 +20,69 @@ const BROWSER_SHORTCUTS_TO_PREVENT = [
 	// { key: 'p', modifiers: ['meta', 'ctrl'] }, // Print
 ];
 
+// Custom hook for handling key actions with repeat prevention
+function useKeyAction(
+	key: string | string[],
+	action: () => void,
+	enabled: boolean = false,
+) {
+	const wasPressed = useRef(false);
+	const isPressed = useKeyPress(key, { actInsideInputWithModifier: false });
+
+	useEffect(() => {
+		if (isPressed && !wasPressed.current && enabled) {
+			action();
+		}
+		wasPressed.current = isPressed;
+	}, [isPressed, enabled, action]);
+}
+
 export function useKeyboardShortcuts() {
 	const duplicateNode = useDuplicateNode();
 	const toolbar = useToolbar();
 	const { data } = useWorkflowDesigner();
 	const { copy: handleCopy, paste: handlePaste } = useCopyPasteNode();
 
-	// Keep track of key press state to detect keydown (not held)
-	const wasPressed = useRef<{ [key: string]: boolean }>({
-		t: false,
-		i: false,
-		g: false,
-		r: false,
-		d: false,
-		escape: false,
-		modC: false,
-		modV: false,
-		modD: false,
-	});
-
-	// Use React Flow's useKeyPress hook with proper options
-	const tPressed = useKeyPress("t", { actInsideInputWithModifier: false });
-	const iPressed = useKeyPress("i", { actInsideInputWithModifier: false });
-	const gPressed = useKeyPress("g", { actInsideInputWithModifier: false });
-	const rPressed = useKeyPress("r", { actInsideInputWithModifier: false });
-	const dPressed = useKeyPress("d", { actInsideInputWithModifier: false });
-	const escapePressed = useKeyPress("Escape", {
-		actInsideInputWithModifier: false,
-	});
-
 	// Only use keyboard shortcuts when canvas is focused
 	const canUseShortcuts = data.ui.focusedArea === "canvas";
+	const canUseToolShortcuts = canUseShortcuts && !!toolbar;
 
-	// For modifier key shortcuts - conditionally use them
-	const modCPressed = useKeyPress(
-		canUseShortcuts ? ["Meta+c", "Control+c"] : null,
-		{ actInsideInputWithModifier: false },
+	// Tool shortcuts using the custom hook
+	useKeyAction(
+		"t",
+		() => toolbar?.setSelectedTool(selectTriggerTool()),
+		canUseToolShortcuts,
 	);
-	const modVPressed = useKeyPress(
-		canUseShortcuts ? ["Meta+v", "Control+v"] : null,
-		{ actInsideInputWithModifier: false },
+	useKeyAction(
+		"i",
+		() => toolbar?.setSelectedTool(selectSourceCategoryTool()),
+		canUseToolShortcuts,
 	);
-	const modDPressed = useKeyPress(
-		canUseShortcuts ? ["Meta+d", "Control+d"] : null,
-		{ actInsideInputWithModifier: false },
+	useKeyAction(
+		"g",
+		() => toolbar?.setSelectedTool(selectLanguageModelTool()),
+		canUseToolShortcuts,
+	);
+	useKeyAction(
+		"r",
+		() => toolbar?.setSelectedTool(selectRetrievalCategoryTool()),
+		canUseToolShortcuts,
+	);
+	useKeyAction(
+		"d",
+		() => toolbar?.setSelectedTool(selectActionTool()),
+		canUseToolShortcuts,
+	);
+	useKeyAction(
+		"Escape",
+		() => toolbar?.setSelectedTool(moveTool()),
+		canUseToolShortcuts,
 	);
 
-	// Handle tool shortcuts
-	useEffect(() => {
-		if (data.ui.focusedArea !== "canvas" || !toolbar) return;
-
-		if (tPressed && !wasPressed.current.t) {
-			toolbar.setSelectedTool(selectTriggerTool());
-		} else if (iPressed && !wasPressed.current.i) {
-			toolbar.setSelectedTool(selectSourceCategoryTool());
-		} else if (gPressed && !wasPressed.current.g) {
-			toolbar.setSelectedTool(selectLanguageModelTool());
-		} else if (rPressed && !wasPressed.current.r) {
-			toolbar.setSelectedTool(selectRetrievalCategoryTool());
-		} else if (dPressed && !wasPressed.current.d) {
-			toolbar.setSelectedTool(selectActionTool());
-		} else if (escapePressed && !wasPressed.current.escape) {
-			toolbar.setSelectedTool(moveTool());
-		}
-
-		// Update pressed state
-		wasPressed.current.t = tPressed;
-		wasPressed.current.i = iPressed;
-		wasPressed.current.g = gPressed;
-		wasPressed.current.r = rPressed;
-		wasPressed.current.d = dPressed;
-		wasPressed.current.escape = escapePressed;
-	}, [
-		tPressed,
-		iPressed,
-		gPressed,
-		rPressed,
-		dPressed,
-		escapePressed,
-		toolbar,
-		data.ui.focusedArea,
-	]);
-
-	// Handle copy/paste/duplicate shortcuts
-	useEffect(() => {
-		// Only handle shortcuts when canvas is focused
-		if (data.ui.focusedArea !== "canvas") return;
-
-		if (modCPressed && !wasPressed.current.modC) {
-			handleCopy();
-		} else if (modVPressed && !wasPressed.current.modV) {
-			handlePaste();
-		} else if (modDPressed && !wasPressed.current.modD) {
-			duplicateNode();
-		}
-
-		// Update pressed state
-		wasPressed.current.modC = modCPressed;
-		wasPressed.current.modV = modVPressed;
-		wasPressed.current.modD = modDPressed;
-	}, [
-		modCPressed,
-		modVPressed,
-		modDPressed,
-		handleCopy,
-		handlePaste,
-		duplicateNode,
-		data.ui.focusedArea,
-	]);
+	// Copy/Paste/Duplicate shortcuts
+	useKeyAction(["Meta+c", "Control+c"], handleCopy, canUseShortcuts);
+	useKeyAction(["Meta+v", "Control+v"], handlePaste, canUseShortcuts);
+	useKeyAction(["Meta+d", "Control+d"], duplicateNode, canUseShortcuts);
 
 	// Return handler for preventing browser default shortcuts
 	const handleKeyDown = useCallback(
