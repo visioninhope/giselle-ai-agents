@@ -19,13 +19,13 @@ import {
 	reconnectIdentity,
 } from "@/services/accounts";
 import { isTeamId } from "@/services/teams";
+import { deleteTeamMember } from "../team/actions";
 import {
 	deleteOldAvatar,
 	getExtensionFromMimeType,
 	uploadAvatar,
 	validateImageFile,
 } from "../utils/avatar-upload";
-import { deleteTeamMember } from "../team/actions";
 
 export async function connectGoogleIdentity() {
 	return await connectIdentity("google", "/settings/account/authentication");
@@ -179,7 +179,11 @@ export async function updateAvatar(formData: FormData) {
 		// Upload new avatar
 		const ext = getExtensionFromMimeType(validation.actualType!);
 		const filePath = `avatars/${supabaseUser.id}.${ext}`;
-		const avatarUrl = await uploadAvatar(file, filePath, validation.actualType!);
+		const avatarUrl = await uploadAvatar(
+			file,
+			filePath,
+			validation.actualType!,
+		);
 
 		// Delete old avatar if exists
 		await deleteOldAvatar(currentUser?.avatarUrl, avatarUrl);

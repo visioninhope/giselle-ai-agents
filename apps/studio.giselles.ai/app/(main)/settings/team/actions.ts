@@ -126,13 +126,19 @@ export async function updateTeamAvatar(teamId: TeamId, formData: FormData) {
 			);
 
 		if (!currentTeam) {
-			throw new Error("Team not found or you don't have permission to modify it");
+			throw new Error(
+				"Team not found or you don't have permission to modify it",
+			);
 		}
 
 		// Upload new avatar
 		const ext = getExtensionFromMimeType(validation.actualType!);
 		const filePath = `avatars/team_${teamId}.${ext}`;
-		const avatarUrl = await uploadAvatar(file, filePath, validation.actualType!);
+		const avatarUrl = await uploadAvatar(
+			file,
+			filePath,
+			validation.actualType!,
+		);
 
 		// Delete old avatar if exists
 		await deleteOldAvatar(currentTeam.avatarUrl, avatarUrl);

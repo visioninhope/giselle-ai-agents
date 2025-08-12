@@ -25,7 +25,8 @@ export async function validateImageFile(file: File): Promise<{
 	if (!IMAGE_CONSTRAINTS.formats.includes(file.type)) {
 		return {
 			valid: false,
-			error: "Invalid file format. Please upload a JPG, PNG, GIF, or WebP image.",
+			error:
+				"Invalid file format. Please upload a JPG, PNG, GIF, or WebP image.",
 		};
 	}
 

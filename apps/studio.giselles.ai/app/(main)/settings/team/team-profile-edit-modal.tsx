@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import type { teams } from "@/drizzle";
 import { TeamAvatarImage } from "@/services/teams/components/team-avatar-image";
 import { IMAGE_CONSTRAINTS } from "../constants";
-import { updateTeamName, updateTeamAvatar } from "./actions";
+import { updateTeamAvatar, updateTeamName } from "./actions";
 
 const ACCEPTED_FILE_TYPES = IMAGE_CONSTRAINTS.formats.join(",");
 
