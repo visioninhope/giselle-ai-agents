@@ -131,34 +131,8 @@ export async function updateTeamAvatar(teamId: TeamId, formData: FormData) {
 		}
 
 		const avatarUrl = await uploadAvatar(file, "team-avatars", teamId);
-		await db.transaction(async (tx) => {
-			const team = await tx
-				.select({ dbId: teams.dbId })
-				.from(teams)
-				.for("update")
-				.innerJoin(teamMemberships, eq(teams.dbId, teamMemberships.teamDbId))
-				.innerJoin(
-					supabaseUserMappings,
-					eq(teamMemberships.userDbId, supabaseUserMappings.userDbId),
-				)
-				.where(
-					and(
-						eq(supabaseUserMappings.supabaseUserId, user.id),
-						eq(teams.id, teamId),
-					),
-				);
 
-			if (team.length === 0) {
-				throw new Error(
-					"Team not found or you don't have permission to modify it",
-				);
-			}
-
-			await tx
-				.update(teams)
-				.set({ avatarUrl })
-				.where(eq(teams.dbId, team[0].dbId));
-		});
+		await db.update(teams).set({ avatarUrl }).where(eq(teams.id, teamId));
 
 		// Delete old avatar after successful DB update (failure is acceptable)
 		if (currentTeam.avatarUrl) {
