@@ -1,7 +1,7 @@
 import { useWorkflowDesigner } from "@giselle-sdk/giselle/react";
 import { useKeyPress } from "@xyflow/react";
 import { useCallback, useEffect, useRef } from "react";
-import { useCopyPasteNode, useDuplicateNode } from "../node";
+import { useNodeManipulation } from "../node";
 import {
 	moveTool,
 	selectActionTool,
@@ -38,10 +38,13 @@ function useKeyAction(
 }
 
 export function useKeyboardShortcuts() {
-	const duplicateNode = useDuplicateNode();
 	const toolbar = useToolbar();
 	const { data } = useWorkflowDesigner();
-	const { copy: handleCopy, paste: handlePaste } = useCopyPasteNode();
+	const {
+		copy: handleCopy,
+		paste: handlePaste,
+		duplicate: handleDuplicate,
+	} = useNodeManipulation();
 
 	// Only use keyboard shortcuts when canvas is focused
 	const canUseShortcuts = data.ui.focusedArea === "canvas";
@@ -82,7 +85,7 @@ export function useKeyboardShortcuts() {
 	// Copy/Paste/Duplicate shortcuts
 	useKeyAction(["Meta+c", "Control+c"], handleCopy, canUseShortcuts);
 	useKeyAction(["Meta+v", "Control+v"], handlePaste, canUseShortcuts);
-	useKeyAction(["Meta+d", "Control+d"], duplicateNode, canUseShortcuts);
+	useKeyAction(["Meta+d", "Control+d"], handleDuplicate, canUseShortcuts);
 
 	// Return handler for preventing browser default shortcuts
 	const handleKeyDown = useCallback(
