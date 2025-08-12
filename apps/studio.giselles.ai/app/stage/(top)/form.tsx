@@ -23,6 +23,19 @@ interface TeamOption {
 	label: string;
 }
 
+type FilterType = "all" | "history" | "latest" | "favorites";
+interface FilterOption {
+	value: FilterType;
+	label: string;
+}
+
+const filterOptions: FilterOption[] = [
+	{ value: "all", label: "All" },
+	{ value: "history", label: "History" },
+	{ value: "latest", label: "Latest" },
+	{ value: "favorites", label: "Favorites" },
+];
+
 export interface FlowTriggerUIItem {
 	id: FlowTriggerId;
 	teamId: TeamId;
@@ -59,6 +72,7 @@ export function Form({
 	const [selectedFlowTriggerId, setSelectedFlowTriggerId] = useState<
 		FlowTriggerId | undefined
 	>(undefined);
+	const [selectedFilter, setSelectedFilter] = useState<FilterType>("all");
 
 	const [validationErrors, setValidationErrors] = useState<
 		Record<string, string>
@@ -130,7 +144,7 @@ export function Form({
 	return (
 		<div className="max-w-[800px] mx-auto space-y-0">
 			{/* Team Selection Container */}
-			<div className="flex justify-end">
+			<div className="flex justify-end gap-2">
 				<div
 					style={{
 						width: "fit-content",
@@ -142,18 +156,23 @@ export function Form({
 					<style
 						dangerouslySetInnerHTML={{
 							__html: `
-              .team-select button[type="button"] {
-                background-color: rgba(255, 255, 255, 0.05) !important;
-                border: none !important;
-                color: white !important;
-              }
-              .team-select button[type="button"]:hover {
-                background-color: rgba(255, 255, 255, 0.1) !important;
-              }
-              .team-select button[type="button"] svg {
-                margin-left: 8px !important;
-              }
-            `,
+			              .team-select button[type="button"], .filter-select button[type="button"] {
+			                background-color: rgba(255, 255, 255, 0.05) !important;
+			                border: none !important;
+			                color: white !important;
+			                font-size: 14px !important;
+			                font-family: inherit !important;
+			              }
+			              .team-select button[type="button"]:hover, .filter-select button[type="button"]:hover {
+			                background-color: rgba(255, 255, 255, 0.1) !important;
+			              }
+			              .team-select button[type="button"] svg, .filter-select button[type="button"] svg {
+			                margin-left: 8px !important;
+			              }
+			              .team-select [role="option"], .filter-select [role="option"] {
+			                font-size: 14px !important;
+			              }
+			            `,
 						}}
 					/>
 					<div className="team-select">
@@ -167,9 +186,20 @@ export function Form({
 								setSelectedTeamId(value as TeamId);
 								setSelectedFlowTriggerId(undefined);
 							}}
-							widthClassName="[&>button]:text-[12px] [&>button]:px-2 [&>button]:py-1 [&>button]:rounded-sm [&>button]:gap-2"
+							widthClassName="[&>button]:text-[14px] [&>button]:px-2 [&>button]:py-1 [&>button]:rounded-sm [&>button]:gap-2"
 						/>
 					</div>
+				</div>
+				<div className="filter-select">
+					<Select
+						id="filter"
+						placeholder="Filter"
+						options={filterOptions}
+						renderOption={(o) => o.label}
+						value={selectedFilter}
+						onValueChange={(value) => setSelectedFilter(value as FilterType)}
+						widthClassName="[&>button]:text-[14px] [&>button]:px-2 [&>button]:py-1 [&>button]:rounded-sm [&>button]:gap-2"
+					/>
 				</div>
 			</div>
 
