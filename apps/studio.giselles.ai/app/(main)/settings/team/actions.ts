@@ -133,7 +133,7 @@ export async function updateTeamAvatar(teamId: TeamId, formData: FormData) {
 
 		// Upload new avatar
 		const ext = getExtensionFromMimeType(file.type);
-		const filePath = `avatars/team_${teamId}.${ext}`;
+		const filePath = `team-avatars/${teamId}.${ext}`;
 		const avatarUrl = await uploadAvatar(file, filePath);
 
 		// Delete old avatar if exists
