@@ -25,20 +25,15 @@ function useKeyAction(
 	key: string | string[],
 	action: () => void,
 	enabled: boolean = false,
+	useKeyPressOptions: { actInsideInputWithModifier?: boolean } = {
+		actInsideInputWithModifier: false,
+	},
 ) {
 	const wasPressed = useRef(false);
-	const isPressed = useKeyPress(key, { actInsideInputWithModifier: false });
+	const isPressed = useKeyPress(key, useKeyPressOptions);
 
 	useEffect(() => {
-		console.log("useKeyAction debug:", {
-			key,
-			isPressed,
-			wasPressed: wasPressed.current,
-			enabled,
-			shouldTrigger: isPressed && !wasPressed.current && enabled,
-		});
 		if (isPressed && !wasPressed.current && enabled) {
-			console.log("Triggering action for key:", key);
 			action();
 		}
 		wasPressed.current = isPressed;
@@ -66,12 +61,6 @@ export function useKeyboardShortcuts(
 	const canUseToolShortcuts = canUseShortcuts && !!toolbar;
 	// Properties panel shortcuts
 	const canUsePropertiesShortcuts = data.ui.focusedArea === "properties-panel";
-
-	console.log("Keyboard shortcuts state:", {
-		focusedArea: data.ui.focusedArea,
-		canUsePropertiesShortcuts,
-		hasOnGenerate: !!onGenerate,
-	});
 
 	// Tool shortcuts using the custom hook
 	useKeyAction(
@@ -105,35 +94,13 @@ export function useKeyboardShortcuts(
 		canUseToolShortcuts,
 	);
 
-	// Generate shortcut for properties panel (special case with different options)
-	const wasGeneratePressed = useRef(false);
-	const isGeneratePressed = useKeyPress(["Meta+Enter", "Control+Enter"], {
-		actInsideInputWithModifier: true, // Allow inside input fields for properties panel
-	});
-
-	useEffect(() => {
-		console.log("Generate key debug:", {
-			isGeneratePressed,
-			wasGeneratePressed: wasGeneratePressed.current,
-			canUsePropertiesShortcuts,
-			hasOnGenerate: !!onGenerate,
-			shouldTrigger:
-				isGeneratePressed &&
-				!wasGeneratePressed.current &&
-				canUsePropertiesShortcuts &&
-				!!onGenerate,
-		});
-		if (
-			isGeneratePressed &&
-			!wasGeneratePressed.current &&
-			canUsePropertiesShortcuts &&
-			!!onGenerate
-		) {
-			console.log("Generate shortcut triggered");
-			onGenerate?.();
-		}
-		wasGeneratePressed.current = isGeneratePressed;
-	}, [isGeneratePressed, canUsePropertiesShortcuts, onGenerate]);
+	// Generate shortcut for properties panel
+	useKeyAction(
+		["Meta+Enter", "Control+Enter"],
+		() => onGenerate?.(),
+		canUsePropertiesShortcuts && !!onGenerate,
+		{ actInsideInputWithModifier: true }, // Allow inside input fields for properties panel
+	);
 
 	// Copy/Paste/Duplicate shortcuts
 	useKeyAction(["Meta+c", "Control+c"], handleCopy, canUseShortcuts);
