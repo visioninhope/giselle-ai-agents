@@ -14,13 +14,12 @@ export function getExtensionFromMimeType(mimeType: string): string {
 }
 
 /**
- * Validate image file including MIME type, size, and magic bytes
+ * Validate image file MIME type and size
  */
-export async function validateImageFile(file: File): Promise<{
+export function validateImageFile(file: File): {
 	valid: boolean;
 	error?: string;
-	actualType?: string;
-}> {
+} {
 	// Validate MIME type
 	if (!IMAGE_CONSTRAINTS.formats.includes(file.type)) {
 		return {
@@ -38,46 +37,8 @@ export async function validateImageFile(file: File): Promise<{
 		};
 	}
 
-	// Server-side MIME type validation using file buffer
-	const buffer = await file.arrayBuffer();
-	const bytes = new Uint8Array(buffer);
-
-	// Check magic bytes for actual file type
-	let actualType: string | null = null;
-	if (bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff) {
-		actualType = "image/jpeg";
-	} else if (
-		bytes[0] === 0x89 &&
-		bytes[1] === 0x50 &&
-		bytes[2] === 0x4e &&
-		bytes[3] === 0x47
-	) {
-		actualType = "image/png";
-	} else if (bytes[0] === 0x47 && bytes[1] === 0x49 && bytes[2] === 0x46) {
-		actualType = "image/gif";
-	} else if (
-		bytes[0] === 0x52 &&
-		bytes[1] === 0x49 &&
-		bytes[2] === 0x46 &&
-		bytes[3] === 0x46 &&
-		bytes[8] === 0x57 &&
-		bytes[9] === 0x45 &&
-		bytes[10] === 0x42 &&
-		bytes[11] === 0x50
-	) {
-		actualType = "image/webp";
-	}
-
-	if (!actualType || !IMAGE_CONSTRAINTS.formats.includes(actualType)) {
-		return {
-			valid: false,
-			error: "File content does not match allowed image types.",
-		};
-	}
-
 	return {
 		valid: true,
-		actualType,
 	};
 }
 
@@ -87,13 +48,12 @@ export async function validateImageFile(file: File): Promise<{
 export async function uploadAvatar(
 	file: File,
 	filePath: string,
-	actualType: string,
 ): Promise<string> {
 	const arrayBuffer = await file.arrayBuffer();
 	const buffer = Buffer.from(arrayBuffer);
 
 	await publicStorage.setItemRaw(filePath, buffer, {
-		contentType: actualType,
+		contentType: file.type,
 	});
 
 	const avatarUrl = await publicStorage.getItem(filePath, {

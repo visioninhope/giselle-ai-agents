@@ -162,7 +162,7 @@ export async function updateAvatar(formData: FormData) {
 		}
 
 		// Validate the image file
-		const validation = await validateImageFile(file);
+		const validation = validateImageFile(file);
 		if (!validation.valid) {
 			throw new Error(validation.error);
 		}
@@ -177,12 +177,9 @@ export async function updateAvatar(formData: FormData) {
 			.where(eq(supabaseUserMappings.supabaseUserId, supabaseUser.id));
 
 		// Upload new avatar
-		if (!validation.actualType) {
-			throw new Error("Unable to determine file type");
-		}
-		const ext = getExtensionFromMimeType(validation.actualType);
+		const ext = getExtensionFromMimeType(file.type);
 		const filePath = `avatars/${supabaseUser.id}.${ext}`;
-		const avatarUrl = await uploadAvatar(file, filePath, validation.actualType);
+		const avatarUrl = await uploadAvatar(file, filePath);
 
 		// Delete old avatar if exists
 		await deleteOldAvatar(currentUser?.avatarUrl, avatarUrl);
