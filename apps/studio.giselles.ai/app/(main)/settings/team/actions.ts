@@ -132,13 +132,12 @@ export async function updateTeamAvatar(teamId: TeamId, formData: FormData) {
 		}
 
 		// Upload new avatar
-		const ext = getExtensionFromMimeType(validation.actualType!);
+		if (!validation.actualType) {
+			throw new Error("Unable to determine file type");
+		}
+		const ext = getExtensionFromMimeType(validation.actualType);
 		const filePath = `avatars/team_${teamId}.${ext}`;
-		const avatarUrl = await uploadAvatar(
-			file,
-			filePath,
-			validation.actualType!,
-		);
+		const avatarUrl = await uploadAvatar(file, filePath, validation.actualType);
 
 		// Delete old avatar if exists
 		await deleteOldAvatar(currentTeam.avatarUrl, avatarUrl);
