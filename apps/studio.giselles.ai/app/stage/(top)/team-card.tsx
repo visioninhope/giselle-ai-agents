@@ -13,8 +13,8 @@ export function TeamCard({ team }: TeamCardProps) {
 		<div
 			className="bg-[var(--color-stage-form-background)] border border-white/10 p-3"
 			style={{
-				width: "96px",
-				height: "128px",
+				width: "90px",
+				height: "120px",
 				borderRadius: "4px 4px 16px 4px",
 				backgroundClip: "padding-box",
 				overflow: "hidden",
@@ -37,8 +37,8 @@ export function TeamCard({ team }: TeamCardProps) {
 					<div
 						className="bg-gray-600 rounded-sm overflow-hidden flex items-center justify-center"
 						style={{
-							width: "72px",
-							height: "72px",
+							width: "66px",
+							height: "66px",
 						}}
 					>
 						{team?.profileImageUrl ? (

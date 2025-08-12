@@ -128,7 +128,7 @@ export function Form({
 	);
 
 	return (
-		<div className="max-w-[800px] mx-auto space-y-6">
+		<div className="max-w-[800px] mx-auto space-y-0">
 			{/* Team Selection Container */}
 			<div className="flex justify-end">
 				<div
