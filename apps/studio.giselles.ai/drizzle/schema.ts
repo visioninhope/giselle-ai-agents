@@ -58,7 +58,7 @@ export const teams = pgTable("teams", {
 	id: text("id").$type<TeamId>().notNull().unique(),
 	dbId: serial("db_id").primaryKey(),
 	name: text("name").notNull(),
-	profileImageUrl: text("profile_image_url"),
+	avatarUrl: text("avatar_url"),
 	createdAt: timestamp("created_at").defaultNow().notNull(),
 	updatedAt: timestamp("updated_at")
 		.defaultNow()
