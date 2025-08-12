@@ -8,13 +8,13 @@ import { Card } from "../components/card";
 import { TeamProfileEditModal } from "./team-profile-edit-modal";
 
 interface TeamNameFormProps extends Team {
-	profileImageUrl?: string | null;
+	avatarUrl?: string | null;
 }
 
 export function TeamNameForm({
 	id: teamId,
 	name,
-	profileImageUrl,
+	avatarUrl,
 }: TeamNameFormProps) {
 	const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
@@ -44,7 +44,7 @@ export function TeamNameForm({
 				{/* Team profile image */}
 				<div className="relative h-[48px] w-[48px] rounded-full overflow-hidden">
 					<TeamAvatarImage
-						profileImageUrl={profileImageUrl}
+						avatarUrl={avatarUrl}
 						teamName={name}
 						width={48}
 						height={48}
@@ -72,7 +72,7 @@ export function TeamNameForm({
 				onClose={() => setIsEditModalOpen(false)}
 				teamId={teamId}
 				teamName={name}
-				profileImageUrl={profileImageUrl}
+				avatarUrl={avatarUrl}
 				alt={name}
 				onSuccess={() => {
 					// Refresh the page to show updated data

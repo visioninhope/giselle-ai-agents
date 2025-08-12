@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import type { teams } from "@/drizzle";
 import { TeamAvatarImage } from "@/services/teams/components/team-avatar-image";
 import { IMAGE_CONSTRAINTS } from "../constants";
-import { updateTeamName, updateTeamProfileImage } from "./actions";
+import { updateTeamName, updateTeamAvatar } from "./actions";
 
 const ACCEPTED_FILE_TYPES = IMAGE_CONSTRAINTS.formats.join(",");
 
@@ -24,7 +24,7 @@ interface TeamProfileEditModalProps {
 	onClose: () => void;
 	teamId: typeof teams.$inferSelect.id;
 	teamName: typeof teams.$inferSelect.name;
-	profileImageUrl?: typeof teams.$inferSelect.profileImageUrl;
+	avatarUrl?: typeof teams.$inferSelect.avatarUrl;
 	alt?: string;
 	onSuccess?: () => void;
 }
@@ -34,7 +34,7 @@ export function TeamProfileEditModal({
 	onClose,
 	teamId,
 	teamName: initialTeamName,
-	profileImageUrl: initialProfileImageUrl,
+	avatarUrl: initialAvatarUrl,
 	alt,
 	onSuccess,
 }: TeamProfileEditModalProps) {
@@ -166,15 +166,15 @@ export function TeamProfileEditModal({
 				promises.push(updateTeamName(teamId, formData));
 			}
 
-			// Update profile image if changed
+			// Update avatar if changed
 			if (selectedProfileImageFile) {
 				const formData = new FormData();
 				formData.append(
-					"profileImage",
+					"avatar",
 					selectedProfileImageFile,
 					selectedProfileImageFile.name,
 				);
-				promises.push(updateTeamProfileImage(teamId, formData));
+				promises.push(updateTeamAvatar(teamId, formData));
 			}
 
 			// Wait for all updates to complete
@@ -288,7 +288,7 @@ export function TeamProfileEditModal({
 												className="group relative w-[80px] h-[80px] rounded-full overflow-hidden cursor-pointer focus:outline-none focus:ring-0 border border-primary-100/20 hover:before:content-[''] hover:before:absolute hover:before:inset-0 hover:before:bg-black-900/40 hover:before:z-10"
 											>
 												<TeamAvatarImage
-													profileImageUrl={initialProfileImageUrl}
+													avatarUrl={initialAvatarUrl}
 													teamName={initialTeamName || "Team"}
 													width={80}
 													height={80}

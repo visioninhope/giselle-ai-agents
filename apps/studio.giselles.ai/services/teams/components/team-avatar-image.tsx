@@ -4,23 +4,23 @@ import type { teams } from "@/drizzle";
 import { cn } from "@/lib/utils";
 
 export function TeamAvatarImage({
-	profileImageUrl,
+	avatarUrl,
 	teamName,
 	width,
 	height,
 	className = "",
 	alt = "",
 }: {
-	profileImageUrl?: typeof teams.$inferSelect.profileImageUrl;
+	avatarUrl?: typeof teams.$inferSelect.avatarUrl;
 	teamName: string;
 	width: number;
 	height: number;
 	className?: string;
 	alt?: string;
 }) {
-	return profileImageUrl ? (
+	return avatarUrl ? (
 		<Image
-			src={profileImageUrl}
+			src={avatarUrl}
 			width={width}
 			height={height}
 			alt={alt || teamName}
