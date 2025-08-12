@@ -6,7 +6,7 @@ import { PoolManager } from "../../database/postgres";
 import { ensurePgVectorTypes } from "../../database/postgres/pgvector-registry";
 import type { DatabaseConfig } from "../../database/types";
 import type { EmbedderFunction } from "../../embedder";
-import { createDefaultEmbedder } from "../../embedder";
+import { createOpenAIEmbedder } from "../../embedder";
 import {
 	ConfigurationError,
 	DatabaseError,
@@ -116,7 +116,22 @@ export function createPostgresQueryService<
 		}
 
 		try {
-			const embedder = config.embedder || createDefaultEmbedder(telemetry);
+			// Use provided embedder or fall back to default OpenAI text-embedding-3-small
+			const embedder =
+				config.embedder ||
+				(() => {
+					const apiKey = process.env.OPENAI_API_KEY;
+					if (!apiKey) {
+						throw new ConfigurationError(
+							"OPENAI_API_KEY environment variable is required when no embedder is provided",
+						);
+					}
+					return createOpenAIEmbedder({
+						model: "text-embedding-3-small",
+						apiKey,
+						telemetry,
+					});
+				})();
 			const queryEmbedding = await embedder.embed(query);
 			const filters = await config.contextToFilter(context);
 
