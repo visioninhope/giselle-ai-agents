@@ -9,6 +9,7 @@ import clsx from "clsx/lite";
 import type { InferSelectModel } from "drizzle-orm";
 import { useActionState, useCallback, useMemo, useState } from "react";
 import type { teams } from "@/drizzle";
+import { CircularCarousel } from "./circular-carousel";
 import {
 	createInputsFromTrigger,
 	parseFormInputs,
@@ -57,7 +58,7 @@ export function Form({
 	);
 	const [selectedFlowTriggerId, setSelectedFlowTriggerId] = useState<
 		FlowTriggerId | undefined
-	>(defaultSelectedFlowTriggerId);
+	>(undefined);
 
 	const [validationErrors, setValidationErrors] = useState<
 		Record<string, string>
@@ -162,9 +163,11 @@ export function Form({
 							options={teamOptions}
 							renderOption={(o) => o.label}
 							value={selectedTeamId}
-							onValueChange={(value) => setSelectedTeamId(value as TeamId)}
-							className="[&>button]:text-[12px] [&>button]:px-2 [&>button]:py-1 [&>button]:rounded-sm [&>button]:gap-2"
-							style={{ width: "fit-content", minWidth: "auto" } as any}
+							onValueChange={(value) => {
+								setSelectedTeamId(value as TeamId);
+								setSelectedFlowTriggerId(undefined);
+							}}
+							widthClassName="[&>button]:text-[12px] [&>button]:px-2 [&>button]:py-1 [&>button]:rounded-sm [&>button]:gap-2"
 						/>
 					</div>
 				</div>
@@ -172,138 +175,141 @@ export function Form({
 
 			{/* App Selection Container */}
 			<div>
-				<div className="flex gap-4 overflow-x-auto pb-2">
-					{filteredFlowTriggers.map((trigger) => (
-						<div key={trigger.id} className="flex-shrink-0">
-							<button
-								type="button"
-								onClick={() => setSelectedFlowTriggerId(trigger.id)}
-								className={`transition-all duration-200 ${
-									selectedFlowTriggerId === trigger.id
-										? "ring-2 ring-blue-400"
-										: "hover:ring-1 hover:ring-white/20"
-								}`}
-							>
-								<TeamCard
-									team={{
-										id: trigger.id,
-										name: trigger.workspaceName,
-										profileImageUrl: undefined, // TODO: Add app image when available
-									}}
-								/>
-							</button>
-						</div>
-					))}
-				</div>
-			</div>
-			<form
-				action={action}
-				className="bg-[var(--color-stage-form-background)] rounded-xl border border-white/10 p-4 text-[14px] text-text resize-none outline-none"
-				style={{
-					boxShadow: `
-            0 4px 12px rgba(0, 0, 0, 0.15),
-            0 2px 4px rgba(0, 0, 0, 0.1),
-            inset 0 -1px 4px -2px rgba(35, 133, 255, 0.1),
-            inset 0 -4px 20px -6px rgba(255, 255, 255, 0.08),
-            inset 0 -8px 30px -8px rgba(102, 148, 255, 0.15),
-            inset 0 -15px 50px -20px rgba(20, 76, 205, 1)
-          `,
-				}}
-			>
-				<div
-					className="absolute inset-x-0 bottom-0 h-[2px] rounded-b-xl"
-					style={{
-						background:
-							"linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.6), transparent)",
-						filter: "blur(1px)",
+				<CircularCarousel
+					items={filteredFlowTriggers.map((trigger) => ({
+						id: trigger.id,
+						name: trigger.workspaceName,
+						profileImageUrl: undefined,
+					}))}
+					selectedId={selectedFlowTriggerId}
+					onItemSelect={(item) => {
+						setSelectedFlowTriggerId(item.id);
+					}}
+					onItemDeselect={() => {
+						setSelectedFlowTriggerId(undefined);
 					}}
 				/>
-				<div className="flex flex-col gap-[8px] mb-[8px]">
-					{inputs.map((input) => {
-						return (
-							<fieldset key={input.name} className={clsx("grid gap-2")}>
-								<label
-									className="text-[14px] font-medium text-white-900"
-									htmlFor={input.name}
-								>
-									{input.label}
-									{input.required && (
-										<span className="text-red-500 ml-1">*</span>
-									)}
-								</label>
-								{input.type === "text" && (
-									<input
-										type="text"
-										name={input.name}
-										id={input.name}
-										className={clsx(
-											"w-full flex justify-between items-center rounded-[8px] py-[8px] px-[12px] outline-none focus:outline-none border",
-											validationErrors[input.name]
-												? "border-error"
-												: "border-white/5",
-											"text-[14px]",
+			</div>
+			{filteredFlowTriggers.length > 0 && (
+				<form
+					action={action}
+					className="bg-[var(--color-stage-form-background)] rounded-xl border border-white/10 p-4 text-[14px] text-text resize-none outline-none"
+					style={{
+						boxShadow: `
+              0 4px 12px rgba(0, 0, 0, 0.15),
+              0 2px 4px rgba(0, 0, 0, 0.1),
+              inset 0 -1px 4px -2px rgba(35, 133, 255, 0.1),
+              inset 0 1px 4px -2px rgba(35, 133, 255, 0.1),
+              inset 0 -8px 30px -8px rgba(102, 148, 255, 0.15),
+              inset 0 -15px 50px -20px rgba(20, 76, 205, 1)
+            `,
+					}}
+				>
+					<div
+						className="absolute inset-x-0 bottom-0 h-[2px] rounded-b-xl"
+						style={{
+							background:
+								"linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.6), transparent)",
+							filter: "blur(1px)",
+						}}
+					/>
+					<div className="flex flex-col gap-[8px] mb-[8px]">
+						{selectedFlowTriggerId === undefined ? (
+							<div className="text-center py-8">
+								<p className="text-white-400 text-[14px] font-medium font-['DM_Sans']">
+									Please select an app to execute
+								</p>
+							</div>
+						) : (
+							inputs.map((input) => {
+								return (
+									<fieldset key={input.name} className={clsx("grid gap-2")}>
+										<label
+											className="text-[14px] font-medium text-white-900"
+											htmlFor={input.name}
+										>
+											{input.label}
+											{input.required && (
+												<span className="text-red-500 ml-1">*</span>
+											)}
+										</label>
+										{input.type === "text" && (
+											<input
+												type="text"
+												name={input.name}
+												id={input.name}
+												className={clsx(
+													"w-full flex justify-between items-center rounded-[8px] py-[8px] px-[12px] outline-none focus:outline-none border",
+													validationErrors[input.name]
+														? "border-error"
+														: "border-white/5",
+													"text-[14px]",
+												)}
+												disabled={isPending}
+											/>
 										)}
-										disabled={isPending}
-									/>
-								)}
-								{input.type === "multiline-text" && (
-									<textarea
-										name={input.name}
-										id={input.name}
-										className={clsx(
-											"w-full flex justify-between items-center rounded-[8px] py-[8px] px-[12px] outline-none focus:outline-none",
-											"border-[1px]",
-											validationErrors[input.name]
-												? "border-error"
-												: "border-white/5",
-											"text-[14px]",
+										{input.type === "multiline-text" && (
+											<textarea
+												name={input.name}
+												id={input.name}
+												className={clsx(
+													"w-full flex justify-between items-center rounded-[8px] py-[8px] px-[12px] outline-none focus:outline-none",
+													"border-[1px]",
+													validationErrors[input.name]
+														? "border-error"
+														: "border-white/5",
+													"text-[14px]",
+												)}
+												rows={4}
+												disabled={isPending}
+											/>
 										)}
-										rows={4}
-										disabled={isPending}
-									/>
-								)}
-								{input.type === "number" && (
-									<input
-										type="number"
-										name={input.name}
-										id={input.name}
-										className={clsx(
-											"w-full flex justify-between items-center rounded-[8px] py-[8px] px-[12px] outline-none focus:outline-none",
-											"border-[1px]",
-											validationErrors[input.name]
-												? "border-error"
-												: "border-white/5",
-											"text-[14px]",
+										{input.type === "number" && (
+											<input
+												type="number"
+												name={input.name}
+												id={input.name}
+												className={clsx(
+													"w-full flex justify-between items-center rounded-[8px] py-[8px] px-[12px] outline-none focus:outline-none",
+													"border-[1px]",
+													validationErrors[input.name]
+														? "border-error"
+														: "border-white/5",
+													"text-[14px]",
+												)}
+												disabled={isPending}
+											/>
 										)}
-										disabled={isPending}
-									/>
-								)}
-								{validationErrors[input.name] && (
-									<span className="text-error text-[12px] font-medium">
-										{validationErrors[input.name]}
-									</span>
-								)}
-							</fieldset>
-						);
-					})}
-				</div>
-				<div className="flex items-center justify-end gap-3">
-					<Button
-						variant="filled"
-						size="large"
-						type="submit"
-						disabled={isPending}
-						className="!bg-blue-600 hover:!bg-blue-700 !border-blue-600 hover:!border-blue-700 [&_div]:text-[14px] [&_.size-[18px]]:text-[18px]"
-						leftIcon={
-							isPending && (
-								<SpinnerIcon className="animate-follow-through-overlap-spin size-[18px]" />
-							)
-						}
-					>
-						{isPending ? "Setting the stage…" : "Start"}
-					</Button>
-				</div>
-			</form>
+										{validationErrors[input.name] && (
+											<span className="text-error text-[12px] font-medium">
+												{validationErrors[input.name]}
+											</span>
+										)}
+									</fieldset>
+								);
+							})
+						)}
+					</div>
+					{selectedFlowTriggerId !== undefined && (
+						<div className="flex items-center justify-end gap-3">
+							<Button
+								variant="filled"
+								size="large"
+								type="submit"
+								disabled={isPending}
+								className="!bg-blue-600 hover:!bg-blue-700 !border-blue-600 hover:!border-blue-700 [&_div]:text-[14px] [&_.size-[18px]]:text-[18px]"
+								leftIcon={
+									isPending && (
+										<SpinnerIcon className="animate-follow-through-overlap-spin size-[18px]" />
+									)
+								}
+							>
+								{isPending ? "Setting the stage…" : "Start"}
+							</Button>
+						</div>
+					)}
+				</form>
+			)}
 		</div>
 	);
 }

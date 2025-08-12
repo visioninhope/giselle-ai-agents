@@ -1,8 +1,25 @@
 "use client";
 
-import { ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+	ChevronDown,
+	ChevronLeft,
+	ChevronRight,
+	ChevronUp,
+} from "lucide-react";
 import { useState } from "react";
 import { TeamCard } from "./team-card";
+
+// Add keyframes for gentle pulse animation
+const pulseKeyframes = `
+  @keyframes gentle-pulse {
+    0%, 100% {
+      opacity: 0.8;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+`;
 
 interface CarouselItem {
 	id: string;
@@ -14,17 +31,23 @@ interface CircularCarouselProps {
 	items: CarouselItem[];
 	selectedId?: string;
 	onItemSelect?: (item: CarouselItem) => void;
+	onItemDeselect?: () => void;
 }
 
 export function CircularCarousel({
 	items,
 	selectedId: _selectedId,
 	onItemSelect,
+	onItemDeselect,
 }: CircularCarouselProps) {
 	const [currentIndex, setCurrentIndex] = useState(
 		Math.floor(items.length / 2),
 	);
 	const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+	const [rejectIndex, setRejectIndex] = useState<number | null>(null);
+	const [insertedIndex, setInsertedIndex] = useState<number | null>(null);
+	const [animatingIndex, setAnimatingIndex] = useState<number | null>(null);
+	const [animatingUpIndex, setAnimatingUpIndex] = useState<number | null>(null);
 
 	// Drag state
 	const [isDragging, setIsDragging] = useState(false);
@@ -100,6 +123,10 @@ export function CircularCarousel({
 		if (currentIndex > 0) {
 			setCurrentIndex(currentIndex - 1);
 			setSelectedIndex(null);
+			setRejectIndex(null);
+			setInsertedIndex(null);
+			setAnimatingIndex(null);
+			setAnimatingUpIndex(null);
 		}
 	};
 
@@ -107,21 +134,64 @@ export function CircularCarousel({
 		if (currentIndex < items.length - 1) {
 			setCurrentIndex(currentIndex + 1);
 			setSelectedIndex(null);
+			setRejectIndex(null);
+			setInsertedIndex(null);
+			setAnimatingIndex(null);
+			setAnimatingUpIndex(null);
 		}
 	};
 
 	// Handle card click
 	const handleCardClick = (originalIndex: number, isCenter: boolean) => {
 		if (isCenter) {
-			// Toggle selection for center card
-			setSelectedIndex(selectedIndex === originalIndex ? null : originalIndex);
-			if (onItemSelect) {
-				onItemSelect(items[originalIndex]);
+			if (insertedIndex === originalIndex) {
+				// Click on inserted card: start slide up animation
+				setAnimatingUpIndex(originalIndex);
+				setInsertedIndex(null);
+				setRejectIndex(null);
+
+				// Call deselect callback
+				if (onItemDeselect) {
+					onItemDeselect();
+				}
+
+				// Complete slide up animation
+				setTimeout(() => {
+					setAnimatingUpIndex(null);
+				}, 600);
+			} else {
+				// First click: show blue selection frame immediately
+				setSelectedIndex(originalIndex);
+				setRejectIndex(null);
+				setInsertedIndex(null);
+				setAnimatingIndex(null);
+				setAnimatingUpIndex(null);
+
+				if (onItemSelect) {
+					onItemSelect(items[originalIndex]);
+				}
+
+				// Brief delay to show selection state, then start slide down animation
+				setTimeout(() => {
+					setAnimatingIndex(originalIndex);
+					setSelectedIndex(null);
+
+					// Start slide down animation
+					setTimeout(() => {
+						setInsertedIndex(originalIndex);
+						setRejectIndex(originalIndex);
+						setAnimatingIndex(null);
+					}, 600);
+				}, 300); // Show selection state for 300ms before animation
 			}
 		} else {
 			// Move clicked card to center
 			setCurrentIndex(originalIndex);
 			setSelectedIndex(null);
+			setRejectIndex(null);
+			setInsertedIndex(null);
+			setAnimatingIndex(null);
+			setAnimatingUpIndex(null);
 		}
 	};
 
@@ -177,11 +247,29 @@ export function CircularCarousel({
 	const visibleCardsList = getVisibleCards();
 	const centerCard = visibleCardsList.find((card) => card.positionIndex === 0);
 
+	// Show empty state when no items available
+	if (items.length === 0) {
+		return (
+			<div
+				className="relative w-full overflow-hidden flex items-center justify-center"
+				style={{ height: "250px" }}
+			>
+				<div className="text-center">
+					<p className="text-white-400 text-[14px] font-medium font-['DM_Sans']">
+						No executable apps available. Please select a different team or
+						create a new app.
+					</p>
+				</div>
+			</div>
+		);
+	}
+
 	return (
 		<div
 			className="relative w-full overflow-hidden"
 			style={{ height: "250px" }}
 		>
+			<style dangerouslySetInnerHTML={{ __html: pulseKeyframes }} />
 			{/* Carousel container */}
 			<div
 				className="relative w-full h-full flex items-center justify-center cursor-grab active:cursor-grabbing"
@@ -199,26 +287,45 @@ export function CircularCarousel({
 			>
 				{visibleCardsList.map(({ item, originalIndex, positionIndex }) => {
 					const position = getCardPosition(positionIndex);
+					const isAnimating =
+						animatingIndex === originalIndex && position.isCenter;
+					const isAnimatingUp =
+						animatingUpIndex === originalIndex && position.isCenter;
+					const isInserted =
+						insertedIndex === originalIndex && position.isCenter;
 
 					return (
 						<div
 							key={`${item.id}-${originalIndex}`}
 							className="absolute cursor-pointer select-none"
 							style={{
-								transform: `
-                  translate(${position.x}px, ${position.y}px)
-                  rotate(${position.rotation}deg)
-                  scale(${position.scale})
-                `,
+								transform: isAnimating
+									? `translate(${position.x}px, ${position.y + 170}px) rotate(0deg) scale(${position.scale})`
+									: isAnimatingUp
+										? `translate(${position.x}px, ${position.y}px) rotate(${position.rotation}deg) scale(${position.scale})`
+										: isInserted
+											? `translate(${position.x}px, ${position.y + 170}px) rotate(0deg) scale(${position.scale})`
+											: `translate(${position.x}px, ${position.y}px) rotate(${position.rotation}deg) scale(${position.scale})`,
 								zIndex: position.zIndex,
 								opacity: position.opacity,
-								transition: isDragging
-									? "none"
-									: "transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.3s ease",
+								transition:
+									isAnimating || isAnimatingUp
+										? "transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.3s ease"
+										: isDragging
+											? "none"
+											: "transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.3s ease",
 							}}
 							onClick={() => handleCardClick(originalIndex, position.isCenter)}
 						>
-							<div className="relative">
+							<div
+								className="relative"
+								style={{
+									...(isInserted && {
+										animation: "gentle-pulse 2s ease-in-out infinite",
+										filter: "drop-shadow(0 0 12px rgba(107, 143, 240, 0.6))",
+									}),
+								}}
+							>
 								<TeamCard
 									team={{
 										id: item.id,
@@ -232,25 +339,61 @@ export function CircularCarousel({
 				})}
 			</div>
 
-			{/* Fixed center selection frame */}
-			<div
-				className="absolute left-1/2 top-1/2 pointer-events-none z-40"
-				style={{
-					width: "104px", // 96px card + 4px padding on each side
-					height: "136px", // 128px card + 4px padding on each side
-					borderRadius: "4px 4px 16px 4px",
-					border: centerCard
-						? selectedIndex === centerCard.originalIndex
-							? "2px solid var(--primary400, #6B8FF0)"
-							: "2px solid #2E2E2E"
-						: "none",
-					boxShadow:
-						centerCard && selectedIndex === centerCard.originalIndex
-							? "1px 1px 16px 8px rgba(107, 143, 240, 0.25)"
-							: "none",
-					transform: `translate(-50%, -50%) translate(${centerX}px, ${centerY - radius - 144}px)`,
-				}}
-			/>
+			{/* Gray selection frame - normal state */}
+			{centerCard && !insertedIndex && !selectedIndex && !animatingIndex && (
+				<div
+					className="absolute left-1/2 top-1/2 pointer-events-none z-40"
+					style={{
+						width: "104px", // 96px card + 4px padding on each side
+						height: "136px", // 128px card + 4px padding on each side
+						borderRadius: "4px 4px 16px 4px",
+						border: "2px solid #2E2E2E",
+						transform: `translate(-50%, -50%) translate(${centerX}px, ${centerY - radius - 144}px)`,
+					}}
+				/>
+			)}
+
+			{/* Normal state: Arrow below gray frame */}
+			{centerCard && !insertedIndex && !selectedIndex && !animatingIndex && (
+				<div
+					className="absolute left-1/2 transform -translate-x-1/2 text-center z-60 cursor-pointer"
+					style={{ top: "75%" }}
+					onClick={() => {
+						if (centerCard) {
+							handleCardClick(centerCard.originalIndex, true);
+						}
+					}}
+				>
+					<div className="text-gray-300 text-lg font-medium mb-1 tracking-wide flex justify-center">
+						<ChevronDown size={20} />
+					</div>
+					<div
+						className="mx-auto"
+						style={{
+							width: "108px",
+							height: "95px",
+							background:
+								"radial-gradient(ellipse 108px 80px at 50% 100%, rgba(107, 143, 240, 1) 0%, rgba(107, 143, 240, 0.8) 20%, rgba(107, 143, 240, 0.5) 40%, rgba(107, 143, 240, 0.2) 70%, transparent 100%)",
+							filter: "blur(2px)",
+						}}
+					/>
+				</div>
+			)}
+
+			{/* Blue selection frame - selected state */}
+			{centerCard && selectedIndex === centerCard.originalIndex && (
+				<div
+					className="absolute left-1/2 top-1/2 pointer-events-none z-40"
+					style={{
+						width: "104px", // 96px card + 4px padding on each side
+						height: "136px", // 128px card + 4px padding on each side
+						borderRadius: "4px 4px 16px 4px",
+						border: "2px solid var(--primary400, #6B8FF0)",
+						boxShadow: "1px 1px 16px 8px rgba(107, 143, 240, 0.25)",
+						transform: `translate(-50%, -50%) translate(${centerX}px, ${centerY - radius - 144}px)`,
+					}}
+				/>
+			)}
 
 			{/* Left arrow */}
 			<button
@@ -272,25 +415,35 @@ export function CircularCarousel({
 				<ChevronRight size={20} />
 			</button>
 
-			{/* INSERT label (only when center card is selected) */}
-			{centerCard && selectedIndex === centerCard.originalIndex && (
+			{/* REJECT state: Arrow above inserted card */}
+			{centerCard && rejectIndex === centerCard.originalIndex && (
 				<div
-					className="absolute left-1/2 transform -translate-x-1/2 text-center z-60"
-					style={{ top: "75%" }}
+					className="absolute left-1/2 top-1/2 pointer-events-auto z-60 cursor-pointer"
+					style={{
+						transform: `translate(-50%, -50%) translate(${centerX}px, ${centerY - radius - 144 + 90}px)`,
+					}}
+					onClick={() => {
+						if (centerCard) {
+							// Start slide up animation
+							setAnimatingUpIndex(centerCard.originalIndex);
+							setInsertedIndex(null);
+							setRejectIndex(null);
+
+							// Call deselect callback
+							if (onItemDeselect) {
+								onItemDeselect();
+							}
+
+							// Complete slide up animation
+							setTimeout(() => {
+								setAnimatingUpIndex(null);
+							}, 600);
+						}
+					}}
 				>
-					<div className="text-gray-300 text-lg font-medium mb-1 tracking-wide flex justify-center">
-						<ChevronDown size={20} />
+					<div className="text-gray-300 text-lg font-medium flex justify-center">
+						<ChevronUp size={20} />
 					</div>
-					<div
-						className="mx-auto"
-						style={{
-							width: "108px",
-							height: "95px",
-							background:
-								"radial-gradient(ellipse 108px 80px at 50% 100%, rgba(107, 143, 240, 1) 0%, rgba(107, 143, 240, 0.8) 20%, rgba(107, 143, 240, 0.5) 40%, rgba(107, 143, 240, 0.2) 70%, transparent 100%)",
-							filter: "blur(2px)",
-						}}
-					/>
 				</div>
 			)}
 		</div>

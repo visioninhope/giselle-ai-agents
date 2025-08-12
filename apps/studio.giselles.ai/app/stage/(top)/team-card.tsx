@@ -16,6 +16,8 @@ export function TeamCard({ team }: TeamCardProps) {
 				width: "96px",
 				height: "128px",
 				borderRadius: "4px 4px 16px 4px",
+				backgroundClip: "padding-box",
+				overflow: "hidden",
 			}}
 		>
 			<div className="space-y-1">
