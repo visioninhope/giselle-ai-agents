@@ -20,7 +20,6 @@ export function validateImageFile(file: File): {
 	valid: boolean;
 	error?: string;
 } {
-	// Validate MIME type
 	if (!IMAGE_CONSTRAINTS.formats.includes(file.type)) {
 		return {
 			valid: false,
@@ -28,8 +27,6 @@ export function validateImageFile(file: File): {
 				"Invalid file format. Please upload a JPG, PNG, GIF, or WebP image.",
 		};
 	}
-
-	// Validate file size
 	if (file.size > IMAGE_CONSTRAINTS.maxSize) {
 		return {
 			valid: false,
@@ -89,7 +86,6 @@ export async function deleteOldAvatar(
 			logger.debug("Old avatar file removed:", oldPath);
 		}
 	} catch (error) {
-		// Don't fail the update if cleanup fails
 		logger.error("Failed to remove old avatar:", error);
 	}
 }
