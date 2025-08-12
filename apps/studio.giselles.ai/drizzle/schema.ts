@@ -1,4 +1,8 @@
-import type { FlowTriggerId, WorkspaceId } from "@giselle-sdk/data-type";
+import type {
+	EmbeddingDimensions,
+	FlowTriggerId,
+	WorkspaceId,
+} from "@giselle-sdk/data-type";
 import type { ActId } from "@giselle-sdk/giselle";
 import type { GitHubRepositoryIndexId } from "@giselles-ai/types";
 import { relations } from "drizzle-orm";
@@ -10,6 +14,7 @@ import {
 	jsonb,
 	numeric,
 	pgTable,
+	primaryKey,
 	serial,
 	text,
 	timestamp,
@@ -301,6 +306,22 @@ export const githubRepositoryIndex = pgTable(
 	],
 );
 
+export const githubRepositoryEmbeddingProfiles = pgTable(
+	"github_repository_embedding_profiles",
+	{
+		repositoryIndexDbId: integer("repository_index_db_id")
+			.notNull()
+			.references(() => githubRepositoryIndex.dbId, { onDelete: "cascade" }),
+		embeddingProfileId: integer("embedding_profile_id").notNull(),
+		createdAt: timestamp("created_at").defaultNow().notNull(),
+	},
+	(table) => ({
+		pk: primaryKey({
+			columns: [table.repositoryIndexDbId, table.embeddingProfileId],
+		}),
+	}),
+);
+
 export type GitHubRepositoryContentType = "blob" | "pull_request";
 export const githubRepositoryContentStatus = pgTable(
 	"github_repository_content_status",
@@ -350,15 +371,24 @@ export const githubRepositoryEmbeddings = pgTable(
 		repositoryIndexDbId: integer("repository_index_db_id")
 			.notNull()
 			.references(() => githubRepositoryIndex.dbId, { onDelete: "cascade" }),
+		embeddingProfileId: integer("embedding_profile_id").notNull(),
+		embeddingDimensions: integer("embedding_dimensions")
+			.$type<EmbeddingDimensions>()
+			.notNull(),
 		fileSha: text("file_sha").notNull(),
 		path: text("path").notNull(),
-		embedding: vector("embedding", { dimensions: 1536 }).notNull(),
+		embedding: vector("embedding").notNull(),
 		chunkContent: text("chunk_content").notNull(),
 		chunkIndex: integer("chunk_index").notNull(),
 		createdAt: timestamp("created_at").defaultNow().notNull(),
 	},
 	(table) => [
-		unique().on(table.repositoryIndexDbId, table.path, table.chunkIndex),
+		unique().on(
+			table.repositoryIndexDbId,
+			table.embeddingProfileId,
+			table.path,
+			table.chunkIndex,
+		),
 		index().using("hnsw", table.embedding.op("vector_cosine_ops")),
 	],
 );
@@ -379,6 +409,10 @@ export const githubRepositoryPullRequestEmbeddings = pgTable(
 	{
 		dbId: serial("db_id").primaryKey(),
 		repositoryIndexDbId: integer("repository_index_db_id").notNull(),
+		embeddingProfileId: integer("embedding_profile_id").notNull(),
+		embeddingDimensions: integer("embedding_dimensions")
+			.$type<EmbeddingDimensions>()
+			.notNull(),
 		prNumber: integer("pr_number").notNull(),
 		mergedAt: timestamp("merged_at").notNull(),
 		contentType: text("content_type")
@@ -388,7 +422,7 @@ export const githubRepositoryPullRequestEmbeddings = pgTable(
 		documentKey: text("document_key")
 			.$type<GitHubPullRequestDocumentKey>()
 			.notNull(),
-		embedding: vector("embedding", { dimensions: 1536 }).notNull(),
+		embedding: vector("embedding").notNull(),
 		chunkContent: text("chunk_content").notNull(),
 		chunkIndex: integer("chunk_index").notNull(),
 		createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -396,6 +430,7 @@ export const githubRepositoryPullRequestEmbeddings = pgTable(
 	(table) => [
 		unique("gh_pr_emb_unique").on(
 			table.repositoryIndexDbId,
+			table.embeddingProfileId,
 			table.prNumber,
 			table.contentType,
 			table.contentId,
