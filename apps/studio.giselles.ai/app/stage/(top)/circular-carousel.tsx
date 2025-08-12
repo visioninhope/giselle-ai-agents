@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
 import { useState } from "react";
 import { TeamCard } from "./team-card";
 
@@ -35,7 +35,7 @@ export function CircularCarousel({
 	const visibleCards = Math.min(7, items.length); // Show up to 7 cards when available
 	const radius = 400;
 	const centerX = 0;
-	const centerY = 500;
+	const centerY = 510;
 
 	// Get visible cards around current index
 	const getVisibleCards = () => {
@@ -218,18 +218,7 @@ export function CircularCarousel({
 							}}
 							onClick={() => handleCardClick(originalIndex, position.isCenter)}
 						>
-							<div
-								className={
-									position.isCenter
-										? "ring-2 ring-blue-400 ring-offset-2 ring-offset-transparent shadow-xl shadow-blue-500/60 relative"
-										: "relative"
-								}
-								style={{
-									filter: position.isCenter
-										? "drop-shadow(0 0 12px rgba(59, 130, 246, 0.7))"
-										: "none",
-								}}
-							>
+							<div className="relative">
 								<TeamCard
 									team={{
 										id: item.id,
@@ -237,28 +226,38 @@ export function CircularCarousel({
 										profileImageUrl: item.profileImageUrl,
 									}}
 								/>
-
-								{/* Center card highlight */}
-								{position.isCenter && (
-									<div className="absolute inset-0 rounded-lg bg-blue-400/5 pointer-events-none" />
-								)}
-
-								{/* Selected card pulse effect */}
-								{selectedIndex === originalIndex && position.isCenter && (
-									<div className="absolute inset-0 rounded-lg bg-green-400/10 pointer-events-none animate-pulse" />
-								)}
 							</div>
 						</div>
 					);
 				})}
 			</div>
 
+			{/* Fixed center selection frame */}
+			<div
+				className="absolute left-1/2 top-1/2 pointer-events-none z-40"
+				style={{
+					width: "104px", // 96px card + 4px padding on each side
+					height: "136px", // 128px card + 4px padding on each side
+					borderRadius: "4px 4px 16px 4px",
+					border: centerCard
+						? selectedIndex === centerCard.originalIndex
+							? "2px solid var(--primary400, #6B8FF0)"
+							: "2px solid #2E2E2E"
+						: "none",
+					boxShadow:
+						centerCard && selectedIndex === centerCard.originalIndex
+							? "1px 1px 16px 8px rgba(107, 143, 240, 0.25)"
+							: "none",
+					transform: `translate(-50%, -50%) translate(${centerX}px, ${centerY - radius - 144}px)`,
+				}}
+			/>
+
 			{/* Left arrow */}
 			<button
 				type="button"
 				onClick={moveRight}
 				disabled={currentIndex === items.length - 1}
-				className="absolute left-6 top-1/3 transform -translate-y-1/2 w-10 h-10 bg-black/50 hover:bg-black/70 rounded-full flex items-center justify-center text-white transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed z-50"
+				className="absolute left-6 top-1/2 transform -translate-y-1/2 w-10 h-10 border border-white hover:bg-white/10 rounded-full flex items-center justify-center text-white transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed z-50"
 			>
 				<ChevronLeft size={20} />
 			</button>
@@ -268,7 +267,7 @@ export function CircularCarousel({
 				type="button"
 				onClick={moveLeft}
 				disabled={currentIndex === 0}
-				className="absolute right-6 top-1/3 transform -translate-y-1/2 w-10 h-10 bg-black/50 hover:bg-black/70 rounded-full flex items-center justify-center text-white transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed z-50"
+				className="absolute right-6 top-1/2 transform -translate-y-1/2 w-10 h-10 border border-white hover:bg-white/10 rounded-full flex items-center justify-center text-white transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed z-50"
 			>
 				<ChevronRight size={20} />
 			</button>
@@ -279,17 +278,21 @@ export function CircularCarousel({
 					className="absolute left-1/2 transform -translate-x-1/2 text-center z-60"
 					style={{ top: "75%" }}
 				>
-					<div className="text-gray-300 text-sm font-medium mb-1 tracking-wide">
-						INSERT
+					<div className="text-gray-300 text-lg font-medium mb-1 tracking-wide flex justify-center">
+						<ChevronDown size={20} />
 					</div>
-					<div className="w-0 h-0 border-l-4 border-r-4 border-t-6 border-transparent border-t-gray-300 mx-auto"></div>
+					<div
+						className="mx-auto"
+						style={{
+							width: "108px",
+							height: "95px",
+							background:
+								"radial-gradient(ellipse 108px 80px at 50% 100%, rgba(107, 143, 240, 1) 0%, rgba(107, 143, 240, 0.8) 20%, rgba(107, 143, 240, 0.5) 40%, rgba(107, 143, 240, 0.2) 70%, transparent 100%)",
+							filter: "blur(2px)",
+						}}
+					/>
 				</div>
 			)}
-
-			{/* Bottom slot */}
-			<div className="absolute bottom-6 left-1/2 transform -translate-x-1/2">
-				<div className="w-32 h-3 bg-blue-900/40 rounded-full border border-blue-600/40 shadow-inner"></div>
-			</div>
 		</div>
 	);
 }
