@@ -3,7 +3,7 @@
 
 ## Summary
 * 816 MIT
-* 184 Apache 2.0
+* 182 Apache 2.0
 * 47 ISC
 * 27 New BSD
 * 13 Simplified BSD
@@ -1733,28 +1733,6 @@ LGPL-3.0-or-later permitted
 
 <a name="@opentelemetry/core"></a>
 ### @opentelemetry/core v1.24.1
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
-
-
-
-<a name="@opentelemetry/exporter-logs-otlp-http"></a>
-### @opentelemetry/exporter-logs-otlp-http v0.54.2
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
-
-
-
-<a name="@opentelemetry/exporter-metrics-otlp-http"></a>
-### @opentelemetry/exporter-metrics-otlp-http v0.52.1
 #### 
 
 ##### Paths
