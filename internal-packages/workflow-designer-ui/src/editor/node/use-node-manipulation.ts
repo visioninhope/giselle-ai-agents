@@ -1,14 +1,13 @@
-import { Node, type NodeLike } from "@giselle-sdk/data-type";
+import { Node } from "@giselle-sdk/data-type";
 import { useWorkflowDesigner } from "@giselle-sdk/giselle/react";
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 
 // Position offset constants for better maintainability
 const OFFSET_X = 200;
 const OFFSET_Y = 100;
 
 export function useNodeManipulation() {
-	const { data, copyNode } = useWorkflowDesigner();
-	const [copiedNode, setCopiedNode] = useState<NodeLike | null>(null);
+	const { data, copyNode, copiedNode, setCopiedNode } = useWorkflowDesigner();
 
 	const copy = useCallback(
 		(onError?: () => void) => {
@@ -21,7 +20,7 @@ export function useNodeManipulation() {
 				onError?.();
 			}
 		},
-		[data.nodes, data.ui.nodeState],
+		[data.nodes, data.ui.nodeState, setCopiedNode],
 	);
 
 	const paste = useCallback(
