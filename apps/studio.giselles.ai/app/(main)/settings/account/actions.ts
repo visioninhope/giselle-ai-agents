@@ -21,8 +21,7 @@ import {
 import { isTeamId } from "@/services/teams";
 import { deleteTeamMember } from "../team/actions";
 import {
-	deleteOldAvatar,
-	getExtensionFromMimeType,
+	deleteAvatar,
 	uploadAvatar,
 	validateImageFile,
 } from "../utils/avatar-upload";
@@ -176,14 +175,7 @@ export async function updateAvatar(formData: FormData) {
 			)
 			.where(eq(supabaseUserMappings.supabaseUserId, supabaseUser.id));
 
-		// Upload new avatar
-		const ext = getExtensionFromMimeType(file.type);
-		const filePath = `avatars/${supabaseUser.id}.${ext}`;
-		const avatarUrl = await uploadAvatar(file, filePath);
-
-		// Delete old avatar if exists
-		await deleteOldAvatar(currentUser?.avatarUrl, filePath);
-
+		const avatarUrl = await uploadAvatar(file, "avatars", supabaseUser.id);
 		const userDbIdSubquery = db
 			.select({ userDbId: supabaseUserMappings.userDbId })
 			.from(supabaseUserMappings)
@@ -193,6 +185,16 @@ export async function updateAvatar(formData: FormData) {
 			.update(users)
 			.set({ avatarUrl })
 			.where(eq(users.dbId, userDbIdSubquery));
+
+		// Delete old avatar after successful DB update (failure is acceptable)
+		if (currentUser?.avatarUrl) {
+			try {
+				await deleteAvatar(currentUser.avatarUrl);
+			} catch (error) {
+				// Log error but don't fail the request
+				logger.error("Failed to delete old avatar:", error);
+			}
+		}
 
 		revalidatePath("/settings/account");
 		revalidatePath("/", "layout");

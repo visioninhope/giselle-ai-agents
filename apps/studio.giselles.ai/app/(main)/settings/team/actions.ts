@@ -24,8 +24,7 @@ import { fetchCurrentTeam, isProPlan } from "@/services/teams";
 import { handleMemberChange } from "@/services/teams/member-change";
 import type { TeamId } from "@/services/teams/types";
 import {
-	deleteOldAvatar,
-	getExtensionFromMimeType,
+	deleteAvatar,
 	uploadAvatar,
 	validateImageFile,
 } from "../utils/avatar-upload";
@@ -131,15 +130,7 @@ export async function updateTeamAvatar(teamId: TeamId, formData: FormData) {
 			);
 		}
 
-		// Upload new avatar
-		const ext = getExtensionFromMimeType(file.type);
-		const filePath = `team-avatars/${teamId}.${ext}`;
-		const avatarUrl = await uploadAvatar(file, filePath);
-
-		// Delete old avatar if exists
-		await deleteOldAvatar(currentTeam.avatarUrl, filePath);
-
-		// Update database
+		const avatarUrl = await uploadAvatar(file, "team-avatars", teamId);
 		await db.transaction(async (tx) => {
 			const team = await tx
 				.select({ dbId: teams.dbId })
@@ -168,6 +159,15 @@ export async function updateTeamAvatar(teamId: TeamId, formData: FormData) {
 				.set({ avatarUrl })
 				.where(eq(teams.dbId, team[0].dbId));
 		});
+
+		// Delete old avatar after successful DB update (failure is acceptable)
+		if (currentTeam.avatarUrl) {
+			try {
+				await deleteAvatar(currentTeam.avatarUrl);
+			} catch (error) {
+				console.error("Failed to delete old avatar:", error);
+			}
+		}
 
 		revalidatePath("/settings/team");
 		revalidatePath("/", "layout");
