@@ -301,12 +301,15 @@ export function StageSidebar({ user }: StageSidebarProps) {
                     <Button
                       variant="glass"
                       size="large"
-                      className="w-full justify-start px-0"
+                      className={clsx(
+                        "w-full px-0",
+                        isCollapsed ? "justify-center" : "justify-start",
+                      )}
                     >
                       <div
                         className={clsx(
-                          "flex items-center gap-3",
-                          isCollapsed ? "px-2" : "px-4",
+                          "flex items-center",
+                          isCollapsed ? "justify-center" : "gap-3 px-4",
                         )}
                       >
                         <item.icon className="w-5 h-5" />

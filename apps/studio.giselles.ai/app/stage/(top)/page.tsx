@@ -16,7 +16,7 @@ import { revalidatePath } from "next/cache";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { after } from "next/server";
-import { getAccountInfo } from "@/app/(main)/settings/account/actions";
+
 import { giselleEngine } from "@/app/giselle-engine";
 import { acts as actsSchema, db } from "@/drizzle";
 import { stageFlag } from "@/flags";
@@ -25,7 +25,6 @@ import { fetchUserTeams } from "@/services/teams";
 import { type FlowTriggerUIItem, Form } from "./form";
 import { ReloadButton } from "./reload-button";
 import { ResizableLayout } from "./resizable-layout";
-import { StageSidebar } from "../ui/stage-sidebar";
 
 // The maximum duration of server actions on this page is extended to 800 seconds through enabled fluid compute.
 // https://vercel.com/docs/functions/runtimes#max-duration
@@ -135,7 +134,6 @@ export default async function StagePage() {
     label: team.name,
   }));
   const user = await fetchCurrentUser();
-  const accountInfo = await getAccountInfo();
   const dbActs = await db.query.acts.findMany({
     where: (acts, { eq }) => eq(acts.directorDbId, user.dbId),
     orderBy: (acts, { desc }) => [desc(acts.createdAt)],
@@ -187,134 +185,123 @@ export default async function StagePage() {
     }
   }
   return (
-    <div className="flex min-h-screen bg-black-900">
-      <StageSidebar
-        user={{
-          displayName: accountInfo.displayName ?? undefined,
-          email: accountInfo.email ?? undefined,
-          avatarUrl: accountInfo.avatarUrl ?? undefined,
-        }}
-      />
-      <div className="flex-1 px-[24px] bg-[var(--color-stage-background)] pt-16 md:pt-0 pb-[calc(4rem+env(safe-area-inset-bottom))] md:pb-0 overflow-y-auto">
-        <ResizableLayout
-          mainContent={
-            <div className="space-y-6 py-6 min-h-full">
-              <div className="text-center text-[24px] font-mono font-light text-white-100 bg-transparent">
-                What are we perform next ?
+    <div className="flex-1 px-[24px] bg-[var(--color-stage-background)] pt-16 md:pt-0 pb-[calc(4rem+env(safe-area-inset-bottom))] md:pb-0 h-full flex flex-col">
+      <ResizableLayout
+        mainContent={
+          <div className="space-y-6 py-6 h-full">
+            <div className="text-center text-[24px] font-mono font-light text-white-100 bg-transparent">
+              What are we perform next ?
+            </div>
+            <Form
+              teamOptions={teamOptions}
+              flowTriggers={flowTriggers}
+              performStageAction={async (payloads) => {
+                "use server";
+
+                const user = await fetchCurrentUser();
+                const { act } = await giselleEngine.createAct({
+                  workspaceId: payloads.flowTrigger.workspaceId,
+                  nodeId: payloads.flowTrigger.nodeId,
+                  inputs: [
+                    {
+                      type: "parameters",
+                      items: payloads.parameterItems,
+                    },
+                  ],
+                  generationOriginType: "stage",
+                });
+
+                const team = await db.query.teams.findFirst({
+                  where: (teams, { eq }) => eq(teams.id, payloads.teamId),
+                });
+                if (team === undefined) {
+                  throw new Error("Team not found");
+                }
+                await db.insert(actsSchema).values({
+                  teamDbId: team.dbId,
+                  directorDbId: user.dbId,
+                  sdkActId: act.id,
+                  sdkFlowTriggerId: payloads.flowTrigger.id,
+                  sdkWorkspaceId: payloads.flowTrigger.workspaceId,
+                });
+                after(() =>
+                  giselleEngine.startAct({
+                    actId: act.id,
+                  }),
+                );
+                revalidatePath("/stage");
+              }}
+            />
+          </div>
+        }
+        actsContent={
+          <div className="space-y-4 py-6 h-full overflow-y-auto">
+            <div className="flex items-center justify-between px-1">
+              <h2 className="text-[16px] font-sans text-white-100">Tasks</h2>
+              <div className="flex items-center gap-3">
+                <ReloadButton reloadAction={reloadPage} />
+                <Button type="button" variant="subtle">
+                  Archive
+                </Button>
               </div>
-              <Form
-                teamOptions={teamOptions}
-                flowTriggers={flowTriggers}
-                performStageAction={async (payloads) => {
-                  "use server";
-
-                  const user = await fetchCurrentUser();
-                  const { act } = await giselleEngine.createAct({
-                    workspaceId: payloads.flowTrigger.workspaceId,
-                    nodeId: payloads.flowTrigger.nodeId,
-                    inputs: [
-                      {
-                        type: "parameters",
-                        items: payloads.parameterItems,
-                      },
-                    ],
-                    generationOriginType: "stage",
-                  });
-
-                  const team = await db.query.teams.findFirst({
-                    where: (teams, { eq }) => eq(teams.id, payloads.teamId),
-                  });
-                  if (team === undefined) {
-                    throw new Error("Team not found");
-                  }
-                  await db.insert(actsSchema).values({
-                    teamDbId: team.dbId,
-                    directorDbId: user.dbId,
-                    sdkActId: act.id,
-                    sdkFlowTriggerId: payloads.flowTrigger.id,
-                    sdkWorkspaceId: payloads.flowTrigger.workspaceId,
-                  });
-                  after(() =>
-                    giselleEngine.startAct({
-                      actId: act.id,
-                    }),
+            </div>
+            <Table className="table-fixed w-full">
+              <TableBody>
+                {acts.map((act) => {
+                  return (
+                    <TableRow
+                      key={act.id}
+                      className="hover:bg-white/5 transition-colors duration-200"
+                    >
+                      <TableCell className="w-12 !p-0 !m-0">
+                        <div className="w-10 h-10 bg-gray-600 rounded-md flex items-center justify-center">
+                          <span className="text-xs text-gray-400">App</span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="min-w-[240px]">
+                        <div className="flex flex-col">
+                          <span className="truncate">{act.workspaceName}</span>
+                          <span className="text-[12px] text-black-600 truncate">
+                            {new Date(act.createdAt).toLocaleString()} ·{" "}
+                            {act.teamName}
+                          </span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-center w-24">
+                        {act.status === "inProgress" && (
+                          <StatusBadge status="info" variant="dot">
+                            Running
+                          </StatusBadge>
+                        )}
+                        {act.status === "completed" && (
+                          <StatusBadge status="success" variant="dot">
+                            Completed
+                          </StatusBadge>
+                        )}
+                        {act.status === "failed" && (
+                          <StatusBadge status="error" variant="dot">
+                            Failed
+                          </StatusBadge>
+                        )}
+                        {act.status === "cancelled" && (
+                          <StatusBadge status="ignored" variant="dot">
+                            Cancelled
+                          </StatusBadge>
+                        )}
+                      </TableCell>
+                      <TableCell className="text-right w-20">
+                        <div className="flex justify-end">
+                          <Link href={act.link}>More {">"}</Link>
+                        </div>
+                      </TableCell>
+                    </TableRow>
                   );
-                  revalidatePath("/stage");
-                }}
-              />
-            </div>
-          }
-          actsContent={
-            <div className="space-y-4 py-6 h-full">
-              <div className="flex items-center justify-between px-1">
-                <h2 className="text-[16px] font-sans text-white-100">Tasks</h2>
-                <div className="flex items-center gap-3">
-                  <ReloadButton reloadAction={reloadPage} />
-                  <Button type="button" variant="subtle">
-                    Archive
-                  </Button>
-                </div>
-              </div>
-              <Table className="table-fixed w-full">
-                <TableBody>
-                  {acts.map((act) => {
-                    return (
-                      <TableRow
-                        key={act.id}
-                        className="hover:bg-white/5 transition-colors duration-200"
-                      >
-                        <TableCell className="w-12 !p-0 !m-0">
-                          <div className="w-10 h-10 bg-gray-600 rounded-md flex items-center justify-center">
-                            <span className="text-xs text-gray-400">App</span>
-                          </div>
-                        </TableCell>
-                        <TableCell className="min-w-[240px]">
-                          <div className="flex flex-col">
-                            <span className="truncate">
-                              {act.workspaceName}
-                            </span>
-                            <span className="text-[12px] text-black-600 truncate">
-                              {new Date(act.createdAt).toLocaleString()} ·{" "}
-                              {act.teamName}
-                            </span>
-                          </div>
-                        </TableCell>
-                        <TableCell className="text-center w-24">
-                          {act.status === "inProgress" && (
-                            <StatusBadge status="info" variant="dot">
-                              Running
-                            </StatusBadge>
-                          )}
-                          {act.status === "completed" && (
-                            <StatusBadge status="success" variant="dot">
-                              Completed
-                            </StatusBadge>
-                          )}
-                          {act.status === "failed" && (
-                            <StatusBadge status="error" variant="dot">
-                              Failed
-                            </StatusBadge>
-                          )}
-                          {act.status === "cancelled" && (
-                            <StatusBadge status="ignored" variant="dot">
-                              Cancelled
-                            </StatusBadge>
-                          )}
-                        </TableCell>
-                        <TableCell className="text-right w-20">
-                          <div className="flex justify-end">
-                            <Link href={act.link}>More {">"}</Link>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-            </div>
-          }
-        />
-      </div>
+                })}
+              </TableBody>
+            </Table>
+          </div>
+        }
+      />
     </div>
   );
 }
