@@ -528,6 +528,9 @@ importers:
       react-dom:
         specifier: 'catalog:'
         version: 19.1.0(react@19.1.0)
+      react-resizable-panels:
+        specifier: 'catalog:'
+        version: 2.1.7(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       require-in-the-middle:
         specifier: 7.5.2
         version: 7.5.2
