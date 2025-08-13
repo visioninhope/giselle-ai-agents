@@ -77,13 +77,11 @@ function CompletionRunner({ generation }: { generation: Generation }) {
 		updateMessages,
 		addStopHandler,
 	} = useGenerationRunnerSystem();
-	const telemetry = useTelemetry();
 	const { messages, sendMessage, stop, status } = useChat({
 		transport: new DefaultChatTransport({
 			api: generateTextApi,
 			body: {
 				generation,
-				telemetry,
 				useExperimentalStorage: experimental_storage,
 			},
 		}),
