@@ -143,10 +143,14 @@ export function TeamProfileEditModal({
 			setError("");
 			setProfileImageError("");
 
+			// Trim team name for validation and comparison
+			const trimmedName = teamName.trim();
+			const trimmedInitialName = initialTeamName.trim();
+
 			// Validate team name if changed
-			if (teamName !== initialTeamName) {
+			if (trimmedName !== trimmedInitialName) {
 				try {
-					parse(TeamNameSchema, teamName);
+					parse(TeamNameSchema, trimmedName);
 				} catch (valError) {
 					if (valError instanceof Error) {
 						setError(valError.message);
@@ -160,9 +164,9 @@ export function TeamProfileEditModal({
 			const promises = [];
 
 			// Update team name if changed
-			if (teamName !== initialTeamName) {
+			if (trimmedName !== trimmedInitialName) {
 				const formData = new FormData();
-				formData.append("name", teamName);
+				formData.append("name", trimmedName);
 				promises.push(updateTeamName(teamId, formData));
 			}
 
