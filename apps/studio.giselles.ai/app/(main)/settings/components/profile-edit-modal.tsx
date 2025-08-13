@@ -233,8 +233,20 @@ export function ProfileEditModal({
 									Edit Profile
 								</Dialog.Title>
 								<Dialog.Close
-									onClick={onClose}
-									className="rounded-sm opacity-70 text-white-400 hover:opacity-100 focus:outline-none"
+									onClick={(e) => {
+										if (isLoading) {
+											e.preventDefault();
+											return;
+										}
+										onClose();
+									}}
+									disabled={isLoading}
+									aria-disabled={isLoading}
+									className={`rounded-sm text-white-400 focus:outline-none ${
+										isLoading
+											? "opacity-30 cursor-not-allowed pointer-events-none"
+											: "opacity-70 hover:opacity-100 cursor-pointer"
+									}`}
 								>
 									<X className="h-5 w-5" />
 									<span className="sr-only">Close</span>
