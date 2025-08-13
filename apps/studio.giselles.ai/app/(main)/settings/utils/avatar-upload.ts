@@ -1,6 +1,5 @@
 import { createHash } from "node:crypto";
 import { publicStorage } from "@/app/giselle-engine";
-import { logger } from "@/lib/logger";
 import { IMAGE_CONSTRAINTS } from "../constants";
 
 async function calculateFileHash(file: File): Promise<string> {
@@ -86,18 +85,15 @@ export async function uploadAvatar(
  * Delete avatar file from storage
  */
 export async function deleteAvatar(avatarUrl: string): Promise<void> {
-	try {
-		// Extract file path from URL
-		// From: https://xxx.supabase.co/storage/v1/object/public/public-assets/avatars/user-id.jpg
-		// To: avatars/user-id.jpg
-		const path = avatarUrl.split("/public-assets/")[1];
+	// Extract file path from URL
+	// From: https://xxx.supabase.co/storage/v1/object/public/public-assets/avatars/user-id.jpg
+	// To: avatars/user-id.jpg
+	const parts = avatarUrl.split("/public-assets/");
 
-		if (path) {
-			await publicStorage.removeItem(path);
-			logger.debug("Avatar file removed:", path);
-		}
-	} catch (error) {
-		logger.error("Failed to remove avatar:", error);
-		throw error;
+	if (parts.length !== 2 || !parts[1]) {
+		throw new Error(`Invalid avatar URL format: ${avatarUrl}`);
 	}
+
+	const path = parts[1];
+	await publicStorage.removeItem(path);
 }
