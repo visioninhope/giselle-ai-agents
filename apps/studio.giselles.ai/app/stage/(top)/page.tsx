@@ -132,6 +132,7 @@ export default async function StagePage() {
 	const teamOptions = teams.map((team) => ({
 		value: team.id,
 		label: team.name,
+		avatarUrl: team.avatarUrl ?? undefined,
 	}));
 	const user = await fetchCurrentUser();
 	const dbActs = await db.query.acts.findMany({

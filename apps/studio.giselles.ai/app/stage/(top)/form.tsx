@@ -15,6 +15,7 @@ import {
 	useState,
 } from "react";
 import type { teams } from "@/drizzle";
+import { AvatarImage } from "@/services/accounts/components/user-button/avatar-image";
 import { CircularCarousel } from "./circular-carousel";
 import {
 	createInputsFromTrigger,
@@ -26,6 +27,7 @@ type TeamId = InferSelectModel<typeof teams>["id"];
 interface TeamOption {
 	value: TeamId;
 	label: string;
+	avatarUrl?: string;
 }
 
 type FilterType = "all" | "history" | "latest" | "favorites";
@@ -68,12 +70,7 @@ export function Form({
 }) {
 	const defaultTeamId = useMemo(() => teamOptions[0].value, [teamOptions]);
 	const [selectedTeamId, setSelectedTeamId] = useState<TeamId>(defaultTeamId);
-	const _defaultSelectedFlowTriggerId = useMemo(
-		() =>
-			flowTriggers.find((flowTrigger) => flowTrigger.teamId === defaultTeamId)
-				?.id,
-		[flowTriggers, defaultTeamId],
-	);
+
 	const [selectedFlowTriggerId, setSelectedFlowTriggerId] = useState<
 		FlowTriggerId | undefined
 	>(undefined);
@@ -82,6 +79,22 @@ export function Form({
 	const [validationErrors, setValidationErrors] = useState<
 		Record<string, string>
 	>({});
+
+	const teamOptionsWithIcons = useMemo(
+		() =>
+			teamOptions.map((team) => ({
+				...team,
+				icon: team.avatarUrl ? (
+					<AvatarImage
+						avatarUrl={team.avatarUrl}
+						width={24}
+						height={24}
+						alt={team.label}
+					/>
+				) : undefined,
+			})),
+		[teamOptions],
+	);
 
 	// Add custom styles for select components
 	useEffect(() => {
@@ -179,10 +192,6 @@ export function Form({
 
 	const [, action, isPending] = useActionState(formAction, null);
 
-	const _selectedTeam = teamOptions.find(
-		(team) => team.value === selectedTeamId,
-	);
-
 	return (
 		<div className="max-w-[800px] mx-auto space-y-0">
 			{/* Team Selection Container */}
@@ -199,7 +208,7 @@ export function Form({
 						<Select
 							id="team"
 							placeholder="Select team"
-							options={teamOptions}
+							options={teamOptionsWithIcons}
 							renderOption={(o) => o.label}
 							value={selectedTeamId}
 							onValueChange={(value) => {
