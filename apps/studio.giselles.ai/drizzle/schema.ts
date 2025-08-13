@@ -5,7 +5,7 @@ import type {
 } from "@giselle-sdk/data-type";
 import type { ActId } from "@giselle-sdk/giselle";
 import type { GitHubRepositoryIndexId } from "@giselles-ai/types";
-import { relations } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import {
 	boolean,
 	foreignKey,
@@ -309,17 +309,21 @@ export const githubRepositoryIndex = pgTable(
 export const githubRepositoryEmbeddingProfiles = pgTable(
 	"github_repository_embedding_profiles",
 	{
-		repositoryIndexDbId: integer("repository_index_db_id")
-			.notNull()
-			.references(() => githubRepositoryIndex.dbId, { onDelete: "cascade" }),
+		repositoryIndexDbId: integer("repository_index_db_id").notNull(),
 		embeddingProfileId: integer("embedding_profile_id").notNull(),
 		createdAt: timestamp("created_at").defaultNow().notNull(),
 	},
-	(table) => ({
-		pk: primaryKey({
+	(table) => [
+		primaryKey({
 			columns: [table.repositoryIndexDbId, table.embeddingProfileId],
+			name: "gh_repo_emb_profiles_pk",
 		}),
-	}),
+		foreignKey({
+			columns: [table.repositoryIndexDbId],
+			foreignColumns: [githubRepositoryIndex.dbId],
+			name: "gh_repo_emb_profiles_repo_idx_fk",
+		}).onDelete("cascade"),
+	],
 );
 
 export type GitHubRepositoryContentType = "blob" | "pull_request";
@@ -383,13 +387,19 @@ export const githubRepositoryEmbeddings = pgTable(
 		createdAt: timestamp("created_at").defaultNow().notNull(),
 	},
 	(table) => [
-		unique().on(
+		unique("gh_repo_emb_unique").on(
 			table.repositoryIndexDbId,
 			table.embeddingProfileId,
 			table.path,
 			table.chunkIndex,
 		),
-		index().using("hnsw", table.embedding.op("vector_cosine_ops")),
+		// Partial HNSW indexes for different dimensions
+		index("github_repository_embeddings_embedding_1536_idx")
+			.using("hnsw", table.embedding.op("vector_cosine_ops"))
+			.where(sql`${table.embeddingDimensions} = 1536`),
+		index("github_repository_embeddings_embedding_3072_idx")
+			.using("hnsw", table.embedding.op("vector_cosine_ops"))
+			.where(sql`${table.embeddingDimensions} = 3072`),
 	],
 );
 
@@ -436,7 +446,13 @@ export const githubRepositoryPullRequestEmbeddings = pgTable(
 			table.contentId,
 			table.chunkIndex,
 		),
-		index().using("hnsw", table.embedding.op("vector_cosine_ops")),
+		// Partial HNSW indexes for different dimensions
+		index("gh_pr_embeddings_embedding_1536_idx")
+			.using("hnsw", table.embedding.op("vector_cosine_ops"))
+			.where(sql`${table.embeddingDimensions} = 1536`),
+		index("gh_pr_embeddings_embedding_3072_idx")
+			.using("hnsw", table.embedding.op("vector_cosine_ops"))
+			.where(sql`${table.embeddingDimensions} = 3072`),
 		foreignKey({
 			columns: [table.repositoryIndexDbId],
 			foreignColumns: [githubRepositoryIndex.dbId],
