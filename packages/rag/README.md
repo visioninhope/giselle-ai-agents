@@ -203,10 +203,9 @@ interface IngestResult {
 - `createQueryService<TContext, TMetadata>(config)` - Creates a new query
   service
 - `createChunkStore<TMetadata>(config)` - Creates a new chunk store
-  - `createDefaultEmbedder()` - Creates OpenAI embedder with default settings
-  - `createOpenAIEmbedder(config)` - Creates OpenAI embedder with custom
-    configuration
-  - `createGoogleEmbedder(config)` - Creates Google Gemini embedder
+- `createOpenAIEmbedder(config)` - Creates OpenAI embedder with custom
+  configuration
+- `createGoogleEmbedder(config)` - Creates Google Gemini embedder
 - `createDefaultChunker()` - Creates line-based chunker with default settings
 - `createColumnMapping(options)` - Creates database column mapping
 
