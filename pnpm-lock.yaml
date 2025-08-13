@@ -947,9 +947,6 @@ importers:
       '@ai-sdk/openai':
         specifier: 'catalog:'
         version: 2.0.0(zod@3.25.76)
-      '@giselle-sdk/data-type':
-        specifier: workspace:*
-        version: link:../data-type
       ai:
         specifier: 'catalog:'
         version: 5.0.0(zod@3.25.76)
