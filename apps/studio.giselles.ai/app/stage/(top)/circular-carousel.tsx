@@ -55,6 +55,8 @@ export function CircularCarousel({
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState(0);
   const [dragOffset, setDragOffset] = useState(0);
+  const [verticalDragStart, setVerticalDragStart] = useState(0);
+  const [verticalDragOffset, setVerticalDragOffset] = useState(0);
 
   // Calculate visible cards based on container width with specific breakpoints
   const calculateVisibleCards = (width: number) => {
@@ -261,23 +263,42 @@ export function CircularCarousel({
   };
 
   // Drag handlers
-  const handleDragStart = (clientX: number) => {
+  const handleDragStart = (clientX: number, clientY: number) => {
     setIsDragging(true);
     setDragStart(clientX);
     setDragOffset(0);
+    setVerticalDragStart(clientY);
+    setVerticalDragOffset(0);
   };
 
-  const handleDragMove = (clientX: number) => {
+  const handleDragMove = (clientX: number, clientY: number) => {
     if (!isDragging) return;
     const distance = clientX - dragStart;
+    const verticalDistance = clientY - verticalDragStart;
     setDragOffset(distance);
+    setVerticalDragOffset(verticalDistance);
   };
 
   const handleDragEnd = () => {
     if (!isDragging) return;
 
     const threshold = 50;
-    if (Math.abs(dragOffset) > threshold) {
+    const verticalThreshold = 60;
+
+    // Check for downward swipe on center card (mobile card selection)
+    if (
+      verticalDragOffset > verticalThreshold &&
+      Math.abs(dragOffset) < threshold
+    ) {
+      const centerCard = visibleCardsList.find(
+        (card) => card.positionIndex === 0,
+      );
+      if (centerCard) {
+        handleCardClick(centerCard.originalIndex, true);
+      }
+    }
+    // Check for horizontal swipe (carousel navigation)
+    else if (Math.abs(dragOffset) > threshold) {
       if (dragOffset > 0) {
         moveRight();
       } else {
@@ -288,25 +309,27 @@ export function CircularCarousel({
     setIsDragging(false);
     setDragStart(0);
     setDragOffset(0);
+    setVerticalDragStart(0);
+    setVerticalDragOffset(0);
   };
 
   // Mouse events
   const handleMouseDown = (e: React.MouseEvent) => {
     e.preventDefault();
-    handleDragStart(e.clientX);
+    handleDragStart(e.clientX, e.clientY);
   };
 
   const handleMouseMove = (e: React.MouseEvent) => {
-    handleDragMove(e.clientX);
+    handleDragMove(e.clientX, e.clientY);
   };
 
   // Touch events
   const handleTouchStart = (e: React.TouchEvent) => {
-    handleDragStart(e.touches[0].clientX);
+    handleDragStart(e.touches[0].clientX, e.touches[0].clientY);
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
-    handleDragMove(e.touches[0].clientX);
+    handleDragMove(e.touches[0].clientX, e.touches[0].clientY);
   };
 
   const visibleCardsList = getVisibleCards();
