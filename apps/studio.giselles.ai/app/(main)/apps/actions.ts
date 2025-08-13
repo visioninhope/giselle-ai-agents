@@ -129,6 +129,12 @@ export async function deleteAgent(agentId: string): Promise<DeleteAgentResult> {
 	try {
 		// Delete the agent from database
 		await db.transaction(async (tx) => {
+			// Delete related flowTriggers first
+			if (agent.workspaceId) {
+				await tx
+					.delete(flowTriggers)
+					.where(eq(flowTriggers.sdkWorkspaceId, agent.workspaceId));
+			}
 			await tx
 				.delete(githubIntegrationSettings)
 				.where(eq(githubIntegrationSettings.agentDbId, agent.dbId));
