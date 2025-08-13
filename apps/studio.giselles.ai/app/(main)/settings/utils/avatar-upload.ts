@@ -3,10 +3,7 @@ import { publicStorage } from "@/app/giselle-engine";
 import { logger } from "@/lib/logger";
 import { IMAGE_CONSTRAINTS } from "../constants";
 
-/**
- * Calculate file hash for cache busting
- */
-export async function calculateFileHash(file: File): Promise<string> {
+async function calculateFileHash(file: File): Promise<string> {
 	const arrayBuffer = await file.arrayBuffer();
 	const buffer = Buffer.from(arrayBuffer);
 	const hash = createHash("sha256").update(buffer).digest("hex");
@@ -14,10 +11,7 @@ export async function calculateFileHash(file: File): Promise<string> {
 	return hash.substring(0, 8);
 }
 
-/**
- * Get file extension from MIME type
- */
-export function getExtensionFromMimeType(mimeType: string): string {
+function getExtensionFromMimeType(mimeType: string): string {
 	return (
 		IMAGE_CONSTRAINTS.mimeToExt[
 			mimeType as keyof typeof IMAGE_CONSTRAINTS.mimeToExt
@@ -51,10 +45,7 @@ export function validateImageFile(file: File): {
 	};
 }
 
-/**
- * Generate avatar file path with hash for cache busting
- */
-export async function generateAvatarPath(
+async function generateAvatarPath(
 	file: File,
 	prefix: string,
 	id: string,
