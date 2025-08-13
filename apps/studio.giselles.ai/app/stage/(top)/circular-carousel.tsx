@@ -1,12 +1,12 @@
 "use client";
 
 import {
-	ChevronDown,
-	ChevronLeft,
-	ChevronRight,
-	ChevronUp,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  ChevronUp,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { TeamCard } from "./team-card";
 
 // Add keyframes for gentle pulse animation
@@ -22,430 +22,497 @@ const pulseKeyframes = `
 `;
 
 interface CarouselItem {
-	id: string;
-	name: string;
-	profileImageUrl?: string;
+  id: string;
+  name: string;
+  profileImageUrl?: string;
 }
 
 interface CircularCarouselProps {
-	items: CarouselItem[];
-	selectedId?: string;
-	onItemSelect?: (item: CarouselItem) => void;
-	onItemDeselect?: () => void;
+  items: CarouselItem[];
+  selectedId?: string;
+  onItemSelect?: (item: CarouselItem) => void;
+  onItemDeselect?: () => void;
 }
 
 export function CircularCarousel({
-	items,
-	selectedId: _selectedId,
-	onItemSelect,
-	onItemDeselect,
+  items,
+  selectedId: _selectedId,
+  onItemSelect,
+  onItemDeselect,
 }: CircularCarouselProps) {
-	const [currentIndex, setCurrentIndex] = useState(
-		Math.floor(items.length / 2),
-	);
-	const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
-	const [rejectIndex, setRejectIndex] = useState<number | null>(null);
-	const [insertedIndex, setInsertedIndex] = useState<number | null>(null);
-	const [animatingIndex, setAnimatingIndex] = useState<number | null>(null);
-	const [animatingUpIndex, setAnimatingUpIndex] = useState<number | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [containerWidth, setContainerWidth] = useState(800);
+  const [currentIndex, setCurrentIndex] = useState(
+    items.length > 0 ? Math.floor(items.length / 2) : 0,
+  );
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+  const [rejectIndex, setRejectIndex] = useState<number | null>(null);
+  const [insertedIndex, setInsertedIndex] = useState<number | null>(null);
+  const [animatingIndex, setAnimatingIndex] = useState<number | null>(null);
+  const [animatingUpIndex, setAnimatingUpIndex] = useState<number | null>(null);
 
-	// Drag state
-	const [isDragging, setIsDragging] = useState(false);
-	const [dragStart, setDragStart] = useState(0);
-	const [dragOffset, setDragOffset] = useState(0);
+  // Drag state
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState(0);
+  const [dragOffset, setDragOffset] = useState(0);
 
-	// Carousel settings
-	const visibleCards = Math.min(7, items.length); // Show up to 7 cards when available
-	const radius = 400;
-	const centerX = 0;
-	const centerY = 510;
+  // Calculate visible cards based on container width with specific breakpoints
+  const calculateVisibleCards = (width: number) => {
+    if (width === 0) return Math.min(5, items.length); // Default while measuring
 
-	// Get visible cards around current index
-	const getVisibleCards = () => {
-		const cards = [];
-		const halfVisible = Math.floor(visibleCards / 2);
+    let visibleCards: number;
+    if (width < 500) {
+      visibleCards = 3; // Small screens
+    } else if (width < 700) {
+      visibleCards = 5; // Medium screens
+    } else {
+      visibleCards = 7; // Large screens
+    }
 
-		for (let i = -halfVisible; i <= halfVisible; i++) {
-			const index = currentIndex + i;
-			if (index >= 0 && index < items.length) {
-				cards.push({
-					item: items[index],
-					originalIndex: index,
-					positionIndex: i,
-				});
-			}
-		}
-		return cards;
-	};
+    return Math.min(visibleCards, items.length);
+  };
 
-	// Calculate card position on semicircle
-	const getCardPosition = (positionIndex: number) => {
-		const isCenter = positionIndex === 0;
+  // Carousel settings
+  const visibleCards = calculateVisibleCards(containerWidth);
+  const radius = 400;
+  const centerX = 0;
+  const centerY = 510;
 
-		// Semicircle angle calculation - tighter arc to bring cards closer
-		const totalAngle = visibleCards > 5 ? Math.PI * 0.6 : Math.PI * 0.5; // Wider arc for more spacing between cards
-		const angleStep = totalAngle / (visibleCards - 1);
-		const angle = Math.PI / 2 + angleStep * positionIndex;
+  // Handle container resize
+  useEffect(() => {
+    const updateContainerWidth = () => {
+      if (containerRef.current) {
+        const width = containerRef.current.offsetWidth;
+        setContainerWidth(width);
+      }
+    };
 
-		// Add drag offset
-		const dragAngle = isDragging ? dragOffset * 0.008 : 0;
-		const finalAngle = angle + dragAngle;
+    // Use ResizeObserver for more accurate detection
+    const resizeObserver = new ResizeObserver(() => {
+      updateContainerWidth();
+    });
 
-		// Position on semicircle - adjust Y so card bottom follows the arc
-		const x = centerX + radius * Math.cos(finalAngle);
-		const y = centerY - radius * Math.sin(finalAngle) - 144; // Offset by card height so bottom edge aligns with arc
+    if (containerRef.current) {
+      resizeObserver.observe(containerRef.current);
+      updateContainerWidth(); // Initial measurement
+    }
 
-		// Rotate card to tilt outward from center
-		const cardRotation = -(finalAngle - Math.PI / 2) * (180 / Math.PI);
+    // Fallback for initial load
+    const timer = setTimeout(updateContainerWidth, 100);
 
-		// Visual effects - edge cards more visible but smaller
-		const distanceFromCenter = Math.abs(positionIndex);
-		const isEdgeCard = Math.abs(positionIndex) >= Math.floor(visibleCards / 2);
-		const opacity = isEdgeCard
-			? Math.max(0.4, 1 - distanceFromCenter * 0.2)
-			: Math.max(0.6, 1 - distanceFromCenter * 0.15);
-		const scale = 1.0; // All cards same size
-		const zIndex = isCenter ? 50 : Math.max(1, 30 - distanceFromCenter * 5);
+    return () => {
+      resizeObserver.disconnect();
+      clearTimeout(timer);
+    };
+  }, []);
 
-		return {
-			x,
-			y,
-			rotation: cardRotation,
-			scale,
-			opacity,
-			zIndex,
-			isCenter,
-		};
-	};
+  // Update current index when visible cards change
+  useEffect(() => {
+    if (items.length === 0) return;
 
-	// Navigation functions
-	const moveLeft = () => {
-		if (currentIndex > 0) {
-			setCurrentIndex(currentIndex - 1);
-			setSelectedIndex(null);
-			setRejectIndex(null);
-			setInsertedIndex(null);
-			setAnimatingIndex(null);
-			setAnimatingUpIndex(null);
-		}
-	};
+    const maxIndex = Math.max(0, items.length - 1);
+    const halfVisible = Math.floor(visibleCards / 2);
+    const minCurrentIndex = halfVisible;
+    const maxCurrentIndex = Math.max(minCurrentIndex, maxIndex - halfVisible);
 
-	const moveRight = () => {
-		if (currentIndex < items.length - 1) {
-			setCurrentIndex(currentIndex + 1);
-			setSelectedIndex(null);
-			setRejectIndex(null);
-			setInsertedIndex(null);
-			setAnimatingIndex(null);
-			setAnimatingUpIndex(null);
-		}
-	};
+    setCurrentIndex((prev) => {
+      if (prev < minCurrentIndex) {
+        return minCurrentIndex;
+      } else if (prev > maxCurrentIndex) {
+        return maxCurrentIndex;
+      }
+      return prev;
+    });
+  }, [visibleCards, items.length]);
 
-	// Handle card click
-	const handleCardClick = (originalIndex: number, isCenter: boolean) => {
-		if (isCenter) {
-			if (insertedIndex === originalIndex) {
-				// Click on inserted card: start slide up animation
-				setAnimatingUpIndex(originalIndex);
-				setInsertedIndex(null);
-				setRejectIndex(null);
+  // Get visible cards around current index
+  const getVisibleCards = () => {
+    const cards = [];
+    const halfVisible = Math.floor(visibleCards / 2);
 
-				// Call deselect callback
-				if (onItemDeselect) {
-					onItemDeselect();
-				}
+    for (let i = -halfVisible; i <= halfVisible; i++) {
+      const index = currentIndex + i;
+      if (index >= 0 && index < items.length) {
+        cards.push({
+          item: items[index],
+          originalIndex: index,
+          positionIndex: i,
+        });
+      }
+    }
+    return cards;
+  };
 
-				// Complete slide up animation
-				setTimeout(() => {
-					setAnimatingUpIndex(null);
-				}, 600);
-			} else {
-				// First click: show blue selection frame immediately
-				setSelectedIndex(originalIndex);
-				setRejectIndex(null);
-				setInsertedIndex(null);
-				setAnimatingIndex(null);
-				setAnimatingUpIndex(null);
+  // Calculate card position on semicircle
+  const getCardPosition = (positionIndex: number) => {
+    const isCenter = positionIndex === 0;
 
-				if (onItemSelect) {
-					onItemSelect(items[originalIndex]);
-				}
+    // Semicircle angle calculation - tighter arc to bring cards closer
+    const totalAngle = visibleCards >= 5 ? Math.PI * 0.6 : Math.PI * 0.2; // Adjusted arc spacing
+    const angleStep = totalAngle / (visibleCards - 1);
+    const angle = Math.PI / 2 + angleStep * positionIndex;
 
-				// Brief delay to show selection state, then start slide down animation
-				setTimeout(() => {
-					setAnimatingIndex(originalIndex);
-					setSelectedIndex(null);
+    // Add drag offset
+    const dragAngle = isDragging ? -dragOffset * 0.008 : 0;
+    const finalAngle = angle + dragAngle;
 
-					// Start slide down animation
-					setTimeout(() => {
-						setInsertedIndex(originalIndex);
-						setRejectIndex(originalIndex);
-						setAnimatingIndex(null);
-					}, 600);
-				}, 300); // Show selection state for 300ms before animation
-			}
-		} else {
-			// Move clicked card to center
-			setCurrentIndex(originalIndex);
-			setSelectedIndex(null);
-			setRejectIndex(null);
-			setInsertedIndex(null);
-			setAnimatingIndex(null);
-			setAnimatingUpIndex(null);
-		}
-	};
+    // Position on semicircle - adjust Y so card bottom follows the arc
+    const x = centerX + radius * Math.cos(finalAngle);
+    const y = centerY - radius * Math.sin(finalAngle) - 144; // Offset by card height so bottom edge aligns with arc
 
-	// Drag handlers
-	const handleDragStart = (clientX: number) => {
-		setIsDragging(true);
-		setDragStart(clientX);
-		setDragOffset(0);
-	};
+    // Rotate card to tilt outward from center
+    const cardRotation = -(finalAngle - Math.PI / 2) * (180 / Math.PI);
 
-	const handleDragMove = (clientX: number) => {
-		if (!isDragging) return;
-		const distance = clientX - dragStart;
-		setDragOffset(distance);
-	};
+    // Visual effects - edge cards more visible but smaller
+    const distanceFromCenter = Math.abs(positionIndex);
+    const isEdgeCard = Math.abs(positionIndex) >= Math.floor(visibleCards / 2);
+    const opacity = isEdgeCard
+      ? Math.max(0.4, 1 - distanceFromCenter * 0.2)
+      : Math.max(0.6, 1 - distanceFromCenter * 0.15);
+    const scale = 1.0; // All cards same size
+    const zIndex = isCenter ? 50 : Math.max(1, 30 - distanceFromCenter * 5);
 
-	const handleDragEnd = () => {
-		if (!isDragging) return;
+    return {
+      x,
+      y,
+      rotation: cardRotation,
+      scale,
+      opacity,
+      zIndex,
+      isCenter,
+    };
+  };
 
-		const threshold = 50;
-		if (Math.abs(dragOffset) > threshold) {
-			if (dragOffset > 0) {
-				moveLeft();
-			} else {
-				moveRight();
-			}
-		}
+  // Navigation functions
+  const moveLeft = () => {
+    if (currentIndex > 0) {
+      setCurrentIndex(currentIndex - 1);
+      setSelectedIndex(null);
+      setRejectIndex(null);
+      setInsertedIndex(null);
+      setAnimatingIndex(null);
+      setAnimatingUpIndex(null);
+    }
+  };
 
-		setIsDragging(false);
-		setDragStart(0);
-		setDragOffset(0);
-	};
+  const moveRight = () => {
+    if (currentIndex < items.length - 1) {
+      setCurrentIndex(currentIndex + 1);
+      setSelectedIndex(null);
+      setRejectIndex(null);
+      setInsertedIndex(null);
+      setAnimatingIndex(null);
+      setAnimatingUpIndex(null);
+    }
+  };
 
-	// Mouse events
-	const handleMouseDown = (e: React.MouseEvent) => {
-		e.preventDefault();
-		handleDragStart(e.clientX);
-	};
+  // Handle card click
+  const handleCardClick = (originalIndex: number, isCenter: boolean) => {
+    if (isCenter) {
+      if (insertedIndex === originalIndex) {
+        // Click on inserted card: start slide up animation
+        setAnimatingUpIndex(originalIndex);
+        setInsertedIndex(null);
+        setRejectIndex(null);
 
-	const handleMouseMove = (e: React.MouseEvent) => {
-		handleDragMove(e.clientX);
-	};
+        // Call deselect callback
+        if (onItemDeselect) {
+          onItemDeselect();
+        }
 
-	// Touch events
-	const handleTouchStart = (e: React.TouchEvent) => {
-		handleDragStart(e.touches[0].clientX);
-	};
+        // Complete slide up animation
+        setTimeout(() => {
+          setAnimatingUpIndex(null);
+        }, 600);
+      } else {
+        // First click: show blue selection frame immediately
+        setSelectedIndex(originalIndex);
+        setRejectIndex(null);
+        setInsertedIndex(null);
+        setAnimatingIndex(null);
+        setAnimatingUpIndex(null);
 
-	const handleTouchMove = (e: React.TouchEvent) => {
-		handleDragMove(e.touches[0].clientX);
-	};
+        if (onItemSelect) {
+          onItemSelect(items[originalIndex]);
+        }
 
-	const visibleCardsList = getVisibleCards();
-	const centerCard = visibleCardsList.find((card) => card.positionIndex === 0);
+        // Brief delay to show selection state, then start slide down animation
+        setTimeout(() => {
+          setAnimatingIndex(originalIndex);
+          setSelectedIndex(null);
 
-	// Show empty state when no items available
-	if (items.length === 0) {
-		return (
-			<div
-				className="relative w-full overflow-hidden flex items-center justify-center"
-				style={{ height: "250px" }}
-			>
-				<div className="text-center">
-					<p className="text-white-400 text-[14px] font-medium font-['DM_Sans']">
-						No executable apps available. Please select a different team or
-						create a new app.
-					</p>
-				</div>
-			</div>
-		);
-	}
+          // Start slide down animation
+          setTimeout(() => {
+            setInsertedIndex(originalIndex);
+            setRejectIndex(originalIndex);
+            setAnimatingIndex(null);
+          }, 600);
+        }, 300); // Show selection state for 300ms before animation
+      }
+    } else {
+      // Move clicked card to center
+      setCurrentIndex(originalIndex);
+      setSelectedIndex(null);
+      setRejectIndex(null);
+      setInsertedIndex(null);
+      setAnimatingIndex(null);
+      setAnimatingUpIndex(null);
+    }
+  };
 
-	return (
-		<div
-			className="relative w-full overflow-hidden"
-			style={{ height: "250px" }}
-		>
-			<style dangerouslySetInnerHTML={{ __html: pulseKeyframes }} />
-			{/* Carousel container */}
-			<div
-				className="relative w-full h-full flex items-center justify-center cursor-grab active:cursor-grabbing"
-				onMouseDown={handleMouseDown}
-				onMouseMove={handleMouseMove}
-				onMouseUp={handleDragEnd}
-				onMouseLeave={handleDragEnd}
-				onTouchStart={handleTouchStart}
-				onTouchMove={handleTouchMove}
-				onTouchEnd={handleDragEnd}
-				style={{
-					userSelect: "none",
-					WebkitUserSelect: "none",
-				}}
-			>
-				{visibleCardsList.map(({ item, originalIndex, positionIndex }) => {
-					const position = getCardPosition(positionIndex);
-					const isAnimating =
-						animatingIndex === originalIndex && position.isCenter;
-					const isAnimatingUp =
-						animatingUpIndex === originalIndex && position.isCenter;
-					const isInserted =
-						insertedIndex === originalIndex && position.isCenter;
+  // Drag handlers
+  const handleDragStart = (clientX: number) => {
+    setIsDragging(true);
+    setDragStart(clientX);
+    setDragOffset(0);
+  };
 
-					return (
-						<div
-							key={`${item.id}-${originalIndex}`}
-							className="absolute cursor-pointer select-none"
-							style={{
-								transform: isAnimating
-									? `translate(${position.x}px, ${position.y + 170}px) rotate(0deg) scale(${position.scale})`
-									: isAnimatingUp
-										? `translate(${position.x}px, ${position.y}px) rotate(${position.rotation}deg) scale(${position.scale})`
-										: isInserted
-											? `translate(${position.x}px, ${position.y + 170}px) rotate(0deg) scale(${position.scale})`
-											: `translate(${position.x}px, ${position.y}px) rotate(${position.rotation}deg) scale(${position.scale})`,
-								zIndex: position.zIndex,
-								opacity: position.opacity,
-								transition:
-									isAnimating || isAnimatingUp
-										? "transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.3s ease"
-										: isDragging
-											? "none"
-											: "transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.3s ease",
-							}}
-							onClick={() => handleCardClick(originalIndex, position.isCenter)}
-						>
-							<div
-								className="relative"
-								style={{
-									...(isInserted && {
-										animation: "gentle-pulse 2s ease-in-out infinite",
-										filter: "drop-shadow(0 0 12px rgba(107, 143, 240, 0.6))",
-									}),
-								}}
-							>
-								<TeamCard
-									team={{
-										id: item.id,
-										name: item.name,
-										profileImageUrl: item.profileImageUrl,
-									}}
-								/>
-							</div>
-						</div>
-					);
-				})}
-			</div>
+  const handleDragMove = (clientX: number) => {
+    if (!isDragging) return;
+    const distance = clientX - dragStart;
+    setDragOffset(distance);
+  };
 
-			{/* Gray selection frame - normal state */}
-			{centerCard && !insertedIndex && !selectedIndex && !animatingIndex && (
-				<div
-					className="absolute left-1/2 top-1/2 pointer-events-none z-40"
-					style={{
-						width: "98px", // 90px card + 4px padding on each side
-						height: "128px", // 120px card + 4px padding on each side
-						borderRadius: "4px 4px 16px 4px",
-						border: "2px solid #2E2E2E",
-						transform: `translate(-50%, -50%) translate(${centerX}px, ${centerY - radius - 144}px)`,
-					}}
-				/>
-			)}
+  const handleDragEnd = () => {
+    if (!isDragging) return;
 
-			{/* Normal state: Arrow below gray frame */}
-			{centerCard && !insertedIndex && !selectedIndex && !animatingIndex && (
-				<div
-					className="absolute left-1/2 transform -translate-x-1/2 text-center z-60 cursor-pointer"
-					style={{ top: "75%" }}
-					onClick={() => {
-						if (centerCard) {
-							handleCardClick(centerCard.originalIndex, true);
-						}
-					}}
-				>
-					<div className="text-gray-300 text-lg font-medium mb-1 tracking-wide flex justify-center">
-						<ChevronDown size={20} />
-					</div>
-					<div
-						className="mx-auto"
-						style={{
-							width: "108px",
-							height: "95px",
-							background:
-								"radial-gradient(ellipse 108px 80px at 50% 100%, rgba(107, 143, 240, 1) 0%, rgba(107, 143, 240, 0.8) 20%, rgba(107, 143, 240, 0.5) 40%, rgba(107, 143, 240, 0.2) 70%, transparent 100%)",
-							filter: "blur(2px)",
-						}}
-					/>
-				</div>
-			)}
+    const threshold = 50;
+    if (Math.abs(dragOffset) > threshold) {
+      if (dragOffset > 0) {
+        moveRight();
+      } else {
+        moveLeft();
+      }
+    }
 
-			{/* Blue selection frame - selected state */}
-			{centerCard && selectedIndex === centerCard.originalIndex && (
-				<div
-					className="absolute left-1/2 top-1/2 pointer-events-none z-40"
-					style={{
-						width: "98px", // 90px card + 4px padding on each side
-						height: "128px", // 120px card + 4px padding on each side
-						borderRadius: "4px 4px 16px 4px",
-						border: "2px solid var(--primary400, #6B8FF0)",
-						boxShadow: "1px 1px 16px 8px rgba(107, 143, 240, 0.25)",
-						transform: `translate(-50%, -50%) translate(${centerX}px, ${centerY - radius - 144}px)`,
-					}}
-				/>
-			)}
+    setIsDragging(false);
+    setDragStart(0);
+    setDragOffset(0);
+  };
 
-			{/* Left arrow */}
-			<button
-				type="button"
-				onClick={moveRight}
-				disabled={currentIndex === items.length - 1}
-				className="absolute left-6 top-1/2 transform -translate-y-1/2 w-10 h-10 border border-white hover:bg-white/10 rounded-full flex items-center justify-center text-white transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed z-50"
-			>
-				<ChevronLeft size={20} />
-			</button>
+  // Mouse events
+  const handleMouseDown = (e: React.MouseEvent) => {
+    e.preventDefault();
+    handleDragStart(e.clientX);
+  };
 
-			{/* Right arrow */}
-			<button
-				type="button"
-				onClick={moveLeft}
-				disabled={currentIndex === 0}
-				className="absolute right-6 top-1/2 transform -translate-y-1/2 w-10 h-10 border border-white hover:bg-white/10 rounded-full flex items-center justify-center text-white transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed z-50"
-			>
-				<ChevronRight size={20} />
-			</button>
+  const handleMouseMove = (e: React.MouseEvent) => {
+    handleDragMove(e.clientX);
+  };
 
-			{/* REJECT state: Arrow above inserted card */}
-			{centerCard && rejectIndex === centerCard.originalIndex && (
-				<div
-					className="absolute left-1/2 top-1/2 pointer-events-auto z-60 cursor-pointer"
-					style={{
-						transform: `translate(-50%, -50%) translate(${centerX}px, ${centerY - radius - 144 + 90}px)`,
-					}}
-					onClick={() => {
-						if (centerCard) {
-							// Start slide up animation
-							setAnimatingUpIndex(centerCard.originalIndex);
-							setInsertedIndex(null);
-							setRejectIndex(null);
+  // Touch events
+  const handleTouchStart = (e: React.TouchEvent) => {
+    handleDragStart(e.touches[0].clientX);
+  };
 
-							// Call deselect callback
-							if (onItemDeselect) {
-								onItemDeselect();
-							}
+  const handleTouchMove = (e: React.TouchEvent) => {
+    handleDragMove(e.touches[0].clientX);
+  };
 
-							// Complete slide up animation
-							setTimeout(() => {
-								setAnimatingUpIndex(null);
-							}, 600);
-						}
-					}}
-				>
-					<div className="text-gray-300 text-lg font-medium flex justify-center">
-						<ChevronUp size={20} />
-					</div>
-				</div>
-			)}
-		</div>
-	);
+  const visibleCardsList = getVisibleCards();
+  const centerCard = visibleCardsList.find((card) => card.positionIndex === 0);
+
+  // Show empty state when no items available
+  if (items.length === 0) {
+    return (
+      <div
+        ref={containerRef}
+        className="relative w-full overflow-hidden select-none"
+        style={{ height: "250px" }}
+      >
+        <div className="text-center">
+          <p className="text-white-400 text-[14px] font-medium font-['DM_Sans']">
+            No executable apps available. Please select a different team or
+            create a new app.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      ref={containerRef}
+      className="relative w-full overflow-hidden"
+      style={{ height: "250px" }}
+    >
+      <style dangerouslySetInnerHTML={{ __html: pulseKeyframes }} />
+      {/* Carousel container */}
+      <div
+        className="relative w-full h-full flex items-center justify-center cursor-grab active:cursor-grabbing"
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleDragEnd}
+        onMouseLeave={handleDragEnd}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleDragEnd}
+        style={{
+          userSelect: "none",
+          WebkitUserSelect: "none",
+        }}
+      >
+        {visibleCardsList.map(({ item, originalIndex, positionIndex }) => {
+          const position = getCardPosition(positionIndex);
+          const isAnimating =
+            animatingIndex === originalIndex && position.isCenter;
+          const isAnimatingUp =
+            animatingUpIndex === originalIndex && position.isCenter;
+          const isInserted =
+            insertedIndex === originalIndex && position.isCenter;
+
+          return (
+            <div
+              key={`${item.id}-${originalIndex}`}
+              className="absolute cursor-pointer select-none"
+              style={{
+                transform: isAnimating
+                  ? `translate(${position.x}px, ${position.y + 170}px) rotate(0deg) scale(${position.scale})`
+                  : isAnimatingUp
+                    ? `translate(${position.x}px, ${position.y}px) rotate(${position.rotation}deg) scale(${position.scale})`
+                    : isInserted
+                      ? `translate(${position.x}px, ${position.y + 170}px) rotate(0deg) scale(${position.scale})`
+                      : `translate(${position.x}px, ${position.y}px) rotate(${position.rotation}deg) scale(${position.scale})`,
+                zIndex: position.zIndex,
+                opacity: position.opacity,
+                transition:
+                  isAnimating || isAnimatingUp
+                    ? "transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.3s ease"
+                    : isDragging
+                      ? "none"
+                      : "transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.3s ease",
+              }}
+              onClick={() => handleCardClick(originalIndex, position.isCenter)}
+            >
+              <div
+                className="relative"
+                style={{
+                  ...(isInserted && {
+                    animation: "gentle-pulse 2s ease-in-out infinite",
+                    filter: "drop-shadow(0 0 12px rgba(107, 143, 240, 0.6))",
+                  }),
+                }}
+              >
+                <TeamCard
+                  team={{
+                    id: item.id,
+                    name: item.name,
+                    profileImageUrl: item.profileImageUrl,
+                  }}
+                />
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Gray selection frame - normal state */}
+      {centerCard && !insertedIndex && !selectedIndex && !animatingIndex && (
+        <div
+          className="absolute left-1/2 top-1/2 pointer-events-none z-40"
+          style={{
+            width: "98px", // 90px card + 4px padding on each side
+            height: "128px", // 120px card + 4px padding on each side
+            borderRadius: "4px 4px 16px 4px",
+            border: "2px solid #2E2E2E",
+            transform: `translate(-50%, -50%) translate(${centerX}px, ${centerY - radius - 144}px)`,
+          }}
+        />
+      )}
+
+      {/* Normal state: Arrow below gray frame */}
+      {centerCard && !insertedIndex && !selectedIndex && !animatingIndex && (
+        <div
+          className="absolute left-1/2 transform -translate-x-1/2 text-center z-60 cursor-pointer"
+          style={{ top: "75%" }}
+          onClick={() => {
+            if (centerCard) {
+              handleCardClick(centerCard.originalIndex, true);
+            }
+          }}
+        >
+          <div className="text-gray-300 text-lg font-medium mb-1 tracking-wide flex justify-center">
+            <ChevronDown size={20} />
+          </div>
+          <div
+            className="mx-auto"
+            style={{
+              width: "108px",
+              height: "95px",
+              background:
+                "radial-gradient(ellipse 108px 80px at 50% 100%, rgba(107, 143, 240, 1) 0%, rgba(107, 143, 240, 0.8) 20%, rgba(107, 143, 240, 0.5) 40%, rgba(107, 143, 240, 0.2) 70%, transparent 100%)",
+              filter: "blur(2px)",
+            }}
+          />
+        </div>
+      )}
+
+      {/* Blue selection frame - selected state */}
+      {centerCard && selectedIndex === centerCard.originalIndex && (
+        <div
+          className="absolute left-1/2 top-1/2 pointer-events-none z-40"
+          style={{
+            width: "98px", // 90px card + 4px padding on each side
+            height: "128px", // 120px card + 4px padding on each side
+            borderRadius: "4px 4px 16px 4px",
+            border: "2px solid var(--primary400, #6B8FF0)",
+            boxShadow: "1px 1px 16px 8px rgba(107, 143, 240, 0.25)",
+            transform: `translate(-50%, -50%) translate(${centerX}px, ${centerY - radius - 144}px)`,
+          }}
+        />
+      )}
+
+      {/* Left arrow */}
+      <button
+        type="button"
+        onClick={moveRight}
+        disabled={currentIndex === items.length - 1}
+        className="hidden md:flex absolute left-6 top-1/2 transform -translate-y-1/2 w-10 h-10 border border-white hover:bg-white/10 rounded-full items-center justify-center text-white transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed z-50"
+      >
+        <ChevronLeft size={20} />
+      </button>
+
+      {/* Right arrow */}
+      <button
+        type="button"
+        onClick={moveLeft}
+        disabled={currentIndex === 0}
+        className="hidden md:flex absolute right-6 top-1/2 transform -translate-y-1/2 w-10 h-10 border border-white hover:bg-white/10 rounded-full items-center justify-center text-white transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed z-50"
+      >
+        <ChevronRight size={20} />
+      </button>
+
+      {/* REJECT state: Arrow above inserted card */}
+      {centerCard && rejectIndex === centerCard.originalIndex && (
+        <div
+          className="absolute left-1/2 top-1/2 pointer-events-auto z-60 cursor-pointer"
+          style={{
+            transform: `translate(-50%, -50%) translate(${centerX}px, ${centerY - radius - 144 + 90}px)`,
+          }}
+          onClick={() => {
+            if (centerCard) {
+              // Start slide up animation
+              setAnimatingUpIndex(centerCard.originalIndex);
+              setInsertedIndex(null);
+              setRejectIndex(null);
+
+              // Call deselect callback
+              if (onItemDeselect) {
+                onItemDeselect();
+              }
+
+              // Complete slide up animation
+              setTimeout(() => {
+                setAnimatingUpIndex(null);
+              }, 600);
+            }
+          }}
+        >
+          <div className="text-gray-300 text-lg font-medium flex justify-center">
+            <ChevronUp size={20} />
+          </div>
+        </div>
+      )}
+    </div>
+  );
 }
