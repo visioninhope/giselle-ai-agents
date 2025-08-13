@@ -1,6 +1,6 @@
 "use server";
 
-import type { WorkspaceId, TriggerNode } from "@giselle-sdk/data-type";
+import type { WorkspaceId } from "@giselle-sdk/data-type";
 import { isTriggerNode } from "@giselle-sdk/data-type";
 import type { AgentId } from "@giselles-ai/types";
 import { createId } from "@paralleldrive/cuid2";
@@ -73,28 +73,25 @@ export async function copyAgent(
 		});
 
 		// Copy flowTrigger DB records for staged triggers
-		const configuredTriggerNodes = workspace.nodes.filter(
-			(node): node is TriggerNode =>
-				isTriggerNode(node) && node.content.state.status === "configured",
-		);
+		for (const node of workspace.nodes) {
+			if (!isTriggerNode(node) || node.content.state.status !== "configured") {
+				continue;
+			}
 
-		for (const node of configuredTriggerNodes) {
-			if (node.content.state.status === "configured") {
-				const flowTrigger = await giselleEngine.getTrigger({
-					flowTriggerId: node.content.state.flowTriggerId,
+			const flowTrigger = await giselleEngine.getTrigger({
+				flowTriggerId: node.content.state.flowTriggerId,
+			});
+			if (
+				flowTrigger &&
+				flowTrigger.configuration.provider === "manual" &&
+				flowTrigger.configuration.staged
+			) {
+				await db.insert(flowTriggers).values({
+					teamDbId: team.dbId,
+					sdkFlowTriggerId: node.content.state.flowTriggerId,
+					sdkWorkspaceId: workspace.id,
+					staged: true,
 				});
-				if (
-					flowTrigger &&
-					flowTrigger.configuration.provider === "manual" &&
-					flowTrigger.configuration.staged
-				) {
-					await db.insert(flowTriggers).values({
-						teamDbId: team.dbId,
-						sdkFlowTriggerId: node.content.state.flowTriggerId,
-						sdkWorkspaceId: workspace.id,
-						staged: true,
-					});
-				}
 			}
 		}
 
