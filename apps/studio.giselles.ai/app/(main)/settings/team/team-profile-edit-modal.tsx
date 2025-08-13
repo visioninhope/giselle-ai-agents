@@ -229,7 +229,12 @@ export function TeamProfileEditModal({
 	};
 
 	return (
-		<Dialog.Root open={isOpen} onOpenChange={onClose}>
+		<Dialog.Root
+			open={isOpen}
+			onOpenChange={(open) => {
+				if (!open && !isLoading) onClose();
+			}}
+		>
 			<Dialog.Portal>
 				<Dialog.Overlay className="fixed inset-0 bg-black/60 z-50" />
 				<div className="fixed inset-0 flex items-center justify-center z-50 p-4">
@@ -239,9 +244,18 @@ export function TeamProfileEditModal({
 							animation: "fadeIn 0.2s ease-out",
 							transformOrigin: "center",
 						}}
-						onEscapeKeyDown={onClose}
-						onPointerDownOutside={onClose}
-						aria-describedby={undefined}
+						onEscapeKeyDown={(e) => {
+							if (isLoading) {
+								e.preventDefault();
+								e.stopPropagation();
+							}
+						}}
+						onPointerDownOutside={(e) => {
+							if (isLoading) {
+								e.preventDefault();
+								e.stopPropagation();
+							}
+						}}
 					>
 						{/* Glass effect layers */}
 						<div
@@ -309,7 +323,12 @@ export function TeamProfileEditModal({
 
 										{/* Left side - preview image */}
 										{profileImagePreview && (
-											<div className="relative w-[80px] h-[80px] rounded-full overflow-hidden border border-primary-100/30">
+											<button
+												type="button"
+												onClick={handleSelectImageClick}
+												className="group relative w-[80px] h-[80px] rounded-full overflow-hidden cursor-pointer focus:outline-none focus:ring-0 border border-primary-100/30 hover:before:content-[''] hover:before:absolute hover:before:inset-0 hover:before:bg-black-900/40 hover:before:z-10"
+												aria-label="Change team profile image"
+											>
 												<Image
 													src={profileImagePreview}
 													alt="Team profile preview"
@@ -318,7 +337,12 @@ export function TeamProfileEditModal({
 													className="object-cover w-full h-full scale-[1.02]"
 													style={{ objectPosition: "center" }}
 												/>
-											</div>
+												<div className="absolute inset-0 flex items-center justify-center bg-black-900/50 opacity-0 group-hover:opacity-100 transition-opacity">
+													<div className="w-[40px] h-[40px] rounded-full flex items-center justify-center">
+														<ImageIcon className="w-7 h-7 text-white-800 transform group-hover:scale-110 transition-transform" />
+													</div>
+												</div>
+											</button>
 										)}
 									</div>
 								</div>

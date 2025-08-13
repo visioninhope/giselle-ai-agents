@@ -188,7 +188,12 @@ export function ProfileEditModal({
 	};
 
 	return (
-		<Dialog.Root open={isOpen} onOpenChange={onClose}>
+		<Dialog.Root
+			open={isOpen}
+			onOpenChange={(open) => {
+				if (!open && !isLoading) onClose();
+			}}
+		>
 			<Dialog.Portal>
 				<Dialog.Overlay className="fixed inset-0 bg-black/60 z-50" />
 				<div className="fixed inset-0 flex items-center justify-center z-50 p-4">
@@ -198,9 +203,18 @@ export function ProfileEditModal({
 							animation: "fadeIn 0.2s ease-out",
 							transformOrigin: "center",
 						}}
-						onEscapeKeyDown={onClose}
-						onPointerDownOutside={onClose}
-						aria-describedby={undefined}
+						onEscapeKeyDown={(e) => {
+							if (isLoading) {
+								e.preventDefault();
+								e.stopPropagation();
+							}
+						}}
+						onPointerDownOutside={(e) => {
+							if (isLoading) {
+								e.preventDefault();
+								e.stopPropagation();
+							}
+						}}
 					>
 						{/* Glass effect layers */}
 						<div
