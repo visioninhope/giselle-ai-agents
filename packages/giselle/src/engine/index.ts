@@ -122,13 +122,11 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 		generateText: async (
 			generation: QueuedGeneration,
 			useExperimentalStorage: boolean,
-			telemetry?: TelemetrySettings,
 		) => {
 			return await generateText({
 				context,
 				generation,
 				useExperimentalStorage,
-				telemetry,
 			});
 		},
 		getGeneration: async (

@@ -82,13 +82,11 @@ export const createJsonRouters = {
 				input: z.object({
 					generation: QueuedGeneration,
 					useExperimentalStorage: z.boolean(),
-					telemetry: z.custom<TelemetrySettings>().optional(),
 				}),
 				handler: async ({ input }) => {
 					const stream = await giselleEngine.generateText(
 						input.generation,
 						input.useExperimentalStorage,
-						input.telemetry,
 					);
 					return createUIMessageStreamResponse({ stream });
 				},
