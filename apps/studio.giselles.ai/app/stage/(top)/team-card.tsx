@@ -2,10 +2,7 @@ import type { InferSelectModel } from "drizzle-orm";
 import type { teams } from "@/drizzle";
 
 interface TeamCardProps {
-	team?: Pick<
-		InferSelectModel<typeof teams>,
-		"id" | "name" | "profileImageUrl"
-	>;
+	team?: Pick<InferSelectModel<typeof teams>, "id" | "name">;
 }
 
 export function TeamCard({ team }: TeamCardProps) {
@@ -26,7 +23,8 @@ export function TeamCard({ team }: TeamCardProps) {
 					style={{
 						display: "-webkit-box",
 						WebkitLineClamp: 2,
-						WebkitBoxOrient: "vertical" as any,
+						WebkitBoxOrient:
+							"vertical" as React.CSSProperties["WebkitBoxOrient"],
 						wordBreak: "break-word",
 						height: "24px", // 12px * 2 lines with spacing
 					}}
@@ -41,17 +39,9 @@ export function TeamCard({ team }: TeamCardProps) {
 							height: "66px",
 						}}
 					>
-						{team?.profileImageUrl ? (
-							<img
-								src={team.profileImageUrl}
-								alt={`${team.name} profile`}
-								className="w-full h-full object-cover"
-							/>
-						) : (
-							<div className="text-gray-400 text-[12px] text-center">
-								No Image
-							</div>
-						)}
+						<div className="text-gray-400 text-[12px] text-center">
+							No Image
+						</div>
 					</div>
 				</div>
 			</div>
