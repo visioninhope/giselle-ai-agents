@@ -20,12 +20,12 @@ import {
 	timestamp,
 	unique,
 	uniqueIndex,
-	vector,
 } from "drizzle-orm/pg-core";
 import type { Stripe } from "stripe";
 import type { ContentStatusMetadata } from "@/lib/vector-stores/github/types";
 import type { AgentId } from "@/services/agents/types";
 import type { TeamId } from "@/services/teams/types";
+import { vectorWithoutDimensions } from "./custom-types";
 
 export const subscriptions = pgTable("subscriptions", {
 	// Subscription ID from Stripe, e.g. sub_1234.
@@ -377,7 +377,7 @@ export const githubRepositoryEmbeddings = pgTable(
 			.notNull(),
 		fileSha: text("file_sha").notNull(),
 		path: text("path").notNull(),
-		embedding: vector("embedding").notNull(),
+		embedding: vectorWithoutDimensions("embedding").notNull(),
 		chunkContent: text("chunk_content").notNull(),
 		chunkIndex: integer("chunk_index").notNull(),
 		createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -422,7 +422,7 @@ export const githubRepositoryPullRequestEmbeddings = pgTable(
 		documentKey: text("document_key")
 			.$type<GitHubPullRequestDocumentKey>()
 			.notNull(),
-		embedding: vector("embedding").notNull(),
+		embedding: vectorWithoutDimensions("embedding").notNull(),
 		chunkContent: text("chunk_content").notNull(),
 		chunkIndex: integer("chunk_index").notNull(),
 		createdAt: timestamp("created_at").defaultNow().notNull(),
