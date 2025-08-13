@@ -122,7 +122,7 @@ export function StageSidebar({ user }: StageSidebarProps) {
 	return (
 		<div
 			className={clsx(
-				"h-screen bg-black-950 flex flex-col border-r border-white/10 transition-all duration-300",
+				"h-screen bg-[var(--color-stage-background)] flex flex-col border-r border-white/10 transition-all duration-300",
 				isCollapsed ? "w-[48px]" : "w-[200px]",
 			)}
 		>
