@@ -37,7 +37,7 @@ export interface GiselleEngineContext {
 		generationComplete: (
 			generation: CompletedGeneration,
 			options: GenerationCompleteOption,
-		) => Promise<void>;
+		) => void | Promise<void>;
 		flowTriggerUpdate?: (flowTrigger: FlowTrigger) => Promise<void>;
 	};
 	vectorStore?: VectorStore;
@@ -114,7 +114,7 @@ export interface GiselleEngineConfig {
 		generationComplete: (
 			generation: CompletedGeneration,
 			options: GenerationCompleteOption,
-		) => Promise<void>;
+		) => void | Promise<void>;
 		flowTriggerUpdate?: (flowTrigger: FlowTrigger) => Promise<void>;
 	};
 	vectorStore?: VectorStore;
