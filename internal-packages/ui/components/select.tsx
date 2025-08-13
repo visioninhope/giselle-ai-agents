@@ -45,7 +45,7 @@ export function Select<T extends SelectOption>({
 				<button
 					type="button"
 					className={clsx(
-						"w-full flex justify-between items-center rounded-[8px] py-[8px] px-[12px] border border-white-900 text-left text-[14px]",
+						"w-full flex justify-between items-center rounded-[8px] h-10 px-[12px] text-left text-[14px]",
 						"outline-none focus:outline-none",
 						"transition-colors hover:bg-ghost-element-hover",
 						"data-[placeholder]:text-text-muted",

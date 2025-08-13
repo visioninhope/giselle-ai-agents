@@ -3,6 +3,7 @@ import {
 	verifyRequest as verifyRequestAsGitHubWebook,
 } from "@giselle-sdk/github-tool";
 import { after } from "next/server";
+import { ZodError } from "zod";
 import {
 	GenerationId,
 	GiselleEngine,
@@ -112,10 +113,19 @@ export function createHttpHandler({
 		}
 
 		if (isJsonRouterPath(routerPath)) {
-			return await jsonRouter[routerPath]({
-				// @ts-expect-error
-				input: await getBody(request),
-			});
+			try {
+				return await jsonRouter[routerPath]({
+					// @ts-expect-error
+					input: await getBody(request),
+				});
+			} catch (e) {
+				if (e instanceof ZodError) {
+					// @todo replace logger
+					console.log(e.message);
+					return new Response("Invalid request body", { status: 400 });
+				}
+				return new Response("Internal Server Error", { status: 500 });
+			}
 		}
 		if (isFormDataRouterPath(routerPath)) {
 			return await formDataRouter[routerPath]({
@@ -124,7 +134,10 @@ export function createHttpHandler({
 			});
 		}
 		/** Experimental implementation for handling webhooks with GiselleEngine */
-		if (routerPath === "experimental_github-webhook") {
+		if (
+			routerPath === "experimental_github-webhook" ||
+			routerPath === "github-webhook"
+		) {
 			try {
 				await verifyRequestAsGitHubWebook({
 					secret: config.integrationConfigs?.github?.authV2.webhookSecret ?? "",

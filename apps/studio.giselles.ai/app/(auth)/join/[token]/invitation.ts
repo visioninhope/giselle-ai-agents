@@ -6,6 +6,7 @@ import {
 	db,
 	db as dbInstance,
 	invitations,
+	subscriptions,
 	supabaseUserMappings,
 	type TeamRole,
 	teamMemberships,
@@ -13,7 +14,8 @@ import {
 	users,
 } from "@/drizzle";
 import { getUser } from "@/lib/supabase/get-user";
-import type { TeamId } from "@/services/teams";
+import type { CurrentTeam, TeamId } from "@/services/teams";
+import { handleMemberChange } from "@/services/teams/member-change";
 import type * as schema from "../../../../drizzle/schema";
 import { JoinError } from "./errors";
 
@@ -73,6 +75,42 @@ export async function fetchInvitationToken(
 	};
 }
 
+async function fetchTeamWithSubscription(
+	teamDbId: number,
+): Promise<CurrentTeam | null> {
+	const [team] = await db
+		.select({
+			id: teams.id,
+			dbId: teams.dbId,
+			name: teams.name,
+			avatarUrl: teams.avatarUrl,
+			type: teams.type,
+			activeSubscriptionId: subscriptions.id,
+		})
+		.from(teams)
+		.leftJoin(
+			subscriptions,
+			and(
+				eq(teams.dbId, subscriptions.teamDbId),
+				eq(subscriptions.status, "active"),
+			),
+		)
+		.where(eq(teams.dbId, teamDbId));
+
+	if (!team) {
+		return null;
+	}
+
+	return {
+		id: team.id as TeamId,
+		dbId: team.dbId,
+		name: team.name,
+		avatarUrl: team.avatarUrl,
+		type: team.type,
+		activeSubscriptionId: team.activeSubscriptionId,
+	};
+}
+
 export async function acceptInvitation(token: string) {
 	if (token.trim() === "") {
 		throw new JoinError("expired");
@@ -85,7 +123,7 @@ export async function acceptInvitation(token: string) {
 		throw new JoinError("wrong_email");
 	}
 
-	await db.transaction(async (tx) => {
+	const invitationTeamDbId = await db.transaction(async (tx) => {
 		const invitation = await fetchInvitationToken(token, tx, true);
 		if (!invitation) {
 			throw new JoinError("expired");
@@ -119,5 +157,13 @@ export async function acceptInvitation(token: string) {
 			.update(invitations)
 			.set({ revokedAt: new Date() })
 			.where(eq(invitations.token, token));
+
+		return invitation.teamDbId;
 	});
+
+	// Fetch team data and handle member change for usage-based billing outside of transaction
+	const teamData = await fetchTeamWithSubscription(invitationTeamDbId);
+	if (teamData) {
+		await handleMemberChange(teamData);
+	}
 }

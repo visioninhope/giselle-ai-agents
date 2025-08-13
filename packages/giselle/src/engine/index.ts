@@ -19,6 +19,7 @@ import {
 	patchAct,
 	type StartActInputs,
 	startAct,
+	streamAct,
 } from "./acts";
 import { getLanguageModelProviders } from "./configurations/get-language-model-providers";
 import { createDataSource, getWorkspaceDataSources } from "./data-source";
@@ -115,9 +116,7 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 				useExperimentalStorage,
 			});
 		},
-		getLanguageModelProviders: async () => {
-			return await getLanguageModelProviders({ context });
-		},
+		getLanguageModelProviders: () => getLanguageModelProviders({ context }),
 		generateText: async (
 			generation: QueuedGeneration,
 			useExperimentalStorage: boolean,
@@ -344,6 +343,9 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 		},
 		getAct(args: { actId: ActId }) {
 			return getAct({ ...args, context });
+		},
+		streamAct(args: { actId: ActId }) {
+			return streamAct({ ...args, context });
 		},
 		deleteSecret(args: { workspaceId: WorkspaceId; secretId: SecretId }) {
 			return deleteSecret({ ...args, context });

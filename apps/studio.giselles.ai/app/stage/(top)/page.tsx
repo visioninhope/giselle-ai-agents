@@ -59,6 +59,17 @@ async function enrichActWithNavigationData(
 			return null;
 		};
 
+		const getFirstStep = () => {
+			if (tmpAct.sequences.length === 0) {
+				return null;
+			}
+			const firstSequence = tmpAct.sequences[0];
+			if (firstSequence.steps.length === 0) {
+				return null;
+			}
+			return firstSequence.steps[0];
+		};
+
 		const getLastStep = () => {
 			if (tmpAct.sequences.length === 0) {
 				return null;
@@ -75,7 +86,7 @@ async function enrichActWithNavigationData(
 
 		switch (tmpAct.status) {
 			case "inProgress":
-				targetStep = findStepByStatus("running");
+				targetStep = findStepByStatus("running") ?? getFirstStep();
 				break;
 			case "completed":
 				targetStep = getLastStep();

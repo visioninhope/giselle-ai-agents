@@ -71,8 +71,8 @@ export const createJsonRouters = {
 		}),
 	getLanguageModelProviders: (giselleEngine: GiselleEngine) =>
 		createHandler({
-			handler: async () => {
-				const providers = await giselleEngine.getLanguageModelProviders();
+			handler: () => {
+				const providers = giselleEngine.getLanguageModelProviders();
 				return JsonResponse.json(providers);
 			},
 		}),
@@ -440,6 +440,22 @@ export const createJsonRouters = {
 			handler: async ({ input }) => {
 				await giselleEngine.deleteSecret(input);
 				return new Response(null, { status: 204 });
+			},
+		}),
+	streamAct: (giselleEngine: GiselleEngine) =>
+		createHandler({
+			input: z.object({
+				actId: ActId.schema,
+			}),
+			handler: ({ input }) => {
+				const stream = giselleEngine.streamAct(input);
+				return new Response(stream, {
+					headers: {
+						"Content-Type": "text/event-stream",
+						"Cache-Control": "no-cache, no-transform",
+						Connection: "keep-alive",
+					},
+				});
 			},
 		}),
 } as const;

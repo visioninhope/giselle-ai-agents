@@ -18,11 +18,16 @@ import {
 } from "@/drizzle";
 import { updateGiselleSession } from "@/lib/giselle-session";
 import { getUser } from "@/lib/supabase";
+
 import { fetchCurrentUser } from "@/services/accounts";
-import { stripe } from "@/services/external/stripe";
 import { fetchCurrentTeam, isProPlan } from "@/services/teams";
-import type { CurrentTeam, TeamId } from "@/services/teams/types";
-import { reportUserSeatUsage } from "@/services/usage-based-billing";
+import { handleMemberChange } from "@/services/teams/member-change";
+import type { TeamId } from "@/services/teams/types";
+import {
+	deleteAvatar,
+	uploadAvatar,
+	validateImageFile,
+} from "../utils/avatar-upload";
 import {
 	createInvitation,
 	type Invitation,
@@ -74,8 +79,88 @@ export async function updateTeamName(teamId: TeamId, formData: FormData) {
 
 		return { success: true };
 	} catch (error) {
-		console.error("Failed to update team name:", error);
-		return { success: false, error };
+		if (error instanceof Error) {
+			if (error.message.includes("not found")) {
+				return { success: false, error: "Team not found or access denied" };
+			}
+			return { success: false, error: error.message };
+		}
+		return { success: false, error: "Failed to update team name" };
+	}
+}
+
+export async function updateTeamAvatar(teamId: TeamId, formData: FormData) {
+	try {
+		const file = formData.get("avatar") as File | null;
+		if (!file) {
+			throw new Error("Missing avatar file");
+		}
+
+		if (!teamId) {
+			throw new Error("Team ID is required");
+		}
+
+		// Validate the image file
+		const validation = validateImageFile(file);
+		if (!validation.valid) {
+			throw new Error(validation.error);
+		}
+
+		const user = await getUser();
+
+		// Get current team avatar URL
+		const [currentTeam] = await db
+			.select({ avatarUrl: teams.avatarUrl })
+			.from(teams)
+			.innerJoin(teamMemberships, eq(teams.dbId, teamMemberships.teamDbId))
+			.innerJoin(
+				supabaseUserMappings,
+				eq(teamMemberships.userDbId, supabaseUserMappings.userDbId),
+			)
+			.where(
+				and(
+					eq(supabaseUserMappings.supabaseUserId, user.id),
+					eq(teams.id, teamId),
+				),
+			);
+
+		if (!currentTeam) {
+			throw new Error(
+				"Team not found or you don't have permission to modify it",
+			);
+		}
+
+		const avatarUrl = await uploadAvatar(file, "team-avatars", teamId);
+
+		await db.update(teams).set({ avatarUrl }).where(eq(teams.id, teamId));
+
+		// Delete old avatar after successful DB update (failure is acceptable)
+		if (currentTeam.avatarUrl) {
+			try {
+				await deleteAvatar(currentTeam.avatarUrl);
+			} catch (error) {
+				console.error("Failed to delete old avatar:", error);
+			}
+		}
+
+		revalidatePath("/settings/team");
+		revalidatePath("/", "layout");
+
+		return {
+			success: true,
+			avatarUrl,
+		};
+	} catch (error) {
+		if (error instanceof Error) {
+			return {
+				success: false,
+				error: error.message,
+			};
+		}
+		return {
+			success: false,
+			error: "An unexpected error occurred. Please try again.",
+		};
 	}
 }
 
@@ -107,8 +192,6 @@ export async function getTeamMembers() {
 			data: teamMembers,
 		};
 	} catch (error) {
-		console.error("Failed to get team members:", error);
-
 		return {
 			success: false,
 			error:
@@ -203,8 +286,6 @@ export async function updateTeamMemberRole(formData: FormData) {
 			success: true,
 		};
 	} catch (error) {
-		console.error("Failed to update team member role:", error);
-
 		return {
 			success: false,
 			error:
@@ -326,8 +407,6 @@ export async function deleteTeamMember(formData: FormData) {
 
 		return { success: true };
 	} catch (error) {
-		console.error("Failed to delete team member:", error);
-
 		return {
 			success: false,
 			error:
@@ -367,8 +446,6 @@ export async function getCurrentUserRole() {
 			data: result[0].role,
 		};
 	} catch (error) {
-		console.error("Failed to get current user role:", error);
-
 		return {
 			success: false,
 			error:
@@ -425,8 +502,6 @@ export async function getAgentActivities({
 			data: formattedActivities,
 		};
 	} catch (error) {
-		console.error("Failed to get agent activities:", error);
-
 		return {
 			success: false,
 			error:
@@ -491,8 +566,6 @@ export async function deleteTeam(
 		// This ensures that the user is redirected to a valid team context and prevents access to the deleted team's resources.
 		await updateGiselleSession({ teamId: otherTeams[0].teamId });
 	} catch (error) {
-		console.error("Failed to delete team:", error);
-
 		return {
 			error: error instanceof Error ? error.message : "Failed to delete team",
 		};
@@ -521,30 +594,12 @@ export async function getSubscription(subscriptionId: string) {
 			data: dbSubscription,
 		};
 	} catch (error) {
-		console.error("Failed to fetch subscription:", error);
-
 		return {
 			success: false,
 			error:
 				error instanceof Error ? error.message : "Failed to fetch subscription",
 		};
 	}
-}
-
-async function handleMemberChange(currentTeam: CurrentTeam) {
-	const subscriptionId = currentTeam.activeSubscriptionId;
-	if (subscriptionId == null) {
-		// No active subscription, nothing to do
-		return;
-	}
-
-	// FIXME: If we have customer in subscriptions table, we don't have to query to Stripe here.
-	const subscription = await stripe.subscriptions.retrieve(subscriptionId);
-	const customer =
-		typeof subscription.customer === "string"
-			? subscription.customer
-			: subscription.customer.id;
-	await reportUserSeatUsage(subscriptionId, customer);
 }
 
 // Define result types for sendInvitations
@@ -581,7 +636,6 @@ export async function sendInvitationsAction(
 				return { email, status: "success" };
 			} catch (error: unknown) {
 				const status = invitation ? "email_error" : "db_error";
-				console.error(`Failed to process invitation for ${email}:`, error);
 				const errorMessage =
 					error instanceof Error
 						? error.message
@@ -600,10 +654,6 @@ export async function sendInvitationsAction(
 			}
 			// Capture unexpected errors in Sentry
 			Sentry.captureException(result.reason);
-			console.error(
-				`Unexpected error processing invitation for ${emails[index]}:`,
-				result.reason,
-			);
 			const reason = result.reason as unknown;
 			const errorMessage =
 				reason instanceof Error
@@ -659,7 +709,6 @@ export async function revokeInvitationAction(
 		revalidatePath("/settings/team/members");
 		return { success: true };
 	} catch (e: unknown) {
-		console.error("Failed to revoke invitation:", e);
 		return {
 			success: false,
 			error: e instanceof Error ? e.message : "Unknown error",
@@ -703,7 +752,6 @@ export async function resendInvitationAction(
 		revalidatePath("/settings/team/members");
 		return { success: true };
 	} catch (e: unknown) {
-		console.error("Failed to resend invitation:", e);
 		return {
 			success: false,
 			error: e instanceof Error ? e.message : "Unknown error",

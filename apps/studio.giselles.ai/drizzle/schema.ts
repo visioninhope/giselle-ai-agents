@@ -30,13 +30,23 @@ export const subscriptions = pgTable("subscriptions", {
 		.notNull()
 		.references(() => teams.dbId, { onDelete: "cascade" }),
 	// Customer ID from Stripe, e.g. cus_xxx.
-	customerId: text("customer_id"),
+	customerId: text("customer_id").notNull(),
 	status: text("status").$type<Stripe.Subscription.Status>().notNull(),
 	cancelAtPeriodEnd: boolean("cancel_at_period_end").notNull(),
 	cancelAt: timestamp("cancel_at"),
 	canceledAt: timestamp("canceled_at"),
+
+	/**
+	 * These fields are removed from the Stripe Subscription object.
+	 * - current_period_start
+	 * - current_period_end
+	 *
+	 * But we keep them for compatibility with existing data.
+	 * New values are populated from subscriptionItem objects.
+	 */
 	currentPeriodStart: timestamp("current_period_start").notNull(),
 	currentPeriodEnd: timestamp("current_period_end").notNull(),
+
 	created: timestamp("created").defaultNow().notNull(),
 	endedAt: timestamp("ended_at"),
 	trialStart: timestamp("trial_start"),
@@ -48,6 +58,7 @@ export const teams = pgTable("teams", {
 	id: text("id").$type<TeamId>().notNull().unique(),
 	dbId: serial("db_id").primaryKey(),
 	name: text("name").notNull(),
+	avatarUrl: text("avatar_url"),
 	createdAt: timestamp("created_at").defaultNow().notNull(),
 	updatedAt: timestamp("updated_at")
 		.defaultNow()
