@@ -247,7 +247,7 @@ export default async function StagePage() {
 					actsContent={
 						<div className="space-y-4 py-6 h-full">
 							<div className="flex items-center justify-between px-1">
-								<h2 className="text-[16px] font-sans text-white-100">Acts</h2>
+								<h2 className="text-[16px] font-sans text-white-100">Tasks</h2>
 								<div className="flex items-center gap-3">
 									<ReloadButton reloadAction={reloadPage} />
 									<Button type="button" variant="subtle">
