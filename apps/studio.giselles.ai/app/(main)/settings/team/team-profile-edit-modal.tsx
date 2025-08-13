@@ -6,125 +6,134 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { maxLength, minLength, parse, pipe, string } from "valibot";
 import { Input } from "@/components/ui/input";
-import type { users } from "@/drizzle";
-import { AvatarImage } from "@/services/accounts/components/user-button/avatar-image";
-import { updateAvatar, updateDisplayName } from "../account/actions";
-import { Button } from "../components/button";
+import type { teams } from "@/drizzle";
+import { TeamAvatarImage } from "@/services/teams/components/team-avatar-image";
 import { IMAGE_CONSTRAINTS } from "../constants";
+import { updateTeamAvatar, updateTeamName } from "./actions";
 
 const ACCEPTED_FILE_TYPES = IMAGE_CONSTRAINTS.formats.join(",");
 
-const DisplayNameSchema = pipe(
+const TeamNameSchema = pipe(
 	string(),
-	minLength(1, "Display name is required"),
-	maxLength(256, "Display name must be 256 characters or less"),
+	minLength(1, "Team name is required"),
+	maxLength(256, "Team name must be 256 characters or less"),
 );
 
-interface ProfileEditModalProps {
+interface TeamProfileEditModalProps {
 	isOpen: boolean;
 	onClose: () => void;
-	displayName: typeof users.$inferSelect.displayName;
-	avatarUrl: typeof users.$inferSelect.avatarUrl;
+	teamId: typeof teams.$inferSelect.id;
+	teamName: typeof teams.$inferSelect.name;
+	avatarUrl?: typeof teams.$inferSelect.avatarUrl;
 	alt?: string;
 	onSuccess?: () => void;
 }
 
-export function ProfileEditModal({
+export function TeamProfileEditModal({
 	isOpen,
 	onClose,
-	displayName: initialDisplayName,
+	teamId,
+	teamName: initialTeamName,
 	avatarUrl: initialAvatarUrl,
 	alt,
 	onSuccess,
-}: ProfileEditModalProps) {
-	// Avatar state
-	const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
-	const [selectedAvatarFile, setSelectedAvatarFile] = useState<File | null>(
+}: TeamProfileEditModalProps) {
+	// Profile image state
+	const [profileImagePreview, setProfileImagePreview] = useState<string | null>(
 		null,
 	);
-	const avatarInputRef = useRef<HTMLInputElement>(null);
+	const [selectedProfileImageFile, setSelectedProfileImageFile] =
+		useState<File | null>(null);
+	const profileImageInputRef = useRef<HTMLInputElement>(null);
 
-	// Display name state
-	const [displayName, setDisplayName] = useState(
-		initialDisplayName ?? "No display name",
-	);
+	// Team name state
+	const [teamName, setTeamName] = useState(initialTeamName ?? "");
 
 	// Shared state
 	const [error, setError] = useState<string>("");
-	const [avatarError, setAvatarError] = useState<string>("");
+	const [profileImageError, setProfileImageError] = useState<string>("");
 	const [isLoading, setIsLoading] = useState(false);
 	const hasChanges =
-		selectedAvatarFile !== null || displayName !== initialDisplayName;
+		selectedProfileImageFile !== null || teamName !== initialTeamName;
 
 	// Reset when the modal opens/closes
 	useEffect(() => {
 		if (!isOpen) {
 			// Clean up preview URL
-			if (avatarPreview) {
-				URL.revokeObjectURL(avatarPreview);
+			if (profileImagePreview) {
+				URL.revokeObjectURL(profileImagePreview);
 			}
 
 			// Reset state
-			setAvatarPreview(null);
-			setSelectedAvatarFile(null);
-			setDisplayName(initialDisplayName ?? "No display name");
+			setProfileImagePreview(null);
+			setSelectedProfileImageFile(null);
+			setTeamName(initialTeamName ?? "");
 			setError("");
-			setAvatarError("");
+			setProfileImageError("");
 
 			// Reset file input
-			if (avatarInputRef.current) {
-				avatarInputRef.current.value = "";
+			if (profileImageInputRef.current) {
+				profileImageInputRef.current.value = "";
 			}
 		}
-	}, [isOpen, initialDisplayName, avatarPreview]);
+	}, [isOpen, initialTeamName, profileImagePreview]);
 
-	// Handle avatar file selection
+	// Clean up object URL on unmount or when preview changes
+	useEffect(() => {
+		return () => {
+			if (profileImagePreview) {
+				URL.revokeObjectURL(profileImagePreview);
+			}
+		};
+	}, [profileImagePreview]);
+
+	// Handle profile image file selection
 	const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-		setAvatarError("");
+		setProfileImageError("");
 		const file = event.target.files?.[0];
 
 		if (!file) return;
 
 		if (!IMAGE_CONSTRAINTS.formats.includes(file.type)) {
-			setAvatarError("Please select a JPG, PNG, GIF, or WebP image");
-			if (avatarPreview) {
-				URL.revokeObjectURL(avatarPreview);
-				setAvatarPreview(null);
+			setProfileImageError("Please select a JPG, PNG, GIF, or WebP image");
+			if (profileImagePreview) {
+				URL.revokeObjectURL(profileImagePreview);
+				setProfileImagePreview(null);
 			}
-			setSelectedAvatarFile(null);
+			setSelectedProfileImageFile(null);
 			return;
 		}
 
 		if (file.size > IMAGE_CONSTRAINTS.maxSize) {
-			setAvatarError(
+			setProfileImageError(
 				`Please select an image under ${IMAGE_CONSTRAINTS.maxSize / (1024 * 1024)}MB in size`,
 			);
-			if (avatarPreview) {
-				URL.revokeObjectURL(avatarPreview);
-				setAvatarPreview(null);
+			if (profileImagePreview) {
+				URL.revokeObjectURL(profileImagePreview);
+				setProfileImagePreview(null);
 			}
-			setSelectedAvatarFile(null);
+			setSelectedProfileImageFile(null);
 			return;
 		}
 
-		if (avatarPreview) {
-			URL.revokeObjectURL(avatarPreview);
+		if (profileImagePreview) {
+			URL.revokeObjectURL(profileImagePreview);
 		}
 
 		const objectUrl = URL.createObjectURL(file);
-		setAvatarPreview(objectUrl);
-		setSelectedAvatarFile(file);
+		setProfileImagePreview(objectUrl);
+		setSelectedProfileImageFile(file);
 	};
 
-	// Handle display name change
-	const handleDisplayNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+	// Handle team name change
+	const handleTeamNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setError("");
-		setDisplayName(e.target.value);
+		setTeamName(e.target.value);
 	};
 
 	// Open file selector
 	const handleSelectImageClick = () => {
-		avatarInputRef.current?.click();
+		profileImageInputRef.current?.click();
 	};
 
 	// Save all changes
@@ -132,12 +141,16 @@ export function ProfileEditModal({
 		try {
 			setIsLoading(true);
 			setError("");
-			setAvatarError("");
+			setProfileImageError("");
 
-			// Validate display name if changed
-			if (displayName !== initialDisplayName) {
+			// Trim team name for validation and comparison
+			const trimmedName = teamName.trim();
+			const trimmedInitialName = initialTeamName.trim();
+
+			// Validate team name if changed
+			if (trimmedName !== trimmedInitialName) {
 				try {
-					parse(DisplayNameSchema, displayName);
+					parse(TeamNameSchema, trimmedName);
 				} catch (valError) {
 					if (valError instanceof Error) {
 						setError(valError.message);
@@ -150,23 +163,39 @@ export function ProfileEditModal({
 			// Save changes
 			const promises = [];
 
-			// Update display name if changed
-			if (displayName !== initialDisplayName) {
+			// Update team name if changed
+			if (trimmedName !== trimmedInitialName) {
 				const formData = new FormData();
-				formData.append("displayName", displayName);
-				promises.push(updateDisplayName(formData));
+				formData.append("name", trimmedName);
+				promises.push(updateTeamName(teamId, formData));
 			}
 
 			// Update avatar if changed
-			if (selectedAvatarFile) {
+			if (selectedProfileImageFile) {
 				const formData = new FormData();
-				formData.append("avatar", selectedAvatarFile, selectedAvatarFile.name);
-				formData.append("avatarUrl", selectedAvatarFile.name);
-				promises.push(updateAvatar(formData));
+				formData.append(
+					"avatar",
+					selectedProfileImageFile,
+					selectedProfileImageFile.name,
+				);
+				promises.push(updateTeamAvatar(teamId, formData));
 			}
 
 			// Wait for all updates to complete
-			await Promise.all(promises);
+			const results = await Promise.all(promises);
+
+			// Check if any updates failed
+			const failedUpdate = results.find(
+				(result: { success: boolean; error?: unknown }) => !result.success,
+			);
+			if (failedUpdate) {
+				const errorMessage = failedUpdate.error
+					? typeof failedUpdate.error === "string"
+						? failedUpdate.error
+						: "Update failed with unknown error"
+					: "Failed to update team profile";
+				throw new Error(errorMessage);
+			}
 
 			// Call success callback if provided
 			if (onSuccess) {
@@ -176,11 +205,23 @@ export function ProfileEditModal({
 			// Close the modal
 			onClose();
 		} catch (error) {
-			console.error("Failed to save profile changes:", error);
+			// More specific error handling
 			if (error instanceof Error) {
-				setError(error.message);
+				const errorMessage = error.message;
+				// Handle specific error types
+				if (
+					errorMessage.includes("profile image") ||
+					errorMessage.includes("image") ||
+					errorMessage.includes("file")
+				) {
+					setProfileImageError(errorMessage);
+				} else if (errorMessage.includes("name")) {
+					setError(errorMessage);
+				} else {
+					setError(errorMessage);
+				}
 			} else {
-				setError("Failed to save changes.");
+				setError("Failed to save changes. Please try again.");
 			}
 		} finally {
 			setIsLoading(false);
@@ -230,7 +271,7 @@ export function ProfileEditModal({
 						<div className="relative z-10">
 							<div className="flex justify-between items-center">
 								<Dialog.Title className="text-[20px] font-medium text-white-400 tracking-tight font-sans">
-									Edit Profile
+									Edit Team Profile
 								</Dialog.Title>
 								<Dialog.Close
 									onClick={(e) => {
@@ -253,31 +294,32 @@ export function ProfileEditModal({
 								</Dialog.Close>
 							</div>
 							<p className="text-[14px] text-black-400 font-geist mt-2">
-								Update your display name and avatar.
+								Update your team's name and profile image.
 							</p>
 
 							<div className="mt-4 flex flex-col items-center gap-6 w-full">
 								{/* Hidden file input */}
 								<Input
-									ref={avatarInputRef}
+									ref={profileImageInputRef}
 									type="file"
 									accept={ACCEPTED_FILE_TYPES}
 									className="hidden"
 									onChange={handleFileSelect}
 								/>
 
-								{/* Avatar Profile Images */}
+								{/* Profile Images */}
 								<div className="flex items-center justify-center gap-4 w-full">
 									<div className="flex flex-row gap-4">
-										{/* Left side - clickable avatar */}
-										{initialAvatarUrl && !avatarPreview && (
+										{/* Left side - clickable profile image */}
+										{!profileImagePreview && (
 											<button
 												type="button"
 												onClick={handleSelectImageClick}
 												className="group relative w-[80px] h-[80px] rounded-full overflow-hidden cursor-pointer focus:outline-none focus:ring-0 border border-primary-100/20 hover:before:content-[''] hover:before:absolute hover:before:inset-0 hover:before:bg-black-900/40 hover:before:z-10"
 											>
-												<AvatarImage
+												<TeamAvatarImage
 													avatarUrl={initialAvatarUrl}
+													teamName={initialTeamName || "Team"}
 													width={80}
 													height={80}
 													alt={alt}
@@ -292,16 +334,16 @@ export function ProfileEditModal({
 										)}
 
 										{/* Left side - preview image */}
-										{avatarPreview && (
+										{profileImagePreview && (
 											<button
 												type="button"
 												onClick={handleSelectImageClick}
 												className="group relative w-[80px] h-[80px] rounded-full overflow-hidden cursor-pointer focus:outline-none focus:ring-0 border border-primary-100/30 hover:before:content-[''] hover:before:absolute hover:before:inset-0 hover:before:bg-black-900/40 hover:before:z-10"
-												aria-label="Change avatar"
+												aria-label="Change team profile image"
 											>
 												<Image
-													src={avatarPreview}
-													alt="Avatar preview"
+													src={profileImagePreview}
+													alt="Team profile preview"
 													fill
 													sizes="80px"
 													className="object-cover w-full h-full scale-[1.02]"
@@ -314,27 +356,16 @@ export function ProfileEditModal({
 												</div>
 											</button>
 										)}
-
-										{/* Left side - image icon when no initial avatar */}
-										{!initialAvatarUrl && !avatarPreview && (
-											<button
-												type="button"
-												onClick={handleSelectImageClick}
-												className="group relative w-[80px] h-[80px] rounded-full overflow-hidden cursor-pointer focus:outline-none focus:ring-0 bg-transparent border border-primary-100/20 flex items-center justify-center hover:before:content-[''] hover:before:absolute hover:before:inset-0 hover:before:bg-black-900/50 hover:before:z-10"
-											>
-												<ImageIcon className="w-7 h-7 text-white-800 transform group-hover:scale-110 transition-transform" />
-											</button>
-										)}
 									</div>
 								</div>
 
-								{/* Display name input */}
+								{/* Team name input */}
 								<div className="w-full">
 									<label
-										htmlFor="displayName"
+										htmlFor="teamName"
 										className="block text-white-800 text-left font-medium text-[12px] leading-[170%] font-geist mb-2"
 									>
-										Your Display Name
+										Team Name
 									</label>
 									<div
 										className="flex flex-col items-start p-2 rounded-[8px] w-full"
@@ -345,9 +376,9 @@ export function ProfileEditModal({
 										}}
 									>
 										<Input
-											id="displayName"
-											value={displayName}
-											onChange={handleDisplayNameChange}
+											id="teamName"
+											value={teamName}
+											onChange={handleTeamNameChange}
 											className="w-full bg-transparent text-white-800 font-medium text-[14px] leading-[23.8px] font-geist shadow-none focus:text-white border-0 p-0 focus-visible:ring-0 focus-visible:ring-offset-0"
 											disabled={isLoading}
 										/>
@@ -355,29 +386,28 @@ export function ProfileEditModal({
 								</div>
 
 								{/* Error message */}
-								{(error || avatarError) && (
+								{(error || profileImageError) && (
 									<p className="text-[12px] leading-[20.4px] text-error-900 font-geist">
-										{error || avatarError}
+										{error || profileImageError}
 									</p>
 								)}
 
 								{/* Action buttons */}
 								<div className="flex justify-end items-center mt-6 w-full">
 									<div className="flex w-full max-w-[280px] space-x-2 ml-auto">
-										<Button
-											variant="link"
-											onClick={onClose}
+										<button
 											type="button"
-											className="flex-1"
+											onClick={onClose}
+											className="flex-1 text-white-400 hover:text-white-300 text-sm font-medium transition-colors"
 											disabled={isLoading}
 										>
 											Cancel
-										</Button>
-										<Button
+										</button>
+										<button
 											type="button"
 											disabled={!hasChanges || isLoading}
 											onClick={handleSave}
-											className="flex-1 rounded-lg px-4 py-2 text-white/80 transition-all duration-200 active:scale-[0.98]"
+											className="flex-1 rounded-lg px-4 py-2 text-white/80 transition-all duration-200 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
 											style={{
 												background:
 													"linear-gradient(180deg, #202530 0%, #12151f 100%)",
@@ -387,7 +417,7 @@ export function ProfileEditModal({
 											}}
 										>
 											{isLoading ? "Saving..." : "Save"}
-										</Button>
+										</button>
 									</div>
 								</div>
 							</div>

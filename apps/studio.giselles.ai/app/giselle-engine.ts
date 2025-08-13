@@ -6,10 +6,13 @@ import {
 	supabaseVaultDriver,
 } from "@giselle-sdk/supabase-driver";
 import { openaiVectorStore } from "@giselle-sdk/vector-store-adapters";
+import { after } from "next/server";
 import { createStorage } from "unstorage";
 import { waitForLangfuseFlush } from "@/instrumentation.node";
 import { fetchUsageLimits } from "@/packages/lib/fetch-usage-limits";
 import { onConsumeAgentTime } from "@/packages/lib/on-consume-agent-time";
+import { fetchCurrentUser } from "@/services/accounts";
+import { fetchCurrentTeam, isProPlan } from "@/services/teams";
 import supabaseStorageDriver from "@/supabase-storage-driver";
 import {
 	gitHubPullRequestQueryService,
@@ -103,15 +106,25 @@ export const giselleEngine = NextGiselleEngine({
 		githubPullRequest: gitHubPullRequestQueryService,
 	},
 	callbacks: {
-		generationComplete: async (generation, options) => {
-			try {
-				await emitTelemetry(generation, {
-					telemetry: options.telemetry,
-					storage,
-				});
-			} catch (error) {
-				console.error("Telemetry emission failed:", error);
-			}
+		generationComplete: (generation) => {
+			after(async () => {
+				const currentUser = await fetchCurrentUser();
+				const currentTeam = await fetchCurrentTeam();
+				const metadata = {
+					isProPlan: isProPlan(currentTeam),
+					teamType: currentTeam.type,
+					userId: currentUser.id,
+					subscriptionId: currentTeam.activeSubscriptionId ?? "",
+				};
+				try {
+					await emitTelemetry(generation, {
+						telemetry: { metadata },
+						storage,
+					});
+				} catch (error) {
+					console.error("Telemetry emission failed:", error);
+				}
+			});
 		},
 	},
 	vectorStore: openaiVectorStore(process.env.OPENAI_API_KEY ?? ""),

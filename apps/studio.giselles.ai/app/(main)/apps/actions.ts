@@ -1,11 +1,12 @@
 "use server";
 
 import type { WorkspaceId } from "@giselle-sdk/data-type";
+import { isTriggerNode } from "@giselle-sdk/data-type";
 import type { AgentId } from "@giselles-ai/types";
 import { createId } from "@paralleldrive/cuid2";
 import { eq } from "drizzle-orm";
 import { giselleEngine } from "@/app/giselle-engine";
-import { agents, db, githubIntegrationSettings } from "@/drizzle";
+import { agents, db, flowTriggers, githubIntegrationSettings } from "@/drizzle";
 import { fetchCurrentUser } from "@/services/accounts";
 import { fetchCurrentTeam } from "@/services/teams";
 
@@ -70,6 +71,29 @@ export async function copyAgent(
 			creatorDbId: user.dbId,
 			workspaceId: workspace.id,
 		});
+
+		// Copy flowTrigger DB records for staged triggers
+		for (const node of workspace.nodes) {
+			if (!isTriggerNode(node) || node.content.state.status !== "configured") {
+				continue;
+			}
+
+			const flowTrigger = await giselleEngine.getTrigger({
+				flowTriggerId: node.content.state.flowTriggerId,
+			});
+			if (
+				flowTrigger &&
+				flowTrigger.configuration.provider === "manual" &&
+				flowTrigger.configuration.staged
+			) {
+				await db.insert(flowTriggers).values({
+					teamDbId: team.dbId,
+					sdkFlowTriggerId: node.content.state.flowTriggerId,
+					sdkWorkspaceId: workspace.id,
+					staged: true,
+				});
+			}
+		}
 
 		return { result: "success", workspaceId: workspace.id };
 	} catch (error) {

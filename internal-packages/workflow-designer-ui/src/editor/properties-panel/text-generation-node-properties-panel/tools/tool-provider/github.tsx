@@ -294,14 +294,7 @@ const githubToolCatalog = [
 	},
 	{
 		label: "Code Management",
-		tools: [
-			"createBranch",
-			"createOrUpdateFile",
-			"getCommit",
-			"listCommits",
-			"listCodeScanningAlerts",
-			"getCodeScanningAlert",
-		],
+		tools: ["createBranch", "createOrUpdateFile", "getCommit", "listCommits"],
 	},
 	{
 		label: "Search",

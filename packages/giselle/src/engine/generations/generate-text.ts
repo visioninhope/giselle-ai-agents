@@ -21,11 +21,10 @@ import type {
 	QueuedGeneration,
 } from "../../concepts/generation";
 import { decryptSecret } from "../secrets";
-import { generateTelemetryTags } from "../telemetry";
 import type { GiselleEngineContext } from "../types";
 import { useGenerationExecutor } from "./internal/use-generation-executor";
 import { createPostgresTools } from "./tools/postgres";
-import type { PreparedToolSet, TelemetrySettings } from "./types";
+import type { PreparedToolSet } from "./types";
 import { buildMessageObject } from "./utils";
 
 // PerplexityProviderOptions is not exported from @ai-sdk/perplexity, so we define it here based on the model configuration
@@ -37,12 +36,10 @@ export function generateText(args: {
 	context: GiselleEngineContext;
 	generation: QueuedGeneration;
 	useExperimentalStorage: boolean;
-	telemetry?: TelemetrySettings;
 }) {
 	return useGenerationExecutor({
 		context: args.context,
 		generation: args.generation,
-		telemetry: args.telemetry,
 		useExperimentalStorage: args.useExperimentalStorage,
 		execute: async ({
 			completeGeneration,
@@ -255,25 +252,6 @@ export function generateText(args: {
 					} catch (error) {
 						console.error("Cleanup process failed:", error);
 					}
-				},
-				experimental_telemetry: {
-					isEnabled: args.context.telemetry?.isEnabled,
-					metadata: {
-						...args.telemetry?.metadata,
-						tags: [
-							"auto-instrumented",
-							...generateTelemetryTags({
-								provider: operationNode.content.llm.provider,
-								modelId: operationNode.content.llm.id,
-								toolSet: preparedToolSet.toolSet,
-								configurations: operationNode.content.llm.configurations,
-								providerOptions:
-									operationNode.content.llm.provider === "anthropic"
-										? providerOptions
-										: undefined,
-							}),
-						],
-					},
 				},
 			});
 			return streamTextResult.toUIMessageStream({

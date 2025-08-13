@@ -116,19 +116,15 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 				useExperimentalStorage,
 			});
 		},
-		getLanguageModelProviders: async () => {
-			return await getLanguageModelProviders({ context });
-		},
+		getLanguageModelProviders: () => getLanguageModelProviders({ context }),
 		generateText: async (
 			generation: QueuedGeneration,
 			useExperimentalStorage: boolean,
-			telemetry?: TelemetrySettings,
 		) => {
 			return await generateText({
 				context,
 				generation,
 				useExperimentalStorage,
-				telemetry,
 			});
 		},
 		getGeneration: async (
