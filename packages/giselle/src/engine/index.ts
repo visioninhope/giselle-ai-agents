@@ -116,9 +116,7 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 				useExperimentalStorage,
 			});
 		},
-		getLanguageModelProviders: async () => {
-			return await getLanguageModelProviders({ context });
-		},
+		getLanguageModelProviders: () => getLanguageModelProviders({ context }),
 		generateText: async (
 			generation: QueuedGeneration,
 			useExperimentalStorage: boolean,

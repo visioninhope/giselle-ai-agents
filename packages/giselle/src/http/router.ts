@@ -71,8 +71,8 @@ export const createJsonRouters = {
 		}),
 	getLanguageModelProviders: (giselleEngine: GiselleEngine) =>
 		createHandler({
-			handler: async () => {
-				const providers = await giselleEngine.getLanguageModelProviders();
+			handler: () => {
+				const providers = giselleEngine.getLanguageModelProviders();
 				return JsonResponse.json(providers);
 			},
 		}),
