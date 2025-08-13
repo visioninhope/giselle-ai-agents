@@ -86,7 +86,7 @@ export function ProfileEditModal({
 		if (!file) return;
 
 		if (!IMAGE_CONSTRAINTS.formats.includes(file.type)) {
-			setAvatarError("Please select a JPG, PNG, GIF, SVG, or WebP image");
+			setAvatarError("Please select a JPG, PNG, GIF, or WebP image");
 			if (avatarPreview) {
 				URL.revokeObjectURL(avatarPreview);
 				setAvatarPreview(null);

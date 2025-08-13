@@ -95,7 +95,7 @@ export function TeamProfileEditModal({
 		if (!file) return;
 
 		if (!IMAGE_CONSTRAINTS.formats.includes(file.type)) {
-			setProfileImageError("Please select a JPG, PNG, GIF, SVG, or WebP image");
+			setProfileImageError("Please select a JPG, PNG, GIF, or WebP image");
 			if (profileImagePreview) {
 				URL.revokeObjectURL(profileImagePreview);
 				setProfileImagePreview(null);
