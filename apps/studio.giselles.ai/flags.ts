@@ -46,16 +46,11 @@ export const runV3Flag = flag<boolean>({
 		if (process.env.NODE_ENV === "development") {
 			return takeLocalEnv("RUN_V3_FLAG");
 		}
-		try {
-			const edgeConfig = await get(`flag__${this.key}`);
-			if (edgeConfig === undefined) {
-				return false;
-			}
-			return edgeConfig === true || edgeConfig === "true";
-		} catch (error) {
-			console.warn(`Edge Config error for ${this.key}:`, error);
+		const edgeConfig = await get(`flag__${this.key}`);
+		if (edgeConfig === undefined) {
 			return false;
 		}
+		return edgeConfig === true || edgeConfig === "true";
 	},
 	description: "Enable Run v3",
 	options: [
@@ -70,16 +65,11 @@ export const layoutV3Flag = flag<boolean>({
 		if (process.env.NODE_ENV === "development") {
 			return takeLocalEnv("LAYOUT_V3_FLAG");
 		}
-		try {
-			const edgeConfig = await get(`flag__${this.key}`);
-			if (edgeConfig === undefined) {
-				return false;
-			}
-			return edgeConfig === true || edgeConfig === "true";
-		} catch (error) {
-			console.warn(`Edge Config error for ${this.key}:`, error);
+		const edgeConfig = await get(`flag__${this.key}`);
+		if (edgeConfig === undefined) {
 			return false;
 		}
+		return edgeConfig === true || edgeConfig === "true";
 	},
 	description: "Enable Layout V3",
 	options: [
@@ -94,16 +84,11 @@ export const experimental_storageFlag = flag<boolean>({
 		if (process.env.NODE_ENV === "development") {
 			return takeLocalEnv("EXPERIMENTAL_STORAGE_FLAG");
 		}
-		try {
-			const edgeConfig = await get(`flag__${this.key}`);
-			if (edgeConfig === undefined) {
-				return false;
-			}
-			return edgeConfig === true || edgeConfig === "true";
-		} catch (error) {
-			console.warn(`Edge Config error for ${this.key}:`, error);
+		const edgeConfig = await get(`flag__${this.key}`);
+		if (edgeConfig === undefined) {
 			return false;
 		}
+		return edgeConfig === true || edgeConfig === "true";
 	},
 	description: "Enable experimental storage",
 	options: [
@@ -118,16 +103,11 @@ export const stageFlag = flag<boolean>({
 		if (process.env.NODE_ENV === "development") {
 			return takeLocalEnv("STAGE_FLAG");
 		}
-		try {
-			const edgeConfig = await get(`flag__${this.key}`);
-			if (edgeConfig === undefined) {
-				return false;
-			}
-			return edgeConfig === true || edgeConfig === "true";
-		} catch (error) {
-			console.warn(`Edge Config error for ${this.key}:`, error);
+		const edgeConfig = await get(`flag__${this.key}`);
+		if (edgeConfig === undefined) {
 			return false;
 		}
+		return edgeConfig === true || edgeConfig === "true";
 	},
 	description: "Enable stage",
 	options: [
