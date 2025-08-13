@@ -5,15 +5,11 @@ import {
 	isImageGenerationNode,
 	type OpenAIImageLanguageModelData,
 } from "@giselle-sdk/data-type";
-import {
-	createUsageCalculator,
-	type GeneratedImageData,
-} from "@giselle-sdk/language-model";
+import type { GeneratedImageData } from "@giselle-sdk/language-model";
 import {
 	experimental_generateImage as generateImageAiSdk,
 	type ModelMessage,
 } from "ai";
-import { type ApiMediaContentType, Langfuse, LangfuseMedia } from "langfuse";
 import {
 	type GenerationContext,
 	type GenerationOutput,
@@ -54,7 +50,6 @@ export function generateImage(args: {
 				throw new Error("Invalid generation type");
 			}
 
-			const tracer = new Langfuse();
 			const messages = await buildMessageObject(
 				operationNode,
 				generationContext.sourceNodes,
@@ -70,8 +65,6 @@ export function generateImage(args: {
 						messages,
 						runningGeneration,
 						generationContext,
-						tracer,
-						telemetry: args.telemetry,
 						context: args.context,
 					});
 					break;
@@ -82,8 +75,6 @@ export function generateImage(args: {
 						generationContext,
 						languageModelData: operationNode.content.llm,
 						context: args.context,
-						tracer,
-						telemetry: args.telemetry,
 					});
 					break;
 				default: {
@@ -101,21 +92,11 @@ export function generateImage(args: {
 	});
 }
 
-function imageDimStringToSize(size: string): { width: number; height: number } {
-	const [width, height] = size.split("x").map(Number);
-	if (Number.isNaN(width) || Number.isNaN(height)) {
-		throw new Error(`Invalid image size format: ${size}`);
-	}
-	return { width, height };
-}
-
 async function generateImageWithFal({
 	operationNode,
 	generationContext,
 	runningGeneration,
 	messages,
-	tracer,
-	telemetry,
 	context,
 	useExperimentalStorage,
 }: {
@@ -123,29 +104,9 @@ async function generateImageWithFal({
 	generationContext: GenerationContext;
 	runningGeneration: RunningGeneration;
 	messages: ModelMessage[];
-	telemetry?: TelemetrySettings;
-	tracer: Langfuse;
 	context: GiselleEngineContext;
 	useExperimentalStorage?: boolean;
 }) {
-	const trace = tracer.trace({
-		name: "ai-sdk/fal",
-		metadata: telemetry?.metadata,
-		input: { messages },
-		tags: ["deprecated"],
-	});
-	const generation = trace.generation({
-		name: "ai-sdk/fal.generateImage",
-		model: operationNode.content.llm.id,
-		modelParameters: operationNode.content.llm.configurations,
-		input: { messages },
-		usage: {
-			input: 0,
-			output: 0,
-			unit: "IMAGES",
-		},
-	});
-
 	let prompt = "";
 	for (const message of messages) {
 		if (!Array.isArray(message.content)) {
@@ -209,36 +170,6 @@ async function generateImageWithFal({
 		});
 	}
 
-	if (context.telemetry?.isEnabled && generatedImageOutput) {
-		const usageCalculator = createUsageCalculator(operationNode.content.llm.id);
-		const imageSize = imageDimStringToSize(
-			operationNode.content.llm.configurations.size,
-		);
-		await Promise.all([
-			...result.images.map((image) => {
-				const wrappedMedia = new LangfuseMedia({
-					contentType: "image/png" as ApiMediaContentType,
-					contentBytes: Buffer.from(image.uint8Array),
-				});
-
-				generation.update({
-					metadata: {
-						context: wrappedMedia,
-					},
-				});
-			}),
-			(() => {
-				const usage = usageCalculator.calculateUsage({
-					...imageSize,
-					n: operationNode.content.llm.configurations.n,
-				});
-				generation.update({
-					usage,
-				});
-				generation.end();
-			})(),
-		]);
-	}
 	return generationOutputs;
 }
 
@@ -248,8 +179,6 @@ async function generateImageWithOpenAI({
 	runningGeneration,
 	languageModelData,
 	context,
-	tracer,
-	telemetry,
 	useExperimentalStorage,
 }: {
 	messages: ModelMessage[];
@@ -257,28 +186,8 @@ async function generateImageWithOpenAI({
 	runningGeneration: RunningGeneration;
 	languageModelData: OpenAIImageLanguageModelData;
 	context: GiselleEngineContext;
-	tracer: Langfuse;
-	telemetry?: TelemetrySettings;
 	useExperimentalStorage?: boolean;
 }) {
-	const trace = tracer.trace({
-		name: "ai-sdk/openai",
-		metadata: telemetry?.metadata,
-		input: { messages },
-		tags: ["deprecated"],
-	});
-	const generation = trace.generation({
-		name: "ai-sdk/openai.generateImage",
-		model: languageModelData.id,
-		modelParameters: languageModelData.configurations,
-		input: { messages },
-		usage: {
-			input: 0,
-			output: 0,
-			unit: "IMAGES",
-		},
-	});
-
 	let prompt = "";
 	for (const message of messages) {
 		if (!Array.isArray(message.content)) {
@@ -345,35 +254,5 @@ async function generateImageWithOpenAI({
 		});
 	}
 
-	if (context.telemetry?.isEnabled && generatedImageOutput) {
-		const usageCalculator = createUsageCalculator(languageModelData.id);
-		const imageSize = imageDimStringToSize(
-			languageModelData.configurations.size,
-		);
-		await Promise.all([
-			...images.map((image) => {
-				const wrappedMedia = new LangfuseMedia({
-					contentType: "image/png" as ApiMediaContentType,
-					contentBytes: Buffer.from(image.uint8Array),
-				});
-
-				generation.update({
-					metadata: {
-						context: wrappedMedia,
-					},
-				});
-			}),
-			(() => {
-				const usage = usageCalculator.calculateUsage({
-					...imageSize,
-					quality: languageModelData.configurations.quality,
-				});
-				generation.update({
-					usage,
-				});
-				generation.end();
-			})(),
-		]);
-	}
 	return generationOutputs;
 }

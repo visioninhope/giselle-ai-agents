@@ -17,7 +17,7 @@ import { type acts as actsSchema, db } from "@/drizzle";
 import { stageFlag } from "@/flags";
 import { fetchCurrentUser } from "@/services/accounts";
 import { fetchUserTeams } from "@/services/teams";
-import { StageSidebar } from "../(top)/stage-sidebar";
+import { StageSidebar } from "../ui/stage-sidebar";
 
 // The maximum duration of server actions on this page is extended to 800 seconds through enabled fluid compute.
 // https://vercel.com/docs/functions/runtimes#max-duration
