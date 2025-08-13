@@ -3,15 +3,7 @@ import { NextResponse } from "next/server";
 import { supabaseMiddleware } from "./lib/supabase";
 
 export default supabaseMiddleware(async (user, request) => {
-	let maintenance = false;
-	try {
-		maintenance = (await get("maintenance")) ?? false;
-	} catch (error) {
-		// In development or when Edge Config is not available, skip maintenance check
-		console.warn("Edge Config error in middleware:", error);
-		maintenance = false;
-	}
-
+	const maintenance = await get("maintenance");
 	if (maintenance) {
 		request.nextUrl.pathname = "/maintenance";
 
