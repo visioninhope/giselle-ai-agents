@@ -578,8 +578,8 @@ export function CircularCarousel({
 			<button
 				type="button"
 				aria-label="Navigate to previous app"
-				onClick={moveLeft}
-				disabled={currentIndex === 0}
+				onClick={moveRight}
+				disabled={currentIndex === items.length - 1}
 				className="hidden md:flex absolute left-6 top-1/2 transform -translate-y-1/2 w-10 h-10 border border-white hover:bg-white/10 rounded-full items-center justify-center text-white transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed z-50"
 			>
 				<ChevronLeft size={20} />
@@ -589,8 +589,8 @@ export function CircularCarousel({
 			<button
 				type="button"
 				aria-label="Navigate to next app"
-				onClick={moveRight}
-				disabled={currentIndex === items.length - 1}
+				onClick={moveLeft}
+				disabled={currentIndex === 0}
 				className="hidden md:flex absolute right-6 top-1/2 transform -translate-y-1/2 w-10 h-10 border border-white hover:bg-white/10 rounded-full items-center justify-center text-white transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed z-50"
 			>
 				<ChevronRight size={20} />
