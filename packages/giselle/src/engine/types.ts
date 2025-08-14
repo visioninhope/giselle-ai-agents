@@ -18,15 +18,16 @@ import type { GenerationCompleteOption, TelemetrySettings } from "./telemetry";
 import type { UsageLimits } from "./usage-limits";
 import type { Vault } from "./vault";
 
+export interface GenerationCompleteCallbackFunctionArgs {
+	generation: CompletedGeneration;
+	inputMessages: ModelMessage[];
+	outputFiles: Array<{
+		outputId: OutputId;
+		data: Uint8Array<ArrayBufferLike>[];
+	}>;
+}
 type GenerationCompleteCallbackFunction = (
-	args: {
-		generation: CompletedGeneration;
-		inputMessages: ModelMessage[];
-		outputFiles: Array<{
-			outputId: OutputId;
-			data: Uint8Array<ArrayBufferLike>[];
-		}>;
-	},
+	args: GenerationCompleteCallbackFunctionArgs,
 	options: GenerationCompleteOption,
 ) => void | Promise<void>;
 

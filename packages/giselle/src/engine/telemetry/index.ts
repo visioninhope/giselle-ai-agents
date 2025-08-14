@@ -16,6 +16,7 @@ import {
 import { type ApiMediaContentType, Langfuse, LangfuseMedia } from "langfuse";
 import type { Storage } from "unstorage";
 import type { CompletedGeneration } from "../../concepts/generation";
+import type { GenerationCompleteCallbackFunctionArgs } from "../types";
 import type {
 	AnthropicProviderOptions,
 	TelemetrySettings,
@@ -325,7 +326,7 @@ async function createLangfuseParams(
 async function createImageMediaObjects(
 	generation: CompletedGeneration,
 	storage?: ReadOnlyStorage,
-): Promise<{ [key: string]: LangfuseMedia } | undefined> {
+): Promise<LangfuseMedia[] | undefined> {
 	if (!storage) {
 		return undefined;
 	}
@@ -338,7 +339,7 @@ async function createImageMediaObjects(
 		return undefined;
 	}
 
-	const imageMediaObjects: { [key: string]: LangfuseMedia } = {};
+	const imageMediaArray: LangfuseMedia[] = [];
 
 	for (const output of generatedImageOutputs) {
 		for (const image of output.contents) {
@@ -356,11 +357,12 @@ async function createImageMediaObjects(
 						continue;
 					}
 
-					const mediaKey = `${output.outputId}_${image.id}`;
-					imageMediaObjects[mediaKey] = new LangfuseMedia({
-						contentType: image.contentType as ApiMediaContentType,
-						contentBytes: buffer,
-					});
+					imageMediaArray.push(
+						new LangfuseMedia({
+							contentType: image.contentType as ApiMediaContentType,
+							contentBytes: buffer,
+						}),
+					);
 				}
 			} catch (error) {
 				console.warn(
@@ -371,17 +373,15 @@ async function createImageMediaObjects(
 		}
 	}
 
-	return Object.keys(imageMediaObjects).length > 0
-		? imageMediaObjects
-		: undefined;
+	return imageMediaArray.length > 0 ? imageMediaArray : undefined;
 }
 
 export async function emitTelemetry(
-	generation: CompletedGeneration,
+	args: GenerationCompleteCallbackFunctionArgs,
 	options: GenerationCompleteOption,
 ) {
 	try {
-		const operationNode = generation.context.operationNode;
+		const operationNode = args.generation.context.operationNode;
 		const nodeType = operationNode.content.type;
 
 		if (isQueryNode(operationNode)) {
@@ -399,7 +399,7 @@ export async function emitTelemetry(
 
 		const { traceParams, spanParams, generationParams } =
 			await createLangfuseParams(
-				generation,
+				args.generation,
 				options,
 				isImageGeneration ? "image" : "text",
 			);
@@ -410,12 +410,11 @@ export async function emitTelemetry(
 		const langfuseGeneration = span.generation(generationParams);
 
 		if (isImageGeneration) {
-			const imageMediaObjects = options.storage
-				? await createImageMediaObjects(generation, options.storage)
+			const imageMediaArray = options.storage
+				? await createImageMediaObjects(args.generation, options.storage)
 				: undefined;
 
-			if (imageMediaObjects) {
-				const imageMediaArray = Object.values(imageMediaObjects);
+			if (imageMediaArray) {
 				trace.update({
 					output: imageMediaArray,
 				});

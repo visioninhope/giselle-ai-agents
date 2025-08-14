@@ -142,9 +142,9 @@ export const giselleEngine = NextGiselleEngine({
 	integrationConfigs,
 	sampleAppWorkspaceId,
 	callbacks: {
-		generationComplete: async ({ generation }, options) => {
+		generationComplete: async (args, options) => {
 			try {
-				await emitTelemetry(generation, {
+				await emitTelemetry(args, {
 					telemetry: options?.telemetry,
 					storage,
 				});

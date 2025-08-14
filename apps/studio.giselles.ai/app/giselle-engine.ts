@@ -106,19 +106,19 @@ export const giselleEngine = NextGiselleEngine({
 		githubPullRequest: gitHubPullRequestQueryService,
 	},
 	callbacks: {
-		generationComplete: ({ generation }) => {
+		generationComplete: (args) => {
 			after(async () => {
 				const currentUser = await fetchCurrentUser();
 				const currentTeam = await fetchCurrentTeam();
 				const metadata = {
-					generationId: generation.id,
+					generationId: args.generation.id,
 					isProPlan: isProPlan(currentTeam),
 					teamType: currentTeam.type,
 					userId: currentUser.id,
 					subscriptionId: currentTeam.activeSubscriptionId ?? "",
 				};
 				try {
-					await emitTelemetry(generation, {
+					await emitTelemetry(args, {
 						telemetry: { metadata },
 						storage,
 					});
