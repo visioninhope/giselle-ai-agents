@@ -15,15 +15,22 @@ export function ReloadButton({
 		<form
 			action={() => {
 				startTransition(async () => {
-					await reloadAction();
+					try {
+						await reloadAction();
+					} catch (error) {
+						console.error("Reload failed:", error);
+					}
 				});
 			}}
 		>
 			<Button
 				type="submit"
 				variant="subtle"
+				aria-busy={isPending}
 				leftIcon={
-					<RefreshCw className={`w-4 h-4${isPending ? " animate-spin" : ""}`} />
+					<RefreshCw
+						className={isPending ? "w-4 h-4 animate-spin" : "w-4 h-4"}
+					/>
 				}
 				disabled={isPending}
 			>

@@ -7,19 +7,8 @@ import {
 	ChevronUp,
 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
+import styles from "./circular-carousel.module.css";
 import { TeamCard } from "./team-card";
-
-// Add keyframes for gentle pulse animation
-const pulseKeyframes = `
-  @keyframes gentle-pulse {
-    0%, 100% {
-      opacity: 0.8;
-    }
-    50% {
-      opacity: 1;
-    }
-  }
-`;
 
 interface CarouselItem {
 	id: string;
@@ -435,7 +424,6 @@ export function CircularCarousel({
 			className="relative w-full overflow-hidden"
 			style={containerStyle}
 		>
-			<style>{pulseKeyframes}</style>
 			{/* Carousel container */}
 			<section
 				aria-label="Team app carousel"
@@ -491,13 +479,9 @@ export function CircularCarousel({
 							}}
 						>
 							<div
-								className="relative"
-								style={{
-									...(isInserted && {
-										animation: "gentle-pulse 2s ease-in-out infinite",
-										filter: "drop-shadow(0 0 12px rgba(107, 143, 240, 0.6))",
-									}),
-								}}
+								className={
+									isInserted ? `relative ${styles.pulseAnimation}` : "relative"
+								}
 							>
 								<TeamCard
 									team={{

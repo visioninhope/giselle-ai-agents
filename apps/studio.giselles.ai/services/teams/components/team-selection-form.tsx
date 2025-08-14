@@ -30,12 +30,12 @@ export function TeamSelectionForm({
 	currentUser,
 }: TeamSelectionFormProps) {
 	const pathname = usePathname();
-	const isAccontSettingPage = useMemo(
+	const isAccountSettingsPage = useMemo(
 		() => pathname.startsWith("/settings/account"),
 		[pathname],
 	);
 	const action = (formData: FormData) => {
-		const withRedirect = isAccontSettingPage;
+		const withRedirect = isAccountSettingsPage;
 		return selectTeam(formData, withRedirect);
 	};
 
@@ -45,18 +45,18 @@ export function TeamSelectionForm({
 		<form
 			action={action}
 			ref={formRef}
-			key={`${currentTeam.id}-${isAccontSettingPage}`}
+			key={`${currentTeam.id}-${isAccountSettingsPage}`}
 		>
 			<Select
 				name="teamId"
-				defaultValue={isAccontSettingPage ? undefined : currentTeam.id}
+				defaultValue={isAccountSettingsPage ? undefined : currentTeam.id}
 				onValueChange={() => {
 					formRef.current?.requestSubmit();
 				}}
 			>
 				<SelectTrigger className="w-auto min-w-[100px] max-w-[360px] border-0 flex justify-between items-center data-[state=open]:border-0 data-[state=open]:ring-0 focus:ring-0 focus-visible:ring-0 focus:ring-offset-0 outline-none focus-visible:outline-none px-0.5 py-0.5 bg-transparent">
 					<div className="flex items-center gap-1.5">
-						{isAccontSettingPage ? (
+						{isAccountSettingsPage ? (
 							currentUser
 						) : (
 							<>
