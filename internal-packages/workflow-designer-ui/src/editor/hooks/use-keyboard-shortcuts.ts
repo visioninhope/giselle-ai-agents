@@ -11,6 +11,7 @@ import {
 	selectTriggerTool,
 	useToolbar,
 } from "../tool/toolbar";
+import type { Tool } from "../tool/types";
 
 // Browser shortcuts that should be prevented when canvas is focused
 const BROWSER_SHORTCUTS_TO_PREVENT = [
@@ -37,8 +38,20 @@ function useKeyAction(
 	}, [isPressed, enabled, action]);
 }
 
-export function useKeyboardShortcuts() {
+function useToolAction(key: string, toolFunction: () => Tool) {
 	const toolbar = useToolbar();
+	const { data } = useWorkflowDesigner();
+	const isCanvasFocused = data.ui.focusedArea === "canvas";
+	const canUseToolShortcuts = isCanvasFocused && !!toolbar;
+
+	useKeyAction(
+		key,
+		() => toolbar?.setSelectedTool(toolFunction()),
+		canUseToolShortcuts,
+	);
+}
+
+export function useKeyboardShortcuts() {
 	const { data } = useWorkflowDesigner();
 	const {
 		copy: handleCopy,
@@ -47,39 +60,14 @@ export function useKeyboardShortcuts() {
 	} = useNodeManipulation();
 
 	const isCanvasFocused = data.ui.focusedArea === "canvas";
-	const canUseToolShortcuts = isCanvasFocused && !!toolbar;
 
-	// Tool shortcuts using the custom hook
-	useKeyAction(
-		"t",
-		() => toolbar?.setSelectedTool(selectTriggerTool()),
-		canUseToolShortcuts,
-	);
-	useKeyAction(
-		"i",
-		() => toolbar?.setSelectedTool(selectSourceCategoryTool()),
-		canUseToolShortcuts,
-	);
-	useKeyAction(
-		"g",
-		() => toolbar?.setSelectedTool(selectLanguageModelTool()),
-		canUseToolShortcuts,
-	);
-	useKeyAction(
-		"r",
-		() => toolbar?.setSelectedTool(selectRetrievalCategoryTool()),
-		canUseToolShortcuts,
-	);
-	useKeyAction(
-		"d",
-		() => toolbar?.setSelectedTool(selectActionTool()),
-		canUseToolShortcuts,
-	);
-	useKeyAction(
-		"Escape",
-		() => toolbar?.setSelectedTool(moveTool()),
-		canUseToolShortcuts,
-	);
+	// Tool shortcuts using the simplified hook
+	useToolAction("t", selectTriggerTool);
+	useToolAction("i", selectSourceCategoryTool);
+	useToolAction("g", selectLanguageModelTool);
+	useToolAction("r", selectRetrievalCategoryTool);
+	useToolAction("d", selectActionTool);
+	useToolAction("Escape", moveTool);
 
 	// Copy/Paste/Duplicate shortcuts
 	useKeyAction(["Meta+c", "Control+c"], handleCopy, isCanvasFocused);
