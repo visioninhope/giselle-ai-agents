@@ -176,7 +176,6 @@ export function generateText(args: {
 
 			const providerOptions = getProviderOptions(operationNode.content.llm);
 
-			const generationOutputs: GenerationOutput[] = [];
 			const streamTextResult = streamText({
 				model: generationModel(operationNode.content.llm),
 				providerOptions,
@@ -219,6 +218,7 @@ export function generateText(args: {
 			return streamTextResult.toUIMessageStream({
 				sendReasoning: true,
 				onFinish: async ({ messages }) => {
+				const generationOutputs: GenerationOutput[] = [];
 					const generatedTextOutput =
 						generationContext.operationNode.outputs.find(
 							(output: Output) => output.accessor === "generated-text",
