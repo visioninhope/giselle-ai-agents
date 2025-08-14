@@ -4,6 +4,7 @@ import type {
 	WorkspaceId,
 } from "@giselle-sdk/data-type";
 import type { ActId } from "@giselle-sdk/giselle";
+import type { EmbeddingProfileId } from "@giselle-sdk/rag";
 import type { GitHubRepositoryIndexId } from "@giselles-ai/types";
 import { relations, sql } from "drizzle-orm";
 import {
@@ -310,7 +311,9 @@ export const githubRepositoryEmbeddingProfiles = pgTable(
 	"github_repository_embedding_profiles",
 	{
 		repositoryIndexDbId: integer("repository_index_db_id").notNull(),
-		embeddingProfileId: integer("embedding_profile_id").notNull(),
+		embeddingProfileId: integer("embedding_profile_id")
+			.$type<EmbeddingProfileId>()
+			.notNull(),
 		createdAt: timestamp("created_at").defaultNow().notNull(),
 	},
 	(table) => [
@@ -375,7 +378,9 @@ export const githubRepositoryEmbeddings = pgTable(
 		repositoryIndexDbId: integer("repository_index_db_id")
 			.notNull()
 			.references(() => githubRepositoryIndex.dbId, { onDelete: "cascade" }),
-		embeddingProfileId: integer("embedding_profile_id").notNull(),
+		embeddingProfileId: integer("embedding_profile_id")
+			.$type<EmbeddingProfileId>()
+			.notNull(),
 		embeddingDimensions: integer("embedding_dimensions")
 			.$type<EmbeddingDimensions>()
 			.notNull(),
@@ -419,7 +424,9 @@ export const githubRepositoryPullRequestEmbeddings = pgTable(
 	{
 		dbId: serial("db_id").primaryKey(),
 		repositoryIndexDbId: integer("repository_index_db_id").notNull(),
-		embeddingProfileId: integer("embedding_profile_id").notNull(),
+		embeddingProfileId: integer("embedding_profile_id")
+			.$type<EmbeddingProfileId>()
+			.notNull(),
 		embeddingDimensions: integer("embedding_dimensions")
 			.$type<EmbeddingDimensions>()
 			.notNull(),
