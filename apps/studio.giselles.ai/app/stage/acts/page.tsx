@@ -1,3 +1,4 @@
+import type { Act } from "@giselle-sdk/giselle";
 import { revalidatePath } from "next/cache";
 import { notFound } from "next/navigation";
 
@@ -117,44 +118,56 @@ async function enrichActWithNavigationData(
 
 		// Extract input values from act inputs
 		console.log("DEBUG tmpAct properties:", Object.keys(tmpAct));
-		console.log("DEBUG tmpAct.inputs:", tmpAct.inputs);
+		console.log(
+			"DEBUG tmpAct.inputs:",
+			(tmpAct as unknown as { inputs?: unknown }).inputs,
+		);
 
 		let inputValues = "";
 		try {
 			// Check for various possible input properties
-			const actAsAny = tmpAct as any;
+			interface ActWithInputs extends Act {
+				inputs?: Array<{
+					type: string;
+					items?: Array<{ name: string; value: unknown }>;
+				}>;
+				parameters?:
+					| Array<{ name?: string; key?: string; value: unknown }>
+					| Record<string, unknown>;
+				input?: string | Record<string, unknown>;
+			}
+			const actWithInputs = tmpAct as ActWithInputs;
 
-			if (actAsAny.inputs && Array.isArray(actAsAny.inputs)) {
-				console.log("DEBUG found inputs array:", actAsAny.inputs);
-				const parameterInputs = actAsAny.inputs.find(
-					(input: any) =>
-						input.type === "parameters" || input.type === "parameter",
+			if (actWithInputs.inputs && Array.isArray(actWithInputs.inputs)) {
+				console.log("DEBUG found inputs array:", actWithInputs.inputs);
+				const parameterInputs = actWithInputs.inputs.find(
+					(input) => input.type === "parameters" || input.type === "parameter",
 				);
 				if (parameterInputs?.items) {
 					const values = parameterInputs.items.map(
-						(item: any) => `${item.name}: ${item.value}`,
+						(item) => `${item.name}: ${item.value}`,
 					);
 					inputValues = values.join(", ");
 				}
-			} else if (actAsAny.parameters) {
-				console.log("DEBUG found parameters:", actAsAny.parameters);
-				if (Array.isArray(actAsAny.parameters)) {
-					const values = actAsAny.parameters.map(
-						(param: any) => `${param.name || param.key}: ${param.value}`,
+			} else if (actWithInputs.parameters) {
+				console.log("DEBUG found parameters:", actWithInputs.parameters);
+				if (Array.isArray(actWithInputs.parameters)) {
+					const values = actWithInputs.parameters.map(
+						(param) => `${param.name || param.key}: ${param.value}`,
 					);
 					inputValues = values.join(", ");
-				} else if (typeof actAsAny.parameters === "object") {
-					const values = Object.entries(actAsAny.parameters).map(
+				} else if (typeof actWithInputs.parameters === "object") {
+					const values = Object.entries(actWithInputs.parameters).map(
 						([key, value]) => `${key}: ${value}`,
 					);
 					inputValues = values.join(", ");
 				}
-			} else if (actAsAny.input) {
-				console.log("DEBUG found input:", actAsAny.input);
-				if (typeof actAsAny.input === "string") {
-					inputValues = actAsAny.input;
-				} else if (typeof actAsAny.input === "object") {
-					const values = Object.entries(actAsAny.input).map(
+			} else if (actWithInputs.input) {
+				console.log("DEBUG found input:", actWithInputs.input);
+				if (typeof actWithInputs.input === "string") {
+					inputValues = actWithInputs.input;
+				} else if (typeof actWithInputs.input === "object") {
+					const values = Object.entries(actWithInputs.input).map(
 						([key, value]) => `${key}: ${value}`,
 					);
 					inputValues = values.join(", ");
