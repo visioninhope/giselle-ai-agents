@@ -428,7 +428,7 @@ export function CircularCarousel({
 							>
 								<TeamCard
 									team={{
-										id: item.id as string,
+										id: item.id as `tm_${string}`,
 										name: item.name,
 									}}
 								/>
