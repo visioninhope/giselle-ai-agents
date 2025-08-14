@@ -19,6 +19,7 @@
 	},
 	"packageManager": "pnpm@10.0.0",
 	"dependencies": {
+		"@vercel/functions": "catalog:",
 		"@aws-sdk/client-s3": "catalog:",
 		"@giselle-internal/ui": "workspace:*",
 		"@giselle-internal/workflow-designer-ui": "workspace:*",
