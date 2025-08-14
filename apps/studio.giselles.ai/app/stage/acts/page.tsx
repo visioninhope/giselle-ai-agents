@@ -19,6 +19,8 @@ type ActWithNavigation = {
 	workspaceName: string;
 	teamName: string;
 	link: string;
+	llmModels?: string[];
+	inputValues?: string;
 };
 
 // This feature is currently under development and data structures change destructively,

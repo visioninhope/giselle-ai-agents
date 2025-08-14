@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@giselle-internal/ui/button";
-import { PopoverContent } from "@giselle-internal/ui/popover";
+import { Popover } from "@giselle-internal/ui/popover";
 import { StatusBadge } from "@giselle-internal/ui/status-badge";
 import {
 	Table,
@@ -105,7 +105,6 @@ export function FilterableActsList({
 	const [selectedStatuses, setSelectedStatuses] = useState<StatusFilter[]>(
 		Object.keys(statusLabels) as StatusFilter[],
 	);
-	const [showStatusDropdown, setShowStatusDropdown] = useState(false);
 
 	const _statusCounts = useMemo(() => {
 		const counts = acts.reduce(
@@ -155,29 +154,23 @@ export function FilterableActsList({
 			styleElement = document.createElement("style");
 			styleElement.id = styleId;
 			styleElement.textContent = `
-	        .status-select button[type="button"] {
-	          background-color: rgba(255, 255, 255, 0.05) !important;
-	          border: none !important;
-	          color: white !important;
-	          font-size: 14px !important;
-	          font-family: inherit !important;
-	        }
-	        .status-select button[type="button"]:hover {
-	          background-color: rgba(255, 255, 255, 0.1) !important;
-	        }
-	        .status-select button[type="button"] svg {
-	          margin-left: 8px !important;
-	        }
-	        .status-select [role="option"] {
-	          font-size: 14px !important;
-	        }
-	        .search-input input {
-	          background-color: rgba(255, 255, 255, 0.05) !important;
-	        }
-	        .search-input input:hover {
-	          background-color: rgba(255, 255, 255, 0.1) !important;
-	        }
-	      `;
+				        .status-select button[type="button"] {
+				          background-color: rgba(255, 255, 255, 0.05) !important;
+				          border: none !important;
+				          color: white !important;
+				          font-size: 14px !important;
+				          font-family: inherit !important;
+				        }
+				        .status-select button[type="button"]:hover {
+				          background-color: rgba(255, 255, 255, 0.1) !important;
+				        }
+				        .search-input input {
+				          background-color: rgba(255, 255, 255, 0.05) !important;
+				        }
+				        .search-input input:hover {
+				          background-color: rgba(255, 255, 255, 0.1) !important;
+				        }
+				      `;
 			document.head.appendChild(styleElement);
 		}
 
@@ -237,89 +230,72 @@ export function FilterableActsList({
 
 					{/* Status Filter */}
 					<div className="status-select">
-						{showStatusDropdown && (
-							<button
-								type="button"
-								className="fixed inset-0 z-40 cursor-default"
-								onClick={() => setShowStatusDropdown(false)}
-								onKeyDown={(e) => {
-									if (e.key === "Escape") {
-										setShowStatusDropdown(false);
-									}
-								}}
-								aria-label="Close status filter"
-							/>
-						)}
-						<div className="relative">
-							<button
-								type="button"
-								onClick={() => setShowStatusDropdown(!showStatusDropdown)}
-								className={clsx(
-									"flex items-center gap-2 rounded-[8px] h-10 px-[12px] text-left text-[14px]",
-									"outline-none focus:outline-none",
-									"transition-colors",
-								)}
-							>
-								<div className="flex items-center gap-1">
-									<span className="text-text">
-										Status {selectedStatuses.length}/
-										{Object.keys(statusLabels).length}
-									</span>
-									<div className="flex -space-x-1">
-										{selectedStatuses.map((status) => (
-											<div
-												key={status}
-												className={`w-3 h-3 rounded-full border border-black-900 ${statusColors[status]}`}
-											/>
-										))}
-									</div>
-								</div>
-								<ChevronDownIcon className="size-[13px] shrink-0 text-text" />
-							</button>
-							{showStatusDropdown && (
-								<div className="absolute top-full left-0 mt-1 z-50">
-									<PopoverContent>
-										{Object.entries(statusLabels).map(([status, label]) => {
-											const isSelected = selectedStatuses.includes(
-												status as StatusFilter,
-											);
-											return (
-												<button
-													type="button"
+						<Popover
+							trigger={
+								<button
+									type="button"
+									className={clsx(
+										"flex items-center gap-2 rounded-[8px] h-10 px-[12px] text-left text-[14px]",
+										"outline-none focus:outline-none",
+										"transition-colors",
+									)}
+								>
+									<div className="flex items-center gap-1">
+										<span className="text-text">
+											Status {selectedStatuses.length}/
+											{Object.keys(statusLabels).length}
+										</span>
+										<div className="flex -space-x-1">
+											{selectedStatuses.map((status) => (
+												<div
 													key={status}
-													onClick={() => {
-														const statusKey = status as StatusFilter;
-														setSelectedStatuses((prev) =>
-															isSelected
-																? prev.filter((s) => s !== statusKey)
-																: [...prev, statusKey],
-														);
-													}}
-													className={clsx(
-														"w-full text-text outline-none cursor-pointer hover:bg-ghost-element-hover",
-														"rounded-[4px] px-[8px] py-[6px] text-[14px]",
-														"flex items-center justify-between gap-[4px]",
-													)}
-												>
-													<div className="flex items-center gap-2">
-														<div
-															className={`w-3 h-3 rounded-full ${statusColors[status as StatusFilter]}`}
-														/>
-														<span>{label}</span>
-													</div>
-													<CheckIcon
-														className={clsx(
-															"size-[13px]",
-															isSelected ? "text-text" : "text-transparent",
-														)}
-													/>
-												</button>
+													className={`w-3 h-3 rounded-full border border-black-900 ${statusColors[status]}`}
+												/>
+											))}
+										</div>
+									</div>
+									<ChevronDownIcon className="size-[13px] shrink-0 text-text" />
+								</button>
+							}
+						>
+							{Object.entries(statusLabels).map(([status, label]) => {
+								const isSelected = selectedStatuses.includes(
+									status as StatusFilter,
+								);
+								return (
+									<button
+										type="button"
+										key={status}
+										onClick={() => {
+											const statusKey = status as StatusFilter;
+											setSelectedStatuses((prev) =>
+												isSelected
+													? prev.filter((s) => s !== statusKey)
+													: [...prev, statusKey],
 											);
-										})}
-									</PopoverContent>
-								</div>
-							)}
-						</div>
+										}}
+										className={clsx(
+											"w-full text-text outline-none cursor-pointer hover:bg-ghost-element-hover",
+											"rounded-[4px] px-[8px] py-[6px] text-[14px]",
+											"flex items-center justify-between gap-[4px]",
+										)}
+									>
+										<div className="flex items-center gap-2">
+											<div
+												className={`w-3 h-3 rounded-full ${statusColors[status as StatusFilter]}`}
+											/>
+											<span>{label}</span>
+										</div>
+										<CheckIcon
+											className={clsx(
+												"size-[13px]",
+												isSelected ? "text-text" : "text-transparent",
+											)}
+										/>
+									</button>
+								);
+							})}
+						</Popover>
 					</div>
 				</div>
 
@@ -390,7 +366,12 @@ export function FilterableActsList({
 									return (
 										<TableRow
 											key={act.id}
-											className="hover:bg-white/5 transition-colors duration-200"
+											className="hover:bg-white/5 transition-colors duration-200 cursor-pointer"
+											onClick={() => {
+												alert(
+													`Act Details:\nID: ${act.id}\nApp: ${act.workspaceName}\nStatus: ${act.status}\nTeam: ${act.teamName}\nLink: ${act.link}`,
+												);
+											}}
 										>
 											<TableCell className="w-12 !p-0 !m-0">
 												<div className="w-10 h-10 bg-gray-600 rounded-md flex items-center justify-center">
@@ -469,15 +450,14 @@ export function FilterableActsList({
 														type="button"
 														className="text-white-700 hover:text-white-900 transition-colors p-1"
 														title="Archive task"
+														onClick={(e) => {
+															e.stopPropagation();
+															// TODO: Implement archive functionality
+															alert(`Archive task: ${act.workspaceName}`);
+														}}
 													>
 														<Trash2 className="w-4 h-4" />
 													</button>
-													<Link
-														href={act.link}
-														className="text-white-700 hover:text-white-900 text-sm transition-colors"
-													>
-														More {">"}
-													</Link>
 												</div>
 											</TableCell>
 										</TableRow>
