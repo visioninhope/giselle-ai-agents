@@ -1,4 +1,5 @@
 import { createOpenAI } from "@ai-sdk/openai";
+import type { OpenAIEmbeddingModel } from "@giselle-sdk/data-type";
 import {
 	type BaseEmbedderConfig,
 	createAiSdkEmbedder,
@@ -6,7 +7,7 @@ import {
 import type { EmbedderFunction } from "./types";
 
 export type OpenAIEmbedderConfig = BaseEmbedderConfig & {
-	model?: "text-embedding-3-small" | "text-embedding-3-large";
+	model?: OpenAIEmbeddingModel;
 };
 
 /**
@@ -18,7 +19,8 @@ export function createOpenAIEmbedder(
 	config: OpenAIEmbedderConfig,
 ): EmbedderFunction {
 	const openai = createOpenAI({ apiKey: config.apiKey });
-	return createAiSdkEmbedder(config, "text-embedding-3-small", (modelName) =>
+	const defaultModel: OpenAIEmbeddingModel = "text-embedding-3-small";
+	return createAiSdkEmbedder(config, defaultModel, (modelName) =>
 		openai.embedding(modelName),
 	);
 }

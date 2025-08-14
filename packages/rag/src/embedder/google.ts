@@ -1,4 +1,5 @@
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
+import type { GeminiEmbeddingModel } from "@giselle-sdk/data-type";
 import {
 	type BaseEmbedderConfig,
 	createAiSdkEmbedder,
@@ -6,7 +7,7 @@ import {
 import type { EmbedderFunction } from "./types";
 
 export type GoogleEmbedderConfig = BaseEmbedderConfig & {
-	model?: "gemini-embedding-001";
+	model?: GeminiEmbeddingModel;
 };
 
 /**
@@ -18,7 +19,8 @@ export function createGoogleEmbedder(
 	config: GoogleEmbedderConfig,
 ): EmbedderFunction {
 	const google = createGoogleGenerativeAI({ apiKey: config.apiKey });
-	return createAiSdkEmbedder(config, "gemini-embedding-001", (modelName) =>
+	const defaultModel: GeminiEmbeddingModel = "gemini-embedding-001";
+	return createAiSdkEmbedder(config, defaultModel, (modelName) =>
 		google.textEmbeddingModel(modelName),
 	);
 }
