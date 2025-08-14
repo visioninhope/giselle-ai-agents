@@ -23,7 +23,9 @@ export interface GenerationCompleteCallbackFunctionArgs {
 	inputMessages: ModelMessage[];
 	outputFiles: Array<{
 		outputId: OutputId;
-		data: Uint8Array<ArrayBufferLike>[];
+		id: string;
+		contentType: string;
+		data: Uint8Array<ArrayBufferLike>;
 	}>;
 }
 type GenerationCompleteCallbackFunction = (

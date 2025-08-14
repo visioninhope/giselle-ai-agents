@@ -320,62 +320,6 @@ async function createLangfuseParams(
 	};
 }
 
-/**
- * Create LangfuseMedia objects from generated images if storage is available
- */
-async function createImageMediaObjects(
-	generation: CompletedGeneration,
-	storage?: ReadOnlyStorage,
-): Promise<LangfuseMedia[] | undefined> {
-	if (!storage) {
-		return undefined;
-	}
-
-	const generatedImageOutputs = generation.outputs.filter(
-		(output) => output.type === "generated-image",
-	);
-
-	if (generatedImageOutputs.length === 0) {
-		return undefined;
-	}
-
-	const imageMediaArray: LangfuseMedia[] = [];
-
-	for (const output of generatedImageOutputs) {
-		for (const image of output.contents) {
-			try {
-				const imagePath = `generations/${generation.id}/generated-images/${image.filename}`;
-				const imageData = await storage.getItemRaw(imagePath);
-
-				if (imageData) {
-					// Convert imageData to Buffer safely
-					let buffer: Buffer;
-					try {
-						buffer = Buffer.from(imageData);
-					} catch (error) {
-						console.warn("Error converting imageData to Buffer:", error);
-						continue;
-					}
-
-					imageMediaArray.push(
-						new LangfuseMedia({
-							contentType: image.contentType as ApiMediaContentType,
-							contentBytes: buffer,
-						}),
-					);
-				}
-			} catch (error) {
-				console.warn(
-					`Failed to load image ${image.filename} for telemetry:`,
-					error,
-				);
-			}
-		}
-	}
-
-	return imageMediaArray.length > 0 ? imageMediaArray : undefined;
-}
-
 export async function emitTelemetry(
 	args: GenerationCompleteCallbackFunctionArgs,
 	options: GenerationCompleteOption,
@@ -410,19 +354,22 @@ export async function emitTelemetry(
 		const langfuseGeneration = span.generation(generationParams);
 
 		if (isImageGeneration) {
-			const imageMediaArray = options.storage
-				? await createImageMediaObjects(args.generation, options.storage)
-				: undefined;
-
-			if (imageMediaArray) {
+			const langfuseMediaReferences = args.outputFiles.map(
+				(outputFile) =>
+					new LangfuseMedia({
+						contentType: outputFile.contentType as ApiMediaContentType,
+						contentBytes: Buffer.from(outputFile.data),
+					}),
+			);
+			if (langfuseMediaReferences.length > 0) {
 				trace.update({
-					output: imageMediaArray,
+					output: langfuseMediaReferences,
 				});
 				span.update({
-					output: imageMediaArray,
+					output: langfuseMediaReferences,
 				});
 				langfuseGeneration.update({
-					output: imageMediaArray,
+					output: langfuseMediaReferences,
 				});
 			}
 		}

@@ -183,34 +183,39 @@ export async function useGenerationExecutor<T>(args: {
 			...runningGeneration,
 			status: "completed",
 			completedAt: Date.now(),
-			outputs: outputs,
+			outputs,
 			usage,
 			messages: generateMessages ?? [],
 		} satisfies CompletedGeneration;
-		const outputFiles = await Promise.all(
-			outputs.map(async (output) => {
-				if (output.type !== "generated-image") {
-					return null;
-				}
-				const data = await Promise.all(
-					output.contents.map((content) =>
-						getGeneratedImage({
-							storage: args.context.storage,
-							experimental_storage: args.context.experimental_storage,
-							generation: args.generation,
-							filename: content.filename,
-							useExperimentalStorage: true,
-						}),
-					),
-				);
-				return {
+
+		/** @todo create type alias */
+		const outputFiles: Array<{
+			outputId: OutputId;
+			id: string;
+			contentType: string;
+			data: Uint8Array<ArrayBufferLike>;
+		}> = [];
+		for (const output of outputs) {
+			if (output.type !== "generated-image") {
+				continue;
+			}
+			for (const content of output.contents) {
+				const data = await getGeneratedImage({
+					storage: args.context.storage,
+					experimental_storage: args.context.experimental_storage,
+					generation: args.generation,
+					filename: content.filename,
+					useExperimentalStorage: true,
+				});
+
+				outputFiles.push({
+					id: content.id,
 					outputId: output.outputId,
+					contentType: content.contentType,
 					data,
-				};
-			}),
-		).then((outputFiles) =>
-			outputFiles.filter((outputFile) => outputFile !== null),
-		);
+				});
+			}
+		}
 
 		await Promise.all([
 			setGeneration(completedGeneration),
@@ -221,7 +226,11 @@ export async function useGenerationExecutor<T>(args: {
 			}),
 			(async () => {
 				const result = await args.context.callbacks?.generationComplete?.(
-					{ generation: completedGeneration, inputMessages, outputFiles },
+					{
+						generation: completedGeneration,
+						inputMessages,
+						outputFiles,
+					},
 					{
 						telemetry: args.telemetry,
 					},
