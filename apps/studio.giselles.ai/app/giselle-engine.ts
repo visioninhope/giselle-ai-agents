@@ -106,7 +106,7 @@ export const giselleEngine = NextGiselleEngine({
 		githubPullRequest: gitHubPullRequestQueryService,
 	},
 	callbacks: {
-		generationComplete: (generation) => {
+		generationComplete: ({ generation }) => {
 			after(async () => {
 				const currentUser = await fetchCurrentUser();
 				const currentTeam = await fetchCurrentTeam();

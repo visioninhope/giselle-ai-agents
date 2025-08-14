@@ -23,6 +23,7 @@ import type { TelemetrySettings } from "../../telemetry";
 import type { GiselleEngineContext } from "../../types";
 import {
 	checkUsageLimits,
+	getGeneratedImage,
 	getGeneration,
 	getNodeGenerationIndexes,
 	handleAgentTimeConsumption,
@@ -175,6 +176,7 @@ export async function useGenerationExecutor<T>(args: {
 	async function completeGeneration({
 		outputs,
 		usage,
+		inputMessages,
 		generateMessages,
 	}: CompleteGenerationArgs) {
 		const completedGeneration = {
@@ -185,6 +187,30 @@ export async function useGenerationExecutor<T>(args: {
 			usage,
 			messages: generateMessages ?? [],
 		} satisfies CompletedGeneration;
+		const outputFiles = await Promise.all(
+			outputs.map(async (output) => {
+				if (output.type !== "generated-image") {
+					return null;
+				}
+				const data = await Promise.all(
+					output.contents.map((content) =>
+						getGeneratedImage({
+							storage: args.context.storage,
+							experimental_storage: args.context.experimental_storage,
+							generation: args.generation,
+							filename: content.filename,
+							useExperimentalStorage: true,
+						}),
+					),
+				);
+				return {
+					outputId: output.outputId,
+					data,
+				};
+			}),
+		).then((outputFiles) =>
+			outputFiles.filter((outputFile) => outputFile !== null),
+		);
 
 		await Promise.all([
 			setGeneration(completedGeneration),
@@ -195,7 +221,7 @@ export async function useGenerationExecutor<T>(args: {
 			}),
 			(async () => {
 				const result = await args.context.callbacks?.generationComplete?.(
-					completedGeneration,
+					{ generation: completedGeneration, inputMessages, outputFiles },
 					{
 						telemetry: args.telemetry,
 					},
