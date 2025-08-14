@@ -1,16 +1,13 @@
-import { openai } from "@ai-sdk/openai";
-import type { TelemetrySettings } from "ai";
-import { createAiSdkEmbedder } from "./ai-sdk-embedder";
+import { createOpenAI } from "@ai-sdk/openai";
+import {
+	type BaseEmbedderConfig,
+	createAiSdkEmbedder,
+} from "./ai-sdk-embedder";
 import type { EmbedderFunction } from "./types";
 
-type OpenAIEmbeddingModel = "text-embedding-3-small" | "text-embedding-3-large";
-
-export interface OpenAIEmbedderConfig {
-	apiKey: string;
-	model?: OpenAIEmbeddingModel;
-	maxRetries?: number;
-	telemetry?: TelemetrySettings;
-}
+export type OpenAIEmbedderConfig = BaseEmbedderConfig & {
+	model?: "text-embedding-3-small" | "text-embedding-3-large";
+};
 
 /**
  * Create an OpenAI embedder with the specified configuration
@@ -20,9 +17,8 @@ export interface OpenAIEmbedderConfig {
 export function createOpenAIEmbedder(
 	config: OpenAIEmbedderConfig,
 ): EmbedderFunction {
-	return createAiSdkEmbedder<OpenAIEmbeddingModel>({
-		config,
-		defaultModel: "text-embedding-3-small",
-		getModel: (modelName) => openai.embedding(modelName),
-	});
+	const openai = createOpenAI({ apiKey: config.apiKey });
+	return createAiSdkEmbedder(config, "text-embedding-3-small", (modelName) =>
+		openai.embedding(modelName),
+	);
 }

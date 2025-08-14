@@ -7,25 +7,23 @@ import {
 import { EmbeddingError } from "../errors";
 import type { EmbedderFunction } from "./types";
 
-interface BaseEmbedderConfig<TModelName extends string> {
+export interface BaseEmbedderConfig {
 	apiKey: string;
-	model?: TModelName;
+	model?: string;
 	maxRetries?: number;
 	telemetry?: TelemetrySettings;
 }
 
-export function createAiSdkEmbedder<TModelName extends string>(params: {
-	config: BaseEmbedderConfig<TModelName>;
-	defaultModel: TModelName;
-	getModel: (modelName: TModelName) => EmbeddingModel<string>;
-}): EmbedderFunction {
-	const { config, defaultModel, getModel } = params;
-
+export function createAiSdkEmbedder(
+	config: BaseEmbedderConfig,
+	defaultModel: string,
+	getModel: (modelName: string) => EmbeddingModel<string>,
+): EmbedderFunction {
 	if (!config.apiKey || config.apiKey.length === 0) {
 		throw new Error("API key is required and cannot be empty");
 	}
 
-	const model = (config.model ?? defaultModel) as TModelName;
+	const model = config.model ?? defaultModel;
 	const maxRetries = config.maxRetries ?? 3;
 	const telemetry = config.telemetry;
 
@@ -44,16 +42,10 @@ export function createAiSdkEmbedder<TModelName extends string>(params: {
 				});
 				return embedding;
 			} catch (error: unknown) {
-				if (error instanceof Error) {
-					throw EmbeddingError.apiError(error, {
-						operation: "embed",
-						model,
-					});
-				}
-				throw EmbeddingError.apiError(new Error(String(error)), {
-					operation: "embed",
-					model,
-				});
+				throw EmbeddingError.apiError(
+					error instanceof Error ? error : new Error(String(error)),
+					{ operation: "embed", model },
+				);
 			}
 		},
 
@@ -67,16 +59,10 @@ export function createAiSdkEmbedder<TModelName extends string>(params: {
 				});
 				return embeddings;
 			} catch (error: unknown) {
-				if (error instanceof Error) {
-					throw EmbeddingError.apiError(error, {
-						operation: "embedMany",
-						model,
-					});
-				}
-				throw EmbeddingError.apiError(new Error(String(error)), {
-					operation: "embedMany",
-					model,
-				});
+				throw EmbeddingError.apiError(
+					error instanceof Error ? error : new Error(String(error)),
+					{ operation: "embedMany", model },
+				);
 			}
 		},
 	};

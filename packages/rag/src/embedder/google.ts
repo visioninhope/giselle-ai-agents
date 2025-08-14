@@ -1,16 +1,13 @@
-import { google } from "@ai-sdk/google";
-import type { TelemetrySettings } from "ai";
-import { createAiSdkEmbedder } from "./ai-sdk-embedder";
+import { createGoogleGenerativeAI } from "@ai-sdk/google";
+import {
+	type BaseEmbedderConfig,
+	createAiSdkEmbedder,
+} from "./ai-sdk-embedder";
 import type { EmbedderFunction } from "./types";
 
-type GeminiEmbeddingModel = "gemini-embedding-001";
-
-export interface GoogleEmbedderConfig {
-	apiKey: string;
-	model?: GeminiEmbeddingModel;
-	maxRetries?: number;
-	telemetry?: TelemetrySettings;
-}
+export type GoogleEmbedderConfig = BaseEmbedderConfig & {
+	model?: "gemini-embedding-001";
+};
 
 /**
  * Create a Google embedder with the specified configuration
@@ -20,9 +17,8 @@ export interface GoogleEmbedderConfig {
 export function createGoogleEmbedder(
 	config: GoogleEmbedderConfig,
 ): EmbedderFunction {
-	return createAiSdkEmbedder<GeminiEmbeddingModel>({
-		config,
-		defaultModel: "gemini-embedding-001",
-		getModel: (modelName) => google.textEmbeddingModel(modelName),
-	});
+	const google = createGoogleGenerativeAI({ apiKey: config.apiKey });
+	return createAiSdkEmbedder(config, "gemini-embedding-001", (modelName) =>
+		google.textEmbeddingModel(modelName),
+	);
 }
