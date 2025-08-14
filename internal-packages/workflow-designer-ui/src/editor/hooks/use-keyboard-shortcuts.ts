@@ -46,9 +46,8 @@ export function useKeyboardShortcuts() {
 		duplicate: handleDuplicate,
 	} = useNodeManipulation();
 
-	// Only use keyboard shortcuts when canvas is focused
-	const canUseShortcuts = data.ui.focusedArea === "canvas";
-	const canUseToolShortcuts = canUseShortcuts && !!toolbar;
+	const isCanvasFocused = data.ui.focusedArea === "canvas";
+	const canUseToolShortcuts = isCanvasFocused && !!toolbar;
 
 	// Tool shortcuts using the custom hook
 	useKeyAction(
@@ -83,15 +82,14 @@ export function useKeyboardShortcuts() {
 	);
 
 	// Copy/Paste/Duplicate shortcuts
-	useKeyAction(["Meta+c", "Control+c"], handleCopy, canUseShortcuts);
-	useKeyAction(["Meta+v", "Control+v"], handlePaste, canUseShortcuts);
-	useKeyAction(["Meta+d", "Control+d"], handleDuplicate, canUseShortcuts);
+	useKeyAction(["Meta+c", "Control+c"], handleCopy, isCanvasFocused);
+	useKeyAction(["Meta+v", "Control+v"], handlePaste, isCanvasFocused);
+	useKeyAction(["Meta+d", "Control+d"], handleDuplicate, isCanvasFocused);
 
 	// Return handler for preventing browser default shortcuts
 	const handleKeyDown = useCallback(
 		(event: React.KeyboardEvent) => {
-			// Only prevent defaults when focused on canvas
-			if (data.ui.focusedArea !== "canvas") return;
+			if (!isCanvasFocused) return;
 
 			const shouldPrevent = BROWSER_SHORTCUTS_TO_PREVENT.some((shortcut) => {
 				const keyMatches = event.key.toLowerCase() === shortcut.key;
@@ -107,7 +105,7 @@ export function useKeyboardShortcuts() {
 				event.preventDefault();
 			}
 		},
-		[data.ui.focusedArea],
+		[isCanvasFocused],
 	);
 
 	return { handleKeyDown };
