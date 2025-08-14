@@ -6,7 +6,7 @@ import {
 	ChevronRight,
 	ChevronUp,
 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { TeamCard } from "./team-card";
 
 // Add keyframes for gentle pulse animation
@@ -209,58 +209,61 @@ export function CircularCarousel({
 	};
 
 	// Handle card click
-	const handleCardClick = (originalIndex: number, isCenter: boolean) => {
-		if (isCenter) {
-			if (insertedIndex === originalIndex) {
-				// Click on inserted card: start slide up animation
-				setAnimatingUpIndex(originalIndex);
-				setInsertedIndex(null);
-				setRejectIndex(null);
+	const handleCardClick = useCallback(
+		(originalIndex: number, isCenter: boolean) => {
+			if (isCenter) {
+				if (insertedIndex === originalIndex) {
+					// Click on inserted card: start slide up animation
+					setAnimatingUpIndex(originalIndex);
+					setInsertedIndex(null);
+					setRejectIndex(null);
 
-				// Call deselect callback
-				if (onItemDeselect) {
-					onItemDeselect();
-				}
+					// Call deselect callback
+					if (onItemDeselect) {
+						onItemDeselect();
+					}
 
-				// Complete slide up animation
-				setTimeout(() => {
+					// Complete slide up animation
+					setTimeout(() => {
+						setAnimatingUpIndex(null);
+					}, 600);
+				} else {
+					// First click: show blue selection frame immediately
+					setSelectedIndex(originalIndex);
+					setRejectIndex(null);
+					setInsertedIndex(null);
+					setAnimatingIndex(null);
 					setAnimatingUpIndex(null);
-				}, 600);
+
+					if (onItemSelect) {
+						onItemSelect(items[originalIndex]);
+					}
+
+					// Brief delay to show selection state, then start slide down animation
+					setTimeout(() => {
+						setAnimatingIndex(originalIndex);
+						setSelectedIndex(null);
+
+						// Start slide down animation
+						setTimeout(() => {
+							setInsertedIndex(originalIndex);
+							setRejectIndex(originalIndex);
+							setAnimatingIndex(null);
+						}, 600);
+					}, 300); // Show selection state for 300ms before animation
+				}
 			} else {
-				// First click: show blue selection frame immediately
-				setSelectedIndex(originalIndex);
+				// Move clicked card to center
+				setCurrentIndex(originalIndex);
+				setSelectedIndex(null);
 				setRejectIndex(null);
 				setInsertedIndex(null);
 				setAnimatingIndex(null);
 				setAnimatingUpIndex(null);
-
-				if (onItemSelect) {
-					onItemSelect(items[originalIndex]);
-				}
-
-				// Brief delay to show selection state, then start slide down animation
-				setTimeout(() => {
-					setAnimatingIndex(originalIndex);
-					setSelectedIndex(null);
-
-					// Start slide down animation
-					setTimeout(() => {
-						setInsertedIndex(originalIndex);
-						setRejectIndex(originalIndex);
-						setAnimatingIndex(null);
-					}, 600);
-				}, 300); // Show selection state for 300ms before animation
 			}
-		} else {
-			// Move clicked card to center
-			setCurrentIndex(originalIndex);
-			setSelectedIndex(null);
-			setRejectIndex(null);
-			setInsertedIndex(null);
-			setAnimatingIndex(null);
-			setAnimatingUpIndex(null);
-		}
-	};
+		},
+		[insertedIndex, onItemDeselect, onItemSelect, items],
+	);
 
 	// Drag handlers
 	const handleDragStart = (clientX: number, clientY: number) => {
@@ -335,13 +338,86 @@ export function CircularCarousel({
 	const visibleCardsList = getVisibleCards();
 	const centerCard = visibleCardsList.find((card) => card.positionIndex === 0);
 
+	// Keyboard navigation
+	useEffect(() => {
+		const handleKeyDown = (e: KeyboardEvent) => {
+			// Only handle arrow keys when the carousel is focused or no other input is focused
+			if (
+				document.activeElement?.tagName === "INPUT" ||
+				document.activeElement?.tagName === "TEXTAREA"
+			) {
+				return;
+			}
+
+			switch (e.key) {
+				case "ArrowLeft":
+					e.preventDefault();
+					if (currentIndex > 0) {
+						setCurrentIndex(currentIndex - 1);
+						setSelectedIndex(null);
+						setRejectIndex(null);
+						setInsertedIndex(null);
+						setAnimatingIndex(null);
+						setAnimatingUpIndex(null);
+					}
+					break;
+				case "ArrowRight":
+					e.preventDefault();
+					if (currentIndex < items.length - 1) {
+						setCurrentIndex(currentIndex + 1);
+						setSelectedIndex(null);
+						setRejectIndex(null);
+						setInsertedIndex(null);
+						setAnimatingIndex(null);
+						setAnimatingUpIndex(null);
+					}
+					break;
+				case "Enter":
+				case " ":
+					if (centerCard) {
+						e.preventDefault();
+						handleCardClick(centerCard.originalIndex, true);
+					}
+					break;
+			}
+		};
+
+		window.addEventListener("keydown", handleKeyDown);
+		return () => {
+			window.removeEventListener("keydown", handleKeyDown);
+		};
+	}, [currentIndex, items.length, centerCard, handleCardClick]);
+
+	// Optimized style objects to prevent recreation on each render
+	const containerStyle = {
+		height: "250px",
+	} as const;
+
+	const emptyStateContainerStyle = {
+		height: "250px",
+	} as const;
+
+	const carouselStyle = {
+		userSelect: "none" as const,
+		WebkitUserSelect: "none" as const,
+	};
+
+	// Optimized gradient style
+	const gradientBackgroundStyle = {
+		width: "108px",
+		height: "95px",
+		background:
+			"radial-gradient(ellipse 108px 80px at 50% 100%, rgba(107, 143, 240, 1) 0%, rgba(107, 143, 240, 0.8) 20%, rgba(107, 143, 240, 0.5) 40%, rgba(107, 143, 240, 0.2) 70%, transparent 100%)",
+		filter: "blur(2px)",
+	} as const;
+
 	// Show empty state when no items available
 	if (items.length === 0) {
 		return (
 			<div
 				ref={containerRef}
 				className="relative w-full overflow-hidden select-none"
-				style={{ height: "250px" }}
+				style={emptyStateContainerStyle}
 			>
 				<div className="text-center">
 					<p className="text-white-400 text-[14px] font-medium font-['DM_Sans']">
@@ -357,14 +433,14 @@ export function CircularCarousel({
 		<div
 			ref={containerRef}
 			className="relative w-full overflow-hidden"
-			style={{ height: "250px" }}
+			style={containerStyle}
 		>
 			<style>{pulseKeyframes}</style>
 			{/* Carousel container */}
-			<div
-				role="application"
-				aria-label="Carousel container"
-				className="relative w-full h-full flex items-center justify-center cursor-grab active:cursor-grabbing"
+			<section
+				aria-label="Team app carousel"
+				aria-describedby="carousel-instructions"
+				className="relative w-full h-full flex items-center justify-center cursor-grab active:cursor-grabbing focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
 				onMouseDown={handleMouseDown}
 				onMouseMove={handleMouseMove}
 				onMouseUp={handleDragEnd}
@@ -372,10 +448,7 @@ export function CircularCarousel({
 				onTouchStart={handleTouchStart}
 				onTouchMove={handleTouchMove}
 				onTouchEnd={handleDragEnd}
-				style={{
-					userSelect: "none",
-					WebkitUserSelect: "none",
-				}}
+				style={carouselStyle}
 			>
 				{visibleCardsList.map(({ item, originalIndex, positionIndex }) => {
 					const position = getCardPosition(positionIndex);
@@ -436,6 +509,12 @@ export function CircularCarousel({
 						</button>
 					);
 				})}
+			</section>
+
+			{/* Hidden instructions for screen readers */}
+			<div id="carousel-instructions" className="sr-only">
+				Use left and right arrow keys to navigate between apps. Press Enter or
+				Space to select the center app.
 			</div>
 
 			{/* Gray selection frame - normal state */}
@@ -476,16 +555,7 @@ export function CircularCarousel({
 					<div className="text-gray-300 text-lg font-medium mb-1 tracking-wide flex justify-center">
 						<ChevronDown size={20} />
 					</div>
-					<div
-						className="mx-auto"
-						style={{
-							width: "108px",
-							height: "95px",
-							background:
-								"radial-gradient(ellipse 108px 80px at 50% 100%, rgba(107, 143, 240, 1) 0%, rgba(107, 143, 240, 0.8) 20%, rgba(107, 143, 240, 0.5) 40%, rgba(107, 143, 240, 0.2) 70%, transparent 100%)",
-							filter: "blur(2px)",
-						}}
-					/>
+					<div className="mx-auto" style={gradientBackgroundStyle} />
 				</button>
 			)}
 
@@ -507,8 +577,9 @@ export function CircularCarousel({
 			{/* Left arrow */}
 			<button
 				type="button"
-				onClick={moveRight}
-				disabled={currentIndex === items.length - 1}
+				aria-label="Navigate to previous app"
+				onClick={moveLeft}
+				disabled={currentIndex === 0}
 				className="hidden md:flex absolute left-6 top-1/2 transform -translate-y-1/2 w-10 h-10 border border-white hover:bg-white/10 rounded-full items-center justify-center text-white transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed z-50"
 			>
 				<ChevronLeft size={20} />
@@ -517,8 +588,9 @@ export function CircularCarousel({
 			{/* Right arrow */}
 			<button
 				type="button"
-				onClick={moveLeft}
-				disabled={currentIndex === 0}
+				aria-label="Navigate to next app"
+				onClick={moveRight}
+				disabled={currentIndex === items.length - 1}
 				className="hidden md:flex absolute right-6 top-1/2 transform -translate-y-1/2 w-10 h-10 border border-white hover:bg-white/10 rounded-full items-center justify-center text-white transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed z-50"
 			>
 				<ChevronRight size={20} />
