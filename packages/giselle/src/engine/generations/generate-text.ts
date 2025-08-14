@@ -218,7 +218,7 @@ export function generateText(args: {
 			return streamTextResult.toUIMessageStream({
 				sendReasoning: true,
 				onFinish: async ({ messages }) => {
-				const generationOutputs: GenerationOutput[] = [];
+					const generationOutputs: GenerationOutput[] = [];
 					const generatedTextOutput =
 						generationContext.operationNode.outputs.find(
 							(output: Output) => output.accessor === "generated-text",
@@ -236,10 +236,7 @@ export function generateText(args: {
 					const reasoningOutput = generationContext.operationNode.outputs.find(
 						(output: Output) => output.accessor === "reasoning",
 					);
-					if (
-						reasoningOutput !== undefined &&
-						reasoningText !== undefined
-					) {
+					if (reasoningOutput !== undefined && reasoningText !== undefined) {
 						generationOutputs.push({
 							type: "reasoning",
 							content: reasoningText,
