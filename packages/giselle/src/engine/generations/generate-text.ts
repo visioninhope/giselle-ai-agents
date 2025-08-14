@@ -217,7 +217,7 @@ export function generateText(args: {
 			});
 			return streamTextResult.toUIMessageStream({
 				sendReasoning: true,
-				onFinish: async ({ messages }) => {
+				onFinish: async ({ messages: generateMessages }) => {
 					const generationOutputs: GenerationOutput[] = [];
 					const generatedTextOutput =
 						generationContext.operationNode.outputs.find(
@@ -256,10 +256,10 @@ export function generateText(args: {
 						});
 					}
 					await completeGeneration({
-						inputMessages: [],
+						inputMessages: messages,
 						outputs: generationOutputs,
 						usage: await streamTextResult.usage,
-						generateMessages: messages,
+						generateMessages: generateMessages,
 					});
 				},
 			});
