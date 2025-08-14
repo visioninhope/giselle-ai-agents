@@ -30,6 +30,7 @@ async function enrichActWithNavigationData(
 ): Promise<ActWithNavigation | null> {
 	try {
 		const tmpAct = await giselleEngine.getAct({ actId: act.sdkActId });
+		console.log("DEBUG tmpAct:", JSON.stringify(tmpAct, null, 2));
 		const team = teams.find((t) => t.dbId === act.teamDbId);
 		if (team === undefined) {
 			throw new Error("Team not found");
@@ -38,6 +39,7 @@ async function enrichActWithNavigationData(
 			act.sdkWorkspaceId,
 			true,
 		);
+		console.log("DEBUG tmpWorkspace:", JSON.stringify(tmpWorkspace, null, 2));
 
 		const findStepByStatus = (status: string) => {
 			for (const sequence of tmpAct.sequences) {
@@ -97,13 +99,45 @@ async function enrichActWithNavigationData(
 		if (targetStep) {
 			link += `/${targetStep.id}`;
 		}
+
+		// Extract LLM models from workspace nodes
+		const llmModels: string[] = [];
+		if (tmpWorkspace.nodes) {
+			for (const node of tmpWorkspace.nodes) {
+				if (node.content?.type === "textGeneration" && node.content.llm) {
+					const model = node.content.llm.id;
+					if (typeof model === "string" && !llmModels.includes(model)) {
+						llmModels.push(model);
+					}
+				}
+			}
+		}
+
+		// Extract input values from act inputs
+		// Note: inputs property is not currently available on Act type
+		const inputValues = "";
+		// TODO: Implement input extraction when Act type includes inputs
+		// if (tmpAct.inputs && tmpAct.inputs.length > 0) {
+		// 	const parameterInputs = tmpAct.inputs.find(
+		// 		(input: any) => input.type === "parameters",
+		// 	);
+		// 	if (parameterInputs?.items) {
+		// 		const values = parameterInputs.items.map(
+		// 			(item: any) => `${item.name}: ${item.value}`,
+		// 		);
+		// 		inputValues = values.join(", ");
+		// 	}
+		// }
+
 		return {
 			id: tmpAct.id,
 			status: tmpAct.status,
-			createdAt: act.createdAt,
+			createdAt: act.createdAt.toISOString(),
 			link,
 			teamName: team.name,
 			workspaceName: tmpWorkspace.name ?? "Untitled",
+			llmModels: llmModels.length > 0 ? llmModels : undefined,
+			inputValues: inputValues || undefined,
 		};
 	} catch {
 		return null;
