@@ -174,7 +174,7 @@ export async function useGenerationExecutor<T>(args: {
 		outputs: GenerationOutput[];
 		usage?: GenerationUsage;
 		messages?: Message[];
-	}): Promise<CompletedGeneration> {
+	}) {
 		const completedGeneration = {
 			...runningGeneration,
 			status: "completed",
