@@ -17,7 +17,6 @@ import { AISDKError, stepCountIs, streamText } from "ai";
 import type {
 	FailedGeneration,
 	GenerationOutput,
-	GenerationUsage,
 	QueuedGeneration,
 } from "../../concepts/generation";
 import { decryptSecret } from "../secrets";
@@ -178,7 +177,6 @@ export function generateText(args: {
 			const providerOptions = getProviderOptions(operationNode.content.llm);
 
 			const generationOutputs: GenerationOutput[] = [];
-			let usage: GenerationUsage | undefined;
 			const streamTextResult = streamText({
 				model: generationModel(operationNode.content.llm),
 				providerOptions,
@@ -242,7 +240,6 @@ export function generateText(args: {
 							sources: event.sources,
 						});
 					}
-					usage = event.usage;
 					try {
 						await Promise.all(
 							preparedToolSet.cleanupFunctions.map((cleanupFunction) =>
@@ -258,9 +255,10 @@ export function generateText(args: {
 				sendReasoning: true,
 				onFinish: async ({ messages }) => {
 					await completeGeneration({
+						inputMessages: [],
 						outputs: generationOutputs,
-						usage,
-						messages,
+						usage: await streamTextResult.usage,
+						generateMessages: messages,
 					});
 				},
 			});

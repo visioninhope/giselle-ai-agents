@@ -5,7 +5,7 @@ import type {
 	OutputId,
 	WorkspaceId,
 } from "@giselle-sdk/data-type";
-import type { DataContent } from "ai";
+import type { DataContent, ModelMessage } from "ai";
 import {
 	type CompletedGeneration,
 	type Generation,
@@ -30,6 +30,16 @@ import {
 } from "../utils";
 import { internalSetGeneration } from "./set-generation";
 
+interface CompleteGenerationArgs {
+	outputs: GenerationOutput[];
+	usage?: GenerationUsage;
+	generateMessages?: Message[];
+	inputMessages: ModelMessage[];
+}
+type CompleteGeneration = (
+	args: CompleteGenerationArgs,
+) => Promise<CompletedGeneration>;
+
 export async function useGenerationExecutor<T>(args: {
 	context: GiselleEngineContext;
 	generation: QueuedGeneration;
@@ -46,11 +56,7 @@ export async function useGenerationExecutor<T>(args: {
 		) => Promise<string | undefined>;
 		workspaceId: WorkspaceId;
 		telemetry?: TelemetrySettings;
-		completeGeneration: (args: {
-			outputs: GenerationOutput[];
-			usage?: GenerationUsage;
-			messages?: Message[];
-		}) => Promise<CompletedGeneration>;
+		completeGeneration: CompleteGeneration;
 	}) => Promise<T>;
 }): Promise<T> {
 	const generationContext = GenerationContext.parse(args.generation.context);
@@ -169,19 +175,15 @@ export async function useGenerationExecutor<T>(args: {
 	async function completeGeneration({
 		outputs,
 		usage,
-		messages,
-	}: {
-		outputs: GenerationOutput[];
-		usage?: GenerationUsage;
-		messages?: Message[];
-	}) {
+		generateMessages,
+	}: CompleteGenerationArgs) {
 		const completedGeneration = {
 			...runningGeneration,
 			status: "completed",
 			completedAt: Date.now(),
 			outputs: outputs,
 			usage,
-			messages: messages ?? [],
+			messages: generateMessages ?? [],
 		} satisfies CompletedGeneration;
 
 		await Promise.all([

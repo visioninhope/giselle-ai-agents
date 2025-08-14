@@ -111,6 +111,7 @@ export const giselleEngine = NextGiselleEngine({
 				const currentUser = await fetchCurrentUser();
 				const currentTeam = await fetchCurrentTeam();
 				const metadata = {
+					generationId: generation.id,
 					isProPlan: isProPlan(currentTeam),
 					teamType: currentTeam.type,
 					userId: currentUser.id,
