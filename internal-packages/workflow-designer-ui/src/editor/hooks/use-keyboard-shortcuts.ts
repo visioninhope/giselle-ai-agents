@@ -11,6 +11,7 @@ import {
 	selectTriggerTool,
 	useToolbar,
 } from "../tool/toolbar";
+import type { Tool } from "../tool/types";
 
 // Browser shortcuts that should be prevented when canvas is focused
 const BROWSER_SHORTCUTS_TO_PREVENT = [
@@ -40,6 +41,19 @@ function useKeyAction(
 	}, [isPressed, enabled, action]);
 }
 
+function useToolAction(key: string, toolFunction: () => Tool) {
+	const toolbar = useToolbar();
+	const { data } = useWorkflowDesigner();
+	const isCanvasFocused = data.ui.focusedArea === "canvas";
+	const canUseToolShortcuts = isCanvasFocused && !!toolbar;
+
+	useKeyAction(
+		key,
+		() => toolbar?.setSelectedTool(toolFunction()),
+		canUseToolShortcuts,
+	);
+}
+
 interface UseKeyboardShortcutsOptions {
 	onGenerate?: () => void;
 }
@@ -47,7 +61,6 @@ interface UseKeyboardShortcutsOptions {
 export function useKeyboardShortcuts(
 	options: UseKeyboardShortcutsOptions = {},
 ) {
-	const toolbar = useToolbar();
 	const { data } = useWorkflowDesigner();
 	const {
 		copy: handleCopy,
@@ -56,62 +69,34 @@ export function useKeyboardShortcuts(
 	} = useNodeManipulation();
 	const { onGenerate } = options;
 
-	// Only use keyboard shortcuts when canvas is focused
-	const canUseShortcuts = data.ui.focusedArea === "canvas";
-	const canUseToolShortcuts = canUseShortcuts && !!toolbar;
-	// Properties panel shortcuts
-	const canUsePropertiesShortcuts = data.ui.focusedArea === "properties-panel";
+	const isCanvasFocused = data.ui.focusedArea === "canvas";
+	const isPropertiesPanelFocused = data.ui.focusedArea === "properties-panel";
 
-	// Tool shortcuts using the custom hook
-	useKeyAction(
-		"t",
-		() => toolbar?.setSelectedTool(selectTriggerTool()),
-		canUseToolShortcuts,
-	);
-	useKeyAction(
-		"i",
-		() => toolbar?.setSelectedTool(selectSourceCategoryTool()),
-		canUseToolShortcuts,
-	);
-	useKeyAction(
-		"g",
-		() => toolbar?.setSelectedTool(selectLanguageModelTool()),
-		canUseToolShortcuts,
-	);
-	useKeyAction(
-		"r",
-		() => toolbar?.setSelectedTool(selectRetrievalCategoryTool()),
-		canUseToolShortcuts,
-	);
-	useKeyAction(
-		"d",
-		() => toolbar?.setSelectedTool(selectActionTool()),
-		canUseToolShortcuts,
-	);
-	useKeyAction(
-		"Escape",
-		() => toolbar?.setSelectedTool(moveTool()),
-		canUseToolShortcuts,
-	);
+	// Tool shortcuts using the simplified hook
+	useToolAction("t", selectTriggerTool);
+	useToolAction("i", selectSourceCategoryTool);
+	useToolAction("g", selectLanguageModelTool);
+	useToolAction("r", selectRetrievalCategoryTool);
+	useToolAction("d", selectActionTool);
+	useToolAction("Escape", moveTool);
 
 	// Generate shortcut for properties panel
 	useKeyAction(
 		["Meta+Enter", "Control+Enter"],
 		() => onGenerate?.(),
-		canUsePropertiesShortcuts && !!onGenerate,
+		isPropertiesPanelFocused && !!onGenerate,
 		{ actInsideInputWithModifier: true }, // Allow inside input fields for properties panel
 	);
 
 	// Copy/Paste/Duplicate shortcuts
-	useKeyAction(["Meta+c", "Control+c"], handleCopy, canUseShortcuts);
-	useKeyAction(["Meta+v", "Control+v"], handlePaste, canUseShortcuts);
-	useKeyAction(["Meta+d", "Control+d"], handleDuplicate, canUseShortcuts);
+	useKeyAction(["Meta+c", "Control+c"], handleCopy, isCanvasFocused);
+	useKeyAction(["Meta+v", "Control+v"], handlePaste, isCanvasFocused);
+	useKeyAction(["Meta+d", "Control+d"], handleDuplicate, isCanvasFocused);
 
 	// Return handler for preventing browser default shortcuts
 	const handleKeyDown = useCallback(
 		(event: React.KeyboardEvent) => {
-			// Only prevent defaults when focused on canvas
-			if (data.ui.focusedArea !== "canvas") return;
+			if (!isCanvasFocused) return;
 
 			const shouldPrevent = BROWSER_SHORTCUTS_TO_PREVENT.some((shortcut) => {
 				const keyMatches = event.key.toLowerCase() === shortcut.key;
@@ -127,7 +112,7 @@ export function useKeyboardShortcuts(
 				event.preventDefault();
 			}
 		},
-		[data.ui.focusedArea],
+		[isCanvasFocused],
 	);
 
 	return { handleKeyDown };
