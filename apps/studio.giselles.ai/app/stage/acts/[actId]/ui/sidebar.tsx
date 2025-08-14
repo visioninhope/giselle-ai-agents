@@ -5,7 +5,7 @@ import {
 	ActStreamReader,
 	type StreamDataEventHandler,
 } from "@giselle-sdk/giselle/react";
-import { Accordion } from "@radix-ui/react-accordion";
+import * as Accordion from "@radix-ui/react-accordion";
 import {
 	ArrowLeftIcon,
 	CheckIcon,
