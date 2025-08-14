@@ -221,7 +221,7 @@ export function StageSidebar({ user }: StageSidebarProps) {
           </div>
 
           {/* User Profile Section */}
-          {user && (
+          {user && isClientMounted && (
             <DropdownMenu>
               <DropdownMenuTrigger
                 className="cursor-pointer w-full"
