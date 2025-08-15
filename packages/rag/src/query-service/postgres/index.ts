@@ -118,7 +118,6 @@ export function createPostgresQueryService<
 		}
 
 		try {
-			// Create embedder from profile
 			const profileId = config.contextToEmbeddingProfileId(context);
 			const profile = EMBEDDING_PROFILES[profileId];
 			if (!profile) {
@@ -126,40 +125,24 @@ export function createPostgresQueryService<
 					`Invalid embedding profile ID: ${profileId}. Valid IDs are: ${Object.keys(EMBEDDING_PROFILES).join(", ")}`,
 				);
 			}
-			if (!profile.dimensions) {
+
+			const apiKey =
+				process.env[
+					profile.provider === "openai" ? "OPENAI_API_KEY" : "GOOGLE_API_KEY"
+				];
+			if (!apiKey) {
 				throw new ConfigurationError(
-					`Embedding profile ${profileId} is missing dimensions`,
+					`No API key found for embedding profile ${profileId}`,
 				);
 			}
 
-			// Get appropriate API key based on provider
-			let apiKey: string | undefined;
-			if (profile.provider === "openai") {
-				apiKey = process.env.OPENAI_API_KEY;
-				if (!apiKey) {
-					throw new ConfigurationError(
-						"OPENAI_API_KEY environment variable is required for OpenAI embedding profile",
-					);
-				}
-			} else if (profile.provider === "google") {
-				apiKey = process.env.GOOGLE_API_KEY;
-				if (!apiKey) {
-					throw new ConfigurationError(
-						"GOOGLE_API_KEY environment variable is required for Google embedding profile",
-					);
-				}
-			}
-
-			const embedder = createEmbedderFromProfile(profileId, apiKey as string, {
+			const embedder = createEmbedderFromProfile(profileId, apiKey, {
 				telemetry,
 			});
 			const queryEmbedding = await embedder.embed(query);
 
-			// Generate filter conditions from context
 			const baseFilter = await config.contextToFilter(context);
-
 			// Enrich filter with embedding profile
-			// Profile validation already done above, so we can safely use it here
 			const filters = {
 				...baseFilter,
 				embedding_profile_id: profileId,

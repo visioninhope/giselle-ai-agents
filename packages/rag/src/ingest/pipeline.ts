@@ -77,7 +77,6 @@ export function createPipeline<
 		telemetry,
 	} = options;
 
-	// Create embedder from profile
 	const profile = EMBEDDING_PROFILES[options.embeddingProfileId];
 	if (!profile) {
 		throw new ConfigurationError(
@@ -85,27 +84,19 @@ export function createPipeline<
 		);
 	}
 
-	// Get appropriate API key based on provider
-	let apiKey: string | undefined;
-	if (profile.provider === "openai") {
-		apiKey = process.env.OPENAI_API_KEY;
-		if (!apiKey) {
-			throw new ConfigurationError(
-				"OPENAI_API_KEY environment variable is required for OpenAI embedding profile",
-			);
-		}
-	} else if (profile.provider === "google") {
-		apiKey = process.env.GOOGLE_API_KEY;
-		if (!apiKey) {
-			throw new ConfigurationError(
-				"GOOGLE_API_KEY environment variable is required for Google embedding profile",
-			);
-		}
+	const apiKey =
+		process.env[
+			profile.provider === "openai" ? "OPENAI_API_KEY" : "GOOGLE_API_KEY"
+		];
+	if (!apiKey) {
+		throw new ConfigurationError(
+			`No API key found for embedding profile ${options.embeddingProfileId}`,
+		);
 	}
 
 	const resolvedEmbedder = createEmbedderFromProfile(
 		options.embeddingProfileId,
-		apiKey as string,
+		apiKey,
 		{ telemetry },
 	);
 
