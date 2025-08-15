@@ -4,8 +4,8 @@ import type { ChunkerFunction } from "../chunker/types";
 import type { DocumentLoader } from "../document-loader/types";
 import { createPipeline } from "./pipeline";
 
-// Mock the embedder profiles module
-vi.mock("../embedder/profiles", () => ({
+// Mock the data-type module for EMBEDDING_PROFILES
+vi.mock("@giselle-sdk/data-type", () => ({
 	EMBEDDING_PROFILES: {
 		1: {
 			provider: "openai",
