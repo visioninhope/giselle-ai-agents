@@ -33,3 +33,7 @@ export const EMBEDDING_PROFILES = {
 } as const satisfies Record<number, EmbeddingProfile>;
 
 export type EmbeddingProfileId = keyof typeof EMBEDDING_PROFILES;
+
+export function isEmbeddingProfileId(id: number): id is EmbeddingProfileId {
+	return id === 1 || id === 2 || id === 3;
+}

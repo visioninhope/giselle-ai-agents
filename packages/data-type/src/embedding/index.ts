@@ -21,4 +21,8 @@ export type EmbeddingModelId = z.infer<typeof EmbeddingModelId>;
 export const EmbeddingDimensions = z.union([z.literal(1536), z.literal(3072)]);
 export type EmbeddingDimensions = z.infer<typeof EmbeddingDimensions>;
 
-export { EMBEDDING_PROFILES, type EmbeddingProfileId } from "./profiles";
+export {
+	EMBEDDING_PROFILES,
+	type EmbeddingProfileId,
+	isEmbeddingProfileId,
+} from "./profiles";
