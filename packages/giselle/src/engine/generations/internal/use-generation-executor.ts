@@ -225,16 +225,11 @@ export async function useGenerationExecutor<T>(args: {
 				onConsumeAgentTime: args.context.onConsumeAgentTime,
 			}),
 			(async () => {
-				const result = await args.context.callbacks?.generationComplete?.(
-					{
-						generation: completedGeneration,
-						inputMessages,
-						outputFiles,
-					},
-					{
-						telemetry: args.telemetry,
-					},
-				);
+				const result = await args.context.callbacks?.generationComplete?.({
+					generation: completedGeneration,
+					inputMessages,
+					outputFiles,
+				});
 				return result;
 			})(),
 		]);

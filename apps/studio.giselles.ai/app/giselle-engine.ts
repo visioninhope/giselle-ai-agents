@@ -118,10 +118,7 @@ export const giselleEngine = NextGiselleEngine({
 					subscriptionId: currentTeam.activeSubscriptionId ?? "",
 				};
 				try {
-					await emitTelemetry(args, {
-						telemetry: { metadata },
-						storage,
-					});
+					await emitTelemetry(args, { metadata });
 				} catch (error) {
 					console.error("Telemetry emission failed:", error);
 				}

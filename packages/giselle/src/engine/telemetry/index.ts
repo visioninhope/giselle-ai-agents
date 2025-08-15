@@ -14,265 +14,284 @@ import { type ApiMediaContentType, Langfuse, LangfuseMedia } from "langfuse";
 import type { GenerationCompleteCallbackFunctionArgs } from "../types";
 import type { TelemetrySettings } from "./types";
 
-export interface GenerationCompleteOption {
-	telemetry?: TelemetrySettings;
-}
-
-async function dataContentToBuffer(dataContent: DataContent | URL) {
-	if (typeof dataContent === "string") {
-		return Buffer.from(dataContent);
+/**
+ * Convert various data content types to Buffer for Langfuse media upload
+ */
+async function toBuffer(data: DataContent | URL) {
+	if (typeof data === "string") {
+		return Buffer.from(data);
 	}
-	if (Buffer.isBuffer(dataContent)) {
-		return dataContent;
+	if (Buffer.isBuffer(data)) {
+		return data;
 	}
-	if (dataContent instanceof URL) {
-		const res = await fetch(dataContent);
-		const arrayBuffer = await res.arrayBuffer();
+	if (data instanceof URL) {
+		const response = await fetch(data);
+		const arrayBuffer = await response.arrayBuffer();
 		return Buffer.from(arrayBuffer);
 	}
-	if (dataContent instanceof Uint8Array) {
-		return Buffer.from(dataContent);
+	if (data instanceof Uint8Array) {
+		return Buffer.from(data);
 	}
-	return Buffer.from(dataContent);
+	// ArrayBuffer or other types
+	return Buffer.from(data);
 }
 
+/**
+ * Convert message content to Langfuse-compatible format with media handling
+ */
+function prepareLangfuseInput(
+	inputMessages: GenerationCompleteCallbackFunctionArgs["inputMessages"],
+) {
+	return Promise.all(
+		inputMessages.map(async (message) => {
+			// If content is a string, return as-is
+			if (!Array.isArray(message.content)) {
+				return message.content;
+			}
+
+			// Process array content with media uploads
+			const processedContent = await Promise.all(
+				message.content.map(async (item) => {
+					switch (item.type) {
+						case "text":
+						case "reasoning":
+						case "tool-call":
+						case "tool-result":
+							return item;
+
+						case "file":
+							return {
+								...item,
+								data: new LangfuseMedia({
+									contentType: item.mediaType as ApiMediaContentType,
+									contentBytes: await toBuffer(item.data),
+								}),
+							};
+
+						case "image":
+							return {
+								...item,
+								data: new LangfuseMedia({
+									contentType: item.mediaType as ApiMediaContentType,
+									contentBytes: await toBuffer(item.image),
+								}),
+							};
+
+						default: {
+							// Type-safe exhaustive check
+							const unhandled: never = item;
+							throw new Error(
+								`Unhandled content type: ${JSON.stringify(unhandled)}`,
+							);
+						}
+					}
+				}),
+			);
+
+			return {
+				...message,
+				content: processedContent,
+			};
+		}),
+	);
+}
+
+/**
+ * Extract feature tags from a generation node
+ */
+function extractTags(node: TextGenerationNode | ImageGenerationNode) {
+	const { content } = node;
+	const tags: string[] = [`provider:${content.llm.provider}`];
+
+	// Only text generation nodes have additional features
+	if (content.type === "textGeneration") {
+		const { llm, tools } = content;
+
+		// Provider-specific features
+		if (llm.provider === "anthropic" && llm.configurations.reasoningText) {
+			tags.push("feature:thinking");
+		}
+		if (llm.provider === "google" && llm.configurations.searchGrounding) {
+			tags.push("tool:web-search");
+		}
+		if (llm.provider === "openai" && tools?.openaiWebSearch) {
+			tags.push("tool:web-search");
+		}
+		if (llm.provider === "perplexity") {
+			tags.push("tool:web-search");
+		}
+
+		// Tool integrations
+		if (tools?.github) tags.push("tool:github");
+		if (tools?.postgres) tags.push("tool:postgres");
+	}
+
+	return tags;
+}
+
+/**
+ * Extract metadata from a generation node
+ */
+function extractMetadata(
+	node: TextGenerationNode | ImageGenerationNode,
+): Record<string, unknown> {
+	const { content } = node;
+	const metadata: Record<string, unknown> = {};
+
+	// Only text generation nodes have metadata-worthy features
+	if (content.type === "textGeneration") {
+		const { llm, tools } = content;
+
+		// Provider-specific metadata
+		if (llm.provider === "anthropic" && llm.configurations.reasoningText) {
+			metadata["tools.thinking.provider"] = "anthropic.thinking";
+		}
+		if (llm.provider === "google" && llm.configurations.searchGrounding) {
+			metadata["tools.webSearch.provider"] = "google.googleSearch";
+		}
+		if (llm.provider === "openai" && tools?.openaiWebSearch) {
+			metadata["tools.webSearch.provider"] = "openai.webSearchPreview";
+		}
+		if (llm.provider === "perplexity") {
+			metadata["tools.webSearch.provider"] = "perplexity";
+		}
+
+		// Tool integrations metadata
+		if (tools?.github) {
+			metadata["tools.github.tools"] = tools.github.tools;
+		}
+	}
+
+	return metadata;
+}
+
+/**
+ * Emit telemetry data for completed generations to Langfuse
+ */
 export async function emitTelemetry(
 	args: GenerationCompleteCallbackFunctionArgs,
-	options: GenerationCompleteOption,
+	telemetry?: TelemetrySettings,
 ) {
 	try {
-		const operationNode = args.generation.context.operationNode;
-		const nodeType = operationNode.content.type;
+		const { operationNode } = args.generation.context;
 
-		if (isQueryNode(operationNode)) {
-			return;
-		}
-		if (isActionNode(operationNode)) {
+		// Skip telemetry for query and action nodes
+		if (isQueryNode(operationNode) || isActionNode(operationNode)) {
 			return;
 		}
 
+		// Validate supported node types
 		if (
-			operationNode.content.type !== "textGeneration" &&
-			operationNode.content.type !== "imageGeneration"
+			!isTextGenerationNode(operationNode) &&
+			!isImageGenerationNode(operationNode)
 		) {
-			throw new Error(`Unsupported generation type: ${nodeType}`);
+			console.warn(
+				`Telemetry: Unsupported node type: ${operationNode.content.type}`,
+			);
+			return;
 		}
 
-		const langfuseInput = await Promise.all(
-			args.inputMessages.map(async (inputMessage) => {
-				if (!Array.isArray(inputMessage.content)) {
-					return inputMessage.content;
-				}
-				const content = await Promise.all(
-					inputMessage.content.map(async (content) => {
-						switch (content.type) {
-							case "text":
-							case "reasoning":
-							case "tool-call":
-							case "tool-result":
-								return content;
-							case "file":
-								return {
-									...content,
-									data: new LangfuseMedia({
-										contentType: content.mediaType as ApiMediaContentType,
-										contentBytes: await dataContentToBuffer(content.data),
-									}),
-								};
-							case "image":
-								return {
-									...content,
-									data: new LangfuseMedia({
-										contentType: content.mediaType as ApiMediaContentType,
-										contentBytes: await dataContentToBuffer(content.image),
-									}),
-								};
-							default: {
-								const _exhaustiveCheck: never = content;
-								throw new Error(`Unhandled content type: ${_exhaustiveCheck}`);
-							}
-						}
-					}),
-				);
-				return {
-					...inputMessage,
-					content,
-				};
-			}),
-		);
+		// Prepare input messages with media uploads
+		const langfuseInput = await prepareLangfuseInput(args.inputMessages);
 
+		// Initialize Langfuse client and create trace
 		const langfuse = new Langfuse();
+		const userId = telemetry?.metadata?.userId;
 		const trace = langfuse.trace({
 			name: "generation",
-			userId: options.telemetry?.metadata?.userId
-				? String(options.telemetry.metadata.userId)
-				: undefined,
+			userId: userId ? String(userId) : undefined,
 			input: langfuseInput,
 		});
+
+		// Common trace metadata
+		const tags = extractTags(operationNode);
+		const metadata = {
+			...telemetry?.metadata,
+			...extractMetadata(operationNode),
+		};
+
+		// Handle text generation telemetry
 		if (isTextGenerationNode(operationNode)) {
-			const cost = await calculateDisplayCost(
-				operationNode.content.llm.provider,
-				operationNode.content.llm.id,
-				{
-					inputTokens: args.generation.usage?.inputTokens ?? 0,
-					outputTokens: args.generation.usage?.outputTokens ?? 0,
-				},
-			);
+			const { llm } = operationNode.content;
+			const usage = args.generation.usage ?? {
+				inputTokens: 0,
+				outputTokens: 0,
+				totalTokens: 0,
+			};
+
+			// Calculate costs for token-based models
+			const cost = await calculateDisplayCost(llm.provider, llm.id, {
+				inputTokens: usage.inputTokens ?? 0,
+				outputTokens: usage.outputTokens ?? 0,
+			});
+
 			trace.update({
 				output: args.generation.outputs,
-				tags: tags(operationNode),
-				metadata: {
-					...options.telemetry?.metadata,
-					...metadata(operationNode),
-				},
+				tags,
+				metadata,
 			});
+
 			trace.generation({
 				name: "generateText",
-				model: operationNode.content.llm.id,
-				modelParameters: operationNode.content.llm.configurations,
+				model: llm.id,
+				modelParameters: llm.configurations,
 				input: langfuseInput,
 				output: args.generation.outputs,
 				usage: {
 					unit: "TOKENS",
-					input: args.generation.usage?.inputTokens ?? 0,
-					output: args.generation.usage?.outputTokens ?? 0,
-					total: args.generation.usage?.totalTokens ?? 0,
+					input: usage.inputTokens ?? 0,
+					output: usage.outputTokens ?? 0,
+					total: usage.totalTokens ?? 0,
 					inputCost: cost.inputCostForDisplay,
 					outputCost: cost.outputCostForDisplay,
 					totalCost: cost.totalCostForDisplay,
 				},
 				startTime: new Date(args.generation.startedAt),
 				endTime: new Date(args.generation.completedAt),
-				metadata: {
-					...options.telemetry?.metadata,
-					...metadata(operationNode),
-				},
+				metadata,
 			});
 		}
+
+		// Handle image generation telemetry
 		if (isImageGenerationNode(operationNode)) {
-			const langfuseMediaReferences = args.outputFiles.map(
-				(outputFile) =>
+			// Convert output files to Langfuse media references
+			const mediaReferences = args.outputFiles.map(
+				(file) =>
 					new LangfuseMedia({
-						contentType: outputFile.contentType as ApiMediaContentType,
-						contentBytes: Buffer.from(outputFile.data),
+						contentType: file.contentType as ApiMediaContentType,
+						contentBytes: Buffer.from(file.data),
 					}),
 			);
-			if (langfuseMediaReferences.length > 0) {
+
+			if (mediaReferences.length > 0) {
 				trace.update({
-					output: langfuseMediaReferences,
-					tags: tags(operationNode),
-					metadata: {
-						...options.telemetry?.metadata,
-						...metadata(operationNode),
-					},
+					output: mediaReferences,
+					tags,
+					metadata,
 				});
+
 				trace.generation({
 					name: "generateImage",
 					input: langfuseInput,
-					output: langfuseMediaReferences,
+					output: mediaReferences,
 					usage: {
 						input: 0,
 						output: 0,
 						total: 0,
 						unit: "IMAGES",
 					},
-					metadata: {
-						...options.telemetry?.metadata,
-						...metadata(operationNode),
-					},
+					metadata,
 				});
 			}
 		}
 
 		await langfuse.flushAsync();
 	} catch (error) {
-		console.error("Telemetry emission failed:", error);
+		// Log error with context for debugging
+		console.error("Telemetry emission failed:", {
+			error: error instanceof Error ? error.message : String(error),
+			nodeType: args.generation.context.operationNode.content.type,
+			generationId: args.generation.id,
+		});
 	}
-}
-
-function tags({ content }: TextGenerationNode | ImageGenerationNode) {
-	const tags: string[] = [`provider:${content.llm.provider}`];
-	switch (content.type) {
-		case "imageGeneration":
-			break;
-		case "textGeneration":
-			switch (content.llm.provider) {
-				case "anthropic":
-					if (content.llm.configurations.reasoningText) {
-						tags.push("feature:thinking");
-					}
-					break;
-				case "google":
-					if (content.llm.configurations.searchGrounding) {
-						tags.push("tool:web-search");
-					}
-					break;
-				case "openai":
-					if (content.tools?.openaiWebSearch) {
-						tags.push("tool:web-search");
-					}
-					break;
-				case "perplexity":
-					tags.push("tool:web-search");
-					break;
-				default: {
-					const _exhaustiveCheck: never = content.llm;
-					return _exhaustiveCheck;
-				}
-			}
-			if (content.tools?.github) {
-				tags.push("tool:github");
-			}
-			if (content.tools?.postgres) {
-				tags.push("tool:postgres");
-			}
-			break;
-		default: {
-			const _exhaustiveCheck: never = content;
-			throw new Error(`Unhandled type: ${_exhaustiveCheck}`);
-		}
-	}
-	return tags;
-}
-
-function metadata({ content }: TextGenerationNode | ImageGenerationNode) {
-	const metadata: Record<string, unknown> = {};
-	switch (content.type) {
-		case "imageGeneration":
-			break;
-		case "textGeneration":
-			switch (content.llm.provider) {
-				case "anthropic":
-					if (content.llm.configurations.reasoningText) {
-						metadata["tools.thinking.provider"] = "anthropic.thinking";
-					}
-					break;
-				case "google":
-					if (content.llm.configurations.searchGrounding) {
-						metadata["tools.webSearch.provider"] = "google.googleSearch";
-					}
-					break;
-				case "openai":
-					if (content.tools?.openaiWebSearch) {
-						metadata["tools.webSearch.provider"] = "openai.webSearchPreview";
-					}
-					break;
-				case "perplexity":
-					metadata["tools.webSearch.provider"] = "perplexity";
-					break;
-				default: {
-					const _exhaustiveCheck: never = content.llm;
-					return _exhaustiveCheck;
-				}
-			}
-			if (content.tools?.github) {
-				metadata["tools.github.tools"] = content.tools.github.tools;
-			}
-			break;
-		default: {
-			const _exhaustiveCheck: never = content;
-			throw new Error(`Unhandled type: ${_exhaustiveCheck}`);
-		}
-	}
-	return metadata;
 }
