@@ -18,19 +18,14 @@ export function getCachedPrice(priceId: string): Promise<Stripe.Price> {
 
 	const fetchPromise = (async () => {
 		try {
-			const cacheKey = `stripe:price:${priceId}`;
-			const cache = getCache();
-			const cached = await cache.get(cacheKey);
-			if (cached) {
-				return cached as Stripe.Price;
-			}
-
-			const price = await stripe.prices.retrieve(priceId);
-			await cache.set(cacheKey, price, {
-				ttl: 3600,
-				tags: ["stripe:price", `stripe:price:${priceId}`],
-			});
-			return price;
+			return await withCache(
+				`stripe:price:${priceId}`,
+				{
+					ttl: 3600,
+					tags: ["stripe:price", `stripe:price:${priceId}`],
+				},
+				async () => stripe.prices.retrieve(priceId),
+			);
 		} finally {
 			inFlightPromises.delete(priceId);
 		}
@@ -38,4 +33,31 @@ export function getCachedPrice(priceId: string): Promise<Stripe.Price> {
 	inFlightPromises.set(priceId, fetchPromise);
 
 	return fetchPromise;
+}
+
+async function withCache(
+	cacheKey: string,
+	options: { ttl: number; tags: string[] },
+	fetchFn: () => Promise<Stripe.Price>,
+): Promise<Stripe.Price> {
+	const cache = getCache();
+
+	try {
+		const cached = await cache.get(cacheKey);
+		if (cached) {
+			return cached as Stripe.Price;
+		}
+	} catch {
+		// Cache read failed, continue to fetch
+	}
+
+	const result = await fetchFn();
+
+	try {
+		await cache.set(cacheKey, result, options);
+	} catch {
+		// Cache write failed, ignore
+	}
+
+	return result;
 }
