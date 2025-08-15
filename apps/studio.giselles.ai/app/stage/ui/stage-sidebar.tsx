@@ -90,8 +90,9 @@ export function StageSidebar({ user }: StageSidebarProps) {
 	const renderBottomItem = (item: BottomItem) => {
 		const isExternalLink = item.href.startsWith("http");
 		const commonClassName = clsx(
-			"flex items-center text-sm text-white-700 hover:text-white-900 hover:bg-white/5 transition-colors",
+			"flex items-center text-sm transition-colors",
 			isCollapsed ? "justify-center px-2 py-3" : "gap-3 px-4 py-3",
+			"text-[color:var(--color-text-nav-inactive)] hover:text-[color:var(--color-text-nav-active)]",
 		);
 
 		const content = (
