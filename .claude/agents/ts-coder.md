@@ -131,8 +131,7 @@ Use TypeScript's type system to prevent obvious mistakes without creating ceremo
 ```typescript
 // Good: Clear function signatures prevent confusion
 function getUser(id: string) { }
-function getOrder(id: string { }
-
+function getOrder(id: string) { }
 // The function names make the intent clear
 const user = await getUser("user-123");
 const order = await getOrder("order-456");
