@@ -1,14 +1,31 @@
 "use client";
 
 import { Button } from "@giselle-internal/ui/button";
+import {
+	Dialog,
+	DialogContent,
+	DialogFooter,
+	DialogTitle,
+} from "@giselle-internal/ui/dialog";
 import { Select } from "@giselle-internal/ui/select";
 import type { FlowTrigger, FlowTriggerId } from "@giselle-sdk/data-type";
 import type { ParameterItem } from "@giselle-sdk/giselle";
 import { SpinnerIcon } from "@giselles-ai/icons/spinner";
+import { cva } from "class-variance-authority";
 import clsx from "clsx/lite";
 import type { InferSelectModel } from "drizzle-orm";
+import { Settings, X } from "lucide-react";
 import { useActionState, useCallback, useMemo, useState } from "react";
+import {
+	Card,
+	CardDescription,
+	CardHeader,
+	CardTitle,
+} from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import type { teams } from "@/drizzle";
+import { cn } from "@/lib/utils";
 import { AvatarImage } from "@/services/accounts/components/user-button/avatar-image";
 import { CircularCarousel } from "./circular-carousel";
 import {
@@ -36,6 +53,36 @@ const filterOptions: FilterOption[] = [
 	{ value: "latest", label: "Latest" },
 	{ value: "favorites", label: "Favorites" },
 ];
+
+interface FontOption {
+	value: string;
+	label: string;
+}
+
+const _fontOptions: FontOption[] = [
+	{ value: "default", label: "Default" },
+	{ value: "mono", label: "Monospace" },
+	{ value: "sans", label: "Sans Serif" },
+	{ value: "serif", label: "Serif" },
+];
+
+const buttonVariants = cva(
+	"relative inline-flex items-center justify-center rounded-lg border-t border-b border-t-white/20 border-b-black/20 px-6 py-2 text-sm font-medium text-white shadow-[0_1px_0_rgba(255,255,255,0.05)_inset,0_-1px_0_rgba(0,0,0,0.2)_inset,0_0_0_1px_rgba(255,255,255,0.08)] transition-all duration-300 hover:shadow-[0_1px_0_rgba(255,255,255,0.1)_inset,0_-1px_0_rgba(0,0,0,0.2)_inset,0_0_0_1px_rgba(255,255,255,0.1)]",
+	{
+		variants: {
+			variant: {
+				default:
+					"bg-[rgba(60,90,160,0.15)] border border-white/10 shadow-[inset_0_0_12px_rgba(255,255,255,0.04)] hover:shadow-[inset_0_0_16px_rgba(255,255,255,0.06)]",
+				link: "bg-black/20 border border-white/10 shadow-[inset_0_0_4px_rgba(0,0,0,0.4)] hover:shadow-[inset_0_0_6px_rgba(0,0,0,0.6)]",
+				primary:
+					"text-white/80 bg-gradient-to-b from-[#202530] to-[#12151f] border border-[rgba(0,0,0,0.7)] shadow-[inset_0_1px_1px_rgba(255,255,255,0.05),0_2px_8px_rgba(5,10,20,0.4),0_1px_2px_rgba(0,0,0,0.3)] transition-all duration-200 active:scale-[0.98]",
+			},
+		},
+		defaultVariants: {
+			variant: "default",
+		},
+	},
+);
 
 export interface FlowTriggerUIItem {
 	id: FlowTriggerId;
@@ -69,6 +116,8 @@ export function Form({
 		FlowTriggerId | undefined
 	>(undefined);
 	const [selectedFilter, setSelectedFilter] = useState<FilterType>("all");
+	const [isCarouselView, setIsCarouselView] = useState(false);
+	const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
 
 	const [validationErrors, setValidationErrors] = useState<
 		Record<string, string>
@@ -150,7 +199,7 @@ export function Form({
 	const [, action, isPending] = useActionState(formAction, null);
 
 	return (
-		<div className="max-w-[800px] mx-auto space-y-0">
+		<div className="max-w-[800px] mx-auto space-y-0 relative">
 			{/* Team Selection Container */}
 			<div className="flex justify-center gap-2">
 				<div
@@ -187,23 +236,70 @@ export function Form({
 				</div>
 			</div>
 
+			{/* Settings Icon */}
+			<button
+				type="button"
+				onClick={() => setIsSettingsModalOpen(true)}
+				className="absolute -top-12 right-0 p-2 rounded-lg hover:bg-white/10 transition-colors z-20"
+			>
+				<Settings className="w-4 h-4 text-white-400" />
+			</button>
+
 			{/* App Selection Container */}
 			<div className="mt-12">
-				<CircularCarousel
-					items={filteredFlowTriggers.map((trigger) => ({
-						id: trigger.id,
-						name: trigger.workspaceName,
-						profileImageUrl: undefined,
-					}))}
-					selectedId={selectedFlowTriggerId}
-					onItemSelect={(item) => {
-						setSelectedFlowTriggerId(item.id as FlowTriggerId);
-					}}
-					onItemDeselect={() => {
-						setSelectedFlowTriggerId(undefined);
-					}}
-				/>
+				{isCarouselView ? (
+					<CircularCarousel
+						items={filteredFlowTriggers.map((trigger) => ({
+							id: trigger.id,
+							name: trigger.workspaceName,
+							profileImageUrl: undefined,
+						}))}
+						selectedId={selectedFlowTriggerId}
+						onItemSelect={(item) => {
+							setSelectedFlowTriggerId(item.id as FlowTriggerId);
+						}}
+						onItemDeselect={() => {
+							setSelectedFlowTriggerId(undefined);
+						}}
+					/>
+				) : (
+					<div className="max-w-md mx-auto space-y-2">
+						{filteredFlowTriggers.length === 0 ? (
+							<div className="text-center py-8">
+								<p className="text-white-400 text-sm">
+									No apps available for the selected team
+								</p>
+							</div>
+						) : (
+							filteredFlowTriggers.map((trigger) => (
+								<button
+									key={trigger.id}
+									type="button"
+									onClick={() => {
+										if (selectedFlowTriggerId === trigger.id) {
+											setSelectedFlowTriggerId(undefined);
+										} else {
+											setSelectedFlowTriggerId(trigger.id);
+										}
+									}}
+									className={clsx(
+										"w-full p-4 rounded-lg border text-left transition-all",
+										selectedFlowTriggerId === trigger.id
+											? "border-white/20 bg-white/10 text-white-100"
+											: "border-white/10 bg-white/5 text-white-400 hover:bg-white/10 hover:border-white/15",
+									)}
+								>
+									<div className="font-medium">{trigger.workspaceName}</div>
+									<div className="text-sm text-white-600 mt-1">
+										{trigger.label}
+									</div>
+								</button>
+							))
+						)}
+					</div>
+				)}
 			</div>
+
 			{filteredFlowTriggers.length > 0 && (
 				<form
 					action={action}
@@ -321,6 +417,125 @@ export function Form({
 					)}
 				</form>
 			)}
+
+			{/* Settings Dialog */}
+			<Dialog open={isSettingsModalOpen} onOpenChange={setIsSettingsModalOpen}>
+				<DialogContent>
+					<div className="flex items-center justify-between mb-6">
+						<DialogTitle className="text-[20px] font-medium text-white-400 tracking-tight font-sans">
+							View Style
+						</DialogTitle>
+						<button
+							type="button"
+							onClick={() => setIsSettingsModalOpen(false)}
+							className="p-1 rounded-lg hover:bg-white/10 transition-colors"
+						>
+							<X className="w-5 h-5 text-white-400" />
+						</button>
+					</div>
+
+					{/* View Type Selection */}
+					<div className="mb-6">
+						<Label className="text-white-800 font-medium text-[12px] leading-[20.4px] font-geist">
+							Display Type
+						</Label>
+						<RadioGroup
+							value={isCarouselView ? "carousel" : "list"}
+							onValueChange={(value) => setIsCarouselView(value === "carousel")}
+							className="grid grid-cols-2 gap-4 mt-2"
+						>
+							<Card
+								className={clsx(
+									"cursor-pointer border-[1px]",
+									!isCarouselView ? "border-blue-500" : "border-white/10",
+								)}
+							>
+								<label htmlFor="list">
+									<CardHeader>
+										<div className="flex flex-col gap-2">
+											<CardTitle className="text-white-400 text-[16px] leading-[27.2px] tracking-normal font-sans">
+												List
+											</CardTitle>
+											<div className="flex items-center mb-2">
+												<RadioGroupItem
+													value="list"
+													id="list"
+													className="text-blue-500 data-[state=checked]:border-[1.5px] data-[state=checked]:border-blue-500"
+												/>
+											</div>
+											<CardDescription className="text-black-400 font-medium text-[12px] leading-[20.4px] font-geist">
+												Simple vertical list
+											</CardDescription>
+										</div>
+									</CardHeader>
+								</label>
+							</Card>
+							<Card
+								className={clsx(
+									"cursor-pointer border-[1px]",
+									isCarouselView ? "border-blue-500" : "border-white/10",
+								)}
+							>
+								<label htmlFor="carousel">
+									<CardHeader>
+										<div className="flex flex-col gap-2">
+											<CardTitle className="text-white-400 text-[16px] leading-[27.2px] tracking-normal font-sans">
+												Carousel
+											</CardTitle>
+											<div className="flex items-center mb-2">
+												<RadioGroupItem
+													value="carousel"
+													id="carousel"
+													className="text-blue-500 data-[state=checked]:border-[1.5px] data-[state=checked]:border-blue-500"
+												/>
+											</div>
+											<CardDescription className="text-black-400 font-medium text-[12px] leading-[20.4px] font-geist">
+												Interactive circular layout
+											</CardDescription>
+										</div>
+									</CardHeader>
+								</label>
+							</Card>
+						</RadioGroup>
+					</div>
+
+					{/* Font Options */}
+					<div className="mb-6">
+						<label
+							htmlFor="font-select"
+							className="block text-white-400 text-sm font-medium mb-3"
+						>
+							Font
+						</label>
+						<select
+							id="font-select"
+							disabled
+							className="w-full p-3 bg-white/5 border border-white/10 rounded-lg text-white-100 text-sm opacity-50 cursor-not-allowed"
+						>
+							<option className="bg-gray-900">Coming Soon</option>
+						</select>
+					</div>
+
+					<DialogFooter>
+						<div className="flex justify-end gap-x-3">
+							<button
+								type="button"
+								onClick={() => setIsSettingsModalOpen(false)}
+								className={cn(buttonVariants({ variant: "link" }))}
+							>
+								Cancel
+							</button>
+							<button
+								type="button"
+								onClick={() => setIsSettingsModalOpen(false)}
+								className={cn(buttonVariants({ variant: "primary" }))}
+							>
+								Continue
+							</button>
+						</div>
+					</DialogFooter>
+				</DialogContent>
+			</Dialog>
 		</div>
 	);
 }
