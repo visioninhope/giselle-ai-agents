@@ -4,7 +4,7 @@ import {
 	embedMany,
 	type TelemetrySettings,
 } from "ai";
-import { EmbeddingError } from "../errors";
+import { ConfigurationError, EmbeddingError } from "../errors";
 import type { EmbedderFunction } from "./types";
 
 export interface BaseEmbedderConfig {
@@ -20,16 +20,12 @@ export function createAiSdkEmbedder(
 	getModel: (modelName: string) => EmbeddingModel<string>,
 ): EmbedderFunction {
 	if (!config.apiKey || config.apiKey.length === 0) {
-		throw new Error("API key is required and cannot be empty");
+		throw ConfigurationError.missingField("apiKey");
 	}
 
 	const model = config.model ?? defaultModel;
 	const maxRetries = config.maxRetries ?? 3;
 	const telemetry = config.telemetry;
-
-	if (config.maxRetries !== undefined && (maxRetries < 0 || maxRetries > 10)) {
-		throw new Error("maxRetries must be between 0 and 10");
-	}
 
 	return {
 		async embed(text: string): Promise<number[]> {
