@@ -2,380 +2,300 @@ export * from "./types";
 
 import {
 	type ImageGenerationNode,
+	isActionNode,
 	isImageGenerationNode,
 	isQueryNode,
 	isTextGenerationNode,
 	type TextGenerationNode,
 } from "@giselle-sdk/data-type";
-import {
-	Capability,
-	calculateDisplayCost,
-	hasCapability,
-	languageModels,
-} from "@giselle-sdk/language-model";
+import { calculateDisplayCost } from "@giselle-sdk/language-model";
+import type { DataContent } from "ai";
 import { type ApiMediaContentType, Langfuse, LangfuseMedia } from "langfuse";
-import type { Storage } from "unstorage";
-import type { CompletedGeneration } from "../../concepts/generation";
 import type { GenerationCompleteCallbackFunctionArgs } from "../types";
-import type {
-	AnthropicProviderOptions,
-	TelemetrySettings,
-	TelemetryTag,
-	ToolSet,
-} from "./types";
+import type { TelemetrySettings } from "./types";
 
-export interface ReadOnlyStorage {
-	getItemRaw: (key: string) => Promise<Uint8Array | null | undefined>;
-}
-
-export interface GenerationCompleteOption {
-	telemetry?: TelemetrySettings;
-	storage?: Storage;
-}
-
-interface LangfuseParams {
-	traceParams: {
-		userId?: string;
-		name: string;
-		input: string;
-		tags: TelemetryTag[];
-		metadata?: TelemetrySettings["metadata"];
-		output?: string;
-	};
-	spanParams: {
-		name: string;
-		startTime: Date;
-		input: string;
-		endTime: Date;
-		metadata?: TelemetrySettings["metadata"];
-		output?: string;
-	};
-	generationParams: {
-		name: string;
-		model: string;
-		modelParameters: Record<
-			string,
-			string | number | boolean | string[] | null
-		>;
-		input: string;
-		usage: {
-			input: number;
-			output: number;
-			total: number;
-			unit: "TOKENS" | "IMAGES";
-			inputCost?: number;
-			outputCost?: number;
-			totalCost?: number;
-		};
-		startTime: Date;
-		completionStartTime: Date;
-		endTime: Date;
-		metadata?: TelemetrySettings["metadata"];
-		output?: string;
-	};
-}
-
-interface PromptJson {
-	content?: Array<{
-		content?: Array<{
-			text?: string;
-		}>;
-	}>;
-	text?: string;
-}
-
-export function generateTelemetryTags(args: {
-	provider: string;
-	modelId: string;
-	toolSet: ToolSet;
-	configurations: Record<string, unknown>;
-	providerOptions?: {
-		anthropic?: AnthropicProviderOptions;
-	};
-}): TelemetryTag[] {
-	const tags: TelemetryTag[] = [];
-
-	tags.push(args.provider, args.modelId);
-
-	// OpenAI Web Search
-	if (args.provider === "openai" && args.toolSet?.openaiWebSearch) {
-		tags.push("web-search", "openai:web-search");
+/**
+ * Convert various data content types to Buffer for Langfuse media upload
+ */
+async function toBuffer(data: DataContent | URL) {
+	if (typeof data === "string") {
+		return Buffer.from(data);
 	}
-
-	// Google Search Grounding
-	if (args.provider === "google" && args.configurations?.searchGrounding) {
-		tags.push("web-search", "google:search-grounding");
+	if (Buffer.isBuffer(data)) {
+		return data;
 	}
-
-	// Anthropic Reasoning/Thinking
-	if (args.provider === "anthropic") {
-		if (args.configurations?.reasoningText) {
-			tags.push("anthropic:reasoning");
-		}
-		if (args.providerOptions?.anthropic?.thinking?.type === "enabled") {
-			// treat as an independent tag because extended thinking is available only on specific models
-			// ref: https://docs.anthropic.com/en/docs/about-claude/models/all-models#model-comparison-table
-			tags.push("anthropic:thinking");
-		}
+	if (data instanceof URL) {
+		const response = await fetch(data);
+		const arrayBuffer = await response.arrayBuffer();
+		return Buffer.from(arrayBuffer);
 	}
+	if (data instanceof Uint8Array) {
+		return Buffer.from(data);
+	}
+	// ArrayBuffer or other types
+	return Buffer.from(data);
+}
 
-	// Perplexity Search Domain Filter
-	if (args.provider === "perplexity") {
-		tags.push("web-search");
+/**
+ * Convert message content to Langfuse-compatible format with media handling
+ */
+function prepareLangfuseInput(
+	inputMessages: GenerationCompleteCallbackFunctionArgs["inputMessages"],
+) {
+	return Promise.all(
+		inputMessages.map(async (message) => {
+			// If content is a string, return as-is
+			if (!Array.isArray(message.content)) {
+				return message.content;
+			}
 
-		if (
-			Array.isArray(args.configurations?.searchDomainFilter) &&
-			args.configurations?.searchDomainFilter.length > 0
-		) {
-			tags.push("perplexity:search-domain-filter");
+			// Process array content with media uploads
+			const processedContent = await Promise.all(
+				message.content.map(async (item) => {
+					switch (item.type) {
+						case "text":
+						case "reasoning":
+						case "tool-call":
+						case "tool-result":
+							return item;
+
+						case "file":
+							return {
+								...item,
+								data: new LangfuseMedia({
+									contentType: item.mediaType as ApiMediaContentType,
+									contentBytes: await toBuffer(item.data),
+								}),
+							};
+
+						case "image":
+							return {
+								...item,
+								data: new LangfuseMedia({
+									contentType: item.mediaType as ApiMediaContentType,
+									contentBytes: await toBuffer(item.image),
+								}),
+							};
+
+						default: {
+							// Type-safe exhaustive check
+							const unhandled: never = item;
+							throw new Error(
+								`Unhandled content type: ${JSON.stringify(unhandled)}`,
+							);
+						}
+					}
+				}),
+			);
+
+			return {
+				...message,
+				content: processedContent,
+			};
+		}),
+	);
+}
+
+/**
+ * Extract feature tags from a generation node
+ */
+function extractTags(node: TextGenerationNode | ImageGenerationNode) {
+	const { content } = node;
+	const tags: string[] = [`provider:${content.llm.provider}`];
+
+	// Only text generation nodes have additional features
+	if (content.type === "textGeneration") {
+		const { llm, tools } = content;
+
+		// Provider-specific features
+		if (llm.provider === "anthropic" && llm.configurations.reasoningText) {
+			tags.push("feature:thinking");
 		}
+		if (llm.provider === "google" && llm.configurations.searchGrounding) {
+			tags.push("tool:web-search");
+		}
+		if (llm.provider === "openai" && tools?.openaiWebSearch) {
+			tags.push("tool:web-search");
+		}
+		if (llm.provider === "perplexity") {
+			tags.push("tool:web-search");
+		}
+
+		// Tool integrations
+		if (tools?.github) tags.push("tool:github");
+		if (tools?.postgres) tags.push("tool:postgres");
 	}
 
 	return tags;
 }
 
-function extractPromptInput(
-	operationNode: TextGenerationNode | ImageGenerationNode,
-): string {
-	const promptJson = (() => {
-		if (typeof operationNode.content.prompt === "string") {
-			try {
-				return JSON.parse(operationNode.content.prompt) as PromptJson;
-			} catch (error) {
-				console.warn("Failed to parse prompt JSON for telemetry:", error);
-				return { text: operationNode.content.prompt };
-			}
+/**
+ * Extract metadata from a generation node
+ */
+function extractMetadata(
+	node: TextGenerationNode | ImageGenerationNode,
+): Record<string, unknown> {
+	const { content } = node;
+	const metadata: Record<string, unknown> = {};
+
+	// Only text generation nodes have metadata-worthy features
+	if (content.type === "textGeneration") {
+		const { llm, tools } = content;
+
+		// Provider-specific metadata
+		if (llm.provider === "anthropic" && llm.configurations.reasoningText) {
+			metadata["tools.thinking.provider"] = "anthropic.thinking";
 		}
-		return { content: [] };
-	})();
-
-	if (promptJson.content?.[0]?.content?.[0]?.text) {
-		return promptJson.content[0].content[0].text;
-	}
-	if (typeof promptJson.content === "string") {
-		return promptJson.content;
-	}
-	return promptJson.text || "";
-}
-
-function extractInputOutputForTextGeneration(
-	generation: CompletedGeneration,
-	operationNode: TextGenerationNode,
-) {
-	const input = extractPromptInput(operationNode);
-	const output = generation.outputs.find(
-		(output) => output.type === "generated-text",
-	);
-
-	return { input, output: output?.content };
-}
-
-function extractInputForImageGeneration(
-	_generation: CompletedGeneration,
-	operationNode: ImageGenerationNode,
-) {
-	const input = extractPromptInput(operationNode);
-
-	// For image generation, we don't need output in telemetry
-	return { input, output: undefined };
-}
-
-function extractToolSet(operationNode: TextGenerationNode): ToolSet {
-	const toolSet: ToolSet = {};
-	const tools = operationNode.content.tools as {
-		openaiWebSearch?: boolean;
-		github?: { tools: string[] };
-		postgres?: { tools: string[] };
-	};
-	if (tools) {
-		if (tools.openaiWebSearch) {
-			toolSet.openaiWebSearch = true;
+		if (llm.provider === "google" && llm.configurations.searchGrounding) {
+			metadata["tools.webSearch.provider"] = "google.googleSearch";
 		}
-		if (tools.github?.tools) {
-			toolSet.github = tools.github.tools;
+		if (llm.provider === "openai" && tools?.openaiWebSearch) {
+			metadata["tools.webSearch.provider"] = "openai.webSearchPreview";
 		}
-		if (tools.postgres?.tools) {
-			toolSet.postgres = tools.postgres.tools;
+		if (llm.provider === "perplexity") {
+			metadata["tools.webSearch.provider"] = "perplexity";
+		}
+
+		// Tool integrations metadata
+		if (tools?.github) {
+			metadata["tools.github.tools"] = tools.github.tools;
 		}
 	}
-	return toolSet;
+
+	return metadata;
 }
 
-function getProviderOptions(
-	provider: string,
-	configurations: Record<string, unknown>,
-	modelId: string,
-): { anthropic?: AnthropicProviderOptions } {
-	const providerOptions: { anthropic?: AnthropicProviderOptions } = {};
-	const languageModel = languageModels.find((model) => model.id === modelId);
-
-	if (
-		languageModel &&
-		provider === "anthropic" &&
-		"reasoning" in configurations &&
-		configurations.reasoningText &&
-		hasCapability(languageModel, Capability.Reasoning)
-	) {
-		providerOptions.anthropic = {
-			thinking: {
-				type: "enabled",
-			},
-		};
-	}
-
-	return providerOptions;
-}
-
-async function createLangfuseParams(
-	generation: CompletedGeneration,
-	options: GenerationCompleteOption,
-	type: "text" | "image",
-): Promise<LangfuseParams> {
-	const operationNode = generation.context.operationNode;
-	const llm = operationNode.content.llm as {
-		provider: string;
-		id: string;
-		configurations?: Record<
-			string,
-			string | number | boolean | string[] | null
-		>;
-	};
-	const { input, output } =
-		type === "text"
-			? extractInputOutputForTextGeneration(
-					generation,
-					operationNode as TextGenerationNode,
-				)
-			: extractInputForImageGeneration(
-					generation,
-					operationNode as ImageGenerationNode,
-				);
-
-	const baseParams = {
-		name: type === "text" ? "llm-generation" : "image-generation",
-		input,
-		output,
-		metadata: options?.telemetry?.metadata,
-	};
-
-	const displayCost =
-		type === "text"
-			? await calculateDisplayCost(llm.provider, llm.id, {
-					inputTokens: generation.usage?.inputTokens ?? 0,
-					outputTokens: generation.usage?.outputTokens ?? 0,
-				})
-			: null;
-
-	return {
-		traceParams: {
-			...(options?.telemetry?.metadata?.userId && {
-				userId: String(options.telemetry?.metadata.userId),
-			}),
-			...baseParams,
-			tags:
-				type === "text"
-					? generateTelemetryTags({
-							provider: llm.provider,
-							modelId: llm.id,
-							toolSet: extractToolSet(operationNode as TextGenerationNode),
-							configurations: llm.configurations ?? {},
-							providerOptions: getProviderOptions(
-								llm.provider,
-								llm.configurations ?? {},
-								llm.id,
-							),
-						})
-					: [llm.provider, llm.id],
-		},
-		spanParams: {
-			...baseParams,
-			startTime: new Date(generation.queuedAt ?? generation.createdAt),
-			endTime: new Date(generation.completedAt),
-		},
-		generationParams: {
-			...baseParams,
-			model: llm.id,
-			modelParameters: llm.configurations ?? {},
-			usage:
-				type === "text"
-					? {
-							input: generation.usage?.inputTokens ?? 0,
-							output: generation.usage?.outputTokens ?? 0,
-							total: generation.usage?.totalTokens ?? 0,
-							unit: "TOKENS",
-							inputCost: displayCost?.inputCostForDisplay ?? 0,
-							outputCost: displayCost?.outputCostForDisplay ?? 0,
-							totalCost: displayCost?.totalCostForDisplay ?? 0,
-						}
-					: {
-							input: 0,
-							output: 0,
-							total: 0,
-							unit: "IMAGES",
-						},
-			startTime: new Date(generation.createdAt),
-			completionStartTime: new Date(generation.startedAt),
-			endTime: new Date(generation.completedAt),
-		},
-	};
-}
-
+/**
+ * Emit telemetry data for completed generations to Langfuse
+ */
 export async function emitTelemetry(
 	args: GenerationCompleteCallbackFunctionArgs,
-	options: GenerationCompleteOption,
+	telemetry?: TelemetrySettings,
 ) {
 	try {
-		const operationNode = args.generation.context.operationNode;
-		const nodeType = operationNode.content.type;
+		const { operationNode } = args.generation.context;
 
-		if (isQueryNode(operationNode)) {
+		// Skip telemetry for query and action nodes
+		if (isQueryNode(operationNode) || isActionNode(operationNode)) {
 			return;
 		}
 
+		// Validate supported node types
 		if (
 			!isTextGenerationNode(operationNode) &&
 			!isImageGenerationNode(operationNode)
 		) {
-			throw new Error(`Unsupported generation type: ${nodeType}`);
+			console.warn(
+				`Telemetry: Unsupported node type: ${operationNode.content.type}`,
+			);
+			return;
 		}
 
-		const isImageGeneration = isImageGenerationNode(operationNode);
+		// Prepare input messages with media uploads
+		const langfuseInput = await prepareLangfuseInput(args.inputMessages);
 
-		const { traceParams, spanParams, generationParams } =
-			await createLangfuseParams(
-				args.generation,
-				options,
-				isImageGeneration ? "image" : "text",
-			);
-
+		// Initialize Langfuse client and create trace
 		const langfuse = new Langfuse();
-		const trace = langfuse.trace(traceParams);
-		const span = trace.span(spanParams);
-		const langfuseGeneration = span.generation(generationParams);
+		const userId = telemetry?.metadata?.userId;
+		const trace = langfuse.trace({
+			name: "generation",
+			userId: userId ? String(userId) : undefined,
+			input: langfuseInput,
+		});
 
-		if (isImageGeneration) {
-			const langfuseMediaReferences = args.outputFiles.map(
-				(outputFile) =>
+		// Common trace metadata
+		const tags = extractTags(operationNode);
+		const metadata = {
+			...telemetry?.metadata,
+			...extractMetadata(operationNode),
+		};
+
+		const { llm } = operationNode.content;
+		// Handle text generation telemetry
+		if (isTextGenerationNode(operationNode)) {
+			const usage = args.generation.usage ?? {
+				inputTokens: 0,
+				outputTokens: 0,
+				totalTokens: 0,
+			};
+
+			// Calculate costs for token-based models
+			const cost = await calculateDisplayCost(llm.provider, llm.id, {
+				inputTokens: usage.inputTokens ?? 0,
+				outputTokens: usage.outputTokens ?? 0,
+			});
+
+			trace.update({
+				output: args.generation.outputs,
+				tags,
+				metadata,
+			});
+
+			trace.generation({
+				name: "generateText",
+				model: llm.id,
+				modelParameters: llm.configurations,
+				input: langfuseInput,
+				output: args.generation.outputs,
+				usage: {
+					unit: "TOKENS",
+					input: usage.inputTokens ?? 0,
+					output: usage.outputTokens ?? 0,
+					total: usage.totalTokens ?? 0,
+					inputCost: cost.inputCostForDisplay,
+					outputCost: cost.outputCostForDisplay,
+					totalCost: cost.totalCostForDisplay,
+				},
+				startTime: new Date(args.generation.startedAt),
+				endTime: new Date(args.generation.completedAt),
+				metadata,
+			});
+		}
+
+		// Handle image generation telemetry
+		if (isImageGenerationNode(operationNode)) {
+			// Convert output files to Langfuse media references
+			const mediaReferences = args.outputFiles.map(
+				(file) =>
 					new LangfuseMedia({
-						contentType: outputFile.contentType as ApiMediaContentType,
-						contentBytes: Buffer.from(outputFile.data),
+						contentType: file.contentType as ApiMediaContentType,
+						contentBytes: Buffer.from(file.data),
 					}),
 			);
-			if (langfuseMediaReferences.length > 0) {
+
+			if (mediaReferences.length > 0) {
 				trace.update({
-					output: langfuseMediaReferences,
+					output: mediaReferences,
+					tags,
+					metadata,
 				});
-				span.update({
-					output: langfuseMediaReferences,
-				});
-				langfuseGeneration.update({
-					output: langfuseMediaReferences,
+
+				trace.generation({
+					name: "generateImage",
+					model: llm.id,
+					modelParameters: llm.configurations,
+					input: langfuseInput,
+					output: mediaReferences,
+					usage: {
+						input: 0,
+						output: 0,
+						total: 0,
+						unit: "IMAGES",
+					},
+					startTime: new Date(args.generation.startedAt),
+					endTime: new Date(args.generation.completedAt),
+					metadata,
 				});
 			}
 		}
 
 		await langfuse.flushAsync();
 	} catch (error) {
-		console.error("Telemetry emission failed:", error);
+		// Log error with context for debugging
+		console.error("Telemetry emission failed:", {
+			error: error instanceof Error ? error.message : String(error),
+			nodeType: args.generation.context.operationNode.content.type,
+			generationId: args.generation.id,
+		});
 	}
 }
