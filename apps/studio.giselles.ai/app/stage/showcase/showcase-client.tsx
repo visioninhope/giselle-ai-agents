@@ -372,6 +372,16 @@ export function ShowcaseClient({
 														boxShadow:
 															"inset 0 1px 1px rgba(255,255,255,0.05), 0 2px 8px rgba(5,10,20,0.4), 0 1px 2px rgba(0,0,0,0.3)",
 													}}
+													onClick={() => {
+														console.log("🔗 Edit button clicked for app:", {
+															id: app.id,
+															name: app.name,
+															workspaceId: app.workspaceId,
+															targetUrl: app.workspaceId
+																? `/workspaces/${app.workspaceId}`
+																: "/playground",
+														});
+													}}
 												>
 													Edit
 												</Link>
@@ -522,23 +532,7 @@ export function ShowcaseClient({
 												>
 													<RotateCcw className="h-3 w-3" />
 												</button>
-												<Link
-													href={
-														item.workspaceId
-															? `/workspaces/${item.workspaceId}`
-															: "/playground"
-													}
-													className="rounded-lg px-3 py-1.5 text-white/80 transition-all duration-200 active:scale-[0.98] text-sm"
-													style={{
-														background:
-															"linear-gradient(180deg, #202530 0%, #12151f 100%)",
-														border: "1px solid rgba(0,0,0,0.7)",
-														boxShadow:
-															"inset 0 1px 1px rgba(255,255,255,0.05), 0 2px 8px rgba(5,10,20,0.4), 0 1px 2px rgba(0,0,0,0.3)",
-													}}
-												>
-													Edit
-												</Link>
+
 												<button
 													type="button"
 													className="p-1.5 rounded-md text-white/60 hover:text-white transition-colors"
