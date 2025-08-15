@@ -232,24 +232,30 @@ export function CircularCarousel({
 	const moveLeft = useCallback(() => {
 		if (currentIndex > 0) {
 			// If there's currently an inserted item, deselect it first
-			if (insertedIndex !== null && onItemDeselect) {
+			if (centerCardState === "inserted" && onItemDeselect) {
 				onItemDeselect();
 			}
 			setCurrentIndex(currentIndex - 1);
 			resetAnimationState();
 		}
-	}, [currentIndex, resetAnimationState]);
+	}, [currentIndex, resetAnimationState, onItemDeselect, centerCardState]);
 
 	const moveRight = useCallback(() => {
 		if (currentIndex < items.length - 1) {
 			// If there's currently an inserted item, deselect it first
-			if (insertedIndex !== null && onItemDeselect) {
+			if (centerCardState === "inserted" && onItemDeselect) {
 				onItemDeselect();
 			}
 			setCurrentIndex(currentIndex + 1);
 			resetAnimationState();
 		}
-	}, [currentIndex, items.length, resetAnimationState]);
+	}, [
+		currentIndex,
+		items.length,
+		resetAnimationState,
+		onItemDeselect,
+		centerCardState,
+	]);
 
 	// Handle deselection animation
 	const handleDeselect = useCallback(
@@ -307,14 +313,19 @@ export function CircularCarousel({
 			} else {
 				// Move clicked card to center
 				// If there's currently an inserted item, deselect it first
-				if (insertedIndex !== null && onItemDeselect) {
+				if (centerCardState === "inserted" && onItemDeselect) {
 					onItemDeselect();
 				}
 				setCurrentIndex(originalIndex);
 				resetAnimationState();
 			}
 		},
-		[handleCenterCardSelect, resetAnimationState],
+		[
+			handleCenterCardSelect,
+			resetAnimationState,
+			onItemDeselect,
+			centerCardState,
+		],
 	);
 
 	// Drag handlers
