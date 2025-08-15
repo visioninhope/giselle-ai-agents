@@ -36,7 +36,6 @@ export function generateImage(args: {
 	return useGenerationExecutor({
 		context: args.context,
 		generation: args.generation,
-		telemetry: args.telemetry,
 		useExperimentalStorage: args.useExperimentalStorage,
 		execute: async ({
 			runningGeneration,

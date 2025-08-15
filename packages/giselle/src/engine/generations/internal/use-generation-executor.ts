@@ -19,7 +19,6 @@ import {
 } from "../../../concepts/generation";
 import { UsageLimitError } from "../../error";
 import { filePath } from "../../files/utils";
-import type { TelemetrySettings } from "../../telemetry";
 import type { GiselleEngineContext } from "../../types";
 import {
 	checkUsageLimits,
@@ -44,7 +43,6 @@ type CompleteGeneration = (
 export async function useGenerationExecutor<T>(args: {
 	context: GiselleEngineContext;
 	generation: QueuedGeneration;
-	telemetry?: TelemetrySettings;
 	useExperimentalStorage?: boolean;
 	execute: (utils: {
 		runningGeneration: RunningGeneration;
@@ -56,7 +54,6 @@ export async function useGenerationExecutor<T>(args: {
 			outputId: OutputId,
 		) => Promise<string | undefined>;
 		workspaceId: WorkspaceId;
-		telemetry?: TelemetrySettings;
 		completeGeneration: CompleteGeneration;
 	}) => Promise<T>;
 }): Promise<T> {
@@ -243,7 +240,6 @@ export async function useGenerationExecutor<T>(args: {
 		fileResolver,
 		generationContentResolver,
 		workspaceId,
-		telemetry: args.telemetry,
 		completeGeneration,
 	});
 }
