@@ -2,8 +2,8 @@
 
 
 ## Summary
-* 817 MIT
-* 182 Apache 2.0
+* 816 MIT
+* 184 Apache 2.0
 * 47 ISC
 * 27 New BSD
 * 13 Simplified BSD
@@ -2952,17 +2952,6 @@ LGPL-3.0-or-later permitted
 
 
 
-<a name="@radix-ui/react-use-effect-event"></a>
-### @radix-ui/react-use-effect-event v0.0.2
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-
-
 <a name="@radix-ui/react-use-escape-keydown"></a>
 ### @radix-ui/react-use-escape-keydown v1.1.0
 #### 
@@ -4780,6 +4769,28 @@ LGPL-3.0-or-later permitted
 
 <a name="@vercel/edge-config-fs"></a>
 ### @vercel/edge-config-fs v0.1.0
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
+
+
+
+<a name="@vercel/functions"></a>
+### @vercel/functions v2.2.11
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
+
+
+
+<a name="@vercel/oidc"></a>
+### @vercel/oidc v2.0.0
 #### 
 
 ##### Paths

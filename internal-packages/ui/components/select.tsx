@@ -34,11 +34,6 @@ export function Select<T extends SelectOption>({
 	id,
 	renderValue,
 }: SelectProps<T>) {
-	const selectedOption = options.find((option) =>
-		renderValue
-			? `${renderValue(option)}` === value
-			: `${option.value}` === value,
-	);
 	return (
 		<SelectPrimitive.Root
 			value={value}
@@ -57,24 +52,7 @@ export function Select<T extends SelectOption>({
 						widthClassName,
 					)}
 				>
-					<div className="flex items-center gap-2">
-						{selectedOption ? (
-							<>
-								{selectedOption.icon && (
-									<span className="h-4 w-4 flex items-center justify-center shrink-0">
-										{selectedOption.icon}
-									</span>
-								)}
-								<span>
-									{renderOption
-										? renderOption(selectedOption)
-										: selectedOption.label}
-								</span>
-							</>
-						) : (
-							<span className="text-text-muted">{placeholder}</span>
-						)}
-					</div>
+					<SelectPrimitive.Value placeholder={placeholder} />
 					<ChevronDownIcon className="size-[13px] shrink-0 text-text" />
 				</button>
 			</SelectPrimitive.Trigger>
@@ -98,16 +76,18 @@ export function Select<T extends SelectOption>({
 										"flex items-center justify-between gap-[4px]",
 									)}
 								>
-									<div className="flex items-center gap-2">
-										{option.icon && (
-											<span className="h-4 w-4 flex items-center justify-center shrink-0">
-												{option.icon}
-											</span>
+									<SelectPrimitive.ItemText>
+										{option.icon ? (
+											<div className="flex items-center gap-2">
+												<span className="h-4 w-4">{option.icon}</span>
+												{renderOption ? renderOption(option) : option.label}
+											</div>
+										) : renderOption ? (
+											renderOption(option)
+										) : (
+											option.label
 										)}
-										<SelectPrimitive.ItemText>
-											{renderOption ? renderOption(option) : option.label}
-										</SelectPrimitive.ItemText>
-									</div>
+									</SelectPrimitive.ItemText>
 									<SelectPrimitive.ItemIndicator>
 										<CheckIcon className="size-[13px]" />
 									</SelectPrimitive.ItemIndicator>
