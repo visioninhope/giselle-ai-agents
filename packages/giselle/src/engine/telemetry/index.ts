@@ -210,9 +210,9 @@ export async function emitTelemetry(
 			...extractMetadata(operationNode),
 		};
 
+		const { llm } = operationNode.content;
 		// Handle text generation telemetry
 		if (isTextGenerationNode(operationNode)) {
-			const { llm } = operationNode.content;
 			const usage = args.generation.usage ?? {
 				inputTokens: 0,
 				outputTokens: 0,
@@ -272,6 +272,8 @@ export async function emitTelemetry(
 
 				trace.generation({
 					name: "generateImage",
+					model: llm.id,
+					modelParameters: llm.configurations,
 					input: langfuseInput,
 					output: mediaReferences,
 					usage: {
@@ -280,6 +282,8 @@ export async function emitTelemetry(
 						total: 0,
 						unit: "IMAGES",
 					},
+					startTime: new Date(args.generation.startedAt),
+					endTime: new Date(args.generation.completedAt),
 					metadata,
 				});
 			}
