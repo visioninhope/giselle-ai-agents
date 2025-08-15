@@ -61,7 +61,9 @@ export function Select<T extends SelectOption>({
 						{selectedOption ? (
 							<>
 								{selectedOption.icon && (
-									<span className="h-6 w-6">{selectedOption.icon}</span>
+									<span className="h-4 w-4 flex items-center justify-center shrink-0">
+										{selectedOption.icon}
+									</span>
 								)}
 								<span>
 									{renderOption
@@ -96,18 +98,16 @@ export function Select<T extends SelectOption>({
 										"flex items-center justify-between gap-[4px]",
 									)}
 								>
-									<SelectPrimitive.ItemText>
-										{option.icon ? (
-											<div className="flex items-center gap-2">
-												<span className="h-6 w-6">{option.icon}</span>
-												{renderOption ? renderOption(option) : option.label}
-											</div>
-										) : renderOption ? (
-											renderOption(option)
-										) : (
-											option.label
+									<div className="flex items-center gap-2">
+										{option.icon && (
+											<span className="h-4 w-4 flex items-center justify-center shrink-0">
+												{option.icon}
+											</span>
 										)}
-									</SelectPrimitive.ItemText>
+										<SelectPrimitive.ItemText>
+											{renderOption ? renderOption(option) : option.label}
+										</SelectPrimitive.ItemText>
+									</div>
 									<SelectPrimitive.ItemIndicator>
 										<CheckIcon className="size-[13px]" />
 									</SelectPrimitive.ItemIndicator>
