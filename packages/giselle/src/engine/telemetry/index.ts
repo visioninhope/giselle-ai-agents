@@ -12,7 +12,6 @@ import { calculateDisplayCost } from "@giselle-sdk/language-model";
 import type { DataContent } from "ai";
 import { type ApiMediaContentType, Langfuse, LangfuseMedia } from "langfuse";
 import type { GenerationCompleteCallbackFunctionArgs } from "../types";
-import type { TelemetrySettings } from "./types";
 
 /**
  * Convert various data content types to Buffer for Langfuse media upload
@@ -165,13 +164,16 @@ function extractMetadata(
 	return metadata;
 }
 
+interface EmitTelemetryArgs extends GenerationCompleteCallbackFunctionArgs {
+	userId?: string;
+	metadata?: Record<string, unknown>;
+	tags?: string[];
+}
+
 /**
  * Emit telemetry data for completed generations to Langfuse
  */
-export async function emitTelemetry(
-	args: GenerationCompleteCallbackFunctionArgs,
-	telemetry?: TelemetrySettings,
-) {
+export async function emitTelemetry(args: EmitTelemetryArgs) {
 	try {
 		const { operationNode } = args.generation.context;
 
@@ -196,17 +198,16 @@ export async function emitTelemetry(
 
 		// Initialize Langfuse client and create trace
 		const langfuse = new Langfuse();
-		const userId = telemetry?.metadata?.userId;
 		const trace = langfuse.trace({
 			name: "generation",
-			userId: userId ? String(userId) : undefined,
+			userId: args.userId ? String(args.userId) : undefined,
 			input: langfuseInput,
 		});
 
 		// Common trace metadata
-		const tags = extractTags(operationNode);
+		const tags = [...(args.tags ?? []), ...extractTags(operationNode)];
 		const metadata = {
-			...telemetry?.metadata,
+			...args.metadata,
 			...extractMetadata(operationNode),
 		};
 
