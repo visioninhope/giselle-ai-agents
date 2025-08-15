@@ -1,6 +1,7 @@
 "use client";
 
 import { Select } from "@giselle-internal/ui/select";
+import * as Dialog from "@radix-ui/react-dialog";
 import {
 	ArrowDownAZ,
 	ArrowUpAZ,
@@ -13,9 +14,16 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
+import { GlassButton } from "@/components/ui/glass-button";
 import { Input } from "@/components/ui/input";
 import { AvatarImage } from "@/services/accounts/components/user-button/avatar-image";
 import { Card } from "../../(main)/settings/components/card";
+import {
+	GlassDialogBody,
+	GlassDialogContent,
+	GlassDialogFooter,
+	GlassDialogHeader,
+} from "../../(main)/settings/team/components/glass-dialog-content";
 
 type SortOption = "name-asc" | "name-desc" | "date-desc" | "date-asc";
 
@@ -47,6 +55,13 @@ export function ShowcaseClient({
 	const [activeTab, setActiveTab] = useState<"Apps" | "Playlist" | "History">(
 		"Apps",
 	);
+
+	// Playlist dialog state
+	const [isPlaylistDialogOpen, setIsPlaylistDialogOpen] = useState(false);
+	const [playlistForm, setPlaylistForm] = useState({
+		title: "",
+		description: "",
+	});
 
 	// Apps tab states
 	const [searchQuery, setSearchQuery] = useState("");
@@ -94,6 +109,14 @@ export function ShowcaseClient({
 	const currentHistory = useMemo(() => {
 		return teamHistory[selectedTeamId] || [];
 	}, [teamHistory, selectedTeamId]);
+
+	// Handle playlist form submission
+	const handleSavePlaylist = () => {
+		// TODO: Implement playlist creation logic
+		console.log("Creating playlist:", playlistForm);
+		setIsPlaylistDialogOpen(false);
+		setPlaylistForm({ title: "", description: "" });
+	};
 
 	// Filter apps based on search query
 	const filteredApps = useMemo(() => {
@@ -408,6 +431,78 @@ export function ShowcaseClient({
 								<p className="text-[12px] font-geist text-black-400">
 									Please create a new playlist with the 'New Playlist +' button.
 								</p>
+								<div className="mt-4">
+									<Dialog.Root
+										open={isPlaylistDialogOpen}
+										onOpenChange={setIsPlaylistDialogOpen}
+									>
+										<Dialog.Trigger asChild>
+											<GlassButton>Create Playlist</GlassButton>
+										</Dialog.Trigger>
+										<GlassDialogContent
+											onEscapeKeyDown={() => setIsPlaylistDialogOpen(false)}
+											onPointerDownOutside={() =>
+												setIsPlaylistDialogOpen(false)
+											}
+										>
+											<GlassDialogHeader
+												title="New Playlist Details"
+												description="Create a new playlist with title, description and thumbnail."
+												onClose={() => setIsPlaylistDialogOpen(false)}
+											/>
+											<GlassDialogBody>
+												<div className="grid gap-4">
+													<div className="grid gap-2">
+														<label
+															htmlFor="title"
+															className="text-sm font-medium text-white"
+														>
+															Title
+														</label>
+														<Input
+															id="title"
+															value={playlistForm.title}
+															onChange={(e) =>
+																setPlaylistForm({
+																	...playlistForm,
+																	title: e.target.value,
+																})
+															}
+															placeholder="Playlist title"
+															className="bg-black-700/50 border-black-600 text-white placeholder:text-black-400"
+														/>
+													</div>
+													<div className="grid gap-2">
+														<label
+															htmlFor="description"
+															className="text-sm font-medium text-white"
+														>
+															Description
+														</label>
+														<textarea
+															id="description"
+															value={playlistForm.description}
+															onChange={(e) =>
+																setPlaylistForm({
+																	...playlistForm,
+																	description: e.target.value,
+																})
+															}
+															placeholder="Playlist description"
+															className="min-h-[80px] px-3 py-2 rounded-md bg-black-700/50 border border-black-600 text-white placeholder:text-black-400 resize-none"
+															rows={3}
+														/>
+													</div>
+												</div>
+											</GlassDialogBody>
+											<GlassDialogFooter
+												onCancel={() => setIsPlaylistDialogOpen(false)}
+												onConfirm={handleSavePlaylist}
+												confirmLabel="Save"
+											/>
+										</GlassDialogContent>
+									</Dialog.Root>
+								</div>
 							</div>
 						</div>
 					)}
