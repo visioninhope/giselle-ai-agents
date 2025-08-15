@@ -63,7 +63,7 @@ export async function emitTelemetry(
 				if (!Array.isArray(inputMessage.content)) {
 					return inputMessage.content;
 				}
-				return await Promise.all(
+				const content = await Promise.all(
 					inputMessage.content.map(async (content) => {
 						switch (content.type) {
 							case "text":
@@ -94,6 +94,10 @@ export async function emitTelemetry(
 						}
 					}),
 				);
+				return {
+					...inputMessage,
+					content,
+				};
 			}),
 		);
 
