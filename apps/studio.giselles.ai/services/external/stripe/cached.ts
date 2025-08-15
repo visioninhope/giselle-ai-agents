@@ -2,29 +2,40 @@ import { getCache } from "@vercel/functions";
 import type Stripe from "stripe";
 import { stripe } from "./config";
 
+// Promise cache to prevent duplicate concurrent API calls
+const inFlightPromises = new Map<string, Promise<Stripe.Price>>();
+
 /**
  * Retrieve a Stripe Price with a Runtime Cache layer.
  * - Uses Vercel Runtime Cache API when available.
  * - Falls back to direct Stripe API if cache is unavailable.
  */
-export async function getCachedPrice(priceId: string): Promise<Stripe.Price> {
-	const cacheKey = `stripe:price:${priceId}`;
-
-	// Vercel Runtime Cache via @vercel/functions
-	const cache = getCache();
-	const cached = await cache.get(cacheKey);
-	if (cached) {
-		return cached as Stripe.Price;
+export function getCachedPrice(priceId: string): Promise<Stripe.Price> {
+	const inFlight = inFlightPromises.get(priceId);
+	if (inFlight) {
+		return inFlight;
 	}
 
-	// Fetch fresh data from Stripe
-	const price = await stripe.prices.retrieve(priceId);
+	const fetchPromise = (async () => {
+		try {
+			const cacheKey = `stripe:price:${priceId}`;
+			const cache = getCache();
+			const cached = await cache.get(cacheKey);
+			if (cached) {
+				return cached as Stripe.Price;
+			}
 
-	// Populate cache (best-effort) using @vercel/functions only
-	await cache.set(cacheKey, price, {
-		ttl: 3600,
-		tags: ["stripe:price", `stripe:price:${priceId}`],
-	});
+			const price = await stripe.prices.retrieve(priceId);
+			await cache.set(cacheKey, price, {
+				ttl: 3600,
+				tags: ["stripe:price", `stripe:price:${priceId}`],
+			});
+			return price;
+		} finally {
+			inFlightPromises.delete(priceId);
+		}
+	})();
+	inFlightPromises.set(priceId, fetchPromise);
 
-	return price;
+	return fetchPromise;
 }
