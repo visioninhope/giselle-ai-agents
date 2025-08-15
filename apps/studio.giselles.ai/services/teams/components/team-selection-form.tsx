@@ -30,12 +30,12 @@ export function TeamSelectionForm({
 	currentUser,
 }: TeamSelectionFormProps) {
 	const pathname = usePathname();
-	const isAccountSettingsPage = useMemo(
+	const isAccontSettingPage = useMemo(
 		() => pathname.startsWith("/settings/account"),
 		[pathname],
 	);
 	const action = (formData: FormData) => {
-		const withRedirect = isAccountSettingsPage;
+		const withRedirect = isAccontSettingPage;
 		return selectTeam(formData, withRedirect);
 	};
 
@@ -45,18 +45,18 @@ export function TeamSelectionForm({
 		<form
 			action={action}
 			ref={formRef}
-			key={`${currentTeam.id}-${isAccountSettingsPage}`}
+			key={`${currentTeam.id}-${isAccontSettingPage}`}
 		>
 			<Select
 				name="teamId"
-				defaultValue={isAccountSettingsPage ? undefined : currentTeam.id}
+				defaultValue={isAccontSettingPage ? undefined : currentTeam.id}
 				onValueChange={() => {
 					formRef.current?.requestSubmit();
 				}}
 			>
 				<SelectTrigger className="w-auto min-w-[100px] max-w-[360px] border-0 flex justify-between items-center data-[state=open]:border-0 data-[state=open]:ring-0 focus:ring-0 focus-visible:ring-0 focus:ring-offset-0 outline-none focus-visible:outline-none px-0.5 py-0.5 bg-transparent">
 					<div className="flex items-center gap-1.5">
-						{isAccountSettingsPage ? (
+						{isAccontSettingPage ? (
 							currentUser
 						) : (
 							<>
@@ -83,12 +83,7 @@ export function TeamSelectionForm({
 						<ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50 hover:bg-accent hover:opacity-100 hover:rounded-md hover:p-0.5" />
 					</div>
 				</SelectTrigger>
-				<SelectContent
-					position="popper"
-					align="end"
-					alignOffset={0}
-					className="p-2 border-[0.5px] border-white/10 rounded-xl shadow-[0_2px_8px_rgba(5,10,20,0.4),0_1px_2px_rgba(0,0,0,0.3)] bg-black-900/50 backdrop-blur-md !left-auto !right-0"
-				>
+				<SelectContent className="p-2 border-[0.5px] border-white/10 rounded-xl shadow-[0_2px_8px_rgba(5,10,20,0.4),0_1px_2px_rgba(0,0,0,0.3)] bg-black-900/50 backdrop-blur-md">
 					<div className="py-1">
 						{allTeams.map((team) => (
 							<SelectItem
