@@ -1,10 +1,15 @@
-import type { FlowTrigger, WorkspaceId } from "@giselle-sdk/data-type";
+import type {
+	FlowTrigger,
+	OutputId,
+	WorkspaceId,
+} from "@giselle-sdk/data-type";
 import type {
 	GitHubInstallationAppAuth,
 	GitHubPersonalAccessTokenAuth,
 } from "@giselle-sdk/github-tool";
 import type { LanguageModelProvider } from "@giselle-sdk/language-model";
 import type { QueryService } from "@giselle-sdk/rag";
+import type { ModelMessage } from "ai";
 import type { Storage } from "unstorage";
 import type { GiselleStorage } from "./experimental_storage";
 import type { VectorStore } from "./experimental_vector-store/types/interface";
@@ -12,6 +17,21 @@ import type { CompletedGeneration } from "./generations";
 import type { GenerationCompleteOption, TelemetrySettings } from "./telemetry";
 import type { UsageLimits } from "./usage-limits";
 import type { Vault } from "./vault";
+
+export interface GenerationCompleteCallbackFunctionArgs {
+	generation: CompletedGeneration;
+	inputMessages: ModelMessage[];
+	outputFiles: Array<{
+		outputId: OutputId;
+		id: string;
+		contentType: string;
+		data: Uint8Array<ArrayBufferLike>;
+	}>;
+}
+type GenerationCompleteCallbackFunction = (
+	args: GenerationCompleteCallbackFunctionArgs,
+	options: GenerationCompleteOption,
+) => void | Promise<void>;
 
 export interface GiselleEngineContext {
 	storage: Storage;
@@ -34,10 +54,7 @@ export interface GiselleEngineContext {
 		githubPullRequest?: GitHubVectorStoreQueryService<Record<string, unknown>>;
 	};
 	callbacks?: {
-		generationComplete: (
-			generation: CompletedGeneration,
-			options: GenerationCompleteOption,
-		) => void | Promise<void>;
+		generationComplete?: GenerationCompleteCallbackFunction;
 		flowTriggerUpdate?: (flowTrigger: FlowTrigger) => Promise<void>;
 	};
 	vectorStore?: VectorStore;
@@ -111,10 +128,7 @@ export interface GiselleEngineConfig {
 		githubPullRequest?: GitHubVectorStoreQueryService<Record<string, unknown>>;
 	};
 	callbacks?: {
-		generationComplete: (
-			generation: CompletedGeneration,
-			options: GenerationCompleteOption,
-		) => void | Promise<void>;
+		generationComplete?: GenerationCompleteCallbackFunction;
 		flowTriggerUpdate?: (flowTrigger: FlowTrigger) => Promise<void>;
 	};
 	vectorStore?: VectorStore;

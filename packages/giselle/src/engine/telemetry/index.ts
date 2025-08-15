@@ -16,6 +16,7 @@ import {
 import { type ApiMediaContentType, Langfuse, LangfuseMedia } from "langfuse";
 import type { Storage } from "unstorage";
 import type { CompletedGeneration } from "../../concepts/generation";
+import type { GenerationCompleteCallbackFunctionArgs } from "../types";
 import type {
 	AnthropicProviderOptions,
 	TelemetrySettings,
@@ -319,69 +320,12 @@ async function createLangfuseParams(
 	};
 }
 
-/**
- * Create LangfuseMedia objects from generated images if storage is available
- */
-async function createImageMediaObjects(
-	generation: CompletedGeneration,
-	storage?: ReadOnlyStorage,
-): Promise<{ [key: string]: LangfuseMedia } | undefined> {
-	if (!storage) {
-		return undefined;
-	}
-
-	const generatedImageOutputs = generation.outputs.filter(
-		(output) => output.type === "generated-image",
-	);
-
-	if (generatedImageOutputs.length === 0) {
-		return undefined;
-	}
-
-	const imageMediaObjects: { [key: string]: LangfuseMedia } = {};
-
-	for (const output of generatedImageOutputs) {
-		for (const image of output.contents) {
-			try {
-				const imagePath = `generations/${generation.id}/generated-images/${image.filename}`;
-				const imageData = await storage.getItemRaw(imagePath);
-
-				if (imageData) {
-					// Convert imageData to Buffer safely
-					let buffer: Buffer;
-					try {
-						buffer = Buffer.from(imageData);
-					} catch (error) {
-						console.warn("Error converting imageData to Buffer:", error);
-						continue;
-					}
-
-					const mediaKey = `${output.outputId}_${image.id}`;
-					imageMediaObjects[mediaKey] = new LangfuseMedia({
-						contentType: image.contentType as ApiMediaContentType,
-						contentBytes: buffer,
-					});
-				}
-			} catch (error) {
-				console.warn(
-					`Failed to load image ${image.filename} for telemetry:`,
-					error,
-				);
-			}
-		}
-	}
-
-	return Object.keys(imageMediaObjects).length > 0
-		? imageMediaObjects
-		: undefined;
-}
-
 export async function emitTelemetry(
-	generation: CompletedGeneration,
+	args: GenerationCompleteCallbackFunctionArgs,
 	options: GenerationCompleteOption,
 ) {
 	try {
-		const operationNode = generation.context.operationNode;
+		const operationNode = args.generation.context.operationNode;
 		const nodeType = operationNode.content.type;
 
 		if (isQueryNode(operationNode)) {
@@ -399,7 +343,7 @@ export async function emitTelemetry(
 
 		const { traceParams, spanParams, generationParams } =
 			await createLangfuseParams(
-				generation,
+				args.generation,
 				options,
 				isImageGeneration ? "image" : "text",
 			);
@@ -410,20 +354,22 @@ export async function emitTelemetry(
 		const langfuseGeneration = span.generation(generationParams);
 
 		if (isImageGeneration) {
-			const imageMediaObjects = options.storage
-				? await createImageMediaObjects(generation, options.storage)
-				: undefined;
-
-			if (imageMediaObjects) {
-				const imageMediaArray = Object.values(imageMediaObjects);
+			const langfuseMediaReferences = args.outputFiles.map(
+				(outputFile) =>
+					new LangfuseMedia({
+						contentType: outputFile.contentType as ApiMediaContentType,
+						contentBytes: Buffer.from(outputFile.data),
+					}),
+			);
+			if (langfuseMediaReferences.length > 0) {
 				trace.update({
-					output: imageMediaArray,
+					output: langfuseMediaReferences,
 				});
 				span.update({
-					output: imageMediaArray,
+					output: langfuseMediaReferences,
 				});
 				langfuseGeneration.update({
-					output: imageMediaArray,
+					output: langfuseMediaReferences,
 				});
 			}
 		}

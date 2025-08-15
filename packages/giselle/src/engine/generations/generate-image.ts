@@ -86,6 +86,7 @@ export function generateImage(args: {
 			}
 
 			await completeGeneration({
+				inputMessages: messages,
 				outputs: generationOutputs,
 			});
 		},
