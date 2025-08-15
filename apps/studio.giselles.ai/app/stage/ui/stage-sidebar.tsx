@@ -317,31 +317,63 @@ export function StageSidebar({ user }: StageSidebarProps) {
 				{/* Navigation Menu */}
 				<div className="flex-1 py-4">
 					<nav>
-						{menuItems.map((item) => (
-							<Link
-								key={item.label}
-								href={item.href}
-								className={clsx(
-									"flex items-center text-sm transition-colors",
-									isCollapsed ? "justify-center px-2 py-3" : "gap-3 px-4 py-3",
-									item.active
-										? "text-white-900"
-										: "text-[color:var(--color-text-nav-inactive)] hover:text-[color:var(--color-text-nav-active)]",
-								)}
-							>
-								<item.icon
+						{menuItems.map((item) =>
+							item.label === "New task" ? (
+								<div
+									key={item.label}
+									className={clsx("pt-0.5 pb-3", isCollapsed ? "px-2" : "px-4")}
+								>
+									<Link href={item.href}>
+										<Button
+											variant="glass"
+											size="large"
+											className={clsx(
+												"w-full px-0",
+												isCollapsed ? "justify-center" : "justify-start",
+											)}
+										>
+											<div
+												className={clsx(
+													"flex items-center",
+													isCollapsed ? "justify-center" : "gap-3 px-4",
+												)}
+											>
+												<item.icon className="w-5 h-5" />
+												{!isCollapsed && (
+													<span className="text-[14px]">{item.label}</span>
+												)}
+											</div>
+										</Button>
+									</Link>
+								</div>
+							) : (
+								<Link
+									key={item.label}
+									href={item.href}
 									className={clsx(
-										"w-5 h-5",
-										item.active ? "text-white-900" : "",
+										"flex items-center text-sm transition-colors",
+										isCollapsed
+											? "justify-center px-2 py-3"
+											: "gap-3 px-4 py-3",
+										item.active
+											? "text-white-900"
+											: "text-[color:var(--color-text-nav-inactive)] hover:text-[color:var(--color-text-nav-active)]",
 									)}
-								/>
-								{!isCollapsed && (
-									<span className={clsx(item.active ? "text-white-900" : "")}>
-										{item.label}
-									</span>
-								)}
-							</Link>
-						))}
+								>
+									<item.icon
+										className={clsx(
+											"w-5 h-5",
+											item.active ? "text-white-900" : "",
+										)}
+									/>
+									{!isCollapsed && (
+										<span className={clsx(item.active ? "text-white-900" : "")}>
+											{item.label}
+										</span>
+									)}
+								</Link>
+							),
+						)}
 					</nav>
 				</div>
 
