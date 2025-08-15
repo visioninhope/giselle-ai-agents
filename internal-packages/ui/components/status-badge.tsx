@@ -21,18 +21,18 @@ const statusStyles = {
 };
 
 const dotStyles = {
-	error: "bg-[#FF3D71]",
-	success: "bg-[#39FF7F]",
+	error: "bg-[var(--color-error)]",
+	success: "bg-[var(--color-success)]",
 	warning: "bg-[var(--color-warning)]",
-	info: "bg-[#39FF7F] animate-pulse",
-	ignored: "bg-[#B8E8F4]",
+	info: "bg-[var(--color-info)] animate-pulse",
+	ignored: "bg-[var(--color-ignored)]",
 };
 
 const dotTextStyles = {
 	error: "text-[var(--color-error)]",
 	success: "text-[var(--color-success)]",
 	warning: "text-[var(--color-warning)]",
-	info: "text-[var(--color-success)]",
+	info: "text-[var(--color-info)]",
 	ignored: "text-[var(--color-ignored)]",
 };
 

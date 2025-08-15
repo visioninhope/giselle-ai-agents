@@ -7,19 +7,8 @@ import {
 	ChevronUp,
 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
+import styles from "./circular-carousel.module.css";
 import { TeamCard } from "./team-card";
-
-// Add keyframes for gentle pulse animation
-const pulseKeyframes = `
-  @keyframes gentle-pulse {
-    0%, 100% {
-      opacity: 0.8;
-    }
-    50% {
-      opacity: 1;
-    }
-  }
-`;
 
 interface CarouselItem {
 	id: string;
@@ -34,6 +23,14 @@ interface CircularCarouselProps {
 	onItemDeselect?: () => void;
 }
 
+// Animation states for center card
+type CenterCardState =
+	| "normal"
+	| "selected"
+	| "animating-down"
+	| "inserted"
+	| "animating-up";
+
 export function CircularCarousel({
 	items,
 	selectedId: _selectedId,
@@ -45,11 +42,9 @@ export function CircularCarousel({
 	const [currentIndex, setCurrentIndex] = useState(
 		items.length > 0 ? Math.floor(items.length / 2) : 0,
 	);
-	const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
-	const [rejectIndex, setRejectIndex] = useState<number | null>(null);
-	const [insertedIndex, setInsertedIndex] = useState<number | null>(null);
-	const [animatingIndex, setAnimatingIndex] = useState<number | null>(null);
-	const [animatingUpIndex, setAnimatingUpIndex] = useState<number | null>(null);
+	const [centerCardState, setCenterCardState] =
+		useState<CenterCardState>("normal");
+	const [activeCardIndex, setActiveCardIndex] = useState<number | null>(null);
 
 	// Drag state
 	const [isDragging, setIsDragging] = useState(false);
@@ -185,84 +180,87 @@ export function CircularCarousel({
 		};
 	};
 
+	// Reset animation state when navigating
+	const resetAnimationState = useCallback(() => {
+		setCenterCardState("normal");
+		setActiveCardIndex(null);
+	}, []);
+
 	// Navigation functions
-	const moveLeft = () => {
+	const moveLeft = useCallback(() => {
 		if (currentIndex > 0) {
 			setCurrentIndex(currentIndex - 1);
-			setSelectedIndex(null);
-			setRejectIndex(null);
-			setInsertedIndex(null);
-			setAnimatingIndex(null);
-			setAnimatingUpIndex(null);
+			resetAnimationState();
 		}
-	};
+	}, [currentIndex, resetAnimationState]);
 
-	const moveRight = () => {
+	const moveRight = useCallback(() => {
 		if (currentIndex < items.length - 1) {
 			setCurrentIndex(currentIndex + 1);
-			setSelectedIndex(null);
-			setRejectIndex(null);
-			setInsertedIndex(null);
-			setAnimatingIndex(null);
-			setAnimatingUpIndex(null);
+			resetAnimationState();
 		}
-	};
+	}, [currentIndex, items.length, resetAnimationState]);
+
+	// Handle deselection animation
+	const handleDeselect = useCallback(
+		(cardIndex: number) => {
+			setCenterCardState("animating-up");
+			setActiveCardIndex(cardIndex);
+
+			// Call deselect callback
+			if (onItemDeselect) {
+				onItemDeselect();
+			}
+
+			// Complete animation and reset state
+			setTimeout(() => {
+				resetAnimationState();
+			}, 600);
+		},
+		[onItemDeselect, resetAnimationState],
+	);
+
+	// Handle center card selection
+	const handleCenterCardSelect = useCallback(
+		(cardIndex: number) => {
+			if (centerCardState === "inserted" && activeCardIndex === cardIndex) {
+				// Deselect inserted card
+				handleDeselect(cardIndex);
+			} else if (centerCardState === "normal") {
+				// Select card: show blue frame first
+				setCenterCardState("selected");
+				setActiveCardIndex(cardIndex);
+
+				if (onItemSelect) {
+					onItemSelect(items[cardIndex]);
+				}
+
+				// Brief delay to show selection state, then animate down
+				setTimeout(() => {
+					setCenterCardState("animating-down");
+
+					// Complete animation and show inserted state
+					setTimeout(() => {
+						setCenterCardState("inserted");
+					}, 600);
+				}, 300);
+			}
+		},
+		[centerCardState, activeCardIndex, onItemSelect, items, handleDeselect],
+	);
 
 	// Handle card click
 	const handleCardClick = useCallback(
 		(originalIndex: number, isCenter: boolean) => {
 			if (isCenter) {
-				if (insertedIndex === originalIndex) {
-					// Click on inserted card: start slide up animation
-					setAnimatingUpIndex(originalIndex);
-					setInsertedIndex(null);
-					setRejectIndex(null);
-
-					// Call deselect callback
-					if (onItemDeselect) {
-						onItemDeselect();
-					}
-
-					// Complete slide up animation
-					setTimeout(() => {
-						setAnimatingUpIndex(null);
-					}, 600);
-				} else {
-					// First click: show blue selection frame immediately
-					setSelectedIndex(originalIndex);
-					setRejectIndex(null);
-					setInsertedIndex(null);
-					setAnimatingIndex(null);
-					setAnimatingUpIndex(null);
-
-					if (onItemSelect) {
-						onItemSelect(items[originalIndex]);
-					}
-
-					// Brief delay to show selection state, then start slide down animation
-					setTimeout(() => {
-						setAnimatingIndex(originalIndex);
-						setSelectedIndex(null);
-
-						// Start slide down animation
-						setTimeout(() => {
-							setInsertedIndex(originalIndex);
-							setRejectIndex(originalIndex);
-							setAnimatingIndex(null);
-						}, 600);
-					}, 300); // Show selection state for 300ms before animation
-				}
+				handleCenterCardSelect(originalIndex);
 			} else {
 				// Move clicked card to center
 				setCurrentIndex(originalIndex);
-				setSelectedIndex(null);
-				setRejectIndex(null);
-				setInsertedIndex(null);
-				setAnimatingIndex(null);
-				setAnimatingUpIndex(null);
+				resetAnimationState();
 			}
 		},
-		[insertedIndex, onItemDeselect, onItemSelect, items],
+		[handleCenterCardSelect, resetAnimationState],
 	);
 
 	// Drag handlers
@@ -297,7 +295,7 @@ export function CircularCarousel({
 				(card) => card.positionIndex === 0,
 			);
 			if (centerCard) {
-				handleCardClick(centerCard.originalIndex, true);
+				handleCenterCardSelect(centerCard.originalIndex);
 			}
 		}
 		// Check for horizontal swipe (carousel navigation)
@@ -352,31 +350,17 @@ export function CircularCarousel({
 			switch (e.key) {
 				case "ArrowLeft":
 					e.preventDefault();
-					if (currentIndex > 0) {
-						setCurrentIndex(currentIndex - 1);
-						setSelectedIndex(null);
-						setRejectIndex(null);
-						setInsertedIndex(null);
-						setAnimatingIndex(null);
-						setAnimatingUpIndex(null);
-					}
+					moveLeft();
 					break;
 				case "ArrowRight":
 					e.preventDefault();
-					if (currentIndex < items.length - 1) {
-						setCurrentIndex(currentIndex + 1);
-						setSelectedIndex(null);
-						setRejectIndex(null);
-						setInsertedIndex(null);
-						setAnimatingIndex(null);
-						setAnimatingUpIndex(null);
-					}
+					moveRight();
 					break;
 				case "Enter":
 				case " ":
 					if (centerCard) {
 						e.preventDefault();
-						handleCardClick(centerCard.originalIndex, true);
+						handleCenterCardSelect(centerCard.originalIndex);
 					}
 					break;
 			}
@@ -386,7 +370,7 @@ export function CircularCarousel({
 		return () => {
 			window.removeEventListener("keydown", handleKeyDown);
 		};
-	}, [currentIndex, items.length, centerCard, handleCardClick]);
+	}, [moveLeft, moveRight, centerCard, handleCenterCardSelect]);
 
 	// Optimized style objects to prevent recreation on each render
 	const containerStyle = {
@@ -435,7 +419,6 @@ export function CircularCarousel({
 			className="relative w-full overflow-hidden"
 			style={containerStyle}
 		>
-			<style>{pulseKeyframes}</style>
 			{/* Carousel container */}
 			<section
 				aria-label="Team app carousel"
@@ -452,12 +435,13 @@ export function CircularCarousel({
 			>
 				{visibleCardsList.map(({ item, originalIndex, positionIndex }) => {
 					const position = getCardPosition(positionIndex);
-					const isAnimating =
-						animatingIndex === originalIndex && position.isCenter;
+					const isActiveCard =
+						activeCardIndex === originalIndex && position.isCenter;
+					const isAnimatingDown =
+						centerCardState === "animating-down" && isActiveCard;
 					const isAnimatingUp =
-						animatingUpIndex === originalIndex && position.isCenter;
-					const isInserted =
-						insertedIndex === originalIndex && position.isCenter;
+						centerCardState === "animating-up" && isActiveCard;
+					const isInserted = centerCardState === "inserted" && isActiveCard;
 
 					return (
 						<button
@@ -466,17 +450,14 @@ export function CircularCarousel({
 							aria-label={`Select ${item.name}`}
 							className="absolute cursor-pointer select-none border-none bg-transparent p-0"
 							style={{
-								transform: isAnimating
-									? `translate(${position.x}px, ${position.y + 170}px) rotate(0deg) scale(${position.scale})`
-									: isAnimatingUp
-										? `translate(${position.x}px, ${position.y}px) rotate(${position.rotation}deg) scale(${position.scale})`
-										: isInserted
-											? `translate(${position.x}px, ${position.y + 170}px) rotate(0deg) scale(${position.scale})`
-											: `translate(${position.x}px, ${position.y}px) rotate(${position.rotation}deg) scale(${position.scale})`,
+								transform:
+									isAnimatingDown || isInserted
+										? `translate(${position.x}px, ${position.y + 170}px) rotate(0deg) scale(${position.scale})`
+										: `translate(${position.x}px, ${position.y}px) rotate(${position.rotation}deg) scale(${position.scale})`,
 								zIndex: position.zIndex,
 								opacity: position.opacity,
 								transition:
-									isAnimating || isAnimatingUp
+									isAnimatingDown || isAnimatingUp
 										? "transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.3s ease"
 										: isDragging
 											? "none"
@@ -491,13 +472,9 @@ export function CircularCarousel({
 							}}
 						>
 							<div
-								className="relative"
-								style={{
-									...(isInserted && {
-										animation: "gentle-pulse 2s ease-in-out infinite",
-										filter: "drop-shadow(0 0 12px rgba(107, 143, 240, 0.6))",
-									}),
-								}}
+								className={
+									isInserted ? `relative ${styles.pulseAnimation}` : "relative"
+								}
 							>
 								<TeamCard
 									team={{
@@ -518,7 +495,7 @@ export function CircularCarousel({
 			</div>
 
 			{/* Gray selection frame - normal state */}
-			{centerCard && !insertedIndex && !selectedIndex && !animatingIndex && (
+			{centerCard && centerCardState === "normal" && (
 				<div
 					className="absolute left-1/2 top-1/2 pointer-events-none z-40"
 					style={{
@@ -532,7 +509,7 @@ export function CircularCarousel({
 			)}
 
 			{/* Normal state: Arrow below gray frame */}
-			{centerCard && !insertedIndex && !selectedIndex && !animatingIndex && (
+			{centerCard && centerCardState === "normal" && (
 				<button
 					type="button"
 					aria-label="Select current app"
@@ -540,14 +517,14 @@ export function CircularCarousel({
 					style={{ top: "75%" }}
 					onClick={() => {
 						if (centerCard) {
-							handleCardClick(centerCard.originalIndex, true);
+							handleCenterCardSelect(centerCard.originalIndex);
 						}
 					}}
 					onKeyDown={(e) => {
 						if (e.key === "Enter" || e.key === " ") {
 							e.preventDefault();
 							if (centerCard) {
-								handleCardClick(centerCard.originalIndex, true);
+								handleCenterCardSelect(centerCard.originalIndex);
 							}
 						}
 					}}
@@ -560,19 +537,21 @@ export function CircularCarousel({
 			)}
 
 			{/* Blue selection frame - selected state */}
-			{centerCard && selectedIndex === centerCard.originalIndex && (
-				<div
-					className="absolute left-1/2 top-1/2 pointer-events-none z-40"
-					style={{
-						width: "98px", // 90px card + 4px padding on each side
-						height: "128px", // 120px card + 4px padding on each side
-						borderRadius: "4px 4px 16px 4px",
-						border: "2px solid var(--primary400, #6B8FF0)",
-						boxShadow: "1px 1px 16px 8px rgba(107, 143, 240, 0.25)",
-						transform: `translate(-50%, -50%) translate(${centerX}px, ${centerY - radius - 144}px)`,
-					}}
-				/>
-			)}
+			{centerCard &&
+				centerCardState === "selected" &&
+				activeCardIndex === centerCard.originalIndex && (
+					<div
+						className="absolute left-1/2 top-1/2 pointer-events-none z-40"
+						style={{
+							width: "98px", // 90px card + 4px padding on each side
+							height: "128px", // 120px card + 4px padding on each side
+							borderRadius: "4px 4px 16px 4px",
+							border: "2px solid var(--primary400, #6B8FF0)",
+							boxShadow: "1px 1px 16px 8px rgba(107, 143, 240, 0.25)",
+							transform: `translate(-50%, -50%) translate(${centerX}px, ${centerY - radius - 144}px)`,
+						}}
+					/>
+				)}
 
 			{/* Left arrow */}
 			<button
@@ -597,59 +576,35 @@ export function CircularCarousel({
 			</button>
 
 			{/* REJECT state: Arrow above inserted card */}
-			{centerCard && rejectIndex === centerCard.originalIndex && (
-				<button
-					type="button"
-					aria-label="Deselect current app"
-					className="absolute left-1/2 top-1/2 pointer-events-auto z-60 cursor-pointer border-none bg-transparent p-0"
-					style={{
-						transform: `translate(-50%, -50%) translate(${centerX}px, ${centerY - radius - 144 + 90}px)`,
-					}}
-					onClick={() => {
-						if (centerCard) {
-							// Start slide up animation
-							setAnimatingUpIndex(centerCard.originalIndex);
-							setInsertedIndex(null);
-							setRejectIndex(null);
-
-							// Call deselect callback
-							if (onItemDeselect) {
-								onItemDeselect();
-							}
-
-							// Complete slide up animation
-							setTimeout(() => {
-								setAnimatingUpIndex(null);
-							}, 600);
-						}
-					}}
-					onKeyDown={(e) => {
-						if (e.key === "Enter" || e.key === " ") {
-							e.preventDefault();
+			{centerCard &&
+				centerCardState === "inserted" &&
+				activeCardIndex === centerCard.originalIndex && (
+					<button
+						type="button"
+						aria-label="Deselect current app"
+						className="absolute left-1/2 top-1/2 pointer-events-auto z-60 cursor-pointer border-none bg-transparent p-0"
+						style={{
+							transform: `translate(-50%, -50%) translate(${centerX}px, ${centerY - radius - 144 + 90}px)`,
+						}}
+						onClick={() => {
 							if (centerCard) {
-								// Start slide up animation
-								setAnimatingUpIndex(centerCard.originalIndex);
-								setInsertedIndex(null);
-								setRejectIndex(null);
-
-								// Call deselect callback
-								if (onItemDeselect) {
-									onItemDeselect();
-								}
-
-								// Complete slide up animation
-								setTimeout(() => {
-									setAnimatingUpIndex(null);
-								}, 600);
+								handleDeselect(centerCard.originalIndex);
 							}
-						}
-					}}
-				>
-					<div className="text-gray-300 text-lg font-medium flex justify-center">
-						<ChevronUp size={20} />
-					</div>
-				</button>
-			)}
+						}}
+						onKeyDown={(e) => {
+							if (e.key === "Enter" || e.key === " ") {
+								e.preventDefault();
+								if (centerCard) {
+									handleDeselect(centerCard.originalIndex);
+								}
+							}
+						}}
+					>
+						<div className="text-gray-300 text-lg font-medium flex justify-center">
+							<ChevronUp size={20} />
+						</div>
+					</button>
+				)}
 		</div>
 	);
 }

@@ -93,6 +93,7 @@ export function executeQuery(args: {
 				];
 
 				await completeGeneration({
+					inputMessages: [],
 					outputs,
 				});
 			} catch (error) {

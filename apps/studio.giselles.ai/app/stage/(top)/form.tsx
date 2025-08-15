@@ -7,13 +7,7 @@ import type { ParameterItem } from "@giselle-sdk/giselle";
 import { SpinnerIcon } from "@giselles-ai/icons/spinner";
 import clsx from "clsx/lite";
 import type { InferSelectModel } from "drizzle-orm";
-import {
-	useActionState,
-	useCallback,
-	useEffect,
-	useMemo,
-	useState,
-} from "react";
+import { useActionState, useCallback, useMemo, useState } from "react";
 import type { teams } from "@/drizzle";
 import { AvatarImage } from "@/services/accounts/components/user-button/avatar-image";
 import { CircularCarousel } from "./circular-carousel";
@@ -75,7 +69,6 @@ export function Form({
 		FlowTriggerId | undefined
 	>(undefined);
 	const [selectedFilter, setSelectedFilter] = useState<FilterType>("all");
-	const [isClientMounted, setIsClientMounted] = useState(false);
 
 	const [validationErrors, setValidationErrors] = useState<
 		Record<string, string>
@@ -96,44 +89,6 @@ export function Form({
 			})),
 		[teamOptions],
 	);
-
-	// Client mount effect
-	useEffect(() => {
-		setIsClientMounted(true);
-	}, []);
-
-	// Add custom styles for select components
-	useEffect(() => {
-		if (!isClientMounted) return;
-
-		const styleId = "form-select-styles";
-		let styleElement = document.getElementById(styleId);
-
-		if (!styleElement) {
-			styleElement = document.createElement("style");
-			styleElement.id = styleId;
-			styleElement.textContent = `
-				.team-select button[type="button"], .filter-select button[type="button"] {
-					background-color: rgba(255, 255, 255, 0.05) !important;
-					border: none !important;
-					color: white !important;
-					font-size: 14px !important;
-					font-family: inherit !important;
-				}
-				.team-select button[type="button"]:hover, .filter-select button[type="button"]:hover {
-					background-color: rgba(255, 255, 255, 0.1) !important;
-				}
-			`;
-			document.head.appendChild(styleElement);
-		}
-
-		return () => {
-			const existingStyle = document.getElementById(styleId);
-			if (existingStyle) {
-				document.head.removeChild(existingStyle);
-			}
-		};
-	}, [isClientMounted]);
 
 	const filteredFlowTriggers = useMemo(
 		() =>
@@ -217,7 +172,6 @@ export function Form({
 								setSelectedTeamId(value as TeamId);
 								setSelectedFlowTriggerId(undefined);
 							}}
-							widthClassName="[&>button]:text-[14px] [&>button]:px-2 [&>button]:py-1 [&>button]:rounded-sm [&>button]:gap-2"
 						/>
 					</div>
 				</div>
@@ -229,7 +183,6 @@ export function Form({
 						renderOption={(o) => o.label}
 						value={selectedFilter}
 						onValueChange={(value) => setSelectedFilter(value as FilterType)}
-						widthClassName="[&>button]:text-[14px] [&>button]:px-2 [&>button]:py-1 [&>button]:rounded-sm [&>button]:gap-2"
 					/>
 				</div>
 			</div>

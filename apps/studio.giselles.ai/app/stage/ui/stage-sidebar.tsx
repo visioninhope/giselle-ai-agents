@@ -18,8 +18,7 @@ import {
 	Sparkles,
 } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -53,32 +52,11 @@ interface BottomItem {
 
 export function StageSidebar({ user }: StageSidebarProps) {
 	const [isCollapsed, setIsCollapsed] = useState(false);
-	const [isClientMounted, setIsClientMounted] = useState(false);
-	const pathname = usePathname();
-
-	useEffect(() => {
-		setIsClientMounted(true);
-	}, []);
 
 	const menuItems: MenuItem[] = [
-		{
-			icon: Sparkles,
-			label: "New task",
-			href: "/stage",
-			active: pathname === "/stage",
-		},
-		{
-			icon: Library,
-			label: "Showcase",
-			href: "/showcase",
-			active: pathname === "/showcase",
-		},
-		{
-			icon: WilliIcon,
-			label: "Tasks",
-			href: "/stage/acts",
-			active: pathname === "/stage/acts",
-		},
+		{ icon: Sparkles, label: "New task", href: "/stage", active: true },
+		{ icon: Library, label: "Showcase", href: "/showcase", active: false },
+		{ icon: WilliIcon, label: "Tasks", href: "/acts", active: false },
 	];
 
 	const bottomItems: BottomItem[] = [
@@ -157,14 +135,12 @@ export function StageSidebar({ user }: StageSidebarProps) {
 
 					{/* Right side: Icons */}
 					<div className="flex items-center gap-4">
-						{isClientMounted && (
-							<button
-								type="button"
-								className="text-white-700 hover:text-white-900 transition-colors"
-							>
-								<Bell className="w-5 h-5" />
-							</button>
-						)}
+						<button
+							type="button"
+							className="text-white-700 hover:text-white-900 transition-colors"
+						>
+							<Bell className="w-5 h-5" />
+						</button>
 						{user && (
 							<AvatarImage
 								className="w-8 h-8 rounded-full"
@@ -179,6 +155,7 @@ export function StageSidebar({ user }: StageSidebarProps) {
 			</div>
 
 			{/* Desktop Sidebar */}
+
 			<div
 				className={clsx(
 					"hidden md:flex h-screen bg-[var(--color-stage-background)] flex-col border-r border-white/10 transition-all duration-300",
@@ -221,7 +198,7 @@ export function StageSidebar({ user }: StageSidebarProps) {
 					</div>
 
 					{/* User Profile Section */}
-					{user && isClientMounted && (
+					{user && (
 						<DropdownMenu>
 							<DropdownMenuTrigger
 								className="cursor-pointer w-full"
@@ -317,7 +294,7 @@ export function StageSidebar({ user }: StageSidebarProps) {
 				<div className="flex-1 py-4">
 					<nav>
 						{menuItems.map((item) =>
-							item.label === "New task" ? (
+							item.active ? (
 								<div
 									key={item.label}
 									className={clsx("pt-0.5 pb-3", isCollapsed ? "px-2" : "px-4")}
@@ -354,22 +331,11 @@ export function StageSidebar({ user }: StageSidebarProps) {
 										isCollapsed
 											? "justify-center px-2 py-3"
 											: "gap-3 px-4 py-3",
-										item.active
-											? "text-white-900"
-											: "text-[color:var(--color-text-nav-inactive)] hover:text-[color:var(--color-text-nav-active)]",
+										"text-[color:var(--color-text-nav-inactive)] hover:text-[color:var(--color-text-nav-active)]",
 									)}
 								>
-									<item.icon
-										className={clsx(
-											"w-5 h-5",
-											item.active ? "text-white-900" : "",
-										)}
-									/>
-									{!isCollapsed && (
-										<span className={clsx(item.active ? "text-white-900" : "")}>
-											{item.label}
-										</span>
-									)}
+									{renderIcon(item.icon, item.label)}
+									{!isCollapsed && <span>{item.label}</span>}
 								</Link>
 							),
 						)}

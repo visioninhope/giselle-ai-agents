@@ -5,7 +5,6 @@ import {
 	ActStreamReader,
 	type StreamDataEventHandler,
 } from "@giselle-sdk/giselle/react";
-import * as Accordion from "@radix-ui/react-accordion";
 import {
 	ArrowLeftIcon,
 	CheckIcon,
@@ -17,6 +16,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Accordion } from "radix-ui";
 import { use, useCallback, useState } from "react";
 
 function SequenceBlock({ children }: React.PropsWithChildren) {

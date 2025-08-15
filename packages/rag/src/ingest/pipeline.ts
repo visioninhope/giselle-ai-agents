@@ -3,7 +3,7 @@ import type { ChunkStore } from "../chunk-store/types";
 import { createDefaultChunker } from "../chunker";
 import type { ChunkerFunction } from "../chunker/types";
 import type { Document, DocumentLoader } from "../document-loader/types";
-import { createDefaultEmbedder } from "../embedder";
+import { createOpenAIEmbedder } from "../embedder";
 import type { EmbedderFunction } from "../embedder/types";
 import { ConfigurationError, OperationError } from "../errors";
 import { embedContent } from "./embedder";
@@ -74,16 +74,22 @@ export function createPipeline<
 		telemetry,
 	} = options;
 
-	let resolvedEmbedder = embedder;
-	if (resolvedEmbedder == null) {
-		try {
-			resolvedEmbedder = createDefaultEmbedder(telemetry);
-		} catch (error) {
-			throw ConfigurationError.missingField("OPENAI_API_KEY", {
-				cause: error instanceof Error ? error.message : String(error),
+	// Use provided embedder or fall back to default OpenAI text-embedding-3-small
+	const resolvedEmbedder =
+		embedder ||
+		(() => {
+			const apiKey = process.env.OPENAI_API_KEY;
+			if (!apiKey) {
+				throw new ConfigurationError(
+					"OPENAI_API_KEY environment variable is required when no embedder is provided",
+				);
+			}
+			return createOpenAIEmbedder({
+				model: "text-embedding-3-small",
+				apiKey,
+				telemetry,
 			});
-		}
-	}
+		})();
 
 	/**
 	 * Process a single document
