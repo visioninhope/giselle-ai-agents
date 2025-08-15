@@ -76,7 +76,7 @@
 		"input-otp": "1.4.2",
 		"jsdom": "catalog:",
 		"langfuse-vercel": "3.37.0",
-		"lucide-react": "0.417.0",
+		"lucide-react": "catalog:",
 		"next": "catalog:",
 		"next-themes": "0.3.0",
 		"nodemailer": "6.10.0",
