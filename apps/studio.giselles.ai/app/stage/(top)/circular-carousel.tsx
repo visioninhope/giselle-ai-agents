@@ -122,17 +122,19 @@ export function CircularCarousel({
 		});
 	}, [visibleCards, items.length]);
 
+	// Reset animation state when navigating
+	const resetAnimationState = useCallback(() => {
+		setCenterCardState("normal");
+		setActiveCardIndex(null);
+	}, []);
+
 	// Auto-navigate to selected item when selectedId changes
 	useEffect(() => {
 		if (_selectedId && items.length > 0) {
 			const selectedIndex = items.findIndex((item) => item.id === _selectedId);
 			if (selectedIndex !== -1 && selectedIndex !== currentIndex) {
 				setCurrentIndex(selectedIndex);
-				setSelectedIndex(null);
-				setRejectIndex(null);
-				setInsertedIndex(null);
-				setAnimatingIndex(null);
-				setAnimatingUpIndex(null);
+				resetAnimationState();
 
 				// Auto-select the center item after navigation with full animation
 				setTimeout(() => {
@@ -141,28 +143,22 @@ export function CircularCarousel({
 					}
 
 					// Simulate card click animation sequence
-					setSelectedIndex(selectedIndex);
-					setRejectIndex(null);
-					setInsertedIndex(null);
-					setAnimatingIndex(null);
-					setAnimatingUpIndex(null);
+					setCenterCardState("selected");
+					setActiveCardIndex(selectedIndex);
 
 					// Brief delay to show selection state, then start slide down animation
 					setTimeout(() => {
-						setAnimatingIndex(selectedIndex);
-						setSelectedIndex(null);
+						setCenterCardState("animating-down");
 
 						// Start slide down animation
 						setTimeout(() => {
-							setInsertedIndex(selectedIndex);
-							setRejectIndex(selectedIndex);
-							setAnimatingIndex(null);
+							setCenterCardState("inserted");
 						}, 600);
 					}, 300); // Show selection state for 300ms before animation
 				}, 100);
 			}
 		}
-	}, [_selectedId, items, currentIndex, onItemSelect]);
+	}, [_selectedId, items, currentIndex, onItemSelect, resetAnimationState]);
 
 	// Get visible cards around current index
 	const getVisibleCards = () => {
@@ -221,12 +217,6 @@ export function CircularCarousel({
 			isCenter,
 		};
 	};
-
-	// Reset animation state when navigating
-	const resetAnimationState = useCallback(() => {
-		setCenterCardState("normal");
-		setActiveCardIndex(null);
-	}, []);
 
 	// Navigation functions
 	const moveLeft = useCallback(() => {
