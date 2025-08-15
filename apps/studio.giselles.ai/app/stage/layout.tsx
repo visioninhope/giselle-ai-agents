@@ -17,7 +17,7 @@ export default async function StageLayout({
 					avatarUrl: accountInfo.avatarUrl ?? undefined,
 				}}
 			/>
-			<div className="flex-1 overflow-hidden">{children}</div>
+			<div className="flex-1 h-full overflow-hidden">{children}</div>
 		</div>
 	);
 }

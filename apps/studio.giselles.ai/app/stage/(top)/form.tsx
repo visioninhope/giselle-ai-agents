@@ -9,6 +9,8 @@ import clsx from "clsx/lite";
 import type { InferSelectModel } from "drizzle-orm";
 import { useActionState, useCallback, useMemo, useState } from "react";
 import type { teams } from "@/drizzle";
+import { AvatarImage } from "@/services/accounts/components/user-button/avatar-image";
+import { CircularCarousel } from "./circular-carousel";
 import {
 	createInputsFromTrigger,
 	parseFormInputs,
@@ -19,7 +21,21 @@ type TeamId = InferSelectModel<typeof teams>["id"];
 interface TeamOption {
 	value: TeamId;
 	label: string;
+	avatarUrl?: string;
 }
+
+type FilterType = "all" | "history" | "latest" | "favorites";
+interface FilterOption {
+	value: FilterType;
+	label: string;
+}
+
+const filterOptions: FilterOption[] = [
+	{ value: "all", label: "All" },
+	{ value: "history", label: "History" },
+	{ value: "latest", label: "Latest" },
+	{ value: "favorites", label: "Favorites" },
+];
 
 export interface FlowTriggerUIItem {
 	id: FlowTriggerId;
@@ -48,19 +64,31 @@ export function Form({
 }) {
 	const defaultTeamId = useMemo(() => teamOptions[0].value, [teamOptions]);
 	const [selectedTeamId, setSelectedTeamId] = useState<TeamId>(defaultTeamId);
-	const defaultSelectedFlowTriggerId = useMemo(
-		() =>
-			flowTriggers.find((flowTrigger) => flowTrigger.teamId === defaultTeamId)
-				?.id,
-		[flowTriggers, defaultTeamId],
-	);
+
 	const [selectedFlowTriggerId, setSelectedFlowTriggerId] = useState<
 		FlowTriggerId | undefined
-	>(defaultSelectedFlowTriggerId);
+	>(undefined);
+	const [selectedFilter, setSelectedFilter] = useState<FilterType>("all");
 
 	const [validationErrors, setValidationErrors] = useState<
 		Record<string, string>
 	>({});
+
+	const teamOptionsWithIcons = useMemo(
+		() =>
+			teamOptions.map((team) => ({
+				...team,
+				icon: team.avatarUrl ? (
+					<AvatarImage
+						avatarUrl={team.avatarUrl}
+						width={24}
+						height={24}
+						alt={team.label}
+					/>
+				) : undefined,
+			})),
+		[teamOptions],
+	);
 
 	const filteredFlowTriggers = useMemo(
 		() =>
@@ -122,130 +150,177 @@ export function Form({
 	const [, action, isPending] = useActionState(formAction, null);
 
 	return (
-		<form
-			action={action}
-			className="max-w-[800px] mx-auto border border-border bg-panel-background rounded-[4px] p-4 text-[14px] text-text resize-none outline-none"
-		>
-			<div className="flex flex-col gap-[8px] mb-[8px]">
-				{inputs.map((input) => {
-					return (
-						<fieldset key={input.name} className={clsx("grid gap-2")}>
-							<label
-								className="text-[14px] font-medium text-white-900"
-								htmlFor={input.name}
-							>
-								{input.label}
-								{input.required && <span className="text-red-500 ml-1">*</span>}
-							</label>
-							{input.type === "text" && (
-								<input
-									type="text"
-									name={input.name}
-									id={input.name}
-									className={clsx(
-										"w-full flex justify-between items-center rounded-[8px] py-[8px] px-[12px] outline-none focus:outline-none border",
-										validationErrors[input.name]
-											? "border-error"
-											: "border-border",
-										"text-[14px]",
-									)}
-									disabled={isPending}
-								/>
-							)}
-							{input.type === "multiline-text" && (
-								<textarea
-									name={input.name}
-									id={input.name}
-									className={clsx(
-										"w-full flex justify-between items-center rounded-[8px] py-[8px] px-[12px] outline-none focus:outline-none",
-										"border-[1px]",
-										validationErrors[input.name]
-											? "border-error"
-											: "border-border",
-										"text-[14px]",
-									)}
-									rows={4}
-									disabled={isPending}
-								/>
-							)}
-							{input.type === "number" && (
-								<input
-									type="number"
-									name={input.name}
-									id={input.name}
-									className={clsx(
-										"w-full flex justify-between items-center rounded-[8px] py-[8px] px-[12px] outline-none focus:outline-none",
-										"border-[1px]",
-										validationErrors[input.name]
-											? "border-error"
-											: "border-border",
-										"text-[14px]",
-									)}
-									disabled={isPending}
-								/>
-							)}
-							{validationErrors[input.name] && (
-								<span className="text-error text-[12px] font-medium">
-									{validationErrors[input.name]}
-								</span>
-							)}
-						</fieldset>
-					);
-				})}
-			</div>
-			<div className="flex items-center justify-between">
-				<div className="flex items-center gap-2 justify-center">
-					<Select
-						id="team"
-						placeholder="Select team"
-						options={teamOptions}
-						renderOption={(o) => o.label}
-						value={selectedTeamId}
-						onValueChange={(value) => setSelectedTeamId(value as TeamId)}
-					/>
-					<Select
-						id="flow"
-						placeholder="Select flow"
-						options={
-							filteredFlowTriggers.length === 0
-								? [
-										{
-											value: "no-flow",
-											label: "No flows available",
-										},
-									]
-								: filteredFlowTriggers.map((trigger) => ({
-										value: trigger.id,
-										label: `${trigger.workspaceName} / ${trigger.label}`,
-									}))
-						}
-						renderOption={(o) => o.label}
-						value={selectedFlowTriggerId}
-						onValueChange={(value) => {
-							const selectedFlowTrigger = filteredFlowTriggers.find(
-								(flowTrigger) => flowTrigger.id === (value as FlowTriggerId),
-							);
-							if (selectedFlowTrigger === undefined) {
-								return;
-							}
-							setSelectedFlowTriggerId(selectedFlowTrigger.id);
-						}}
-					/>
-				</div>
-				<Button
-					variant="solid"
-					size="large"
-					type="submit"
-					disabled={isPending}
-					leftIcon={
-						isPending && (
-							<SpinnerIcon className="animate-follow-through-overlap-spin size-[18px]" />
-						)
+		<div className="max-w-[800px] mx-auto space-y-0">
+			{/* Team Selection Container */}
+			<div className="flex justify-center gap-2">
+				<div
+					style={
+						{
+							width: "fit-content",
+							minWidth: "auto",
+						} as React.CSSProperties
 					}
 				>
-					{isPending ? "Setting the stage…" : "Start"}
-				</Button>
+					<div className="team-select">
+						<Select
+							id="team"
+							placeholder="Select team"
+							options={teamOptionsWithIcons}
+							renderOption={(o) => o.label}
+							value={selectedTeamId}
+							onValueChange={(value) => {
+								setSelectedTeamId(value as TeamId);
+								setSelectedFlowTriggerId(undefined);
+							}}
+						/>
+					</div>
+				</div>
+				<div className="filter-select">
+					<Select
+						id="filter"
+						placeholder="Filter"
+						options={filterOptions}
+						renderOption={(o) => o.label}
+						value={selectedFilter}
+						onValueChange={(value) => setSelectedFilter(value as FilterType)}
+					/>
+				</div>
 			</div>
-		</form>
+
+			{/* App Selection Container */}
+			<div className="mt-12">
+				<CircularCarousel
+					items={filteredFlowTriggers.map((trigger) => ({
+						id: trigger.id,
+						name: trigger.workspaceName,
+						profileImageUrl: undefined,
+					}))}
+					selectedId={selectedFlowTriggerId}
+					onItemSelect={(item) => {
+						setSelectedFlowTriggerId(item.id as FlowTriggerId);
+					}}
+					onItemDeselect={() => {
+						setSelectedFlowTriggerId(undefined);
+					}}
+				/>
+			</div>
+			{filteredFlowTriggers.length > 0 && (
+				<form
+					action={action}
+					className="backdrop-blur-3xl rounded-2xl p-6 text-[14px] text-text resize-none outline-none relative"
+					style={{
+						backgroundColor: "rgba(255, 255, 255, 0.05)",
+						boxShadow: `
+				              0 4px 16px rgba(0, 0, 0, 0.1),
+				              0 1px 4px rgba(0, 0, 0, 0.05),
+				              inset 0 1px 0 rgba(255, 255, 255, 0.03)
+				            `,
+					}}
+				>
+					<div
+						className="absolute inset-x-0 bottom-0 h-[1px] rounded-b-2xl"
+						style={{
+							background:
+								"linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.03), transparent)",
+						}}
+					/>
+					<div className="flex flex-col gap-[8px] mb-[8px]">
+						{selectedFlowTriggerId === undefined ? (
+							<div className="text-center py-8">
+								<p className="text-white-400 text-[14px] font-medium font-['DM_Sans']">
+									Please select an app to execute
+								</p>
+							</div>
+						) : (
+							inputs.map((input) => {
+								return (
+									<fieldset key={input.name} className={clsx("grid gap-2")}>
+										<label
+											className="text-[14px] font-medium text-white-900"
+											htmlFor={input.name}
+										>
+											{input.label}
+											{input.required && (
+												<span className="text-red-500 ml-1">*</span>
+											)}
+										</label>
+										{input.type === "text" && (
+											<input
+												type="text"
+												name={input.name}
+												id={input.name}
+												className={clsx(
+													"w-full flex justify-between items-center rounded-[8px] py-[8px] px-[12px] outline-none focus:outline-none border",
+													validationErrors[input.name]
+														? "border-error"
+														: "border-white/5",
+													"text-[14px]",
+												)}
+												disabled={isPending}
+											/>
+										)}
+										{input.type === "multiline-text" && (
+											<textarea
+												name={input.name}
+												id={input.name}
+												className={clsx(
+													"w-full rounded-[8px] py-[8px] px-[12px] outline-none focus:outline-none",
+													"border-[1px]",
+													validationErrors[input.name]
+														? "border-error"
+														: "border-white/5",
+													"text-[14px]",
+												)}
+												rows={4}
+												disabled={isPending}
+											/>
+										)}
+										{input.type === "number" && (
+											<input
+												type="number"
+												name={input.name}
+												id={input.name}
+												className={clsx(
+													"w-full flex justify-between items-center rounded-[8px] py-[8px] px-[12px] outline-none focus:outline-none",
+													"border-[1px]",
+													validationErrors[input.name]
+														? "border-error"
+														: "border-white/5",
+													"text-[14px]",
+												)}
+												disabled={isPending}
+											/>
+										)}
+										{validationErrors[input.name] && (
+											<span className="text-error text-[12px] font-medium">
+												{validationErrors[input.name]}
+											</span>
+										)}
+									</fieldset>
+								);
+							})
+						)}
+					</div>
+					{selectedFlowTriggerId !== undefined && (
+						<div className="flex items-center justify-end gap-3">
+							<Button
+								variant="filled"
+								size="large"
+								type="submit"
+								disabled={isPending}
+								className="!bg-blue-600 hover:!bg-blue-700 !border-blue-600 hover:!border-blue-700 [&_div]:text-[14px] [&_.size-[18px]]:text-[18px]"
+								leftIcon={
+									isPending && (
+										<SpinnerIcon className="animate-follow-through-overlap-spin size-[18px]" />
+									)
+								}
+							>
+								{isPending ? "Setting the stage…" : "Start"}
+							</Button>
+						</div>
+					)}
+				</form>
+			)}
+		</div>
 	);
 }
