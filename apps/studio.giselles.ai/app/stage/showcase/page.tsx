@@ -1,12 +1,11 @@
-import { notFound } from "next/navigation";
+"use client";
 
-import { stageFlag } from "@/flags";
+import { useState } from "react";
 
-export default async function StageShowcasePage() {
-	const enableStage = await stageFlag();
-	if (!enableStage) {
-		return notFound();
-	}
+export default function StageShowcasePage() {
+	const [activeTab, setActiveTab] = useState<"Apps" | "Playlist" | "History">(
+		"Apps",
+	);
 
 	return (
 		<div className="flex-1 px-[24px] bg-[var(--color-stage-background)] pt-16 md:pt-0 pb-[calc(4rem+env(safe-area-inset-bottom))] md:pb-0 h-full flex flex-col">
@@ -28,17 +27,74 @@ export default async function StageShowcasePage() {
 					</div>
 				</div>
 
-				{/* Content area */}
-				<div className="flex flex-col items-center justify-center h-full text-center">
-					<div className="w-16 h-16 bg-gray-600 rounded-full flex items-center justify-center mb-4">
-						<span className="text-2xl text-gray-400">✨</span>
+				{/* Tabs */}
+				<div className="mb-8">
+					<div className="flex items-center px-0 py-0 border-t border-black-900/50">
+						<div className="flex items-center space-x-[12px]">
+							{["Apps", "Playlist", "History"].map((tab) => {
+								const isActive = activeTab === tab;
+								return (
+									<button
+										key={tab}
+										type="button"
+										onClick={() =>
+											setActiveTab(tab as "Apps" | "Playlist" | "History")
+										}
+										className={`text-[16px] font-sans font-medium transition-colors px-2 py-2 relative rounded-md
+                    ${
+											isActive
+												? "text-primary-100 [text-shadow:0px_0px_20px_#0087f6] after:content-[''] after:absolute after:left-0 after:right-0 after:bottom-0 after:h-[2px] after:bg-primary-100"
+												: "text-black-70 hover:text-white-100 hover:after:content-[''] hover:after:absolute hover:after:left-0 hover:after:right-0 hover:after:bottom-0 hover:after:h-[2px] hover:after:bg-primary-100"
+										}`}
+									>
+										{tab}
+									</button>
+								);
+							})}
+						</div>
 					</div>
-					<h2 className="text-lg font-medium text-white-100 mb-2">
-						Coming Soon
-					</h2>
-					<p className="text-sm text-white-700 mb-6 max-w-sm">
-						We're preparing amazing showcases for you to explore.
-					</p>
+				</div>
+
+				{/* Content area */}
+				<div className="flex-1">
+					{activeTab === "Apps" && (
+						<div className="flex justify-center items-center h-full">
+							<div className="grid gap-[8px] justify-center text-center">
+								<h3 className="text-[18px] font-geist font-bold text-black-400">
+									No apps yet.
+								</h3>
+								<p className="text-[12px] font-geist text-black-400">
+									Please create a new app with the 'New App +' button.
+								</p>
+							</div>
+						</div>
+					)}
+
+					{activeTab === "Playlist" && (
+						<div className="flex justify-center items-center h-full">
+							<div className="grid gap-[8px] justify-center text-center">
+								<h3 className="text-[18px] font-geist font-bold text-black-400">
+									No playlists yet.
+								</h3>
+								<p className="text-[12px] font-geist text-black-400">
+									Please create a new playlist with the 'New Playlist +' button.
+								</p>
+							</div>
+						</div>
+					)}
+
+					{activeTab === "History" && (
+						<div className="flex justify-center items-center h-full">
+							<div className="grid gap-[8px] justify-center text-center">
+								<h3 className="text-[18px] font-geist font-bold text-black-400">
+									No history yet.
+								</h3>
+								<p className="text-[12px] font-geist text-black-400">
+									Please create a new workflow to see your history.
+								</p>
+							</div>
+						</div>
+					)}
 				</div>
 			</div>
 		</div>
