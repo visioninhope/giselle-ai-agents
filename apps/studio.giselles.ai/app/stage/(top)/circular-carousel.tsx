@@ -116,6 +116,48 @@ export function CircularCarousel({
 		});
 	}, [visibleCards, items.length]);
 
+	// Auto-navigate to selected item when selectedId changes
+	useEffect(() => {
+		if (_selectedId && items.length > 0) {
+			const selectedIndex = items.findIndex((item) => item.id === _selectedId);
+			if (selectedIndex !== -1 && selectedIndex !== currentIndex) {
+				setCurrentIndex(selectedIndex);
+				setSelectedIndex(null);
+				setRejectIndex(null);
+				setInsertedIndex(null);
+				setAnimatingIndex(null);
+				setAnimatingUpIndex(null);
+
+				// Auto-select the center item after navigation with full animation
+				setTimeout(() => {
+					if (onItemSelect) {
+						onItemSelect(items[selectedIndex]);
+					}
+
+					// Simulate card click animation sequence
+					setSelectedIndex(selectedIndex);
+					setRejectIndex(null);
+					setInsertedIndex(null);
+					setAnimatingIndex(null);
+					setAnimatingUpIndex(null);
+
+					// Brief delay to show selection state, then start slide down animation
+					setTimeout(() => {
+						setAnimatingIndex(selectedIndex);
+						setSelectedIndex(null);
+
+						// Start slide down animation
+						setTimeout(() => {
+							setInsertedIndex(selectedIndex);
+							setRejectIndex(selectedIndex);
+							setAnimatingIndex(null);
+						}, 600);
+					}, 300); // Show selection state for 300ms before animation
+				}, 100);
+			}
+		}
+	}, [_selectedId, items, currentIndex, onItemSelect]);
+
 	// Get visible cards around current index
 	const getVisibleCards = () => {
 		const cards = [];
@@ -177,6 +219,10 @@ export function CircularCarousel({
 	// Navigation functions
 	const moveLeft = () => {
 		if (currentIndex > 0) {
+			// If there's currently an inserted item, deselect it first
+			if (insertedIndex !== null && onItemDeselect) {
+				onItemDeselect();
+			}
 			setCurrentIndex(currentIndex - 1);
 			setSelectedIndex(null);
 			setRejectIndex(null);
@@ -188,6 +234,10 @@ export function CircularCarousel({
 
 	const moveRight = () => {
 		if (currentIndex < items.length - 1) {
+			// If there's currently an inserted item, deselect it first
+			if (insertedIndex !== null && onItemDeselect) {
+				onItemDeselect();
+			}
 			setCurrentIndex(currentIndex + 1);
 			setSelectedIndex(null);
 			setRejectIndex(null);
@@ -243,6 +293,10 @@ export function CircularCarousel({
 				}
 			} else {
 				// Move clicked card to center
+				// If there's currently an inserted item, deselect it first
+				if (insertedIndex !== null && onItemDeselect) {
+					onItemDeselect();
+				}
 				setCurrentIndex(originalIndex);
 				setSelectedIndex(null);
 				setRejectIndex(null);
