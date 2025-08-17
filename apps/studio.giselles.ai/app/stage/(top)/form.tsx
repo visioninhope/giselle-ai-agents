@@ -7,11 +7,9 @@ import {
   DialogTitle,
 } from "@giselle-internal/ui/dialog";
 import { Select } from "@giselle-internal/ui/select";
-import type { FlowTrigger, FlowTriggerId } from "@giselle-sdk/data-type";
-import type { ParameterItem } from "@giselle-sdk/giselle";
+import type { FlowTriggerId } from "@giselle-sdk/data-type";
 
 import clsx from "clsx/lite";
-import type { InferSelectModel } from "drizzle-orm";
 import { Settings, X } from "lucide-react";
 import {
   useActionState,
@@ -28,7 +26,6 @@ import {
 } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import type { teams } from "@/drizzle";
 import { cn } from "@/lib/utils";
 import { AvatarImage } from "@/services/accounts/components/user-button/avatar-image";
 import { buttonVariants } from "../../(main)/settings/components/button";
@@ -39,26 +36,15 @@ import {
   parseFormInputs,
   toParameterItems,
 } from "./helpers";
-
-type TeamId = InferSelectModel<typeof teams>["id"];
-interface TeamOption {
-  value: TeamId;
-  label: string;
-  avatarUrl?: string;
-}
-
-type FilterType = "all" | "history" | "latest" | "favorites";
-interface FilterOption {
-  value: FilterType;
-  label: string;
-}
-
-const filterOptions: FilterOption[] = [
-  { value: "all", label: "All" },
-  { value: "history", label: "History" },
-  { value: "latest", label: "Latest" },
-  { value: "favorites", label: "Favorites" },
-];
+import type {
+  FilterType,
+  FlowTriggerUIItem,
+  PerformStageAction,
+  TeamId,
+  TeamOption,
+  ValidationErrors,
+} from "./types";
+import { FILTER_OPTIONS } from "./types";
 
 interface FontOption {
   value: string;
@@ -71,22 +57,6 @@ const _fontOptions: FontOption[] = [
   { value: "sans", label: "Sans Serif" },
   { value: "serif", label: "Serif" },
 ];
-
-export interface FlowTriggerUIItem {
-  id: FlowTriggerId;
-  teamId: TeamId;
-  workspaceName: string;
-  label: string;
-  sdkData: FlowTrigger;
-}
-
-interface PerformStagePayloads {
-  teamId: TeamId;
-  flowTrigger: FlowTrigger;
-  parameterItems: ParameterItem[];
-}
-
-type PerformStageAction = (payloads: PerformStagePayloads) => Promise<void>;
 
 export function Form({
   teamOptions,
@@ -108,9 +78,9 @@ export function Form({
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
-  const [validationErrors, setValidationErrors] = useState<
-    Record<string, string>
-  >({});
+  const [validationErrors, setValidationErrors] = useState<ValidationErrors>(
+    {},
+  );
 
   useEffect(() => {
     const checkMobile = () => {
@@ -235,7 +205,7 @@ export function Form({
           <Select
             id="filter"
             placeholder="Filter"
-            options={filterOptions}
+            options={FILTER_OPTIONS}
             renderOption={(o) => o.label}
             value={selectedFilter}
             onValueChange={(value) => setSelectedFilter(value as FilterType)}

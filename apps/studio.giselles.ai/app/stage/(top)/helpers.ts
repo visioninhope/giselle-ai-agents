@@ -1,16 +1,10 @@
 import type { FlowTrigger } from "@giselle-sdk/data-type";
 import type { ParameterItem } from "@giselle-sdk/giselle";
+import type { FormInput, FormValues, ValidationErrors } from "./types";
 
 /**
  * This code is based on internal-packages/workflow-designer-ui/src/header/ui/trigger-input-dialog/helpers.ts
  */
-
-interface FormInput {
-	name: string;
-	label: string;
-	type: "text" | "multiline-text" | "number";
-	required: boolean;
-}
 
 export function createInputsFromTrigger(
 	trigger: FlowTrigger | undefined,
@@ -39,8 +33,8 @@ export function createInputsFromTrigger(
 }
 
 export function parseFormInputs(inputs: FormInput[], formData: FormData) {
-	const errors: Record<string, string> = {};
-	const values: Record<string, string | number> = {};
+	const errors: ValidationErrors = {};
+	const values: FormValues = {};
 
 	for (const input of inputs) {
 		const formDataEntryValue = formData.get(input.name);
@@ -84,7 +78,7 @@ export function parseFormInputs(inputs: FormInput[], formData: FormData) {
 
 export function toParameterItems(
 	inputs: FormInput[],
-	values: Record<string, string | number>,
+	values: FormValues,
 ): ParameterItem[] {
 	const items: ParameterItem[] = [];
 	for (const input of inputs) {
