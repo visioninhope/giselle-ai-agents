@@ -179,6 +179,7 @@ export function Form({
 		<div
 			className={clsx(
 				"space-y-0 relative flex flex-col",
+				isMobile ? "pt-12" : "",
 				isCarouselView && isMobile
 					? "h-auto max-h-full overflow-y-auto"
 					: "h-full",
@@ -188,7 +189,10 @@ export function Form({
 			<button
 				type="button"
 				onClick={() => setIsSettingsModalOpen(true)}
-				className="absolute -top-16 right-2 p-2 rounded-lg hover:bg-white/10 transition-colors z-20"
+				className={clsx(
+					"absolute right-2 p-2 rounded-lg hover:bg-white/10 transition-colors z-20",
+					isMobile ? "top-2" : "-top-16",
+				)}
 			>
 				<Settings className="w-4 h-4 text-white-400" />
 			</button>
