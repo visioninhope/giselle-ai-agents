@@ -29,7 +29,6 @@ export function ResizableLayout({
 		return (
 			<div className="h-full flex flex-col">
 				<div className="flex-1">{mainContent}</div>
-				<div className="flex-shrink-0">{actsContent}</div>
 			</div>
 		);
 	}

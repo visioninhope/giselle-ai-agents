@@ -12,7 +12,7 @@ import {
 	type WorkspaceId,
 } from "@giselle-sdk/data-type";
 import { defaultName } from "@giselle-sdk/giselle";
-import { Settings } from "lucide-react";
+
 import { revalidatePath } from "next/cache";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -190,14 +190,7 @@ export default async function StagePage() {
 		<div className="flex-1 bg-[var(--color-stage-background)] pt-16 md:pt-0 pb-[calc(4rem+env(safe-area-inset-bottom))] md:pb-0 h-full flex flex-col">
 			<ResizableLayout
 				mainContent={
-					<div className="space-y-6 py-6 h-full relative">
-						{/* Settings Icon */}
-						<button
-							type="button"
-							className="absolute top-8 right-4 p-2 rounded-lg hover:bg-white/10 transition-colors z-20"
-						>
-							<Settings className="w-4 h-4 text-white-400" />
-						</button>
+					<div className="space-y-6 py-6 h-full md:h-full h-auto max-h-full overflow-y-auto md:overflow-hidden relative">
 						<div className="text-center text-[24px] font-mono font-light text-white-100 bg-transparent px-6">
 							What are we perform next ?
 						</div>
