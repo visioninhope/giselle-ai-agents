@@ -1,5 +1,5 @@
 {
-	"extends": "@giselle/giselle-sdk-tsconfig/node.json",
+	"extends": "@giselle/giselle-sdk-tsconfig/node-library.json",
 	"compilerOptions": {
 		"plugins": [
 			{
