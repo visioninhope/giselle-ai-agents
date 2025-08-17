@@ -12,6 +12,7 @@ import {
 	type WorkspaceId,
 } from "@giselle-sdk/data-type";
 import { defaultName } from "@giselle-sdk/giselle";
+import { Settings } from "lucide-react";
 import { revalidatePath } from "next/cache";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -138,7 +139,7 @@ export default async function StagePage() {
 	const dbActs = await db.query.acts.findMany({
 		where: (acts, { eq }) => eq(acts.directorDbId, user.dbId),
 		orderBy: (acts, { desc }) => [desc(acts.createdAt)],
-		limit: 10,
+		limit: 50,
 	});
 	const acts = await Promise.all(
 		dbActs.map((dbAct) => enrichActWithNavigationData(dbAct, teams)),
@@ -186,11 +187,18 @@ export default async function StagePage() {
 		}
 	}
 	return (
-		<div className="flex-1 px-[24px] bg-[var(--color-stage-background)] pt-16 md:pt-0 pb-[calc(4rem+env(safe-area-inset-bottom))] md:pb-0 h-full flex flex-col">
+		<div className="flex-1 bg-[var(--color-stage-background)] pt-16 md:pt-0 pb-[calc(4rem+env(safe-area-inset-bottom))] md:pb-0 h-full flex flex-col">
 			<ResizableLayout
 				mainContent={
-					<div className="space-y-6 py-6 h-full">
-						<div className="text-center text-[24px] font-mono font-light text-white-100 bg-transparent">
+					<div className="space-y-6 py-6 h-full relative">
+						{/* Settings Icon */}
+						<button
+							type="button"
+							className="absolute top-8 right-4 p-2 rounded-lg hover:bg-white/10 transition-colors z-20"
+						>
+							<Settings className="w-4 h-4 text-white-400" />
+						</button>
+						<div className="text-center text-[24px] font-mono font-light text-white-100 bg-transparent px-6">
 							What are we perform next ?
 						</div>
 						<Form
@@ -236,8 +244,8 @@ export default async function StagePage() {
 					</div>
 				}
 				actsContent={
-					<div className="space-y-4 py-6 h-full overflow-y-auto">
-						<div className="flex items-center justify-between px-1">
+					<div className="space-y-4 py-6 px-4 h-full overflow-y-auto">
+						<div className="flex items-center justify-between">
 							<h2 className="text-[16px] font-sans text-white-100">Tasks</h2>
 							<div className="flex items-center gap-3">
 								<ReloadButton reloadAction={reloadPage} />
