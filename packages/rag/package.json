@@ -21,6 +21,7 @@
 		"zod": "catalog:"
 	},
 	"devDependencies": {
+		"@giselle/giselle-sdk-tsconfig": "workspace:^",
 		"@types/node": "catalog:",
 		"@types/pg": "catalog:",
 		"tsup": "catalog:",
