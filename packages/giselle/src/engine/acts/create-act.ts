@@ -90,11 +90,9 @@ export async function createAct(
 
 	// Handle single operation node execution when no connections are found
 	if (nodes.length === 0 && args.nodeId !== undefined) {
-		const singleNode = workspace.nodes.find(
-			(node) => node.id === args.nodeId,
-		);
+		const singleNode = workspace.nodes.find((node) => node.id === args.nodeId);
 		if (singleNode && isOperationNode(singleNode)) {
-		nodes.push(singleNode);
+			nodes.push(singleNode);
 		}
 	}
 
