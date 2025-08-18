@@ -1,6 +1,6 @@
 import { WorkspaceId } from "@giselle-sdk/data-type";
-import { emitTelemetry } from "@giselle-sdk/giselle";
 import { NextGiselleEngine } from "@giselle-sdk/giselle/next";
+import { traceGeneration } from "@giselle-sdk/langfuse";
 import {
 	supabaseStorageDriver as experimental_supabaseStorageDriver,
 	supabaseVaultDriver,
@@ -108,13 +108,15 @@ export const giselleEngine = NextGiselleEngine({
 	callbacks: {
 		generationComplete: (args) => {
 			after(async () => {
-				const currentUser = await fetchCurrentUser();
-				const currentTeam = await fetchCurrentTeam();
-				const plan = isProPlan(currentTeam) ? "plan:pro" : "plan:free";
-				const teamType = `teamType:${currentTeam.type}`;
 				try {
-					await emitTelemetry({
-						...args,
+					const currentUser = await fetchCurrentUser();
+					const currentTeam = await fetchCurrentTeam();
+					const plan = isProPlan(currentTeam) ? "plan:pro" : "plan:free";
+					const teamType = `teamType:${currentTeam.type}`;
+					await traceGeneration({
+						generation: args.generation,
+						outputFileBlobs: args.outputFileBlobs,
+						inputMessages: args.inputMessages,
 						userId: currentUser.id,
 						tags: [plan, teamType],
 						metadata: {
@@ -126,7 +128,7 @@ export const giselleEngine = NextGiselleEngine({
 						},
 					});
 				} catch (error) {
-					console.error("Telemetry emission failed:", error);
+					console.error("Trace generation failed:", error);
 				}
 			});
 		},

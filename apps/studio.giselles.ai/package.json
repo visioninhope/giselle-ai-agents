@@ -25,6 +25,7 @@
 		"@giselle-sdk/data-type": "workspace:*",
 		"@giselle-sdk/giselle": "workspace:*",
 		"@giselle-sdk/github-tool": "workspace:*",
+		"@giselle-sdk/langfuse": "workspace:*",
 		"@giselle-sdk/language-model": "workspace:*",
 		"@giselle-sdk/rag": "workspace:*",
 		"@giselle-sdk/supabase-driver": "workspace:*",

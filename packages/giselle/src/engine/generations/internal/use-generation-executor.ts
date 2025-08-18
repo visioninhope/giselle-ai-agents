@@ -14,6 +14,7 @@ import {
 	type GenerationUsage,
 	isCompletedGeneration,
 	type Message,
+	type OutputFileBlob,
 	type QueuedGeneration,
 	type RunningGeneration,
 } from "../../../concepts/generation";
@@ -188,18 +189,13 @@ export async function useGenerationExecutor<T>(args: {
 		} satisfies CompletedGeneration;
 
 		/** @todo create type alias */
-		const outputFiles: Array<{
-			outputId: OutputId;
-			id: string;
-			contentType: string;
-			data: Uint8Array<ArrayBufferLike>;
-		}> = [];
+		const outputFileBlobs: OutputFileBlob[] = [];
 		for (const output of outputs) {
 			if (output.type !== "generated-image") {
 				continue;
 			}
 			for (const content of output.contents) {
-				const data = await getGeneratedImage({
+				const bytes = await getGeneratedImage({
 					storage: args.context.storage,
 					experimental_storage: args.context.experimental_storage,
 					generation: args.generation,
@@ -207,11 +203,11 @@ export async function useGenerationExecutor<T>(args: {
 					useExperimentalStorage: true,
 				});
 
-				outputFiles.push({
+				outputFileBlobs.push({
 					id: content.id,
 					outputId: output.outputId,
 					contentType: content.contentType,
-					data,
+					bytes,
 				});
 			}
 		}
@@ -227,7 +223,7 @@ export async function useGenerationExecutor<T>(args: {
 				const result = await args.context.callbacks?.generationComplete?.({
 					generation: completedGeneration,
 					inputMessages,
-					outputFiles,
+					outputFileBlobs,
 				});
 				return result;
 			})(),
