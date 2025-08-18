@@ -261,7 +261,7 @@ export function ShowcaseClient({
 				</div>
 
 				{/* Content area */}
-				<div className="flex-1">
+				<div className="flex-1 overflow-auto min-h-0">
 					{activeTab === "Apps" && (
 						<>
 							<div className="mb-4 flex flex-col sm:flex-row gap-3 items-center">
