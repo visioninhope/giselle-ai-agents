@@ -398,12 +398,20 @@ export const githubRepositoryEmbeddings = pgTable(
 			table.path,
 			table.chunkIndex,
 		),
-		// Partial HNSW indexes for different dimensions
+		// Partial HNSW indexes for different dimensions with casting
 		index("github_repository_embeddings_embedding_1536_idx")
-			.using("hnsw", table.embedding.op("vector_cosine_ops"))
+			.using(
+				"hnsw",
+				sql`(${table.embedding}::vector(1536))`,
+				sql`vector_cosine_ops`,
+			)
 			.where(sql`${table.embeddingDimensions} = 1536`),
 		index("github_repository_embeddings_embedding_3072_idx")
-			.using("hnsw", table.embedding.op("vector_cosine_ops"))
+			.using(
+				"hnsw",
+				sql`(${table.embedding}::halfvec(3072))`,
+				sql`vector_cosine_ops`,
+			)
 			.where(sql`${table.embeddingDimensions} = 3072`),
 	],
 );
@@ -453,12 +461,20 @@ export const githubRepositoryPullRequestEmbeddings = pgTable(
 			table.contentId,
 			table.chunkIndex,
 		),
-		// Partial HNSW indexes for different dimensions
+		// Partial HNSW indexes for different dimensions with casting
 		index("gh_pr_embeddings_embedding_1536_idx")
-			.using("hnsw", table.embedding.op("vector_cosine_ops"))
+			.using(
+				"hnsw",
+				sql`(${table.embedding}::vector(1536))`,
+				sql`vector_cosine_ops`,
+			)
 			.where(sql`${table.embeddingDimensions} = 1536`),
 		index("gh_pr_embeddings_embedding_3072_idx")
-			.using("hnsw", table.embedding.op("vector_cosine_ops"))
+			.using(
+				"hnsw",
+				sql`(${table.embedding}::halfvec(3072))`,
+				sql`vector_cosine_ops`,
+			)
 			.where(sql`${table.embeddingDimensions} = 3072`),
 		foreignKey({
 			columns: [table.repositoryIndexDbId],

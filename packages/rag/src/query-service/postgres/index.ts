@@ -195,6 +195,13 @@ function buildSearchQuery({
 	const whereConditions: string[] = [];
 	let paramIndex = 2;
 
+	// Determine the appropriate cast based on embedding dimensions
+	const embeddingDimensions = filters.embedding_dimensions;
+	const embeddingCast =
+		embeddingDimensions === 3072
+			? `${escapeIdentifier(columnMapping.embedding)}::halfvec(3072)`
+			: `${escapeIdentifier(columnMapping.embedding)}::vector(1536)`;
+
 	for (const [column, value] of Object.entries(filters)) {
 		whereConditions.push(`${escapeIdentifier(column)} = $${paramIndex}`);
 		values.push(value);
@@ -202,9 +209,7 @@ function buildSearchQuery({
 	}
 
 	if (similarityThreshold !== undefined && similarityThreshold > 0) {
-		whereConditions.push(
-			`1 - (${escapeIdentifier(columnMapping.embedding)} <=> $1) >= $${paramIndex}`,
-		);
+		whereConditions.push(`1 - (${embeddingCast} <=> $1) >= $${paramIndex}`);
 		values.push(similarityThreshold);
 		paramIndex++;
 	}
@@ -222,10 +227,10 @@ function buildSearchQuery({
 			${escapeIdentifier(columnMapping.chunkContent)} as content,
 			${escapeIdentifier(columnMapping.chunkIndex)} as index,
 			${metadataSelects}${metadataColumns.length > 0 ? "," : ""}
-			1 - (${escapeIdentifier(columnMapping.embedding)} <=> $1) as similarity
+			1 - (${embeddingCast} <=> $1) as similarity
 		FROM ${escapeIdentifier(tableName)}
 		${whereConditions.length > 0 ? `WHERE ${whereConditions.join(" AND ")}` : ""}
-		ORDER BY ${escapeIdentifier(columnMapping.embedding)} <=> $1
+		ORDER BY ${embeddingCast} <=> $1
 		LIMIT $${paramIndex}
 	`;
 
