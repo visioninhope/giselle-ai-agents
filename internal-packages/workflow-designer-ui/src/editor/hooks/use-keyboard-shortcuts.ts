@@ -41,7 +41,7 @@ function useKeyAction(
 function useToolAction(key: string, toolFunction: () => Tool) {
 	const toolbar = useToolbar();
 	const { data } = useWorkflowDesigner();
-	const isCanvasFocused = data.ui.focusedArea === "canvas";
+	const isCanvasFocused = data.ui.currentShortcutScope === "canvas";
 	const canUseToolShortcuts = isCanvasFocused && !!toolbar;
 
 	useKeyAction(
@@ -59,7 +59,7 @@ export function useKeyboardShortcuts() {
 		duplicate: handleDuplicate,
 	} = useNodeManipulation();
 
-	const isCanvasFocused = data.ui.focusedArea === "canvas";
+	const isCanvasFocused = data.ui.currentShortcutScope === "canvas";
 
 	// Tool shortcuts using the simplified hook
 	useToolAction("t", selectTriggerTool);
