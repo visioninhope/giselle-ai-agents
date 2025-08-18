@@ -126,6 +126,7 @@ export const giselleEngine = NextGiselleEngine({
 							userId: currentUser.id,
 							subscriptionId: currentTeam.activeSubscriptionId ?? "",
 						},
+						sessionId: args.generation.context.origin.actId,
 					});
 				} catch (error) {
 					console.error("Trace generation failed:", error);
