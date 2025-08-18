@@ -29,6 +29,7 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { AvatarImage } from "@/services/accounts/components/user-button/avatar-image";
+import { SignOutButton } from "@/services/accounts/components/user-button/sign-out-button";
 
 interface StageSidebarProps {
 	user?: {
@@ -102,8 +103,9 @@ export function StageSidebar({ user }: StageSidebarProps) {
 	const renderBottomItem = (item: BottomItem) => {
 		const isExternalLink = item.href.startsWith("http");
 		const commonClassName = clsx(
-			"flex items-center text-sm text-white-700 hover:text-white-900 hover:bg-white/5 transition-colors",
+			"flex items-center text-sm transition-colors",
 			isCollapsed ? "justify-center px-2 py-3" : "gap-3 px-4 py-3",
+			"text-[color:var(--color-text-nav-inactive)] hover:text-[color:var(--color-text-nav-active)]",
 		);
 
 		const content = (
@@ -300,6 +302,13 @@ export function StageSidebar({ user }: StageSidebarProps) {
 										>
 											Home Page
 										</a>
+									</DropdownMenuItem>
+								</div>
+								<div className="py-1 space-y-1">
+									<DropdownMenuItem className="p-0 rounded-lg focus:bg-white/5">
+										<SignOutButton className="block px-2 py-1.5 w-full text-left text-white-400 font-medium text-[14px] leading-[14px] font-geist">
+											Log Out
+										</SignOutButton>
 									</DropdownMenuItem>
 								</div>
 							</DropdownMenuContent>
