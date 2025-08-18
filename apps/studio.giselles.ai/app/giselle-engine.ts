@@ -110,15 +110,21 @@ export const giselleEngine = NextGiselleEngine({
 			after(async () => {
 				const currentUser = await fetchCurrentUser();
 				const currentTeam = await fetchCurrentTeam();
-				const metadata = {
-					generationId: args.generation.id,
-					isProPlan: isProPlan(currentTeam),
-					teamType: currentTeam.type,
-					userId: currentUser.id,
-					subscriptionId: currentTeam.activeSubscriptionId ?? "",
-				};
+				const plan = isProPlan(currentTeam) ? "plan:pro" : "plan:free";
+				const teamType = `teamType:${currentTeam.type}`;
 				try {
-					await emitTelemetry(args, { metadata });
+					await emitTelemetry({
+						...args,
+						userId: currentUser.id,
+						tags: [plan, teamType],
+						metadata: {
+							generationId: args.generation.id,
+							isProPlan: isProPlan(currentTeam),
+							teamType: currentTeam.type,
+							userId: currentUser.id,
+							subscriptionId: currentTeam.activeSubscriptionId ?? "",
+						},
+					});
 				} catch (error) {
 					console.error("Telemetry emission failed:", error);
 				}
