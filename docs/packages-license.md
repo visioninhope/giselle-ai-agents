@@ -8204,7 +8204,7 @@ BlueOak-1.0.0 permitted
 
 
 <a name="lucide-react"></a>
-### lucide-react v0.417.0
+### lucide-react v0.473.0
 #### 
 
 ##### Paths
