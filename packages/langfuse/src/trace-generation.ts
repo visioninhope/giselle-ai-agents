@@ -155,6 +155,7 @@ export async function traceGeneration(args: {
 	metadata?: Record<string, unknown>;
 	tags?: string[];
 	outputFileBlobs: OutputFileBlob[];
+	sessionId?: string;
 }) {
 	try {
 		const { operationNode } = args.generation.context;
@@ -184,6 +185,7 @@ export async function traceGeneration(args: {
 			name: "generation",
 			userId: args.userId ? String(args.userId) : undefined,
 			input: langfuseInput,
+			sessionId: args.sessionId,
 		});
 
 		// Common trace metadata
