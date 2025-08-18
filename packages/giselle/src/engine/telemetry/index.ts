@@ -256,11 +256,11 @@ export async function emitTelemetry(args: EmitTelemetryArgs) {
 		// Handle image generation telemetry
 		if (isImageGenerationNode(operationNode)) {
 			// Convert output files to Langfuse media references
-			const mediaReferences = args.outputFiles.map(
+			const mediaReferences = args.outputFileBlobs.map(
 				(file) =>
 					new LangfuseMedia({
 						contentType: file.contentType as ApiMediaContentType,
-						contentBytes: Buffer.from(file.data),
+						contentBytes: Buffer.from(file.bytes),
 					}),
 			);
 
