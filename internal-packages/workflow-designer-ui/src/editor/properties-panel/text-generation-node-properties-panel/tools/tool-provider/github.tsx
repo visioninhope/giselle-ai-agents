@@ -423,6 +423,7 @@ function GitHubToolConfigurationDialogInternal({
 										<a
 											href={`https://docs.giselles.ai/glossary/github-tools#${tool.toLowerCase()}`}
 											target="_blank"
+											rel="noopener"
 											className="flex items-center gap-[4px] text-[13px] text-text-muted hover:bg-ghost-element-hover transition-colors px-[4px] rounded-[2px] ml-2"
 											onClick={(e) => e.stopPropagation()}
 										>
