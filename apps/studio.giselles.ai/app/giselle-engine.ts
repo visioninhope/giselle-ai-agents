@@ -1,4 +1,5 @@
 import { WorkspaceId } from "@giselle-sdk/data-type";
+import type { CompletedGeneration, OutputFileBlob } from "@giselle-sdk/giselle";
 import { NextGiselleEngine } from "@giselle-sdk/giselle/next";
 import { traceGeneration } from "@giselle-sdk/langfuse";
 import {
@@ -6,6 +7,7 @@ import {
 	supabaseVaultDriver,
 } from "@giselle-sdk/supabase-driver";
 import { openaiVectorStore } from "@giselle-sdk/vector-store-adapters";
+import type { ModelMessage } from "ai";
 import { after } from "next/server";
 import { createStorage } from "unstorage";
 import { waitForLangfuseFlush } from "@/instrumentation.node";
@@ -13,7 +15,11 @@ import { getWorkspaceTeam } from "@/lib/workspaces/get-workspace-team";
 import { fetchUsageLimits } from "@/packages/lib/fetch-usage-limits";
 import { onConsumeAgentTime } from "@/packages/lib/on-consume-agent-time";
 import { fetchCurrentUser } from "@/services/accounts";
-import { fetchCurrentTeam, isProPlan } from "@/services/teams";
+import {
+	type CurrentTeam,
+	fetchCurrentTeam,
+	isProPlan,
+} from "@/services/teams";
 import supabaseStorageDriver from "@/supabase-storage-driver";
 import {
 	gitHubPullRequestQueryService,
@@ -69,6 +75,37 @@ if (
 	throw new Error("missing github credentials");
 }
 
+type TeamForPlan = Pick<CurrentTeam, "activeSubscriptionId" | "type">;
+
+async function traceGenerationForTeam(args: {
+	generation: CompletedGeneration;
+	inputMessages: ModelMessage[];
+	outputFileBlobs: OutputFileBlob[];
+	sessionId?: string;
+	userId: string;
+	team: TeamForPlan;
+}) {
+	const isPro = isProPlan(args.team);
+	const planTag = isPro ? "plan:pro" : "plan:free";
+	const teamTypeTag = `teamType:${args.team.type}`;
+
+	await traceGeneration({
+		generation: args.generation,
+		outputFileBlobs: args.outputFileBlobs,
+		inputMessages: args.inputMessages,
+		userId: args.userId,
+		tags: [planTag, teamTypeTag],
+		metadata: {
+			generationId: args.generation.id,
+			isProPlan: isPro,
+			teamType: args.team.type,
+			userId: args.userId,
+			subscriptionId: args.team.activeSubscriptionId ?? "",
+		},
+		sessionId: args.sessionId,
+	});
+}
+
 export const giselleEngine = NextGiselleEngine({
 	basePath: "/api/giselle",
 	storage,
@@ -112,48 +149,32 @@ export const giselleEngine = NextGiselleEngine({
 				try {
 					switch (args.generation.context.origin.type) {
 						case "github-app": {
-							const workspaceTeam = await getWorkspaceTeam(
+							const team = await getWorkspaceTeam(
 								args.generation.context.origin.workspaceId,
 							);
-							const plan = isProPlan(workspaceTeam) ? "plan:pro" : "plan:free";
-							const teamType = `teamType:${workspaceTeam.type}`;
-							await traceGeneration({
+							await traceGenerationForTeam({
 								generation: args.generation,
-								outputFileBlobs: args.outputFileBlobs,
 								inputMessages: args.inputMessages,
-								userId: "github-app",
-								tags: [plan, teamType],
-								metadata: {
-									generationId: args.generation.id,
-									isProPlan: isProPlan(workspaceTeam),
-									teamType: workspaceTeam.type,
-									userId: "github-apps",
-									subscriptionId: workspaceTeam.activeSubscriptionId ?? "",
-								},
+								outputFileBlobs: args.outputFileBlobs,
 								sessionId: args.generation.context.origin.actId,
+								userId: "github-app",
+								team,
 							});
 							break;
 						}
 						case "stage":
 						case "studio": {
-							const currentUser = await fetchCurrentUser();
-							const currentTeam = await fetchCurrentTeam();
-							const plan = isProPlan(currentTeam) ? "plan:pro" : "plan:free";
-							const teamType = `teamType:${currentTeam.type}`;
-							await traceGeneration({
+							const [currentUser, currentTeam] = await Promise.all([
+								fetchCurrentUser(),
+								fetchCurrentTeam(),
+							]);
+							await traceGenerationForTeam({
 								generation: args.generation,
-								outputFileBlobs: args.outputFileBlobs,
 								inputMessages: args.inputMessages,
-								userId: currentUser.id,
-								tags: [plan, teamType],
-								metadata: {
-									generationId: args.generation.id,
-									isProPlan: isProPlan(currentTeam),
-									teamType: currentTeam.type,
-									userId: currentUser.id,
-									subscriptionId: currentTeam.activeSubscriptionId ?? "",
-								},
+								outputFileBlobs: args.outputFileBlobs,
 								sessionId: args.generation.context.origin.actId,
+								userId: currentUser.id,
+								team: currentTeam,
 							});
 							break;
 						}
