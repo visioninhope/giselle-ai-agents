@@ -29,7 +29,6 @@ export function ResizableLayout({
 		return (
 			<div className="h-full flex flex-col">
 				<div className="flex-1">{mainContent}</div>
-				<div className="flex-shrink-0">{actsContent}</div>
 			</div>
 		);
 	}
@@ -40,7 +39,7 @@ export function ResizableLayout({
 				{mainContent}
 			</Panel>
 
-			<PanelResizeHandle className="w-[3px] mx-3 bg-black-70/50 hover:bg-black-70 cursor-col-resize" />
+			<PanelResizeHandle className="w-[3px] bg-black-70/50 hover:bg-black-70 cursor-col-resize" />
 
 			<Panel defaultSize={30} minSize={20} maxSize={50}>
 				{actsContent}

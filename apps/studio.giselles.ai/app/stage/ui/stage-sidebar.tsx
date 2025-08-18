@@ -384,7 +384,7 @@ export function StageSidebar({ user }: StageSidebarProps) {
 			</div>
 
 			{/* Mobile Bottom Navigation */}
-			<div className="md:hidden fixed bottom-0 left-0 right-0 bg-[var(--color-stage-background)] border-t border-white/10 px-4 pt-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
+			<div className="md:hidden fixed bottom-0 left-0 right-0 bg-[var(--color-stage-background)] border-t border-white/10 px-4 pt-4 pb-[calc(1rem+env(safe-area-inset-bottom))] z-50">
 				<div className="flex items-center justify-around max-w-md mx-auto">
 					{/* Lobby */}
 					<Link
