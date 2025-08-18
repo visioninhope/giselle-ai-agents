@@ -53,12 +53,7 @@ interface BottomItem {
 
 export function StageSidebar({ user }: StageSidebarProps) {
 	const [isCollapsed, setIsCollapsed] = useState(false);
-	const [isClientMounted, setIsClientMounted] = useState(false);
 	const pathname = usePathname();
-
-	useEffect(() => {
-		setIsClientMounted(true);
-	}, []);
 
 	const menuItems: MenuItem[] = [
 		{
@@ -157,14 +152,12 @@ export function StageSidebar({ user }: StageSidebarProps) {
 
 					{/* Right side: Icons */}
 					<div className="flex items-center gap-4">
-						{isClientMounted && (
-							<button
-								type="button"
-								className="text-white-700 hover:text-white-900 transition-colors"
-							>
-								<Bell className="w-5 h-5" />
-							</button>
-						)}
+						<button
+							type="button"
+							className="text-white-700 hover:text-white-900 transition-colors"
+						>
+							<Bell className="w-5 h-5" />
+						</button>
 						{user && (
 							<AvatarImage
 								className="w-8 h-8 rounded-full"
