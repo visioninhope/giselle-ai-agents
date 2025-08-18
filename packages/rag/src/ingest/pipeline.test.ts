@@ -26,6 +26,7 @@ vi.mock("../embedder/profiles", () => ({
 			name: "Google gemini-embedding-001",
 		},
 	},
+	// biome-ignore lint/correctness/noUnusedFunctionParameters: mock
 	createEmbedderFromProfile: vi.fn((profileId, apiKey, telemetry) => ({
 		embed: vi.fn(async () => [0.1, 0.2, 0.3]),
 		embedMany: vi.fn(async (texts) => texts.map(() => [0.1, 0.2, 0.3])),
