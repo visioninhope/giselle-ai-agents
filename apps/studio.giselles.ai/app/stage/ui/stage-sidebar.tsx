@@ -18,6 +18,7 @@ import {
 	Sparkles,
 } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
 import {
 	DropdownMenu,
@@ -28,6 +29,7 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { AvatarImage } from "@/services/accounts/components/user-button/avatar-image";
+import { SignOutButton } from "@/services/accounts/components/user-button/sign-out-button";
 
 interface StageSidebarProps {
 	user?: {
@@ -52,11 +54,27 @@ interface BottomItem {
 
 export function StageSidebar({ user }: StageSidebarProps) {
 	const [isCollapsed, setIsCollapsed] = useState(false);
+	const pathname = usePathname();
 
 	const menuItems: MenuItem[] = [
-		{ icon: Sparkles, label: "New task", href: "/stage", active: true },
-		{ icon: Library, label: "Showcase", href: "/showcase", active: false },
-		{ icon: WilliIcon, label: "Tasks", href: "/acts", active: false },
+		{
+			icon: Sparkles,
+			label: "New task",
+			href: "/stage",
+			active: pathname === "/stage",
+		},
+		{
+			icon: Library,
+			label: "Showcase",
+			href: "/stage/showcase",
+			active: pathname === "/stage/showcase",
+		},
+		{
+			icon: WilliIcon,
+			label: "Tasks",
+			href: "/stage/acts",
+			active: pathname.startsWith("/stage/acts"),
+		},
 	];
 
 	const bottomItems: BottomItem[] = [
@@ -85,8 +103,9 @@ export function StageSidebar({ user }: StageSidebarProps) {
 	const renderBottomItem = (item: BottomItem) => {
 		const isExternalLink = item.href.startsWith("http");
 		const commonClassName = clsx(
-			"flex items-center text-sm text-white-700 hover:text-white-900 hover:bg-white/5 transition-colors",
+			"flex items-center text-sm transition-colors",
 			isCollapsed ? "justify-center px-2 py-3" : "gap-3 px-4 py-3",
+			"text-[color:var(--color-text-nav-inactive)] hover:text-[color:var(--color-text-nav-active)]",
 		);
 
 		const content = (
@@ -285,6 +304,13 @@ export function StageSidebar({ user }: StageSidebarProps) {
 										</a>
 									</DropdownMenuItem>
 								</div>
+								<div className="py-1 space-y-1">
+									<DropdownMenuItem className="p-0 rounded-lg focus:bg-white/5">
+										<SignOutButton className="block px-2 py-1.5 w-full text-left text-white-400 font-medium text-[14px] leading-[14px] font-geist">
+											Log Out
+										</SignOutButton>
+									</DropdownMenuItem>
+								</div>
 							</DropdownMenuContent>
 						</DropdownMenu>
 					)}
@@ -294,7 +320,7 @@ export function StageSidebar({ user }: StageSidebarProps) {
 				<div className="flex-1 py-4">
 					<nav>
 						{menuItems.map((item) =>
-							item.active ? (
+							item.label === "New task" ? (
 								<div
 									key={item.label}
 									className={clsx("pt-0.5 pb-3", isCollapsed ? "px-2" : "px-4")}
@@ -331,11 +357,22 @@ export function StageSidebar({ user }: StageSidebarProps) {
 										isCollapsed
 											? "justify-center px-2 py-3"
 											: "gap-3 px-4 py-3",
-										"text-[color:var(--color-text-nav-inactive)] hover:text-[color:var(--color-text-nav-active)]",
+										item.active
+											? "text-white-900"
+											: "text-[color:var(--color-text-nav-inactive)] hover:text-[color:var(--color-text-nav-active)]",
 									)}
 								>
-									{renderIcon(item.icon, item.label)}
-									{!isCollapsed && <span>{item.label}</span>}
+									<item.icon
+										className={clsx(
+											"w-5 h-5",
+											item.active ? "text-white-900" : "",
+										)}
+									/>
+									{!isCollapsed && (
+										<span className={clsx(item.active ? "text-white-900" : "")}>
+											{item.label}
+										</span>
+									)}
 								</Link>
 							),
 						)}
@@ -359,7 +396,7 @@ export function StageSidebar({ user }: StageSidebarProps) {
 
 					{/* Showcase */}
 					<Link
-						href="/showcase"
+						href="/stage/showcase"
 						className="flex items-center justify-center p-3 text-white-700 hover:text-white-900 transition-colors"
 					>
 						<Library className="w-5 h-5" />

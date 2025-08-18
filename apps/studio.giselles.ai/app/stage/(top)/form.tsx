@@ -5,11 +5,13 @@ import type { FlowTriggerId } from "@giselle-sdk/data-type";
 
 import clsx from "clsx/lite";
 import { Settings, X } from "lucide-react";
+import { useSearchParams } from "next/navigation";
 import {
 	useActionState,
 	useCallback,
 	useEffect,
 	useMemo,
+	useRef,
 	useState,
 } from "react";
 import { cn } from "@/lib/utils";
@@ -59,12 +61,24 @@ export function Form({
 	flowTriggers: FlowTriggerUIItem[];
 	performStageAction: PerformStageAction;
 }) {
-	const defaultTeamId = useMemo(() => teamOptions[0].value, [teamOptions]);
+	const searchParams = useSearchParams();
+	const urlTeamId = searchParams.get("teamId");
+	const urlWorkspaceId = searchParams.get("workspaceId");
+
+	const defaultTeamId = useMemo(() => {
+		if (urlTeamId && teamOptions.some((team) => team.value === urlTeamId)) {
+			return urlTeamId as TeamId;
+		}
+		return teamOptions[0].value;
+	}, [teamOptions, urlTeamId]);
+
 	const [selectedTeamId, setSelectedTeamId] = useState<TeamId>(defaultTeamId);
 
 	const [selectedFlowTriggerId, setSelectedFlowTriggerId] = useState<
 		FlowTriggerId | undefined
 	>(undefined);
+	const initializedRef = useRef(false);
+	const userHasSelectedRef = useRef(false);
 	const [selectedFilter, setSelectedFilter] = useState<FilterType>("all");
 	const [isCarouselView, setIsCarouselView] = useState(false);
 	const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
@@ -108,6 +122,26 @@ export function Form({
 			),
 		[flowTriggers, selectedTeamId],
 	);
+
+	// Pre-select flow trigger based on URL workspace ID (only once on initial load and if user hasn't manually selected)
+	useEffect(() => {
+		if (
+			!initializedRef.current &&
+			!userHasSelectedRef.current &&
+			filteredFlowTriggers.length > 0
+		) {
+			if (urlWorkspaceId) {
+				const matchingTrigger = filteredFlowTriggers.find(
+					(trigger) => trigger.sdkData.workspaceId === urlWorkspaceId,
+				);
+				if (matchingTrigger) {
+					setSelectedFlowTriggerId(matchingTrigger.id);
+					// Don't mark as user-selected for auto-selection from URL
+				}
+			}
+			initializedRef.current = true;
+		}
+	}, [filteredFlowTriggers, urlWorkspaceId]);
 
 	const selectedTrigger = useMemo(
 		() =>
@@ -187,18 +221,28 @@ export function Form({
 
 			{/* Team Selection Container */}
 			<div className="flex justify-center gap-2">
-				<div className="team-select">
-					<Select
-						id="team"
-						placeholder="Select team"
-						options={teamOptionsWithIcons}
-						renderOption={(o) => o.label}
-						value={selectedTeamId}
-						onValueChange={(value) => {
-							setSelectedTeamId(value as TeamId);
-							setSelectedFlowTriggerId(undefined);
-						}}
-					/>
+				<div
+					style={
+						{
+							width: "fit-content",
+							minWidth: "auto",
+						} as React.CSSProperties
+					}
+				>
+					<div className="team-select">
+						<Select
+							id="team"
+							placeholder="Select team"
+							options={teamOptionsWithIcons}
+							renderOption={(o) => o.label}
+							value={selectedTeamId}
+							onValueChange={(value) => {
+								setSelectedTeamId(value as TeamId);
+								userHasSelectedRef.current = true;
+								setSelectedFlowTriggerId(undefined);
+							}}
+						/>
+					</div>
 				</div>
 				<div className="filter-select">
 					<Select
@@ -226,9 +270,11 @@ export function Form({
 						}))}
 						selectedId={selectedFlowTriggerId}
 						onItemSelect={(item) => {
+							userHasSelectedRef.current = true;
 							setSelectedFlowTriggerId(item.id as FlowTriggerId);
 						}}
 						onItemDeselect={() => {
+							userHasSelectedRef.current = true;
 							setSelectedFlowTriggerId(undefined);
 						}}
 					/>
@@ -255,6 +301,7 @@ export function Form({
 											key={trigger.id}
 											type="button"
 											onClick={() => {
+												userHasSelectedRef.current = true;
 												if (selectedFlowTriggerId === trigger.id) {
 													setSelectedFlowTriggerId(undefined);
 												} else {

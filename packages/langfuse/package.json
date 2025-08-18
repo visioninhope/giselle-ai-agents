@@ -1,17 +1,14 @@
 {
-	"name": "@giselle-sdk/supabase-driver",
+	"name": "@giselle-sdk/langfuse",
 	"version": "0.0.0",
 	"private": true,
 	"main": "./dist/index.js",
 	"module": "./dist/index.mjs",
 	"types": "./dist/index.d.ts",
-	"files": [
-		"dist/**"
-	],
 	"scripts": {
 		"build": "tsup",
 		"check-types": "tsc --noEmit",
-		"format": "biome check --write ."
+		"format": "biome format --write ."
 	},
 	"exports": {
 		"./package.json": "./package.json",
@@ -22,13 +19,14 @@
 		}
 	},
 	"devDependencies": {
-		"@giselle-sdk/giselle": "workspace:^",
-		"@giselle/giselle-sdk-tsconfig": "workspace:^",
+		"@giselle/giselle-sdk-tsconfig": "workspace:*",
+		"ai": "catalog:",
 		"tsup": "catalog:"
 	},
 	"dependencies": {
-		"@aws-sdk/client-s3": "catalog:",
-		"@supabase/supabase-js": "catalog:",
-		"zod": "catalog:"
+		"@giselle-sdk/data-type": "workspace:^",
+		"@giselle-sdk/giselle": "workspace:^",
+		"@giselle-sdk/language-model": "workspace:^",
+		"langfuse": "catalog:"
 	}
 }
