@@ -955,11 +955,10 @@
 					"name": "github_repository_embeddings_embedding_1536_idx",
 					"columns": [
 						{
-							"expression": "embedding",
-							"isExpression": false,
+							"expression": "\"embedding\"::vector(1536) vector_cosine_ops",
 							"asc": true,
-							"nulls": "last",
-							"opclass": "vector_cosine_ops"
+							"isExpression": true,
+							"nulls": "last"
 						}
 					],
 					"isUnique": false,
@@ -972,11 +971,10 @@
 					"name": "github_repository_embeddings_embedding_3072_idx",
 					"columns": [
 						{
-							"expression": "embedding",
-							"isExpression": false,
+							"expression": "\"embedding\"::halfvec(3072) halfvec_cosine_ops",
 							"asc": true,
-							"nulls": "last",
-							"opclass": "vector_cosine_ops"
+							"isExpression": true,
+							"nulls": "last"
 						}
 					],
 					"isUnique": false,
@@ -1243,11 +1241,10 @@
 					"name": "gh_pr_embeddings_embedding_1536_idx",
 					"columns": [
 						{
-							"expression": "embedding",
-							"isExpression": false,
+							"expression": "\"embedding\"::vector(1536) vector_cosine_ops",
 							"asc": true,
-							"nulls": "last",
-							"opclass": "vector_cosine_ops"
+							"isExpression": true,
+							"nulls": "last"
 						}
 					],
 					"isUnique": false,
@@ -1260,11 +1257,10 @@
 					"name": "gh_pr_embeddings_embedding_3072_idx",
 					"columns": [
 						{
-							"expression": "embedding",
-							"isExpression": false,
+							"expression": "\"embedding\"::halfvec(3072) halfvec_cosine_ops",
 							"asc": true,
-							"nulls": "last",
-							"opclass": "vector_cosine_ops"
+							"isExpression": true,
+							"nulls": "last"
 						}
 					],
 					"isUnique": false,
