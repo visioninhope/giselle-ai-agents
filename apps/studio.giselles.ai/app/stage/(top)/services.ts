@@ -16,7 +16,15 @@ import type { FlowTriggerUIItem, TeamId } from "./types";
 async function enrichActWithNavigationData(
 	act: typeof actsSchema.$inferSelect,
 	teams: { dbId: number; name: string }[],
-) {
+): Promise<{
+	id: string;
+	status: "inProgress" | "completed" | "cancelled" | "failed";
+	sequences: Array<{ steps: Array<{ id: string; status: string }> }>;
+	link: string;
+	teamName: string;
+	workspaceName: string;
+	createdAt: Date;
+} | null> {
 	try {
 		const tmpAct = await giselleEngine.getAct({ actId: act.sdkActId });
 		const team = teams.find((t) => t.dbId === act.teamDbId);
@@ -91,6 +99,7 @@ async function enrichActWithNavigationData(
 			link,
 			teamName: team.name,
 			workspaceName: tmpWorkspace.name ?? "Untitled",
+			createdAt: act.createdAt,
 		};
 	} catch {
 		return null;
@@ -99,12 +108,22 @@ async function enrichActWithNavigationData(
 
 export async function fetchEnrichedActs(
 	teams: { dbId: number; name: string }[],
-) {
+): Promise<
+	Array<{
+		id: string;
+		status: "inProgress" | "completed" | "cancelled" | "failed";
+		sequences: Array<{ steps: Array<{ id: string; status: string }> }>;
+		link: string;
+		teamName: string;
+		workspaceName: string;
+		createdAt: Date;
+	}>
+> {
 	const user = await fetchCurrentUser();
 	const dbActs = await db.query.acts.findMany({
 		where: (acts, { eq }) => eq(acts.directorDbId, user.dbId),
 		orderBy: (acts, { desc }) => [desc(acts.createdAt)],
-		limit: 50,
+		limit: 10,
 	});
 
 	const acts = await Promise.all(
@@ -170,7 +189,7 @@ export async function fetchFlowTriggers(
 	return flowTriggers;
 }
 
-export async function reloadPage() {
+export async function reloadPage(): Promise<void> {
 	"use server";
 	await Promise.resolve();
 	revalidatePath("/stage");

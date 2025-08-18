@@ -32,7 +32,10 @@ export function createInputsFromTrigger(
 	}
 }
 
-export function parseFormInputs(inputs: FormInput[], formData: FormData) {
+export function parseFormInputs(
+	inputs: FormInput[],
+	formData: FormData,
+): { errors: ValidationErrors; values: FormValues } {
 	const errors: ValidationErrors = {};
 	const values: FormValues = {};
 

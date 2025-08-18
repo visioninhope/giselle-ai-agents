@@ -31,6 +31,14 @@ export function FormInputRenderer({
 								type="text"
 								name={input.name}
 								id={input.name}
+								required={input.required}
+								aria-required={input.required}
+								aria-invalid={!!validationErrors[input.name]}
+								aria-describedby={
+									validationErrors[input.name]
+										? `${input.name}-error`
+										: undefined
+								}
 								className={clsx(
 									"w-full flex justify-between items-center rounded-[8px] py-[8px] px-[12px] outline-none focus:outline-none border",
 									validationErrors[input.name]
@@ -39,12 +47,21 @@ export function FormInputRenderer({
 									"text-[14px]",
 								)}
 								disabled={isPending}
+								tabIndex={isPending ? -1 : undefined}
 							/>
 						)}
 						{input.type === "multiline-text" && (
 							<textarea
 								name={input.name}
 								id={input.name}
+								required={input.required}
+								aria-required={input.required}
+								aria-invalid={!!validationErrors[input.name]}
+								aria-describedby={
+									validationErrors[input.name]
+										? `${input.name}-error`
+										: undefined
+								}
 								className={clsx(
 									"w-full rounded-[8px] py-[8px] px-[12px] outline-none focus:outline-none",
 									"border-[1px]",
@@ -55,6 +72,7 @@ export function FormInputRenderer({
 								)}
 								rows={4}
 								disabled={isPending}
+								tabIndex={isPending ? -1 : undefined}
 							/>
 						)}
 						{input.type === "number" && (
@@ -62,6 +80,14 @@ export function FormInputRenderer({
 								type="number"
 								name={input.name}
 								id={input.name}
+								required={input.required}
+								aria-required={input.required}
+								aria-invalid={!!validationErrors[input.name]}
+								aria-describedby={
+									validationErrors[input.name]
+										? `${input.name}-error`
+										: undefined
+								}
 								className={clsx(
 									"w-full flex justify-between items-center rounded-[8px] py-[8px] px-[12px] outline-none focus:outline-none",
 									"border-[1px]",
@@ -71,10 +97,15 @@ export function FormInputRenderer({
 									"text-[14px]",
 								)}
 								disabled={isPending}
+								tabIndex={isPending ? -1 : undefined}
 							/>
 						)}
 						{validationErrors[input.name] && (
-							<span className="text-error text-[12px] font-medium">
+							<span
+								id={`${input.name}-error`}
+								className="text-error text-[12px] font-medium"
+								role="alert"
+							>
 								{validationErrors[input.name]}
 							</span>
 						)}
