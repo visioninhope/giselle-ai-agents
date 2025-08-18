@@ -410,7 +410,7 @@ export const githubRepositoryEmbeddings = pgTable(
 			.using(
 				"hnsw",
 				sql`(${table.embedding}::halfvec(3072))`,
-				sql`vector_cosine_ops`,
+				sql`halfvec_cosine_ops`,
 			)
 			.where(sql`${table.embeddingDimensions} = 3072`),
 	],
@@ -473,7 +473,7 @@ export const githubRepositoryPullRequestEmbeddings = pgTable(
 			.using(
 				"hnsw",
 				sql`(${table.embedding}::halfvec(3072))`,
-				sql`vector_cosine_ops`,
+				sql`halfvec_cosine_ops`,
 			)
 			.where(sql`${table.embeddingDimensions} = 3072`),
 		foreignKey({
