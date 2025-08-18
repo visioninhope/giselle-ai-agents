@@ -421,10 +421,14 @@ function GitHubToolConfigurationDialogInternal({
 											</p>
 										</div>
 										<a
-											href={`https://docs.giselles.ai/glossary/github-tools#${tool.toLowerCase()}`}
+											href={`https://docs.giselles.ai/glossary/github-tools#${encodeURIComponent(
+												tool.toLowerCase(),
+											)}`}
 											target="_blank"
 											rel="noopener"
+											aria-label={`Open docs for ${tool}`}
 											className="flex items-center gap-[4px] text-[13px] text-text-muted hover:bg-ghost-element-hover transition-colors px-[4px] rounded-[2px] ml-2"
+											onMouseDown={(e) => e.stopPropagation()}
 											onClick={(e) => e.stopPropagation()}
 										>
 											<span>Docs</span>
