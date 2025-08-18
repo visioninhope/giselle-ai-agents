@@ -13,6 +13,7 @@ SELECT "db_id", 1 FROM "github_repository_index"
 ON CONFLICT DO NOTHING;
 
 -- 2. Update github_repository_embeddings table (for blob embeddings)
+DROP INDEX "github_repository_embeddings_embedding_index";
 ALTER TABLE "github_repository_embeddings" ALTER COLUMN "embedding" SET DATA TYPE vector;
 -- add the new columns with defaults
 ALTER TABLE "github_repository_embeddings" ADD COLUMN "embedding_profile_id" integer DEFAULT 1 NOT NULL;
@@ -21,7 +22,6 @@ ALTER TABLE "github_repository_embeddings" ADD COLUMN "embedding_dimensions" int
 ALTER TABLE "github_repository_embeddings" ALTER COLUMN "embedding_profile_id" DROP DEFAULT;
 ALTER TABLE "github_repository_embeddings" ALTER COLUMN "embedding_dimensions" DROP DEFAULT;
 -- recreate hnsw indexes
-DROP INDEX "github_repository_embeddings_embedding_index";
 CREATE INDEX "github_repository_embeddings_embedding_1536_idx" ON "github_repository_embeddings" USING hnsw ("embedding" vector_cosine_ops) WHERE "github_repository_embeddings"."embedding_dimensions" = 1536;
 CREATE INDEX "github_repository_embeddings_embedding_3072_idx" ON "github_repository_embeddings" USING hnsw ("embedding" vector_cosine_ops) WHERE "github_repository_embeddings"."embedding_dimensions" = 3072;
 -- recreate unique constraint
@@ -29,6 +29,7 @@ ALTER TABLE "github_repository_embeddings" DROP CONSTRAINT "github_repository_em
 ALTER TABLE "github_repository_embeddings" ADD CONSTRAINT "gh_repo_emb_unique" UNIQUE("repository_index_db_id","embedding_profile_id","path","chunk_index");
 
 -- 3. Update github_repository_pull_request_embeddings table (for PR embeddings)
+DROP INDEX "github_repository_pull_request_embeddings_embedding_index";
 ALTER TABLE "github_repository_pull_request_embeddings" ALTER COLUMN "embedding" SET DATA TYPE vector;
 -- add the new columns with defaults
 ALTER TABLE "github_repository_pull_request_embeddings" ADD COLUMN "embedding_profile_id" integer DEFAULT 1 NOT NULL;
@@ -37,7 +38,6 @@ ALTER TABLE "github_repository_pull_request_embeddings" ADD COLUMN "embedding_di
 ALTER TABLE "github_repository_pull_request_embeddings" ALTER COLUMN "embedding_profile_id" DROP DEFAULT;
 ALTER TABLE "github_repository_pull_request_embeddings" ALTER COLUMN "embedding_dimensions" DROP DEFAULT;
 -- recreate hnsw indexes
-DROP INDEX "github_repository_pull_request_embeddings_embedding_index";
 CREATE INDEX "gh_pr_embeddings_embedding_1536_idx" ON "github_repository_pull_request_embeddings" USING hnsw ("embedding" vector_cosine_ops) WHERE "github_repository_pull_request_embeddings"."embedding_dimensions" = 1536;
 CREATE INDEX "gh_pr_embeddings_embedding_3072_idx" ON "github_repository_pull_request_embeddings" USING hnsw ("embedding" vector_cosine_ops) WHERE "github_repository_pull_request_embeddings"."embedding_dimensions" = 3072;
 -- recreate unique constraint
