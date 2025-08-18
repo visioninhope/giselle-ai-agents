@@ -2,7 +2,7 @@
 
 
 ## Summary
-* 817 MIT
+* 816 MIT
 * 184 Apache 2.0
 * 47 ISC
 * 27 New BSD
@@ -2943,17 +2943,6 @@ LGPL-3.0-or-later permitted
 
 <a name="@radix-ui/react-use-controllable-state"></a>
 ### @radix-ui/react-use-controllable-state v1.1.0
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-
-
-<a name="@radix-ui/react-use-effect-event"></a>
-### @radix-ui/react-use-effect-event v0.0.2
 #### 
 
 ##### Paths
@@ -8215,7 +8204,7 @@ BlueOak-1.0.0 permitted
 
 
 <a name="lucide-react"></a>
-### lucide-react v0.417.0
+### lucide-react v0.473.0
 #### 
 
 ##### Paths
