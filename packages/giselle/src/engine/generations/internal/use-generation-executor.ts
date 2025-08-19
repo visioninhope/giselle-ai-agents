@@ -1,7 +1,6 @@
 import type {
 	FileId,
 	NodeId,
-	Output,
 	OutputId,
 	WorkspaceId,
 } from "@giselle-sdk/data-type";
@@ -18,6 +17,7 @@ import {
 	type QueuedGeneration,
 	type RunningGeneration,
 } from "../../../concepts/generation";
+import type { ActId } from "../../../concepts/identifiers";
 import { UsageLimitError } from "../../error";
 import { filePath } from "../../files/utils";
 import type { GiselleEngineContext } from "../../types";
@@ -122,10 +122,17 @@ export async function useGenerationExecutor<T>(args: {
 		}
 		return blob as DataContent;
 	}
+
 	async function generationContentResolver(nodeId: NodeId, outputId: OutputId) {
-		let generation: Generation | undefined;
-		const actId = runningGeneration.context.origin.actId;
-		if (actId === undefined) {
+		function findGeneration(nodeId: NodeId) {
+			const actId = runningGeneration.context.origin.actId;
+			if (actId === undefined) {
+				return findGenerationByNode(nodeId);
+			}
+			return findGenerationByAct(nodeId, actId as ActId);
+		}
+
+		async function findGenerationByNode(nodeId: NodeId) {
 			const nodeGenerationIndexes = await getNodeGenerationIndexes({
 				storage: args.context.storage,
 				experimental_storage: args.context.experimental_storage,
@@ -138,14 +145,16 @@ export async function useGenerationExecutor<T>(args: {
 			) {
 				return undefined;
 			}
-			generation = await getGeneration({
+			return getGeneration({
 				storage: args.context.storage,
 				experimental_storage: args.context.experimental_storage,
 				useExperimentalStorage: args.useExperimentalStorage,
 				generationId:
 					nodeGenerationIndexes[nodeGenerationIndexes.length - 1].id,
 			});
-		} else {
+		}
+
+		async function findGenerationByAct(nodeId: NodeId, actId: ActId) {
 			const actGenerationIndexes = await getActGenerationIndexes({
 				experimental_storage: args.context.experimental_storage,
 				actId,
@@ -156,44 +165,56 @@ export async function useGenerationExecutor<T>(args: {
 			if (targetGenerationIndex === undefined) {
 				return undefined;
 			}
-			generation = await getGeneration({
+			return getGeneration({
 				storage: args.context.storage,
 				experimental_storage: args.context.experimental_storage,
 				useExperimentalStorage: args.useExperimentalStorage,
 				generationId: targetGenerationIndex.id,
 			});
 		}
+
+		function findOutput(outputId: OutputId) {
+			for (const sourceNode of runningGeneration.context.sourceNodes) {
+				for (const sourceOutput of sourceNode.outputs) {
+					if (sourceOutput.id === outputId) {
+						return sourceOutput;
+					}
+				}
+			}
+			return undefined;
+		}
+
+		function formatGenerationOutput(generationOutput: GenerationOutput) {
+			switch (generationOutput.type) {
+				case "source":
+					return JSON.stringify(generationOutput.sources);
+				case "generated-text":
+					return generationOutput.content;
+				case "query-result":
+					return queryResultToText(generationOutput);
+				default:
+					throw new Error("Generation output type is not supported");
+			}
+		}
+
+		const generation = await findGeneration(nodeId);
 		if (generation === undefined || !isCompletedGeneration(generation)) {
 			return undefined;
 		}
-		let output: Output | undefined;
-		for (const sourceNode of runningGeneration.context.sourceNodes) {
-			for (const sourceOutput of sourceNode.outputs) {
-				if (sourceOutput.id === outputId) {
-					output = sourceOutput;
-					break;
-				}
-			}
-		}
+
+		const output = findOutput(outputId);
 		if (output === undefined) {
 			return undefined;
 		}
+
 		const generationOutput = generation.outputs.find(
 			(o) => o.outputId === outputId,
 		);
 		if (generationOutput === undefined) {
 			return undefined;
 		}
-		switch (generationOutput.type) {
-			case "source":
-				return JSON.stringify(generationOutput.sources);
-			case "generated-text":
-				return generationOutput.content;
-			case "query-result":
-				return queryResultToText(generationOutput);
-			default:
-				throw new Error("Generation output type is not supported");
-		}
+
+		return formatGenerationOutput(generationOutput);
 	}
 
 	async function completeGeneration({
