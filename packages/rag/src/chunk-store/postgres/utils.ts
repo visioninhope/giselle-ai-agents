@@ -1,6 +1,7 @@
 import type { PoolClient } from "pg";
 import { escapeIdentifier } from "pg";
 import * as pgvector from "pgvector/pg";
+import { EMBEDDING_COLUMNS } from "../../database/constants";
 import { ConfigurationError } from "../../errors";
 import type { ColumnMapping } from "../column-mapping";
 import { REQUIRED_COLUMN_KEYS } from "../column-mapping";
@@ -35,7 +36,6 @@ function createParamHelper() {
 type ChunkRecord = {
 	record: Record<string, unknown>;
 	embedding: {
-		embeddingColumn: string;
 		embeddingValue: number[];
 		embeddingProfileId: number;
 		embeddingDimensions: number;
@@ -85,8 +85,12 @@ export async function deleteChunksByDocumentKey(
 	conditions.push(
 		`${escapeIdentifier(documentKeyColumn)} = ${param.add(documentKey)}`,
 	);
-	conditions.push(`embedding_profile_id = ${param.add(embeddingProfileId)}`);
-	conditions.push(`embedding_dimensions = ${param.add(embeddingDimensions)}`);
+	conditions.push(
+		`${EMBEDDING_COLUMNS.PROFILE_ID} = ${param.add(embeddingProfileId)}`,
+	);
+	conditions.push(
+		`${EMBEDDING_COLUMNS.DIMENSIONS} = ${param.add(embeddingDimensions)}`,
+	);
 
 	// Add scope conditions (sorted for stability)
 	const scopeKeys = Object.keys(scope).sort();
@@ -125,7 +129,6 @@ export function prepareChunkRecords<TMetadata extends Record<string, unknown>>(
 			...scope,
 		},
 		embedding: {
-			embeddingColumn: columnMapping.embedding,
 			embeddingValue: chunk.embedding,
 			embeddingProfileId,
 			embeddingDimensions,
@@ -149,9 +152,9 @@ async function insertRecordsBatch(
 	const firstRecord = records[0];
 	const columns = [
 		...Object.keys(firstRecord.record),
-		firstRecord.embedding.embeddingColumn,
-		"embedding_profile_id",
-		"embedding_dimensions",
+		EMBEDDING_COLUMNS.VECTOR,
+		EMBEDDING_COLUMNS.PROFILE_ID,
+		EMBEDDING_COLUMNS.DIMENSIONS,
 	];
 
 	const param = createParamHelper();
@@ -160,13 +163,13 @@ async function insertRecordsBatch(
 	// Build value placeholders for each record
 	for (const item of records) {
 		const placeholders = columns.map((column) => {
-			if (column === item.embedding.embeddingColumn) {
+			if (column === EMBEDDING_COLUMNS.VECTOR) {
 				return param.add(pgvector.toSql(item.embedding.embeddingValue));
 			}
-			if (column === "embedding_profile_id") {
+			if (column === EMBEDDING_COLUMNS.PROFILE_ID) {
 				return param.add(item.embedding.embeddingProfileId);
 			}
-			if (column === "embedding_dimensions") {
+			if (column === EMBEDDING_COLUMNS.DIMENSIONS) {
 				return param.add(item.embedding.embeddingDimensions);
 			}
 			return param.add(item.record[column]);
@@ -228,8 +231,12 @@ export async function deleteChunksByDocumentKeys(
 	const conditions: string[] = [];
 
 	// Add conditions with automatic parameter tracking
-	conditions.push(`embedding_profile_id = ${param.add(embeddingProfileId)}`);
-	conditions.push(`embedding_dimensions = ${param.add(embeddingDimensions)}`);
+	conditions.push(
+		`${EMBEDDING_COLUMNS.PROFILE_ID} = ${param.add(embeddingProfileId)}`,
+	);
+	conditions.push(
+		`${EMBEDDING_COLUMNS.DIMENSIONS} = ${param.add(embeddingDimensions)}`,
+	);
 
 	// Add scope conditions (sorted for stability)
 	const scopeKeys = Object.keys(scope).sort();
@@ -272,8 +279,12 @@ export async function queryDocumentVersions(
 	const conditions: string[] = [];
 
 	// Add conditions with automatic parameter tracking
-	conditions.push(`embedding_profile_id = ${param.add(embeddingProfileId)}`);
-	conditions.push(`embedding_dimensions = ${param.add(embeddingDimensions)}`);
+	conditions.push(
+		`${EMBEDDING_COLUMNS.PROFILE_ID} = ${param.add(embeddingProfileId)}`,
+	);
+	conditions.push(
+		`${EMBEDDING_COLUMNS.DIMENSIONS} = ${param.add(embeddingDimensions)}`,
+	);
 
 	// Add scope conditions (sorted for stability)
 	const scopeKeys = Object.keys(scope).sort();

@@ -14,7 +14,7 @@ describe("chunk-store/postgres/utils", () => {
 				documentKey: "doc_key",
 				chunkContent: "content",
 				chunkIndex: "idx",
-				embedding: "vec",
+				version: "version",
 				title: "title_col",
 				author: "author_col",
 				tags: "tags_col",
@@ -40,7 +40,7 @@ describe("chunk-store/postgres/utils", () => {
 				documentKey: "doc_key",
 				chunkContent: "content",
 				chunkIndex: "idx",
-				embedding: "vec",
+				version: "version",
 				title: "title_col",
 			};
 
@@ -70,7 +70,7 @@ describe("chunk-store/postgres/utils", () => {
 				documentKey: "doc_key",
 				chunkContent: "content",
 				chunkIndex: "idx",
-				embedding: "vec",
+				version: "version",
 				title: "title_col",
 				author: "author_col",
 			};
@@ -95,7 +95,6 @@ describe("chunk-store/postgres/utils", () => {
 					author_col: "Author",
 				},
 				embedding: {
-					embeddingColumn: "vec",
 					embeddingValue: [1, 2, 3],
 					embeddingProfileId: 1,
 					embeddingDimensions: 1536,
@@ -113,7 +112,7 @@ describe("chunk-store/postgres/utils", () => {
 				documentKey: "doc_key",
 				chunkContent: "content",
 				chunkIndex: "idx",
-				embedding: "vec",
+				version: "version",
 				title: "title_col",
 			};
 

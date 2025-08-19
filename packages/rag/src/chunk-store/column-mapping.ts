@@ -5,7 +5,6 @@ export const REQUIRED_COLUMN_KEYS = [
 	"documentKey",
 	"chunkContent",
 	"chunkIndex",
-	"embedding",
 	"version",
 ] as const;
 
@@ -22,7 +21,6 @@ const DEFAULT_COLUMNS: RequiredColumns = {
 	documentKey: "document_key",
 	chunkContent: "chunk_content",
 	chunkIndex: "chunk_index",
-	embedding: "embedding",
 	version: "version",
 } as const;
 
