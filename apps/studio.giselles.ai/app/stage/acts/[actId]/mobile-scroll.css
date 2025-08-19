@@ -1,32 +1,27 @@
-/* Mobile Scroll Fix */
+/* Mobile scroll optimization */
 @media (max-width: 767px) {
+	/* Base mobile scroll setup */
 	html,
 	body {
 		height: auto !important;
 		min-height: 100vh;
 		overflow-y: auto !important;
 		overflow-x: hidden;
-		-webkit-overflow-scrolling: touch;
+		padding-bottom: 80px !important; /* Mobile navigation clearance */
 	}
 
-	/* Override parent layout height constraints */
+	/* Override layout constraints */
 	[class*="h-screen"] {
 		height: auto !important;
 		min-height: 100vh !important;
 	}
 
-	/* Override parent overflow constraints */
 	[class*="overflow-y-hidden"],
 	[class*="overflow-hidden"] {
 		overflow-y: auto !important;
 	}
 
-	/* Add bottom padding for mobile navigation menu */
-	body {
-		padding-bottom: 80px !important;
-	}
-
-	/* Ensure main containers don't constrain height on mobile */
+	/* Container fixes */
 	.mobile-scroll-container {
 		height: auto !important;
 		min-height: auto !important;
@@ -34,20 +29,18 @@
 		overflow: visible !important;
 	}
 
-	/* Fix for flex containers that might constrain height */
 	.mobile-flex-fix {
 		display: block !important;
 		height: auto !important;
 	}
 }
 
-/* Touch scrolling improvements */
-* {
+/* Touch scrolling */
+*,
+.scrollable-area {
 	-webkit-overflow-scrolling: touch;
 }
 
-/* Ensure scrollable areas work on touch devices */
 .scrollable-area {
 	overflow-y: auto;
-	-webkit-overflow-scrolling: touch;
 }

@@ -2,11 +2,7 @@
 
 import { StatusBadge } from "@giselle-internal/ui/status-badge";
 import { NodeIcon } from "@giselle-internal/workflow-designer-ui";
-import {
-	isImageGenerationNode,
-	isTextGenerationNode,
-	type ManualTriggerParameter,
-} from "@giselle-sdk/data-type";
+import type { ManualTriggerParameter } from "@giselle-sdk/data-type";
 import type { Generation } from "@giselle-sdk/giselle";
 import {
 	type Act,
@@ -27,32 +23,11 @@ import Link from "next/link";
 import { use, useCallback, useEffect, useState } from "react";
 import { GenerationView } from "../../../../../../../internal-packages/workflow-designer-ui/src/ui/generation-view";
 import { fetchGenerationData } from "../actions";
-
-// Helper function to get model info from generation
-function getModelInfo(generation: Generation | undefined): {
-	provider: string;
-	modelName: string;
-} {
-	if (!generation) {
-		return { provider: "Unknown", modelName: "Unknown" };
-	}
-
-	try {
-		const operationNode = generation.context.operationNode;
-		if (
-			operationNode &&
-			(isTextGenerationNode(operationNode) ||
-				isImageGenerationNode(operationNode))
-		) {
-			const provider = operationNode.content.llm.provider;
-			const modelName = operationNode.content.llm.id || provider;
-			return { provider, modelName };
-		}
-	} catch (_error) {
-		// If we can't access the operation node, fall back to defaults
-	}
-	return { provider: "Unknown", modelName: "Unknown" };
-}
+import {
+	formatExecutionDate,
+	getModelInfo,
+	getStatusBadgeStatus,
+} from "../lib/utils";
 
 export function Sidebar({
 	act: defaultActPromise,
@@ -77,29 +52,6 @@ export function Sidebar({
 	const updateAct = useCallback<StreamDataEventHandler>((data) => {
 		setAct(data.act);
 	}, []);
-
-	// Map act status to StatusBadge status
-	const getStatusBadgeStatus = (actStatus: string) => {
-		switch (actStatus?.toLowerCase()) {
-			case "completed":
-			case "success":
-				return "success";
-			case "failed":
-			case "error":
-				return "error";
-			case "running":
-			case "processing":
-				return "info";
-			case "queued":
-			case "pending":
-				return "warning";
-			case "cancelled":
-			case "ignored":
-				return "ignored";
-			default:
-				return "info";
-		}
-	};
 
 	// Fetch generation data for completed steps and trigger step
 	useEffect(() => {
@@ -189,15 +141,7 @@ export function Sidebar({
 					<div className="mt-[16px]">
 						<div className="flex items-center justify-center md:justify-start gap-2 text-[11px]">
 							<span className="text-white/50">
-								{new Date(act.createdAt).toLocaleDateString("en-US", {
-									year: "numeric",
-									month: "numeric",
-									day: "numeric",
-									hour: "2-digit",
-									minute: "2-digit",
-									second: "2-digit",
-									hour12: false,
-								})}
+								{formatExecutionDate(act.createdAt)}
 							</span>
 							<StatusBadge
 								status={getStatusBadgeStatus(act.status)}
