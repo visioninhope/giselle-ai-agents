@@ -13,6 +13,8 @@ type BasicTagInputProps = {
 	placeholder?: string;
 	validateInput?: (input: string) => { isValid: boolean; message?: string };
 	emptyStateText?: string;
+	/** When true, disables input, add, and remove actions */
+	disabled?: boolean;
 };
 
 export function BasicTagInput({
@@ -22,6 +24,7 @@ export function BasicTagInput({
 	placeholder = "Type and press Enter",
 	validateInput,
 	emptyStateText = "No tags added yet",
+	disabled = false,
 }: BasicTagInputProps) {
 	// Local state for managing tags
 	const [tags, setTags] = useState<string[]>(initialTags);
@@ -221,12 +224,12 @@ export function BasicTagInput({
 							outline: "none",
 							padding: 0,
 						}}
-						disabled={isMaxReached}
+						disabled={isMaxReached || disabled}
 					/>
 					<button
 						type="button"
 						onClick={addTag}
-						disabled={!inputValue.trim() || isMaxReached}
+						disabled={!inputValue.trim() || isMaxReached || disabled}
 						style={{
 							marginLeft: "8px",
 							padding: "4px 12px",
@@ -238,10 +241,11 @@ export function BasicTagInput({
 							fontWeight: 500,
 							fontFamily: "var(--font-dm-sans), system-ui, sans-serif",
 							cursor:
-								inputValue.trim() === "" || isMaxReached
+								inputValue.trim() === "" || isMaxReached || disabled
 									? "not-allowed"
 									: "pointer",
-							opacity: inputValue.trim() === "" || isMaxReached ? 0.5 : 1,
+							opacity:
+								inputValue.trim() === "" || isMaxReached || disabled ? 0.5 : 1,
 						}}
 					>
 						Add
