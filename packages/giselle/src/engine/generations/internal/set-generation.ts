@@ -6,6 +6,7 @@ import {
 	getNodeGenerationIndexes,
 	nodeGenerationIndexPath,
 } from "../utils";
+import { getActGenerationIndexes } from "./get-act-generation-indexes";
 
 export async function internalSetGeneration(params: {
 	storage: Storage;
@@ -65,6 +66,46 @@ export async function internalSetGeneration(params: {
 			nodeGenerationIndexPath(nodeId),
 			newNodeGenerationIndexes,
 		);
+	}
+
+	if (params.generation.context.origin.actId !== undefined) {
+		const currentActGenerationIndexes = await getActGenerationIndexes({
+			experimental_storage: params.experimental_storage,
+			actId: params.generation.context.origin.actId,
+		});
+
+		if (currentActGenerationIndexes === undefined) {
+			newNodeGenerationIndexes = [newNodeGenerationIndex];
+		} else {
+			const index = currentActGenerationIndexes.findIndex(
+				(nodeGenerationIndex) =>
+					nodeGenerationIndex.id === params.generation.id,
+			);
+			if (index === -1) {
+				newNodeGenerationIndexes = [
+					...currentActGenerationIndexes,
+					newNodeGenerationIndex,
+				];
+			} else {
+				newNodeGenerationIndexes = [
+					...currentActGenerationIndexes.slice(0, index),
+					newNodeGenerationIndex,
+					...currentActGenerationIndexes.slice(index + 1),
+				];
+			}
+		}
+		if (params.useExperimentalStorage) {
+			await params.experimental_storage.setJson({
+				path: nodeGenerationIndexPath(nodeId),
+				data: newNodeGenerationIndexes,
+				schema: NodeGenerationIndex.array(),
+			});
+		} else {
+			await params.storage.setItem(
+				nodeGenerationIndexPath(nodeId),
+				newNodeGenerationIndexes,
+			);
+		}
 	}
 }
 
