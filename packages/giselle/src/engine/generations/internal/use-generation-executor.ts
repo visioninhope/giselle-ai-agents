@@ -29,6 +29,7 @@ import {
 	handleAgentTimeConsumption,
 	queryResultToText,
 } from "../utils";
+import { getActGenerationIndexes } from "./get-act-generation-indexes";
 import { internalSetGeneration } from "./set-generation";
 
 interface CompleteGenerationArgs {
@@ -122,24 +123,46 @@ export async function useGenerationExecutor<T>(args: {
 		return blob as DataContent;
 	}
 	async function generationContentResolver(nodeId: NodeId, outputId: OutputId) {
-		const nodeGenerationIndexes = await getNodeGenerationIndexes({
-			storage: args.context.storage,
-			experimental_storage: args.context.experimental_storage,
-			useExperimentalStorage: args.useExperimentalStorage,
-			nodeId,
-		});
-		if (
-			nodeGenerationIndexes === undefined ||
-			nodeGenerationIndexes.length === 0
-		) {
-			return undefined;
+		let generation: Generation | undefined;
+		const actId = runningGeneration.context.origin.actId;
+		if (actId === undefined) {
+			const nodeGenerationIndexes = await getNodeGenerationIndexes({
+				storage: args.context.storage,
+				experimental_storage: args.context.experimental_storage,
+				useExperimentalStorage: args.useExperimentalStorage,
+				nodeId,
+			});
+			if (
+				nodeGenerationIndexes === undefined ||
+				nodeGenerationIndexes.length === 0
+			) {
+				return undefined;
+			}
+			generation = await getGeneration({
+				storage: args.context.storage,
+				experimental_storage: args.context.experimental_storage,
+				useExperimentalStorage: args.useExperimentalStorage,
+				generationId:
+					nodeGenerationIndexes[nodeGenerationIndexes.length - 1].id,
+			});
+		} else {
+			const actGenerationIndexes = await getActGenerationIndexes({
+				experimental_storage: args.context.experimental_storage,
+				actId,
+			});
+			const targetGenerationIndex = actGenerationIndexes?.find(
+				(actGenerationIndex) => actGenerationIndex.nodeId === nodeId,
+			);
+			if (targetGenerationIndex === undefined) {
+				return undefined;
+			}
+			generation = await getGeneration({
+				storage: args.context.storage,
+				experimental_storage: args.context.experimental_storage,
+				useExperimentalStorage: args.useExperimentalStorage,
+				generationId: targetGenerationIndex.id,
+			});
 		}
-		const generation = await getGeneration({
-			storage: args.context.storage,
-			experimental_storage: args.context.experimental_storage,
-			useExperimentalStorage: args.useExperimentalStorage,
-			generationId: nodeGenerationIndexes[nodeGenerationIndexes.length - 1].id,
-		});
 		if (generation === undefined || !isCompletedGeneration(generation)) {
 			return undefined;
 		}
