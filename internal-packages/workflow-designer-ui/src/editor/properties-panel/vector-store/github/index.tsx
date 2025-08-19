@@ -1,5 +1,7 @@
 import type { VectorStoreNode } from "@giselle-sdk/data-type";
+import { EMBEDDING_PROFILES } from "@giselle-sdk/data-type";
 import {
+	useFeatureFlag,
 	useVectorStore,
 	useWorkflowDesigner,
 } from "@giselle-sdk/giselle/react";
@@ -18,6 +20,7 @@ export function GitHubVectorStoreNodePropertiesPanel({
 }: GitHubVectorStoreNodePropertiesPanelProps) {
 	const { updateNodeData } = useWorkflowDesigner();
 	const vectorStore = useVectorStore();
+	const { multiEmbedding } = useFeatureFlag();
 	const settingPath = vectorStore?.settingPath;
 
 	// Get repository indexes
@@ -34,6 +37,13 @@ export function GitHubVectorStoreNodePropertiesPanel({
 	const [selectedContentType, setSelectedContentType] = useState<
 		"blob" | "pull_request" | undefined
 	>(currentContentType);
+	const [selectedEmbeddingProfileId, setSelectedEmbeddingProfileId] = useState<
+		number | undefined
+	>(
+		node.content.source.state.status === "configured"
+			? node.content.source.state.embeddingProfileId
+			: undefined,
+	);
 	const dropdownRef = useRef<HTMLDivElement>(null);
 
 	// Get all unique repositories
@@ -41,6 +51,7 @@ export function GitHubVectorStoreNodePropertiesPanel({
 		return githubRepositoryIndexes.map((repo) => ({
 			...repo,
 			availableTypes: new Set(repo.availableContentTypes),
+			contentTypesWithProfiles: repo.contentTypesWithProfiles,
 		}));
 	}, [githubRepositoryIndexes]);
 
@@ -96,6 +107,23 @@ export function GitHubVectorStoreNodePropertiesPanel({
 		if (selectedRepo) {
 			setSelectedContentType(contentType);
 
+			// Set default embedding profile
+			// When feature flag is off, always use profile 1
+			// When feature flag is on, use first available profile for the content type
+			let profileId = 1;
+			if (multiEmbedding && selectedRepo.contentTypesWithProfiles) {
+				const contentTypeProfiles = selectedRepo.contentTypesWithProfiles.find(
+					(ct: { contentType: string }) => ct.contentType === contentType,
+				);
+				if (
+					contentTypeProfiles &&
+					contentTypeProfiles.embeddingProfileIds.length > 0
+				) {
+					profileId = contentTypeProfiles.embeddingProfileIds[0];
+				}
+			}
+			setSelectedEmbeddingProfileId(profileId);
+
 			// Update output label based on content type
 			const updatedOutputs = [...node.outputs];
 			if (updatedOutputs[0]) {
@@ -116,6 +144,7 @@ export function GitHubVectorStoreNodePropertiesPanel({
 							owner: selectedRepo.owner,
 							repo: selectedRepo.repo,
 							contentType,
+							embeddingProfileId: profileId,
 						},
 					},
 				},
@@ -231,9 +260,19 @@ export function GitHubVectorStoreNodePropertiesPanel({
 								);
 								if (!selectedRepo) return null;
 
-								const hasBlobContent = selectedRepo.availableTypes.has("blob");
-								const hasPullRequestContent =
-									selectedRepo.availableTypes.has("pull_request");
+								// Check if content types are available with the new structure
+								const hasBlobContent = multiEmbedding
+									? selectedRepo.contentTypesWithProfiles?.some(
+											(ct: { contentType: string }) =>
+												ct.contentType === "blob",
+										)
+									: selectedRepo.availableTypes.has("blob");
+								const hasPullRequestContent = multiEmbedding
+									? selectedRepo.contentTypesWithProfiles?.some(
+											(ct: { contentType: string }) =>
+												ct.contentType === "pull_request",
+										)
+									: selectedRepo.availableTypes.has("pull_request");
 
 								return (
 									<>
@@ -303,6 +342,73 @@ export function GitHubVectorStoreNodePropertiesPanel({
 						</div>
 					</div>
 				)}
+
+				{/* Embedding Profile Selection - Only show when feature flag is enabled */}
+				{multiEmbedding &&
+					selectedRepoKey &&
+					selectedContentType &&
+					(() => {
+						const selectedRepo = allRepositories.find(
+							(repo) => `${repo.owner}/${repo.repo}` === selectedRepoKey,
+						);
+						if (!selectedRepo) return null;
+
+						// Get available embedding profiles for the selected content type
+						const availableProfiles =
+							selectedRepo.contentTypesWithProfiles?.find(
+								(ct: { contentType: string }) =>
+									ct.contentType === selectedContentType,
+							)?.embeddingProfileIds || [];
+
+						if (availableProfiles.length === 0) {
+							return null;
+						}
+
+						return (
+							<div className="mt-[16px]">
+								<p className="text-[14px] py-[1.5px] text-white-400 mb-[8px]">
+									Embedding Model
+								</p>
+								<select
+									value={selectedEmbeddingProfileId || availableProfiles[0]}
+									onChange={(e) => {
+										const profileId = Number(e.target.value);
+										setSelectedEmbeddingProfileId(profileId);
+
+										// Update node data with selected profile
+										if (node.content.source.state.status === "configured") {
+											updateNodeData(node, {
+												content: {
+													...node.content,
+													source: {
+														...node.content.source,
+														state: {
+															...node.content.source.state,
+															embeddingProfileId: profileId,
+														},
+													},
+												},
+											});
+										}
+									}}
+									className="w-full px-3 py-2 bg-black-300/20 rounded-[8px] text-white-400 text-[14px] font-geist cursor-pointer"
+								>
+									{availableProfiles.map((profileId: number) => {
+										const profile =
+											EMBEDDING_PROFILES[
+												profileId as keyof typeof EMBEDDING_PROFILES
+											];
+										if (!profile) return null;
+										return (
+											<option key={profileId} value={profileId}>
+												{profile.name} ({profile.dimensions} dimensions)
+											</option>
+										);
+									})}
+								</select>
+							</div>
+						);
+					})()}
 
 				{settingPath && (
 					<div className="pt-[8px] flex justify-end">

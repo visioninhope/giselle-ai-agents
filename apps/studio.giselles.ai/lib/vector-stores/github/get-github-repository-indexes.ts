@@ -5,12 +5,18 @@ import {
 	githubRepositoryIndex,
 } from "@/drizzle";
 
+type ContentTypeWithProfiles = {
+	contentType: "blob" | "pull_request";
+	embeddingProfileIds: number[];
+};
+
 type GitHubRepositoryIndex = {
 	id: string;
 	name: string;
 	owner: string;
 	repo: string;
 	availableContentTypes: ("blob" | "pull_request")[];
+	contentTypesWithProfiles?: ContentTypeWithProfiles[];
 };
 
 export async function getGitHubRepositoryIndexes(
@@ -22,6 +28,7 @@ export async function getGitHubRepositoryIndexes(
 			owner: githubRepositoryIndex.owner,
 			repo: githubRepositoryIndex.repo,
 			contentType: githubRepositoryContentStatus.contentType,
+			embeddingProfileId: githubRepositoryContentStatus.embeddingProfileId,
 		})
 		.from(githubRepositoryIndex)
 		.innerJoin(
@@ -39,7 +46,7 @@ export async function getGitHubRepositoryIndexes(
 			),
 		);
 
-	// Group by repository and collect available content types
+	// Group by repository and collect available content types with embedding profiles
 	const repoMap = new Map<string, GitHubRepositoryIndex>();
 
 	for (const repo of repositories) {
@@ -47,8 +54,30 @@ export async function getGitHubRepositoryIndexes(
 		const existing = repoMap.get(key);
 
 		if (existing) {
+			// Add to availableContentTypes if not already present
 			if (!existing.availableContentTypes.includes(repo.contentType)) {
 				existing.availableContentTypes.push(repo.contentType);
+			}
+
+			// Update contentTypesWithProfiles
+			if (existing.contentTypesWithProfiles) {
+				const contentTypeEntry = existing.contentTypesWithProfiles.find(
+					(ct) => ct.contentType === repo.contentType,
+				);
+				if (contentTypeEntry) {
+					if (
+						!contentTypeEntry.embeddingProfileIds.includes(
+							repo.embeddingProfileId,
+						)
+					) {
+						contentTypeEntry.embeddingProfileIds.push(repo.embeddingProfileId);
+					}
+				} else {
+					existing.contentTypesWithProfiles.push({
+						contentType: repo.contentType,
+						embeddingProfileIds: [repo.embeddingProfileId],
+					});
+				}
 			}
 		} else {
 			repoMap.set(key, {
@@ -57,6 +86,12 @@ export async function getGitHubRepositoryIndexes(
 				owner: repo.owner,
 				repo: repo.repo,
 				availableContentTypes: [repo.contentType],
+				contentTypesWithProfiles: [
+					{
+						contentType: repo.contentType,
+						embeddingProfileIds: [repo.embeddingProfileId],
+					},
+				],
 			});
 		}
 	}
