@@ -60,11 +60,7 @@ export async function internalSetGeneration(params: {
 	// Update actId-based index when present
 	const actId = params.generation.context.origin.actId;
 	if (actId !== undefined) {
-		await updateActGenerationIndexes(
-			params.experimental_storage,
-			actId,
-			newIndex,
-		);
+		updateActGenerationIndexes(params.experimental_storage, actId, newIndex);
 	}
 }
 

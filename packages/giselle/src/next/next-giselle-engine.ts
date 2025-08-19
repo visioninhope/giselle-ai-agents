@@ -112,6 +112,11 @@ export function createHttpHandler({
 			after(config.telemetry.waitForFlushFn);
 		}
 
+		// Flush generation index patches after response
+		after(async () => {
+			await giselleEngine.flushGenerationIndexQueue();
+		});
+
 		if (isJsonRouterPath(routerPath)) {
 			try {
 				return await jsonRouter[routerPath]({
