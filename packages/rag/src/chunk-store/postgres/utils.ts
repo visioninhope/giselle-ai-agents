@@ -15,6 +15,23 @@ const PERFORMANCE_CONSTANTS = {
 	MAX_BATCH_SIZE: 5000,
 } as const;
 
+/**
+ * Helper for building parameterized SQL queries
+ * Automatically tracks parameter indices and builds the values array
+ */
+function createParamHelper() {
+	const values: unknown[] = [];
+	return {
+		add(value: unknown): string {
+			values.push(value);
+			return `$${values.length}`;
+		},
+		values() {
+			return values;
+		},
+	};
+}
+
 type ChunkRecord = {
 	record: Record<string, unknown>;
 	embedding: {
@@ -50,23 +67,6 @@ export function mapMetadataToColumns<TMetadata extends Record<string, unknown>>(
 }
 
 /**
- * Build scope conditions for WHERE clause
- */
-function buildScopeConditions(
-	scope: Record<string, unknown>,
-	startParamIndex = 1,
-): { conditions: string; values: unknown[] } {
-	const conditions = Object.entries(scope)
-		.map(
-			([key, _], index) =>
-				`${escapeIdentifier(key)} = $${startParamIndex + index}`,
-		)
-		.join(" AND ");
-	const values = Object.values(scope);
-	return { conditions, values };
-}
-
-/**
  * Delete chunks by document key
  */
 export async function deleteChunksByDocumentKey(
@@ -78,26 +78,28 @@ export async function deleteChunksByDocumentKey(
 	embeddingProfileId: number,
 	embeddingDimensions: number,
 ): Promise<void> {
-	const { conditions: scopeConditions, values: scopeValues } =
-		buildScopeConditions(scope, 4);
+	const param = createParamHelper();
+	const conditions: string[] = [];
 
-	let query = `
-		DELETE FROM ${escapeIdentifier(tableName)}
-		WHERE ${escapeIdentifier(documentKeyColumn)} = $1
-			AND embedding_profile_id = $2
-			AND embedding_dimensions = $3
-	`;
+	// Add conditions with automatic parameter tracking
+	conditions.push(
+		`${escapeIdentifier(documentKeyColumn)} = ${param.add(documentKey)}`,
+	);
+	conditions.push(`embedding_profile_id = ${param.add(embeddingProfileId)}`);
+	conditions.push(`embedding_dimensions = ${param.add(embeddingDimensions)}`);
 
-	if (scopeConditions) {
-		query += ` AND ${scopeConditions}`;
+	// Add scope conditions (sorted for stability)
+	const scopeKeys = Object.keys(scope).sort();
+	for (const key of scopeKeys) {
+		conditions.push(`${escapeIdentifier(key)} = ${param.add(scope[key])}`);
 	}
 
-	await client.query(query, [
-		documentKey,
-		embeddingProfileId,
-		embeddingDimensions,
-		...scopeValues,
-	]);
+	const query = `
+        DELETE FROM ${escapeIdentifier(tableName)}
+        WHERE ${conditions.join(" AND ")}
+    `;
+
+	await client.query(query, param.values());
 }
 
 /**
@@ -151,30 +153,26 @@ async function insertRecordsBatch(
 		"embedding_profile_id",
 		"embedding_dimensions",
 	];
-	const allValues: unknown[] = [];
+
+	const param = createParamHelper();
 	const valuePlaceholders: string[] = [];
 
-	records.forEach((item, recordIndex) => {
-		const recordValues = columns.map((c) => {
-			if (c === item.embedding.embeddingColumn) {
-				return pgvector.toSql(item.embedding.embeddingValue);
+	// Build value placeholders for each record
+	for (const item of records) {
+		const placeholders = columns.map((column) => {
+			if (column === item.embedding.embeddingColumn) {
+				return param.add(pgvector.toSql(item.embedding.embeddingValue));
 			}
-			if (c === "embedding_profile_id") {
-				return item.embedding.embeddingProfileId;
+			if (column === "embedding_profile_id") {
+				return param.add(item.embedding.embeddingProfileId);
 			}
-			if (c === "embedding_dimensions") {
-				return item.embedding.embeddingDimensions;
+			if (column === "embedding_dimensions") {
+				return param.add(item.embedding.embeddingDimensions);
 			}
-			return item.record[c];
+			return param.add(item.record[column]);
 		});
-		allValues.push(...recordValues);
-
-		const startIndex = recordIndex * columns.length;
-		const placeholders = columns.map(
-			(_, colIndex) => `$${startIndex + colIndex + 1}`,
-		);
 		valuePlaceholders.push(`(${placeholders.join(", ")})`);
-	});
+	}
 
 	const query = `
 		INSERT INTO ${escapeIdentifier(tableName)}
@@ -182,7 +180,7 @@ async function insertRecordsBatch(
 		VALUES ${valuePlaceholders.join(", ")}
 	`;
 
-	await client.query(query, allValues);
+	await client.query(query, param.values());
 }
 
 /**
@@ -226,33 +224,31 @@ export async function deleteChunksByDocumentKeys(
 		return;
 	}
 
-	const { conditions: scopeConditions, values: scopeValues } =
-		buildScopeConditions(scope, 3);
+	const param = createParamHelper();
+	const conditions: string[] = [];
 
-	const allValues = [
-		embeddingProfileId,
-		embeddingDimensions,
-		...scopeValues,
-		...documentKeys,
-	];
-	const documentKeyStartIndex = 2 + scopeValues.length + 1;
-	const documentKeyPlaceholders = documentKeys
-		.map((_, index) => `$${documentKeyStartIndex + index}`)
-		.join(", ");
+	// Add conditions with automatic parameter tracking
+	conditions.push(`embedding_profile_id = ${param.add(embeddingProfileId)}`);
+	conditions.push(`embedding_dimensions = ${param.add(embeddingDimensions)}`);
 
-	let query = `
-		DELETE FROM ${escapeIdentifier(tableName)}
-		WHERE embedding_profile_id = $1
-			AND embedding_dimensions = $2
-	`;
-
-	if (scopeConditions) {
-		query += ` AND ${scopeConditions}`;
+	// Add scope conditions (sorted for stability)
+	const scopeKeys = Object.keys(scope).sort();
+	for (const key of scopeKeys) {
+		conditions.push(`${escapeIdentifier(key)} = ${param.add(scope[key])}`);
 	}
 
-	query += ` AND ${escapeIdentifier(documentKeyColumn)} IN (${documentKeyPlaceholders})`;
+	// Add IN clause for document keys
+	const inPlaceholders = documentKeys.map((key) => param.add(key)).join(", ");
+	conditions.push(
+		`${escapeIdentifier(documentKeyColumn)} IN (${inPlaceholders})`,
+	);
 
-	await client.query(query, allValues);
+	const query = `
+        DELETE FROM ${escapeIdentifier(tableName)}
+        WHERE ${conditions.join(" AND ")}
+    `;
+
+	await client.query(query, param.values());
 }
 
 /**
@@ -272,28 +268,34 @@ export async function queryDocumentVersions(
 		version: string;
 	}>
 > {
-	const { conditions: scopeConditions, values: scopeValues } =
-		buildScopeConditions(scope, 3);
+	const param = createParamHelper();
+	const conditions: string[] = [];
 
-	let query = `
-		SELECT DISTINCT
-			${escapeIdentifier(documentKeyColumn)} as document_key,
-			${escapeIdentifier(versionColumn)} as version
-		FROM ${escapeIdentifier(tableName)}
-		WHERE embedding_profile_id = $1
-			AND embedding_dimensions = $2
-	`;
+	// Add conditions with automatic parameter tracking
+	conditions.push(`embedding_profile_id = ${param.add(embeddingProfileId)}`);
+	conditions.push(`embedding_dimensions = ${param.add(embeddingDimensions)}`);
 
-	if (scopeConditions) {
-		query += ` AND ${scopeConditions}`;
+	// Add scope conditions (sorted for stability)
+	const scopeKeys = Object.keys(scope).sort();
+	for (const key of scopeKeys) {
+		conditions.push(`${escapeIdentifier(key)} = ${param.add(scope[key])}`);
 	}
 
-	query += ` AND ${escapeIdentifier(versionColumn)} IS NOT NULL`;
+	// Add version not null condition
+	conditions.push(`${escapeIdentifier(versionColumn)} IS NOT NULL`);
+
+	const query = `
+        SELECT DISTINCT
+            ${escapeIdentifier(documentKeyColumn)} as document_key,
+            ${escapeIdentifier(versionColumn)} as version
+        FROM ${escapeIdentifier(tableName)}
+        WHERE ${conditions.join(" AND ")}
+    `;
 
 	const result = await client.query<{
 		document_key: unknown;
 		version: unknown;
-	}>(query, [embeddingProfileId, embeddingDimensions, ...scopeValues]);
+	}>(query, param.values());
 	return result.rows.map((row) => {
 		return {
 			documentKey: toColumnString(row.document_key, "documentKey"),

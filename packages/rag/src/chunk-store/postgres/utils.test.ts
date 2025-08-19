@@ -81,6 +81,8 @@ describe("chunk-store/postgres/utils", () => {
 				metadata,
 				columnMapping,
 				{},
+				1, // embeddingProfileId
+				1536, // embeddingDimensions
 			);
 
 			expect(records).toHaveLength(2);
@@ -95,6 +97,8 @@ describe("chunk-store/postgres/utils", () => {
 				embedding: {
 					embeddingColumn: "vec",
 					embeddingValue: [1, 2, 3],
+					embeddingProfileId: 1,
+					embeddingDimensions: 1536,
 				},
 			});
 			expect(records[1].record.idx).toBe(1);
@@ -123,6 +127,8 @@ describe("chunk-store/postgres/utils", () => {
 				metadata,
 				columnMapping,
 				scope,
+				1, // embeddingProfileId
+				1536, // embeddingDimensions
 			);
 
 			expect(records[0].record).toMatchObject({
