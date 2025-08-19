@@ -58,7 +58,7 @@ export const initializeAccount = async (
 		const workspaces = await giselleEngine.createSampleWorkspaces();
 		for (const workspace of workspaces) {
 			const agentId = `agnt_${createId()}` as const;
-			await db.insert(agents).values({
+			await tx.insert(agents).values({
 				id: agentId,
 				name: workspace.name,
 				teamDbId: team.id,
