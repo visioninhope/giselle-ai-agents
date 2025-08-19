@@ -5,12 +5,14 @@ import type { z } from "zod/v4";
 import { PoolManager } from "../../database/postgres";
 import { ensurePgVectorTypes } from "../../database/postgres/pgvector-registry";
 import type { DatabaseConfig } from "../../database/types";
-import type { EmbedderFunction } from "../../embedder";
-import { createOpenAIEmbedder } from "../../embedder";
+import type { EmbeddingProfileId } from "../../embedder/profiles";
+import {
+	createEmbedderFromProfile,
+	EMBEDDING_PROFILES,
+} from "../../embedder/profiles";
 import {
 	ConfigurationError,
 	DatabaseError,
-	EmbeddingError,
 	ValidationError,
 } from "../../errors";
 import type { RequiredColumns } from "../column-mapping";
@@ -80,7 +82,7 @@ export function createPostgresQueryService<
 >(config: {
 	database: DatabaseConfig;
 	tableName: string;
-	embedder?: EmbedderFunction;
+	contextToEmbeddingProfileId: (context: TContext) => EmbeddingProfileId;
 	requiredColumnOverrides?: Partial<RequiredColumns>;
 	metadataColumnOverrides?: Partial<Record<keyof z.infer<TSchema>, string>>;
 	contextToFilter: (
@@ -116,37 +118,38 @@ export function createPostgresQueryService<
 		}
 
 		try {
-			// Use provided embedder or fall back to default OpenAI text-embedding-3-small
-			const embedder =
-				config.embedder ||
-				(() => {
-					const apiKey = process.env.OPENAI_API_KEY;
-					if (!apiKey) {
-						throw new ConfigurationError(
-							"OPENAI_API_KEY environment variable is required when no embedder is provided",
-						);
-					}
-					return createOpenAIEmbedder({
-						model: "text-embedding-3-small",
-						apiKey,
-						telemetry,
-					});
-				})();
-			const queryEmbedding = await embedder.embed(query);
-			const filters = await config.contextToFilter(context);
+			const profileId = config.contextToEmbeddingProfileId(context);
+			const profile = EMBEDDING_PROFILES[profileId];
+			if (!profile) {
+				throw new ConfigurationError(
+					`Invalid embedding profile ID: ${profileId}. Valid IDs are: ${Object.keys(EMBEDDING_PROFILES).join(", ")}`,
+				);
+			}
 
-			// Add hardcoded embedding profile filters for index usage
-			const enrichedFilters = {
-				...filters,
-				embedding_profile_id: 1,
-				embedding_dimensions: 1536,
-			};
+			const apiKey =
+				process.env[
+					profile.provider === "openai" ? "OPENAI_API_KEY" : "GOOGLE_API_KEY"
+				];
+			if (!apiKey) {
+				throw new ConfigurationError(
+					`No API key found for embedding profile ${profileId}`,
+				);
+			}
+
+			const embedder = createEmbedderFromProfile(profileId, apiKey, {
+				telemetry,
+			});
+			const queryEmbedding = await embedder.embed(query);
+
+			const filters = await config.contextToFilter(context);
 
 			const { sql, values } = buildSearchQuery({
 				tableName: config.tableName,
 				columnMapping,
 				queryEmbedding,
-				filters: enrichedFilters,
+				filters,
+				embeddingProfileId: profileId,
+				embeddingDimensions: profile.dimensions,
 				limit,
 				similarityThreshold,
 			});
@@ -163,7 +166,7 @@ export function createPostgresQueryService<
 
 			return mappedResults;
 		} catch (error) {
-			if (error instanceof EmbeddingError || error instanceof ValidationError) {
+			if (error instanceof ValidationError) {
 				throw error;
 			}
 			throw DatabaseError.queryFailed(
@@ -181,6 +184,8 @@ function buildSearchQuery({
 	columnMapping,
 	queryEmbedding,
 	filters,
+	embeddingProfileId,
+	embeddingDimensions,
 	limit,
 	similarityThreshold,
 }: {
@@ -188,6 +193,8 @@ function buildSearchQuery({
 	columnMapping: ReturnType<typeof createColumnMapping>;
 	queryEmbedding: number[];
 	filters: Record<string, unknown>;
+	embeddingProfileId: number;
+	embeddingDimensions: number;
 	limit: number;
 	similarityThreshold?: number;
 }) {
@@ -196,12 +203,21 @@ function buildSearchQuery({
 	let paramIndex = 2;
 
 	// Determine the appropriate cast based on embedding dimensions
-	const embeddingDimensions = filters.embedding_dimensions;
 	const embeddingCast =
 		embeddingDimensions === 3072
 			? `${escapeIdentifier(columnMapping.embedding)}::halfvec(3072)`
 			: `${escapeIdentifier(columnMapping.embedding)}::vector(1536)`;
 
+	// Add embedding profile conditions
+	whereConditions.push(`embedding_profile_id = $${paramIndex}`);
+	values.push(embeddingProfileId);
+	paramIndex++;
+
+	whereConditions.push(`embedding_dimensions = $${paramIndex}`);
+	values.push(embeddingDimensions);
+	paramIndex++;
+
+	// Add user-provided filters
 	for (const [column, value] of Object.entries(filters)) {
 		whereConditions.push(`${escapeIdentifier(column)} = $${paramIndex}`);
 		values.push(value);
