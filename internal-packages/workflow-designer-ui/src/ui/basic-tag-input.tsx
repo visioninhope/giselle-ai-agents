@@ -88,6 +88,8 @@ export function BasicTagInput({
 
 	// Tag removal process
 	const removeTag = (index: number) => {
+		// Prevent removal when component is disabled
+		if (disabled) return;
 		const newTags = tags.filter((_, i) => i !== index);
 		setTags(newTags);
 
@@ -139,12 +141,15 @@ export function BasicTagInput({
 							<button
 								type="button"
 								onClick={() => removeTag(index)}
+								disabled={disabled}
+								aria-disabled={disabled}
 								style={{
 									padding: "0 0 0 2px",
 									color: "var(--black-400, #505D7B)",
 									backgroundColor: "transparent",
 									border: "none",
-									cursor: "pointer",
+									cursor: disabled ? "not-allowed" : "pointer",
+									opacity: disabled ? 0.5 : 1,
 									fontFamily: "var(--font-geist), system-ui, sans-serif",
 								}}
 							>
