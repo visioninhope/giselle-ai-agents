@@ -83,13 +83,6 @@ export function useKeyboardShortcuts() {
 	);
 	useKeyAction(["Meta+d", "Control+d"], handleDuplicate, isCanvasFocused);
 
-	// Note: Paste for properties panel is handled by FilePanels DOM event listener
-	// useKeyAction(
-	// 	["Meta+v", "Control+v"],
-	// 	handleImagePaste,
-	// 	isPropertiesPanelFocused,
-	// );
-
 	// Return handler for preventing browser default shortcuts
 	const handleKeyDown = useCallback(
 		(event: React.KeyboardEvent) => {
