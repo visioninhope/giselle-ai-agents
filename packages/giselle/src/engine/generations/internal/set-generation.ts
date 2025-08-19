@@ -1,5 +1,7 @@
+import type { NodeId } from "@giselle-sdk/data-type";
 import type { Storage } from "unstorage";
 import { Generation, NodeGenerationIndex } from "../../../concepts/generation";
+import { actGenerationIndexesPath } from "../../../concepts/path";
 import type { GiselleStorage } from "../../experimental_storage";
 import {
 	generationPath,
@@ -7,6 +9,16 @@ import {
 	nodeGenerationIndexPath,
 } from "../utils";
 import { getActGenerationIndexes } from "./get-act-generation-indexes";
+
+function upsertIndex(
+	current: NodeGenerationIndex[] | undefined,
+	incoming: NodeGenerationIndex,
+) {
+	if (!current) return [incoming];
+	const pos = current.findIndex((i) => i.id === incoming.id);
+	if (pos === -1) return [...current, incoming];
+	return [...current.slice(0, pos), incoming, ...current.slice(pos + 1)];
+}
 
 export async function internalSetGeneration(params: {
 	storage: Storage;
@@ -26,86 +38,39 @@ export async function internalSetGeneration(params: {
 			Generation.parse(params.generation),
 		);
 	}
-	let newNodeGenerationIndexes: NodeGenerationIndex[] | undefined;
-	const newNodeGenerationIndex = toNodeGenerationIndex(params.generation);
+
+	const newIndex = toNodeGenerationIndex(params.generation);
 	const nodeId = params.generation.context.operationNode.id;
-	const currentNodeGenerationIndexes = await getNodeGenerationIndexes({
+
+	// Update nodeId-based index
+	const currentNodeIndexes = await getNodeGenerationIndexes({
 		storage: params.storage,
 		experimental_storage: params.experimental_storage,
 		useExperimentalStorage: params.useExperimentalStorage,
 		nodeId,
 	});
+	const nextNodeIndexes = upsertIndex(currentNodeIndexes, newIndex);
+	await writeNodeIndexes({
+		storage: params.storage,
+		experimental_storage: params.experimental_storage,
+		useExperimentalStorage: params.useExperimentalStorage,
+		nodeId,
+		indexes: nextNodeIndexes,
+	});
 
-	if (currentNodeGenerationIndexes === undefined) {
-		newNodeGenerationIndexes = [newNodeGenerationIndex];
-	} else {
-		const index = currentNodeGenerationIndexes.findIndex(
-			(nodeGenerationIndex) => nodeGenerationIndex.id === params.generation.id,
-		);
-		if (index === -1) {
-			newNodeGenerationIndexes = [
-				...currentNodeGenerationIndexes,
-				newNodeGenerationIndex,
-			];
-		} else {
-			newNodeGenerationIndexes = [
-				...currentNodeGenerationIndexes.slice(0, index),
-				newNodeGenerationIndex,
-				...currentNodeGenerationIndexes.slice(index + 1),
-			];
-		}
-	}
-	if (params.useExperimentalStorage) {
+	// Update actId-based index when present
+	const actId = params.generation.context.origin.actId;
+	if (actId !== undefined) {
+		const currentActIndexes = await getActGenerationIndexes({
+			experimental_storage: params.experimental_storage,
+			actId,
+		});
+		const nextActIndexes = upsertIndex(currentActIndexes, newIndex);
 		await params.experimental_storage.setJson({
-			path: nodeGenerationIndexPath(nodeId),
-			data: newNodeGenerationIndexes,
+			path: actGenerationIndexesPath(actId),
+			data: nextActIndexes,
 			schema: NodeGenerationIndex.array(),
 		});
-	} else {
-		await params.storage.setItem(
-			nodeGenerationIndexPath(nodeId),
-			newNodeGenerationIndexes,
-		);
-	}
-
-	if (params.generation.context.origin.actId !== undefined) {
-		const currentActGenerationIndexes = await getActGenerationIndexes({
-			experimental_storage: params.experimental_storage,
-			actId: params.generation.context.origin.actId,
-		});
-
-		if (currentActGenerationIndexes === undefined) {
-			newNodeGenerationIndexes = [newNodeGenerationIndex];
-		} else {
-			const index = currentActGenerationIndexes.findIndex(
-				(nodeGenerationIndex) =>
-					nodeGenerationIndex.id === params.generation.id,
-			);
-			if (index === -1) {
-				newNodeGenerationIndexes = [
-					...currentActGenerationIndexes,
-					newNodeGenerationIndex,
-				];
-			} else {
-				newNodeGenerationIndexes = [
-					...currentActGenerationIndexes.slice(0, index),
-					newNodeGenerationIndex,
-					...currentActGenerationIndexes.slice(index + 1),
-				];
-			}
-		}
-		if (params.useExperimentalStorage) {
-			await params.experimental_storage.setJson({
-				path: nodeGenerationIndexPath(nodeId),
-				data: newNodeGenerationIndexes,
-				schema: NodeGenerationIndex.array(),
-			});
-		} else {
-			await params.storage.setItem(
-				nodeGenerationIndexPath(nodeId),
-				newNodeGenerationIndexes,
-			);
-		}
 	}
 }
 
@@ -123,4 +88,25 @@ function toNodeGenerationIndex(generation: Generation): NodeGenerationIndex {
 		cancelledAt:
 			"cancelledAt" in generation ? generation.cancelledAt : undefined,
 	};
+}
+
+async function writeNodeIndexes(args: {
+	storage: Storage;
+	experimental_storage: GiselleStorage;
+	useExperimentalStorage?: boolean;
+	nodeId: NodeId;
+	indexes: NodeGenerationIndex[];
+}) {
+	if (args.useExperimentalStorage) {
+		await args.experimental_storage.setJson({
+			path: nodeGenerationIndexPath(args.nodeId),
+			data: args.indexes,
+			schema: NodeGenerationIndex.array(),
+		});
+		return;
+	}
+	await args.storage.setItem(
+		nodeGenerationIndexPath(args.nodeId),
+		args.indexes,
+	);
 }
