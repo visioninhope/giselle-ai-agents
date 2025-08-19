@@ -9,6 +9,7 @@ import { giselleEngine } from "@/app/giselle-engine";
 import { fetchUserTeams } from "@/services/teams";
 import { NavSkelton } from "./ui/nav-skelton";
 import { Sidebar } from "./ui/sidebar";
+import "./mobile-scroll.css";
 
 export default async function ({
 	children,
@@ -59,18 +60,21 @@ export default async function ({
 	}
 
 	return (
-		<div className="bg-[var(--color-stage-background)] text-foreground h-screen flex font-sans">
-			{/* Left Sidebar */}
-			<Suspense fallback={<NavSkelton />}>
-				<Sidebar
-					act={Promise.resolve(act)}
-					appName={appName}
-					teamName={teamName}
-					triggerParameters={triggerParameters}
-				/>
-			</Suspense>
+		<div className="bg-[var(--color-stage-background)] text-foreground min-h-screen md:h-screen md:flex md:flex-row font-sans">
+			{/* Left Sidebar - Always visible */}
+			<div className="w-full md:w-auto md:h-screen md:overflow-y-auto">
+				<Suspense fallback={<NavSkelton />}>
+					<Sidebar
+						act={Promise.resolve(act)}
+						appName={appName}
+						teamName={teamName}
+						triggerParameters={triggerParameters}
+					/>
+				</Suspense>
+			</div>
 
-			<main className="m-[8px] flex flex-1 rounded-[12px] backdrop-blur-md border border-white/20 shadow-lg shadow-black/10 shadow-inner overflow-hidden">
+			{/* Main Content - Hidden on mobile */}
+			<main className="hidden md:flex m-0 md:m-[8px] flex-1 rounded-none md:rounded-[12px] backdrop-blur-md border-0 md:border md:border-white/20 shadow-lg shadow-black/10 shadow-inner overflow-hidden">
 				{children}
 			</main>
 		</div>

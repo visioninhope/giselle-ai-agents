@@ -20,7 +20,7 @@ import { StepLayout } from "./ui/step-layout";
 function getModelInfo(generation: Generation): {
 	provider: string;
 	modelName: string;
-	icon: React.ComponentType<{ className?: string }>;
+	iconName: string;
 } {
 	try {
 		const operationNode = generation.context.operationNode;
@@ -32,32 +32,36 @@ function getModelInfo(generation: Generation): {
 			const provider = operationNode.content.llm.provider;
 			const modelName = operationNode.content.llm.id || provider;
 
-			// Get appropriate icon based on provider
-			let icon = BrainCircuit; // default icon
+			// Get appropriate icon name based on provider
+			let iconName = "brain-circuit"; // default icon
 			switch (provider) {
 				case "openai":
-					icon = Sparkles;
+					iconName = "sparkles";
 					break;
 				case "anthropic":
-					icon = BrainCircuit;
+					iconName = "brain-circuit";
 					break;
 				case "google":
-					icon = Search;
+					iconName = "search";
 					break;
 				case "perplexity":
-					icon = Zap;
+					iconName = "zap";
 					break;
 				case "fal":
-					icon = Image;
+					iconName = "image";
 					break;
 			}
 
-			return { provider, modelName, icon };
+			return { provider, modelName, iconName };
 		}
 	} catch (_error) {
 		// If we can't access the operation node, fall back to defaults
 	}
-	return { provider: "Unknown", modelName: "Unknown", icon: BrainCircuit };
+	return {
+		provider: "Unknown",
+		modelName: "Unknown",
+		iconName: "brain-circuit",
+	};
 }
 
 export default async function ({
@@ -88,34 +92,38 @@ export default async function ({
 		return notFound();
 	}
 
+	const modelInfo = getModelInfo(generation);
+
 	return (
-		<StepLayout
-			header={
-				<div className="flex items-center gap-[6px]">
-					<div className="p-[8px] bg-element-active rounded-[4px]">
-						<NodeIcon
-							node={generation.context.operationNode}
-							className="size-[16px]"
-						/>
-					</div>
-					<div className="flex flex-col">
-						<div className="text-[14px]">
-							{generation.context.operationNode.name ??
-								defaultName(generation.context.operationNode)}
+		<>
+			{/* Desktop Layout */}
+			<div className="hidden md:block">
+				<StepLayout
+					header={
+						<div className="flex items-center gap-[6px]">
+							<div className="p-[8px] bg-element-active rounded-[4px]">
+								<NodeIcon
+									node={generation.context.operationNode}
+									className="size-[16px]"
+								/>
+							</div>
+							<div className="flex flex-col">
+								<div className="text-[14px]">
+									{generation.context.operationNode.name ??
+										defaultName(generation.context.operationNode)}
+								</div>
+								<div className="text text-text-muted text-[10px] flex items-center gap-[4px]">
+									<span>{modelInfo.modelName}</span>
+									<div className="size-[2px] rounded-full bg-text-muted" />
+									<span>Finished: 07/17/2025, 10:48 AM</span>
+								</div>
+							</div>
 						</div>
-						<div className="text text-text-muted text-[10px] flex items-center gap-[4px]">
-							{(() => {
-								const modelInfo = getModelInfo(generation);
-								return <span>{modelInfo.modelName}</span>;
-							})()}
-							<div className="size-[2px] rounded-full bg-text-muted" />
-							<span>Finished: 07/17/2025, 10:48 AM</span>
-						</div>
-					</div>
-				</div>
-			}
-		>
-			<GenerationView generation={generation} />
-		</StepLayout>
+					}
+				>
+					<GenerationView generation={generation} />
+				</StepLayout>
+			</div>
+		</>
 	);
 }
