@@ -49,7 +49,7 @@ export function createPostgresChunkStore<
 		metadataColumnOverrides,
 	});
 
-	// Validate and enrich scope with embedding profile info
+	// Validate embedding profile
 	const profile =
 		EMBEDDING_PROFILES[embeddingProfileId as keyof typeof EMBEDDING_PROFILES];
 	if (!profile) {
@@ -62,11 +62,6 @@ export function createPostgresChunkStore<
 			`Embedding profile ${embeddingProfileId} is missing dimensions`,
 		);
 	}
-	const enrichedScope = {
-		...scope,
-		embedding_profile_id: embeddingProfileId,
-		embedding_dimensions: profile.dimensions,
-	};
 
 	/**
 	 * Insert chunks with metadata
@@ -102,7 +97,9 @@ export function createPostgresChunkStore<
 				tableName,
 				documentKey,
 				columnMapping.documentKey,
-				enrichedScope,
+				scope,
+				embeddingProfileId,
+				profile.dimensions,
 			);
 
 			const records = prepareChunkRecords(
@@ -110,7 +107,9 @@ export function createPostgresChunkStore<
 				chunks,
 				metadata,
 				columnMapping,
-				enrichedScope,
+				scope,
+				embeddingProfileId,
+				profile.dimensions,
 			);
 			await insertChunkRecords(client, tableName, records);
 
@@ -146,7 +145,9 @@ export function createPostgresChunkStore<
 				tableName,
 				documentKey,
 				columnMapping.documentKey,
-				enrichedScope,
+				scope,
+				embeddingProfileId,
+				profile.dimensions,
 			);
 		} catch (error) {
 			throw DatabaseError.queryFailed(
@@ -182,7 +183,9 @@ export function createPostgresChunkStore<
 				tableName,
 				documentKeys,
 				columnMapping.documentKey,
-				enrichedScope,
+				scope,
+				embeddingProfileId,
+				profile.dimensions,
 			);
 		} catch (error) {
 			throw DatabaseError.queryFailed(
@@ -226,7 +229,9 @@ export function createPostgresChunkStore<
 				tableName,
 				columnMapping.documentKey,
 				columnMapping.version,
-				enrichedScope,
+				scope,
+				embeddingProfileId,
+				profile.dimensions,
 			);
 		} catch (error) {
 			throw DatabaseError.queryFailed(

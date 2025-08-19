@@ -141,19 +141,15 @@ export function createPostgresQueryService<
 			});
 			const queryEmbedding = await embedder.embed(query);
 
-			const baseFilter = await config.contextToFilter(context);
-			// Enrich filter with embedding profile
-			const filters = {
-				...baseFilter,
-				embedding_profile_id: profileId,
-				embedding_dimensions: profile.dimensions,
-			};
+			const filters = await config.contextToFilter(context);
 
 			const { sql, values } = buildSearchQuery({
 				tableName: config.tableName,
 				columnMapping,
 				queryEmbedding,
 				filters,
+				embeddingProfileId: profileId,
+				embeddingDimensions: profile.dimensions,
 				limit,
 				similarityThreshold,
 			});
@@ -188,6 +184,8 @@ function buildSearchQuery({
 	columnMapping,
 	queryEmbedding,
 	filters,
+	embeddingProfileId,
+	embeddingDimensions,
 	limit,
 	similarityThreshold,
 }: {
@@ -195,6 +193,8 @@ function buildSearchQuery({
 	columnMapping: ReturnType<typeof createColumnMapping>;
 	queryEmbedding: number[];
 	filters: Record<string, unknown>;
+	embeddingProfileId: number;
+	embeddingDimensions: number;
 	limit: number;
 	similarityThreshold?: number;
 }) {
@@ -203,12 +203,21 @@ function buildSearchQuery({
 	let paramIndex = 2;
 
 	// Determine the appropriate cast based on embedding dimensions
-	const embeddingDimensions = filters.embedding_dimensions;
 	const embeddingCast =
 		embeddingDimensions === 3072
 			? `${escapeIdentifier(columnMapping.embedding)}::halfvec(3072)`
 			: `${escapeIdentifier(columnMapping.embedding)}::vector(1536)`;
 
+	// Add embedding profile conditions
+	whereConditions.push(`embedding_profile_id = $${paramIndex}`);
+	values.push(embeddingProfileId);
+	paramIndex++;
+
+	whereConditions.push(`embedding_dimensions = $${paramIndex}`);
+	values.push(embeddingDimensions);
+	paramIndex++;
+
+	// Add user-provided filters
 	for (const [column, value] of Object.entries(filters)) {
 		whereConditions.push(`${escapeIdentifier(column)} = $${paramIndex}`);
 		values.push(value);
