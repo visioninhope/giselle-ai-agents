@@ -1,5 +1,5 @@
 import { NodeGenerationIndex } from "../../../concepts/generation";
-import type { ActId, GenerationId } from "../../../concepts/identifiers";
+import type { ActId } from "../../../concepts/identifiers";
 import { actGenerationIndexesPath } from "../../../concepts/path";
 import type { GiselleStorage } from "../../experimental_storage";
 import {
@@ -232,100 +232,6 @@ export function updateActGenerationIndexes(
 
 	// Enqueue the patch
 	enqueuePatch(experimental_storage, actId, patch);
-}
-
-/**
- * Flushes patches for a specific actId
- */
-async function flushForActId(
-	experimental_storage: GiselleStorage,
-	actId: ActId,
-) {
-	const maxWaitTime = 5000; // 5 seconds max wait
-	const startTime = Date.now();
-
-	while (Date.now() - startTime < maxWaitTime) {
-		// Check if this actId has pending patches or is being processed
-		if (!state.queue.has(actId) && !state.processing.has(actId)) {
-			return;
-		}
-
-		// If there are patches in the queue for this actId, process immediately
-		const item = state.queue.get(actId);
-		if (item && !state.processing.has(actId)) {
-			state.queue.delete(actId);
-			state.processing.add(actId);
-
-			try {
-				await processPatchBatch(experimental_storage, item);
-			} catch (error) {
-				// Handle the same retry logic as in processQueue
-				if (item.retryCount < state.retryConfig.maxRetries) {
-					const retryItem: QueuedPatch = {
-						...item,
-						retryCount: item.retryCount + 1,
-						timestamp: Date.now(),
-					};
-					state.queue.set(actId, retryItem);
-					console.warn(
-						`Generation index patch failed for act ${actId}, retry ${item.retryCount + 1}/${state.retryConfig.maxRetries}:`,
-						error,
-					);
-				} else {
-					console.error(
-						`Generation index patch permanently failed for act ${actId} after ${state.retryConfig.maxRetries} retries:`,
-						error,
-					);
-				}
-			} finally {
-				state.processing.delete(actId);
-			}
-		}
-
-		// Wait a bit before checking again
-		await new Promise((resolve) => setTimeout(resolve, 10));
-	}
-
-	console.warn(
-		`Timeout waiting for generation index patches to complete for act ${actId}`,
-	);
-}
-
-/**
- * Creates a patch queue context for batch operations
- * Useful when you want to batch multiple updates together
- */
-export function createGenerationIndexPatchQueue(
-	experimental_storage: GiselleStorage,
-) {
-	return {
-		/**
-		 * Enqueues an upsert patch for a generation index
-		 */
-		upsert: (actId: ActId, index: NodeGenerationIndex) => {
-			enqueuePatch(experimental_storage, actId, upsert(index));
-		},
-
-		/**
-		 * Enqueues a remove patch for a generation index
-		 */
-		remove: (actId: ActId, generationId: GenerationId) => {
-			enqueuePatch(experimental_storage, actId, {
-				type: "remove",
-				generationId,
-			});
-		},
-
-		/**
-		 * Flushes all pending patches
-		 */
-		flush: () => flushGenerationIndexQueue(experimental_storage),
-
-		/**
-		 * Flushes patches for a specific actId
-		 */
-		flushActId: (actId: ActId) => flushForActId(experimental_storage, actId),
-	};
 }
 
 // Cleanup function for tests or shutdown

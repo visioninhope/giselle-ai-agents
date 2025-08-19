@@ -32,7 +32,3 @@ export function applyPatches(
 export function upsert(index: NodeGenerationIndex): GenerationIndexPatch {
 	return { type: "upsert", index };
 }
-
-export function remove(generationId: GenerationId): GenerationIndexPatch {
-	return { type: "remove", generationId };
-}
