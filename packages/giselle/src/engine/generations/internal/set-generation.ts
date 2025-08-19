@@ -1,14 +1,13 @@
 import type { NodeId } from "@giselle-sdk/data-type";
 import type { Storage } from "unstorage";
 import { Generation, NodeGenerationIndex } from "../../../concepts/generation";
-import { actGenerationIndexesPath } from "../../../concepts/path";
 import type { GiselleStorage } from "../../experimental_storage";
 import {
 	generationPath,
 	getNodeGenerationIndexes,
 	nodeGenerationIndexPath,
 } from "../utils";
-import { getActGenerationIndexes } from "./get-act-generation-indexes";
+import { updateActGenerationIndexes } from "./act-generation-index-queue";
 
 function upsertIndex(
 	current: NodeGenerationIndex[] | undefined,
@@ -61,16 +60,11 @@ export async function internalSetGeneration(params: {
 	// Update actId-based index when present
 	const actId = params.generation.context.origin.actId;
 	if (actId !== undefined) {
-		const currentActIndexes = await getActGenerationIndexes({
-			experimental_storage: params.experimental_storage,
+		await updateActGenerationIndexes(
+			params.experimental_storage,
 			actId,
-		});
-		const nextActIndexes = upsertIndex(currentActIndexes, newIndex);
-		await params.experimental_storage.setJson({
-			path: actGenerationIndexesPath(actId),
-			data: nextActIndexes,
-			schema: NodeGenerationIndex.array(),
-		});
+			newIndex,
+		);
 	}
 }
 
