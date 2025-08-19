@@ -82,55 +82,6 @@ export function FilePanel({ node, config }: FilePanelProps) {
 	const maxFileSize = config.maxSize ?? defaultMaxSize;
 	const panelRef = useRef<HTMLDivElement>(null);
 
-	// Handle paste events for image clipboard data
-	const handlePaste = useCallback(
-		(e: ClipboardEvent) => {
-			const items = e.clipboardData?.items;
-			if (!items) return;
-
-			const imageItems: DataTransferItem[] = [];
-			for (const item of items) {
-				if (item.type.startsWith("image/")) {
-					imageItems.push(item);
-				}
-			}
-
-			if (imageItems.length === 0) return;
-
-			// Prevent default paste behavior
-			e.preventDefault();
-
-			const files: File[] = [];
-			for (const item of imageItems) {
-				const file = item.getAsFile();
-				if (file) {
-					files.push(file);
-				}
-			}
-
-			if (files.length > 0) {
-				// Create a FileList from File[] to use validation path
-				const dataTransfer = new DataTransfer();
-				for (const file of files) {
-					dataTransfer.items.add(file);
-				}
-				addFiles(dataTransfer.files); // Use validation path
-			}
-		},
-		[addFiles],
-	);
-
-	useEffect(() => {
-		// Only add paste listener for image file nodes
-		if (node.content.category === "image" && panelRef.current) {
-			const panelEl = panelRef.current;
-			panelEl.addEventListener("paste", handlePaste);
-			return () => {
-				panelEl.removeEventListener("paste", handlePaste);
-			};
-		}
-	}, [handlePaste, node.content.category]);
-
 	const validateItems = useCallback(
 		(dataTransferItemList: DataTransferItemList) => {
 			let isValid = true;
@@ -219,6 +170,54 @@ export function FilePanel({ node, config }: FilePanelProps) {
 		},
 		[addFilesInternal, maxFileSize, assertFiles, toasts],
 	);
+
+	const handlePaste = useCallback(
+		(e: ClipboardEvent) => {
+			const items = e.clipboardData?.items;
+			if (!items) return;
+
+			const imageItems: DataTransferItem[] = [];
+			for (const item of items) {
+				if (item.type.startsWith("image/")) {
+					imageItems.push(item);
+				}
+			}
+
+			if (imageItems.length === 0) return;
+
+			// Prevent default paste behavior
+			e.preventDefault();
+
+			const files: File[] = [];
+			for (const item of imageItems) {
+				const file = item.getAsFile();
+				if (file) {
+					files.push(file);
+				}
+			}
+
+			if (files.length > 0) {
+				// Create a FileList from File[] to use validation path
+				const dataTransfer = new DataTransfer();
+				for (const file of files) {
+					dataTransfer.items.add(file);
+				}
+				addFiles(dataTransfer.files); // Use validation path
+			}
+		},
+		[addFiles],
+	);
+
+	useEffect(() => {
+		// Only add paste listener for image file nodes
+		if (node.content.category === "image" && panelRef.current) {
+			const panelEl = panelRef.current;
+			panelEl.addEventListener("paste", handlePaste);
+			return () => {
+				panelEl.removeEventListener("paste", handlePaste);
+			};
+		}
+	}, [handlePaste, node.content.category]);
 
 	const onDrop = useCallback(
 		(e: React.DragEvent<HTMLButtonElement>) => {
