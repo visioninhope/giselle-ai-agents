@@ -9,6 +9,7 @@ import { openaiVectorStore } from "@giselle-sdk/vector-store-adapters";
 import { after } from "next/server";
 import { createStorage } from "unstorage";
 import { waitForLangfuseFlush } from "@/instrumentation.node";
+import { getWorkspaceTeam } from "@/lib/workspaces/get-workspace-team";
 import { fetchUsageLimits } from "@/packages/lib/fetch-usage-limits";
 import { onConsumeAgentTime } from "@/packages/lib/on-consume-agent-time";
 import { fetchCurrentUser } from "@/services/accounts";
@@ -109,25 +110,58 @@ export const giselleEngine = NextGiselleEngine({
 		generationComplete: (args) => {
 			after(async () => {
 				try {
-					const currentUser = await fetchCurrentUser();
-					const currentTeam = await fetchCurrentTeam();
-					const plan = isProPlan(currentTeam) ? "plan:pro" : "plan:free";
-					const teamType = `teamType:${currentTeam.type}`;
-					await traceGeneration({
-						generation: args.generation,
-						outputFileBlobs: args.outputFileBlobs,
-						inputMessages: args.inputMessages,
-						userId: currentUser.id,
-						tags: [plan, teamType],
-						metadata: {
-							generationId: args.generation.id,
-							isProPlan: isProPlan(currentTeam),
-							teamType: currentTeam.type,
-							userId: currentUser.id,
-							subscriptionId: currentTeam.activeSubscriptionId ?? "",
-						},
-						sessionId: args.generation.context.origin.actId,
-					});
+					switch (args.generation.context.origin.type) {
+						case "github-app": {
+							const workspaceTeam = await getWorkspaceTeam(
+								args.generation.context.origin.workspaceId,
+							);
+							const plan = isProPlan(workspaceTeam) ? "plan:pro" : "plan:free";
+							const teamType = `teamType:${workspaceTeam.type}`;
+							await traceGeneration({
+								generation: args.generation,
+								outputFileBlobs: args.outputFileBlobs,
+								inputMessages: args.inputMessages,
+								userId: "github-app",
+								tags: [plan, teamType],
+								metadata: {
+									generationId: args.generation.id,
+									isProPlan: isProPlan(workspaceTeam),
+									teamType: workspaceTeam.type,
+									userId: "github-apps",
+									subscriptionId: workspaceTeam.activeSubscriptionId ?? "",
+								},
+								sessionId: args.generation.context.origin.actId,
+							});
+							break;
+						}
+						case "stage":
+						case "studio": {
+							const currentUser = await fetchCurrentUser();
+							const currentTeam = await fetchCurrentTeam();
+							const plan = isProPlan(currentTeam) ? "plan:pro" : "plan:free";
+							const teamType = `teamType:${currentTeam.type}`;
+							await traceGeneration({
+								generation: args.generation,
+								outputFileBlobs: args.outputFileBlobs,
+								inputMessages: args.inputMessages,
+								userId: currentUser.id,
+								tags: [plan, teamType],
+								metadata: {
+									generationId: args.generation.id,
+									isProPlan: isProPlan(currentTeam),
+									teamType: currentTeam.type,
+									userId: currentUser.id,
+									subscriptionId: currentTeam.activeSubscriptionId ?? "",
+								},
+								sessionId: args.generation.context.origin.actId,
+							});
+							break;
+						}
+						default: {
+							const _exhaustiveCheck: never = args.generation.context.origin;
+							throw new Error(`Unhandled origin type: ${_exhaustiveCheck}`);
+						}
+					}
 				} catch (error) {
 					console.error("Trace generation failed:", error);
 				}
