@@ -1,7 +1,6 @@
-import { isFileNode } from "@giselle-sdk/data-type";
 import { useWorkflowDesigner } from "@giselle-sdk/giselle/react";
 import { useKeyPress } from "@xyflow/react";
-import { type RefObject, useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { useNodeManipulation } from "../node";
 import {
 	moveTool,
@@ -27,9 +26,13 @@ function useKeyAction(
 	key: string | string[],
 	action: () => void,
 	enabled: boolean = false,
+	options?: { preventDefault?: boolean },
 ) {
 	const wasPressed = useRef(false);
-	const isPressed = useKeyPress(key, { actInsideInputWithModifier: false });
+	const isPressed = useKeyPress(key, {
+		actInsideInputWithModifier: false,
+		...options,
+	});
 
 	useEffect(() => {
 		if (isPressed && !wasPressed.current && enabled) {
@@ -53,7 +56,7 @@ function useToolAction(key: string, toolFunction: () => Tool) {
 }
 
 export function useKeyboardShortcuts() {
-	const { data, uploadFile } = useWorkflowDesigner();
+	const { data } = useWorkflowDesigner();
 	const {
 		copy: handleCopy,
 		paste: handlePaste,
@@ -61,71 +64,6 @@ export function useKeyboardShortcuts() {
 	} = useNodeManipulation();
 
 	const isCanvasFocused = data.ui.currentShortcutScope === "canvas";
-	const isPropertiesPanelFocused =
-		data.ui.currentShortcutScope === "properties-panel";
-
-	// Image paste handler - moved from FilePanel
-	const handleImagePasteFromClipboard = useCallback(
-		(e: ClipboardEvent) => {
-			// Get the currently selected node
-			const selectedNode = data.nodes.find(
-				(node) => data.ui.nodeState[node.id]?.selected,
-			);
-
-			if (
-				!selectedNode ||
-				!isFileNode(selectedNode) ||
-				selectedNode.content.category !== "image"
-			) {
-				return;
-			}
-
-			const items = e.clipboardData?.items;
-			if (!items) return;
-
-			const imageItems: DataTransferItem[] = [];
-			for (const item of items) {
-				if (item.type.startsWith("image/")) {
-					imageItems.push(item);
-				}
-			}
-
-			if (imageItems.length === 0) return;
-
-			// Prevent default paste behavior
-			e.preventDefault();
-
-			const files: File[] = [];
-			for (const item of imageItems) {
-				const file = item.getAsFile();
-				if (file) {
-					files.push(file);
-				}
-			}
-
-			if (files.length > 0) {
-				uploadFile(files, selectedNode);
-			}
-		},
-		[data, uploadFile],
-	);
-
-	// Hook to add paste listener to specific DOM element
-	const useImagePasteListener = useCallback(
-		(ref: RefObject<HTMLElement>) => {
-			useEffect(() => {
-				const element = ref.current;
-				if (!element || !isPropertiesPanelFocused) return;
-
-				element.addEventListener("paste", handleImagePasteFromClipboard);
-
-				return () => {
-					element.removeEventListener("paste", handleImagePasteFromClipboard);
-				};
-			}, [ref, isPropertiesPanelFocused, handleImagePasteFromClipboard]);
-		},
-		[handleImagePasteFromClipboard, isPropertiesPanelFocused],
-	);
 
 	// Tool shortcuts using the simplified hook
 	useToolAction("t", selectTriggerTool);
@@ -137,7 +75,12 @@ export function useKeyboardShortcuts() {
 
 	// Copy/Paste/Duplicate shortcuts
 	useKeyAction(["Meta+c", "Control+c"], handleCopy, isCanvasFocused);
-	// useKeyAction(["Meta+v", "Control+v"], handlePaste, isCanvasFocused);
+	useKeyAction(
+		["Meta+v", "Control+v"],
+		handlePaste,
+		isCanvasFocused,
+		{ preventDefault: false }, // Preserve browser paste events for FilePanel listeners
+	);
 	useKeyAction(["Meta+d", "Control+d"], handleDuplicate, isCanvasFocused);
 
 	// Note: Paste for properties panel is handled by FilePanels DOM event listener
@@ -171,6 +114,5 @@ export function useKeyboardShortcuts() {
 
 	return {
 		handleKeyDown,
-		useImagePasteListener,
 	};
 }

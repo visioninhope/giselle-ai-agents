@@ -5,7 +5,6 @@ import { ArrowUpFromLineIcon, FileXIcon, TrashIcon } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { TriangleAlert } from "../../../icons";
 import { FileNodeIcon } from "../../../icons/node";
-import { useKeyboardShortcuts } from "../../hooks/use-keyboard-shortcuts";
 import type { FilePanelProps } from "./file-panel-type";
 import { useFileNode } from "./use-file-node";
 
@@ -83,9 +82,54 @@ export function FilePanel({ node, config }: FilePanelProps) {
 	const maxFileSize = config.maxSize ?? defaultMaxSize;
 	const panelRef = useRef<HTMLDivElement>(null);
 
-	// Use image paste listener from keyboard shortcuts hook
-	const { useImagePasteListener } = useKeyboardShortcuts();
-	useImagePasteListener(panelRef);
+	// Handle paste events for image clipboard data
+	const handlePaste = useCallback(
+		(e: ClipboardEvent) => {
+			const items = e.clipboardData?.items;
+			if (!items) return;
+
+			const imageItems: DataTransferItem[] = [];
+			for (const item of items) {
+				if (item.type.startsWith("image/")) {
+					imageItems.push(item);
+				}
+			}
+
+			if (imageItems.length === 0) return;
+
+			// Prevent default paste behavior
+			e.preventDefault();
+
+			const files: File[] = [];
+			for (const item of imageItems) {
+				const file = item.getAsFile();
+				if (file) {
+					files.push(file);
+				}
+			}
+
+			if (files.length > 0) {
+				// Create a DataTransfer object to create a FileList
+				const dataTransfer = new DataTransfer();
+				for (const file of files) {
+					dataTransfer.items.add(file);
+				}
+				addFilesInternal(Array.from(dataTransfer.files));
+			}
+		},
+		[addFilesInternal],
+	);
+
+	useEffect(() => {
+		// Only add paste listener for image file nodes
+		if (node.content.category === "image" && panelRef.current) {
+			const panelEl = panelRef.current;
+			panelEl.addEventListener("paste", handlePaste);
+			return () => {
+				panelEl.removeEventListener("paste", handlePaste);
+			};
+		}
+	}, [handlePaste, node.content.category]);
 
 	const validateItems = useCallback(
 		(dataTransferItemList: DataTransferItemList) => {
