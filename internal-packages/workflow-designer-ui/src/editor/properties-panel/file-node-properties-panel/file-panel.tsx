@@ -109,15 +109,15 @@ export function FilePanel({ node, config }: FilePanelProps) {
 			}
 
 			if (files.length > 0) {
-				// Create a DataTransfer object to create a FileList
+				// Create a FileList from File[] to use validation path
 				const dataTransfer = new DataTransfer();
 				for (const file of files) {
 					dataTransfer.items.add(file);
 				}
-				addFilesInternal(Array.from(dataTransfer.files));
+				addFiles(dataTransfer.files); // Use validation path
 			}
 		},
-		[addFilesInternal],
+		[addFiles],
 	);
 
 	useEffect(() => {
