@@ -1,14 +1,64 @@
 import {
+	isImageGenerationNode,
+	isTextGenerationNode,
+} from "@giselle-sdk/data-type";
+import {
 	type ActId,
 	defaultName,
+	type Generation,
 	type Step,
 	type StepId,
 } from "@giselle-sdk/giselle";
 import { NodeIcon } from "@giselles-ai/icons/node";
+import { BrainCircuit, Image, Search, Sparkles, Zap } from "lucide-react";
 import { notFound } from "next/navigation";
 import { giselleEngine } from "@/app/giselle-engine";
 import { GenerationView } from "../../../../../../../internal-packages/workflow-designer-ui/src/ui/generation-view";
 import { StepLayout } from "./ui/step-layout";
+
+// Helper function to get model info from generation
+function getModelInfo(generation: Generation): {
+	provider: string;
+	modelName: string;
+	icon: React.ComponentType<{ className?: string }>;
+} {
+	try {
+		const operationNode = generation.context.operationNode;
+		if (
+			operationNode &&
+			(isTextGenerationNode(operationNode) ||
+				isImageGenerationNode(operationNode))
+		) {
+			const provider = operationNode.content.llm.provider;
+			const modelName = operationNode.content.llm.id || provider;
+
+			// Get appropriate icon based on provider
+			let icon = BrainCircuit; // default icon
+			switch (provider) {
+				case "openai":
+					icon = Sparkles;
+					break;
+				case "anthropic":
+					icon = BrainCircuit;
+					break;
+				case "google":
+					icon = Search;
+					break;
+				case "perplexity":
+					icon = Zap;
+					break;
+				case "fal":
+					icon = Image;
+					break;
+			}
+
+			return { provider, modelName, icon };
+		}
+	} catch (_error) {
+		// If we can't access the operation node, fall back to defaults
+	}
+	return { provider: "Unknown", modelName: "Unknown", icon: BrainCircuit };
+}
 
 export default async function ({
 	params,
@@ -54,7 +104,10 @@ export default async function ({
 								defaultName(generation.context.operationNode)}
 						</div>
 						<div className="text text-text-muted text-[10px] flex items-center gap-[4px]">
-							<span>gpt-4o</span>
+							{(() => {
+								const modelInfo = getModelInfo(generation);
+								return <span>{modelInfo.modelName}</span>;
+							})()}
 							<div className="size-[2px] rounded-full bg-text-muted" />
 							<span>Finished: 07/17/2025, 10:48 AM</span>
 						</div>

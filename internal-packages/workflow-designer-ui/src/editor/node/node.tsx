@@ -41,6 +41,14 @@ import { Tooltip } from "../../ui/tooltip";
 import { GitHubNodeInfo } from "./ui";
 import { GitHubTriggerStatusBadge } from "./ui/github-trigger/status-badge";
 
+// Helper function to get completion label from node LLM provider
+function getCompletionLabel(node: Node): string {
+	if (isTextGenerationNode(node) || isImageGenerationNode(node)) {
+		return node.content.llm.provider;
+	}
+	return "Completed";
+}
+
 // Helper function to check if a GitHub node requires setup
 function isGitHubNodeRequiresSetup(node: NodeLike): boolean {
 	if (isTriggerNode(node, "github")) {
@@ -279,7 +287,9 @@ export function NodeComponent({
 						exit={{ opacity: 0 }}
 					>
 						<div className="flex items-center gap-[4px]">
-							<p className="text-xs font-medium font-sans">Completed</p>
+							<p className="text-[10px] font-medium font-geist text-black-400 leading-[140%]">
+								{getCompletionLabel(node)}
+							</p>
 							<CheckIcon className="w-4 h-4" />
 						</div>
 					</motion.div>
@@ -372,6 +382,19 @@ export function NodeComponent({
 						/>
 					</div>
 					<div>
+						<div className="flex items-center gap-[2px] pl-[4px] text-[10px] font-mono [&>*:not(:last-child)]:after:content-['/'] [&>*:not(:last-child)]:after:ml-[2px] [&>*:not(:last-child)]:after:text-white-300">
+							{metadataTexts.map((item, _index) => (
+								<div key={item.label} className="text-[10px] text-white-400">
+									{selected ? (
+										<Tooltip text={item.tooltip} variant="dark">
+											<button type="button">{item.label}</button>
+										</Tooltip>
+									) : (
+										item.label
+									)}
+								</div>
+							))}
+						</div>
 						<EditableText
 							className="group-data-[selected=false]:pointer-events-none **:data-input:w-full"
 							text={defaultName(node)}
@@ -393,19 +416,6 @@ export function NodeComponent({
 								e.stopPropagation();
 							}}
 						/>
-						<div className="flex items-center gap-[2px] pl-[4px] text-[10px] font-mono [&>*:not(:last-child)]:after:content-['/'] [&>*:not(:last-child)]:after:ml-[2px] [&>*:not(:last-child)]:after:text-white-300">
-							{metadataTexts.map((item, _index) => (
-								<div key={item.label} className="text-[10px] text-white-400">
-									{selected ? (
-										<Tooltip text={item.tooltip} variant="dark">
-											<button type="button">{item.label}</button>
-										</Tooltip>
-									) : (
-										item.label
-									)}
-								</div>
-							))}
-						</div>
 					</div>
 				</div>
 			</div>
