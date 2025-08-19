@@ -5109,7 +5109,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@xyflow/react"></a>
-### @xyflow/react v12.4.1
+### @xyflow/react v12.8.3
 #### 
 
 ##### Paths
@@ -5120,7 +5120,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@xyflow/system"></a>
-### @xyflow/system v0.0.49
+### @xyflow/system v0.0.67
 #### 
 
 ##### Paths

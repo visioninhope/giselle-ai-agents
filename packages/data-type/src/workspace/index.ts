@@ -12,9 +12,14 @@ export const Viewport = z.object({
 	zoom: z.number(),
 });
 export type Viewport = z.infer<typeof Viewport>;
+
+export const ShortcutScope = z.enum(["canvas", "properties-panel", "none"]);
+export type ShortcutScope = z.infer<typeof ShortcutScope>;
+
 export const UIState = z.object({
 	nodeState: z.record(NodeId.schema, NodeUIState),
 	viewport: Viewport,
+	currentShortcutScope: ShortcutScope.optional().default("canvas"),
 });
 export type UIState = z.infer<typeof UIState>;
 
@@ -41,6 +46,7 @@ export function generateInitialWorkspace() {
 				y: 0,
 				zoom: 1,
 			},
+			currentShortcutScope: "canvas",
 		},
 	} satisfies Workspace;
 }

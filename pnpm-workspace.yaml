@@ -28,7 +28,7 @@ catalog:
   "@radix-ui/react-tabs": 1.1.2
   lucide-react: 0.473.0
   clsx: 2.1.1
-  "@xyflow/react": 12.4.1
+  "@xyflow/react": 12.8.3
   openai: 5.11.0
   "@ai-sdk/openai": 2.0.0
   "@ai-sdk/anthropic": 2.0.0

@@ -8,6 +8,7 @@ import type {
 	NodeLike,
 	NodeUIState,
 	OutputId,
+	ShortcutScope,
 	UploadedFileData,
 	Viewport,
 	Workspace,
@@ -59,4 +60,7 @@ export interface WorkflowDesignerContextValue {
 		outputNode: NodeLike,
 		inputNode: NodeLike,
 	) => { canConnect: boolean; message?: string };
+	setCurrentShortcutScope: (scope: ShortcutScope) => void;
+	copiedNode: NodeLike | null;
+	setCopiedNode: (node: NodeLike | null) => void;
 }
