@@ -58,7 +58,7 @@ import { addWebPage } from "./sources";
 import type { GiselleEngineConfig, GiselleEngineContext } from "./types";
 import {
 	copyWorkspace,
-	createSampleWorkspace,
+	createSampleWorkspaces,
 	createWorkspace,
 	getWorkspace,
 	updateWorkspace,
@@ -240,8 +240,8 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 				useExperimentalStorage,
 			});
 		},
-		createSampleWorkspace: async () => {
-			return await createSampleWorkspace({ context });
+		createSampleWorkspaces: async () => {
+			return await createSampleWorkspaces({ context });
 		},
 		getGitHubRepositories: async () => {
 			return await getGitHubRepositories({ context });

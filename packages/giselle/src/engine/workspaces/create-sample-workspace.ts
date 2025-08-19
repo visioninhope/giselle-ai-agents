@@ -14,17 +14,15 @@ import {
 import type { GiselleEngineContext } from "../types";
 import { copyFiles, getWorkspace, setWorkspace } from "./utils";
 
-export async function createSampleWorkspace(args: {
+async function createSampleWorkspaceFromTemplate(args: {
 	context: GiselleEngineContext;
+	templateWorkspaceId: WorkspaceId;
 }) {
-	if (!args.context.sampleAppWorkspaceId) {
-		throw new Error("sampleAppWorkspaceId is required");
-	}
 	const templateWorkspace = await getWorkspace({
 		useExperimentalStorage: false,
 		storage: args.context.storage,
 		experimental_storage: args.context.experimental_storage,
-		workspaceId: args.context.sampleAppWorkspaceId,
+		workspaceId: args.templateWorkspaceId,
 	});
 	const idMap = new Map<string, string>();
 	const newNodes: NodeLike[] = [];
@@ -131,4 +129,28 @@ export async function createSampleWorkspace(args: {
 		}),
 	]);
 	return newWorkspace;
+}
+
+export async function createSampleWorkspaces(args: {
+	context: GiselleEngineContext;
+}) {
+	if (
+		!args.context.sampleAppWorkspaceIds ||
+		args.context.sampleAppWorkspaceIds.length === 0
+	) {
+		throw new Error(
+			"sampleAppWorkspaceIds is required and must contain at least one workspace ID",
+		);
+	}
+
+	const workspaces = await Promise.all(
+		args.context.sampleAppWorkspaceIds.map((templateWorkspaceId) =>
+			createSampleWorkspaceFromTemplate({
+				context: args.context,
+				templateWorkspaceId,
+			}),
+		),
+	);
+
+	return workspaces;
 }

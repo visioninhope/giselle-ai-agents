@@ -54,16 +54,18 @@ export const initializeAccount = async (
 			role: "admin",
 		});
 
-		// create sample app
-		const agentId = `agnt_${createId()}` as const;
-		const workspace = await giselleEngine.createSampleWorkspace();
-		await db.insert(agents).values({
-			id: agentId,
-			name: workspace.name,
-			teamDbId: team.id,
-			creatorDbId: user.dbId,
-			workspaceId: workspace.id,
-		});
+		// create sample apps
+		const workspaces = await giselleEngine.createSampleWorkspaces();
+		for (const workspace of workspaces) {
+			const agentId = `agnt_${createId()}` as const;
+			await db.insert(agents).values({
+				id: agentId,
+				name: workspace.name,
+				teamDbId: team.id,
+				creatorDbId: user.dbId,
+				workspaceId: workspace.id,
+			});
+		}
 
 		return { id: userId };
 	});

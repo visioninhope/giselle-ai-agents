@@ -16,8 +16,12 @@ export default function Home() {
 		router.push(`/workspaces/${workspace.id}`);
 	}, [router.push, giselleEngine]);
 	const createSampleWorkspace = useCallback(async () => {
-		const workspace = await giselleEngine.createSampleWorkspace();
-		router.push(`/workspaces/${workspace.id}`);
+		const workspaces = await giselleEngine.createSampleWorkspaces();
+		// Use the first workspace if multiple are created
+		const workspace = workspaces[0];
+		if (workspace) {
+			router.push(`/workspaces/${workspace.id}`);
+		}
 	}, [router.push, giselleEngine]);
 	return (
 		<div className="p-[24px] flex gap-[8px]">

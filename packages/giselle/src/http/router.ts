@@ -204,11 +204,11 @@ export const createJsonRouters = {
 				return new Response(null, { status: 204 });
 			},
 		}),
-	createSampleWorkspace: (giselleEngine: GiselleEngine) =>
+	createSampleWorkspaces: (giselleEngine: GiselleEngine) =>
 		createHandler({
 			handler: async () => {
-				const workspace = await giselleEngine.createSampleWorkspace();
-				return JsonResponse.json(workspace);
+				const workspaces = await giselleEngine.createSampleWorkspaces();
+				return JsonResponse.json(workspaces);
 			},
 		}),
 	getGitHubRepositories: (giselleEngine: GiselleEngine) =>
