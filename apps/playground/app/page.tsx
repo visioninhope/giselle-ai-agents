@@ -18,8 +18,8 @@ export default function Home() {
 	const createSampleWorkspace = useCallback(async () => {
 		const workspaces = await giselleEngine.createSampleWorkspaces();
 		// Use the first workspace if multiple are created
-		const workspace = workspaces[0];
-		if (workspace) {
+		if (Array.isArray(workspaces) && workspaces.length > 0 && workspaces[0]) {
+			const workspace = workspaces[0];
 			router.push(`/workspaces/${workspace.id}`);
 		}
 	}, [router.push, giselleEngine]);
