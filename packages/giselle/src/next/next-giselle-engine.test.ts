@@ -50,6 +50,7 @@ describe("createHttpHandler", () => {
 						return "fake";
 					},
 				},
+				useAfterFunction: false,
 			},
 		});
 	});

@@ -46,6 +46,7 @@ import {
 	setGeneration,
 	type TelemetrySettings,
 } from "./generations";
+import { flushGenerationIndexQueue } from "./generations/internal/act-generation-index-queue";
 import {
 	getGitHubRepositories,
 	getGitHubRepositoryFullname,
@@ -349,6 +350,9 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 		},
 		deleteSecret(args: { workspaceId: WorkspaceId; secretId: SecretId }) {
 			return deleteSecret({ ...args, context });
+		},
+		async flushGenerationIndexQueue() {
+			return await flushGenerationIndexQueue(context.experimental_storage);
 		},
 	};
 }
