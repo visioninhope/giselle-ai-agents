@@ -330,6 +330,13 @@
 			"when": 1755567043931,
 			"tag": "0046_lush_shriek",
 			"breakpoints": true
+		},
+		{
+			"idx": 47,
+			"version": "7",
+			"when": 1755584435518,
+			"tag": "0047_hot_chamber",
+			"breakpoints": true
 		}
 	]
 }
