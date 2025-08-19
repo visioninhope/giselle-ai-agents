@@ -130,22 +130,23 @@ export async function registerRepositoryIndex(
 			}
 		}
 
-		// Create content status records
-		for (const contentType of contentTypesToCreate) {
-			await db.insert(githubRepositoryContentStatus).values({
-				repositoryIndexDbId: newRepository.dbId,
-				contentType: contentType.contentType,
-				enabled: contentType.enabled,
-				status: "idle",
-			});
-		}
-
 		// Add default embedding profile (ID: 1)
 		// FIXME: receive user input when implementing UI.
 		await db.insert(githubRepositoryEmbeddingProfiles).values({
 			repositoryIndexDbId: newRepository.dbId,
 			embeddingProfileId: 1,
 		});
+
+		// Create content status records for each embedding profile
+		for (const contentType of contentTypesToCreate) {
+			await db.insert(githubRepositoryContentStatus).values({
+				repositoryIndexDbId: newRepository.dbId,
+				embeddingProfileId: 1, // Default embedding profile
+				contentType: contentType.contentType,
+				enabled: contentType.enabled,
+				status: "idle",
+			});
+		}
 
 		revalidatePath("/settings/team/vector-stores");
 		return { success: true };
@@ -291,7 +292,7 @@ export async function updateRepositoryInstallation(
 			})
 			.where(
 				eq(githubRepositoryContentStatus.repositoryIndexDbId, repository.dbId),
-				// we don't have to watch content type because we are updating the whole contents for the repository
+				// we don't have to watch content type or embedding profile because we are updating the whole contents for the repository
 			);
 	}
 
@@ -465,27 +466,47 @@ export async function updateRepositoryContentTypes(
 			};
 		}
 
-		// Update or create content status records using single upsert
-		await db
-			.insert(githubRepositoryContentStatus)
-			.values(
-				contentTypes.map((contentType) => ({
+		// Get enabled embedding profiles for this repository
+		const embeddingProfiles = await db
+			.select()
+			.from(githubRepositoryEmbeddingProfiles)
+			.where(
+				eq(
+					githubRepositoryEmbeddingProfiles.repositoryIndexDbId,
+					repository.dbId,
+				),
+			);
+
+		// Update or create content status records for each embedding profile
+		const valuesToInsert = [];
+		for (const profile of embeddingProfiles) {
+			for (const contentType of contentTypes) {
+				valuesToInsert.push({
 					repositoryIndexDbId: repository.dbId,
+					embeddingProfileId: profile.embeddingProfileId,
 					contentType: contentType.contentType,
 					enabled: contentType.enabled,
 					status: "idle" as const,
-				})),
-			)
-			.onConflictDoUpdate({
-				target: [
-					githubRepositoryContentStatus.repositoryIndexDbId,
-					githubRepositoryContentStatus.contentType,
-				],
-				set: {
-					enabled: sql`excluded.enabled`,
-					updatedAt: new Date(),
-				},
-			});
+				});
+			}
+		}
+
+		if (valuesToInsert.length > 0) {
+			await db
+				.insert(githubRepositoryContentStatus)
+				.values(valuesToInsert)
+				.onConflictDoUpdate({
+					target: [
+						githubRepositoryContentStatus.repositoryIndexDbId,
+						githubRepositoryContentStatus.embeddingProfileId,
+						githubRepositoryContentStatus.contentType,
+					],
+					set: {
+						enabled: sql`excluded.enabled`,
+						updatedAt: new Date(),
+					},
+				});
+		}
 
 		revalidatePath("/settings/team/vector-stores");
 		return { success: true };

@@ -30,6 +30,7 @@ export async function ingestGitHubBlobs(params: {
 	const { repositoryIndexDbId, isInitialIngest } = await getRepositoryIndexInfo(
 		params.source,
 		params.teamDbId,
+		params.embeddingProfileId,
 	);
 
 	const githubLoader = isInitialIngest
@@ -73,6 +74,7 @@ export async function ingestGitHubBlobs(params: {
 async function getRepositoryIndexInfo(
 	source: { owner: string; repo: string },
 	teamDbId: number,
+	embeddingProfileId: EmbeddingProfileId,
 ): Promise<{ repositoryIndexDbId: number; isInitialIngest: boolean }> {
 	const contentType = "blob";
 
@@ -88,6 +90,10 @@ async function getRepositoryIndexInfo(
 				eq(
 					githubRepositoryContentStatus.repositoryIndexDbId,
 					githubRepositoryIndex.dbId,
+				),
+				eq(
+					githubRepositoryContentStatus.embeddingProfileId,
+					embeddingProfileId,
 				),
 				eq(githubRepositoryContentStatus.contentType, contentType),
 			),
