@@ -15,10 +15,7 @@ const PERFORMANCE_CONSTANTS = {
 	MAX_BATCH_SIZE: 5000,
 } as const;
 
-/**
- * Type definition for chunk records prepared for insertion
- */
-export type ChunkRecord = {
+type ChunkRecord = {
 	record: Record<string, unknown>;
 	embedding: {
 		embeddingColumn: string;
