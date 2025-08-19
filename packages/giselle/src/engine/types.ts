@@ -1,10 +1,14 @@
-import type { FlowTrigger, WorkspaceId } from "@giselle-sdk/data-type";
+import type {
+	EmbeddingProfileId,
+	FlowTrigger,
+	WorkspaceId,
+} from "@giselle-sdk/data-type";
 import type {
 	GitHubInstallationAppAuth,
 	GitHubPersonalAccessTokenAuth,
 } from "@giselle-sdk/github-tool";
 import type { LanguageModelProvider } from "@giselle-sdk/language-model";
-import type { EmbeddingProfileId, QueryService } from "@giselle-sdk/rag";
+import type { QueryService } from "@giselle-sdk/rag";
 import type { ModelMessage } from "ai";
 import type { Storage } from "unstorage";
 import type { GiselleStorage } from "./experimental_storage";

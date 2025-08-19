@@ -1,6 +1,7 @@
 import {
 	DEFAULT_MAX_RESULTS,
 	DEFAULT_SIMILARITY_THRESHOLD,
+	type EmbeddingProfileId,
 	isQueryNode,
 	isTextNode,
 	NodeId,
@@ -9,7 +10,6 @@ import {
 	type VectorStoreNode,
 	type WorkspaceId,
 } from "@giselle-sdk/data-type";
-import type { EmbeddingProfileId } from "@giselle-sdk/rag";
 import {
 	isJsonContent,
 	jsonContentToText,
