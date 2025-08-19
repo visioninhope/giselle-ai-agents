@@ -12,7 +12,7 @@ export async function fetchGenerationData(
 			true,
 		);
 	} catch (error) {
-		console.warn(`Failed to fetch generation ${generationId}:`, error);
+		console.warn("Failed to fetch generation:", generationId, error);
 		return undefined;
 	}
 }
