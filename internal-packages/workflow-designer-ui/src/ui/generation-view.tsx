@@ -2,12 +2,42 @@
 
 import type { Generation } from "@giselle-sdk/giselle";
 import { useGiselleEngine } from "@giselle-sdk/giselle/react";
+import type { UIMessage } from "ai";
 import { ChevronRightIcon } from "lucide-react";
 import { Accordion } from "radix-ui";
 import { useMemo } from "react";
 import { WilliIcon } from "../icons";
 import ClipboardButton from "./clipboard-button";
 import { MemoizedMarkdown } from "./memoized-markdown";
+
+function mergeAdjacentTextParts<T extends UIMessage>(message: T) {
+	const { parts } = message;
+	const merged: T["parts"] = [];
+	let buffer = "";
+
+	for (const part of parts) {
+		if (part.type === "text") {
+			buffer += part.text;
+			continue;
+		}
+		// Flush any buffered text before pushing a non-text part
+		if (buffer.length > 0) {
+			merged.push({ type: "text", text: buffer });
+			buffer = "";
+		}
+		merged.push(part);
+	}
+
+	// Flush tail buffer
+	if (buffer.length > 0) {
+		merged.push({ type: "text", text: buffer });
+	}
+
+	return {
+		...message,
+		parts: merged,
+	};
+}
 
 function Spinner() {
 	return (
@@ -20,13 +50,14 @@ function Spinner() {
 }
 export function GenerationView({ generation }: { generation: Generation }) {
 	const client = useGiselleEngine();
-	const generatedMessages = useMemo(
-		() =>
-			"messages" in generation
-				? (generation.messages?.filter((m) => m.role === "assistant") ?? [])
-				: [],
-		[generation],
-	);
+	const generatedMessages = useMemo(() => {
+		if ("messages" in generation && generation.messages !== undefined) {
+			return generation.messages
+				.filter((m) => m.role === "assistant")
+				.map((message) => mergeAdjacentTextParts(message));
+		}
+		return [];
+	}, [generation]);
 
 	if (generation.status === "failed") {
 		return generation.error.message;
