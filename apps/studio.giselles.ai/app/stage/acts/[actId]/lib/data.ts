@@ -2,9 +2,10 @@ import {
 	isTriggerNode,
 	type ManualTriggerParameter,
 } from "@giselle-sdk/data-type";
-import type { Act } from "@giselle-sdk/giselle";
+import type { Act, ActId } from "@giselle-sdk/giselle";
 import { giselleEngine } from "@/app/giselle-engine";
 import { fetchUserTeams } from "@/services/teams";
+import type { SidebarDataObject } from "../ui/sidebar";
 
 interface ActMetadata {
 	appName: string;
@@ -15,7 +16,7 @@ interface ActMetadata {
 /**
  * Fetch comprehensive act metadata including workspace and team information
  */
-export async function fetchActMetadata(act: Act): Promise<ActMetadata> {
+async function fetchActMetadata(act: Act): Promise<ActMetadata> {
 	const defaultMetadata: ActMetadata = {
 		appName: "Untitled App",
 		teamName: "Personal Team",
@@ -85,4 +86,17 @@ async function fetchTriggerParameters(workspace: {
 		console.warn("Failed to fetch trigger parameters:", error);
 		return [];
 	}
+}
+
+export async function getSidebarDataObject(
+	actId: ActId,
+): Promise<SidebarDataObject> {
+	const act = await giselleEngine.getAct({ actId });
+	const { appName, teamName, triggerParameters } = await fetchActMetadata(act);
+	return {
+		act,
+		appName,
+		teamName,
+		triggerParameters,
+	};
 }
