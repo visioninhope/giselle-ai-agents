@@ -1,19 +1,18 @@
 import { Toasts } from "@giselles-ai/components/toasts";
 import { ToastProvider } from "@giselles-ai/contexts/toast";
 import { isNotNull } from "drizzle-orm";
-import { Suspense } from "react";
-import { db } from "@/drizzle";
+import { Suspense, use } from "react";
+import { db, type agents as dbAgents } from "@/drizzle";
 import { fetchCurrentTeam } from "@/services/teams";
 import { SearchableAgentList } from "./components/searchable-agent-list";
 
-async function AgentList() {
-	const currentTeam = await fetchCurrentTeam();
-	const dbAgents = await db.query.agents.findMany({
-		where: (agents, { and, eq }) =>
-			and(eq(agents.teamDbId, currentTeam.dbId), isNotNull(agents.workspaceId)),
-		orderBy: (agents, { desc }) => desc(agents.updatedAt),
-	});
-	if (dbAgents.length === 0) {
+function AgentList({
+	agents: agentsPromise,
+}: {
+	agents: Promise<(typeof dbAgents.$inferSelect)[]>;
+}) {
+	const agents = use(agentsPromise);
+	if (agents.length === 0) {
 		return (
 			<div className="flex justify-center items-center h-full">
 				<div className="grid gap-[8px] justify-center text-center">
@@ -27,15 +26,25 @@ async function AgentList() {
 			</div>
 		);
 	}
-	return <SearchableAgentList agents={dbAgents} />;
+	return <SearchableAgentList agents={agents} />;
 }
 
-export default function AgentListV2Page() {
+async function agentsQuery(teamDbId: number) {
+	return await db.query.agents.findMany({
+		where: (agents, { and, eq }) =>
+			and(eq(agents.teamDbId, teamDbId), isNotNull(agents.workspaceId)),
+		orderBy: (agents, { desc }) => desc(agents.updatedAt),
+	});
+}
+
+export default async function AgentListV2Page() {
+	const currentTeam = await fetchCurrentTeam();
+	const agents = agentsQuery(currentTeam.dbId);
 	return (
 		<ToastProvider>
 			<div className="w-full pt-2 pb-2">
 				<Suspense fallback={<p className="text-center py-8">Loading...</p>}>
-					<AgentList />
+					<AgentList agents={agents} />
 				</Suspense>
 				<Toasts />
 			</div>
