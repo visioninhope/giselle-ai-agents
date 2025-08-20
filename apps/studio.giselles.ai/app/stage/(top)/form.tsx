@@ -5,7 +5,7 @@ import type { FlowTriggerId } from "@giselle-sdk/data-type";
 
 import clsx from "clsx/lite";
 import { Settings, X } from "lucide-react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
 	useActionState,
 	useCallback,
@@ -61,6 +61,7 @@ export function Form({
 	flowTriggers: FlowTriggerUIItem[];
 	performStageAction: PerformStageAction;
 }) {
+	const router = useRouter();
 	const searchParams = useSearchParams();
 	const urlTeamId = searchParams.get("teamId");
 	const urlWorkspaceId = searchParams.get("workspaceId");
@@ -79,7 +80,9 @@ export function Form({
 	>(undefined);
 	const initializedRef = useRef(false);
 	const userHasSelectedRef = useRef(false);
-	const [selectedFilter, setSelectedFilter] = useState<FilterType>("all");
+	const [selectedFilter, setSelectedFilter] = useState<FilterType>(
+		(searchParams.get("filter") as FilterType) || "all",
+	);
 	const [isCarouselView, setIsCarouselView] = useState(false);
 	const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
 	const [isMobile, setIsMobile] = useState(false);
@@ -121,6 +124,29 @@ export function Form({
 				(flowTrigger) => flowTrigger.teamId === selectedTeamId,
 			),
 		[flowTriggers, selectedTeamId],
+	);
+
+	// Handle filter changes via URL navigation
+	const handleFilterChange = useCallback(
+		(newFilter: FilterType) => {
+			const params = new URLSearchParams(searchParams);
+			if (newFilter === "all") {
+				params.delete("filter");
+			} else {
+				params.set("filter", newFilter);
+			}
+			router.push(`/stage?${params.toString()}`);
+		},
+		[router, searchParams],
+	);
+
+	const handleTeamChange = useCallback(
+		(newTeamId: TeamId) => {
+			const params = new URLSearchParams(searchParams);
+			params.set("teamId", newTeamId);
+			router.push(`/stage?${params.toString()}`);
+		},
+		[router, searchParams],
 	);
 
 	// Pre-select flow trigger based on URL workspace ID (only once on initial load and if user hasn't manually selected)
@@ -237,9 +263,11 @@ export function Form({
 							renderOption={(o) => o.label}
 							value={selectedTeamId}
 							onValueChange={(value) => {
-								setSelectedTeamId(value as TeamId);
+								const newTeamId = value as TeamId;
+								setSelectedTeamId(newTeamId);
 								userHasSelectedRef.current = true;
 								setSelectedFlowTriggerId(undefined);
+								handleTeamChange(newTeamId);
 							}}
 						/>
 					</div>
@@ -251,7 +279,13 @@ export function Form({
 						options={FILTER_OPTIONS}
 						renderOption={(o) => o.label}
 						value={selectedFilter}
-						onValueChange={(value) => setSelectedFilter(value as FilterType)}
+						onValueChange={(value) => {
+							const newFilter = value as FilterType;
+							setSelectedFilter(newFilter);
+							userHasSelectedRef.current = true;
+							setSelectedFlowTriggerId(undefined);
+							handleFilterChange(newFilter);
+						}}
 					/>
 				</div>
 			</div>
