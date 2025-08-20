@@ -4625,7 +4625,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@types/react"></a>
-### @types/react v19.1.0
+### @types/react v19.1.10
 #### 
 
 ##### Paths
@@ -4636,7 +4636,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@types/react-dom"></a>
-### @types/react-dom v19.1.2
+### @types/react-dom v19.1.7
 #### 
 
 ##### Paths
@@ -10140,7 +10140,7 @@ BlueOak-1.0.0 permitted
 
 
 <a name="react"></a>
-### react v19.1.0
+### react v19.1.1
 #### 
 
 ##### Paths
@@ -10151,7 +10151,7 @@ BlueOak-1.0.0 permitted
 
 
 <a name="react-dom"></a>
-### react-dom v19.1.0
+### react-dom v19.1.1
 #### 
 
 ##### Paths
