@@ -115,11 +115,7 @@ export function Form({
 	const handleFilterChange = useCallback(
 		(newFilter: FilterType) => {
 			const params = new URLSearchParams(searchParams);
-			if (newFilter === "all") {
-				params.delete("filter");
-			} else {
-				params.set("filter", newFilter);
-			}
+			params.set("filter", newFilter);
 			router.push(`/stage?${params.toString()}`);
 		},
 		[router, searchParams],

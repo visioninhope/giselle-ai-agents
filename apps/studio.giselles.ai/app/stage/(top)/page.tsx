@@ -35,6 +35,7 @@ export default async function StagePage({
 	}
 
 	const searchParamsResolved = await searchParams;
+	// Default to 'history' when no filter param, otherwise use the specified filter (including 'all' for reset)
 	const filterType = (searchParamsResolved.filter as FilterType) || "history";
 	const user = await fetchCurrentUser();
 	const teams = await fetchUserTeams();
