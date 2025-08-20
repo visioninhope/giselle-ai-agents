@@ -14,8 +14,3 @@ export type AgentGridProps = {
 export type AgentCardProps = {
 	agent: Agent;
 };
-
-export type Position = {
-	x: number;
-	y: number;
-};

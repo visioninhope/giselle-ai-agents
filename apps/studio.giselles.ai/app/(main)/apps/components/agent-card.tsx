@@ -79,7 +79,7 @@ export function AgentCard({ agent }: AgentCardProps) {
 				className="pointer-events-none absolute inset-0 z-20 opacity-0 transition-opacity duration-500 group-hover:opacity-100 rounded-[inherit]"
 				style={{
 					background:
-						"radial-gradient(circle at var(--mouse-x) var(--mouse-y), var(--spotlight-color), transparent 50%)",
+						"radial-gradient(circle at var(--mouse-x) var(--mouse-y), var(--spotlight-color), transparent 75%)",
 				}}
 			/>
 
