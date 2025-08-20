@@ -10,9 +10,11 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import type { teams as teamsTable } from "@/drizzle";
 import { cn } from "@/lib/utils";
 import { Toast } from "@/packages/components/toast";
 import { useToast } from "@/packages/contexts/toast";
+import { TeamAvatarImage } from "@/services/teams/components/team-avatar-image";
 import { leaveTeam, navigateWithChangeTeam } from "./actions";
 
 const roles = {
@@ -28,6 +30,7 @@ export default function UserTeams({
 		id: string;
 		name: string;
 		role: "admin" | "member";
+		avatarUrl?: typeof teamsTable.$inferSelect.avatarUrl;
 		isPro?: boolean;
 	}[];
 	currentUser: {
@@ -75,6 +78,7 @@ export default function UserTeams({
 							key={team.id}
 							teamId={team.id}
 							teamName={team.name}
+							avatarUrl={team.avatarUrl}
 							role={roles[team.role]}
 							isPro={team.isPro}
 							currentUserId={currentUser.id}
@@ -97,6 +101,7 @@ export default function UserTeams({
 function UserTeamsItem({
 	teamId,
 	teamName,
+	avatarUrl,
 	role,
 	isPro = false,
 	currentUserId,
@@ -104,6 +109,7 @@ function UserTeamsItem({
 }: {
 	teamId: string;
 	teamName: string;
+	avatarUrl?: typeof teamsTable.$inferSelect.avatarUrl;
 	role: string;
 	isPro?: boolean;
 	currentUserId: string;
@@ -125,15 +131,23 @@ function UserTeamsItem({
 		<div
 			className={cn("flex items-center justify-between gap-4 p-4", className)}
 		>
-			<div className="flex flex-col">
-				<div className="flex items-center gap-2">
-					<div className="text-white-400 font-medium text-[16px] leading-[22.4px] font-geist">
-						{teamName}
+			<div className="flex items-center gap-3">
+				<TeamAvatarImage
+					avatarUrl={avatarUrl}
+					teamName={teamName}
+					width={32}
+					height={32}
+				/>
+				<div className="flex flex-col">
+					<div className="flex items-center gap-2">
+						<div className="text-white-400 font-medium text-[16px] leading-[22.4px] font-geist">
+							{teamName}
+						</div>
+						{isPro ? <ProTag /> : <FreeTag />}
 					</div>
-					{isPro ? <ProTag /> : <FreeTag />}
-				</div>
-				<div className="text-black-400 font-medium text-[12px] leading-[20.4px] font-geist">
-					{role}
+					<div className="text-black-400 font-medium text-[12px] leading-[20.4px] font-geist">
+						{role}
+					</div>
 				</div>
 			</div>
 			<DropdownMenu modal={false}>
