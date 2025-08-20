@@ -110,7 +110,7 @@ async function createSampleWorkspaceFromTemplate(args: {
 			let updatedPrompt = node.content.prompt;
 			// Replace old node IDs with new ones in prompt content
 			for (const [oldId, newId] of idMap.entries()) {
-				updatedPrompt = updatedPrompt.replace(new RegExp(oldId, "g"), newId);
+				updatedPrompt = updatedPrompt.replaceAll(oldId, newId);
 			}
 			return {
 				...node,
