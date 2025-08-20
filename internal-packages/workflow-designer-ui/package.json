@@ -45,6 +45,7 @@
 		"@types/pluralize": "catalog:",
 		"@types/react": "catalog:",
 		"@types/react-dom": "catalog:",
+		"ai": "catalog:",
 		"tailwindcss": "catalog:",
 		"typescript": "catalog:",
 		"vitest": "catalog:"
