@@ -5,19 +5,11 @@ import type { FlowTriggerId } from "@giselle-sdk/data-type";
 
 import clsx from "clsx/lite";
 import { Settings, X } from "lucide-react";
-import { useRouter, useSearchParams } from "next/navigation";
-import {
-	useActionState,
-	useCallback,
-	useEffect,
-	useMemo,
-	useRef,
-	useState,
-} from "react";
+
+import { useActionState, useCallback, useMemo } from "react";
 import { cn } from "@/lib/utils";
 import { AvatarImage } from "@/services/accounts/components/user-button/avatar-image";
 import { buttonVariants } from "../../(main)/settings/components/button";
-
 import { AppIcon } from "./app-icon";
 import { CircularCarousel } from "./circular-carousel";
 import { FormInputRenderer } from "./form-input-renderer";
@@ -26,6 +18,9 @@ import {
 	parseFormInputs,
 	toParameterItems,
 } from "./helpers";
+import { useFilterState } from "./hooks/use-filter-state";
+import { useFormState } from "./hooks/use-form-state";
+import { useUIState } from "./hooks/use-ui-state";
 import { SettingsDialog } from "./settings-dialog";
 import type {
 	FilterType,
@@ -33,7 +28,6 @@ import type {
 	PerformStageAction,
 	TeamId,
 	TeamOption,
-	ValidationErrors,
 } from "./types";
 import { FILTER_OPTIONS } from "./types";
 
@@ -46,46 +40,22 @@ export function Form({
 	flowTriggers: FlowTriggerUIItem[];
 	performStageAction: PerformStageAction;
 }) {
-	const router = useRouter();
-	const searchParams = useSearchParams();
-	const urlTeamId = searchParams.get("teamId");
-	const urlWorkspaceId = searchParams.get("workspaceId");
+	const {
+		selectedTeamId,
+		setSelectedTeamId,
+		selectedFilter,
+		setSelectedFilter,
+		handleFilterChange,
+		handleTeamChange,
+	} = useFilterState({ teamOptions });
 
-	const defaultTeamId = useMemo(() => {
-		if (urlTeamId && teamOptions.some((team) => team.value === urlTeamId)) {
-			return urlTeamId as TeamId;
-		}
-		return teamOptions[0].value;
-	}, [teamOptions, urlTeamId]);
-
-	const [selectedTeamId, setSelectedTeamId] = useState<TeamId>(defaultTeamId);
-
-	const [selectedFlowTriggerId, setSelectedFlowTriggerId] = useState<
-		FlowTriggerId | undefined
-	>(undefined);
-	const initializedRef = useRef(false);
-	const userHasSelectedRef = useRef(false);
-	const [selectedFilter, setSelectedFilter] = useState<FilterType>(
-		(searchParams.get("filter") as FilterType) || "history",
-	);
-	const [isCarouselView, setIsCarouselView] = useState(false);
-	const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
-	const [isMobile, setIsMobile] = useState(false);
-
-	const [validationErrors, setValidationErrors] = useState<ValidationErrors>(
-		{},
-	);
-
-	useEffect(() => {
-		const checkMobile = () => {
-			setIsMobile(window.innerWidth < 768);
-		};
-
-		checkMobile();
-		window.addEventListener("resize", checkMobile);
-
-		return () => window.removeEventListener("resize", checkMobile);
-	}, []);
+	const {
+		isMobile,
+		isCarouselView,
+		setIsCarouselView,
+		isSettingsModalOpen,
+		setIsSettingsModalOpen,
+	} = useUIState();
 
 	const teamOptionsWithIcons = useMemo(
 		() =>
@@ -111,52 +81,16 @@ export function Form({
 		[flowTriggers, selectedTeamId],
 	);
 
-	// Handle filter changes via URL navigation
-	const handleFilterChange = useCallback(
-		(newFilter: FilterType) => {
-			const params = new URLSearchParams(searchParams);
-			params.set("filter", newFilter);
-			router.push(`/stage?${params.toString()}`);
-		},
-		[router, searchParams],
-	);
-
-	const handleTeamChange = useCallback(
-		(newTeamId: TeamId) => {
-			const params = new URLSearchParams(searchParams);
-			params.set("teamId", newTeamId);
-			router.push(`/stage?${params.toString()}`);
-		},
-		[router, searchParams],
-	);
-
-	// Pre-select flow trigger based on URL workspace ID (only once on initial load and if user hasn't manually selected)
-	useEffect(() => {
-		if (
-			!initializedRef.current &&
-			!userHasSelectedRef.current &&
-			filteredFlowTriggers.length > 0
-		) {
-			if (urlWorkspaceId) {
-				const matchingTrigger = filteredFlowTriggers.find(
-					(trigger) => trigger.sdkData.workspaceId === urlWorkspaceId,
-				);
-				if (matchingTrigger) {
-					setSelectedFlowTriggerId(matchingTrigger.id);
-					// Don't mark as user-selected for auto-selection from URL
-				}
-			}
-			initializedRef.current = true;
-		}
-	}, [filteredFlowTriggers, urlWorkspaceId]);
-
-	const selectedTrigger = useMemo(
-		() =>
-			filteredFlowTriggers.find(
-				(flowTrigger) => flowTrigger.id === selectedFlowTriggerId,
-			),
-		[filteredFlowTriggers, selectedFlowTriggerId],
-	);
+	const {
+		selectedFlowTriggerId,
+		setSelectedFlowTriggerId,
+		selectedTrigger,
+		validationErrors,
+		setValidationErrors,
+		userHasSelectedRef,
+		handleFlowTriggerSelect,
+		handleFlowTriggerDeselect,
+	} = useFormState({ filteredFlowTriggers });
 
 	const inputs = useMemo(
 		() => createInputsFromTrigger(selectedTrigger?.sdkData),
@@ -199,6 +133,7 @@ export function Form({
 			selectedFlowTriggerId,
 			selectedTeamId,
 			filteredFlowTriggers,
+			setValidationErrors,
 		],
 	);
 
@@ -285,13 +220,9 @@ export function Form({
 						}))}
 						selectedId={selectedFlowTriggerId}
 						onItemSelect={(item) => {
-							userHasSelectedRef.current = true;
-							setSelectedFlowTriggerId(item.id as FlowTriggerId);
+							handleFlowTriggerSelect(item.id as FlowTriggerId);
 						}}
-						onItemDeselect={() => {
-							userHasSelectedRef.current = true;
-							setSelectedFlowTriggerId(undefined);
-						}}
+						onItemDeselect={handleFlowTriggerDeselect}
 					/>
 				) : (
 					<div className="w-full px-4 max-w-4xl mx-auto">
@@ -316,12 +247,7 @@ export function Form({
 											key={trigger.id}
 											type="button"
 											onClick={() => {
-												userHasSelectedRef.current = true;
-												if (selectedFlowTriggerId === trigger.id) {
-													setSelectedFlowTriggerId(undefined);
-												} else {
-													setSelectedFlowTriggerId(trigger.id);
-												}
+												handleFlowTriggerSelect(trigger.id);
 											}}
 											className={clsx(
 												"group flex items-center gap-3 p-3 rounded-lg border transition-all cursor-pointer relative z-20 w-full text-left",
@@ -396,7 +322,7 @@ export function Form({
 							</div>
 							<button
 								type="button"
-								onClick={() => setSelectedFlowTriggerId(undefined)}
+								onClick={handleFlowTriggerDeselect}
 								className="rounded-full p-2 text-white-400 opacity-70 hover:opacity-100 hover:bg-white/10 focus:outline-none transition-all"
 							>
 								<X className="h-5 w-5" />
@@ -413,7 +339,7 @@ export function Form({
 							<div className="mt-6 flex justify-end gap-x-3 pb-6">
 								<button
 									type="button"
-									onClick={() => setSelectedFlowTriggerId(undefined)}
+									onClick={handleFlowTriggerDeselect}
 									disabled={isPending}
 									className={cn(buttonVariants({ variant: "link" }))}
 								>
