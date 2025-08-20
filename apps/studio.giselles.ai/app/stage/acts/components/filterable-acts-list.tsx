@@ -349,7 +349,7 @@ export function FilterableActsList({
 				</div>
 
 				{/* Filters */}
-				<div className="flex flex-col gap-4 mb-6">
+				<div className="flex flex-col md:flex-row gap-4 mb-6">
 					{/* Search */}
 					<div className="search-input relative flex-1">
 						<div
@@ -394,7 +394,7 @@ export function FilterableActsList({
 					</div>
 
 					{/* Status Filter and New Task Button Row */}
-					<div className="flex flex-row gap-4">
+					<div className="flex flex-row gap-4 md:flex-shrink-0">
 						{/* Status Filter */}
 						<div className="status-select flex-1">
 							<Popover
