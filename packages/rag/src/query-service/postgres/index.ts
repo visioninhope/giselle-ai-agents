@@ -6,6 +6,7 @@ import type { TelemetrySettings } from "ai";
 import { escapeIdentifier } from "pg";
 import * as pgvector from "pgvector/pg";
 import type { z } from "zod/v4";
+import { EMBEDDING_COLUMNS } from "../../database/constants";
 import { PoolManager } from "../../database/postgres";
 import { ensurePgVectorTypes } from "../../database/postgres/pgvector-registry";
 import type { DatabaseConfig } from "../../database/types";
@@ -205,15 +206,15 @@ function buildSearchQuery({
 	// Determine the appropriate cast based on embedding dimensions
 	const embeddingCast =
 		embeddingDimensions === 3072
-			? `${escapeIdentifier(columnMapping.embedding)}::halfvec(3072)`
-			: `${escapeIdentifier(columnMapping.embedding)}::vector(1536)`;
+			? `${escapeIdentifier(EMBEDDING_COLUMNS.VECTOR)}::halfvec(3072)`
+			: `${escapeIdentifier(EMBEDDING_COLUMNS.VECTOR)}::vector(1536)`;
 
 	// Add embedding profile conditions
-	whereConditions.push(`embedding_profile_id = $${paramIndex}`);
+	whereConditions.push(`${EMBEDDING_COLUMNS.PROFILE_ID} = $${paramIndex}`);
 	values.push(embeddingProfileId);
 	paramIndex++;
 
-	whereConditions.push(`embedding_dimensions = $${paramIndex}`);
+	whereConditions.push(`${EMBEDDING_COLUMNS.DIMENSIONS} = $${paramIndex}`);
 	values.push(embeddingDimensions);
 	paramIndex++;
 

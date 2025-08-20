@@ -14,7 +14,7 @@ describe("chunk-store/postgres/utils", () => {
 				documentKey: "doc_key",
 				chunkContent: "content",
 				chunkIndex: "idx",
-				embedding: "vec",
+				version: "version",
 				title: "title_col",
 				author: "author_col",
 				tags: "tags_col",
@@ -40,7 +40,7 @@ describe("chunk-store/postgres/utils", () => {
 				documentKey: "doc_key",
 				chunkContent: "content",
 				chunkIndex: "idx",
-				embedding: "vec",
+				version: "version",
 				title: "title_col",
 			};
 
@@ -70,7 +70,7 @@ describe("chunk-store/postgres/utils", () => {
 				documentKey: "doc_key",
 				chunkContent: "content",
 				chunkIndex: "idx",
-				embedding: "vec",
+				version: "version",
 				title: "title_col",
 				author: "author_col",
 			};
@@ -81,6 +81,8 @@ describe("chunk-store/postgres/utils", () => {
 				metadata,
 				columnMapping,
 				{},
+				1, // embeddingProfileId
+				1536, // embeddingDimensions
 			);
 
 			expect(records).toHaveLength(2);
@@ -93,8 +95,9 @@ describe("chunk-store/postgres/utils", () => {
 					author_col: "Author",
 				},
 				embedding: {
-					embeddingColumn: "vec",
 					embeddingValue: [1, 2, 3],
+					embeddingProfileId: 1,
+					embeddingDimensions: 1536,
 				},
 			});
 			expect(records[1].record.idx).toBe(1);
@@ -109,7 +112,7 @@ describe("chunk-store/postgres/utils", () => {
 				documentKey: "doc_key",
 				chunkContent: "content",
 				chunkIndex: "idx",
-				embedding: "vec",
+				version: "version",
 				title: "title_col",
 			};
 
@@ -123,6 +126,8 @@ describe("chunk-store/postgres/utils", () => {
 				metadata,
 				columnMapping,
 				scope,
+				1, // embeddingProfileId
+				1536, // embeddingDimensions
 			);
 
 			expect(records[0].record).toMatchObject({
