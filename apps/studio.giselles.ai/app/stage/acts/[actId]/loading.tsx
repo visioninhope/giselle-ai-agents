@@ -3,32 +3,77 @@ import { StepLayout } from "./[stepId]/ui/step-layout";
 
 // Define a dummy generation object for the loading state to satisfy StepLayout's props
 const dummyGeneration: Generation = {
-	id: "gnr-loading-placeholder" as `gnr-${string}`,
-	status: "queued", // Or "running"
+	id: "gnr-YZHtVOATbNRxxxxx",
 	context: {
 		operationNode: {
-			id: "nd-loading-placeholder" as `nd-${string}`,
-			name: "Loading Node",
+			id: "nd-TgsASBm3TvVxxxxx",
+			name: "Claude 4 Sonnet with Reasoning",
 			type: "operation",
+			inputs: [],
+			outputs: [
+				{
+					id: "otp-bSeZklOS4SeDOxOC",
+					label: "Output",
+					accessor: "generated-text",
+				},
+			],
 			content: {
-				type: "text-generation",
-				llm: { provider: "loading", id: "loading" },
+				type: "textGeneration",
+				llm: {
+					provider: "anthropic",
+					id: "claude-4-sonnet-20250514",
+					configurations: {
+						temperature: 0.7,
+						topP: 1,
+						reasoningText: false,
+					},
+				},
+				prompt: "hello",
 			},
 		},
-		inputs: [],
 		sourceNodes: [],
+		connections: [],
+		origin: {
+			actId: "act-Ibp7hXQp2TWPUEUo",
+			workspaceId: "wrks-bQi1pOHmSRtH8Qo6",
+			type: "studio",
+		},
+		inputs: [],
 	},
-	outputs: [],
+	status: "completed",
+	createdAt: 1755586531409,
+	queuedAt: 1755586535244,
+	startedAt: 1755586535398,
+	completedAt: 1755586544713,
 	messages: [
 		{
-			id: "msg-loading-placeholder",
+			id: "",
 			role: "assistant",
-			parts: [{ type: "text", text: "Loading content..." }],
+			parts: [
+				{ type: "step-start" },
+				{
+					type: "text",
+					text: "I need to find N where 100 ≤ N ≤ 250 that satisfies all three conditions.\n\nFirst, let me unde...",
+					state: "done",
+				},
+			],
 		},
 	],
-	createdAt: new Date().toISOString(),
-	updatedAt: new Date().toISOString(),
-	metadata: {},
+	outputs: [
+		{
+			type: "generated-text",
+			outputId: "otp-bSeZklOS4SeDOxOC",
+			content:
+				"I need to find N where 100 ≤ N ≤ 250 that satisfies all three conditions.\n\nFirst, let me understand condition (c): N...",
+		},
+	],
+
+	usage: {
+		inputTokens: 137,
+		outputTokens: 654,
+		totalTokens: 791,
+		cachedInputTokens: 0,
+	},
 };
 
 export default function Loading() {
