@@ -334,6 +334,9 @@ export const githubRepositoryContentStatus = pgTable(
 	{
 		dbId: serial("db_id").primaryKey(),
 		repositoryIndexDbId: integer("repository_index_db_id").notNull(),
+		embeddingProfileId: integer("embedding_profile_id")
+			.$type<EmbeddingProfileId>()
+			.notNull(),
 		contentType: text("content_type")
 			.$type<GitHubRepositoryContentType>()
 			.notNull(),
@@ -354,6 +357,7 @@ export const githubRepositoryContentStatus = pgTable(
 	(table) => [
 		unique("gh_content_status_unique").on(
 			table.repositoryIndexDbId,
+			table.embeddingProfileId,
 			table.contentType,
 		),
 		foreignKey({
