@@ -1,4 +1,3 @@
-import { Button } from "@giselle-internal/ui/button";
 import { StatusBadge } from "@giselle-internal/ui/status-badge";
 import {
 	Table,
@@ -13,9 +12,9 @@ import { stageFlag } from "@/flags";
 import { fetchUserTeams } from "@/services/teams";
 import { performStageAction } from "./actions";
 import { Form } from "./form";
-import { ReloadButton } from "./reload-button";
+
 import { ResizableLayout } from "./resizable-layout";
-import { fetchEnrichedActs, fetchFlowTriggers, reloadPage } from "./services";
+import { fetchEnrichedActs, fetchFlowTriggers } from "./services";
 
 // The maximum duration of server actions on this page is extended to 800 seconds through enabled fluid compute.
 // https://vercel.com/docs/functions/runtimes#max-duration
@@ -53,12 +52,6 @@ export default async function StagePage() {
 					<div className="space-y-4 py-6 px-4 h-full overflow-y-auto">
 						<div className="flex items-center justify-between">
 							<h2 className="text-[16px] font-sans text-white-100">Tasks</h2>
-							<div className="flex items-center gap-3">
-								<ReloadButton reloadAction={reloadPage} />
-								<Button type="button" variant="subtle">
-									Archive
-								</Button>
-							</div>
 						</div>
 						<Table className="table-fixed w-full">
 							<TableBody>
