@@ -24,7 +24,7 @@ export function TeamAvatarImage({
 			width={width}
 			height={height}
 			alt={alt || teamName}
-			className={cn("rounded-full object-cover w-full h-full", className)}
+			className={cn("rounded-full object-cover shrink-0", className)}
 			style={{ objectPosition: "center" }}
 		/>
 	) : (
@@ -34,7 +34,7 @@ export function TeamAvatarImage({
 			width={width}
 			height={height}
 			colors={["#2563eb", "#7c3aed", "#dc2626", "#ea580c", "#16a34a"]}
-			className={cn("w-full h-full", className)}
+			className={className}
 		/>
 	);
 }
