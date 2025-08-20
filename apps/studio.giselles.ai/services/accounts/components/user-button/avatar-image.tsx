@@ -32,7 +32,7 @@ export function AvatarImage({
 			width={width}
 			height={height}
 			colors={["#413e4a", "#73626e", "#b38184", "#f0b49e", "#f7e4be"]}
-			className={cn(className)}
+			className={className}
 		/>
 	);
 }
