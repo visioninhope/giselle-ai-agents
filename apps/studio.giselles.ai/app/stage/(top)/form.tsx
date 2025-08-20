@@ -81,7 +81,7 @@ export function Form({
 	const initializedRef = useRef(false);
 	const userHasSelectedRef = useRef(false);
 	const [selectedFilter, setSelectedFilter] = useState<FilterType>(
-		(searchParams.get("filter") as FilterType) || "all",
+		(searchParams.get("filter") as FilterType) || "history",
 	);
 	const [isCarouselView, setIsCarouselView] = useState(false);
 	const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
