@@ -13,6 +13,7 @@ type TeamMembersListProps = {
 		userId: string;
 		displayName: string | null;
 		email: string | null;
+		avatarUrl: string | null;
 		role: TeamRole;
 	}[];
 	invitations: Invitation[];
@@ -39,6 +40,7 @@ export function TeamMembersList({
 					userId={member.userId}
 					displayName={member.displayName}
 					email={member.email}
+					avatarUrl={member.avatarUrl}
 					role={member.role}
 					currentUserRole={currentUserRole}
 					isProPlan={isProPlan}

@@ -22,7 +22,7 @@ export function AvatarImage({
 			width={width}
 			height={height}
 			alt={alt}
-			className={cn("rounded-full object-cover w-full h-full", className)}
+			className={cn("rounded-full object-cover shrink-0", className)}
 			style={{ objectPosition: "center" }}
 		/>
 	) : (
@@ -32,7 +32,7 @@ export function AvatarImage({
 			width={width}
 			height={height}
 			colors={["#413e4a", "#73626e", "#b38184", "#f0b49e", "#f7e4be"]}
-			className={cn("w-full h-full", className)}
+			className={className}
 		/>
 	);
 }
