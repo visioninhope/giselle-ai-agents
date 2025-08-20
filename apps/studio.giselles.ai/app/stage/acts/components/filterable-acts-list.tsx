@@ -292,9 +292,12 @@ export function FilterableActsList({
 	};
 
 	const handleReload = () => {
+		console.log("handleReload called");
 		if (onReload) {
+			console.log("calling onReload function");
 			onReload();
 		} else {
+			console.log("calling window.location.reload()");
 			window.location.reload();
 		}
 	};
@@ -664,17 +667,19 @@ export function FilterableActsList({
 															Cancelled
 														</StatusBadge>
 													)}
-													<button
-														type="button"
-														onClick={(e) => {
-															e.stopPropagation();
-															handleReload();
-														}}
-														className="text-white-700 hover:text-white-900 transition-colors p-1 rounded"
-														title="Reload this task"
-													>
-														<RefreshCw className="w-3 h-3" />
-													</button>
+													{act.status === "failed" && (
+														<button
+															type="button"
+															onClick={(e) => {
+																e.stopPropagation();
+																handleReload();
+															}}
+															className="text-white-700 hover:text-white-900 transition-colors p-1 rounded"
+															title="Reload this task"
+														>
+															<RefreshCw className="w-3 h-3" />
+														</button>
+													)}
 												</div>
 											</TableCell>
 											<TableCell className="text-right w-20">

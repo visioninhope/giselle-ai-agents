@@ -1,5 +1,5 @@
 import { revalidatePath } from "next/cache";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 
 import { giselleEngine } from "@/app/giselle-engine";
 import { type acts as actsSchema, db } from "@/drizzle";
@@ -169,10 +169,11 @@ async function enrichActWithNavigationData(
 	}
 }
 
+// biome-ignore lint/suspicious/useAwait: Server Actions must be async functions
 async function reloadPage() {
 	"use server";
-	await Promise.resolve();
 	revalidatePath("/stage/acts");
+	redirect("/stage/acts");
 }
 
 export default async function StageActsPage() {
