@@ -55,9 +55,22 @@ const vault = supabaseVaultDriver({
 	serviceKey: process.env.SUPABASE_SERVICE_KEY ?? "",
 });
 
-const sampleAppWorkspaceId = WorkspaceId.parse(
-	process.env.SAMPLE_APP_WORKSPACE_ID,
-);
+let sampleAppWorkspaceIds: WorkspaceId[] | undefined;
+if (process.env.SAMPLE_APP_WORKSPACE_IDS) {
+	const workspaceIdStrings = process.env.SAMPLE_APP_WORKSPACE_IDS.split(",")
+		.map((id) => id.trim())
+		.filter((id) => id.length > 0);
+	const parsedWorkspaceIds: WorkspaceId[] = [];
+	for (const workspaceIdString of workspaceIdStrings) {
+		const parseResult = WorkspaceId.safeParse(workspaceIdString);
+		if (parseResult.success) {
+			parsedWorkspaceIds.push(parseResult.data);
+		}
+	}
+	if (parsedWorkspaceIds.length > 0) {
+		sampleAppWorkspaceIds = parsedWorkspaceIds;
+	}
+}
 
 const githubAppId = process.env.GITHUB_APP_ID;
 const githubAppPrivateKey = process.env.GITHUB_APP_PRIVATE_KEY;
@@ -117,7 +130,7 @@ export const giselleEngine = NextGiselleEngine({
 		waitForFlushFn: waitForLangfuseFlush,
 	},
 	fetchUsageLimitsFn: fetchUsageLimits,
-	sampleAppWorkspaceId,
+	sampleAppWorkspaceIds,
 	integrationConfigs: {
 		github: {
 			auth: {

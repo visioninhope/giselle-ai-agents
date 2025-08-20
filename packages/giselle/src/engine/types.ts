@@ -30,7 +30,7 @@ type GenerationCompleteCallbackFunction = (
 export interface GiselleEngineContext {
 	storage: Storage;
 	experimental_storage: GiselleStorage;
-	sampleAppWorkspaceId?: WorkspaceId;
+	sampleAppWorkspaceIds?: WorkspaceId[];
 	llmProviders: LanguageModelProvider[];
 	integrationConfigs?: {
 		github?: GitHubIntegrationConfig;
@@ -107,7 +107,7 @@ export type GitHubVectorStoreQueryService<
 export interface GiselleEngineConfig {
 	storage: Storage;
 	experimental_storage: GiselleStorage;
-	sampleAppWorkspaceId?: WorkspaceId;
+	sampleAppWorkspaceIds?: WorkspaceId[];
 	llmProviders?: LanguageModelProvider[];
 	integrationConfigs?: GiselleIntegrationConfig;
 	onConsumeAgentTime?: ConsumeAgentTimeCallback;
