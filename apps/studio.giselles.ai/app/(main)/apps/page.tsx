@@ -1,41 +1,18 @@
 import { Toasts } from "@giselles-ai/components/toasts";
 import { ToastProvider } from "@giselles-ai/contexts/toast";
-import { and, desc, eq, isNotNull } from "drizzle-orm";
-import { type ReactNode, Suspense } from "react";
-import { agents, db } from "@/drizzle";
+import { isNotNull } from "drizzle-orm";
+import { Suspense } from "react";
+import { db } from "@/drizzle";
 import { fetchCurrentTeam } from "@/services/teams";
-
 import { SearchableAgentList } from "./components/searchable-agent-list";
-
-function _DataList({
-	label,
-	children,
-}: {
-	label: string;
-	children: ReactNode;
-}) {
-	return (
-		<div className="text-black-30">
-			<p className="text-[12px]">{label}</p>
-			<div className="font-bold">{children}</div>
-		</div>
-	);
-}
 
 async function AgentList() {
 	const currentTeam = await fetchCurrentTeam();
-	const dbAgents = await db
-		.select({
-			id: agents.id,
-			name: agents.name,
-			updatedAt: agents.updatedAt,
-			workspaceId: agents.workspaceId,
-		})
-		.from(agents)
-		.where(
+	const dbAgents = await db.query.agents.findMany({
+		where: (agents, { and, eq }) =>
 			and(eq(agents.teamDbId, currentTeam.dbId), isNotNull(agents.workspaceId)),
-		)
-		.orderBy(desc(agents.updatedAt));
+		orderBy: (agents, { desc }) => desc(agents.updatedAt),
+	});
 	if (dbAgents.length === 0) {
 		return (
 			<div className="flex justify-center items-center h-full">
