@@ -19,21 +19,25 @@ function ensureTools(key: keyof ToolSet, node: TextGenerationNode): string[] {
 export function ToolsPanel({ node }: { node: TextGenerationNode }) {
 	return (
 		<div className="text-white-400 space-y-[16px]">
-			{toolProviders.map((provider) => (
-				<ToolListItem
-					key={provider.key}
-					icon={provider.icon}
-					configurationPanel={provider.renderConfiguration(node)}
-					availableTools={ensureTools(provider.key, node)}
-				>
-					<div className="flex gap-[10px] items-center">
-						<h3 className="text-text text-[14px]">{provider.label}</h3>
-						{node.content.tools?.[provider.key] && (
-							<CheckIcon className="size-[14px] text-success" />
-						)}
-					</div>
-				</ToolListItem>
-			))}
+			{toolProviders.map(
+				(provider) =>
+					(provider.requirement === undefined ||
+						provider.requirement(node)) && (
+						<ToolListItem
+							key={provider.key}
+							icon={provider.icon}
+							configurationPanel={provider.renderConfiguration(node)}
+							availableTools={ensureTools(provider.key, node)}
+						>
+							<div className="flex gap-[10px] items-center">
+								<h3 className="text-text text-[14px]">{provider.label}</h3>
+								{node.content.tools?.[provider.key] && (
+									<CheckIcon className="size-[14px] text-success" />
+								)}
+							</div>
+						</ToolListItem>
+					),
+			)}
 		</div>
 	);
 }

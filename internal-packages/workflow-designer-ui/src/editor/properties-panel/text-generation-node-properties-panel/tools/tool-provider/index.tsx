@@ -1,7 +1,8 @@
 import type { TextGenerationNode, ToolSet } from "@giselle-sdk/data-type";
-import { DatabaseIcon } from "lucide-react";
+import { DatabaseIcon, GlobeIcon } from "lucide-react";
 import type { ReactNode } from "react";
 import { GitHubIcon } from "../../../../../icons";
+import { AnthropicWebSearchToolConfigurationDialog } from "./anthropic-web-search";
 import { GitHubToolConfigurationDialog } from "./github";
 import { PostgresToolConfigurationDialog } from "./postgres";
 
@@ -10,6 +11,7 @@ interface ToolProviderDescriptor {
 	label: string;
 	icon: ReactNode;
 	renderConfiguration: (node: TextGenerationNode) => ReactNode;
+	requirement?: (node: TextGenerationNode) => boolean;
 }
 
 export const toolProviders: ToolProviderDescriptor[] = [
@@ -28,5 +30,14 @@ export const toolProviders: ToolProviderDescriptor[] = [
 		renderConfiguration: (node) => (
 			<PostgresToolConfigurationDialog node={node} />
 		),
+	},
+	{
+		key: "anthropicWebSearch",
+		label: "Anthropic Web Search",
+		icon: <GlobeIcon data-tool-icon />,
+		renderConfiguration: (node) => (
+			<AnthropicWebSearchToolConfigurationDialog node={node} />
+		),
+		requirement: (node) => node.content.llm.provider === "anthropic",
 	},
 ];

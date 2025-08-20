@@ -174,6 +174,21 @@ export function generateText(args: {
 				};
 			}
 
+			if (
+				operationNode.content.llm.provider === "anthropic" &&
+				operationNode.content.tools?.anthropicWebSearch
+			) {
+				preparedToolSet = {
+					...preparedToolSet,
+					toolSet: {
+						...preparedToolSet.toolSet,
+						web_search: anthropic.tools.webSearch_20250305(
+							operationNode.content.tools.anthropicWebSearch,
+						),
+					},
+				};
+			}
+
 			const providerOptions = getProviderOptions(operationNode.content.llm);
 
 			const streamTextResult = streamText({

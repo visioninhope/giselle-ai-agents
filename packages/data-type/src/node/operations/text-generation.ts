@@ -101,10 +101,18 @@ export const OpenAIWebSearchTool = z.object({
 });
 export type OpenAIWebSearchTool = z.infer<typeof OpenAIWebSearchTool>;
 
+export const AnthropicWebSearchTool = z.object({
+	maxUses: z.number(),
+	allowedDomains: z.string().array().optional(),
+	blockedDomains: z.string().array().optional(),
+});
+export type AnthropicWebSearchTool = z.infer<typeof AnthropicWebSearchTool>;
+
 export const ToolSet = z.object({
 	github: z.optional(GitHubTool),
 	postgres: z.optional(PostgresTool),
 	openaiWebSearch: z.optional(OpenAIWebSearchTool),
+	anthropicWebSearch: z.optional(AnthropicWebSearchTool),
 });
 export type ToolSet = z.infer<typeof ToolSet>;
 

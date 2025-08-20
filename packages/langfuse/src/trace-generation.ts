@@ -103,6 +103,9 @@ function extractTags(node: TextGenerationNode | ImageGenerationNode) {
 		if (llm.provider === "openai" && tools?.openaiWebSearch) {
 			tags.push("tool:web-search");
 		}
+		if (llm.provider === "anthropic" && tools?.anthropicWebSearch) {
+			tags.push("tool:web-search");
+		}
 		if (llm.provider === "perplexity") {
 			tags.push("tool:web-search");
 		}
@@ -128,6 +131,9 @@ function extractMetadata(
 		// Provider-specific metadata
 		if (llm.provider === "anthropic" && llm.configurations.reasoningText) {
 			metadata["tools.thinking.provider"] = "anthropic.thinking";
+		}
+		if (llm.provider === "anthropic" && tools?.anthropicWebSearch) {
+			metadata["tools.webSearch.provider"] = "anthropic.webSearch";
 		}
 		if (llm.provider === "google" && llm.configurations.searchGrounding) {
 			metadata["tools.webSearch.provider"] = "google.googleSearch";
