@@ -11,6 +11,7 @@ import { notFound } from "next/navigation";
 
 import { stageFlag } from "@/flags";
 
+import { fetchCurrentUser } from "@/services/accounts";
 import { fetchUserTeams } from "@/services/teams";
 import { performStageAction } from "./actions";
 import { Form } from "./form";
@@ -35,9 +36,10 @@ export default async function StagePage({
 
 	const searchParamsResolved = await searchParams;
 	const filterType = (searchParamsResolved.filter as FilterType) || "history";
+	const user = await fetchCurrentUser();
 	const teams = await fetchUserTeams();
-	const acts = await fetchEnrichedActs(teams);
-	const flowTriggers = await fetchFlowTriggers(teams, filterType);
+	const acts = await fetchEnrichedActs(teams, user);
+	const flowTriggers = await fetchFlowTriggers(teams, filterType, user);
 
 	const teamOptions = teams.map((team) => ({
 		value: team.id,

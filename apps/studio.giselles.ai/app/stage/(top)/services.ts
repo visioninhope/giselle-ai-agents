@@ -108,6 +108,7 @@ async function enrichActWithNavigationData(
 
 export async function fetchEnrichedActs(
 	teams: { dbId: number; name: string }[],
+	user?: Awaited<ReturnType<typeof fetchCurrentUser>>,
 ): Promise<
 	Array<{
 		id: string;
@@ -119,9 +120,9 @@ export async function fetchEnrichedActs(
 		createdAt: Date;
 	}>
 > {
-	const user = await fetchCurrentUser();
+	const currentUser = user ?? (await fetchCurrentUser());
 	const dbActs = await db.query.acts.findMany({
-		where: (acts, { eq }) => eq(acts.directorDbId, user.dbId),
+		where: (acts, { eq }) => eq(acts.directorDbId, currentUser.dbId),
 		orderBy: (acts, { desc }) => [desc(acts.createdAt)],
 		limit: 10,
 	});
@@ -136,15 +137,16 @@ export async function fetchEnrichedActs(
 export async function fetchFlowTriggers(
 	teams: { dbId: number; id: TeamId; name: string }[],
 	filterType: FilterType = "all",
+	user?: Awaited<ReturnType<typeof fetchCurrentUser>>,
 ): Promise<FlowTriggerUIItem[]> {
 	const flowTriggers: Array<FlowTriggerUIItem> = [];
-	const user = await fetchCurrentUser();
+	const currentUser = user ?? (await fetchCurrentUser());
 
 	// Get user's act history for filtering
 	const userActs =
 		filterType === "history"
 			? await db.query.acts.findMany({
-					where: (acts, { eq }) => eq(acts.directorDbId, user.dbId),
+					where: (acts, { eq }) => eq(acts.directorDbId, currentUser.dbId),
 					columns: {
 						sdkFlowTriggerId: true,
 					},
