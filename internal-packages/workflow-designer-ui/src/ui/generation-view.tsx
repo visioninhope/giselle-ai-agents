@@ -6,7 +6,7 @@ import { ChevronRightIcon } from "lucide-react";
 import { Accordion } from "radix-ui";
 import { useMemo } from "react";
 import { WilliIcon } from "../icons";
-import ClipboardButton from "./clipboard-button";
+
 import { MemoizedMarkdown } from "./memoized-markdown";
 
 function Spinner() {
@@ -125,12 +125,9 @@ export function GenerationView({ generation }: { generation: Generation }) {
 							case "text":
 								return (
 									<div
-										className="markdown-renderer relative group"
+										className="markdown-renderer"
 										key={`${message.id}-${part.text}`}
 									>
-										<div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-											<ClipboardButton text={part.text} />
-										</div>
 										<MemoizedMarkdown content={part.text} />
 									</div>
 								);
