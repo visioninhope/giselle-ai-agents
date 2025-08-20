@@ -1,6 +1,5 @@
 "use client";
 
-import Avatar from "boring-avatars";
 import { Check, ChevronDown } from "lucide-react";
 import { useState } from "react";
 import {
@@ -20,12 +19,14 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import type { TeamRole } from "@/drizzle";
+import { AvatarImage } from "@/services/accounts/components/user-button/avatar-image";
 import { deleteTeamMember, updateTeamMemberRole } from "./actions";
 
 type TeamMemberListItemProps = {
 	userId: string;
 	displayName: string | null;
 	email: string | null;
+	avatarUrl: string | null;
 	role: TeamRole;
 	currentUserRole: TeamRole;
 	isProPlan: boolean;
@@ -36,6 +37,7 @@ export function TeamMemberListItem({
 	userId,
 	displayName,
 	email,
+	avatarUrl,
 	role: initialRole,
 	currentUserRole,
 	isProPlan,
@@ -108,11 +110,11 @@ export function TeamMemberListItem({
 			<div className="flex items-center justify-between gap-2 border-b-[0.5px] border-white/10 last:border-b-0">
 				<div className="flex gap-x-2 items-center">
 					<div className="flex-shrink-0">
-						<Avatar
-							name={email || userId}
-							variant="marble"
-							size={36}
-							colors={["#413e4a", "#73626e", "#b38184", "#f0b49e", "#f7e4be"]}
+						<AvatarImage
+							avatarUrl={avatarUrl}
+							width={36}
+							height={36}
+							alt={displayName || email || ""}
 						/>
 					</div>
 					<div className="flex flex-col gap-y-1 font-medium">
