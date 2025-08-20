@@ -25,6 +25,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { useEffect, useMemo, useState } from "react";
+import type { ActWithNavigation, StatusFilter } from "../types";
 
 // GitHub-style search parser
 interface SearchFilters {
@@ -80,19 +81,6 @@ function matchesSearchFilters(
 function hasExplicitStatusFilter(filters: SearchFilters): boolean {
 	return filters.isOpen === true || filters.isArchived === true;
 }
-
-type ActWithNavigation = {
-	id: string;
-	status: "inProgress" | "completed" | "failed" | "cancelled";
-	createdAt: string;
-	workspaceName: string;
-	teamName: string;
-	link: string;
-	llmModels?: string[]; // Array of LLM model names used
-	inputValues?: string; // User input values when executing the app
-};
-
-type StatusFilter = "inProgress" | "completed" | "failed" | "cancelled";
 
 interface FilterableActsListProps {
 	acts: ActWithNavigation[];
@@ -292,12 +280,9 @@ export function FilterableActsList({
 	};
 
 	const handleReload = () => {
-		console.log("handleReload called");
 		if (onReload) {
-			console.log("calling onReload function");
 			onReload();
 		} else {
-			console.log("calling window.location.reload()");
 			window.location.reload();
 		}
 	};

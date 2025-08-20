@@ -8,21 +8,11 @@ import { fetchCurrentUser } from "@/services/accounts";
 import { fetchUserTeams } from "@/services/teams";
 import { fetchActMetadata } from "./[actId]/lib/data";
 import { FilterableActsList } from "./components/filterable-acts-list";
+import type { ActWithNavigation } from "./types";
 
 // The maximum duration of server actions on this page is extended to 800 seconds through enabled fluid compute.
 // https://vercel.com/docs/functions/runtimes#max-duration
 export const maxDuration = 800;
-
-type ActWithNavigation = {
-	id: string;
-	status: "inProgress" | "completed" | "failed" | "cancelled";
-	createdAt: string;
-	workspaceName: string;
-	teamName: string;
-	link: string;
-	llmModels?: string[];
-	inputValues?: string;
-};
 
 // This feature is currently under development and data structures change destructively,
 // so parsing of legacy data frequently fails. We're using a rough try-catch to ignore
@@ -33,7 +23,6 @@ async function enrichActWithNavigationData(
 ): Promise<ActWithNavigation | null> {
 	try {
 		const tmpAct = await giselleEngine.getAct({ actId: act.sdkActId });
-		console.log("DEBUG tmpAct:", JSON.stringify(tmpAct, null, 2));
 		const team = teams.find((t) => t.dbId === act.teamDbId);
 		if (team === undefined) {
 			throw new Error("Team not found");
@@ -42,7 +31,6 @@ async function enrichActWithNavigationData(
 			act.sdkWorkspaceId,
 			true,
 		);
-		console.log("DEBUG tmpWorkspace:", JSON.stringify(tmpWorkspace, null, 2));
 
 		const findStepByStatus = (status: string) => {
 			for (const sequence of tmpAct.sequences) {
