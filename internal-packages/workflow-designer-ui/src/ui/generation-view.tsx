@@ -10,8 +10,7 @@ import { WilliIcon } from "../icons";
 import ClipboardButton from "./clipboard-button";
 import { MemoizedMarkdown } from "./memoized-markdown";
 
-function mergeAdjacentTextParts<T extends UIMessage>(message: T) {
-	const { parts } = message;
+function mergeAdjacentTextParts<T extends UIMessage>({ parts, ...message }: T) {
 	const merged: T["parts"] = [];
 	let buffer = "";
 
@@ -96,8 +95,8 @@ export function GenerationView({ generation }: { generation: Generation }) {
 				})}
 			{generatedMessages.map((message) => (
 				<div key={message.id}>
-					{message.parts?.map((part, index) => {
-						const lastPart = message.parts?.length === index + 1;
+					{message.parts.map((part, index) => {
+						const lastPart = message.parts.length === index + 1;
 						switch (part.type) {
 							case "reasoning":
 								if (lastPart) {
@@ -177,7 +176,7 @@ export function GenerationView({ generation }: { generation: Generation }) {
 				generation.status !== "cancelled" &&
 				// Show the spinner only when there is no reasoning part
 				!generatedMessages.some((message) =>
-					message.parts?.some(
+					message.parts.some(
 						(part) =>
 							part.type === "reasoning" && generation.status === "running",
 					),
