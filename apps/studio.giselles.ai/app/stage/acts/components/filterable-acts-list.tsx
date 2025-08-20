@@ -364,7 +364,7 @@ export function FilterableActsList({
 				</div>
 
 				{/* Filters */}
-				<div className="flex flex-col md:flex-row gap-4 mb-6">
+				<div className="flex flex-col gap-4 mb-6">
 					{/* Search */}
 					<div className="search-input relative flex-1">
 						<div
@@ -408,86 +408,89 @@ export function FilterableActsList({
 						<Search className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-white-600" />
 					</div>
 
-					{/* Status Filter */}
-					<div className="status-select">
-						<Popover
-							trigger={
-								<button
-									type="button"
-									className={clsx(
-										"flex items-center gap-2 rounded-[8px] h-10 px-[12px] text-left text-[14px]",
-										"outline-none focus:outline-none",
-										"transition-colors",
-									)}
-								>
-									<div className="flex items-center gap-1">
-										<span className="text-text">
-											Status {selectedStatuses.length}/
-											{Object.keys(statusLabels).length}
-										</span>
-										<div className="flex -space-x-1">
-											{selectedStatuses.map((status) => (
-												<div
-													key={status}
-													className={`w-3 h-3 rounded-full border border-black-900 ${statusColors[status]}`}
-												/>
-											))}
-										</div>
-									</div>
-									<ChevronDownIcon className="size-[13px] shrink-0 text-text" />
-								</button>
-							}
-						>
-							{Object.entries(statusLabels).map(([status, label]) => {
-								const isSelected = selectedStatuses.includes(
-									status as StatusFilter,
-								);
-								return (
+					{/* Status Filter and New Task Button Row */}
+					<div className="flex flex-row gap-4">
+						{/* Status Filter */}
+						<div className="status-select flex-1">
+							<Popover
+								trigger={
 									<button
 										type="button"
-										key={status}
-										onClick={() => {
-											const statusKey = status as StatusFilter;
-											setSelectedStatuses((prev) =>
-												isSelected
-													? prev.filter((s) => s !== statusKey)
-													: [...prev, statusKey],
-											);
-										}}
 										className={clsx(
-											"w-full text-text outline-none cursor-pointer hover:bg-ghost-element-hover",
-											"rounded-[4px] px-[8px] py-[6px] text-[14px]",
-											"flex items-center justify-between gap-[4px]",
+											"flex items-center gap-2 rounded-[8px] h-10 px-[12px] text-left text-[14px] w-full",
+											"outline-none focus:outline-none",
+											"transition-colors",
 										)}
 									>
-										<div className="flex items-center gap-2">
-											<div
-												className={`w-3 h-3 rounded-full ${statusColors[status as StatusFilter]}`}
-											/>
-											<span>{label}</span>
+										<div className="flex items-center gap-1">
+											<span className="text-text">
+												Status {selectedStatuses.length}/
+												{Object.keys(statusLabels).length}
+											</span>
+											<div className="flex -space-x-1">
+												{selectedStatuses.map((status) => (
+													<div
+														key={status}
+														className={`w-3 h-3 rounded-full border border-black-900 ${statusColors[status]}`}
+													/>
+												))}
+											</div>
 										</div>
-										<CheckIcon
-											className={clsx(
-												"size-[13px]",
-												isSelected ? "text-text" : "text-transparent",
-											)}
-										/>
+										<ChevronDownIcon className="size-[13px] shrink-0 text-text" />
 									</button>
-								);
-							})}
-						</Popover>
-					</div>
+								}
+							>
+								{Object.entries(statusLabels).map(([status, label]) => {
+									const isSelected = selectedStatuses.includes(
+										status as StatusFilter,
+									);
+									return (
+										<button
+											type="button"
+											key={status}
+											onClick={() => {
+												const statusKey = status as StatusFilter;
+												setSelectedStatuses((prev) =>
+													isSelected
+														? prev.filter((s) => s !== statusKey)
+														: [...prev, statusKey],
+												);
+											}}
+											className={clsx(
+												"w-full text-text outline-none cursor-pointer hover:bg-ghost-element-hover",
+												"rounded-[4px] px-[8px] py-[6px] text-[14px]",
+												"flex items-center justify-between gap-[4px]",
+											)}
+										>
+											<div className="flex items-center gap-2">
+												<div
+													className={`w-3 h-3 rounded-full ${statusColors[status as StatusFilter]}`}
+												/>
+												<span>{label}</span>
+											</div>
+											<CheckIcon
+												className={clsx(
+													"size-[13px]",
+													isSelected ? "text-text" : "text-transparent",
+												)}
+											/>
+										</button>
+									);
+								})}
+							</Popover>
+						</div>
 
-					{/* New Task Button */}
-					<div>
-						<Link href="/stage">
-							<Button variant="glass" size="large" className="h-10 px-4">
-								<div className="flex items-center gap-2">
-									<Sparkles className="w-4 h-4" />
-									<span className="text-sm">New task</span>
-								</div>
-							</Button>
-						</Link>
+						{/* New Task Button */}
+						<div>
+							<Link href="/stage">
+								<Button variant="glass" size="large" className="h-10 px-4">
+									<div className="flex items-center gap-2">
+										<Sparkles className="w-4 h-4" />
+										<span className="text-sm">New task</span>
+									</div>
+								</Button>
+							</Link>
+						</div>
 					</div>
 				</div>
 
@@ -573,16 +576,16 @@ export function FilterableActsList({
 												</button>
 											</div>
 										</TableHead>
-										<TableHead className="text-white-100 w-auto">
+										<TableHead className="text-white-100 w-auto hidden md:table-cell">
 											LLM Models
 										</TableHead>
-										<TableHead className="text-white-100 w-auto max-w-80">
+										<TableHead className="text-white-100 w-auto max-w-80 hidden md:table-cell">
 											Input Values
 										</TableHead>
 										<TableHead className="text-center text-white-100 w-24">
 											Status
 										</TableHead>
-										<TableHead className="text-right text-white-100 w-20">
+										<TableHead className="text-right text-white-100 w-20 hidden md:table-cell">
 											Actions
 										</TableHead>
 									</TableRow>
@@ -616,7 +619,7 @@ export function FilterableActsList({
 														</div>
 													</div>
 												</TableCell>
-												<TableCell className="w-auto">
+												<TableCell className="w-auto hidden md:table-cell">
 													{act.llmModels && act.llmModels.length > 0 ? (
 														<div className="flex gap-1 flex-wrap">
 															{act.llmModels.slice(0, 2).map((model) => (
@@ -637,7 +640,7 @@ export function FilterableActsList({
 														<span className="text-xs text-white-500">-</span>
 													)}
 												</TableCell>
-												<TableCell className="w-auto max-w-80">
+												<TableCell className="w-auto max-w-80 hidden md:table-cell">
 													{act.inputValues ? (
 														<span className="text-sm text-white-700 line-clamp-2">
 															{act.inputValues}
@@ -670,7 +673,7 @@ export function FilterableActsList({
 														)}
 													</div>
 												</TableCell>
-												<TableCell className="text-right w-20">
+												<TableCell className="text-right w-20 hidden md:table-cell">
 													<div className="flex justify-end items-center gap-2">
 														{act.status === "failed" ? (
 															<button
