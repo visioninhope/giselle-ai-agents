@@ -119,8 +119,12 @@ export async function fetchEnrichedActs(
 	}>
 > {
 	const user = await fetchCurrentUser();
+	const sevenDaysAgo = new Date();
+	sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
 	const dbActs = await db.query.acts.findMany({
-		where: (acts, { eq }) => eq(acts.directorDbId, user.dbId),
+		where: (acts, { eq, gte, and }) =>
+			and(eq(acts.directorDbId, user.dbId), gte(acts.createdAt, sevenDaysAgo)),
 		orderBy: (acts, { desc }) => [desc(acts.createdAt)],
 		limit: 10,
 	});
