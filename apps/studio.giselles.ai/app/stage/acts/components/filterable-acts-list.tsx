@@ -534,13 +534,10 @@ export function FilterableActsList({
 						</div>
 					) : (
 						<div className="overflow-x-auto">
-							<Table className="table-fixed min-w-full">
+							<Table className="table-fixed w-full">
 								<TableHeader>
 									<TableRow>
-										<TableHead
-											className="text-white-100"
-											style={{ minWidth: "292px" }}
-										>
+										<TableHead className="text-white-100 w-auto max-w-96">
 											<div className="flex items-center gap-6">
 												<button
 													type="button"
@@ -576,28 +573,16 @@ export function FilterableActsList({
 												</button>
 											</div>
 										</TableHead>
-										<TableHead
-											className="text-white-100"
-											style={{ minWidth: "180px" }}
-										>
+										<TableHead className="text-white-100 w-auto">
 											LLM Models
 										</TableHead>
-										<TableHead
-											className="text-white-100"
-											style={{ minWidth: "200px" }}
-										>
+										<TableHead className="text-white-100 w-auto max-w-80">
 											Input Values
 										</TableHead>
-										<TableHead
-											className="text-center text-white-100"
-											style={{ minWidth: "128px" }}
-										>
+										<TableHead className="text-center text-white-100 w-24">
 											Status
 										</TableHead>
-										<TableHead
-											className="text-right text-white-100"
-											style={{ minWidth: "80px" }}
-										>
+										<TableHead className="text-right text-white-100 w-20">
 											Actions
 										</TableHead>
 									</TableRow>
@@ -612,7 +597,7 @@ export function FilterableActsList({
 													router.push(act.link);
 												}}
 											>
-												<TableCell style={{ minWidth: "292px" }}>
+												<TableCell className="w-auto max-w-96">
 													<div className="flex items-center gap-3">
 														<div className="w-10 h-10 bg-gray-600 rounded-md flex items-center justify-center flex-shrink-0">
 															<span className="text-sm text-gray-400">App</span>
@@ -631,7 +616,7 @@ export function FilterableActsList({
 														</div>
 													</div>
 												</TableCell>
-												<TableCell style={{ minWidth: "180px" }}>
+												<TableCell className="w-auto">
 													{act.llmModels && act.llmModels.length > 0 ? (
 														<div className="flex gap-1 flex-wrap">
 															{act.llmModels.slice(0, 2).map((model) => (
@@ -652,7 +637,7 @@ export function FilterableActsList({
 														<span className="text-xs text-white-500">-</span>
 													)}
 												</TableCell>
-												<TableCell style={{ minWidth: "200px" }}>
+												<TableCell className="w-auto max-w-80">
 													{act.inputValues ? (
 														<span className="text-sm text-white-700 line-clamp-2">
 															{act.inputValues}
@@ -661,10 +646,7 @@ export function FilterableActsList({
 														<span className="text-xs text-white-500">-</span>
 													)}
 												</TableCell>
-												<TableCell
-													className="text-center"
-													style={{ minWidth: "128px" }}
-												>
+												<TableCell className="text-center w-24">
 													<div className="flex items-center justify-center gap-2">
 														{act.status === "inProgress" && (
 															<StatusBadge status="info" variant="dot">
@@ -688,10 +670,7 @@ export function FilterableActsList({
 														)}
 													</div>
 												</TableCell>
-												<TableCell
-													className="text-right"
-													style={{ minWidth: "80px" }}
-												>
+												<TableCell className="text-right w-20">
 													<div className="flex justify-end items-center gap-2">
 														{act.status === "failed" ? (
 															<button
