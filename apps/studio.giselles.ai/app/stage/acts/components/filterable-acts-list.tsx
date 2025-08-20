@@ -533,176 +533,200 @@ export function FilterableActsList({
 							</Link>
 						</div>
 					) : (
-						<Table className="table-fixed w-full">
-							<TableHeader>
-								<TableRow>
-									<TableHead className="w-[292px] text-white-100">
-										<div className="flex items-center gap-6">
-											<button
-												type="button"
-												onClick={() => handleTabChange("open")}
-												className={`pb-1 text-xs font-medium transition-colors ${
-													activeTab === "open"
-														? "text-white-100"
-														: "text-gray-600 hover:text-gray-500"
-												}`}
-											>
-												<span className="flex items-center gap-2">
-													Open
-													<span className="bg-gray-700 text-gray-300 px-2 py-0.5 rounded-full text-xs font-semibold">
-														{acts.length}
-													</span>
-												</span>
-											</button>
-											<button
-												type="button"
-												onClick={() => handleTabChange("archived")}
-												className={`pb-1 text-xs font-medium transition-colors ${
-													activeTab === "archived"
-														? "text-white-100"
-														: "text-gray-600 hover:text-gray-500"
-												}`}
-											>
-												<span className="flex items-center gap-2">
-													Archived
-													<span className="bg-gray-700 text-gray-300 px-2 py-0.5 rounded-full text-xs font-semibold">
-														0
-													</span>
-												</span>
-											</button>
-										</div>
-									</TableHead>
-									<TableHead className="w-[180px] text-white-100">
-										LLM Models
-									</TableHead>
-									<TableHead className="w-[200px] text-white-100">
-										Input Values
-									</TableHead>
-									<TableHead className="w-32 text-center text-white-100">
-										Status
-									</TableHead>
-									<TableHead className="w-20 text-right text-white-100">
-										Actions
-									</TableHead>
-								</TableRow>
-							</TableHeader>
-							<TableBody>
-								{filteredActs.map((act) => {
-									return (
-										<TableRow
-											key={act.id}
-											className="hover:bg-white/5 transition-colors duration-200 cursor-pointer"
-											onClick={() => {
-												router.push(act.link);
-											}}
+						<div className="overflow-x-auto">
+							<Table className="table-fixed min-w-full">
+								<TableHeader>
+									<TableRow>
+										<TableHead
+											className="text-white-100"
+											style={{ minWidth: "292px" }}
 										>
-											<TableCell className="w-[292px]">
-												<div className="flex items-center gap-3">
-													<div className="w-10 h-10 bg-gray-600 rounded-md flex items-center justify-center flex-shrink-0">
-														<span className="text-sm text-gray-400">App</span>
-													</div>
-													<div className="flex flex-col min-w-0">
-														<span className="truncate font-medium text-white-100">
-															{act.workspaceName}
+											<div className="flex items-center gap-6">
+												<button
+													type="button"
+													onClick={() => handleTabChange("open")}
+													className={`pb-1 text-xs font-medium transition-colors ${
+														activeTab === "open"
+															? "text-white-100"
+															: "text-gray-600 hover:text-gray-500"
+													}`}
+												>
+													<span className="flex items-center gap-2">
+														Open
+														<span className="bg-gray-700 text-gray-300 px-2 py-0.5 rounded-full text-xs font-semibold">
+															{acts.length}
 														</span>
-														<span className="text-sm text-black-600 truncate">
-															{new Date(act.createdAt)
-																.toISOString()
-																.slice(0, 19)
-																.replace("T", " ")}{" "}
-															· {act.teamName}
+													</span>
+												</button>
+												<button
+													type="button"
+													onClick={() => handleTabChange("archived")}
+													className={`pb-1 text-xs font-medium transition-colors ${
+														activeTab === "archived"
+															? "text-white-100"
+															: "text-gray-600 hover:text-gray-500"
+													}`}
+												>
+													<span className="flex items-center gap-2">
+														Archived
+														<span className="bg-gray-700 text-gray-300 px-2 py-0.5 rounded-full text-xs font-semibold">
+															0
 														</span>
+													</span>
+												</button>
+											</div>
+										</TableHead>
+										<TableHead
+											className="text-white-100"
+											style={{ minWidth: "180px" }}
+										>
+											LLM Models
+										</TableHead>
+										<TableHead
+											className="text-white-100"
+											style={{ minWidth: "200px" }}
+										>
+											Input Values
+										</TableHead>
+										<TableHead
+											className="text-center text-white-100"
+											style={{ minWidth: "128px" }}
+										>
+											Status
+										</TableHead>
+										<TableHead
+											className="text-right text-white-100"
+											style={{ minWidth: "80px" }}
+										>
+											Actions
+										</TableHead>
+									</TableRow>
+								</TableHeader>
+								<TableBody>
+									{filteredActs.map((act) => {
+										return (
+											<TableRow
+												key={act.id}
+												className="hover:bg-white/5 transition-colors duration-200 cursor-pointer"
+												onClick={() => {
+													router.push(act.link);
+												}}
+											>
+												<TableCell style={{ minWidth: "292px" }}>
+													<div className="flex items-center gap-3">
+														<div className="w-10 h-10 bg-gray-600 rounded-md flex items-center justify-center flex-shrink-0">
+															<span className="text-sm text-gray-400">App</span>
+														</div>
+														<div className="flex flex-col min-w-0">
+															<span className="truncate font-medium text-white-100">
+																{act.workspaceName}
+															</span>
+															<span className="text-sm text-black-600 truncate">
+																{new Date(act.createdAt)
+																	.toISOString()
+																	.slice(0, 19)
+																	.replace("T", " ")}{" "}
+																· {act.teamName}
+															</span>
+														</div>
 													</div>
-												</div>
-											</TableCell>
-											<TableCell className="w-[180px]">
-												{act.llmModels && act.llmModels.length > 0 ? (
-													<div className="flex gap-1 flex-wrap">
-														{act.llmModels.slice(0, 2).map((model) => (
-															<span
-																key={model}
-																className="px-2 py-1 text-xs text-white-700 rounded-full border border-gray-600"
-															>
-																{model}
-															</span>
-														))}
-														{act.llmModels.length > 2 && (
-															<span className="px-2 py-1 text-xs text-white-700 rounded-full border border-gray-600">
-																+{act.llmModels.length - 2}
-															</span>
+												</TableCell>
+												<TableCell style={{ minWidth: "180px" }}>
+													{act.llmModels && act.llmModels.length > 0 ? (
+														<div className="flex gap-1 flex-wrap">
+															{act.llmModels.slice(0, 2).map((model) => (
+																<span
+																	key={model}
+																	className="px-2 py-1 text-xs text-white-700 rounded-full border border-gray-600"
+																>
+																	{model}
+																</span>
+															))}
+															{act.llmModels.length > 2 && (
+																<span className="px-2 py-1 text-xs text-white-700 rounded-full border border-gray-600">
+																	+{act.llmModels.length - 2}
+																</span>
+															)}
+														</div>
+													) : (
+														<span className="text-xs text-white-500">-</span>
+													)}
+												</TableCell>
+												<TableCell style={{ minWidth: "200px" }}>
+													{act.inputValues ? (
+														<span className="text-sm text-white-700 line-clamp-2">
+															{act.inputValues}
+														</span>
+													) : (
+														<span className="text-xs text-white-500">-</span>
+													)}
+												</TableCell>
+												<TableCell
+													className="text-center"
+													style={{ minWidth: "128px" }}
+												>
+													<div className="flex items-center justify-center gap-2">
+														{act.status === "inProgress" && (
+															<StatusBadge status="info" variant="dot">
+																Running
+															</StatusBadge>
+														)}
+														{act.status === "completed" && (
+															<StatusBadge status="success" variant="dot">
+																Completed
+															</StatusBadge>
+														)}
+														{act.status === "failed" && (
+															<StatusBadge status="error" variant="dot">
+																Failed
+															</StatusBadge>
+														)}
+														{act.status === "cancelled" && (
+															<StatusBadge status="ignored" variant="dot">
+																Cancelled
+															</StatusBadge>
 														)}
 													</div>
-												) : (
-													<span className="text-xs text-white-500">-</span>
-												)}
-											</TableCell>
-											<TableCell className="w-[200px]">
-												{act.inputValues ? (
-													<span className="text-sm text-white-700 line-clamp-2">
-														{act.inputValues}
-													</span>
-												) : (
-													<span className="text-xs text-white-500">-</span>
-												)}
-											</TableCell>
-											<TableCell className="text-center w-32">
-												<div className="flex items-center justify-center gap-2">
-													{act.status === "inProgress" && (
-														<StatusBadge status="info" variant="dot">
-															Running
-														</StatusBadge>
-													)}
-													{act.status === "completed" && (
-														<StatusBadge status="success" variant="dot">
-															Completed
-														</StatusBadge>
-													)}
-													{act.status === "failed" && (
-														<StatusBadge status="error" variant="dot">
-															Failed
-														</StatusBadge>
-													)}
-													{act.status === "cancelled" && (
-														<StatusBadge status="ignored" variant="dot">
-															Cancelled
-														</StatusBadge>
-													)}
-													{act.status === "failed" && (
-														<button
-															type="button"
-															onClick={(e) => {
-																e.stopPropagation();
-																handleReload();
-															}}
-															className="text-white-700 hover:text-white-900 transition-colors p-1 rounded"
-															title="Reload this task"
-														>
-															<RefreshCw className="w-3 h-3" />
-														</button>
-													)}
-												</div>
-											</TableCell>
-											<TableCell className="text-right w-20">
-												<div className="flex justify-end items-center gap-2">
-													<button
-														type="button"
-														className="text-white-700 hover:text-white-900 transition-colors p-1"
-														title="Archive task"
-														onClick={(e) => {
-															e.stopPropagation();
-															// TODO: Implement archive functionality
-															alert(`Archive task: ${act.workspaceName}`);
-														}}
-													>
-														<Archive className="w-4 h-4" />
-													</button>
-												</div>
-											</TableCell>
-										</TableRow>
-									);
-								})}
-							</TableBody>
-						</Table>
+												</TableCell>
+												<TableCell
+													className="text-right"
+													style={{ minWidth: "80px" }}
+												>
+													<div className="flex justify-end items-center gap-2">
+														{act.status === "failed" ? (
+															<button
+																type="button"
+																onClick={(e) => {
+																	e.stopPropagation();
+																	handleReload();
+																}}
+																className="text-white-700 hover:text-white-900 transition-colors p-1"
+																title="Reload this task"
+															>
+																<RefreshCw className="w-3 h-3" />
+															</button>
+														) : (
+															<button
+																type="button"
+																className="text-white-700 hover:text-white-900 transition-colors p-1"
+																title="Archive task"
+																onClick={(e) => {
+																	e.stopPropagation();
+																	// TODO: Implement archive functionality
+																	alert(`Archive task: ${act.workspaceName}`);
+																}}
+															>
+																<Archive className="w-4 h-4" />
+															</button>
+														)}
+													</div>
+												</TableCell>
+											</TableRow>
+										);
+									})}
+								</TableBody>
+							</Table>
+						</div>
 					)}
 				</div>
 			</div>
