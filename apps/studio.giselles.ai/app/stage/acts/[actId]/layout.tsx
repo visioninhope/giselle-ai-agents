@@ -14,7 +14,7 @@ export default async function ({
 	params: Promise<{ actId: ActId }>;
 }>) {
 	const { actId } = await params;
-	const act = await giselleEngine.getAct({ actId });
+	const act = giselleEngine.getAct({ actId });
 	const { appName, teamName, triggerParameters } = await fetchActMetadata(act);
 
 	return (
@@ -23,7 +23,7 @@ export default async function ({
 			<div className="w-full md:w-auto md:h-screen md:overflow-y-auto">
 				<Suspense fallback={<NavSkelton />}>
 					<Sidebar
-						act={Promise.resolve(act)}
+						act={act}
 						appName={appName}
 						teamName={teamName}
 						triggerParameters={triggerParameters}
