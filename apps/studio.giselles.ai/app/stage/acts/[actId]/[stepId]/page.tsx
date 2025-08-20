@@ -10,7 +10,7 @@ import {
 	type StepId,
 } from "@giselle-sdk/giselle";
 import { NodeIcon } from "@giselles-ai/icons/node";
-import { BrainCircuit, Image, Search, Sparkles, Zap } from "lucide-react";
+
 import { notFound } from "next/navigation";
 import { giselleEngine } from "@/app/giselle-engine";
 import { GenerationView } from "../../../../../../../internal-packages/workflow-designer-ui/src/ui/generation-view";
@@ -99,6 +99,7 @@ export default async function ({
 			{/* Desktop Layout */}
 			<div className="hidden md:block">
 				<StepLayout
+					generation={generation}
 					header={
 						<div className="flex items-center gap-[6px]">
 							<div className="p-[8px] bg-element-active rounded-[4px]">

@@ -28,6 +28,7 @@ import {
 	getModelInfo,
 	getStatusBadgeStatus,
 } from "../lib/utils";
+import { MobileActions } from "./mobile-actions";
 
 export function Sidebar({
 	act: defaultActPromise,
@@ -331,6 +332,7 @@ export function Sidebar({
 												{isExpanded && generation && (
 													<div className="block md:hidden mt-2 bg-white/5 rounded-lg p-4 border border-white/10">
 														<GenerationView generation={generation} />
+														<MobileActions generation={generation} />
 													</div>
 												)}
 											</div>
