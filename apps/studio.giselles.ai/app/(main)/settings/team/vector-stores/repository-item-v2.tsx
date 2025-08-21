@@ -176,20 +176,16 @@ export function RepositoryItem({
 									Configure Sources
 								</DropdownMenuItem>
 								<DropdownMenuSeparator className="my-1 h-px bg-white/10" />
-								<Dialog.Root
-									open={showDeleteDialog}
-									onOpenChange={setShowDeleteDialog}
+								<DropdownMenuItem
+									onSelect={(e) => {
+										e.preventDefault();
+										setShowDeleteDialog(true);
+									}}
+									className="flex items-center px-3 py-2 text-[14px] leading-[16px] text-error-900 hover:bg-error-900/20 rounded-md"
 								>
-									<Dialog.Trigger asChild>
-										<DropdownMenuItem
-											onClick={() => setShowDeleteDialog(true)}
-											className="flex items-center px-3 py-2 text-[14px] leading-[16px] text-error-900 hover:bg-error-900/20 rounded-md"
-										>
-											<Trash className="h-4 w-4 mr-2" />
-											Delete
-										</DropdownMenuItem>
-									</Dialog.Trigger>
-								</Dialog.Root>
+									<Trash className="h-4 w-4 mr-2" />
+									Delete
+								</DropdownMenuItem>
 							</DropdownMenuContent>
 						</DropdownMenu>
 					</div>
@@ -443,9 +439,7 @@ function ContentTypeSection({
 				</div>
 			)}
 			{!enabled && contentType === "pull_request" && (
-				<div className="text-xs text-gray-500">
-					<span>Not configured</span>
-				</div>
+				<div className="text-xs text-gray-500">Not configured</div>
 			)}
 		</div>
 	);
