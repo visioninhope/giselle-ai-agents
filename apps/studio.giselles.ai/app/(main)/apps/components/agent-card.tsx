@@ -8,31 +8,6 @@ import type { agents as dbAgents } from "@/drizzle";
 import { DeleteAgentButton } from "./delete-agent-button";
 import { DuplicateAgentButton } from "./duplicate-agent-button";
 
-const colors = [
-	{ border: "#3B82F6", gradient: "linear-gradient(145deg, #3B82F6, #0d1117)" },
-	{ border: "#10B981", gradient: "linear-gradient(180deg, #10B981, #0d1117)" },
-	{ border: "#F59E0B", gradient: "linear-gradient(165deg, #F59E0B, #0d1117)" },
-	{ border: "#EF4444", gradient: "linear-gradient(195deg, #EF4444, #0d1117)" },
-	{ border: "#8B5CF6", gradient: "linear-gradient(225deg, #8B5CF6, #0d1117)" },
-	{ border: "#06B6D4", gradient: "linear-gradient(135deg, #06B6D4, #0d1117)" },
-];
-
-const stringToHash = (str: string) => {
-	let hash = 0;
-	if (str.length === 0) return hash;
-	for (let i = 0; i < str.length; i++) {
-		const char = str.charCodeAt(i);
-		hash = (hash << 5) - hash + char;
-		hash |= 0; // Convert to 32bit integer
-	}
-	return Math.abs(hash);
-};
-
-const getDeterministicColor = (id: string) => {
-	const hash = stringToHash(id);
-	return colors[hash % colors.length];
-};
-
 export function AgentCard({ agent }: { agent: typeof dbAgents.$inferSelect }) {
 	const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
 		const card = e.currentTarget;
@@ -40,8 +15,6 @@ export function AgentCard({ agent }: { agent: typeof dbAgents.$inferSelect }) {
 		card.style.setProperty("--mouse-x", `${e.clientX - rect.left}px`);
 		card.style.setProperty("--mouse-y", `${e.clientY - rect.top}px`);
 	};
-
-	const _color = getDeterministicColor(agent.id);
 
 	const [relativeTime, setRelativeTime] = useState("");
 
