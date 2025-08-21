@@ -263,14 +263,12 @@ function EmbeddingModelCard({
 	isIngesting,
 	onShowDiagnostic,
 }: {
-	profile?: { name: string; provider: string; model: string };
+	profile?: (typeof EMBEDDING_PROFILES)[keyof typeof EMBEDDING_PROFILES];
 	profileId: number;
 	contentStatuses: (typeof githubRepositoryContentStatus.$inferSelect)[];
 	isIngesting: boolean;
 	onShowDiagnostic: () => void;
 }) {
-	const provider = profile?.provider || "Unknown";
-
 	// Filter statuses for this embedding profile
 	const profileStatuses = contentStatuses.filter(
 		(cs) => cs.embeddingProfileId === profileId,
@@ -292,12 +290,9 @@ function EmbeddingModelCard({
 			}}
 		>
 			{/* Model Header */}
-			<div className="flex items-center gap-2 mb-4">
-				<span className="text-[12px] font-medium text-white/60 bg-white/10 px-2 py-0.5 rounded">
-					{provider}
-				</span>
-				<span className="text-[14px] text-white/90">
-					{profile?.model || `Profile ${profileId}`}
+			<div className="flex items-center gap-2 mb-3">
+				<span className="text-xs text-white/60 bg-white/5 px-2 py-1 rounded font-medium">
+					{profile?.name || `Profile ${profileId}`}
 				</span>
 			</div>
 
@@ -372,6 +367,7 @@ function ContentTypeSection({
 		lastSyncedAt,
 		metadata,
 		errorCode,
+		retryAfter,
 	} = status;
 
 	// Parse metadata based on content type
@@ -390,7 +386,10 @@ function ContentTypeSection({
 		pull_request: {
 			icon: GitPullRequest,
 			label: "Pull Requests",
-			metadataLabel: null,
+			metadataLabel:
+				parsedMetadata && "lastIngestedPrNumber" in parsedMetadata
+					? `PR: #${parsedMetadata.lastIngestedPrNumber || "none"}`
+					: null,
 		},
 	};
 
@@ -439,6 +438,8 @@ function ContentTypeSection({
 			{enabled && syncStatus === "failed" && errorCode && (
 				<div className="text-xs text-red-400 mt-1">
 					{getErrorMessage(errorCode as DocumentLoaderErrorCode)}
+					{retryAfter &&
+						` • Retry ${formatTimestamp.toRelativeTime(new Date(retryAfter).getTime())}`}
 				</div>
 			)}
 			{!enabled && contentType === "pull_request" && (
