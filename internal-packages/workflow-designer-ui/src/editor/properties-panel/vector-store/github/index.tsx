@@ -1,5 +1,11 @@
-import type { VectorStoreNode } from "@giselle-sdk/data-type";
-import { EMBEDDING_PROFILES } from "@giselle-sdk/data-type";
+import type {
+	EmbeddingProfileId,
+	VectorStoreNode,
+} from "@giselle-sdk/data-type";
+import {
+	EMBEDDING_PROFILES,
+	isEmbeddingProfileId,
+} from "@giselle-sdk/data-type";
 import {
 	useFeatureFlag,
 	useVectorStore,
@@ -39,7 +45,7 @@ export function GitHubVectorStoreNodePropertiesPanel({
 		"blob" | "pull_request" | undefined
 	>(currentContentType);
 	const [selectedEmbeddingProfileId, setSelectedEmbeddingProfileId] = useState<
-		number | undefined
+		EmbeddingProfileId | undefined
 	>(
 		node.content.source.state.status === "configured"
 			? node.content.source.state.embeddingProfileId
@@ -111,7 +117,7 @@ export function GitHubVectorStoreNodePropertiesPanel({
 			// Set default embedding profile
 			// When feature flag is off, always use profile 1
 			// When feature flag is on, use first available profile for the content type
-			let profileId = 1;
+			let profileId: EmbeddingProfileId = 1;
 			if (multiEmbedding && selectedRepo.contentTypesWithProfiles) {
 				const contentTypeProfiles = selectedRepo.contentTypesWithProfiles.find(
 					(ct: { contentType: string }) => ct.contentType === contentType,
@@ -120,7 +126,10 @@ export function GitHubVectorStoreNodePropertiesPanel({
 					contentTypeProfiles &&
 					contentTypeProfiles.embeddingProfileIds.length > 0
 				) {
-					profileId = contentTypeProfiles.embeddingProfileIds[0];
+					const firstId = contentTypeProfiles.embeddingProfileIds[0];
+					if (isEmbeddingProfileId(firstId)) {
+						profileId = firstId;
+					}
 				}
 			}
 			setSelectedEmbeddingProfileId(profileId);
@@ -355,11 +364,14 @@ export function GitHubVectorStoreNodePropertiesPanel({
 						if (!selectedRepo) return null;
 
 						// Get available embedding profiles for the selected content type
-						const availableProfiles =
+						const availableProfiles = (
 							selectedRepo.contentTypesWithProfiles?.find(
 								(ct: { contentType: string }) =>
 									ct.contentType === selectedContentType,
-							)?.embeddingProfileIds || [];
+							)?.embeddingProfileIds || []
+						).filter((id): id is EmbeddingProfileId =>
+							isEmbeddingProfileId(id),
+						);
 
 						if (availableProfiles.length === 0) {
 							return null;
@@ -383,8 +395,9 @@ export function GitHubVectorStoreNodePropertiesPanel({
 								<select
 									value={selectedEmbeddingProfileId || availableProfiles[0]}
 									onChange={(e) => {
-										const profileId = Number(e.target.value);
-										setSelectedEmbeddingProfileId(profileId);
+										const maybeId = Number(e.target.value);
+										if (!isEmbeddingProfileId(maybeId)) return;
+										setSelectedEmbeddingProfileId(maybeId);
 
 										// Update node data with selected profile
 										if (node.content.source.state.status === "configured") {
@@ -395,7 +408,7 @@ export function GitHubVectorStoreNodePropertiesPanel({
 														...node.content.source,
 														state: {
 															...node.content.source.state,
-															embeddingProfileId: profileId,
+															embeddingProfileId: maybeId,
 														},
 													},
 												},
@@ -404,7 +417,7 @@ export function GitHubVectorStoreNodePropertiesPanel({
 									}}
 									className="w-full px-3 py-2 bg-black-300/20 rounded-[8px] text-white-400 text-[14px] font-geist cursor-pointer"
 								>
-									{availableProfiles.map((profileId: number) => {
+									{availableProfiles.map((profileId: EmbeddingProfileId) => {
 										const profile =
 											EMBEDDING_PROFILES[
 												profileId as keyof typeof EMBEDDING_PROFILES

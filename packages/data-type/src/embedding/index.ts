@@ -1,4 +1,6 @@
 import { z } from "zod/v4";
+import type { EmbeddingProfileId } from "./profiles";
+import { isEmbeddingProfileId } from "./profiles";
 
 export const EmbeddingProvider = z.enum(["openai", "google"]);
 export type EmbeddingProvider = z.infer<typeof EmbeddingProvider>;
@@ -20,6 +22,15 @@ export type EmbeddingModelId = z.infer<typeof EmbeddingModelId>;
 
 export const EmbeddingDimensions = z.union([z.literal(1536), z.literal(3072)]);
 export type EmbeddingDimensions = z.infer<typeof EmbeddingDimensions>;
+
+// Schema for validating embedding profile IDs against known profiles
+export const EmbeddingProfileIdSchema = z.custom<EmbeddingProfileId>(
+	(val) =>
+		typeof val === "number" &&
+		Number.isInteger(val) &&
+		isEmbeddingProfileId(val),
+	{ message: "Invalid embedding profile id" },
+);
 
 export {
 	EMBEDDING_PROFILES,
