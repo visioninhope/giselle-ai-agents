@@ -8,6 +8,7 @@ import type {
 	githubRepositoryContentStatus,
 } from "@/drizzle";
 import type { RepositoryWithStatuses } from "@/lib/vector-stores/github";
+import type { GitHubRepositoryIndexId } from "@/packages/types";
 import {
 	GlassDialogBody,
 	GlassDialogContent,
@@ -19,12 +20,13 @@ type ConfigureSourcesDialogProps = {
 	open: boolean;
 	setOpen: (open: boolean) => void;
 	repositoryData: RepositoryWithStatuses;
-	updateRepositoryContentTypesAction: (
-		repositoryIndexId: string,
+	updateRepositoryIndexAction: (
+		repositoryIndexId: GitHubRepositoryIndexId,
 		contentTypes: {
 			contentType: GitHubRepositoryContentType;
 			enabled: boolean;
 		}[],
+		embeddingProfileIds?: number[],
 	) => Promise<{ success: boolean; error?: string }>;
 };
 
@@ -32,7 +34,7 @@ export function ConfigureSourcesDialog({
 	open,
 	setOpen,
 	repositoryData,
-	updateRepositoryContentTypesAction,
+	updateRepositoryIndexAction,
 }: ConfigureSourcesDialogProps) {
 	const { repositoryIndex, contentStatuses } = repositoryData;
 	const [isPending, startTransition] = useTransition();
@@ -60,7 +62,7 @@ export function ConfigureSourcesDialog({
 				{ contentType: "pull_request", enabled: config.pullRequests.enabled },
 			];
 
-			const result = await updateRepositoryContentTypesAction(
+			const result = await updateRepositoryIndexAction(
 				repositoryIndex.id,
 				contentTypes,
 			);

@@ -12,12 +12,13 @@ type RepositoryListProps = {
 	triggerManualIngestAction: (
 		indexId: GitHubRepositoryIndexId,
 	) => Promise<{ success: boolean; error?: string }>;
-	updateRepositoryContentTypesAction: (
-		repositoryIndexId: string,
+	updateRepositoryIndexAction: (
+		repositoryIndexId: GitHubRepositoryIndexId,
 		contentTypes: {
 			contentType: GitHubRepositoryContentType;
 			enabled: boolean;
 		}[],
+		embeddingProfileIds?: number[],
 	) => Promise<{ success: boolean; error?: string }>;
 };
 
@@ -25,7 +26,7 @@ export function RepositoryList({
 	repositories,
 	deleteRepositoryIndexAction,
 	triggerManualIngestAction,
-	updateRepositoryContentTypesAction,
+	updateRepositoryIndexAction,
 }: RepositoryListProps) {
 	return (
 		<div className="flex flex-col gap-y-[16px]">
@@ -50,9 +51,7 @@ export function RepositoryList({
 								repositoryData={repo}
 								deleteRepositoryIndexAction={deleteRepositoryIndexAction}
 								triggerManualIngestAction={triggerManualIngestAction}
-								updateRepositoryContentTypesAction={
-									updateRepositoryContentTypesAction
-								}
+								updateRepositoryIndexAction={updateRepositoryIndexAction}
 							/>
 						))}
 					</div>
