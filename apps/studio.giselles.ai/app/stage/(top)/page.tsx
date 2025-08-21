@@ -7,32 +7,45 @@ import {
 } from "@giselle-internal/ui/table";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+
 import { stageFlag } from "@/flags";
 
+import { fetchCurrentUser } from "@/services/accounts";
 import { fetchUserTeams } from "@/services/teams";
 import { performStageAction } from "./actions";
 import { Form } from "./form";
 
 import { ResizableLayout } from "./resizable-layout";
 import { fetchEnrichedActs, fetchFlowTriggers } from "./services";
+import type { FilterType } from "./types";
 
 // The maximum duration of server actions on this page is extended to 800 seconds through enabled fluid compute.
 // https://vercel.com/docs/functions/runtimes#max-duration
 export const maxDuration = 800;
 
-export default async function StagePage() {
+export default async function StagePage({
+	searchParams,
+}: {
+	searchParams: Promise<{ filter?: string; teamId?: string }>;
+}) {
 	const enableStage = await stageFlag();
 	if (!enableStage) {
 		return notFound();
 	}
+
+	const searchParamsResolved = await searchParams;
+	// Default to 'history' when no filter param, otherwise use the specified filter (including 'all' for reset)
+	const filterType = (searchParamsResolved.filter as FilterType) || "history";
+	const user = await fetchCurrentUser();
 	const teams = await fetchUserTeams();
+	const acts = await fetchEnrichedActs(teams, user);
+	const flowTriggers = await fetchFlowTriggers(teams, filterType, user);
+
 	const teamOptions = teams.map((team) => ({
 		value: team.id,
 		label: team.name,
 		avatarUrl: team.avatarUrl ?? undefined,
 	}));
-	const acts = await fetchEnrichedActs(teams);
-	const flowTriggers = await fetchFlowTriggers(teams);
 	return (
 		<div className="flex-1 bg-[var(--color-stage-background)] pt-16 md:pt-0 pb-[calc(4rem+env(safe-area-inset-bottom))] md:pb-0 h-full flex flex-col">
 			<ResizableLayout

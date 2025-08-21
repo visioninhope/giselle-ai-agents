@@ -7,7 +7,7 @@ import { defaultName } from "@giselle-sdk/giselle";
 import { giselleEngine } from "@/app/giselle-engine";
 import { type acts as actsSchema, db } from "@/drizzle";
 import { fetchCurrentUser } from "@/services/accounts";
-import type { FlowTriggerUIItem, TeamId } from "./types";
+import type { FilterType, FlowTriggerUIItem, TeamId } from "./types";
 
 // This feature is currently under development and data structures change destructively,
 // so parsing of legacy data frequently fails. We're using a rough try-catch to ignore
@@ -107,6 +107,7 @@ async function enrichActWithNavigationData(
 
 export async function fetchEnrichedActs(
 	teams: { dbId: number; name: string }[],
+	user: Awaited<ReturnType<typeof fetchCurrentUser>>,
 ): Promise<
 	Array<{
 		id: string;
@@ -118,7 +119,6 @@ export async function fetchEnrichedActs(
 		createdAt: Date;
 	}>
 > {
-	const user = await fetchCurrentUser();
 	const sevenDaysAgo = new Date();
 	sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
@@ -138,13 +138,49 @@ export async function fetchEnrichedActs(
 
 export async function fetchFlowTriggers(
 	teams: { dbId: number; id: TeamId; name: string }[],
+	filterType: FilterType = "all",
+	user?: Awaited<ReturnType<typeof fetchCurrentUser>>,
 ): Promise<FlowTriggerUIItem[]> {
 	const flowTriggers: Array<FlowTriggerUIItem> = [];
+	const currentUser = user ?? (await fetchCurrentUser());
+
+	// Get user's act history for filtering
+	const userActs =
+		filterType === "history"
+			? await db.query.acts.findMany({
+					where: (acts, { eq }) => eq(acts.directorDbId, currentUser.dbId),
+					columns: {
+						sdkFlowTriggerId: true,
+					},
+				})
+			: [];
+
+	const usedFlowTriggerIds = new Set(
+		userActs.map((act) => act.sdkFlowTriggerId),
+	);
 
 	for (const team of teams) {
-		const tmpFlowTriggers = await db.query.flowTriggers.findMany({
-			where: (flowTriggers, { eq }) => eq(flowTriggers.teamDbId, team.dbId),
-		});
+		// Build query conditions based on filter type
+		let tmpFlowTriggers: Awaited<
+			ReturnType<typeof db.query.flowTriggers.findMany>
+		>;
+
+		if (filterType === "latest") {
+			// Filter for flow triggers updated in the last 7 days
+			const sevenDaysAgo = new Date();
+			sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+			tmpFlowTriggers = await db.query.flowTriggers.findMany({
+				where: (flowTriggers, { eq, gte, and }) =>
+					and(
+						eq(flowTriggers.teamDbId, team.dbId),
+						gte(flowTriggers.updatedAt, sevenDaysAgo),
+					),
+			});
+		} else {
+			tmpFlowTriggers = await db.query.flowTriggers.findMany({
+				where: (flowTriggers, { eq }) => eq(flowTriggers.teamDbId, team.dbId),
+			});
+		}
 
 		const workspaceMap: Map<WorkspaceId, Workspace> = new Map();
 
@@ -176,6 +212,14 @@ export async function fetchFlowTriggers(
 				flowTriggerId: tmpFlowTrigger.sdkFlowTriggerId,
 			});
 			if (flowTrigger === undefined) {
+				continue;
+			}
+
+			// Apply history filter
+			if (
+				filterType === "history" &&
+				!usedFlowTriggerIds.has(tmpFlowTrigger.sdkFlowTriggerId)
+			) {
 				continue;
 			}
 
