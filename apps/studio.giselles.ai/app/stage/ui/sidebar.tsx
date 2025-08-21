@@ -1,8 +1,11 @@
 "use client";
 
+import { Button } from "@giselle-internal/ui/button";
 import { GiselleIcon } from "@giselle-internal/workflow-designer-ui";
 import { ChevronLeftIcon } from "@radix-ui/react-icons";
 import clsx from "clsx/lite";
+import { SparklesIcon } from "lucide-react";
+import Link from "next/link";
 import { useCallback, useState } from "react";
 
 export function Sidebar(props: React.PropsWithChildren) {
@@ -43,6 +46,47 @@ export function Sidebar(props: React.PropsWithChildren) {
 						</button>
 					</div>
 				</div>
+				<nav>
+					<div className="relative h-[200px]">
+						<div
+							className={clsx(
+								"absolute inset-0 transition-opacity duration-500 overflow-hidden whitespace-nowrap",
+								!open && "opacity-0",
+							)}
+						>
+							<Button
+								variant="glass"
+								size="large"
+								leftIcon={<SparklesIcon />}
+								asChild
+							>
+								<Link href="/stage" className="flex">
+									<div
+										className={clsx(
+											"transition-opacity duration-500 overflow-hidden whitespace-nowrap",
+											!open && "opacity-0",
+										)}
+									>
+										New Task
+									</div>
+								</Link>
+							</Button>
+						</div>
+
+						<div
+							className={clsx(
+								"absolute inset-0 transition-opacity duration-500 overflow-hidden whitespace-nowrap opacity-0",
+								!open && "opacity-100",
+							)}
+						>
+							<Button variant="glass" size="large" asChild>
+								<Link href="/stage" className="flex">
+									<SparklesIcon className="size-[18px]" />
+								</Link>
+							</Button>
+						</div>
+					</div>
+				</nav>
 			</div>
 			{/* Main content spacer */}
 			<div
