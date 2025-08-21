@@ -1,7 +1,7 @@
 import {
 	DEFAULT_MAX_RESULTS,
 	DEFAULT_SIMILARITY_THRESHOLD,
-	type EmbeddingProfileId,
+	isEmbeddingProfileId,
 	isQueryNode,
 	isTextNode,
 	NodeId,
@@ -310,11 +310,18 @@ async function queryVectorStore(
 					case "github": {
 						const { owner, repo, contentType } = state;
 
+						const givenEmbeddingProfileId = state.embeddingProfileId;
+						const embeddingProfileId =
+							givenEmbeddingProfileId != null &&
+							isEmbeddingProfileId(givenEmbeddingProfileId)
+								? givenEmbeddingProfileId
+								: 1;
+
 						const queryContext: GitHubQueryContext = {
 							workspaceId,
 							owner,
 							repo,
-							embeddingProfileId: 1 as EmbeddingProfileId, // TODO: Get from VectorStoreNode when UI is implemented
+							embeddingProfileId,
 						};
 
 						if (contentType === "pull_request") {
