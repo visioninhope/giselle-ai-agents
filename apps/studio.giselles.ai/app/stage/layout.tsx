@@ -1,23 +1,15 @@
-import type { ReactNode } from "react";
-import { getAccountInfo } from "../(main)/settings/account/actions";
+import { type ReactNode, Suspense } from "react";
+import { getSidebarData } from "./query";
 import { StageSidebar } from "./ui/stage-sidebar";
 
-export default async function StageLayout({
-	children,
-}: {
-	children: ReactNode;
-}) {
-	const accountInfo = await getAccountInfo();
+export default function StageLayout({ children }: { children: ReactNode }) {
+	const data = getSidebarData();
 	return (
 		<div className="flex h-screen bg-black-900">
-			<StageSidebar
-				user={{
-					displayName: accountInfo.displayName ?? undefined,
-					email: accountInfo.email ?? undefined,
-					avatarUrl: accountInfo.avatarUrl ?? undefined,
-				}}
-			/>
-			<div className="flex-1 h-full">{children}</div>
+			<Suspense fallback="">
+				<StageSidebar data={data} />
+				<div className="flex-1 h-full">{children}</div>
+			</Suspense>
 		</div>
 	);
 }
