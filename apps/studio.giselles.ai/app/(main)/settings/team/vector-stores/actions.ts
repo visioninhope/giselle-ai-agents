@@ -2,7 +2,7 @@
 
 import { isEmbeddingProfileId } from "@giselle-sdk/data-type";
 import { createId } from "@paralleldrive/cuid2";
-import { and, eq, inArray, notInArray, sql } from "drizzle-orm";
+import { and, eq, inArray, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { after } from "next/server";
 import {
@@ -235,6 +235,7 @@ export async function updateRepositoryIndex(
 						githubRepositoryEmbeddingProfiles.embeddingProfileId,
 				})
 				.from(githubRepositoryEmbeddingProfiles)
+				.for("update")
 				.where(
 					eq(
 						githubRepositoryEmbeddingProfiles.repositoryIndexDbId,
@@ -278,31 +279,7 @@ export async function updateRepositoryIndex(
 					);
 			}
 
-			// Delete content statuses for removed content types (but keep profiles)
-			const desiredContentTypes = contentTypes.map((ct) => ct.contentType);
-			if (desiredContentTypes.length > 0 && validProfileIds.length > 0) {
-				await tx
-					.delete(githubRepositoryContentStatus)
-					.where(
-						and(
-							eq(
-								githubRepositoryContentStatus.repositoryIndexDbId,
-								repository.dbId,
-							),
-							inArray(
-								githubRepositoryContentStatus.embeddingProfileId,
-								validProfileIds,
-							),
-							notInArray(
-								githubRepositoryContentStatus.contentType,
-								desiredContentTypes,
-							),
-						),
-					);
-			}
-
-			// Step 2: Upsert profiles and content statuses
-			// Upsert embedding profiles (batch for efficiency)
+			// Upsert embedding profiles
 			if (validProfileIds.length > 0) {
 				const embeddingProfilesData = validProfileIds.map((profileId) => ({
 					repositoryIndexDbId: repository.dbId,
@@ -316,7 +293,7 @@ export async function updateRepositoryIndex(
 					.onConflictDoNothing();
 			}
 
-			// Upsert content statuses (batch for efficiency)
+			// Upsert content statuses
 			if (validProfileIds.length > 0 && contentTypes.length > 0) {
 				const contentStatusData = validProfileIds.flatMap((profileId) =>
 					contentTypes.map((contentType) => ({
