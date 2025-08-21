@@ -1,12 +1,10 @@
 import { revalidatePath } from "next/cache";
-import { notFound, redirect } from "next/navigation";
-
+import { notFound } from "next/navigation";
 import { giselleEngine } from "@/app/giselle-engine";
 import { type acts as actsSchema, db } from "@/drizzle";
 import { stageFlag } from "@/flags";
 import { fetchCurrentUser } from "@/services/accounts";
 import { fetchUserTeams } from "@/services/teams";
-import { fetchActMetadata } from "./[actId]/lib/data";
 import { FilterableActsList } from "./components/filterable-acts-list";
 import type { ActWithNavigation } from "./types";
 
@@ -104,44 +102,6 @@ async function enrichActWithNavigationData(
 			}
 		}
 
-		// Extract input values from generation context (same as actId page)
-		let inputValues = "";
-		try {
-			// Get the trigger step (first step in first sequence)
-			const triggerStep = tmpAct.sequences[0]?.steps[0];
-			if (triggerStep && triggerStep.status === "completed") {
-				// Fetch generation data for the trigger step
-				const generation = await giselleEngine.getGeneration(
-					triggerStep.generationId,
-					true,
-				);
-
-				if (generation?.context?.inputs) {
-					const inputs =
-						generation.context.inputs.find(
-							(input) => input.type === "parameters",
-						)?.items || [];
-
-					if (inputs.length > 0) {
-						// Get trigger parameters for user-friendly names (same as actId page)
-						const { triggerParameters } = await fetchActMetadata(tmpAct);
-
-						const values = inputs.map((input) => {
-							// Find the corresponding parameter definition for user-friendly label
-							const parameter = triggerParameters.find(
-								(param) => param.id === input.name,
-							);
-							const displayName = parameter?.name || input.name;
-							return `${displayName}: '${String(input.value)}'`;
-						});
-						inputValues = values.join(", ");
-					}
-				}
-			}
-		} catch (error) {
-			console.warn("Error extracting input values:", error);
-		}
-
 		return {
 			id: tmpAct.id,
 			status: tmpAct.status,
@@ -150,7 +110,7 @@ async function enrichActWithNavigationData(
 			teamName: team.name,
 			workspaceName: tmpWorkspace.name ?? "Untitled",
 			llmModels: llmModels.length > 0 ? llmModels : undefined,
-			inputValues: inputValues || undefined,
+			inputValues: undefined,
 		};
 	} catch {
 		return null;
