@@ -157,11 +157,10 @@ async function enrichActWithNavigationData(
 	}
 }
 
-// biome-ignore lint/suspicious/useAwait: Server Actions must be async functions
 async function reloadPage() {
 	"use server";
+	await Promise.resolve();
 	revalidatePath("/stage/acts");
-	redirect("/stage/acts");
 }
 
 export default async function StageActsPage() {
