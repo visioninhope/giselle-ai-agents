@@ -1,8 +1,8 @@
 "use client";
 
-import { formatTimestamp } from "@giselles-ai/lib/utils";
 import { StatusBadge } from "@giselle-internal/ui/status-badge";
 import { EMBEDDING_PROFILES } from "@giselle-sdk/data-type";
+import { formatTimestamp } from "@giselles-ai/lib/utils";
 import * as Dialog from "@radix-ui/react-dialog";
 import {
 	Code,
@@ -427,7 +427,8 @@ function ContentTypeSection({
 				<div className="text-xs text-gray-500 flex justify-between">
 					{lastSyncedAt ? (
 						<span>
-							Last sync: {formatTimestamp.toRelativeTime(new Date(lastSyncedAt).getTime())}
+							Last sync:{" "}
+							{formatTimestamp.toRelativeTime(new Date(lastSyncedAt).getTime())}
 						</span>
 					) : (
 						<span>Never synced</span>
