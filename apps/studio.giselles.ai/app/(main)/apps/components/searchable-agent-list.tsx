@@ -12,16 +12,16 @@ import {
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { Input } from "@/components/ui/input";
+import type { agents as dbAgents } from "@/drizzle";
 import { Card } from "../../settings/components/card";
-import { AgentGrid } from "./agent-grid";
+import { AgentCard } from "./agent-card";
 import { DeleteAgentButton } from "./delete-agent-button";
 import { DuplicateAgentButton } from "./duplicate-agent-button";
-import type { AgentGridProps } from "./types";
 
 type SortOption = "name-asc" | "name-desc" | "date-desc" | "date-asc";
 type ViewMode = "grid" | "list";
 
-function ListItem({ agent }: { agent: AgentGridProps["agents"][0] }) {
+function ListItem({ agent }: { agent: typeof dbAgents.$inferSelect }) {
 	return (
 		<Link
 			href={`/workspaces/${agent.workspaceId}`}
@@ -70,7 +70,11 @@ function ListItem({ agent }: { agent: AgentGridProps["agents"][0] }) {
 	);
 }
 
-export function SearchableAgentList({ agents }: AgentGridProps) {
+export function SearchableAgentList({
+	agents,
+}: {
+	agents: (typeof dbAgents.$inferSelect)[];
+}) {
 	const [searchQuery, setSearchQuery] = useState("");
 	const [sortOption, setSortOption] = useState<SortOption>("date-desc");
 	const [viewMode, setViewMode] = useState<ViewMode>("grid");
@@ -187,7 +191,11 @@ export function SearchableAgentList({ agents }: AgentGridProps) {
 					</div>
 				</div>
 			) : viewMode === "grid" ? (
-				<AgentGrid agents={sortedAgents} />
+				<div className="relative flex h-full w-full flex-wrap items-start justify-start gap-4">
+					{sortedAgents.map((agent) => (
+						<AgentCard key={agent.id} agent={agent} />
+					))}
+				</div>
 			) : (
 				<Card className="gap-0 py-2">
 					{sortedAgents.map((agent) => {

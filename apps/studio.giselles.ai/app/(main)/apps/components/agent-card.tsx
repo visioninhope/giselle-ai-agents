@@ -1,11 +1,12 @@
 "use client";
 
 import { formatTimestamp } from "@giselles-ai/lib/utils";
+import clsx from "clsx/lite";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import type { agents as dbAgents } from "@/drizzle";
 import { DeleteAgentButton } from "./delete-agent-button";
 import { DuplicateAgentButton } from "./duplicate-agent-button";
-import type { AgentCardProps } from "./types";
 
 const colors = [
 	{ border: "#3B82F6", gradient: "linear-gradient(145deg, #3B82F6, #0d1117)" },
@@ -32,7 +33,7 @@ const getDeterministicColor = (id: string) => {
 	return colors[hash % colors.length];
 };
 
-export function AgentCard({ agent }: AgentCardProps) {
+export function AgentCard({ agent }: { agent: typeof dbAgents.$inferSelect }) {
 	const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
 		const card = e.currentTarget;
 		const rect = card.getBoundingClientRect();
@@ -63,15 +64,15 @@ export function AgentCard({ agent }: AgentCardProps) {
 		<section
 			onMouseMove={handleMouseMove}
 			aria-label={agent.name || "Untitled app"}
-			className="group relative flex h-[300px] w-[267px] flex-none flex-col rounded-[12px] border-[0.5px]"
+			className={clsx(
+				"group relative flex h-[300px] w-[267px] flex-none flex-col rounded-[12px] border-[0.5px]",
+				"bg-[linear-gradient(135deg,rgba(100,130,200,0.20)_0%,rgba(60,80,120,0.35)_40%,rgba(20,30,60,0.85)_100%)]",
+				"filter grayscale hover:grayscale-0 transition duration-500",
+			)}
 			style={
 				{
 					"--spotlight-color": "rgba(255,255,255,0.15)",
-					background:
-						"linear-gradient(135deg, rgba(100,130,200,0.20) 0%, rgba(60,80,120,0.35) 40%, rgba(20,30,60,0.85) 100%)",
 					borderColor: "rgba(160,180,255,0.15)",
-					backdropFilter: "blur(8px)",
-					WebkitBackdropFilter: "blur(8px)",
 				} as React.CSSProperties
 			}
 		>
