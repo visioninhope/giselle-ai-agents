@@ -45,12 +45,13 @@ type RepositoryItemProps = {
 	triggerManualIngestAction: (
 		indexId: GitHubRepositoryIndexId,
 	) => Promise<{ success: boolean; error?: string }>;
-	updateRepositoryContentTypesAction: (
-		repositoryIndexId: string,
+	updateRepositoryIndexAction: (
+		repositoryIndexId: GitHubRepositoryIndexId,
 		contentTypes: {
 			contentType: GitHubRepositoryContentType;
 			enabled: boolean;
 		}[],
+		embeddingProfileIds?: number[],
 	) => Promise<{ success: boolean; error?: string }>;
 };
 
@@ -58,7 +59,7 @@ export function RepositoryItem({
 	repositoryData,
 	deleteRepositoryIndexAction,
 	triggerManualIngestAction,
-	updateRepositoryContentTypesAction,
+	updateRepositoryIndexAction,
 }: RepositoryItemProps) {
 	const { repositoryIndex, contentStatuses } = repositoryData;
 	const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -235,7 +236,7 @@ export function RepositoryItem({
 				open={showConfigureDialog}
 				setOpen={setShowConfigureDialog}
 				repositoryData={repositoryData}
-				updateRepositoryContentTypesAction={updateRepositoryContentTypesAction}
+				updateRepositoryIndexAction={updateRepositoryIndexAction}
 			/>
 
 			<DiagnosticModal
