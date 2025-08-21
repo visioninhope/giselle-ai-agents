@@ -1,4 +1,5 @@
 import clsx from "clsx/lite";
+import { Slot } from "radix-ui";
 
 type ButtonStyle = "subtle" | "filled" | "solid" | "glass" | "outline";
 type ButtonSize = "compact" | "default" | "large";
@@ -8,6 +9,7 @@ interface ButtonProps
 	rightIcon?: React.ReactNode;
 	variant?: ButtonStyle;
 	size?: ButtonSize;
+	asChild?: boolean;
 }
 
 export function Button({
@@ -17,12 +19,14 @@ export function Button({
 	rightIcon,
 	variant: style = "subtle",
 	size = "default",
+	asChild = false,
 	...props
 }: ButtonProps) {
+	const Comp = asChild ? Slot.Root : "button";
 	return (
-		<button
+		<Comp
 			className={clsx(
-				"relative flex items-center justify-between outline-none overflow-hidden",
+				"relative flex items-center justify-center outline-none overflow-hidden",
 				"data-[size=default]:px-[8px] data-[size=default]:py-[2px] data-[size=default]:rounded-[2px] data-[size=default]:gap-[4px]",
 				"data-[size=large]:px-4 data-[size=large]:py-2 data-[size=large]:rounded-lg data-[size=large]:gap-[6px]",
 				"data-[size=compact]:px-[4px] data-[size=compact]:py-[0px] data-[size=compact]:rounded-[2px] data-[size=compact]:gap-[2px]",
@@ -47,8 +51,10 @@ export function Button({
 				</>
 			)}
 			{leftIcon && <div className="*:size-[13px] *:text-text">{leftIcon}</div>}
-			<div className="text-[13px] text-text">{children}</div>
+			<Slot.Slottable>
+				<div className="text-[13px] text-text">{children}</div>
+			</Slot.Slottable>
 			{rightIcon && <div className="*:size-[13px]">{rightIcon}</div>}
-		</button>
+		</Comp>
 	);
 }

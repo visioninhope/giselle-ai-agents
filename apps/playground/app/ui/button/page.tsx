@@ -1,4 +1,5 @@
 import { Button } from "@giselle-internal/ui/button";
+import { SparklesIcon } from "lucide-react";
 import { DemoSection } from "../components/demo-section";
 import { UiPage } from "../components/ui-page";
 
@@ -15,6 +16,16 @@ export default function () {
 			<DemoSection label="Size">
 				<Button variant="glass">default</Button>
 				<Button variant="glass" size="large">
+					Large
+				</Button>
+			</DemoSection>
+			<DemoSection label="Examples">
+				<Button
+					variant="glass"
+					size="large"
+					leftIcon={<SparklesIcon />}
+					className="w-full"
+				>
 					Large
 				</Button>
 			</DemoSection>
