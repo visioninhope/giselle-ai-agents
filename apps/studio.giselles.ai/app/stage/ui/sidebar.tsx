@@ -32,7 +32,7 @@ export function Sidebar(props: React.PropsWithChildren) {
 
 			<div
 				className={clsx(
-					"hidden md:flex h-screen bg-stage-background flex-col border-r border-white/10 transition-all duration-300 py-4",
+					"hidden md:block fixed top-0 left-0 h-full  bg-stage-background flex-col border-r border-white/10 transition-all duration-300 py-4 z-40",
 					open ? "w-64 px-4" : "w-16 pl-4 pr-2",
 				)}
 			>
@@ -64,6 +64,13 @@ export function Sidebar(props: React.PropsWithChildren) {
 					</div>
 				</div>
 			</div>
+			{/* Main content spacer */}
+			<div
+				className={clsx(
+					"hidden md:block transition-all duration-300",
+					open ? "w-64" : "w-16",
+				)}
+			/>
 		</>
 	);
 }
