@@ -526,3 +526,10 @@ export const acts = pgTable(
 		index().on(table.sdkActId),
 	],
 );
+
+export const actRelations = relations(acts, ({ one }) => ({
+	team: one(teams, {
+		fields: [acts.teamDbId],
+		references: [teams.dbId],
+	}),
+}));
