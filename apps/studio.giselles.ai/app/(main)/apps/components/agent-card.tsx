@@ -3,9 +3,9 @@
 import { formatTimestamp } from "@giselles-ai/lib/utils";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import type { agents as dbAgents } from "@/drizzle";
 import { DeleteAgentButton } from "./delete-agent-button";
 import { DuplicateAgentButton } from "./duplicate-agent-button";
-import type { AgentCardProps } from "./types";
 
 const colors = [
 	{ border: "#3B82F6", gradient: "linear-gradient(145deg, #3B82F6, #0d1117)" },
@@ -32,7 +32,7 @@ const getDeterministicColor = (id: string) => {
 	return colors[hash % colors.length];
 };
 
-export function AgentCard({ agent }: AgentCardProps) {
+export function AgentCard({ agent }: { agent: typeof dbAgents.$inferSelect }) {
 	const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
 		const card = e.currentTarget;
 		const rect = card.getBoundingClientRect();
