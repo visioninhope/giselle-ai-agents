@@ -86,7 +86,9 @@ export function createPipeline<
 
 	const apiKey =
 		process.env[
-			profile.provider === "openai" ? "OPENAI_API_KEY" : "GOOGLE_API_KEY"
+			profile.provider === "openai"
+				? "OPENAI_API_KEY"
+				: "GOOGLE_GENERATIVE_AI_API_KEY"
 		];
 	if (!apiKey) {
 		throw new ConfigurationError(
