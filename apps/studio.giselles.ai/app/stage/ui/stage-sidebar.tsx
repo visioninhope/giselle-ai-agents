@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { use, useState } from "react";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -30,14 +30,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { AvatarImage } from "@/services/accounts/components/user-button/avatar-image";
 import { SignOutButton } from "@/services/accounts/components/user-button/sign-out-button";
-
-interface StageSidebarProps {
-	user?: {
-		displayName?: string;
-		email?: string;
-		avatarUrl?: string;
-	};
-}
+import type { SidebarData } from "../query";
 
 interface MenuItem {
 	icon: React.ComponentType<{ className?: string }>;
@@ -52,7 +45,8 @@ interface BottomItem {
 	href: string;
 }
 
-export function StageSidebar({ user }: StageSidebarProps) {
+export function StageSidebar({ data }: { data: SidebarData }) {
+	const { displayName, email, avatarUrl } = use(data);
 	const [isCollapsed, setIsCollapsed] = useState(false);
 	const pathname = usePathname();
 
@@ -160,15 +154,13 @@ export function StageSidebar({ user }: StageSidebarProps) {
 						>
 							<Bell className="w-5 h-5" />
 						</button>
-						{user && (
-							<AvatarImage
-								className="w-8 h-8 rounded-full"
-								avatarUrl={user.avatarUrl ?? null}
-								width={32}
-								height={32}
-								alt={user.displayName || user.email || "User"}
-							/>
-						)}
+						<AvatarImage
+							className="w-8 h-8 rounded-full"
+							avatarUrl={avatarUrl ?? null}
+							width={32}
+							height={32}
+							alt={displayName || email || "User"}
+						/>
 					</div>
 				</div>
 			</div>
@@ -217,103 +209,101 @@ export function StageSidebar({ user }: StageSidebarProps) {
 					</div>
 
 					{/* User Profile Section */}
-					{user && (
-						<DropdownMenu>
-							<DropdownMenuTrigger
-								className="cursor-pointer w-full"
-								aria-label="Profile menu"
+					<DropdownMenu>
+						<DropdownMenuTrigger
+							className="cursor-pointer w-full"
+							aria-label="Profile menu"
+						>
+							<div
+								className={clsx(
+									"flex items-center",
+									isCollapsed ? "justify-center" : "gap-3",
+								)}
 							>
-								<div
-									className={clsx(
-										"flex items-center",
-										isCollapsed ? "justify-center" : "gap-3",
-									)}
-								>
-									{isCollapsed ? (
-										<Tooltip
-											text={user.displayName || user.email || "User"}
-											side="right"
-											variant="light"
-										>
-											<AvatarImage
-												className="w-8 h-8 rounded-full"
-												avatarUrl={user.avatarUrl ?? null}
-												width={32}
-												height={32}
-												alt={user.displayName || user.email || "User"}
-											/>
-										</Tooltip>
-									) : (
+								{isCollapsed ? (
+									<Tooltip
+										text={displayName || email || "User"}
+										side="right"
+										variant="light"
+									>
 										<AvatarImage
 											className="w-8 h-8 rounded-full"
-											avatarUrl={user.avatarUrl ?? null}
+											avatarUrl={avatarUrl ?? null}
 											width={32}
 											height={32}
-											alt={user.displayName || user.email || "User"}
+											alt={displayName || email || "User"}
 										/>
-									)}
-									{!isCollapsed && (
-										<>
-											<div className="flex-1 min-w-0 text-left">
-												<span className="font-bold text-sm text-white-400 truncate block">
-													{user.displayName || "No display name"}
-												</span>
-											</div>
-											<ChevronDown className="w-3 h-3 text-black-600 hover:text-white-700 transition-colors" />
-										</>
-									)}
-								</div>
-							</DropdownMenuTrigger>
-							<DropdownMenuContent
-								align="start"
-								className="p-2 border-[0.5px] border-white/10 rounded-xl shadow-[0_2px_8px_rgba(5,10,20,0.4),0_1px_2px_rgba(0,0,0,0.3)] bg-black-900/50 backdrop-blur-md"
-							>
-								<DropdownMenuLabel className="flex flex-col px-2 pt-2 pb-1 text-white-400">
-									<span className="font-bold text-[16px] leading-[16px] font-geist">
-										{user.displayName || "No display name"}
-									</span>
-									<span className="font-medium leading-[20.4px] font-geist text-black-600">
-										{user.email}
-									</span>
-								</DropdownMenuLabel>
-								<DropdownMenuSeparator className="bg-white/10" />
-								<div className="py-1 space-y-1">
-									<DropdownMenuItem
-										className="p-0 rounded-lg focus:bg-white/5"
-										asChild
+									</Tooltip>
+								) : (
+									<AvatarImage
+										className="w-8 h-8 rounded-full"
+										avatarUrl={avatarUrl ?? null}
+										width={32}
+										height={32}
+										alt={displayName || email || "User"}
+									/>
+								)}
+								{!isCollapsed && (
+									<>
+										<div className="flex-1 min-w-0 text-left">
+											<span className="font-bold text-sm text-white-400 truncate block">
+												{displayName || "No display name"}
+											</span>
+										</div>
+										<ChevronDown className="w-3 h-3 text-black-600 hover:text-white-700 transition-colors" />
+									</>
+								)}
+							</div>
+						</DropdownMenuTrigger>
+						<DropdownMenuContent
+							align="start"
+							className="p-2 border-[0.5px] border-white/10 rounded-xl shadow-[0_2px_8px_rgba(5,10,20,0.4),0_1px_2px_rgba(0,0,0,0.3)] bg-black-900/50 backdrop-blur-md"
+						>
+							<DropdownMenuLabel className="flex flex-col px-2 pt-2 pb-1 text-white-400">
+								<span className="font-bold text-[16px] leading-[16px] font-geist">
+									{displayName || "No display name"}
+								</span>
+								<span className="font-medium leading-[20.4px] font-geist text-black-600">
+									{email}
+								</span>
+							</DropdownMenuLabel>
+							<DropdownMenuSeparator className="bg-white/10" />
+							<div className="py-1 space-y-1">
+								<DropdownMenuItem
+									className="p-0 rounded-lg focus:bg-white/5"
+									asChild
+								>
+									<Link
+										href="/settings/account"
+										className="block px-2 py-1.5 w-full text-white-400 font-medium text-[14px] leading-[14px] font-geist"
+										aria-label="Account settings"
 									>
-										<Link
-											href="/settings/account"
-											className="block px-2 py-1.5 w-full text-white-400 font-medium text-[14px] leading-[14px] font-geist"
-											aria-label="Account settings"
-										>
-											Account Settings
-										</Link>
-									</DropdownMenuItem>
-								</div>
-								<DropdownMenuSeparator className="bg-white/10" />
-								<div className="py-1 space-y-1">
-									<DropdownMenuItem className="p-0 rounded-lg focus:bg-white/5">
-										<a
-											href="https://giselles.ai/"
-											target="_blank"
-											className="block px-2 py-1.5 w-full text-white-400 font-medium text-[14px] leading-[14px] font-geist"
-											rel="noreferrer"
-										>
-											Home Page
-										</a>
-									</DropdownMenuItem>
-								</div>
-								<div className="py-1 space-y-1">
-									<DropdownMenuItem className="p-0 rounded-lg focus:bg-white/5">
-										<SignOutButton className="block px-2 py-1.5 w-full text-left text-white-400 font-medium text-[14px] leading-[14px] font-geist">
-											Log Out
-										</SignOutButton>
-									</DropdownMenuItem>
-								</div>
-							</DropdownMenuContent>
-						</DropdownMenu>
-					)}
+										Account Settings
+									</Link>
+								</DropdownMenuItem>
+							</div>
+							<DropdownMenuSeparator className="bg-white/10" />
+							<div className="py-1 space-y-1">
+								<DropdownMenuItem className="p-0 rounded-lg focus:bg-white/5">
+									<a
+										href="https://giselles.ai/"
+										target="_blank"
+										className="block px-2 py-1.5 w-full text-white-400 font-medium text-[14px] leading-[14px] font-geist"
+										rel="noreferrer"
+									>
+										Home Page
+									</a>
+								</DropdownMenuItem>
+							</div>
+							<div className="py-1 space-y-1">
+								<DropdownMenuItem className="p-0 rounded-lg focus:bg-white/5">
+									<SignOutButton className="block px-2 py-1.5 w-full text-left text-white-400 font-medium text-[14px] leading-[14px] font-geist">
+										Log Out
+									</SignOutButton>
+								</DropdownMenuItem>
+							</div>
+						</DropdownMenuContent>
+					</DropdownMenu>
 				</div>
 
 				{/* Navigation Menu */}
