@@ -32,7 +32,8 @@ export function GitHubVectorStoreNodePropertiesPanel({
 			? node.content.source.state.contentType
 			: undefined;
 
-	const { isOrphaned, repositoryId } = useGitHubVectorStoreStatus(node);
+	const { isOrphaned, repositoryId, isEmbeddingProfileOrphaned } =
+		useGitHubVectorStoreStatus(node);
 	const [isOpen, setIsOpen] = useState(false);
 	const [selectedContentType, setSelectedContentType] = useState<
 		"blob" | "pull_request" | undefined
@@ -369,6 +370,16 @@ export function GitHubVectorStoreNodePropertiesPanel({
 								<p className="text-[14px] py-[1.5px] text-white-400 mb-[8px]">
 									Embedding Model
 								</p>
+								{isEmbeddingProfileOrphaned &&
+									node.content.source.state.status === "configured" && (
+										<div className="flex items-center gap-[6px] text-error-900 text-[13px] mb-[8px]">
+											<TriangleAlert className="size-[16px]" />
+											<span>
+												The selected embedding model is no longer available for
+												this content type. Please select a different model.
+											</span>
+										</div>
+									)}
 								<select
 									value={selectedEmbeddingProfileId || availableProfiles[0]}
 									onChange={(e) => {

@@ -25,7 +25,7 @@ function RequiresSetupBadge(): ReactElement {
 }
 
 export function GitHubNodeInfo({ node }: { node: Node }): ReactElement | null {
-	const { isOrphaned: isVectorStoreOrphaned } =
+	const { isOrphaned: isVectorStoreOrphaned, isEmbeddingProfileOrphaned } =
 		useGitHubVectorStoreStatus(node);
 
 	if (isTriggerNode(node, "github")) {
@@ -55,7 +55,8 @@ export function GitHubNodeInfo({ node }: { node: Node }): ReactElement | null {
 
 	if (isVectorStoreNode(node, "github")) {
 		return node.content.source.state.status === "configured" &&
-			!isVectorStoreOrphaned ? (
+			!isVectorStoreOrphaned &&
+			!isEmbeddingProfileOrphaned ? (
 			<div className="px-[16px] relative">
 				<GitHubRepositoryBadge
 					owner={node.content.source.state.owner}
