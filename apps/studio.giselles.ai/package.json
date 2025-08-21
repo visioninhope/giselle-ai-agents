@@ -81,6 +81,7 @@
 		"next": "catalog:",
 		"next-themes": "0.3.0",
 		"nodemailer": "6.10.0",
+		"nuqs": "catalog:",
 		"openai": "catalog:",
 		"pg": "catalog:",
 		"pino": "9.5.0",

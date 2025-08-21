@@ -3,6 +3,7 @@ import "./globals.css";
 import { GoogleTagManager } from "@next/third-parties/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { DM_Mono, DM_Sans } from "next/font/google";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { Suspense } from "react";
 import { ThemeProvider } from "@/components/theme-provider";
 import { PostHogPageView } from "./posthog-page-view";
@@ -66,7 +67,7 @@ export default function RootLayout({
 						<Suspense>
 							<PostHogPageView />
 						</Suspense>
-						{children}
+						<NuqsAdapter>{children}</NuqsAdapter>
 					</ThemeProvider>
 					<SpeedInsights />
 				</body>
