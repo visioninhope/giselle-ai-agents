@@ -2,7 +2,7 @@
 
 
 ## Summary
-* 816 MIT
+* 818 MIT
 * 184 Apache 2.0
 * 47 ISC
 * 27 New BSD
@@ -8863,6 +8863,17 @@ BlueOak-1.0.0 permitted
 
 
 
+<a name="mitt"></a>
+### mitt v3.0.1
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
 <a name="mkdirp"></a>
 ### mkdirp v3.0.1
 #### 
@@ -9096,6 +9107,17 @@ MIT-0 permitted
 
 <a name="normalize-path"></a>
 ### normalize-path v3.0.0
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
+<a name="nuqs"></a>
+### nuqs v2.4.3
 #### 
 
 ##### Paths
