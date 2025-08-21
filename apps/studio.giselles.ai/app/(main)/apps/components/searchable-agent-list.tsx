@@ -192,7 +192,7 @@ export function SearchableAgentList({
 				</div>
 			) : viewMode === "grid" ? (
 				<div className="relative flex h-full w-full flex-wrap items-start justify-start gap-4">
-					{agents.map((agent) => (
+					{sortedAgents.map((agent) => (
 						<AgentCard key={agent.id} agent={agent} />
 					))}
 				</div>
