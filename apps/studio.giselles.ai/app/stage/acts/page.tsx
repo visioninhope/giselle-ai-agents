@@ -1,28 +1,18 @@
-import type { Act } from "@giselle-sdk/giselle";
 import { revalidatePath } from "next/cache";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 
 import { giselleEngine } from "@/app/giselle-engine";
 import { type acts as actsSchema, db } from "@/drizzle";
 import { stageFlag } from "@/flags";
 import { fetchCurrentUser } from "@/services/accounts";
 import { fetchUserTeams } from "@/services/teams";
+import { fetchActMetadata } from "./[actId]/lib/data";
 import { FilterableActsList } from "./components/filterable-acts-list";
+import type { ActWithNavigation } from "./types";
 
 // The maximum duration of server actions on this page is extended to 800 seconds through enabled fluid compute.
 // https://vercel.com/docs/functions/runtimes#max-duration
 export const maxDuration = 800;
-
-type ActWithNavigation = {
-	id: string;
-	status: "inProgress" | "completed" | "failed" | "cancelled";
-	createdAt: string;
-	workspaceName: string;
-	teamName: string;
-	link: string;
-	llmModels?: string[];
-	inputValues?: string;
-};
 
 // This feature is currently under development and data structures change destructively,
 // so parsing of legacy data frequently fails. We're using a rough try-catch to ignore
@@ -33,7 +23,6 @@ async function enrichActWithNavigationData(
 ): Promise<ActWithNavigation | null> {
 	try {
 		const tmpAct = await giselleEngine.getAct({ actId: act.sdkActId });
-		console.log("DEBUG tmpAct:", JSON.stringify(tmpAct, null, 2));
 		const team = teams.find((t) => t.dbId === act.teamDbId);
 		if (team === undefined) {
 			throw new Error("Team not found");
@@ -42,7 +31,6 @@ async function enrichActWithNavigationData(
 			act.sdkWorkspaceId,
 			true,
 		);
-		console.log("DEBUG tmpWorkspace:", JSON.stringify(tmpWorkspace, null, 2));
 
 		const findStepByStatus = (status: string) => {
 			for (const sequence of tmpAct.sequences) {
@@ -116,67 +104,42 @@ async function enrichActWithNavigationData(
 			}
 		}
 
-		// Extract input values from act inputs
-		console.log("DEBUG tmpAct properties:", Object.keys(tmpAct));
-		console.log(
-			"DEBUG tmpAct.inputs:",
-			(tmpAct as unknown as { inputs?: unknown }).inputs,
-		);
-
+		// Extract input values from generation context (same as actId page)
 		let inputValues = "";
 		try {
-			// Check for various possible input properties
-			interface ActWithInputs extends Act {
-				inputs?: Array<{
-					type: string;
-					items?: Array<{ name: string; value: unknown }>;
-				}>;
-				parameters?:
-					| Array<{ name?: string; key?: string; value: unknown }>
-					| Record<string, unknown>;
-				input?: string | Record<string, unknown>;
-			}
-			const actWithInputs = tmpAct as ActWithInputs;
-
-			if (actWithInputs.inputs && Array.isArray(actWithInputs.inputs)) {
-				console.log("DEBUG found inputs array:", actWithInputs.inputs);
-				const parameterInputs = actWithInputs.inputs.find(
-					(input) => input.type === "parameters" || input.type === "parameter",
+			// Get the trigger step (first step in first sequence)
+			const triggerStep = tmpAct.sequences[0]?.steps[0];
+			if (triggerStep && triggerStep.status === "completed") {
+				// Fetch generation data for the trigger step
+				const generation = await giselleEngine.getGeneration(
+					triggerStep.generationId,
+					true,
 				);
-				if (parameterInputs?.items) {
-					const values = parameterInputs.items.map(
-						(item) => `${item.name}: ${item.value}`,
-					);
-					inputValues = values.join(", ");
-				}
-			} else if (actWithInputs.parameters) {
-				console.log("DEBUG found parameters:", actWithInputs.parameters);
-				if (Array.isArray(actWithInputs.parameters)) {
-					const values = actWithInputs.parameters.map(
-						(param) => `${param.name || param.key}: ${param.value}`,
-					);
-					inputValues = values.join(", ");
-				} else if (typeof actWithInputs.parameters === "object") {
-					const values = Object.entries(actWithInputs.parameters).map(
-						([key, value]) => `${key}: ${value}`,
-					);
-					inputValues = values.join(", ");
-				}
-			} else if (actWithInputs.input) {
-				console.log("DEBUG found input:", actWithInputs.input);
-				if (typeof actWithInputs.input === "string") {
-					inputValues = actWithInputs.input;
-				} else if (typeof actWithInputs.input === "object") {
-					const values = Object.entries(actWithInputs.input).map(
-						([key, value]) => `${key}: ${value}`,
-					);
-					inputValues = values.join(", ");
+
+				if (generation?.context?.inputs) {
+					const inputs =
+						generation.context.inputs.find(
+							(input) => input.type === "parameters",
+						)?.items || [];
+
+					if (inputs.length > 0) {
+						// Get trigger parameters for user-friendly names (same as actId page)
+						const { triggerParameters } = await fetchActMetadata(tmpAct);
+
+						const values = inputs.map((input) => {
+							// Find the corresponding parameter definition for user-friendly label
+							const parameter = triggerParameters.find(
+								(param) => param.id === input.name,
+							);
+							const displayName = parameter?.name || input.name;
+							return `${displayName}: '${String(input.value)}'`;
+						});
+						inputValues = values.join(", ");
+					}
 				}
 			}
-
-			console.log("DEBUG extracted inputValues:", inputValues);
 		} catch (error) {
-			console.log("DEBUG error extracting inputs:", error);
+			console.warn("Error extracting input values:", error);
 		}
 
 		return {
