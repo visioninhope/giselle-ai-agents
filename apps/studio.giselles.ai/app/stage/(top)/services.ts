@@ -4,7 +4,6 @@ import {
 	type WorkspaceId,
 } from "@giselle-sdk/data-type";
 import { defaultName } from "@giselle-sdk/giselle";
-import { revalidatePath } from "next/cache";
 import { giselleEngine } from "@/app/giselle-engine";
 import { type acts as actsSchema, db } from "@/drizzle";
 import { fetchCurrentUser } from "@/services/accounts";
@@ -108,7 +107,7 @@ async function enrichActWithNavigationData(
 
 export async function fetchEnrichedActs(
 	teams: { dbId: number; name: string }[],
-	user?: Awaited<ReturnType<typeof fetchCurrentUser>>,
+	user: Awaited<ReturnType<typeof fetchCurrentUser>>,
 ): Promise<
 	Array<{
 		id: string;
@@ -120,9 +119,12 @@ export async function fetchEnrichedActs(
 		createdAt: Date;
 	}>
 > {
-	const currentUser = user ?? (await fetchCurrentUser());
+	const sevenDaysAgo = new Date();
+	sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
 	const dbActs = await db.query.acts.findMany({
-		where: (acts, { eq }) => eq(acts.directorDbId, currentUser.dbId),
+		where: (acts, { eq, gte, and }) =>
+			and(eq(acts.directorDbId, user.dbId), gte(acts.createdAt, sevenDaysAgo)),
 		orderBy: (acts, { desc }) => [desc(acts.createdAt)],
 		limit: 10,
 	});
@@ -232,10 +234,4 @@ export async function fetchFlowTriggers(
 	}
 
 	return flowTriggers;
-}
-
-export async function reloadPage(): Promise<void> {
-	"use server";
-	await Promise.resolve();
-	revalidatePath("/stage");
 }

@@ -30,18 +30,15 @@ import {
 } from "../lib/utils";
 import { MobileActions } from "./mobile-actions";
 
-export function Sidebar({
-	act: defaultActPromise,
-	appName,
-	teamName,
-	triggerParameters,
-}: {
-	act: Promise<Act>;
+export interface SidebarDataObject {
+	act: Act;
 	appName: string;
 	teamName: string;
 	triggerParameters: ManualTriggerParameter[];
-}) {
-	const defaultAct = use(defaultActPromise);
+}
+
+export function Sidebar({ data }: { data: Promise<SidebarDataObject> }) {
+	const { act: defaultAct, appName, teamName, triggerParameters } = use(data);
 	const [act, setAct] = useState(defaultAct);
 	const [stepGenerations, setStepGenerations] = useState<
 		Record<string, Generation>
