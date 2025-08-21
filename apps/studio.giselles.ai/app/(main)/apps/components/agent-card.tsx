@@ -72,8 +72,6 @@ export function AgentCard({ agent }: { agent: typeof dbAgents.$inferSelect }) {
 			style={
 				{
 					"--spotlight-color": "rgba(255,255,255,0.15)",
-					background:
-						"linear-gradient(135deg, rgba(100,130,200,0.20) 0%, rgba(60,80,120,0.35) 40%, rgba(20,30,60,0.85) 100%)",
 					borderColor: "rgba(160,180,255,0.15)",
 				} as React.CSSProperties
 			}
