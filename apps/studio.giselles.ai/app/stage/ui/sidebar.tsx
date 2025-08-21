@@ -1,7 +1,7 @@
 "use client";
 
 import { GiselleIcon } from "@giselle-internal/workflow-designer-ui";
-import { BellIcon, ChevronLeftIcon } from "@radix-ui/react-icons";
+import { ChevronLeftIcon } from "@radix-ui/react-icons";
 import clsx from "clsx/lite";
 import { useCallback, useState } from "react";
 
@@ -10,26 +10,6 @@ export function Sidebar(props: React.PropsWithChildren) {
 	const toggleOpen = useCallback(() => setOpen(!open), [open]);
 	return (
 		<>
-			<div className="md:hidden fixed top-0 left-0 right-0 bg-[var(--color-stage-background)] border-b border-white/10 px-4 py-3 z-50">
-				<div className="flex items-center justify-between">
-					{/* Left side: G icon + Stage */}
-					<div className="flex items-center gap-2">
-						<GiselleIcon className="text-white-900 w-6 h-6" />
-						<span className="text-white-900 text-lg font-semibold">Stage</span>
-					</div>
-
-					{/* Right side: Icons */}
-					<div className="flex items-center gap-4">
-						<button
-							type="button"
-							className="text-white-700 hover:text-white-900 transition-colors"
-						>
-							<BellIcon className="w-5 h-5" />
-						</button>
-					</div>
-				</div>
-			</div>
-
 			<div
 				className={clsx(
 					"hidden md:block fixed top-0 left-0 h-full  bg-stage-background flex-col border-r border-white/10 transition-all duration-300 py-4 z-40",
