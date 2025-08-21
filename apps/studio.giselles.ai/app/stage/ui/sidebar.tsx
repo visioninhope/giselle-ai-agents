@@ -47,10 +47,10 @@ export function Sidebar(props: React.PropsWithChildren) {
 					</div>
 				</div>
 				<nav>
-					<div className="relative h-[200px]">
+					<div className="relative h-16">
 						<div
 							className={clsx(
-								"absolute inset-0 transition-opacity duration-500 overflow-hidden whitespace-nowrap",
+								"flex items-center absolute inset-0 transition-opacity duration-500 overflow-hidden whitespace-nowrap",
 								!open && "opacity-0",
 							)}
 						>
@@ -59,8 +59,9 @@ export function Sidebar(props: React.PropsWithChildren) {
 								size="large"
 								leftIcon={<SparklesIcon />}
 								asChild
+								className="w-full"
 							>
-								<Link href="/stage" className="flex">
+								<Link href="/stage">
 									<div
 										className={clsx(
 											"transition-opacity duration-500 overflow-hidden whitespace-nowrap",
@@ -75,12 +76,12 @@ export function Sidebar(props: React.PropsWithChildren) {
 
 						<div
 							className={clsx(
-								"absolute inset-0 transition-opacity duration-500 overflow-hidden whitespace-nowrap opacity-0",
+								"flex items-center absolute inset-0 transition-opacity duration-500 overflow-hidden whitespace-nowrap opacity-0",
 								!open && "opacity-100",
 							)}
 						>
-							<Button variant="glass" size="large" asChild>
-								<Link href="/stage" className="flex">
+							<Button variant="glass" size="large" asChild className="w-full">
+								<Link href="/stage">
 									<SparklesIcon className="size-[18px]" />
 								</Link>
 							</Button>
