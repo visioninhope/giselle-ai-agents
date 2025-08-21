@@ -1,5 +1,6 @@
 "use client";
 
+import { formatTimestamp } from "@giselles-ai/lib/utils";
 import { StatusBadge } from "@giselle-internal/ui/status-badge";
 import { EMBEDDING_PROFILES } from "@giselle-sdk/data-type";
 import * as Dialog from "@radix-ui/react-dialog";
@@ -36,7 +37,6 @@ import {
 import { ConfigureSourcesDialog } from "./configure-sources-dialog";
 import { DiagnosticModal } from "./diagnostic-modal";
 import { getErrorMessage } from "./error-messages";
-import { getRelativeTimeString } from "./repository-item-utils";
 import type { DocumentLoaderErrorCode } from "./types";
 
 // Status configuration for sync badges
@@ -427,7 +427,7 @@ function ContentTypeSection({
 				<div className="text-xs text-gray-500 flex justify-between">
 					{lastSyncedAt ? (
 						<span>
-							Last sync: {getRelativeTimeString(new Date(lastSyncedAt))}
+							Last sync: {formatTimestamp.toRelativeTime(new Date(lastSyncedAt).getTime())}
 						</span>
 					) : (
 						<span>Never synced</span>
