@@ -30,7 +30,7 @@ export function NavigationRail({
 	}, [state]);
 	return (
 		<>
-			<AnimatePresence>
+			<AnimatePresence initial={false}>
 				{state === "expanded" && (
 					<motion.div
 						className="hidden md:block fixed top-0 left-0 h-full"
@@ -54,7 +54,7 @@ export function NavigationRail({
 					</motion.div>
 				)}
 			</AnimatePresence>
-			<AnimatePresence>
+			<AnimatePresence initial={false}>
 				{state === "collapsed" && (
 					<motion.div
 						className="hidden md:block fixed top-0 left-0 h-full"
@@ -79,6 +79,9 @@ export function NavigationRail({
 				)}
 			</AnimatePresence>
 			<motion.div
+				initial={{
+					width: "var(--spacing-navigation-rail-expanded)",
+				}}
 				animate={spacingAnimationControls}
 				className="border-r border-white/10"
 			/>
