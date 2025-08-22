@@ -16,7 +16,7 @@ export function NavigationRailExpanded({
 					<div className="size-8 flex justify-center items-center">
 						<GiselleIcon className="size-6 text-text-muted stroke-1 group-hover:hidden shrink-0" />
 					</div>
-					<p>Stage</p>
+					<p className="text-white-900 text-[13px] font-semibold">Stage</p>
 				</div>
 				<div className="absolute right-3 top-1.5">
 					<MenuButton
