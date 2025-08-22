@@ -1,3 +1,4 @@
+import { DEFAULT_EMBEDDING_PROFILE_ID } from "@giselle-sdk/data-type";
 import { describe, expect, it } from "vitest";
 import { mapMetadataToColumns, prepareChunkRecords } from "./utils";
 
@@ -96,7 +97,7 @@ describe("chunk-store/postgres/utils", () => {
 				},
 				embedding: {
 					embeddingValue: [1, 2, 3],
-					embeddingProfileId: 1,
+					embeddingProfileId: DEFAULT_EMBEDDING_PROFILE_ID,
 					embeddingDimensions: 1536,
 				},
 			});

@@ -33,6 +33,7 @@ export const EmbeddingProfileIdSchema = z.custom<EmbeddingProfileId>(
 );
 
 export {
+	DEFAULT_EMBEDDING_PROFILE_ID,
 	EMBEDDING_PROFILES,
 	type EmbeddingProfileId,
 	isEmbeddingProfileId,

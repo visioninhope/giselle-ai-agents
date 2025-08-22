@@ -34,6 +34,8 @@ export const EMBEDDING_PROFILES = {
 
 export type EmbeddingProfileId = keyof typeof EMBEDDING_PROFILES;
 
+export const DEFAULT_EMBEDDING_PROFILE_ID: EmbeddingProfileId = 1;
+
 export function isEmbeddingProfileId(id: number): id is EmbeddingProfileId {
 	return id in EMBEDDING_PROFILES;
 }

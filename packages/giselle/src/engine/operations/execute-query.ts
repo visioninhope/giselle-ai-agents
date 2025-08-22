@@ -1,4 +1,5 @@
 import {
+	DEFAULT_EMBEDDING_PROFILE_ID,
 	DEFAULT_MAX_RESULTS,
 	DEFAULT_SIMILARITY_THRESHOLD,
 	isQueryNode,
@@ -309,7 +310,8 @@ async function queryVectorStore(
 					case "github": {
 						const { owner, repo, contentType } = state;
 
-						const embeddingProfileId = state.embeddingProfileId ?? 1;
+						const embeddingProfileId =
+							state.embeddingProfileId ?? DEFAULT_EMBEDDING_PROFILE_ID;
 						const queryContext: GitHubQueryContext = {
 							workspaceId,
 							owner,

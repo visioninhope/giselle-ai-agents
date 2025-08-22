@@ -4,6 +4,7 @@ import type {
 	VectorStoreNode,
 } from "@giselle-sdk/data-type";
 import {
+	DEFAULT_EMBEDDING_PROFILE_ID,
 	EMBEDDING_PROFILES,
 	isEmbeddingProfileId,
 } from "@giselle-sdk/data-type";
@@ -14,7 +15,7 @@ import {
 } from "@giselle-sdk/giselle/react";
 import { Info } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { TriangleAlert } from "../../../../icons";
 import { useGitHubVectorStoreStatus } from "../../../lib/use-github-vector-store-status";
 
@@ -178,9 +179,9 @@ export function GitHubVectorStoreNodePropertiesPanel({
 			setSelectedContentType(contentType);
 
 			// Set default embedding profile
-			// When feature flag is off, always use profile 1
-			// When feature flag is on, use first available profile for the content type (sorted by ID)
-			let profileId: EmbeddingProfileId = 1;
+			// When feature flag is off, always use DEFAULT_EMBEDDING_PROFILE_ID
+			// When feature flag is on, use first available profile for the content type
+			let profileId: EmbeddingProfileId = DEFAULT_EMBEDDING_PROFILE_ID;
 			if (multiEmbedding && selectedRepo.contentTypes) {
 				const contentTypeProfiles = selectedRepo.contentTypes.find(
 					(ct: { contentType: string }) => ct.contentType === contentType,
