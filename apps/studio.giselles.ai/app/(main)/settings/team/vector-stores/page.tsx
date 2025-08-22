@@ -1,4 +1,5 @@
 import { ExternalLink } from "lucide-react";
+import { multiEmbeddingFlag } from "@/flags";
 import { getGitHubIdentityState } from "@/services/accounts";
 import {
 	deleteRepositoryIndex,
@@ -37,10 +38,12 @@ export default async function TeamVectorStorePage() {
 		return <GitHubAppInstallRequiredCard />;
 	}
 
-	const [installationsWithRepos, repositoryIndexes] = await Promise.all([
-		getInstallationsWithRepos(),
-		getGitHubRepositoryIndexes(),
-	]);
+	const [installationsWithRepos, repositoryIndexes, multiEmbedding] =
+		await Promise.all([
+			getInstallationsWithRepos(),
+			getGitHubRepositoryIndexes(),
+			multiEmbeddingFlag(),
+		]);
 
 	return (
 		<div className="flex flex-col gap-[24px]">
@@ -66,6 +69,7 @@ export default async function TeamVectorStorePage() {
 					<RepositoryRegistrationDialog
 						installationsWithRepos={installationsWithRepos}
 						registerRepositoryIndexAction={registerRepositoryIndex}
+						multiEmbedding={multiEmbedding}
 					/>
 				</div>
 			</div>
@@ -75,6 +79,7 @@ export default async function TeamVectorStorePage() {
 				deleteRepositoryIndexAction={deleteRepositoryIndex}
 				triggerManualIngestAction={triggerManualIngest}
 				updateRepositoryIndexAction={updateRepositoryIndex}
+				multiEmbedding={multiEmbedding}
 			/>
 		</div>
 	);
