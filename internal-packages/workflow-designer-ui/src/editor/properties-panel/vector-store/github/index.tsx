@@ -126,7 +126,7 @@ export function GitHubVectorStoreNodePropertiesPanel({
 
 			// Set default embedding profile
 			// When feature flag is off, always use profile 1
-			// When feature flag is on, use first available profile for the content type
+			// When feature flag is on, use first available profile for the content type (sorted by ID)
 			let profileId: EmbeddingProfileId = 1;
 			if (multiEmbedding && selectedRepo.contentTypes) {
 				const contentTypeProfiles = selectedRepo.contentTypes.find(
@@ -136,7 +136,11 @@ export function GitHubVectorStoreNodePropertiesPanel({
 					contentTypeProfiles &&
 					contentTypeProfiles.embeddingProfileIds.length > 0
 				) {
-					const firstId = contentTypeProfiles.embeddingProfileIds[0];
+					// Sort profile IDs and take the first one
+					const sortedProfileIds = [
+						...contentTypeProfiles.embeddingProfileIds,
+					].sort((a, b) => a - b);
+					const firstId = sortedProfileIds[0];
 					if (isEmbeddingProfileId(firstId)) {
 						profileId = firstId;
 					}
@@ -400,7 +404,10 @@ export function GitHubVectorStoreNodePropertiesPanel({
 										</div>
 									)}
 								<select
-									value={selectedEmbeddingProfileId || availableProfiles[0]}
+									value={
+										selectedEmbeddingProfileId ||
+										availableProfiles.sort((a, b) => a - b)[0]
+									}
 									onChange={(e) => {
 										const maybeId = Number(e.target.value);
 										if (!isEmbeddingProfileId(maybeId)) return;
@@ -424,18 +431,20 @@ export function GitHubVectorStoreNodePropertiesPanel({
 									}}
 									className="w-full px-3 py-2 bg-black-300/20 rounded-[8px] text-white-400 text-[14px] font-geist cursor-pointer"
 								>
-									{availableProfiles.map((profileId: EmbeddingProfileId) => {
-										const profile =
-											EMBEDDING_PROFILES[
-												profileId as keyof typeof EMBEDDING_PROFILES
-											];
-										if (!profile) return null;
-										return (
-											<option key={profileId} value={profileId}>
-												{profile.name} ({profile.dimensions} dimensions)
-											</option>
-										);
-									})}
+									{availableProfiles
+										.sort((a, b) => a - b)
+										.map((profileId: EmbeddingProfileId) => {
+											const profile =
+												EMBEDDING_PROFILES[
+													profileId as keyof typeof EMBEDDING_PROFILES
+												];
+											if (!profile) return null;
+											return (
+												<option key={profileId} value={profileId}>
+													{profile.name} ({profile.dimensions} dimensions)
+												</option>
+											);
+										})}
 								</select>
 							</div>
 						);
