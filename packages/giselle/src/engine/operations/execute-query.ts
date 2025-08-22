@@ -318,7 +318,6 @@ async function queryVectorStore(
 							repo,
 							embeddingProfileId,
 						};
-						console.dir(queryContext, { depth: null });
 
 						if (contentType === "pull_request") {
 							if (!vectorStoreQueryServices?.githubPullRequest) {
