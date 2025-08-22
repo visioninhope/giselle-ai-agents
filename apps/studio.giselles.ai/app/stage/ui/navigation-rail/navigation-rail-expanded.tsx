@@ -35,7 +35,11 @@ export function NavigationRailExpanded({
 			<NavigationRailContentsContainer>
 				<NavigationList>
 					{navigationItems.map((navigationItem) => (
-						<NavigationListItem key={navigationItem.id} {...navigationItem} />
+						<NavigationListItem
+							key={navigationItem.id}
+							{...navigationItem}
+							variant="expanded"
+						/>
 					))}
 				</NavigationList>
 			</NavigationRailContentsContainer>

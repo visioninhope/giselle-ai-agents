@@ -1,7 +1,10 @@
 import Link from "next/link";
 import type { NavigationItem } from "./navigation-items";
+import type { NavigationRailState } from "./types";
 
-export function NavigationListItem(props: NavigationItem) {
+export function NavigationListItem(
+	props: NavigationItem & { variant: NavigationRailState },
+) {
 	switch (props.type) {
 		case "link":
 			return (
@@ -12,7 +15,7 @@ export function NavigationListItem(props: NavigationItem) {
 					<div className="size-8 flex items-center justify-center">
 						<props.icon className="size-4" />
 					</div>
-					{props.label}
+					{props.variant === "expanded" && props.label}
 				</Link>
 			);
 		default: {
