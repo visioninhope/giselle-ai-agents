@@ -119,6 +119,9 @@
 	--font-accent: var(--font-dm-sans);
 	--font-sans: var(--font-dm-sans);
 	--font-mono: var(--font-dm-mono);
+
+	--spacing-navigation-rail-expanded: 260px;
+	--spacing-navigation-rail-collapsed: 64px;
 }
 
 @layer components {
