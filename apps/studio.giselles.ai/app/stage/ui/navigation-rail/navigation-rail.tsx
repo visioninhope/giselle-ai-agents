@@ -4,9 +4,13 @@ import { AnimatePresence, motion } from "motion/react";
 import { useMemo, useState } from "react";
 import { NavigationRailCollapsed } from "./navigation-rail-collapsed";
 import { NavigationRailExpanded } from "./navigation-rail-expanded";
-import type { NavigationRailState } from "./types";
+import type { NavigationRailState, UserDataForNavigationRail } from "./types";
 
-export function NavigationRail() {
+export function NavigationRail({
+	user: userPromise,
+}: {
+	user: Promise<UserDataForNavigationRail>;
+}) {
 	const [state, setState] = useState<NavigationRailState>("expanded");
 	const spacingAnimationControls = useMemo(() => {
 		switch (state) {
@@ -44,6 +48,7 @@ export function NavigationRail() {
 						}}
 					>
 						<NavigationRailExpanded
+							user={userPromise}
 							onCollapseButtonClick={() => setState("collapsed")}
 						/>
 					</motion.div>
@@ -67,6 +72,7 @@ export function NavigationRail() {
 						}}
 					>
 						<NavigationRailCollapsed
+							user={userPromise}
 							onExpandButtonClick={() => setState("expanded")}
 						/>
 					</motion.div>
