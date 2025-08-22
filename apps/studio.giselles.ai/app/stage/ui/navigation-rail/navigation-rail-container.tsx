@@ -8,7 +8,7 @@ export function NavigationRailContainer({
 	return (
 		<div
 			className={clsx(
-				"h-full border-r border-white/10 flex-col transition-all duration-300",
+				"h-full flex-col transition-all duration-300",
 				variant === "collapsed" && "w-navigation-rail-collapsed",
 				variant === "expanded" && "w-navigation-rail-expanded",
 			)}

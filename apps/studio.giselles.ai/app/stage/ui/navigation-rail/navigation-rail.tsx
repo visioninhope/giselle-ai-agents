@@ -54,7 +54,7 @@ export function NavigationRail() {
 					<motion.div
 						className="hidden md:block fixed top-0 left-0 h-full"
 						initial={{
-							opacity: 0,
+							opacity: 1,
 							width: "var(--spacing-navigation-rail-collapsed)",
 						}}
 						exit={{
@@ -72,7 +72,10 @@ export function NavigationRail() {
 					</motion.div>
 				)}
 			</AnimatePresence>
-			<motion.div animate={spacingAnimationControls} />
+			<motion.div
+				animate={spacingAnimationControls}
+				className="border-r border-white/10"
+			/>
 		</>
 	);
 }

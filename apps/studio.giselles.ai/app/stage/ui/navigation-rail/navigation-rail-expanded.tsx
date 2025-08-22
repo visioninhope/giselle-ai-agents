@@ -12,18 +12,21 @@ export function NavigationRailExpanded({
 	return (
 		<NavigationRailContainer variant="expanded">
 			<NavigationRailHeader>
-				<div className="flex items-center p-1.5 justify-center w-full">
-					<GiselleIcon className="size-6 text-text-muted stroke-1 group-hover:hidden" />
+				<div className="flex items-center justify-start w-full">
+					<div className="size-8 flex justify-center items-center">
+						<GiselleIcon className="size-6 text-text-muted stroke-1 group-hover:hidden shrink-0" />
+					</div>
+					<p>Stage</p>
 				</div>
-				<div className="absolute right-1.5 top-1.5">
-					<MenuButton onClick={() => onCollapseButtonClick()}>
+				<div className="absolute right-3 top-1.5">
+					<MenuButton
+						onClick={() => onCollapseButtonClick()}
+						className="cursor-w-resize"
+					>
 						<PanelLeftCloseIcon className="size-6 text-text-muted stroke-1" />
 					</MenuButton>
 				</div>
 			</NavigationRailHeader>
-			<button onClick={() => onCollapseButtonClick()} type="button">
-				Open
-			</button>
 		</NavigationRailContainer>
 	);
 }

@@ -1,17 +1,23 @@
+import clsx from "clsx/lite";
+
 export function MenuButton({
 	onClick,
 	children,
+	className,
 }: Pick<
 	React.DetailedHTMLProps<
 		React.ButtonHTMLAttributes<HTMLButtonElement>,
 		HTMLButtonElement
 	>,
-	"onClick" | "children"
+	"onClick" | "children" | "className"
 >) {
 	return (
 		<button
 			type="button"
-			className="group p-1.5 cursor-e-resize hover:bg-ghost-element-hover transition-colors rounded"
+			className={clsx(
+				"group size-8 hover:bg-ghost-element-hover transition-colors rounded flex items-center justify-center",
+				className,
+			)}
 			onClick={onClick}
 		>
 			{children}

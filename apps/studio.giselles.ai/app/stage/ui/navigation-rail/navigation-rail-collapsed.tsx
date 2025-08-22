@@ -12,7 +12,10 @@ export function NavigationRailCollapsed({
 	return (
 		<NavigationRailContainer variant="collapsed">
 			<NavigationRailHeader>
-				<MenuButton onClick={() => onExpandButtonClick()}>
+				<MenuButton
+					onClick={() => onExpandButtonClick()}
+					className="cursor-e-resize"
+				>
 					<GiselleIcon className="size-6 text-text-muted stroke-1 group-hover:hidden" />
 					<PanelLeftOpenIcon className="size-6 text-text-muted stroke-1 hidden group-hover:block" />
 				</MenuButton>
