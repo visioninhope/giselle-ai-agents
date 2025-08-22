@@ -17,17 +17,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { TriangleAlert } from "../../../../icons";
 import { useGitHubVectorStoreStatus } from "../../../lib/use-github-vector-store-status";
 
-type GitHubRepositoryIndexUI = {
-	id: string;
-	name: string;
-	owner: string;
-	repo: string;
-	contentTypes?: {
-		contentType: "blob" | "pull_request";
-		embeddingProfileIds: number[];
-	}[];
-};
-
 type GitHubVectorStoreNodePropertiesPanelProps = {
 	node: VectorStoreNode;
 };
@@ -41,8 +30,7 @@ export function GitHubVectorStoreNodePropertiesPanel({
 	const settingPath = vectorStore?.settingPath;
 
 	// Get repository indexes
-	const githubRepositoryIndexes = (vectorStore?.githubRepositoryIndexes ??
-		[]) as GitHubRepositoryIndexUI[];
+	const githubRepositoryIndexes = vectorStore?.githubRepositoryIndexes ?? [];
 
 	// Current content type from node (if configured)
 	const currentContentType =

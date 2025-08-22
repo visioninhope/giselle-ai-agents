@@ -3,22 +3,10 @@ import { isVectorStoreNode } from "@giselle-sdk/data-type";
 import { useFeatureFlag, useVectorStore } from "@giselle-sdk/giselle/react";
 import { useMemo } from "react";
 
-type GitHubRepositoryIndexUI = {
-	id: string;
-	name: string;
-	owner: string;
-	repo: string;
-	contentTypes?: {
-		contentType: "blob" | "pull_request";
-		embeddingProfileIds: number[];
-	}[];
-};
-
 export function useGitHubVectorStoreStatus(node: Node) {
 	const vectorStore = useVectorStore();
 	const { multiEmbedding } = useFeatureFlag();
-	const githubRepositoryIndexes = (vectorStore?.githubRepositoryIndexes ??
-		[]) as GitHubRepositoryIndexUI[];
+	const githubRepositoryIndexes = vectorStore?.githubRepositoryIndexes ?? [];
 
 	return useMemo(() => {
 		if (
