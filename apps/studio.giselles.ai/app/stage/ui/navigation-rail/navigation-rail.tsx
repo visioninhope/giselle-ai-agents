@@ -44,7 +44,7 @@ export function NavigationRail() {
 						}}
 					>
 						<NavigationRailExpanded
-							onCollapsedButtonClick={() => setState("collapsed")}
+							onCollapseButtonClick={() => setState("collapsed")}
 						/>
 					</motion.div>
 				)}
@@ -67,7 +67,7 @@ export function NavigationRail() {
 						}}
 					>
 						<NavigationRailCollapsed
-							onExpandedButtonClick={() => setState("expanded")}
+							onExpandButtonClick={() => setState("expanded")}
 						/>
 					</motion.div>
 				)}

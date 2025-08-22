@@ -121,7 +121,8 @@
 	--font-mono: var(--font-dm-mono);
 
 	--spacing-navigation-rail-expanded: 260px;
-	--spacing-navigation-rail-collapsed: 64px;
+	--spacing-navigation-rail-collapsed: 52px;
+	--spacing-navigation-rail-header: 52px;
 }
 
 @layer components {
