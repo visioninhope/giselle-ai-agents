@@ -8,4 +8,3 @@ export async function getSidebarData() {
 		avatarUrl: accountInfo.avatarUrl ?? undefined,
 	};
 }
-export type SidebarData = ReturnType<typeof getSidebarData>;
