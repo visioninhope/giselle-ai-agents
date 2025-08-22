@@ -1,3 +1,4 @@
+import { Select } from "@giselle-internal/ui/select";
 import type {
 	EmbeddingProfileId,
 	VectorStoreNode,
@@ -11,9 +12,9 @@ import {
 	useVectorStore,
 	useWorkflowDesigner,
 } from "@giselle-sdk/giselle/react";
-import { Check, ChevronDown, Info } from "lucide-react";
+import { Info } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { TriangleAlert } from "../../../../icons";
 import { useGitHubVectorStoreStatus } from "../../../lib/use-github-vector-store-status";
 
@@ -40,7 +41,6 @@ export function GitHubVectorStoreNodePropertiesPanel({
 
 	const { isOrphaned, repositoryId, isEmbeddingProfileOrphaned } =
 		useGitHubVectorStoreStatus(node);
-	const [isOpen, setIsOpen] = useState(false);
 	const [selectedContentType, setSelectedContentType] = useState<
 		"blob" | "pull_request" | undefined
 	>(currentContentType);
@@ -51,7 +51,6 @@ export function GitHubVectorStoreNodePropertiesPanel({
 			? node.content.source.state.embeddingProfileId
 			: undefined,
 	);
-	const dropdownRef = useRef<HTMLDivElement>(null);
 
 	// Get all unique repositories
 	const allRepositories = useMemo(() => {
@@ -60,9 +59,16 @@ export function GitHubVectorStoreNodePropertiesPanel({
 		}));
 	}, [githubRepositoryIndexes]);
 
-	const selectedRepository = allRepositories.find(
-		(repo) => repo.id === repositoryId,
-	);
+	const selectedRepository = useMemo(() => {
+		return allRepositories.find((repo) => repo.id === repositoryId);
+	}, [allRepositories, repositoryId]);
+
+	const repositoryOptions = useMemo(() => {
+		return allRepositories.map((repo) => ({
+			value: `${repo.owner}/${repo.repo}`,
+			label: `${repo.owner}/${repo.repo}`,
+		}));
+	}, [allRepositories]);
 
 	const handleRepositoryChange = (selectedKey: string) => {
 		const selectedRepo = allRepositories.find(
@@ -104,6 +110,65 @@ export function GitHubVectorStoreNodePropertiesPanel({
 			? `${selectedRepository.owner}/${selectedRepository.repo}`
 			: undefined,
 	);
+
+	const contentTypeAvailability = useMemo(() => {
+		const selectedRepo = allRepositories.find(
+			(repo) => `${repo.owner}/${repo.repo}` === selectedRepoKey,
+		);
+		if (!selectedRepo)
+			return { hasBlobContent: false, hasPullRequestContent: false };
+
+		return {
+			hasBlobContent:
+				selectedRepo.contentTypes?.some(
+					(ct: { contentType: string }) => ct.contentType === "blob",
+				) ?? false,
+			hasPullRequestContent:
+				selectedRepo.contentTypes?.some(
+					(ct: { contentType: string }) => ct.contentType === "pull_request",
+				) ?? false,
+		};
+	}, [allRepositories, selectedRepoKey]);
+
+	const availableEmbeddingProfiles = useMemo(() => {
+		const selectedRepo = allRepositories.find(
+			(repo) => `${repo.owner}/${repo.repo}` === selectedRepoKey,
+		);
+		if (!selectedRepo || !selectedContentType) return [];
+
+		const contentTypeProfiles = selectedRepo.contentTypes?.find(
+			(ct: { contentType: string }) => ct.contentType === selectedContentType,
+		);
+
+		return (contentTypeProfiles?.embeddingProfileIds || []).filter(
+			(id): id is EmbeddingProfileId => isEmbeddingProfileId(id),
+		);
+	}, [allRepositories, selectedRepoKey, selectedContentType]);
+
+	const embeddingProfileOptions = useMemo(() => {
+		return availableEmbeddingProfiles
+			.sort((a, b) => a - b)
+			.map((profileId: EmbeddingProfileId) => {
+				const profile =
+					EMBEDDING_PROFILES[profileId as keyof typeof EMBEDDING_PROFILES];
+				if (!profile)
+					return {
+						value: profileId,
+						label: `Profile ${profileId}`,
+					};
+				return {
+					value: profileId,
+					label: `${profile.name} (${profile.dimensions} dimensions)`,
+				};
+			});
+	}, [availableEmbeddingProfiles]);
+
+	const defaultEmbeddingProfileValue = useMemo(() => {
+		return (
+			selectedEmbeddingProfileId?.toString() ||
+			availableEmbeddingProfiles.sort((a, b) => a - b)[0]?.toString()
+		);
+	}, [selectedEmbeddingProfileId, availableEmbeddingProfiles]);
 
 	const handleContentTypeChange = (contentType: "blob" | "pull_request") => {
 		const selectedRepo = allRepositories.find(
@@ -164,43 +229,6 @@ export function GitHubVectorStoreNodePropertiesPanel({
 		}
 	};
 
-	// Handle click outside to close dropdown
-	useEffect(() => {
-		const handleClickOutside = (event: MouseEvent) => {
-			if (
-				dropdownRef.current &&
-				!dropdownRef.current.contains(event.target as Node)
-			) {
-				setIsOpen(false);
-			}
-		};
-
-		if (isOpen) {
-			document.addEventListener("mousedown", handleClickOutside);
-		}
-
-		return () => {
-			document.removeEventListener("mousedown", handleClickOutside);
-		};
-	}, [isOpen]);
-
-	// Handle escape key to close dropdown
-	useEffect(() => {
-		const handleEscape = (event: KeyboardEvent) => {
-			if (event.key === "Escape") {
-				setIsOpen(false);
-			}
-		};
-
-		if (isOpen) {
-			document.addEventListener("keydown", handleEscape);
-		}
-
-		return () => {
-			document.removeEventListener("keydown", handleEscape);
-		};
-	}, [isOpen]);
-
 	return (
 		<div className="flex flex-col gap-[17px] p-0">
 			<div className="space-y-[4px]">
@@ -221,43 +249,12 @@ export function GitHubVectorStoreNodePropertiesPanel({
 						</span>
 					</div>
 				)}
-				<div className="relative" ref={dropdownRef}>
-					<button
-						type="button"
-						onClick={() => setIsOpen(!isOpen)}
-						className="w-full px-3 py-2 bg-black-300/20 rounded-[8px] text-white-400 text-[14px] font-geist cursor-pointer text-left flex items-center justify-between"
-					>
-						<span className={selectedRepoKey ? "" : "text-white/30"}>
-							{selectedRepoKey || "Select a repository"}
-						</span>
-						<ChevronDown className="h-4 w-4 text-white/60" />
-					</button>
-					{isOpen && (
-						<div className="absolute top-full left-0 right-0 mt-1 z-50 rounded-[8px] border-[0.25px] border-white/10 bg-black-850 p-1 shadow-none">
-							{allRepositories.map((repo) => {
-								const repoKey = `${repo.owner}/${repo.repo}`;
-								return (
-									<button
-										key={repoKey}
-										type="button"
-										onClick={() => {
-											handleRepositoryChange(repoKey);
-											setIsOpen(false);
-										}}
-										className="flex w-full items-center rounded-md px-3 py-2 text-left font-sans text-[14px] leading-[16px] text-white-400 hover:bg-white/5"
-									>
-										<span className="mr-2 inline-flex h-4 w-4 items-center justify-center">
-											{selectedRepoKey === repoKey && (
-												<Check className="h-4 w-4" />
-											)}
-										</span>
-										{repoKey}
-									</button>
-								);
-							})}
-						</div>
-					)}
-				</div>
+				<Select
+					value={selectedRepoKey || ""}
+					onValueChange={handleRepositoryChange}
+					options={repositoryOptions}
+					placeholder="Select a repository"
+				/>
 
 				{/* Content Type Selection */}
 				{selectedRepoKey && (
@@ -267,21 +264,8 @@ export function GitHubVectorStoreNodePropertiesPanel({
 						</p>
 						<div className="space-y-[8px]">
 							{(() => {
-								const selectedRepo = allRepositories.find(
-									(repo) => `${repo.owner}/${repo.repo}` === selectedRepoKey,
-								);
-								if (!selectedRepo) return null;
-
-								// Check if content types are available
-								const hasBlobContent =
-									selectedRepo.contentTypes?.some(
-										(ct: { contentType: string }) => ct.contentType === "blob",
-									) ?? false;
-								const hasPullRequestContent =
-									selectedRepo.contentTypes?.some(
-										(ct: { contentType: string }) =>
-											ct.contentType === "pull_request",
-									) ?? false;
+								const { hasBlobContent, hasPullRequestContent } =
+									contentTypeAvailability;
 
 								return (
 									<>
@@ -356,87 +340,49 @@ export function GitHubVectorStoreNodePropertiesPanel({
 				{multiEmbedding &&
 					selectedRepoKey &&
 					selectedContentType &&
-					(() => {
-						const selectedRepo = allRepositories.find(
-							(repo) => `${repo.owner}/${repo.repo}` === selectedRepoKey,
-						);
-						if (!selectedRepo) return null;
+					availableEmbeddingProfiles.length > 0 && (
+						<div className="mt-[16px]">
+							<p className="text-[14px] py-[1.5px] text-white-400 mb-[8px]">
+								Embedding Model
+							</p>
+							{isEmbeddingProfileOrphaned &&
+								node.content.source.state.status === "configured" && (
+									<div className="flex items-center gap-[6px] text-error-900 text-[13px] mb-[8px]">
+										<TriangleAlert className="size-[16px]" />
+										<span>
+											The selected embedding model is no longer available for
+											this content type. Please select a different model.
+										</span>
+									</div>
+								)}
+							<Select
+								options={embeddingProfileOptions}
+								placeholder="Select embedding model..."
+								value={defaultEmbeddingProfileValue}
+								onValueChange={(value) => {
+									const maybeId = Number(value);
+									if (!isEmbeddingProfileId(maybeId)) return;
+									setSelectedEmbeddingProfileId(maybeId);
 
-						// Get available embedding profiles for the selected content type
-						const availableProfiles: EmbeddingProfileId[] = (
-							selectedRepo.contentTypes?.find(
-								(ct: { contentType: string }) =>
-									ct.contentType === selectedContentType,
-							)?.embeddingProfileIds || []
-						).filter((id): id is EmbeddingProfileId =>
-							isEmbeddingProfileId(id),
-						);
-
-						if (availableProfiles.length === 0) {
-							return null;
-						}
-
-						return (
-							<div className="mt-[16px]">
-								<p className="text-[14px] py-[1.5px] text-white-400 mb-[8px]">
-									Embedding Model
-								</p>
-								{isEmbeddingProfileOrphaned &&
-									node.content.source.state.status === "configured" && (
-										<div className="flex items-center gap-[6px] text-error-900 text-[13px] mb-[8px]">
-											<TriangleAlert className="size-[16px]" />
-											<span>
-												The selected embedding model is no longer available for
-												this content type. Please select a different model.
-											</span>
-										</div>
-									)}
-								<select
-									value={
-										selectedEmbeddingProfileId ||
-										availableProfiles.sort((a, b) => a - b)[0]
-									}
-									onChange={(e) => {
-										const maybeId = Number(e.target.value);
-										if (!isEmbeddingProfileId(maybeId)) return;
-										setSelectedEmbeddingProfileId(maybeId);
-
-										// Update node data with selected profile
-										if (node.content.source.state.status === "configured") {
-											updateNodeData(node, {
-												content: {
-													...node.content,
-													source: {
-														...node.content.source,
-														state: {
-															...node.content.source.state,
-															embeddingProfileId: maybeId,
-														},
+									// Update node data with selected profile
+									if (node.content.source.state.status === "configured") {
+										updateNodeData(node, {
+											content: {
+												...node.content,
+												source: {
+													...node.content.source,
+													state: {
+														...node.content.source.state,
+														embeddingProfileId: maybeId,
 													},
 												},
-											});
-										}
-									}}
-									className="w-full px-3 py-2 bg-black-300/20 rounded-[8px] text-white-400 text-[14px] font-geist cursor-pointer"
-								>
-									{availableProfiles
-										.sort((a, b) => a - b)
-										.map((profileId: EmbeddingProfileId) => {
-											const profile =
-												EMBEDDING_PROFILES[
-													profileId as keyof typeof EMBEDDING_PROFILES
-												];
-											if (!profile) return null;
-											return (
-												<option key={profileId} value={profileId}>
-													{profile.name} ({profile.dimensions} dimensions)
-												</option>
-											);
-										})}
-								</select>
-							</div>
-						);
-					})()}
+											},
+										});
+									}
+								}}
+							/>
+						</div>
+					)}
 
 				{settingPath && (
 					<div className="pt-[8px] flex justify-end">
