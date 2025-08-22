@@ -18,23 +18,35 @@ export function TeamAvatarImage({
 	className?: string;
 	alt?: string;
 }) {
-	return avatarUrl ? (
-		<Image
-			src={avatarUrl}
-			width={width}
-			height={height}
-			alt={alt || teamName}
-			className={cn("rounded-full object-cover shrink-0", className)}
-			style={{ objectPosition: "center" }}
-		/>
-	) : (
-		<Avatar
-			name={teamName}
-			variant="marble"
-			width={width}
-			height={height}
-			colors={["#2563eb", "#7c3aed", "#dc2626", "#ea580c", "#16a34a"]}
-			className={className}
-		/>
+	const size = Math.max(width, height);
+	const altText = alt || teamName || "";
+
+	return (
+		<div
+			className={cn(
+				"relative rounded-full overflow-hidden shrink-0",
+				className,
+			)}
+			style={{ width: size, height: size }}
+		>
+			{avatarUrl ? (
+				<Image
+					src={avatarUrl}
+					alt={altText}
+					fill
+					sizes={`${size}px`}
+					className={"object-cover"}
+					style={{ objectPosition: "center" }}
+				/>
+			) : (
+				<Avatar
+					name={teamName}
+					variant="marble"
+					width={size}
+					height={size}
+					colors={["#2563eb", "#7c3aed", "#dc2626", "#ea580c", "#16a34a"]}
+				/>
+			)}
+		</div>
 	);
 }
