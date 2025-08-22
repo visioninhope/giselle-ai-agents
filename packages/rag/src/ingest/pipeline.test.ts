@@ -1,3 +1,4 @@
+import { DEFAULT_EMBEDDING_PROFILE_ID } from "@giselle-sdk/data-type";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { ChunkStore } from "../chunk-store/types";
 import type { ChunkerFunction } from "../chunker/types";
@@ -6,6 +7,7 @@ import { createPipeline } from "./pipeline";
 
 // Mock the data-type module for EMBEDDING_PROFILES
 vi.mock("@giselle-sdk/data-type", () => ({
+	DEFAULT_EMBEDDING_PROFILE_ID: 1,
 	EMBEDDING_PROFILES: {
 		1: {
 			provider: "openai",
@@ -73,7 +75,7 @@ describe("createPipeline", () => {
 		const ingest = createPipeline({
 			documentLoader: mockDocumentLoader,
 			chunker: mockChunker,
-			embeddingProfileId: 1,
+			embeddingProfileId: DEFAULT_EMBEDDING_PROFILE_ID,
 			chunkStore: mockChunkStore,
 			documentKey: (metadata) => metadata.path,
 			documentVersion: (metadata) => metadata.version,
@@ -102,7 +104,7 @@ describe("createPipeline", () => {
 		const ingest = createPipeline({
 			documentLoader: mockDocumentLoader,
 			chunker: mockChunker,
-			embeddingProfileId: 1,
+			embeddingProfileId: DEFAULT_EMBEDDING_PROFILE_ID,
 			chunkStore: failingChunkStore,
 			documentKey: (metadata) => metadata.path,
 			documentVersion: (metadata) => metadata.version,
@@ -123,7 +125,7 @@ describe("createPipeline", () => {
 		const ingest = createPipeline({
 			documentLoader: mockDocumentLoader,
 			chunker: mockChunker,
-			embeddingProfileId: 1,
+			embeddingProfileId: DEFAULT_EMBEDDING_PROFILE_ID,
 			chunkStore: mockChunkStore,
 			documentKey: (metadata) => metadata.path,
 			documentVersion: (metadata) => metadata.version,
@@ -142,7 +144,7 @@ describe("createPipeline", () => {
 		const ingest = createPipeline({
 			documentLoader: mockDocumentLoader,
 			chunker: mockChunker,
-			embeddingProfileId: 1,
+			embeddingProfileId: DEFAULT_EMBEDDING_PROFILE_ID,
 			chunkStore: mockChunkStore,
 			documentKey: (metadata) => metadata.path,
 			documentVersion: (metadata) => metadata.version,
@@ -199,7 +201,7 @@ describe("createPipeline with differential ingestion", () => {
 		const ingest = createPipeline({
 			documentLoader: mockDocumentLoader,
 			chunker: mockChunker,
-			embeddingProfileId: 1,
+			embeddingProfileId: DEFAULT_EMBEDDING_PROFILE_ID,
 			chunkStore: mockChunkStore,
 			documentKey: (metadata) => metadata.path,
 			documentVersion: (metadata) => metadata.sha,
@@ -242,7 +244,7 @@ describe("createPipeline with differential ingestion", () => {
 		const ingest = createPipeline({
 			documentLoader: mockDocumentLoader,
 			chunker: mockChunker,
-			embeddingProfileId: 1,
+			embeddingProfileId: DEFAULT_EMBEDDING_PROFILE_ID,
 			chunkStore: failingChunkStore,
 			documentKey: (metadata) => metadata.path,
 			documentVersion: (metadata) => metadata.sha,
@@ -266,7 +268,7 @@ describe("createPipeline with differential ingestion", () => {
 		const ingest = createPipeline({
 			documentLoader: mockDocumentLoader,
 			chunker: mockChunker,
-			embeddingProfileId: 1,
+			embeddingProfileId: DEFAULT_EMBEDDING_PROFILE_ID,
 			chunkStore: mockChunkStore,
 			documentKey: (metadata) => metadata.path,
 			documentVersion: (metadata) => metadata.sha,
@@ -296,7 +298,7 @@ describe("createPipeline with differential ingestion", () => {
 		const ingest = createPipeline({
 			documentLoader: mockDocumentLoader,
 			chunker: mockChunker,
-			embeddingProfileId: 1,
+			embeddingProfileId: DEFAULT_EMBEDDING_PROFILE_ID,
 			chunkStore: unchangedChunkStore,
 			documentKey: (metadata) => metadata.path,
 			documentVersion: (metadata) => metadata.sha,

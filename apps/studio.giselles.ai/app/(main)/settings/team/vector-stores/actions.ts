@@ -1,6 +1,9 @@
 "use server";
 
-import { isEmbeddingProfileId } from "@giselle-sdk/data-type";
+import {
+	DEFAULT_EMBEDDING_PROFILE_ID,
+	isEmbeddingProfileId,
+} from "@giselle-sdk/data-type";
 import { createId } from "@paralleldrive/cuid2";
 import { and, eq, inArray, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
@@ -93,7 +96,9 @@ export async function registerRepositoryIndex(
 		];
 	}
 
-	const profilesToCreate = embeddingProfileIds || [1]; // Default to profile 1 if not specified
+	const profilesToCreate = embeddingProfileIds || [
+		DEFAULT_EMBEDDING_PROFILE_ID,
+	];
 	const validProfileIds = profilesToCreate.filter(isEmbeddingProfileId);
 	if (validProfileIds.length === 0) {
 		return {
@@ -197,7 +202,9 @@ export async function updateRepositoryIndex(
 		};
 	}
 
-	const profilesToUpdate = embeddingProfileIds || [1]; // Default to profile 1 if not specified
+	const profilesToUpdate = embeddingProfileIds || [
+		DEFAULT_EMBEDDING_PROFILE_ID,
+	];
 	const validProfileIds = profilesToUpdate.filter(isEmbeddingProfileId);
 	if (validProfileIds.length === 0) {
 		return {
