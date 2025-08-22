@@ -1,7 +1,12 @@
 import { GiselleIcon } from "@giselle-internal/workflow-designer-ui";
 import { PanelLeftCloseIcon } from "lucide-react";
 import { MenuButton } from "./menu-button";
+import { navigationItems } from "./navigation-items";
+import { NavigationList } from "./navigation-list";
+import { NavigationListItem } from "./navigation-list-item";
 import { NavigationRailContainer } from "./navigation-rail-container";
+import { NavigationRailContentsContainer } from "./navigation-rail-contents-container";
+import { NavigationRailFooter } from "./navigation-rail-footer";
 import { NavigationRailHeader } from "./navigation-rail-header";
 
 export function NavigationRailExpanded({
@@ -27,6 +32,16 @@ export function NavigationRailExpanded({
 					</MenuButton>
 				</div>
 			</NavigationRailHeader>
+			<NavigationRailContentsContainer>
+				<NavigationList>
+					{navigationItems.map((navigationItem) => (
+						<NavigationListItem key={navigationItem.id} {...navigationItem} />
+					))}
+				</NavigationList>
+			</NavigationRailContentsContainer>
+			<NavigationRailFooter>
+				<p>Footer</p>
+			</NavigationRailFooter>
 		</NavigationRailContainer>
 	);
 }
