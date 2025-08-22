@@ -6,8 +6,7 @@ export interface VectorStoreContextValue {
 		name: string;
 		owner: string;
 		repo: string;
-		availableContentTypes: ("blob" | "pull_request")[];
-		contentTypesWithProfiles?: {
+		contentTypes: {
 			contentType: "blob" | "pull_request";
 			embeddingProfileIds: number[];
 		}[];

@@ -5,7 +5,7 @@ import {
 	githubRepositoryIndex,
 } from "@/drizzle";
 
-type ContentTypeWithProfiles = {
+type ContentType = {
 	contentType: "blob" | "pull_request";
 	embeddingProfileIds: number[];
 };
@@ -15,8 +15,7 @@ type GitHubRepositoryIndex = {
 	name: string;
 	owner: string;
 	repo: string;
-	availableContentTypes: ("blob" | "pull_request")[];
-	contentTypesWithProfiles?: ContentTypeWithProfiles[];
+	contentTypes: ContentType[];
 };
 
 export async function getGitHubRepositoryIndexes(
@@ -46,55 +45,50 @@ export async function getGitHubRepositoryIndexes(
 			),
 		);
 
-	// Group by repository and collect available content types with embedding profiles
-	const repoMap = new Map<string, GitHubRepositoryIndex>();
+	// Group by repository and collect content types with embedding profiles
+	const repoMap = new Map<
+		string,
+		{
+			id: string;
+			name: string;
+			owner: string;
+			repo: string;
+			contentTypeToProfiles: Map<"blob" | "pull_request", Set<number>>;
+		}
+	>();
 
-	for (const repo of repositories) {
-		const key = `${repo.owner}/${repo.repo}`;
-		const existing = repoMap.get(key);
-
-		if (existing) {
-			// Add to availableContentTypes if not already present
-			if (!existing.availableContentTypes.includes(repo.contentType)) {
-				existing.availableContentTypes.push(repo.contentType);
-			}
-
-			// Update contentTypesWithProfiles
-			if (existing.contentTypesWithProfiles) {
-				const contentTypeEntry = existing.contentTypesWithProfiles.find(
-					(ct) => ct.contentType === repo.contentType,
-				);
-				if (contentTypeEntry) {
-					if (
-						!contentTypeEntry.embeddingProfileIds.includes(
-							repo.embeddingProfileId,
-						)
-					) {
-						contentTypeEntry.embeddingProfileIds.push(repo.embeddingProfileId);
-					}
-				} else {
-					existing.contentTypesWithProfiles.push({
-						contentType: repo.contentType,
-						embeddingProfileIds: [repo.embeddingProfileId],
-					});
-				}
-			}
-		} else {
-			repoMap.set(key, {
-				id: repo.id,
+	for (const row of repositories) {
+		const key = `${row.owner}/${row.repo}`;
+		let acc = repoMap.get(key);
+		if (!acc) {
+			acc = {
+				id: row.id,
 				name: key,
-				owner: repo.owner,
-				repo: repo.repo,
-				availableContentTypes: [repo.contentType],
-				contentTypesWithProfiles: [
-					{
-						contentType: repo.contentType,
-						embeddingProfileIds: [repo.embeddingProfileId],
-					},
-				],
-			});
+				owner: row.owner,
+				repo: row.repo,
+				contentTypeToProfiles: new Map(),
+			};
+			repoMap.set(key, acc);
+		}
+
+		const set =
+			acc.contentTypeToProfiles.get(row.contentType) ?? new Set<number>();
+		set.add(row.embeddingProfileId);
+		if (!acc.contentTypeToProfiles.has(row.contentType)) {
+			acc.contentTypeToProfiles.set(row.contentType, set);
 		}
 	}
 
-	return Array.from(repoMap.values());
+	return Array.from(repoMap.values()).map((r) => ({
+		id: r.id,
+		name: r.name,
+		owner: r.owner,
+		repo: r.repo,
+		contentTypes: Array.from(r.contentTypeToProfiles.entries()).map(
+			([contentType, ids]) => ({
+				contentType,
+				embeddingProfileIds: Array.from(ids),
+			}),
+		),
+	}));
 }

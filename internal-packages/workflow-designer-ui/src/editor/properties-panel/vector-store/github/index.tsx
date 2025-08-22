@@ -17,6 +17,17 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { TriangleAlert } from "../../../../icons";
 import { useGitHubVectorStoreStatus } from "../../../lib/use-github-vector-store-status";
 
+type GitHubRepositoryIndexUI = {
+	id: string;
+	name: string;
+	owner: string;
+	repo: string;
+	contentTypes?: {
+		contentType: "blob" | "pull_request";
+		embeddingProfileIds: number[];
+	}[];
+};
+
 type GitHubVectorStoreNodePropertiesPanelProps = {
 	node: VectorStoreNode;
 };
@@ -30,7 +41,8 @@ export function GitHubVectorStoreNodePropertiesPanel({
 	const settingPath = vectorStore?.settingPath;
 
 	// Get repository indexes
-	const githubRepositoryIndexes = vectorStore?.githubRepositoryIndexes ?? [];
+	const githubRepositoryIndexes = (vectorStore?.githubRepositoryIndexes ??
+		[]) as GitHubRepositoryIndexUI[];
 
 	// Current content type from node (if configured)
 	const currentContentType =
@@ -57,8 +69,6 @@ export function GitHubVectorStoreNodePropertiesPanel({
 	const allRepositories = useMemo(() => {
 		return githubRepositoryIndexes.map((repo) => ({
 			...repo,
-			availableTypes: new Set(repo.availableContentTypes),
-			contentTypesWithProfiles: repo.contentTypesWithProfiles,
 		}));
 	}, [githubRepositoryIndexes]);
 
@@ -118,8 +128,8 @@ export function GitHubVectorStoreNodePropertiesPanel({
 			// When feature flag is off, always use profile 1
 			// When feature flag is on, use first available profile for the content type
 			let profileId: EmbeddingProfileId = 1;
-			if (multiEmbedding && selectedRepo.contentTypesWithProfiles) {
-				const contentTypeProfiles = selectedRepo.contentTypesWithProfiles.find(
+			if (multiEmbedding && selectedRepo.contentTypes) {
+				const contentTypeProfiles = selectedRepo.contentTypes.find(
 					(ct: { contentType: string }) => ct.contentType === contentType,
 				);
 				if (
@@ -270,19 +280,16 @@ export function GitHubVectorStoreNodePropertiesPanel({
 								);
 								if (!selectedRepo) return null;
 
-								// Check if content types are available with the new structure
-								const hasBlobContent = multiEmbedding
-									? selectedRepo.contentTypesWithProfiles?.some(
-											(ct: { contentType: string }) =>
-												ct.contentType === "blob",
-										)
-									: selectedRepo.availableTypes.has("blob");
-								const hasPullRequestContent = multiEmbedding
-									? selectedRepo.contentTypesWithProfiles?.some(
-											(ct: { contentType: string }) =>
-												ct.contentType === "pull_request",
-										)
-									: selectedRepo.availableTypes.has("pull_request");
+								// Check if content types are available
+								const hasBlobContent =
+									selectedRepo.contentTypes?.some(
+										(ct: { contentType: string }) => ct.contentType === "blob",
+									) ?? false;
+								const hasPullRequestContent =
+									selectedRepo.contentTypes?.some(
+										(ct: { contentType: string }) =>
+											ct.contentType === "pull_request",
+									) ?? false;
 
 								return (
 									<>
@@ -364,8 +371,8 @@ export function GitHubVectorStoreNodePropertiesPanel({
 						if (!selectedRepo) return null;
 
 						// Get available embedding profiles for the selected content type
-						const availableProfiles = (
-							selectedRepo.contentTypesWithProfiles?.find(
+						const availableProfiles: EmbeddingProfileId[] = (
+							selectedRepo.contentTypes?.find(
 								(ct: { contentType: string }) =>
 									ct.contentType === selectedContentType,
 							)?.embeddingProfileIds || []

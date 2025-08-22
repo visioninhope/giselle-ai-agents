@@ -3,10 +3,22 @@ import { isVectorStoreNode } from "@giselle-sdk/data-type";
 import { useFeatureFlag, useVectorStore } from "@giselle-sdk/giselle/react";
 import { useMemo } from "react";
 
+type GitHubRepositoryIndexUI = {
+	id: string;
+	name: string;
+	owner: string;
+	repo: string;
+	contentTypes?: {
+		contentType: "blob" | "pull_request";
+		embeddingProfileIds: number[];
+	}[];
+};
+
 export function useGitHubVectorStoreStatus(node: Node) {
 	const vectorStore = useVectorStore();
 	const { multiEmbedding } = useFeatureFlag();
-	const githubRepositoryIndexes = vectorStore?.githubRepositoryIndexes ?? [];
+	const githubRepositoryIndexes = (vectorStore?.githubRepositoryIndexes ??
+		[]) as GitHubRepositoryIndexUI[];
 
 	return useMemo(() => {
 		if (
@@ -28,13 +40,15 @@ export function useGitHubVectorStoreStatus(node: Node) {
 			(info) =>
 				info.owner === owner &&
 				info.repo === repo &&
-				info.availableContentTypes.includes(contentType),
+				info.contentTypes?.some(
+					(ct: { contentType: string }) => ct.contentType === contentType,
+				),
 		);
 
 		// Check if embedding profile is available when multiEmbedding is enabled
 		let isEmbeddingProfileOrphaned = false;
 		if (multiEmbedding && foundInfo && embeddingProfileId) {
-			const contentTypeProfile = foundInfo.contentTypesWithProfiles?.find(
+			const contentTypeProfile = foundInfo.contentTypes?.find(
 				(ct: { contentType: string }) => ct.contentType === contentType,
 			);
 			if (contentTypeProfile) {
