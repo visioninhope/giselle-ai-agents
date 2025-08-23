@@ -8,6 +8,10 @@ const OpenAILanguageModelConfigurations = z.object({
 	topP: z.number(),
 	presencePenalty: z.number(),
 	frequencyPenalty: z.number(),
+	reasoningEffort: z
+		.enum(["minimum", "low", "medium", "high"])
+		.optional()
+		.default("medium"),
 });
 type OpenAILanguageModelConfigurations = z.infer<
 	typeof OpenAILanguageModelConfigurations
@@ -18,6 +22,7 @@ const defaultConfigurations: OpenAILanguageModelConfigurations = {
 	topP: 1.0,
 	presencePenalty: 0.0,
 	frequencyPenalty: 0.0,
+	reasoningEffort: "medium",
 };
 
 export const OpenAILanguageModelId = z
@@ -76,7 +81,8 @@ const o3: OpenAILanguageModel = {
 	capabilities:
 		Capability.ImageFileInput |
 		Capability.TextGeneration |
-		Capability.OptionalSearchGrounding,
+		Capability.OptionalSearchGrounding |
+		Capability.Reasoning,
 	tier: Tier.enum.pro,
 	configurations: defaultConfigurations,
 };
@@ -128,7 +134,8 @@ const gpt5: OpenAILanguageModel = {
 	capabilities:
 		Capability.ImageFileInput |
 		Capability.TextGeneration |
-		Capability.OptionalSearchGrounding,
+		Capability.OptionalSearchGrounding |
+		Capability.Reasoning,
 	tier: Tier.enum.pro,
 	configurations: defaultConfigurations,
 };
@@ -139,7 +146,8 @@ const gpt5mini: OpenAILanguageModel = {
 	capabilities:
 		Capability.ImageFileInput |
 		Capability.TextGeneration |
-		Capability.OptionalSearchGrounding,
+		Capability.OptionalSearchGrounding |
+		Capability.Reasoning,
 	tier: Tier.enum.free,
 	configurations: defaultConfigurations,
 };
@@ -147,7 +155,10 @@ const gpt5mini: OpenAILanguageModel = {
 const gpt5nano: OpenAILanguageModel = {
 	provider: "openai",
 	id: "gpt-5-nano",
-	capabilities: Capability.ImageFileInput | Capability.TextGeneration,
+	capabilities:
+		Capability.ImageFileInput |
+		Capability.TextGeneration |
+		Capability.Reasoning,
 	tier: Tier.enum.free,
 	configurations: defaultConfigurations,
 };

@@ -1,6 +1,6 @@
 import { type AnthropicProviderOptions, anthropic } from "@ai-sdk/anthropic";
 import { google } from "@ai-sdk/google";
-import { openai } from "@ai-sdk/openai";
+import { type OpenAIResponsesProviderOptions, openai } from "@ai-sdk/openai";
 import { perplexity } from "@ai-sdk/perplexity";
 import {
 	isTextGenerationNode,
@@ -308,6 +308,7 @@ function getProviderOptions(languageModelData: TextGenerationLanguageModelData):
 	| {
 			anthropic?: AnthropicProviderOptions;
 			perplexity?: PerplexityProviderOptions;
+			openai?: OpenAIResponsesProviderOptions;
 	  }
 	| undefined {
 	const languageModel = languageModels.find(
@@ -339,6 +340,18 @@ function getProviderOptions(languageModelData: TextGenerationLanguageModelData):
 			perplexity: {
 				// https://docs.perplexity.ai/guides/search-domain-filters
 				search_domain_filter: searchDomainFilter,
+			},
+		};
+	}
+	if (
+		languageModel &&
+		languageModelData.provider === "openai" &&
+		hasCapability(languageModel, Capability.Reasoning)
+	) {
+		return {
+			openai: {
+				reasoningSummary: "auto",
+				reasoningEffort: languageModelData.configurations.reasoningEffort,
 			},
 		};
 	}

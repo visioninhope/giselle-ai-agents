@@ -36,6 +36,10 @@ export function OpenAIModelPanel({
 		() => openaiLanguageModels.find((lm) => lm.id === openaiLanguageModel.id),
 		[openaiLanguageModel.id],
 	);
+	if (languageModel === undefined) {
+		console.error("Language Model Not Found", openaiLanguageModel);
+		return <div>Language Model Not Found</div>;
+	}
 
 	return (
 		<div className="flex flex-col gap-[34px]">
@@ -67,6 +71,35 @@ export function OpenAIModelPanel({
 					</SelectGroup>
 				</SelectContent>
 			</Select>
+			{hasCapability(languageModel, Capability.Reasoning) && (
+				<Select
+					value={openaiLanguageModel.configurations.reasoningEffort}
+					onValueChange={(value) => {
+						onModelChange(
+							OpenAILanguageModelData.parse({
+								...openaiLanguageModel,
+								configurations: {
+									...openaiLanguageModel.configurations,
+									reasoningEffort: value,
+								},
+							}),
+						);
+					}}
+				>
+					<SelectTrigger>
+						<SelectValue placeholder="Select a LLM" />
+					</SelectTrigger>
+					<SelectContent>
+						<SelectGroup>
+							{["minimum", "low", "medium", "high"].map((reasoningEffort) => (
+								<SelectItem key={reasoningEffort} value={reasoningEffort}>
+									{reasoningEffort}
+								</SelectItem>
+							))}
+						</SelectGroup>
+					</SelectContent>
+				</Select>
+			)}
 			<div>
 				<div className="grid grid-cols-2 gap-[24px]">
 					<Slider
