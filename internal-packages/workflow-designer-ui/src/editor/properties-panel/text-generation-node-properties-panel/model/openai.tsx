@@ -32,63 +32,88 @@ export function OpenAIModelPanel({
 	}
 
 	return (
-		<div className="flex flex-col gap-[34px]">
-			<Select
-				placeholder="Select a LLM"
-				value={openaiLanguageModel.id}
-				onValueChange={(value) => {
-					onModelChange(
-						OpenAILanguageModelData.parse({
-							...openaiLanguageModel,
-							id: value,
-						}),
-					);
-				}}
-				options={openaiLanguageModels.map((model) => ({
-					value: model.id,
-					label: model.id,
-				}))}
-			/>
+		<div className="flex flex-col gap-[16px]">
+			<fieldset className="flex flex-col">
+				<label htmlFor="model" className="text-text text-[13px] mb-[2px]">
+					Model
+				</label>
+				<Select
+					id="model"
+					placeholder="Select a LLM"
+					value={openaiLanguageModel.id}
+					onValueChange={(value) => {
+						onModelChange(
+							OpenAILanguageModelData.parse({
+								...openaiLanguageModel,
+								id: value,
+							}),
+						);
+					}}
+					options={openaiLanguageModels.map((model) => ({
+						value: model.id,
+						label: model.id,
+					}))}
+				/>
+			</fieldset>
 			{hasCapability(languageModel, Capability.Reasoning) && (
 				<>
-					<Select
-						placeholder="Select reasoning effort"
-						value={openaiLanguageModel.configurations.reasoningEffort}
-						onValueChange={(value) => {
-							onModelChange(
-								OpenAILanguageModelData.parse({
-									...openaiLanguageModel,
-									configurations: {
-										...openaiLanguageModel.configurations,
-										reasoningEffort: value,
-									},
-								}),
-							);
-						}}
-						options={["minimum", "low", "medium", "high"].map((v) => ({
-							value: v,
-							label: v,
-						}))}
-					/>
-					<Select
-						placeholder="Select verbosity"
-						value={openaiLanguageModel.configurations.textVerbosity}
-						onValueChange={(value) => {
-							onModelChange(
-								OpenAILanguageModelData.parse({
-									...openaiLanguageModel,
-									configurations: {
-										...openaiLanguageModel.configurations,
-										textVerbosity: value,
-									},
-								}),
-							);
-						}}
-						options={["low", "medium", "high"].map((v) => ({
-							value: v,
-							label: v,
-						}))}
-					/>
+					<fieldset className="flex flex-col">
+						<label
+							htmlFor="reasoningEffort"
+							className="text-text text-[13px] mb-[2px]"
+						>
+							Reasoning effort
+						</label>
+						<Select
+							id="reasoningEffort"
+							placeholder="Select reasoning effort"
+							value={openaiLanguageModel.configurations.reasoningEffort}
+							onValueChange={(value) => {
+								onModelChange(
+									OpenAILanguageModelData.parse({
+										...openaiLanguageModel,
+										configurations: {
+											...openaiLanguageModel.configurations,
+											reasoningEffort: value,
+										},
+									}),
+								);
+							}}
+							options={["minimum", "low", "medium", "high"].map((v) => ({
+								value: v,
+								label: v,
+							}))}
+						/>
+					</fieldset>
+
+					<fieldset className="flex flex-col">
+						<label
+							htmlFor="verbosity"
+							className="text-text text-[13px] mb-[2px]"
+						>
+							Verbosity
+						</label>
+						<Select
+							id="verbosity"
+							placeholder="Select verbosity"
+							value={openaiLanguageModel.configurations.textVerbosity}
+							onValueChange={(value) => {
+								onModelChange(
+									OpenAILanguageModelData.parse({
+										...openaiLanguageModel,
+										configurations: {
+											...openaiLanguageModel.configurations,
+											textVerbosity: value,
+										},
+									}),
+								);
+							}}
+							options={["low", "medium", "high"].map((v) => ({
+								value: v,
+								label: v,
+							}))}
+						/>
+					</fieldset>
 				</>
 			)}
 			<div>
