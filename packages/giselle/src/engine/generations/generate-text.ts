@@ -343,17 +343,17 @@ function getProviderOptions(languageModelData: TextGenerationLanguageModelData):
 			},
 		};
 	}
-	if (
-		languageModel &&
-		languageModelData.provider === "openai" &&
-		hasCapability(languageModel, Capability.Reasoning)
-	) {
-		return {
-			openai: {
-				reasoningSummary: "auto",
-				reasoningEffort: languageModelData.configurations.reasoningEffort,
-			},
-		};
+	if (languageModel && languageModelData.provider === "openai") {
+		const openaiOptions: OpenAIResponsesProviderOptions = {};
+		if (hasCapability(languageModel, Capability.Reasoning)) {
+			openaiOptions.textVerbosity =
+				languageModelData.configurations.textVerbosity;
+			openaiOptions.reasoningSummary = "auto";
+			openaiOptions.reasoningEffort =
+				languageModelData.configurations.reasoningEffort;
+		}
+
+		return { openai: openaiOptions };
 	}
 	return undefined;
 }

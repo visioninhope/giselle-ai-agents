@@ -72,33 +72,62 @@ export function OpenAIModelPanel({
 				</SelectContent>
 			</Select>
 			{hasCapability(languageModel, Capability.Reasoning) && (
-				<Select
-					value={openaiLanguageModel.configurations.reasoningEffort}
-					onValueChange={(value) => {
-						onModelChange(
-							OpenAILanguageModelData.parse({
-								...openaiLanguageModel,
-								configurations: {
-									...openaiLanguageModel.configurations,
-									reasoningEffort: value,
-								},
-							}),
-						);
-					}}
-				>
-					<SelectTrigger>
-						<SelectValue placeholder="Select a LLM" />
-					</SelectTrigger>
-					<SelectContent>
-						<SelectGroup>
-							{["minimum", "low", "medium", "high"].map((reasoningEffort) => (
-								<SelectItem key={reasoningEffort} value={reasoningEffort}>
-									{reasoningEffort}
-								</SelectItem>
-							))}
-						</SelectGroup>
-					</SelectContent>
-				</Select>
+				<>
+					<Select
+						value={openaiLanguageModel.configurations.reasoningEffort}
+						onValueChange={(value) => {
+							onModelChange(
+								OpenAILanguageModelData.parse({
+									...openaiLanguageModel,
+									configurations: {
+										...openaiLanguageModel.configurations,
+										reasoningEffort: value,
+									},
+								}),
+							);
+						}}
+					>
+						<SelectTrigger>
+							<SelectValue placeholder="Select a LLM" />
+						</SelectTrigger>
+						<SelectContent>
+							<SelectGroup>
+								{["minimum", "low", "medium", "high"].map((reasoningEffort) => (
+									<SelectItem key={reasoningEffort} value={reasoningEffort}>
+										{reasoningEffort}
+									</SelectItem>
+								))}
+							</SelectGroup>
+						</SelectContent>
+					</Select>
+					<Select
+						value={openaiLanguageModel.configurations.textVerbosity}
+						onValueChange={(value) => {
+							onModelChange(
+								OpenAILanguageModelData.parse({
+									...openaiLanguageModel,
+									configurations: {
+										...openaiLanguageModel.configurations,
+										textVerbosity: value,
+									},
+								}),
+							);
+						}}
+					>
+						<SelectTrigger>
+							<SelectValue placeholder="Select verbosity" />
+						</SelectTrigger>
+						<SelectContent>
+							<SelectGroup>
+								{["low", "medium", "high"].map((verbosity) => (
+									<SelectItem key={verbosity} value={verbosity}>
+										{verbosity}
+									</SelectItem>
+								))}
+							</SelectGroup>
+						</SelectContent>
+					</Select>
+				</>
 			)}
 			<div>
 				<div className="grid grid-cols-2 gap-[24px]">

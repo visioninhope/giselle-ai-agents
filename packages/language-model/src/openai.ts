@@ -8,6 +8,7 @@ const OpenAILanguageModelConfigurations = z.object({
 	topP: z.number(),
 	presencePenalty: z.number(),
 	frequencyPenalty: z.number(),
+	textVerbosity: z.enum(["low", "medium", "high"]).optional().default("medium"),
 	reasoningEffort: z
 		.enum(["minimum", "low", "medium", "high"])
 		.optional()
@@ -22,6 +23,7 @@ const defaultConfigurations: OpenAILanguageModelConfigurations = {
 	topP: 1.0,
 	presencePenalty: 0.0,
 	frequencyPenalty: 0.0,
+	textVerbosity: "medium",
 	reasoningEffort: "medium",
 };
 
