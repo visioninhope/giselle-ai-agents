@@ -149,6 +149,7 @@ function extractMetadata(
 		if (tools?.github) {
 			metadata["tools.github.tools"] = tools.github.tools;
 		}
+		metadata["llm.configuration"] = content.llm.configurations;
 	}
 
 	return metadata;
