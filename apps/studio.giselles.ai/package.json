@@ -78,6 +78,7 @@
 		"jsdom": "catalog:",
 		"langfuse-vercel": "3.37.0",
 		"lucide-react": "catalog:",
+		"motion": "catalog:",
 		"next": "catalog:",
 		"next-themes": "0.3.0",
 		"nodemailer": "6.10.0",

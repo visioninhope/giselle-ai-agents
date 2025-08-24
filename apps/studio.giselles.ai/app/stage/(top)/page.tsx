@@ -47,10 +47,10 @@ export default async function StagePage({
 		avatarUrl: team.avatarUrl ?? undefined,
 	}));
 	return (
-		<div className="flex-1 bg-[var(--color-stage-background)] pt-16 md:pt-0 pb-[calc(4rem+env(safe-area-inset-bottom))] md:pb-0 h-full flex flex-col">
+		<div className="flex-1 bg-[var(--color-stage-background)] pb-[calc(4rem+env(safe-area-inset-bottom))] md:pb-0 h-full flex flex-col">
 			<ResizableLayout
 				mainContent={
-					<div className="space-y-6 py-6 h-full md:h-full h-auto max-h-full overflow-y-auto md:overflow-hidden relative">
+					<div className="space-y-6 py-6 h-full md:h-full max-h-full overflow-y-auto md:overflow-hidden relative">
 						<div className="text-center text-[24px] font-mono font-light text-white-100 bg-transparent px-6">
 							What are we perform next ?
 						</div>
