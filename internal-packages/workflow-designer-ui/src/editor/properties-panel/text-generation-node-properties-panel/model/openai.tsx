@@ -1,22 +1,13 @@
+import { Select } from "@giselle-internal/ui/select";
 import { OpenAILanguageModelData, type ToolSet } from "@giselle-sdk/data-type";
-import { useUsageLimits } from "@giselle-sdk/giselle/react";
 import {
 	Capability,
 	hasCapability,
 	openaiLanguageModels,
 } from "@giselle-sdk/language-model";
 import { useMemo } from "react";
-import {
-	Select,
-	SelectContent,
-	SelectGroup,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "../../../../ui/select";
 import { Slider } from "../../../../ui/slider";
 import { Switch } from "../../../../ui/switch";
-import { languageModelAvailable } from "./utils";
 
 export function OpenAIModelPanel({
 	openaiLanguageModel,
@@ -31,7 +22,6 @@ export function OpenAIModelPanel({
 	onToolChange: (changedValue: ToolSet) => void;
 	onWebSearchChange: (enabled: boolean) => void;
 }) {
-	const limits = useUsageLimits();
 	const languageModel = useMemo(
 		() => openaiLanguageModels.find((lm) => lm.id === openaiLanguageModel.id),
 		[openaiLanguageModel.id],
@@ -44,6 +34,7 @@ export function OpenAIModelPanel({
 	return (
 		<div className="flex flex-col gap-[34px]">
 			<Select
+				placeholder="Select a LLM"
 				value={openaiLanguageModel.id}
 				onValueChange={(value) => {
 					onModelChange(
@@ -53,27 +44,15 @@ export function OpenAIModelPanel({
 						}),
 					);
 				}}
-			>
-				<SelectTrigger>
-					<SelectValue placeholder="Select a LLM" />
-				</SelectTrigger>
-				<SelectContent>
-					<SelectGroup>
-						{openaiLanguageModels.map((model) => (
-							<SelectItem
-								key={model.id}
-								value={model.id}
-								disabled={!languageModelAvailable(model, limits)}
-							>
-								{model.id}
-							</SelectItem>
-						))}
-					</SelectGroup>
-				</SelectContent>
-			</Select>
+				options={openaiLanguageModels.map((model) => ({
+					value: model.id,
+					label: model.id,
+				}))}
+			/>
 			{hasCapability(languageModel, Capability.Reasoning) && (
 				<>
 					<Select
+						placeholder="Select reasoning effort"
 						value={openaiLanguageModel.configurations.reasoningEffort}
 						onValueChange={(value) => {
 							onModelChange(
@@ -86,21 +65,13 @@ export function OpenAIModelPanel({
 								}),
 							);
 						}}
-					>
-						<SelectTrigger>
-							<SelectValue placeholder="Select a LLM" />
-						</SelectTrigger>
-						<SelectContent>
-							<SelectGroup>
-								{["minimum", "low", "medium", "high"].map((reasoningEffort) => (
-									<SelectItem key={reasoningEffort} value={reasoningEffort}>
-										{reasoningEffort}
-									</SelectItem>
-								))}
-							</SelectGroup>
-						</SelectContent>
-					</Select>
+						options={["minimum", "low", "medium", "high"].map((v) => ({
+							value: v,
+							label: v,
+						}))}
+					/>
 					<Select
+						placeholder="Select verbosity"
 						value={openaiLanguageModel.configurations.textVerbosity}
 						onValueChange={(value) => {
 							onModelChange(
@@ -113,20 +84,11 @@ export function OpenAIModelPanel({
 								}),
 							);
 						}}
-					>
-						<SelectTrigger>
-							<SelectValue placeholder="Select verbosity" />
-						</SelectTrigger>
-						<SelectContent>
-							<SelectGroup>
-								{["low", "medium", "high"].map((verbosity) => (
-									<SelectItem key={verbosity} value={verbosity}>
-										{verbosity}
-									</SelectItem>
-								))}
-							</SelectGroup>
-						</SelectContent>
-					</Select>
+						options={["low", "medium", "high"].map((v) => ({
+							value: v,
+							label: v,
+						}))}
+					/>
 				</>
 			)}
 			<div>
