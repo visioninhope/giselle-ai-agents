@@ -49,7 +49,7 @@
 
 
 <a name="@ai-sdk/anthropic"></a>
-### @ai-sdk/anthropic v2.0.0
+### @ai-sdk/anthropic v2.0.6
 #### 
 
 ##### Paths
@@ -71,7 +71,7 @@
 
 
 <a name="@ai-sdk/gateway"></a>
-### @ai-sdk/gateway v1.0.0
+### @ai-sdk/gateway v1.0.11
 #### 
 
 ##### Paths
@@ -82,7 +82,7 @@
 
 
 <a name="@ai-sdk/google"></a>
-### @ai-sdk/google v2.0.0
+### @ai-sdk/google v2.0.8
 #### 
 
 ##### Paths
@@ -93,7 +93,7 @@
 
 
 <a name="@ai-sdk/openai"></a>
-### @ai-sdk/openai v2.0.0
+### @ai-sdk/openai v2.0.19
 #### 
 
 ##### Paths
@@ -104,7 +104,7 @@
 
 
 <a name="@ai-sdk/perplexity"></a>
-### @ai-sdk/perplexity v2.0.0
+### @ai-sdk/perplexity v2.0.5
 #### 
 
 ##### Paths
@@ -137,7 +137,7 @@
 
 
 <a name="@ai-sdk/react"></a>
-### @ai-sdk/react v2.0.0
+### @ai-sdk/react v2.0.22
 #### 
 
 ##### Paths
@@ -5186,7 +5186,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="ai"></a>
-### ai v5.0.0
+### ai v5.0.22
 #### 
 
 ##### Paths
