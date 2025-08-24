@@ -55,7 +55,7 @@ export function OpenAIModelPanel({
 					}))}
 				/>
 			</fieldset>
-			{hasCapability(languageModel, Capability.Reasoning) && (
+			{hasCapability(languageModel, Capability.Reasoning) ? (
 				<>
 					<fieldset className="flex flex-col">
 						<label
@@ -115,124 +115,122 @@ export function OpenAIModelPanel({
 						/>
 					</fieldset>
 				</>
-			)}
-			<div>
-				<div className="grid grid-cols-2 gap-[24px]">
-					<Slider
-						label="Temperature"
-						value={openaiLanguageModel.configurations.temperature}
-						max={2.0}
-						min={0.0}
-						step={0.01}
-						onChange={(value) => {
-							onModelChange(
-								OpenAILanguageModelData.parse({
-									...openaiLanguageModel,
-									configurations: {
-										...openaiLanguageModel.configurations,
-										temperature: value,
-									},
-								}),
-							);
-						}}
-					/>
-					<Slider
-						label="Top P"
-						value={openaiLanguageModel.configurations.topP}
-						max={1.0}
-						min={0.0}
-						step={0.01}
-						onChange={(value) => {
-							onModelChange(
-								OpenAILanguageModelData.parse({
-									...openaiLanguageModel,
-									configurations: {
-										...openaiLanguageModel.configurations,
-										topP: value,
-									},
-								}),
-							);
-						}}
-					/>
-					<Slider
-						label="Frequency Panalty"
-						value={openaiLanguageModel.configurations.frequencyPenalty}
-						max={2.0}
-						min={0.0}
-						step={0.01}
-						onChange={(value) => {
-							onModelChange(
-								OpenAILanguageModelData.parse({
-									...openaiLanguageModel,
-									configurations: {
-										...openaiLanguageModel.configurations,
-										frequencyPenalty: value,
-									},
-								}),
-							);
-						}}
-					/>
-					<Slider
-						label="Presence Penalty"
-						value={openaiLanguageModel.configurations.presencePenalty}
-						max={2.0}
-						min={0.0}
-						step={0.01}
-						onChange={(value) => {
-							onModelChange(
-								OpenAILanguageModelData.parse({
-									...openaiLanguageModel,
-									configurations: {
-										...openaiLanguageModel.configurations,
-										presencePenalty: value,
-									},
-								}),
-							);
-						}}
-					/>
-					<Switch
-						label="Web Search"
-						name="webSearch"
-						checked={!!tools?.openaiWebSearch}
-						onCheckedChange={(checked) => {
-							let changedTools: ToolSet = {};
-							for (const toolName of Object.keys(tools ?? {})) {
-								const tool = tools?.[toolName as keyof ToolSet];
-
-								if (
-									tool === undefined ||
-									(!checked && toolName === "openaiWebSearch")
-								) {
-									continue;
-								}
-								changedTools = {
-									...changedTools,
-									[toolName]: tool,
-								};
-							}
-							if (checked) {
-								changedTools = {
-									...tools,
-									openaiWebSearch: {
-										searchContextSize: "medium",
-									},
-								};
-							}
-							onToolChange(changedTools);
-							onWebSearchChange(checked);
-						}}
-						note={
-							languageModel &&
-							tools?.openaiWebSearch &&
-							!hasCapability(
-								languageModel,
-								Capability.OptionalSearchGrounding,
-							) &&
-							"Web search is not supported by the selected model"
-						}
-					/>
+			) : (
+				<div>
+					<div className="grid grid-cols-2 gap-[24px]">
+						<Slider
+							label="Temperature"
+							value={openaiLanguageModel.configurations.temperature}
+							max={2.0}
+							min={0.0}
+							step={0.01}
+							onChange={(value) => {
+								onModelChange(
+									OpenAILanguageModelData.parse({
+										...openaiLanguageModel,
+										configurations: {
+											...openaiLanguageModel.configurations,
+											temperature: value,
+										},
+									}),
+								);
+							}}
+						/>
+						<Slider
+							label="Top P"
+							value={openaiLanguageModel.configurations.topP}
+							max={1.0}
+							min={0.0}
+							step={0.01}
+							onChange={(value) => {
+								onModelChange(
+									OpenAILanguageModelData.parse({
+										...openaiLanguageModel,
+										configurations: {
+											...openaiLanguageModel.configurations,
+											topP: value,
+										},
+									}),
+								);
+							}}
+						/>
+						<Slider
+							label="Frequency Panalty"
+							value={openaiLanguageModel.configurations.frequencyPenalty}
+							max={2.0}
+							min={0.0}
+							step={0.01}
+							onChange={(value) => {
+								onModelChange(
+									OpenAILanguageModelData.parse({
+										...openaiLanguageModel,
+										configurations: {
+											...openaiLanguageModel.configurations,
+											frequencyPenalty: value,
+										},
+									}),
+								);
+							}}
+						/>
+						<Slider
+							label="Presence Penalty"
+							value={openaiLanguageModel.configurations.presencePenalty}
+							max={2.0}
+							min={0.0}
+							step={0.01}
+							onChange={(value) => {
+								onModelChange(
+									OpenAILanguageModelData.parse({
+										...openaiLanguageModel,
+										configurations: {
+											...openaiLanguageModel.configurations,
+											presencePenalty: value,
+										},
+									}),
+								);
+							}}
+						/>
+					</div>
 				</div>
-			</div>
+			)}
+			<Switch
+				label="Web Search"
+				name="webSearch"
+				checked={!!tools?.openaiWebSearch}
+				onCheckedChange={(checked) => {
+					let changedTools: ToolSet = {};
+					for (const toolName of Object.keys(tools ?? {})) {
+						const tool = tools?.[toolName as keyof ToolSet];
+
+						if (
+							tool === undefined ||
+							(!checked && toolName === "openaiWebSearch")
+						) {
+							continue;
+						}
+						changedTools = {
+							...changedTools,
+							[toolName]: tool,
+						};
+					}
+					if (checked) {
+						changedTools = {
+							...tools,
+							openaiWebSearch: {
+								searchContextSize: "medium",
+							},
+						};
+					}
+					onToolChange(changedTools);
+					onWebSearchChange(checked);
+				}}
+				note={
+					languageModel &&
+					tools?.openaiWebSearch &&
+					!hasCapability(languageModel, Capability.OptionalSearchGrounding) &&
+					"Web search is not supported by the selected model"
+				}
+			/>
 		</div>
 	);
 }
