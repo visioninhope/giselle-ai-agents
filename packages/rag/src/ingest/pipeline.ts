@@ -9,7 +9,7 @@ import type { ChunkerFunction } from "../chunker/types";
 import type { Document, DocumentLoader } from "../document-loader/types";
 import { createEmbedderFromProfile } from "../embedder/profiles";
 import type { EmbedderFunction } from "../embedder/types";
-import { ConfigurationError, OperationError } from "../errors";
+import { ConfigurationError, OperationError, RagError } from "../errors";
 import { embedContent } from "./embedder";
 import type { IngestError, IngestProgress, IngestResult } from "./types";
 import { createBatches, retryOperation } from "./utils";
@@ -259,6 +259,12 @@ export function createPipeline<
 				}
 			}
 		} catch (error) {
+			if (error instanceof RagError) {
+				// Re-throw RagError instances as-is to preserve error type information
+				throw error;
+			}
+
+			// Re-throw other errors as OperationError
 			throw OperationError.invalidOperation(
 				"ingestion pipeline",
 				"Failed to complete ingestion pipeline",
