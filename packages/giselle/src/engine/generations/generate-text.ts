@@ -192,8 +192,12 @@ export function generateText(args: {
 
 			const providerOptions = getProviderOptions(operationNode.content.llm);
 
+			const model = generationModel(
+				operationNode.content.llm,
+				args.useAiGateway,
+			);
 			const streamTextResult = streamText({
-				model: generationModel(operationNode.content.llm, args.useAiGateway),
+				model,
 				providerOptions,
 				messages,
 				tools: preparedToolSet.toolSet,
