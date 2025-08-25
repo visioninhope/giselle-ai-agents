@@ -3,7 +3,7 @@ import {
 	type DocumentLoader,
 	DocumentLoaderError,
 } from "@giselle-sdk/rag";
-import type { Client } from "urql";
+import { type Client, CombinedError } from "urql";
 import { graphql } from "../../client";
 import { octokit } from "../../octokit";
 import type { GitHubAuthConfig } from "../../types";
@@ -26,6 +26,62 @@ import type {
 } from "./types";
 
 const GRAPHQL_BATCH_SIZE = 50; // GitHub GraphQL API optimal batch size
+
+/**
+ * Categorize GitHub GraphQL errors into appropriate DocumentLoaderError types
+ */
+function categorizeGitHubGraphqlError(
+	error: CombinedError,
+	context: { owner: string; repo: string; [key: string]: unknown },
+): DocumentLoaderError {
+	if (error.networkError) {
+		return DocumentLoaderError.fetchError(
+			"github",
+			"Network error occurred",
+			error,
+			context,
+		);
+	}
+
+	// preserve the original error types for future reference
+	const errorTypes: string[] = [];
+	for (const gqlError of error.graphQLErrors) {
+		const originalError = gqlError.originalError;
+		if (originalError == null) {
+			continue;
+		}
+
+		if (
+			typeof originalError === "object" &&
+			"type" in originalError &&
+			typeof originalError.type === "string"
+		) {
+			errorTypes.push(originalError.type);
+
+			if (originalError.type === "NOT_FOUND") {
+				return DocumentLoaderError.notFound(
+					`${context.owner}/${context.repo}`,
+					error,
+					{
+						source: "github",
+						resourceType: "Repository",
+						originalErrorType: originalError.type,
+					},
+				);
+			}
+		}
+	}
+
+	return DocumentLoaderError.fetchError(
+		"github",
+		error.message || "Unknown error occurred",
+		error,
+		{
+			...context,
+			errorTypes,
+		},
+	);
+}
 
 export function createGitHubPullRequestsLoader(
 	config: GitHubPullRequestsLoaderConfig,
@@ -96,10 +152,26 @@ export function createGitHubPullRequestsLoader(
 			let pageCount = 0;
 
 			while (pageCount < maxPages) {
-				const result = await fetchPullRequestsMetadata(ctx, {
-					first: Math.min(perPage, GRAPHQL_BATCH_SIZE),
-					after: cursor,
-				});
+				let result: Awaited<ReturnType<typeof fetchPullRequestsMetadata>>;
+				try {
+					result = await fetchPullRequestsMetadata(ctx, {
+						first: Math.min(perPage, GRAPHQL_BATCH_SIZE),
+						after: cursor,
+					});
+				} catch (error) {
+					if (error instanceof CombinedError) {
+						throw categorizeGitHubGraphqlError(error, {
+							owner,
+							repo,
+						});
+					}
+					throw DocumentLoaderError.fetchError(
+						"github",
+						"fetching pull requests metadata",
+						error instanceof Error ? error : new Error(String(error)),
+						{ owner, repo },
+					);
+				}
 
 				for (const pr of result.pullRequests) {
 					if (!pr.mergedAt) continue;
@@ -204,32 +276,19 @@ export function createGitHubPullRequestsLoader(
 					return null;
 			}
 		} catch (error) {
-			console.error(`Failed to load document for PR #${pr_number}:`, error);
-
-			if (error instanceof Error) {
-				// If the error is already a DocumentLoaderError, re-throw it
-				if (error instanceof DocumentLoaderError) {
-					throw error;
-				}
-
-				throw DocumentLoaderError.fetchError(
-					"github",
-					`loading ${content_type} for PR ${owner}/${repo}#${pr_number}`,
-					error,
-					{
-						owner,
-						repo,
-						pr_number,
-						content_type,
-						content_id,
-					},
-				);
+			if (error instanceof CombinedError) {
+				throw categorizeGitHubGraphqlError(error, {
+					owner,
+					repo,
+					pr_number,
+					content_type,
+					content_id,
+				});
 			}
-
 			throw DocumentLoaderError.fetchError(
 				"github",
 				`loading ${content_type} for PR ${owner}/${repo}#${pr_number}`,
-				new Error(String(error)),
+				error instanceof Error ? error : new Error(String(error)),
 				{
 					owner,
 					repo,
