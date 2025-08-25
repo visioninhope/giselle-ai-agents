@@ -179,11 +179,12 @@ export const createJsonRouters = {
 					useExperimentalStorage: z.boolean(),
 					telemetry: z.custom<TelemetrySettings>().optional(),
 				}),
-				handler: async ({ input }) => {
+				handler: async ({ input, signal }) => {
 					await giselleEngine.generateImage(
 						input.generation,
 						input.useExperimentalStorage,
 						input.telemetry,
+						signal,
 					);
 					return new Response(null, { status: 204 });
 				},
@@ -203,11 +204,11 @@ export const createJsonRouters = {
 				return new Response(null, { status: 204 });
 			},
 		}),
-	createSampleWorkspace: (giselleEngine: GiselleEngine) =>
+	createSampleWorkspaces: (giselleEngine: GiselleEngine) =>
 		createHandler({
 			handler: async () => {
-				const workspace = await giselleEngine.createSampleWorkspace();
-				return JsonResponse.json(workspace);
+				const workspaces = await giselleEngine.createSampleWorkspaces();
+				return JsonResponse.json(workspaces);
 			},
 		}),
 	getGitHubRepositories: (giselleEngine: GiselleEngine) =>

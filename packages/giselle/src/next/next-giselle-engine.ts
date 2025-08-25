@@ -20,6 +20,7 @@ import {
 
 interface NextGiselleEngineConfig extends GiselleEngineConfig {
 	basePath: string;
+	useAfterFunction?: boolean;
 }
 
 async function getBody(
@@ -108,8 +109,15 @@ export function createHttpHandler({
 
 		const [routerPath] = segments;
 
-		if (config?.telemetry?.isEnabled && config?.telemetry?.waitForFlushFn) {
-			after(config.telemetry.waitForFlushFn);
+		if (config.useAfterFunction) {
+			if (config.telemetry?.isEnabled && config.telemetry?.waitForFlushFn) {
+				after(config.telemetry.waitForFlushFn);
+			}
+
+			// Flush generation index patches after response
+			after(async () => {
+				await giselleEngine.flushGenerationIndexQueue();
+			});
 		}
 
 		if (isJsonRouterPath(routerPath)) {
@@ -117,6 +125,7 @@ export function createHttpHandler({
 				return await jsonRouter[routerPath]({
 					// @ts-expect-error
 					input: await getBody(request),
+					signal: request.signal,
 				});
 			} catch (e) {
 				if (e instanceof ZodError) {

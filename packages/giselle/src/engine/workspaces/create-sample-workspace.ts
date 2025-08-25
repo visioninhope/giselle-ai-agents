@@ -14,17 +14,15 @@ import {
 import type { GiselleEngineContext } from "../types";
 import { copyFiles, getWorkspace, setWorkspace } from "./utils";
 
-export async function createSampleWorkspace(args: {
+async function createSampleWorkspaceFromTemplate(args: {
 	context: GiselleEngineContext;
+	templateWorkspaceId: WorkspaceId;
 }) {
-	if (!args.context.sampleAppWorkspaceId) {
-		throw new Error("sampleAppWorkspaceId is required");
-	}
 	const templateWorkspace = await getWorkspace({
 		useExperimentalStorage: false,
 		storage: args.context.storage,
 		experimental_storage: args.context.experimental_storage,
-		workspaceId: args.context.sampleAppWorkspaceId,
+		workspaceId: args.templateWorkspaceId,
 	});
 	const idMap = new Map<string, string>();
 	const newNodes: NodeLike[] = [];
@@ -100,21 +98,40 @@ export async function createSampleWorkspace(args: {
 		newNodeState[NodeId.parse(newNodeId)] = nodeState;
 	}
 	const newWorkspaceId = WorkspaceId.generate();
+
+	// Update prompt content with new IDs if present
+	const updatedNodes = newNodes.map((node) => {
+		if (
+			node.type === "operation" &&
+			node.content.type === "textGeneration" &&
+			node.content.prompt &&
+			typeof node.content.prompt === "string"
+		) {
+			let updatedPrompt = node.content.prompt;
+			// Replace old node IDs with new ones in prompt content
+			for (const [oldId, newId] of idMap.entries()) {
+				updatedPrompt = updatedPrompt.replaceAll(oldId, newId);
+			}
+			return {
+				...node,
+				content: {
+					...node.content,
+					prompt: updatedPrompt,
+				},
+			};
+		}
+		return node;
+	});
+
 	const newWorkspace = {
 		...templateWorkspace,
 		id: newWorkspaceId,
-		//
-		// I wanted to re-assign new IDs to all copied Nodes, Inputs, Outputs, and Connections.
-		// However, doing so would require updating the information embedded in the prompt,
-		// which would be a bit complicated. So, for now, I'm leaving the IDs as they are.
-		// Since the workspace ID is different, each element can still be uniquely identified.
-		// Also, nothing is globally identified based on the node or input ID, so it shouldn't cause any problems.
-		//
-		// schemaVersion: templateWorkspace.schemaVersion,
-		// nodes: newNodes,
-		// connections: newConnections,
-		// editingWorkflows: workflows,
-		// ui: newUi,
+		nodes: updatedNodes,
+		connections: newConnections,
+		ui: {
+			...templateWorkspace.ui,
+			nodeState: newNodeState,
+		},
 	} satisfies Workspace;
 	await Promise.all([
 		setWorkspace({
@@ -131,4 +148,28 @@ export async function createSampleWorkspace(args: {
 		}),
 	]);
 	return newWorkspace;
+}
+
+export async function createSampleWorkspaces(args: {
+	context: GiselleEngineContext;
+}) {
+	if (
+		!args.context.sampleAppWorkspaceIds ||
+		args.context.sampleAppWorkspaceIds.length === 0
+	) {
+		throw new Error(
+			"sampleAppWorkspaceIds is required and must contain at least one workspace ID",
+		);
+	}
+
+	const workspaces = await Promise.all(
+		args.context.sampleAppWorkspaceIds.map((templateWorkspaceId) =>
+			createSampleWorkspaceFromTemplate({
+				context: args.context,
+				templateWorkspaceId,
+			}),
+		),
+	);
+
+	return workspaces;
 }

@@ -46,6 +46,7 @@ import {
 	setGeneration,
 	type TelemetrySettings,
 } from "./generations";
+import { flushGenerationIndexQueue } from "./generations/internal/act-generation-index-queue";
 import {
 	getGitHubRepositories,
 	getGitHubRepositoryFullname,
@@ -58,7 +59,7 @@ import { addWebPage } from "./sources";
 import type { GiselleEngineConfig, GiselleEngineContext } from "./types";
 import {
 	copyWorkspace,
-	createSampleWorkspace,
+	createSampleWorkspaces,
 	createWorkspace,
 	getWorkspace,
 	updateWorkspace,
@@ -208,12 +209,14 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 			generation: QueuedGeneration,
 			useExperimentalStorage: boolean,
 			telemetry?: TelemetrySettings,
+			signal?: AbortSignal,
 		) => {
 			return await generateImage({
 				context,
 				generation,
 				useExperimentalStorage,
 				telemetry,
+				signal,
 			});
 		},
 		getGeneratedImage: async (
@@ -238,8 +241,8 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 				useExperimentalStorage,
 			});
 		},
-		createSampleWorkspace: async () => {
-			return await createSampleWorkspace({ context });
+		createSampleWorkspaces: async () => {
+			return await createSampleWorkspaces({ context });
 		},
 		getGitHubRepositories: async () => {
 			return await getGitHubRepositories({ context });
@@ -347,6 +350,9 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 		},
 		deleteSecret(args: { workspaceId: WorkspaceId; secretId: SecretId }) {
 			return deleteSecret({ ...args, context });
+		},
+		async flushGenerationIndexQueue() {
+			return await flushGenerationIndexQueue(context.experimental_storage);
 		},
 	};
 }

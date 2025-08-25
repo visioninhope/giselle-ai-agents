@@ -1,3 +1,4 @@
+import { DocumentLoaderError } from "@giselle-sdk/rag";
 import type { Octokit } from "@octokit/core";
 import type { Client } from "urql";
 import { executeRestRequest } from "../utils";
@@ -88,7 +89,21 @@ export async function fetchPullRequestsMetadata(
 	});
 
 	if (result.error) {
-		throw new Error(`GraphQL error: ${result.error.message}`);
+		throw DocumentLoaderError.fetchError(
+			"github",
+			"fetching pull requests metadata",
+			result.error,
+			{ owner: ctx.owner, repo: ctx.repo },
+		);
+	}
+
+	// Check if repository exists
+	if (result.data?.repository === null) {
+		throw DocumentLoaderError.notFound(
+			`${ctx.owner}/${ctx.repo}`,
+			new Error("Repository not found or no access"),
+			{ source: "github", resourceType: "Repository" },
+		);
 	}
 
 	const pullRequests = result.data?.repository?.pullRequests;
@@ -141,7 +156,21 @@ export async function fetchPullRequestDetails(
 	});
 
 	if (result.error) {
-		throw new Error(`GraphQL error: ${result.error.message}`);
+		throw DocumentLoaderError.fetchError(
+			"github",
+			"fetching pull request details",
+			result.error,
+			{ owner: ctx.owner, repo: ctx.repo, prNumber },
+		);
+	}
+
+	// Check if repository exists
+	if (result.data?.repository === null) {
+		throw DocumentLoaderError.notFound(
+			`${ctx.owner}/${ctx.repo}`,
+			new Error("Repository not found or no access"),
+			{ source: "github", resourceType: "Repository" },
+		);
 	}
 
 	const pr = result.data?.repository?.pullRequest;

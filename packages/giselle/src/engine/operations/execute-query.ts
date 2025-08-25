@@ -1,4 +1,5 @@
 import {
+	DEFAULT_EMBEDDING_PROFILE_ID,
 	DEFAULT_MAX_RESULTS,
 	DEFAULT_SIMILARITY_THRESHOLD,
 	isQueryNode,
@@ -40,7 +41,6 @@ export function executeQuery(args: {
 	return useGenerationExecutor({
 		context: args.context,
 		generation: args.generation,
-		telemetry: args.telemetry,
 		execute: async ({
 			runningGeneration,
 			generationContext,
@@ -93,6 +93,7 @@ export function executeQuery(args: {
 				];
 
 				await completeGeneration({
+					inputMessages: [],
 					outputs,
 				});
 			} catch (error) {
@@ -309,10 +310,13 @@ async function queryVectorStore(
 					case "github": {
 						const { owner, repo, contentType } = state;
 
+						const embeddingProfileId =
+							state.embeddingProfileId ?? DEFAULT_EMBEDDING_PROFILE_ID;
 						const queryContext: GitHubQueryContext = {
 							workspaceId,
 							owner,
 							repo,
+							embeddingProfileId,
 						};
 
 						if (contentType === "pull_request") {

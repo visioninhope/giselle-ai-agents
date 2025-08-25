@@ -1,16 +1,19 @@
+import {
+	EMBEDDING_PROFILES,
+	type EmbeddingProfileId,
+} from "@giselle-sdk/data-type";
 import type { TelemetrySettings } from "ai";
 import { escapeIdentifier } from "pg";
 import * as pgvector from "pgvector/pg";
 import type { z } from "zod/v4";
+import { EMBEDDING_COLUMNS } from "../../database/constants";
 import { PoolManager } from "../../database/postgres";
 import { ensurePgVectorTypes } from "../../database/postgres/pgvector-registry";
 import type { DatabaseConfig } from "../../database/types";
-import type { EmbedderFunction } from "../../embedder";
-import { createDefaultEmbedder } from "../../embedder";
+import { createEmbedderFromProfile } from "../../embedder/profiles";
 import {
 	ConfigurationError,
 	DatabaseError,
-	EmbeddingError,
 	ValidationError,
 } from "../../errors";
 import type { RequiredColumns } from "../column-mapping";
@@ -80,7 +83,7 @@ export function createPostgresQueryService<
 >(config: {
 	database: DatabaseConfig;
 	tableName: string;
-	embedder?: EmbedderFunction;
+	contextToEmbeddingProfileId: (context: TContext) => EmbeddingProfileId;
 	requiredColumnOverrides?: Partial<RequiredColumns>;
 	metadataColumnOverrides?: Partial<Record<keyof z.infer<TSchema>, string>>;
 	contextToFilter: (
@@ -116,8 +119,31 @@ export function createPostgresQueryService<
 		}
 
 		try {
-			const embedder = config.embedder || createDefaultEmbedder(telemetry);
+			const profileId = config.contextToEmbeddingProfileId(context);
+			const profile = EMBEDDING_PROFILES[profileId];
+			if (!profile) {
+				throw new ConfigurationError(
+					`Invalid embedding profile ID: ${profileId}. Valid IDs are: ${Object.keys(EMBEDDING_PROFILES).join(", ")}`,
+				);
+			}
+
+			const apiKey =
+				process.env[
+					profile.provider === "openai"
+						? "OPENAI_API_KEY"
+						: "GOOGLE_GENERATIVE_AI_API_KEY"
+				];
+			if (!apiKey) {
+				throw new ConfigurationError(
+					`No API key found for embedding profile ${profileId}`,
+				);
+			}
+
+			const embedder = createEmbedderFromProfile(profileId, apiKey, {
+				telemetry,
+			});
 			const queryEmbedding = await embedder.embed(query);
+
 			const filters = await config.contextToFilter(context);
 
 			const { sql, values } = buildSearchQuery({
@@ -125,6 +151,8 @@ export function createPostgresQueryService<
 				columnMapping,
 				queryEmbedding,
 				filters,
+				embeddingProfileId: profileId,
+				embeddingDimensions: profile.dimensions,
 				limit,
 				similarityThreshold,
 			});
@@ -141,7 +169,7 @@ export function createPostgresQueryService<
 
 			return mappedResults;
 		} catch (error) {
-			if (error instanceof EmbeddingError || error instanceof ValidationError) {
+			if (error instanceof ValidationError) {
 				throw error;
 			}
 			throw DatabaseError.queryFailed(
@@ -159,6 +187,8 @@ function buildSearchQuery({
 	columnMapping,
 	queryEmbedding,
 	filters,
+	embeddingProfileId,
+	embeddingDimensions,
 	limit,
 	similarityThreshold,
 }: {
@@ -166,6 +196,8 @@ function buildSearchQuery({
 	columnMapping: ReturnType<typeof createColumnMapping>;
 	queryEmbedding: number[];
 	filters: Record<string, unknown>;
+	embeddingProfileId: number;
+	embeddingDimensions: number;
 	limit: number;
 	similarityThreshold?: number;
 }) {
@@ -173,6 +205,22 @@ function buildSearchQuery({
 	const whereConditions: string[] = [];
 	let paramIndex = 2;
 
+	// Determine the appropriate cast based on embedding dimensions
+	const embeddingCast =
+		embeddingDimensions === 3072
+			? `${escapeIdentifier(EMBEDDING_COLUMNS.VECTOR)}::halfvec(3072)`
+			: `${escapeIdentifier(EMBEDDING_COLUMNS.VECTOR)}::vector(1536)`;
+
+	// Add embedding profile conditions
+	whereConditions.push(`${EMBEDDING_COLUMNS.PROFILE_ID} = $${paramIndex}`);
+	values.push(embeddingProfileId);
+	paramIndex++;
+
+	whereConditions.push(`${EMBEDDING_COLUMNS.DIMENSIONS} = $${paramIndex}`);
+	values.push(embeddingDimensions);
+	paramIndex++;
+
+	// Add user-provided filters
 	for (const [column, value] of Object.entries(filters)) {
 		whereConditions.push(`${escapeIdentifier(column)} = $${paramIndex}`);
 		values.push(value);
@@ -180,9 +228,7 @@ function buildSearchQuery({
 	}
 
 	if (similarityThreshold !== undefined && similarityThreshold > 0) {
-		whereConditions.push(
-			`1 - (${escapeIdentifier(columnMapping.embedding)} <=> $1) >= $${paramIndex}`,
-		);
+		whereConditions.push(`1 - (${embeddingCast} <=> $1) >= $${paramIndex}`);
 		values.push(similarityThreshold);
 		paramIndex++;
 	}
@@ -200,10 +246,10 @@ function buildSearchQuery({
 			${escapeIdentifier(columnMapping.chunkContent)} as content,
 			${escapeIdentifier(columnMapping.chunkIndex)} as index,
 			${metadataSelects}${metadataColumns.length > 0 ? "," : ""}
-			1 - (${escapeIdentifier(columnMapping.embedding)} <=> $1) as similarity
+			1 - (${embeddingCast} <=> $1) as similarity
 		FROM ${escapeIdentifier(tableName)}
 		${whereConditions.length > 0 ? `WHERE ${whereConditions.join(" AND ")}` : ""}
-		ORDER BY ${escapeIdentifier(columnMapping.embedding)} <=> $1
+		ORDER BY ${embeddingCast} <=> $1
 		LIMIT $${paramIndex}
 	`;
 

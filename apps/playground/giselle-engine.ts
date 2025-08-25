@@ -3,8 +3,9 @@ import type {
 	GiselleIntegrationConfig,
 	LanguageModelProvider,
 } from "@giselle-sdk/giselle";
-import { emitTelemetry, fsStorageDriver } from "@giselle-sdk/giselle";
+import { fsStorageDriver } from "@giselle-sdk/giselle";
 import { NextGiselleEngine } from "@giselle-sdk/giselle/next-internal";
+import { traceGeneration } from "@giselle-sdk/langfuse";
 import { supabaseStorageDriver as experimental_supabaseStorageDriver } from "@giselle-sdk/supabase-driver";
 import { createStorage } from "unstorage";
 import fsDriver from "unstorage/drivers/fs";
@@ -124,13 +125,20 @@ if (process.env.FAL_API_KEY) {
 	llmProviders.push("fal");
 }
 
-let sampleAppWorkspaceId: WorkspaceId | undefined;
-if (process.env.SAMPLE_APP_WORKSPACE_ID) {
-	const parseResult = WorkspaceId.safeParse(
-		process.env.SAMPLE_APP_WORKSPACE_ID,
-	);
-	if (parseResult.success) {
-		sampleAppWorkspaceId = parseResult.data;
+let sampleAppWorkspaceIds: WorkspaceId[] | undefined;
+if (process.env.SAMPLE_APP_WORKSPACE_IDS) {
+	const workspaceIdStrings = process.env.SAMPLE_APP_WORKSPACE_IDS.split(",")
+		.map((id) => id.trim())
+		.filter((id) => id.length > 0);
+	const parsedWorkspaceIds: WorkspaceId[] = [];
+	for (const workspaceIdString of workspaceIdStrings) {
+		const parseResult = WorkspaceId.safeParse(workspaceIdString);
+		if (parseResult.success) {
+			parsedWorkspaceIds.push(parseResult.data);
+		}
+	}
+	if (parsedWorkspaceIds.length > 0) {
+		sampleAppWorkspaceIds = parsedWorkspaceIds;
 	}
 }
 
@@ -140,16 +148,13 @@ export const giselleEngine = NextGiselleEngine({
 	experimental_storage,
 	llmProviders,
 	integrationConfigs,
-	sampleAppWorkspaceId,
+	sampleAppWorkspaceIds,
 	callbacks: {
-		generationComplete: async (generation, options) => {
+		generationComplete: async (args) => {
 			try {
-				await emitTelemetry(generation, {
-					telemetry: options?.telemetry,
-					storage,
-				});
+				await traceGeneration(args);
 			} catch (error) {
-				console.error("Telemetry emission failed:", error);
+				console.error("Trace generation failed:", error);
 			}
 		},
 	},

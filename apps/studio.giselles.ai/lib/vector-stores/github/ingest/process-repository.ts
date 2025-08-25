@@ -1,3 +1,4 @@
+import type { EmbeddingProfileId } from "@giselle-sdk/data-type";
 import { fetchDefaultBranchHead } from "@giselle-sdk/github-tool";
 import { DocumentLoaderError, RagError } from "@giselle-sdk/rag";
 import { captureException } from "@sentry/nextjs";
@@ -19,6 +20,7 @@ import { createIngestTelemetrySettings } from "./telemetry";
 
 type ProcessorConfig = {
 	repositoryIndex: typeof githubRepositoryIndex.$inferSelect;
+	embeddingProfileId: EmbeddingProfileId;
 	telemetry?: TelemetrySettings;
 };
 
@@ -32,7 +34,7 @@ const CONTENT_PROCESSORS: Record<
 	GitHubRepositoryContentType,
 	ContentProcessor
 > = {
-	blob: async ({ repositoryIndex, telemetry }) => {
+	blob: async ({ repositoryIndex, embeddingProfileId, telemetry }) => {
 		const { owner, repo, installationId, teamDbId } = repositoryIndex;
 		const octokit = buildOctokit(installationId);
 		const commit = await fetchDefaultBranchHead(octokit, owner, repo);
@@ -41,6 +43,7 @@ const CONTENT_PROCESSORS: Record<
 			octokitClient: octokit,
 			source: { owner, repo, commitSha: commit.sha },
 			teamDbId,
+			embeddingProfileId,
 			telemetry,
 		});
 
@@ -49,17 +52,21 @@ const CONTENT_PROCESSORS: Record<
 		};
 	},
 
-	pull_request: async ({ repositoryIndex, telemetry }) => {
+	pull_request: async ({ repositoryIndex, embeddingProfileId, telemetry }) => {
 		const { owner, repo, installationId, teamDbId, dbId } = repositoryIndex;
 
 		await ingestGitHubPullRequests({
 			githubAuthConfig: buildGitHubAuthConfig(installationId),
 			source: { owner, repo },
 			teamDbId,
+			embeddingProfileId,
 			telemetry,
 		});
 
-		const lastPrNumber = await getLastIngestedPrNumber(dbId);
+		const lastPrNumber = await getLastIngestedPrNumber(
+			dbId,
+			embeddingProfileId,
+		);
 		return {
 			metadata: createPullRequestMetadata({
 				lastIngestedPrNumber: lastPrNumber ?? undefined,
@@ -90,6 +97,7 @@ export async function processRepository(
 		try {
 			await updateContentStatus(
 				repositoryIndex.dbId,
+				contentStatus.embeddingProfileId,
 				contentStatus.contentType,
 				{
 					status: "running",
@@ -97,10 +105,15 @@ export async function processRepository(
 			);
 
 			const processor = CONTENT_PROCESSORS[contentStatus.contentType];
-			const { metadata } = await processor({ repositoryIndex, telemetry });
+			const { metadata } = await processor({
+				repositoryIndex,
+				embeddingProfileId: contentStatus.embeddingProfileId,
+				telemetry,
+			});
 
 			await updateContentStatus(
 				repositoryIndex.dbId,
+				contentStatus.embeddingProfileId,
 				contentStatus.contentType,
 				{
 					...completedStatus(metadata),
@@ -108,7 +121,7 @@ export async function processRepository(
 			);
 		} catch (error) {
 			console.error(
-				`Failed to ingest ${contentStatus.contentType} for GitHub Repository: teamDbId=${teamDbId}, repository=${owner}/${repo}`,
+				`Failed to ingest ${contentStatus.contentType} for GitHub Repository: teamDbId=${teamDbId}, repository=${owner}/${repo}, embeddingProfileId=${contentStatus.embeddingProfileId}`,
 				error,
 			);
 
@@ -120,6 +133,7 @@ export async function processRepository(
 					repo,
 					teamDbId,
 					contentType: contentStatus.contentType,
+					embeddingProfileId: contentStatus.embeddingProfileId,
 					...errorInfo,
 					errorContext:
 						error instanceof DocumentLoaderError ? error.context : undefined,
@@ -128,6 +142,7 @@ export async function processRepository(
 
 			await updateContentStatus(
 				repositoryIndex.dbId,
+				contentStatus.embeddingProfileId,
 				contentStatus.contentType,
 				{
 					...failedStatus(errorInfo),
@@ -162,7 +177,10 @@ function failedStatus({
 	};
 }
 
-async function getLastIngestedPrNumber(repositoryIndexDbId: number) {
+async function getLastIngestedPrNumber(
+	repositoryIndexDbId: number,
+	embeddingProfileId: EmbeddingProfileId,
+) {
 	const results = await db
 		.select({
 			lastIngestedPrNumber: max(githubRepositoryPullRequestEmbeddings.prNumber),
@@ -173,6 +191,10 @@ async function getLastIngestedPrNumber(repositoryIndexDbId: number) {
 				eq(
 					githubRepositoryPullRequestEmbeddings.repositoryIndexDbId,
 					repositoryIndexDbId,
+				),
+				eq(
+					githubRepositoryPullRequestEmbeddings.embeddingProfileId,
+					embeddingProfileId,
 				),
 			),
 		);
@@ -212,6 +234,7 @@ function extractErrorInfo(error: unknown): {
 
 async function updateContentStatus(
 	repositoryIndexDbId: number,
+	embeddingProfileId: EmbeddingProfileId,
 	contentType: GitHubRepositoryContentType,
 	update: {
 		status: "running" | "completed" | "failed";
@@ -231,6 +254,10 @@ async function updateContentStatus(
 				eq(
 					githubRepositoryContentStatus.repositoryIndexDbId,
 					repositoryIndexDbId,
+				),
+				eq(
+					githubRepositoryContentStatus.embeddingProfileId,
+					embeddingProfileId,
 				),
 				eq(githubRepositoryContentStatus.contentType, contentType),
 			),

@@ -8,7 +8,9 @@ import {
 	type FileNode,
 	type Node,
 	NodeId,
+	type NodeLike,
 	type NodeUIState,
+	type ShortcutScope,
 	type UploadedFileData,
 	type Viewport,
 	type Workspace,
@@ -66,6 +68,7 @@ export function WorkflowDesignerProvider({
 	);
 	const [isLoading, setIsLoading] = useState(true);
 	const [llmProviders, setLLMProviders] = useState<LanguageModelProvider[]>([]);
+	const [copiedNode, setCopiedNode] = useState<NodeLike | null>(null);
 
 	const addNode = useAddNode(dispatch);
 	const addConnection = useAddConnection(dispatch);
@@ -99,6 +102,13 @@ export function WorkflowDesignerProvider({
 	const setUiViewport = useCallback(
 		(viewport: Viewport) => {
 			dispatch({ type: "SET_UI_VIEWPORT", viewport });
+		},
+		[dispatch],
+	);
+
+	const setCurrentShortcutScope = useCallback(
+		(scope: ShortcutScope) => {
+			dispatch({ type: "SET_CURRENT_SHORTCUT_SCOPE", scope });
 		},
 		[dispatch],
 	);
@@ -232,6 +242,9 @@ export function WorkflowDesignerProvider({
 				setUiViewport,
 				updateName,
 				isSupportedConnection: isSupportedConnectionCb,
+				setCurrentShortcutScope,
+				copiedNode,
+				setCopiedNode,
 				...propertiesPanelHelper,
 			}}
 		>

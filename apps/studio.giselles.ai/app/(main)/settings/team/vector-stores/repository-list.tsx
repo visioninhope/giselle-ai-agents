@@ -3,6 +3,7 @@ import type { GitHubRepositoryContentType } from "@/drizzle";
 import type { RepositoryWithStatuses } from "@/lib/vector-stores/github";
 import type { GitHubRepositoryIndexId } from "@/packages/types";
 import { RepositoryItem } from "./repository-item";
+import { RepositoryItem as RepositoryItemV2 } from "./repository-item-v2";
 
 type RepositoryListProps = {
 	repositories: RepositoryWithStatuses[];
@@ -12,20 +13,23 @@ type RepositoryListProps = {
 	triggerManualIngestAction: (
 		indexId: GitHubRepositoryIndexId,
 	) => Promise<{ success: boolean; error?: string }>;
-	updateRepositoryContentTypesAction: (
-		repositoryIndexId: string,
+	updateRepositoryIndexAction: (
+		repositoryIndexId: GitHubRepositoryIndexId,
 		contentTypes: {
 			contentType: GitHubRepositoryContentType;
 			enabled: boolean;
 		}[],
+		embeddingProfileIds?: number[],
 	) => Promise<{ success: boolean; error?: string }>;
+	multiEmbedding?: boolean;
 };
 
 export function RepositoryList({
 	repositories,
 	deleteRepositoryIndexAction,
 	triggerManualIngestAction,
-	updateRepositoryContentTypesAction,
+	updateRepositoryIndexAction,
+	multiEmbedding = false,
 }: RepositoryListProps) {
 	return (
 		<div className="flex flex-col gap-y-[16px]">
@@ -44,17 +48,21 @@ export function RepositoryList({
 
 				{repositories.length > 0 ? (
 					<div className="space-y-4">
-						{repositories.map((repo) => (
-							<RepositoryItem
-								key={repo.repositoryIndex.id}
-								repositoryData={repo}
-								deleteRepositoryIndexAction={deleteRepositoryIndexAction}
-								triggerManualIngestAction={triggerManualIngestAction}
-								updateRepositoryContentTypesAction={
-									updateRepositoryContentTypesAction
-								}
-							/>
-						))}
+						{repositories.map((repo) => {
+							const Component = multiEmbedding
+								? RepositoryItemV2
+								: RepositoryItem;
+							return (
+								<Component
+									key={repo.repositoryIndex.id}
+									repositoryData={repo}
+									deleteRepositoryIndexAction={deleteRepositoryIndexAction}
+									triggerManualIngestAction={triggerManualIngestAction}
+									updateRepositoryIndexAction={updateRepositoryIndexAction}
+									multiEmbedding={multiEmbedding}
+								/>
+							);
+						})}
 					</div>
 				) : (
 					<EmptyRepositoryCard />

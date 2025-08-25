@@ -17,7 +17,6 @@ import { AISDKError, stepCountIs, streamText } from "ai";
 import type {
 	FailedGeneration,
 	GenerationOutput,
-	GenerationUsage,
 	QueuedGeneration,
 } from "../../concepts/generation";
 import { decryptSecret } from "../secrets";
@@ -175,10 +174,23 @@ export function generateText(args: {
 				};
 			}
 
+			if (
+				operationNode.content.llm.provider === "anthropic" &&
+				operationNode.content.tools?.anthropicWebSearch
+			) {
+				preparedToolSet = {
+					...preparedToolSet,
+					toolSet: {
+						...preparedToolSet.toolSet,
+						web_search: anthropic.tools.webSearch_20250305(
+							operationNode.content.tools.anthropicWebSearch,
+						),
+					},
+				};
+			}
+
 			const providerOptions = getProviderOptions(operationNode.content.llm);
 
-			const generationOutputs: GenerationOutput[] = [];
-			let usage: GenerationUsage | undefined;
 			const streamTextResult = streamText({
 				model: generationModel(operationNode.content.llm),
 				providerOptions,
@@ -206,43 +218,7 @@ export function generateText(args: {
 					);
 				},
 				stopWhen: stepCountIs(Object.keys(preparedToolSet.toolSet).length + 1),
-				async onFinish(event) {
-					const generatedTextOutput =
-						generationContext.operationNode.outputs.find(
-							(output: Output) => output.accessor === "generated-text",
-						);
-					if (generatedTextOutput !== undefined) {
-						generationOutputs.push({
-							type: "generated-text",
-							content: event.text,
-							outputId: generatedTextOutput.id,
-						});
-					}
-
-					const reasoningOutput = generationContext.operationNode.outputs.find(
-						(output: Output) => output.accessor === "reasoning",
-					);
-					if (
-						reasoningOutput !== undefined &&
-						event.reasoningText !== undefined
-					) {
-						generationOutputs.push({
-							type: "reasoning",
-							content: event.reasoningText,
-							outputId: reasoningOutput.id,
-						});
-					}
-					const sourceOutput = generationContext.operationNode.outputs.find(
-						(output: Output) => output.accessor === "source",
-					);
-					if (sourceOutput !== undefined && event.sources.length > 0) {
-						generationOutputs.push({
-							type: "source",
-							outputId: sourceOutput.id,
-							sources: event.sources,
-						});
-					}
-					usage = event.usage;
+				async onFinish() {
 					try {
 						await Promise.all(
 							preparedToolSet.cleanupFunctions.map((cleanupFunction) =>
@@ -256,11 +232,49 @@ export function generateText(args: {
 			});
 			return streamTextResult.toUIMessageStream({
 				sendReasoning: true,
-				onFinish: async ({ messages }) => {
+				onFinish: async ({ messages: generateMessages }) => {
+					const generationOutputs: GenerationOutput[] = [];
+					const generatedTextOutput =
+						generationContext.operationNode.outputs.find(
+							(output: Output) => output.accessor === "generated-text",
+						);
+					const text = await streamTextResult.text;
+					if (generatedTextOutput !== undefined) {
+						generationOutputs.push({
+							type: "generated-text",
+							content: text,
+							outputId: generatedTextOutput.id,
+						});
+					}
+
+					const reasoningText = await streamTextResult.reasoningText;
+					const reasoningOutput = generationContext.operationNode.outputs.find(
+						(output: Output) => output.accessor === "reasoning",
+					);
+					if (reasoningOutput !== undefined && reasoningText !== undefined) {
+						generationOutputs.push({
+							type: "reasoning",
+							content: reasoningText,
+							outputId: reasoningOutput.id,
+						});
+					}
+
+					const sources = await streamTextResult.sources;
+					const sourceOutput = generationContext.operationNode.outputs.find(
+						(output: Output) => output.accessor === "source",
+					);
+					if (sourceOutput !== undefined && sources.length > 0) {
+						generationOutputs.push({
+							type: "source",
+							outputId: sourceOutput.id,
+							sources,
+						});
+					}
 					await completeGeneration({
+						inputMessages: messages,
 						outputs: generationOutputs,
-						usage,
-						messages,
+						usage: await streamTextResult.usage,
+						generateMessages: generateMessages,
 					});
 				},
 			});

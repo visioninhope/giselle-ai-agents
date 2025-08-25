@@ -175,6 +175,7 @@ export async function getTeamMembers() {
 				userId: users.id,
 				email: users.email,
 				displayName: users.displayName,
+				avatarUrl: users.avatarUrl,
 				role: teamMemberships.role,
 			})
 			.from(users)

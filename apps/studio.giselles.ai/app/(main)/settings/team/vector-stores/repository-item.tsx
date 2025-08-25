@@ -45,22 +45,30 @@ type RepositoryItemProps = {
 	triggerManualIngestAction: (
 		indexId: GitHubRepositoryIndexId,
 	) => Promise<{ success: boolean; error?: string }>;
-	updateRepositoryContentTypesAction: (
-		repositoryIndexId: string,
+	updateRepositoryIndexAction: (
+		repositoryIndexId: GitHubRepositoryIndexId,
 		contentTypes: {
 			contentType: GitHubRepositoryContentType;
 			enabled: boolean;
 		}[],
+		embeddingProfileIds?: number[],
 	) => Promise<{ success: boolean; error?: string }>;
+	multiEmbedding?: boolean;
 };
 
 export function RepositoryItem({
 	repositoryData,
 	deleteRepositoryIndexAction,
 	triggerManualIngestAction,
-	updateRepositoryContentTypesAction,
+	updateRepositoryIndexAction,
+	multiEmbedding = false,
 }: RepositoryItemProps) {
 	const { repositoryIndex, contentStatuses } = repositoryData;
+
+	// For backward compatibility: derive embedding profile IDs from content statuses
+	const embeddingProfileIds = [
+		...new Set(contentStatuses.map((cs) => cs.embeddingProfileId)),
+	];
 	const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 	const [showConfigureDialog, setShowConfigureDialog] = useState(false);
 	const [showDiagnosticModal, setShowDiagnosticModal] = useState(false);
@@ -235,7 +243,9 @@ export function RepositoryItem({
 				open={showConfigureDialog}
 				setOpen={setShowConfigureDialog}
 				repositoryData={repositoryData}
-				updateRepositoryContentTypesAction={updateRepositoryContentTypesAction}
+				updateRepositoryIndexAction={updateRepositoryIndexAction}
+				enabledProfiles={embeddingProfileIds}
+				multiEmbedding={multiEmbedding}
 			/>
 
 			<DiagnosticModal

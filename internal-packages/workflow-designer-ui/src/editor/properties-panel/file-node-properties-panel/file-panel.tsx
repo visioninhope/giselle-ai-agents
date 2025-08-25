@@ -171,27 +171,6 @@ export function FilePanel({ node, config }: FilePanelProps) {
 		[addFilesInternal, maxFileSize, assertFiles, toasts],
 	);
 
-	const onDrop = useCallback(
-		(e: React.DragEvent<HTMLButtonElement>) => {
-			e.preventDefault();
-			setIsDragging(false);
-			setIsValidFile(true);
-			addFiles(e.dataTransfer.files);
-		},
-		[addFiles],
-	);
-
-	const onFileChange = useCallback(
-		(e: React.ChangeEvent<HTMLInputElement>) => {
-			if (!e.target.files) {
-				return;
-			}
-			addFiles(e.target.files);
-			e.target.value = "";
-		},
-		[addFiles],
-	);
-
 	const handlePaste = useCallback(
 		(e: ClipboardEvent) => {
 			const items = e.clipboardData?.items;
@@ -218,12 +197,12 @@ export function FilePanel({ node, config }: FilePanelProps) {
 			}
 
 			if (files.length > 0) {
-				// Create a DataTransfer object to create a FileList
+				// Create a FileList from File[] to use validation path
 				const dataTransfer = new DataTransfer();
 				for (const file of files) {
 					dataTransfer.items.add(file);
 				}
-				addFiles(dataTransfer.files);
+				addFiles(dataTransfer.files); // Use validation path
 			}
 		},
 		[addFiles],
@@ -233,14 +212,33 @@ export function FilePanel({ node, config }: FilePanelProps) {
 		// Only add paste listener for image file nodes
 		if (node.content.category === "image" && panelRef.current) {
 			const panelEl = panelRef.current;
-			// Focus the panel when it's mounted to enable paste without clicking
-			panelEl.focus();
 			panelEl.addEventListener("paste", handlePaste);
 			return () => {
 				panelEl.removeEventListener("paste", handlePaste);
 			};
 		}
 	}, [handlePaste, node.content.category]);
+
+	const onDrop = useCallback(
+		(e: React.DragEvent<HTMLButtonElement>) => {
+			e.preventDefault();
+			setIsDragging(false);
+			setIsValidFile(true);
+			addFiles(e.dataTransfer.files);
+		},
+		[addFiles],
+	);
+
+	const onFileChange = useCallback(
+		(e: React.ChangeEvent<HTMLInputElement>) => {
+			if (!e.target.files) {
+				return;
+			}
+			addFiles(e.target.files);
+			e.target.value = "";
+		},
+		[addFiles],
+	);
 
 	return (
 		<div
@@ -307,7 +305,8 @@ export function FilePanel({ node, config }: FilePanelProps) {
 										<p>Drop {config.label} files here to upload.</p>
 										{node.content.category === "image" && (
 											<p className="text-[12px] text-black-400">
-												You can also paste images from clipboard (Ctrl/Cmd + V)
+												Click here and paste images from clipboard (Ctrl/Cmd +
+												V)
 											</p>
 										)}
 										<div className="flex gap-[8px] justify-center items-center">

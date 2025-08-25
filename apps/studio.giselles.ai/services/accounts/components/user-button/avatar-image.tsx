@@ -16,23 +16,36 @@ export function AvatarImage({
 	className?: string;
 	alt?: string;
 }) {
-	return avatarUrl ? (
-		<Image
-			src={avatarUrl}
-			width={width}
-			height={height}
-			alt={alt}
-			className={cn("rounded-full object-cover w-full h-full", className)}
-			style={{ objectPosition: "center" }}
-		/>
-	) : (
-		<Avatar
-			name={alt}
-			variant="marble"
-			width={width}
-			height={height}
-			colors={["#413e4a", "#73626e", "#b38184", "#f0b49e", "#f7e4be"]}
-			className={cn("w-full h-full", className)}
-		/>
+	// Normalize to a square to guarantee a perfect circle regardless of caller input
+	const size = Math.max(width, height);
+	const altText = alt ?? "";
+
+	return (
+		<div
+			className={cn(
+				"relative rounded-full overflow-hidden shrink-0",
+				className,
+			)}
+			style={{ width: size, height: size }}
+		>
+			{avatarUrl ? (
+				<Image
+					src={avatarUrl}
+					alt={altText}
+					fill
+					sizes={`${size}px`}
+					className={"object-cover"}
+					style={{ objectPosition: "center" }}
+				/>
+			) : (
+				<Avatar
+					name={altText}
+					variant="marble"
+					width={size}
+					height={size}
+					colors={["#413e4a", "#73626e", "#b38184", "#f0b49e", "#f7e4be"]}
+				/>
+			)}
+		</div>
 	);
 }

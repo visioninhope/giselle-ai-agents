@@ -1,4 +1,5 @@
 import { z } from "zod/v4";
+import { EmbeddingProfileIdSchema } from "../../embedding";
 
 const VectorStoreContentBase = z.object({
 	type: z.literal("vectorStore"),
@@ -12,6 +13,7 @@ export const GitHubVectorStoreSource = z.object({
 			owner: z.string(),
 			repo: z.string(),
 			contentType: z.enum(["blob", "pull_request"]),
+			embeddingProfileId: EmbeddingProfileIdSchema.optional(),
 		}),
 		z.object({
 			status: z.literal("unconfigured"),

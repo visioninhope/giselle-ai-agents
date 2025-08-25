@@ -119,6 +119,11 @@
 	--font-accent: var(--font-dm-sans);
 	--font-sans: var(--font-dm-sans);
 	--font-mono: var(--font-dm-mono);
+
+	--spacing-navigation-rail-expanded: 260px;
+	--spacing-navigation-rail-collapsed: 52px;
+	--spacing-navigation-rail-header: 52px;
+	--spacing-navigation-rail-footer: 60px;
 }
 
 @layer components {
@@ -127,7 +132,7 @@
 		/* Base variables */
 		--base-font-size: 14;
 		--rem-base: calc(var(--base-font-size) / 16);
-		--line-height-ratio: calc(20 / var(--base-font-size));
+		--line-height-ratio: 1.6;
 
 		/* Font sizes */
 		--text-base: calc(var(--rem-base) * 1rem);

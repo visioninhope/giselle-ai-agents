@@ -2,8 +2,8 @@
 
 
 ## Summary
-* 816 MIT
-* 182 Apache 2.0
+* 818 MIT
+* 184 Apache 2.0
 * 47 ISC
 * 27 New BSD
 * 13 Simplified BSD
@@ -4625,7 +4625,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@types/react"></a>
-### @types/react v19.1.0
+### @types/react v19.1.10
 #### 
 
 ##### Paths
@@ -4636,7 +4636,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@types/react-dom"></a>
-### @types/react-dom v19.1.2
+### @types/react-dom v19.1.7
 #### 
 
 ##### Paths
@@ -4769,6 +4769,28 @@ LGPL-3.0-or-later permitted
 
 <a name="@vercel/edge-config-fs"></a>
 ### @vercel/edge-config-fs v0.1.0
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
+
+
+
+<a name="@vercel/functions"></a>
+### @vercel/functions v2.2.11
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
+
+
+
+<a name="@vercel/oidc"></a>
+### @vercel/oidc v2.0.0
 #### 
 
 ##### Paths
@@ -5087,7 +5109,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@xyflow/react"></a>
-### @xyflow/react v12.4.1
+### @xyflow/react v12.8.3
 #### 
 
 ##### Paths
@@ -5098,7 +5120,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@xyflow/system"></a>
-### @xyflow/system v0.0.49
+### @xyflow/system v0.0.67
 #### 
 
 ##### Paths
@@ -8182,7 +8204,7 @@ BlueOak-1.0.0 permitted
 
 
 <a name="lucide-react"></a>
-### lucide-react v0.417.0
+### lucide-react v0.473.0
 #### 
 
 ##### Paths
@@ -8841,6 +8863,17 @@ BlueOak-1.0.0 permitted
 
 
 
+<a name="mitt"></a>
+### mitt v3.0.1
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
 <a name="mkdirp"></a>
 ### mkdirp v3.0.1
 #### 
@@ -9074,6 +9107,17 @@ MIT-0 permitted
 
 <a name="normalize-path"></a>
 ### normalize-path v3.0.0
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
+<a name="nuqs"></a>
+### nuqs v2.4.3
 #### 
 
 ##### Paths
@@ -10118,7 +10162,7 @@ BlueOak-1.0.0 permitted
 
 
 <a name="react"></a>
-### react v19.1.0
+### react v19.1.1
 #### 
 
 ##### Paths
@@ -10129,7 +10173,7 @@ BlueOak-1.0.0 permitted
 
 
 <a name="react-dom"></a>
-### react-dom v19.1.0
+### react-dom v19.1.1
 #### 
 
 ##### Paths

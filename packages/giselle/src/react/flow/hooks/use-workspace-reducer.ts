@@ -8,6 +8,7 @@ import {
 	NodeId,
 	type NodeLike,
 	type NodeUIState,
+	type ShortcutScope,
 	type Viewport,
 	type Workspace,
 } from "@giselle-sdk/data-type";
@@ -26,6 +27,10 @@ export type WorkspaceAction =
 			save?: boolean;
 	  }
 	| { type: "SET_UI_VIEWPORT"; viewport: Viewport }
+	| {
+			type: "SET_CURRENT_SHORTCUT_SCOPE";
+			scope: ShortcutScope;
+	  }
 	| { type: "UPDATE_WORKSPACE_NAME"; name: string | undefined }
 	| {
 			type: "UPDATE_NODE_CONTENT";
@@ -95,6 +100,12 @@ function workspaceReducer(
 		}
 		case "SET_UI_VIEWPORT": {
 			return { ...state, ui: { ...state.ui, viewport: action.viewport } };
+		}
+		case "SET_CURRENT_SHORTCUT_SCOPE": {
+			return {
+				...state,
+				ui: { ...state.ui, currentShortcutScope: action.scope },
+			};
 		}
 		case "UPDATE_WORKSPACE_NAME": {
 			return { ...state, name: action.name };

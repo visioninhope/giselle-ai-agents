@@ -16,19 +16,19 @@ catalog:
   unstorage: 1.14.4
   ai: 5.0.0
   "@types/node": 22.14.0
-  "@types/react": 19.1.0
-  "@types/react-dom": 19.1.2
+  "@types/react": 19.1.10
+  "@types/react-dom": 19.1.7
   postcss: 8.5.5
   tailwindcss: 4.1.10
   "@tailwindcss/postcss": 4.1.10
-  react: 19.1.0
-  react-dom: 19.1.0
+  react: 19.1.1
+  react-dom: 19.1.1
   node-loader: 2.1.0
   vitest: 3.2.4
   "@radix-ui/react-tabs": 1.1.2
   lucide-react: 0.473.0
   clsx: 2.1.1
-  "@xyflow/react": 12.4.1
+  "@xyflow/react": 12.8.3
   openai: 5.11.0
   "@ai-sdk/openai": 2.0.0
   "@ai-sdk/anthropic": 2.0.0
@@ -73,6 +73,7 @@ catalog:
   langfuse: 3.37.0
   langfuse-core: 3.37.0
   "@vercel/edge-config": 1.4.0
+  "@vercel/functions": 2.2.11
   "@supabase/supabase-js": 2.50.5
   "@supabase/auth-js": 2.70.0
   "@supabase/ssr": 0.6.1
@@ -89,3 +90,4 @@ catalog:
   "@types/tar": 6.1.13
   "@aws-sdk/client-s3": 3.842.0
   "@ai-sdk/provider": 2.0.0
+  nuqs: 2.4.3

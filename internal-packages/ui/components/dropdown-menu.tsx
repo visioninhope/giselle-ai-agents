@@ -51,6 +51,7 @@ interface DropdownMenuProps<
 		: (item: T[number], isHovered: boolean) => void;
 	widthClassName?: string;
 	sideOffset?: DropdownMenuPrimitive.DropdownMenuContentProps["sideOffset"];
+	alignOffset?: DropdownMenuPrimitive.DropdownMenuContentProps["alignOffset"];
 	align?: DropdownMenuPrimitive.DropdownMenuContentProps["align"];
 	open?: DropdownMenuPrimitive.DropdownMenuProps["open"];
 	onOpenChange?: DropdownMenuPrimitive.DropdownMenuProps["onOpenChange"];

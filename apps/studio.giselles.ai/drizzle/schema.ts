@@ -1,7 +1,12 @@
-import type { FlowTriggerId, WorkspaceId } from "@giselle-sdk/data-type";
+import type {
+	EmbeddingDimensions,
+	EmbeddingProfileId,
+	FlowTriggerId,
+	WorkspaceId,
+} from "@giselle-sdk/data-type";
 import type { ActId } from "@giselle-sdk/giselle";
 import type { GitHubRepositoryIndexId } from "@giselles-ai/types";
-import { relations } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import {
 	boolean,
 	foreignKey,
@@ -10,17 +15,18 @@ import {
 	jsonb,
 	numeric,
 	pgTable,
+	primaryKey,
 	serial,
 	text,
 	timestamp,
 	unique,
 	uniqueIndex,
-	vector,
 } from "drizzle-orm/pg-core";
 import type { Stripe } from "stripe";
 import type { ContentStatusMetadata } from "@/lib/vector-stores/github/types";
 import type { AgentId } from "@/services/agents/types";
 import type { TeamId } from "@/services/teams/types";
+import { vectorWithoutDimensions } from "./custom-types";
 
 export const subscriptions = pgTable("subscriptions", {
 	// Subscription ID from Stripe, e.g. sub_1234.
@@ -220,7 +226,6 @@ export const userSeatUsageReports = pgTable(
 		userDbIdList: integer("user_db_id_list").array().notNull(),
 		stripeMeterEventId: text("stripe_meter_event_id").notNull(),
 		value: integer("value").notNull(),
-		isDelta: boolean("is_delta").notNull(),
 		createdAt: timestamp("created_at").defaultNow().notNull(),
 	},
 	(table) => [
@@ -301,12 +306,37 @@ export const githubRepositoryIndex = pgTable(
 	],
 );
 
+export const githubRepositoryEmbeddingProfiles = pgTable(
+	"github_repository_embedding_profiles",
+	{
+		repositoryIndexDbId: integer("repository_index_db_id").notNull(),
+		embeddingProfileId: integer("embedding_profile_id")
+			.$type<EmbeddingProfileId>()
+			.notNull(),
+		createdAt: timestamp("created_at").defaultNow().notNull(),
+	},
+	(table) => [
+		primaryKey({
+			columns: [table.repositoryIndexDbId, table.embeddingProfileId],
+			name: "gh_repo_emb_profiles_pk",
+		}),
+		foreignKey({
+			columns: [table.repositoryIndexDbId],
+			foreignColumns: [githubRepositoryIndex.dbId],
+			name: "gh_repo_emb_profiles_repo_idx_fk",
+		}).onDelete("cascade"),
+	],
+);
+
 export type GitHubRepositoryContentType = "blob" | "pull_request";
 export const githubRepositoryContentStatus = pgTable(
 	"github_repository_content_status",
 	{
 		dbId: serial("db_id").primaryKey(),
 		repositoryIndexDbId: integer("repository_index_db_id").notNull(),
+		embeddingProfileId: integer("embedding_profile_id")
+			.$type<EmbeddingProfileId>()
+			.notNull(),
 		contentType: text("content_type")
 			.$type<GitHubRepositoryContentType>()
 			.notNull(),
@@ -327,6 +357,7 @@ export const githubRepositoryContentStatus = pgTable(
 	(table) => [
 		unique("gh_content_status_unique").on(
 			table.repositoryIndexDbId,
+			table.embeddingProfileId,
 			table.contentType,
 		),
 		foreignKey({
@@ -350,16 +381,33 @@ export const githubRepositoryEmbeddings = pgTable(
 		repositoryIndexDbId: integer("repository_index_db_id")
 			.notNull()
 			.references(() => githubRepositoryIndex.dbId, { onDelete: "cascade" }),
+		embeddingProfileId: integer("embedding_profile_id")
+			.$type<EmbeddingProfileId>()
+			.notNull(),
+		embeddingDimensions: integer("embedding_dimensions")
+			.$type<EmbeddingDimensions>()
+			.notNull(),
 		fileSha: text("file_sha").notNull(),
 		path: text("path").notNull(),
-		embedding: vector("embedding", { dimensions: 1536 }).notNull(),
+		embedding: vectorWithoutDimensions("embedding").notNull(),
 		chunkContent: text("chunk_content").notNull(),
 		chunkIndex: integer("chunk_index").notNull(),
 		createdAt: timestamp("created_at").defaultNow().notNull(),
 	},
 	(table) => [
-		unique().on(table.repositoryIndexDbId, table.path, table.chunkIndex),
-		index().using("hnsw", table.embedding.op("vector_cosine_ops")),
+		unique("gh_repo_emb_unique").on(
+			table.repositoryIndexDbId,
+			table.embeddingProfileId,
+			table.path,
+			table.chunkIndex,
+		),
+		// Partial HNSW indexes for different dimensions with casting
+		index("github_repository_embeddings_embedding_1536_idx")
+			.using("hnsw", sql`${table.embedding}::vector(1536) vector_cosine_ops`)
+			.where(sql`${table.embeddingDimensions} = 1536`),
+		index("github_repository_embeddings_embedding_3072_idx")
+			.using("hnsw", sql`${table.embedding}::halfvec(3072) halfvec_cosine_ops`)
+			.where(sql`${table.embeddingDimensions} = 3072`),
 	],
 );
 
@@ -379,6 +427,12 @@ export const githubRepositoryPullRequestEmbeddings = pgTable(
 	{
 		dbId: serial("db_id").primaryKey(),
 		repositoryIndexDbId: integer("repository_index_db_id").notNull(),
+		embeddingProfileId: integer("embedding_profile_id")
+			.$type<EmbeddingProfileId>()
+			.notNull(),
+		embeddingDimensions: integer("embedding_dimensions")
+			.$type<EmbeddingDimensions>()
+			.notNull(),
 		prNumber: integer("pr_number").notNull(),
 		mergedAt: timestamp("merged_at").notNull(),
 		contentType: text("content_type")
@@ -388,7 +442,7 @@ export const githubRepositoryPullRequestEmbeddings = pgTable(
 		documentKey: text("document_key")
 			.$type<GitHubPullRequestDocumentKey>()
 			.notNull(),
-		embedding: vector("embedding", { dimensions: 1536 }).notNull(),
+		embedding: vectorWithoutDimensions("embedding").notNull(),
 		chunkContent: text("chunk_content").notNull(),
 		chunkIndex: integer("chunk_index").notNull(),
 		createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -396,12 +450,19 @@ export const githubRepositoryPullRequestEmbeddings = pgTable(
 	(table) => [
 		unique("gh_pr_emb_unique").on(
 			table.repositoryIndexDbId,
+			table.embeddingProfileId,
 			table.prNumber,
 			table.contentType,
 			table.contentId,
 			table.chunkIndex,
 		),
-		index().using("hnsw", table.embedding.op("vector_cosine_ops")),
+		// Partial HNSW indexes for different dimensions with casting
+		index("gh_pr_embeddings_embedding_1536_idx")
+			.using("hnsw", sql`${table.embedding}::vector(1536) vector_cosine_ops`)
+			.where(sql`${table.embeddingDimensions} = 1536`),
+		index("gh_pr_embeddings_embedding_3072_idx")
+			.using("hnsw", sql`${table.embedding}::halfvec(3072) halfvec_cosine_ops`)
+			.where(sql`${table.embeddingDimensions} = 3072`),
 		foreignKey({
 			columns: [table.repositoryIndexDbId],
 			foreignColumns: [githubRepositoryIndex.dbId],
@@ -465,3 +526,10 @@ export const acts = pgTable(
 		index().on(table.sdkActId),
 	],
 );
+
+export const actRelations = relations(acts, ({ one }) => ({
+	team: one(teams, {
+		fields: [acts.teamDbId],
+		references: [teams.dbId],
+	}),
+}));

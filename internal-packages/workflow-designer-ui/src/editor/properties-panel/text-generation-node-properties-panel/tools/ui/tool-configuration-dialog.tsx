@@ -4,6 +4,7 @@ import {
 	DialogContent,
 	DialogDescription,
 	DialogFooter,
+	type DialogSize,
 	DialogTitle,
 	DialogTrigger,
 } from "@giselle-internal/ui/dialog";
@@ -17,6 +18,7 @@ export interface ToolConfigurationDialogProps
 	submitting: boolean;
 	trigger: React.ReactNode;
 	disabled?: boolean;
+	size?: DialogSize;
 	submitText?: string;
 }
 
@@ -31,12 +33,13 @@ export function ToolConfigurationDialog({
 	description,
 	trigger,
 	disabled,
-	submitText = "Save & Connect",
+	size,
+	submitText = "Save",
 }: PropsWithChildren<ToolConfigurationDialogProps>) {
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange} defaultOpen={defaultOpen}>
 			<DialogTrigger asChild>{trigger}</DialogTrigger>
-			<DialogContent>
+			<DialogContent size={size}>
 				<div className="mb-4">
 					<DialogTitle className="text-[20px] font-medium text-text tracking-tight font-sans">
 						{title}
