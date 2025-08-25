@@ -159,7 +159,7 @@ export function OpenAIModelPanel({
 							}}
 						/>
 						<Slider
-							label="Frequency Panalty"
+							label="Frequency Penalty"
 							value={openaiLanguageModel.configurations.frequencyPenalty}
 							max={2.0}
 							min={0.0}
