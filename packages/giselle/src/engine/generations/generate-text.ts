@@ -1,6 +1,6 @@
 import { type AnthropicProviderOptions, anthropic } from "@ai-sdk/anthropic";
 import { google } from "@ai-sdk/google";
-import { openai } from "@ai-sdk/openai";
+import { type OpenAIResponsesProviderOptions, openai } from "@ai-sdk/openai";
 import { perplexity } from "@ai-sdk/perplexity";
 import {
 	isTextGenerationNode,
@@ -308,6 +308,7 @@ function getProviderOptions(languageModelData: TextGenerationLanguageModelData):
 	| {
 			anthropic?: AnthropicProviderOptions;
 			perplexity?: PerplexityProviderOptions;
+			openai?: OpenAIResponsesProviderOptions;
 	  }
 	| undefined {
 	const languageModel = languageModels.find(
@@ -341,6 +342,18 @@ function getProviderOptions(languageModelData: TextGenerationLanguageModelData):
 				search_domain_filter: searchDomainFilter,
 			},
 		};
+	}
+	if (languageModel && languageModelData.provider === "openai") {
+		const openaiOptions: OpenAIResponsesProviderOptions = {};
+		if (hasCapability(languageModel, Capability.Reasoning)) {
+			openaiOptions.textVerbosity =
+				languageModelData.configurations.textVerbosity;
+			openaiOptions.reasoningSummary = "auto";
+			openaiOptions.reasoningEffort =
+				languageModelData.configurations.reasoningEffort;
+		}
+
+		return { openai: openaiOptions };
 	}
 	return undefined;
 }
