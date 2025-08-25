@@ -36,12 +36,7 @@ function categorizeGitHubGraphqlError(
 	context: { owner: string; repo: string; [key: string]: unknown },
 ): DocumentLoaderError {
 	if (error.networkError) {
-		return DocumentLoaderError.fetchError(
-			"github",
-			operation,
-			error,
-			context,
-		);
+		return DocumentLoaderError.fetchError("github", operation, error, context);
 	}
 
 	// preserve the original error types for future reference
@@ -73,15 +68,10 @@ function categorizeGitHubGraphqlError(
 		}
 	}
 
-	return DocumentLoaderError.fetchError(
-		"github",
-		operation,
-		error,
-		{
-			...context,
-			errorTypes,
-		},
-	);
+	return DocumentLoaderError.fetchError("github", operation, error, {
+		...context,
+		errorTypes,
+	});
 }
 
 export function createGitHubPullRequestsLoader(
