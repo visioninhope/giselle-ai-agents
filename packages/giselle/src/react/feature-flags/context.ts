@@ -7,6 +7,7 @@ export interface FeatureFlagContextValue {
 	experimental_storage: boolean;
 	stage: boolean;
 	multiEmbedding: boolean;
+	aiGateway: boolean;
 }
 export const FeatureFlagContext = createContext<
 	FeatureFlagContextValue | undefined
