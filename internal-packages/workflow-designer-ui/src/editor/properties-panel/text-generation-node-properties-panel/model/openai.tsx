@@ -83,7 +83,7 @@ export function OpenAIModelPanel({
 									}),
 								);
 							}}
-							options={["minimum", "low", "medium", "high"].map((v) => ({
+							options={["minimal", "low", "medium", "high"].map((v) => ({
 								value: v,
 								label: v,
 							}))}
