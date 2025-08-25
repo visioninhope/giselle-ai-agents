@@ -89,7 +89,7 @@ export function useKeyboardShortcuts(
 		["Meta+Enter", "Control+Enter"],
 		() => onGenerate?.(),
 		isPropertiesPanelFocused && !!onGenerate,
-		{ actInsideInputWithModifier: true }, // Allow inside input fields for properties panel
+		{ actInsideInputWithModifier: true },
 	);
 
 	// Copy/Paste/Duplicate shortcuts
