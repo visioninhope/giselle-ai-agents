@@ -35,6 +35,7 @@ export function generateText(args: {
 	context: GiselleEngineContext;
 	generation: QueuedGeneration;
 	useExperimentalStorage: boolean;
+	useAiGateway: boolean;
 }) {
 	return useGenerationExecutor({
 		context: args.context,
@@ -192,7 +193,7 @@ export function generateText(args: {
 			const providerOptions = getProviderOptions(operationNode.content.llm);
 
 			const streamTextResult = streamText({
-				model: generationModel(operationNode.content.llm),
+				model: generationModel(operationNode.content.llm, args.useAiGateway),
 				providerOptions,
 				messages,
 				tools: preparedToolSet.toolSet,
@@ -282,8 +283,29 @@ export function generateText(args: {
 	});
 }
 
-function generationModel(languageModel: TextGenerationLanguageModelData) {
+function generationModel(
+	languageModel: TextGenerationLanguageModelData,
+	useAiGateway?: boolean,
+) {
 	const llmProvider = languageModel.provider;
+	if (useAiGateway) {
+		// Use AI Gateway model specifier: "<provider>/<modelId>"
+		// e.g. "openai/gpt-4o" or "anthropic/claude-3-5-sonnet-20240620"
+		switch (llmProvider) {
+			case "anthropic":
+			case "openai":
+			case "google":
+			case "perplexity": {
+				return `${llmProvider}/${languageModel.id}`;
+			}
+			default: {
+				const _exhaustiveCheck: never = llmProvider;
+				throw new Error(`Unknown LLM provider: ${_exhaustiveCheck}`);
+			}
+		}
+	}
+
+	// Default: use direct provider SDKs
 	switch (llmProvider) {
 		case "anthropic": {
 			return anthropic(languageModel.id);

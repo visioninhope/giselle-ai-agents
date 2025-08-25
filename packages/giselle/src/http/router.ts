@@ -82,11 +82,13 @@ export const createJsonRouters = {
 				input: z.object({
 					generation: QueuedGeneration,
 					useExperimentalStorage: z.boolean(),
+					useAiGateway: z.boolean(),
 				}),
 				handler: async ({ input }) => {
 					const stream = await giselleEngine.generateText(
 						input.generation,
 						input.useExperimentalStorage,
+						input.useAiGateway,
 					);
 					return createUIMessageStreamResponse({ stream });
 				},
@@ -316,6 +318,7 @@ export const createJsonRouters = {
 			input: z.object({
 				actId: ActId.schema,
 				useExperimentalStorage: z.boolean(),
+				useAiGateway: z.boolean(),
 			}),
 			handler: async ({ input }) => {
 				await giselleEngine.startAct(input);

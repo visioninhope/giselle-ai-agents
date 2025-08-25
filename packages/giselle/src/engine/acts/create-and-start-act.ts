@@ -29,5 +29,6 @@ export async function createAndStartAct(
 		context: args.context,
 		actId: act.id,
 		callbacks: args.callbacks,
+		useAiGateway: args.useAiGateway,
 	});
 }
