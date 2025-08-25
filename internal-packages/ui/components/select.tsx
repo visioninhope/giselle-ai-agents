@@ -7,6 +7,7 @@ type SelectOption = {
 	value: string | number;
 	label: string;
 	icon?: React.ReactNode;
+	disabled?: boolean;
 };
 
 interface SelectProps<T extends SelectOption> {
@@ -70,10 +71,12 @@ export function Select<T extends SelectOption>({
 									value={
 										renderValue ? `${renderValue(option)}` : `${option.value}`
 									}
+									disabled={option.disabled}
 									className={clsx(
 										"text-text outline-none cursor-pointer hover:bg-ghost-element-hover",
 										"rounded-[4px] px-[8px] py-[6px] text-[14px]",
 										"flex items-center justify-between gap-[4px]",
+										"data-[disabled]:opacity-50 data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none",
 									)}
 								>
 									<SelectPrimitive.ItemText>

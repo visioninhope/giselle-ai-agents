@@ -1,5 +1,6 @@
 import { Select } from "@giselle-internal/ui/select";
 import { OpenAILanguageModelData, type ToolSet } from "@giselle-sdk/data-type";
+import { useUsageLimits } from "@giselle-sdk/giselle/react";
 import {
 	Capability,
 	hasCapability,
@@ -8,6 +9,7 @@ import {
 import { useMemo } from "react";
 import { Slider } from "../../../../ui/slider";
 import { Switch } from "../../../../ui/switch";
+import { languageModelAvailable } from "./utils";
 
 export function OpenAIModelPanel({
 	openaiLanguageModel,
@@ -22,6 +24,7 @@ export function OpenAIModelPanel({
 	onToolChange: (changedValue: ToolSet) => void;
 	onWebSearchChange: (enabled: boolean) => void;
 }) {
+	const limits = useUsageLimits();
 	const languageModel = useMemo(
 		() => openaiLanguageModels.find((lm) => lm.id === openaiLanguageModel.id),
 		[openaiLanguageModel.id],
@@ -52,6 +55,7 @@ export function OpenAIModelPanel({
 					options={openaiLanguageModels.map((model) => ({
 						value: model.id,
 						label: model.id,
+						disabled: !languageModelAvailable(model, limits),
 					}))}
 				/>
 			</fieldset>
