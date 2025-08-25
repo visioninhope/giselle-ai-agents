@@ -203,4 +203,12 @@ export const giselleEngine = NextGiselleEngine({
 		},
 	},
 	vectorStore: openaiVectorStore(process.env.OPENAI_API_KEY ?? ""),
+	aiGateway: {
+		httpReferer:
+			process.env.VERCEL_ENV === "preview"
+				? `https://${process.env.VERCEL_URL}`
+				: "https://studio.giselles.ai",
+		xTitle:
+			process.env.VERCEL_ENV === "preview" ? "Giselle(preview)" : "Giselle",
+	},
 });

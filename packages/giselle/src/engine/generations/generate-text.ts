@@ -1,4 +1,5 @@
 import { type AnthropicProviderOptions, anthropic } from "@ai-sdk/anthropic";
+import { createGateway } from "@ai-sdk/gateway";
 import { google } from "@ai-sdk/google";
 import { type OpenAIResponsesProviderOptions, openai } from "@ai-sdk/openai";
 import { perplexity } from "@ai-sdk/perplexity";
@@ -289,10 +290,21 @@ export function generateText(args: {
 
 function generationModel(
 	languageModel: TextGenerationLanguageModelData,
-	useAiGateway?: boolean,
+	useAiGateway: boolean,
+	gatewayOptions?: { httpReferrer: string; xTitle: string },
 ) {
 	const llmProvider = languageModel.provider;
 	if (useAiGateway) {
+		const gateway = createGateway(
+			gatewayOptions === undefined
+				? undefined
+				: {
+						headers: {
+							"http-referer": gatewayOptions.httpReferrer,
+							"x-title": gatewayOptions.xTitle,
+						},
+					},
+		);
 		// Use AI Gateway model specifier: "<provider>/<modelId>"
 		// e.g. "openai/gpt-4o" or "anthropic/claude-3-5-sonnet-20240620"
 		switch (llmProvider) {
@@ -300,7 +312,7 @@ function generationModel(
 			case "openai":
 			case "google":
 			case "perplexity": {
-				return `${llmProvider}/${languageModel.id}`;
+				return gateway(`${llmProvider}/${languageModel.id}`);
 			}
 			default: {
 				const _exhaustiveCheck: never = llmProvider;

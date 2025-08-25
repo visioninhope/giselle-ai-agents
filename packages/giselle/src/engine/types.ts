@@ -52,6 +52,10 @@ export interface GiselleEngineContext {
 		flowTriggerUpdate?: (flowTrigger: FlowTrigger) => Promise<void>;
 	};
 	vectorStore?: VectorStore;
+	aiGateway?: {
+		httpReferer: string;
+		xTitle: string;
+	};
 }
 
 interface GitHubInstalltionAppAuthResolver {
@@ -127,4 +131,8 @@ export interface GiselleEngineConfig {
 		flowTriggerUpdate?: (flowTrigger: FlowTrigger) => Promise<void>;
 	};
 	vectorStore?: VectorStore;
+	aiGateway?: {
+		httpReferer: string;
+		xTitle: string;
+	};
 }
