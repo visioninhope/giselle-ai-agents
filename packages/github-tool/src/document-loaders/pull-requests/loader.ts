@@ -32,12 +32,13 @@ const GRAPHQL_BATCH_SIZE = 50; // GitHub GraphQL API optimal batch size
  */
 function categorizeGitHubGraphqlError(
 	error: CombinedError,
+	operation: string,
 	context: { owner: string; repo: string; [key: string]: unknown },
 ): DocumentLoaderError {
 	if (error.networkError) {
 		return DocumentLoaderError.fetchError(
 			"github",
-			"Network error occurred",
+			operation,
 			error,
 			context,
 		);
@@ -74,7 +75,7 @@ function categorizeGitHubGraphqlError(
 
 	return DocumentLoaderError.fetchError(
 		"github",
-		error.message || "Unknown error occurred",
+		operation,
 		error,
 		{
 			...context,
@@ -160,14 +161,18 @@ export function createGitHubPullRequestsLoader(
 					});
 				} catch (error) {
 					if (error instanceof CombinedError) {
-						throw categorizeGitHubGraphqlError(error, {
-							owner,
-							repo,
-						});
+						throw categorizeGitHubGraphqlError(
+							error,
+							"fetching_pull_requests_metadata",
+							{
+								owner,
+								repo,
+							},
+						);
 					}
 					throw DocumentLoaderError.fetchError(
 						"github",
-						"fetching pull requests metadata",
+						"fetching_pull_requests_metadata",
 						error instanceof Error ? error : new Error(String(error)),
 						{ owner, repo },
 					);
@@ -277,17 +282,21 @@ export function createGitHubPullRequestsLoader(
 			}
 		} catch (error) {
 			if (error instanceof CombinedError) {
-				throw categorizeGitHubGraphqlError(error, {
-					owner,
-					repo,
-					pr_number,
-					content_type,
-					content_id,
-				});
+				throw categorizeGitHubGraphqlError(
+					error,
+					`loading_${content_type}_for_pr`,
+					{
+						owner,
+						repo,
+						pr_number,
+						content_type,
+						content_id,
+					},
+				);
 			}
 			throw DocumentLoaderError.fetchError(
 				"github",
-				`loading ${content_type} for PR ${owner}/${repo}#${pr_number}`,
+				`loading_${content_type}_for_pr`,
 				error instanceof Error ? error : new Error(String(error)),
 				{
 					owner,
