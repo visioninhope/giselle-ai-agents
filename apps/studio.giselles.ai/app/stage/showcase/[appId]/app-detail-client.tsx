@@ -15,8 +15,10 @@ interface AppDetails {
 	status: string;
 	runTime: string;
 	requests: string;
+	executionCount: number;
 	totalOutput: string;
 	tokens: string;
+	llm: string;
 	isFavorite: boolean;
 	favoriteCount: number;
 	creator: {
@@ -31,6 +33,12 @@ interface AppDetails {
 			views: string;
 		};
 	};
+	executionHistory: Array<{
+		id: string;
+		status: string;
+		createdAt: Date;
+		duration: string;
+	}>;
 }
 
 interface AppDetailClientProps {
@@ -140,7 +148,7 @@ export function AppDetailClient({ appDetails }: AppDetailClientProps) {
 							<div className="flex items-center gap-3">
 								<div className="flex items-center gap-2 px-3 py-2 rounded-full bg-white/10 text-sm text-white/80">
 									<Play className="h-4 w-4" fill="currentColor" />
-									<span>{appDetails.requests.split(" ")[0]}</span>
+									<span>{appDetails.executionCount}</span>
 								</div>
 								<button
 									type="button"
@@ -188,45 +196,126 @@ export function AppDetailClient({ appDetails }: AppDetailClientProps) {
 
 				{/* Additional Details Section */}
 				<div className="px-6 pb-6">
-					<div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-						{/* App Statistics */}
-						<div className="p-4 bg-white/5 rounded-lg">
-							<h3 className="text-sm font-medium text-white/60 mb-3">
-								アプリ統計
+					<div className="flex gap-6">
+						{/* Left Column - App History */}
+						<div className="flex-1 rounded-lg p-6">
+							<h3 className="text-lg font-medium text-white mb-4">
+								My Execution History
 							</h3>
-							<div className="grid grid-cols-2 gap-4 text-sm">
-								<div>
-									<div className="text-white/40">実行回数</div>
-									<div className="text-white font-medium">
-										{appDetails.requests}
+							<div className="space-y-3">
+								{appDetails.executionHistory.length > 0 ? (
+									appDetails.executionHistory.map((execution) => (
+										<div
+											key={execution.id}
+											className="flex items-center justify-between py-2 border-b border-white/10 last:border-b-0"
+										>
+											<div className="flex items-center gap-3">
+												<div
+													className={`w-2 h-2 rounded-full ${
+														execution.status === "success"
+															? "bg-green-400"
+															: "bg-red-400"
+													}`}
+												></div>
+												<div>
+													<div className="text-sm text-white">
+														{execution.status === "success"
+															? "Successful execution"
+															: "Failed execution"}
+													</div>
+													<div className="text-xs text-white/60">
+														{new Intl.RelativeTimeFormat("en", {
+															numeric: "auto",
+														}).format(
+															Math.floor(
+																(execution.createdAt.getTime() - Date.now()) /
+																	(1000 * 60 * 60 * 24),
+															),
+															"day",
+														)}
+													</div>
+												</div>
+											</div>
+											<div className="text-xs text-white/60">
+												{execution.duration}
+											</div>
+										</div>
+									))
+								) : (
+									<div className="text-sm text-white/60 text-center py-4">
+										No execution history found
 									</div>
-								</div>
-								<div>
-									<div className="text-white/40">最終実行</div>
-									<div className="text-white font-medium">
-										{appDetails.runTime}
-									</div>
-								</div>
+								)}
 							</div>
 						</div>
 
-						{/* Stats Section */}
-						<div className="bg-gray-900 rounded-lg p-4">
-							<div className="space-y-3">
+						{/* Divider */}
+						<div className="w-px bg-white/10"></div>
+
+						{/* Right Column - App Details */}
+						<div className="flex-1 rounded-lg p-6">
+							<h3 className="text-lg font-medium text-white mb-4">
+								App Details
+							</h3>
+							<div className="space-y-4">
 								<div className="flex justify-between">
-									<span className="text-white/60">Owner</span>
-									<span className="text-white">{appDetails.owner}</span>
+									<span className="text-white/60 text-sm">Team</span>
+									<span className="text-white text-sm">{appDetails.owner}</span>
 								</div>
 								<div className="flex justify-between">
-									<span className="text-white/60">Updated</span>
-									<span className="text-white">{appDetails.updatedAt}</span>
+									<span className="text-white/60 text-sm">Owner</span>
+									<span className="text-white text-sm">
+										{appDetails.creator.name}
+									</span>
 								</div>
 								<div className="flex justify-between">
-									<span className="text-white/60">Status</span>
+									<span className="text-white/60 text-sm">Updated</span>
+									<span className="text-white text-sm">
+										{appDetails.updatedAt}
+									</span>
+								</div>
+								<div className="flex justify-between">
+									<span className="text-white/60 text-sm">Status</span>
 									<div className="flex items-center gap-2">
-										<div className="w-2 h-2 bg-green-400 rounded-full"></div>
-										<span className="text-white">{appDetails.status}</span>
+										<div
+											className={`w-2 h-2 rounded-full ${
+												appDetails.status === "Active"
+													? "bg-green-400"
+													: "bg-gray-400"
+											}`}
+										></div>
+										<span className="text-white text-sm">
+											{appDetails.status}
+										</span>
 									</div>
+								</div>
+								<div className="flex justify-between">
+									<span className="text-white/60 text-sm">LLM</span>
+									<span className="text-white text-sm">{appDetails.llm}</span>
+								</div>
+								<div className="flex justify-between">
+									<span className="text-white/60 text-sm">Runtime</span>
+									<span className="text-white text-sm">
+										{appDetails.runTime}
+									</span>
+								</div>
+								<div className="flex justify-between">
+									<span className="text-white/60 text-sm">Requests</span>
+									<span className="text-white text-sm">
+										{appDetails.requests}
+									</span>
+								</div>
+								<div className="flex justify-between">
+									<span className="text-white/60 text-sm">Total output</span>
+									<span className="text-white text-sm">
+										{appDetails.totalOutput}
+									</span>
+								</div>
+								<div className="flex justify-between">
+									<span className="text-white/60 text-sm">Tokens</span>
+									<span className="text-white text-sm">
+										{appDetails.tokens}
+									</span>
 								</div>
 							</div>
 						</div>
