@@ -30,13 +30,11 @@ import {
 	getNodeGenerationIndexes,
 	queryResultToText,
 } from "../generations/utils";
-import type { TelemetrySettings } from "../telemetry";
 import type { GiselleEngineContext, GitHubQueryContext } from "../types";
 
 export function executeQuery(args: {
 	context: GiselleEngineContext;
 	generation: QueuedGeneration;
-	telemetry?: TelemetrySettings;
 }) {
 	return useGenerationExecutor({
 		context: args.context,
@@ -75,7 +73,6 @@ export function executeQuery(args: {
 					vectorStoreNodes as VectorStoreNode[],
 					operationNode.content.maxResults,
 					operationNode.content.similarityThreshold,
-					args.telemetry,
 				);
 
 				const outputId = generationContext.operationNode.outputs.find(
@@ -283,7 +280,6 @@ async function queryVectorStore(
 	vectorStoreNodes: VectorStoreNode[],
 	maxResults?: number,
 	similarityThreshold?: number,
-	telemetry?: TelemetrySettings,
 ) {
 	if (vectorStoreNodes.length === 0) {
 		return [];
@@ -332,7 +328,6 @@ async function queryVectorStore(
 									queryContext,
 									maxResults ?? DEFAULT_MAX_RESULTS,
 									similarityThreshold ?? DEFAULT_SIMILARITY_THRESHOLD,
-									telemetry,
 								);
 							return {
 								type: "vector-store" as const,
@@ -362,7 +357,6 @@ async function queryVectorStore(
 							queryContext,
 							maxResults ?? DEFAULT_MAX_RESULTS,
 							similarityThreshold ?? DEFAULT_SIMILARITY_THRESHOLD,
-							telemetry,
 						);
 						return {
 							type: "vector-store" as const,

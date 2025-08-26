@@ -1,4 +1,3 @@
-import type { TelemetrySettings } from "ai";
 import type { Chunk } from "../chunk-store/types";
 
 export interface QueryResult<
@@ -20,13 +19,11 @@ export interface QueryService<
 	 * @param context search context (filtering)
 	 * @param limit maximum number of results
 	 * @param similarityThreshold minimum similarity score (optional)
-	 * @param telemetry telemetry settings (optional)
 	 */
 	search(
 		query: string,
 		context: TContext,
 		limit?: number,
 		similarityThreshold?: number,
-		telemetry?: TelemetrySettings,
 	): Promise<QueryResult<TMetadata>[]>;
 }

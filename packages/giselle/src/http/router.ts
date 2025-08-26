@@ -329,7 +329,7 @@ export const createJsonRouters = {
 				telemetry: z.custom<TelemetrySettings>().optional(),
 			}),
 			handler: async ({ input }) => {
-				await giselleEngine.executeQuery(input.generation, input.telemetry);
+				await giselleEngine.executeQuery(input.generation);
 				return new Response(null, { status: 204 });
 			},
 		}),

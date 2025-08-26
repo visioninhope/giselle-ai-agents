@@ -2,7 +2,6 @@ import {
 	EMBEDDING_PROFILES,
 	type EmbeddingProfileId,
 } from "@giselle-sdk/data-type";
-import type { TelemetrySettings } from "ai";
 import type { ChunkStore } from "../chunk-store/types";
 import { createDefaultChunker } from "../chunker";
 import type { ChunkerFunction } from "../chunker/types";
@@ -40,7 +39,6 @@ export interface IngestPipelineOptions<
 	parallelLimit?: number;
 	onProgress?: (progress: IngestProgress) => void;
 	onError?: (error: IngestError) => void;
-	telemetry?: TelemetrySettings;
 }
 
 const DEFAULT_MAX_BATCH_SIZE = 100;
@@ -74,7 +72,6 @@ export function createPipeline<
 		parallelLimit = DEFAULT_PARALLEL_LIMIT,
 		onProgress = () => {},
 		onError = () => {},
-		telemetry,
 	} = options;
 
 	const profile = EMBEDDING_PROFILES[options.embeddingProfileId];
@@ -99,7 +96,6 @@ export function createPipeline<
 	const resolvedEmbedder = createEmbedderFromProfile(
 		options.embeddingProfileId,
 		apiKey,
-		{ telemetry },
 	);
 
 	/**

@@ -1,9 +1,4 @@
-import {
-	type EmbeddingModel,
-	embed,
-	embedMany,
-	type TelemetrySettings,
-} from "ai";
+import { type EmbeddingModel, embed, embedMany } from "ai";
 import { ConfigurationError, EmbeddingError } from "../errors";
 import type { EmbedderFunction } from "./types";
 
@@ -11,7 +6,6 @@ export interface BaseEmbedderConfig {
 	apiKey: string;
 	model?: string;
 	maxRetries?: number;
-	telemetry?: TelemetrySettings;
 }
 
 export function createAiSdkEmbedder(
@@ -25,7 +19,6 @@ export function createAiSdkEmbedder(
 
 	const model = config.model ?? defaultModel;
 	const maxRetries = config.maxRetries ?? 3;
-	const telemetry = config.telemetry;
 
 	return {
 		async embed(text: string): Promise<number[]> {
@@ -34,7 +27,6 @@ export function createAiSdkEmbedder(
 					model: getModel(model),
 					maxRetries,
 					value: text,
-					experimental_telemetry: telemetry,
 				});
 				return embedding;
 			} catch (error: unknown) {
@@ -51,7 +43,6 @@ export function createAiSdkEmbedder(
 					model: getModel(model),
 					maxRetries,
 					values: texts,
-					experimental_telemetry: telemetry,
 				});
 				return embeddings;
 			} catch (error: unknown) {

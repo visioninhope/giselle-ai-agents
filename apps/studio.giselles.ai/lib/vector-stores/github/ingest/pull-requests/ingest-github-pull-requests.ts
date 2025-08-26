@@ -4,7 +4,6 @@ import {
 	type GitHubAuthConfig,
 } from "@giselle-sdk/github-tool";
 import { createPipeline } from "@giselle-sdk/rag";
-import type { TelemetrySettings } from "ai";
 import { and, eq } from "drizzle-orm";
 import {
 	db,
@@ -23,7 +22,6 @@ export async function ingestGitHubPullRequests(params: {
 	source: { owner: string; repo: string };
 	teamDbId: number;
 	embeddingProfileId: EmbeddingProfileId;
-	telemetry?: TelemetrySettings;
 }): Promise<void> {
 	const { repositoryIndexDbId } = await getRepositoryIndexInfo(
 		params.source,
@@ -56,7 +54,6 @@ export async function ingestGitHubPullRequests(params: {
 			prNumber: metadata.prNumber,
 		}),
 		embeddingProfileId: params.embeddingProfileId,
-		telemetry: params.telemetry,
 	});
 
 	const result = await ingest();

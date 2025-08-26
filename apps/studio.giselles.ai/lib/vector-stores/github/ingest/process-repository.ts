@@ -2,7 +2,6 @@ import type { EmbeddingProfileId } from "@giselle-sdk/data-type";
 import { fetchDefaultBranchHead } from "@giselle-sdk/github-tool";
 import { DocumentLoaderError, RagError } from "@giselle-sdk/rag";
 import { captureException } from "@sentry/nextjs";
-import type { TelemetrySettings } from "ai";
 import { and, eq, max } from "drizzle-orm";
 import {
 	db,
@@ -16,12 +15,10 @@ import { createBlobMetadata, createPullRequestMetadata } from "../types";
 import { ingestGitHubBlobs } from "./blobs/ingest-github-blobs";
 import { buildGitHubAuthConfig, buildOctokit } from "./build-octokit";
 import { ingestGitHubPullRequests } from "./pull-requests/ingest-github-pull-requests";
-import { createIngestTelemetrySettings } from "./telemetry";
 
 type ProcessorConfig = {
 	repositoryIndex: typeof githubRepositoryIndex.$inferSelect;
 	embeddingProfileId: EmbeddingProfileId;
-	telemetry?: TelemetrySettings;
 };
 
 type ContentProcessor = (config: ProcessorConfig) => Promise<{
@@ -34,7 +31,7 @@ const CONTENT_PROCESSORS: Record<
 	GitHubRepositoryContentType,
 	ContentProcessor
 > = {
-	blob: async ({ repositoryIndex, embeddingProfileId, telemetry }) => {
+	blob: async ({ repositoryIndex, embeddingProfileId }) => {
 		const { owner, repo, installationId, teamDbId } = repositoryIndex;
 		const octokit = buildOctokit(installationId);
 		const commit = await fetchDefaultBranchHead(octokit, owner, repo);
@@ -44,7 +41,6 @@ const CONTENT_PROCESSORS: Record<
 			source: { owner, repo, commitSha: commit.sha },
 			teamDbId,
 			embeddingProfileId,
-			telemetry,
 		});
 
 		return {
@@ -52,7 +48,7 @@ const CONTENT_PROCESSORS: Record<
 		};
 	},
 
-	pull_request: async ({ repositoryIndex, embeddingProfileId, telemetry }) => {
+	pull_request: async ({ repositoryIndex, embeddingProfileId }) => {
 		const { owner, repo, installationId, teamDbId, dbId } = repositoryIndex;
 
 		await ingestGitHubPullRequests({
@@ -60,7 +56,6 @@ const CONTENT_PROCESSORS: Record<
 			source: { owner, repo },
 			teamDbId,
 			embeddingProfileId,
-			telemetry,
 		});
 
 		const lastPrNumber = await getLastIngestedPrNumber(
@@ -84,11 +79,6 @@ export async function processRepository(
 	const { repositoryIndex, contentStatuses } = repositoryData;
 	const { owner, repo, teamDbId } = repositoryIndex;
 
-	const telemetry = await createIngestTelemetrySettings(
-		teamDbId,
-		`${owner}/${repo}`,
-	);
-
 	for (const contentStatus of contentStatuses) {
 		if (!contentStatus.enabled) {
 			continue;
@@ -108,7 +98,6 @@ export async function processRepository(
 			const { metadata } = await processor({
 				repositoryIndex,
 				embeddingProfileId: contentStatus.embeddingProfileId,
-				telemetry,
 			});
 
 			await updateContentStatus(

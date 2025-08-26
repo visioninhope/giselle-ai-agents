@@ -11,7 +11,7 @@ import type { EmbedderFunction } from "./types";
 export function createEmbedderFromProfile(
 	profileId: EmbeddingProfileId,
 	apiKey: string,
-	options?: Pick<BaseEmbedderConfig, "telemetry" | "maxRetries">,
+	options?: Pick<BaseEmbedderConfig, "maxRetries">,
 ): EmbedderFunction {
 	const profile = EMBEDDING_PROFILES[profileId];
 	if (!profile) {
