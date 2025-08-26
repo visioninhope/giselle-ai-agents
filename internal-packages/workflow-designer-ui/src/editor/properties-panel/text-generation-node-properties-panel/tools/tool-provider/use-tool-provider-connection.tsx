@@ -119,7 +119,9 @@ export function useToolProviderConnection<T extends keyof ToolSet>(config: {
 							value: payload.value,
 							tags: secretTags,
 						});
-						mutate([...(data ?? []), result.secret]);
+						// Update cache immediately with new secret (optimistic)
+						mutate([...(data ?? []), result.secret], false);
+						// Now safe to update node (secret exists in cache)
 						updateNodeWithToolConfig(result.secret.id);
 					});
 					break;
