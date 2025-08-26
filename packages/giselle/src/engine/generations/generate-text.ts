@@ -196,6 +196,7 @@ export function generateText(args: {
 			const model = generationModel(
 				operationNode.content.llm,
 				args.useAiGateway,
+				args.context.aiGateway,
 			);
 			const streamTextResult = streamText({
 				model,
@@ -292,7 +293,7 @@ export function generateText(args: {
 function generationModel(
 	languageModel: TextGenerationLanguageModelData,
 	useAiGateway: boolean,
-	gatewayOptions?: { httpReferrer: string; xTitle: string },
+	gatewayOptions?: { httpReferer: string; xTitle: string },
 ) {
 	const llmProvider = languageModel.provider;
 	if (useAiGateway) {
@@ -301,7 +302,7 @@ function generationModel(
 				? undefined
 				: {
 						headers: {
-							"http-referer": gatewayOptions.httpReferrer,
+							"http-referer": gatewayOptions.httpReferer,
 							"x-title": gatewayOptions.xTitle,
 						},
 					},
