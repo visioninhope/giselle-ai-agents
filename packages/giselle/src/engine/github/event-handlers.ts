@@ -490,6 +490,7 @@ export async function processEvent<TEventName extends WebhookEventName>(
 					);
 				},
 			},
+			useAiGateway: false,
 		});
 		const greeting = hasFlowError
 			? "Unexpected error on running flow"

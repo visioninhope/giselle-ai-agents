@@ -16,6 +16,7 @@ import {
 	CreateActInputs,
 	CreateAndStartActInputs,
 	type Patch,
+	StartActInputs,
 } from "../engine/acts";
 import { DataSourceProviderObject } from "../engine/data-source";
 import { ConfigureTriggerInput } from "../engine/flows";
@@ -82,11 +83,13 @@ export const createJsonRouters = {
 				input: z.object({
 					generation: QueuedGeneration,
 					useExperimentalStorage: z.boolean(),
+					useAiGateway: z.boolean(),
 				}),
 				handler: async ({ input }) => {
 					const stream = await giselleEngine.generateText(
 						input.generation,
 						input.useExperimentalStorage,
+						input.useAiGateway,
 					);
 					return createUIMessageStreamResponse({ stream });
 				},
@@ -313,10 +316,7 @@ export const createJsonRouters = {
 		}),
 	startAct: (giselleEngine: GiselleEngine) =>
 		createHandler({
-			input: z.object({
-				actId: ActId.schema,
-				useExperimentalStorage: z.boolean(),
-			}),
+			input: StartActInputs.omit({ callbacks: true }),
 			handler: async ({ input }) => {
 				await giselleEngine.startAct(input);
 				return new Response(null, { status: 204 });
