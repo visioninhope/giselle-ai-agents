@@ -281,6 +281,7 @@ export function generateText(args: {
 						outputs: generationOutputs,
 						usage: await streamTextResult.usage,
 						generateMessages: generateMessages,
+						providerMetadata: await streamTextResult.providerMetadata,
 					});
 				},
 			});

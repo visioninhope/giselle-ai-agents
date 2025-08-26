@@ -9,7 +9,7 @@ import type {
 } from "@giselle-sdk/github-tool";
 import type { LanguageModelProvider } from "@giselle-sdk/language-model";
 import type { QueryService } from "@giselle-sdk/rag";
-import type { ModelMessage } from "ai";
+import type { ModelMessage, ProviderMetadata } from "ai";
 import type { Storage } from "unstorage";
 import type { GiselleStorage } from "./experimental_storage";
 import type { VectorStore } from "./experimental_vector-store/types/interface";
@@ -22,6 +22,7 @@ export interface GenerationCompleteCallbackFunctionArgs {
 	generation: CompletedGeneration;
 	inputMessages: ModelMessage[];
 	outputFileBlobs: OutputFileBlob[];
+	providerMetadata?: ProviderMetadata;
 }
 type GenerationCompleteCallbackFunction = (
 	args: GenerationCompleteCallbackFunctionArgs,

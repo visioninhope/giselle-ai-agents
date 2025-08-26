@@ -7,7 +7,7 @@ import {
 	supabaseVaultDriver,
 } from "@giselle-sdk/supabase-driver";
 import { openaiVectorStore } from "@giselle-sdk/vector-store-adapters";
-import type { ModelMessage } from "ai";
+import type { ModelMessage, ProviderMetadata } from "ai";
 import { after } from "next/server";
 import { createStorage } from "unstorage";
 import { waitForLangfuseFlush } from "@/instrumentation.node";
@@ -97,6 +97,7 @@ async function traceGenerationForTeam(args: {
 	sessionId?: string;
 	userId: string;
 	team: TeamForPlan;
+	providerMetadata?: ProviderMetadata;
 }) {
 	const isPro = isProPlan(args.team);
 	const planTag = isPro ? "plan:pro" : "plan:free";
@@ -114,6 +115,7 @@ async function traceGenerationForTeam(args: {
 			teamType: args.team.type,
 			userId: args.userId,
 			subscriptionId: args.team.activeSubscriptionId ?? "",
+			providerMetadata: args.providerMetadata,
 		},
 		sessionId: args.sessionId,
 	});
@@ -172,6 +174,7 @@ export const giselleEngine = NextGiselleEngine({
 								sessionId: args.generation.context.origin.actId,
 								userId: "github-app",
 								team,
+								providerMetadata: args.providerMetadata,
 							});
 							break;
 						}
@@ -188,6 +191,7 @@ export const giselleEngine = NextGiselleEngine({
 								sessionId: args.generation.context.origin.actId,
 								userId: currentUser.id,
 								team: currentTeam,
+								providerMetadata: args.providerMetadata,
 							});
 							break;
 						}
