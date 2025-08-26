@@ -4,7 +4,7 @@ import type {
 	OutputId,
 	WorkspaceId,
 } from "@giselle-sdk/data-type";
-import type { DataContent, ModelMessage } from "ai";
+import type { DataContent, ModelMessage, ProviderMetadata } from "ai";
 import {
 	type CompletedGeneration,
 	type Generation,
@@ -37,6 +37,7 @@ interface CompleteGenerationArgs {
 	usage?: GenerationUsage;
 	generateMessages?: Message[];
 	inputMessages: ModelMessage[];
+	providerMetadata?: ProviderMetadata;
 }
 type CompleteGeneration = (
 	args: CompleteGenerationArgs,
@@ -222,6 +223,7 @@ export async function useGenerationExecutor<T>(args: {
 		usage,
 		inputMessages,
 		generateMessages,
+		providerMetadata,
 	}: CompleteGenerationArgs) {
 		const completedGeneration = {
 			...runningGeneration,
@@ -268,6 +270,7 @@ export async function useGenerationExecutor<T>(args: {
 					generation: completedGeneration,
 					inputMessages,
 					outputFileBlobs,
+					providerMetadata,
 				});
 				return result;
 			})(),
