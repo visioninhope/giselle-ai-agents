@@ -56,6 +56,8 @@ export function GitHubToolConfigurationDialog({
 }: {
 	node: TextGenerationNode;
 }) {
+	const [showUpdateDialog, setShowUpdateDialog] = useState(false);
+
 	const {
 		presentDialog,
 		setPresentDialog,
@@ -75,15 +77,18 @@ export function GitHubToolConfigurationDialog({
 			tools: node.content.tools?.github?.tools ?? [],
 			auth: { type: "secret", secretId },
 		}),
-		isUpdatingExistingConfiguration: true,
+		isUpdatingExistingConfiguration: showUpdateDialog,
 	});
-
-	const [showUpdateDialog, setShowUpdateDialog] = useState(false);
 
 	const handleUpdateSubmit = useCallback<
 		React.FormEventHandler<HTMLFormElement>
 	>(
 		(e) => {
+			if (!e.currentTarget.checkValidity()) {
+				e.preventDefault();
+				return;
+			}
+
 			handleSubmit(e);
 			setShowUpdateDialog(false);
 		},
@@ -179,6 +184,16 @@ function GitHubToolConnectionDialog({
 			e.preventDefault();
 			return;
 		}
+
+		if (tabValue === "select") {
+			const formData = new FormData(e.currentTarget);
+			const secretId = formData.get("secretId");
+			if (!secretId || secretId === "") {
+				e.preventDefault();
+				return;
+			}
+		}
+
 		onSubmit(e);
 	};
 
@@ -223,7 +238,7 @@ function GitHubToolConnectionDialog({
 							<label htmlFor="label" className="text-text text-[13px] mb-[2px]">
 								Token Name
 							</label>
-							<Input type="text" id="label" name="label" />
+							<Input type="text" id="label" name="label" required />
 							<p className="text-[11px] text-text-muted px-[4px] mt-[1px]">
 								Give this token a short name (e.g. “Prod-bot”). You’ll use it
 								when linking other nodes.
@@ -256,6 +271,7 @@ function GitHubToolConnectionDialog({
 								onChange={handleTokenChange}
 								aria-invalid={!!tokenError}
 								aria-describedby={tokenError ? "pat-error" : undefined}
+								required
 							/>
 							{tokenError ? (
 								<p
