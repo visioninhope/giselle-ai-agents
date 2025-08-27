@@ -59,7 +59,7 @@ export const subscriptions = pgTable("subscriptions", {
 	trialEnd: timestamp("trial_end"),
 });
 
-type TeamType = "customer" | "internal";
+export type TeamType = "customer" | "internal";
 export const teams = pgTable("teams", {
 	id: text("id").$type<TeamId>().notNull().unique(),
 	dbId: serial("db_id").primaryKey(),
