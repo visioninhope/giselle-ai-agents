@@ -475,12 +475,11 @@ function GitHubToolConfigurationDialogInternal({
 						<Button
 							type="button"
 							onClick={() => {
+								const { github: _removed, ...otherTools } =
+									node.content.tools || {};
 								updateNodeDataContent(node, {
 									...node.content,
-									tools: {
-										...node.content.tools,
-										github: undefined,
-									},
+									tools: otherTools,
 								});
 								onOpenChange?.(false);
 							}}
