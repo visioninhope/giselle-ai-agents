@@ -15,6 +15,18 @@ export function createInputsFromTrigger(
 
 	switch (trigger.configuration.provider) {
 		case "github": {
+			// Check if GitHub trigger has parameters (similar to manual)
+			if (
+				"event" in trigger.configuration &&
+				"parameters" in trigger.configuration.event
+			) {
+				return trigger.configuration.event.parameters.map((parameter) => ({
+					name: parameter.id,
+					label: parameter.name,
+					type: parameter.type,
+					required: parameter.required,
+				}));
+			}
 			return [];
 		}
 		case "manual": {

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { GlassButton } from "@/components/ui/glass-button";
 import { AvatarImage } from "@/services/accounts/components/user-button/avatar-image";
+import { RunModal } from "./components/run-modal";
 
 interface AppDetails {
 	id: string;
@@ -21,6 +22,8 @@ interface AppDetails {
 	llm: string;
 	isFavorite: boolean;
 	favoriteCount: number;
+	teamId: string;
+	workspaceId: string;
 	creator: {
 		name: string;
 		avatarUrl?: string;
@@ -47,10 +50,15 @@ interface AppDetailClientProps {
 
 export function AppDetailClient({ appDetails }: AppDetailClientProps) {
 	const [isFavorite, setIsFavorite] = useState(appDetails.isFavorite);
+	const [isRunModalOpen, setIsRunModalOpen] = useState(false);
 
 	const toggleFavorite = () => {
 		setIsFavorite(!isFavorite);
 		// TODO: Add API call to update favorite status
+	};
+
+	const handleRunClick = () => {
+		setIsRunModalOpen(true);
 	};
 
 	return (
@@ -185,7 +193,7 @@ export function AppDetailClient({ appDetails }: AppDetailClientProps) {
 								>
 									Edit
 								</Link>
-								<GlassButton>
+								<GlassButton onClick={handleRunClick}>
 									<Play className="h-3 w-3" />
 									Run
 								</GlassButton>
@@ -322,6 +330,14 @@ export function AppDetailClient({ appDetails }: AppDetailClientProps) {
 					</div>
 				</div>
 			</div>
+
+			<RunModal
+				isOpen={isRunModalOpen}
+				onClose={() => setIsRunModalOpen(false)}
+				appName={appDetails.name}
+				workspaceId={appDetails.workspaceId}
+				teamId={appDetails.teamId}
+			/>
 		</div>
 	);
 }

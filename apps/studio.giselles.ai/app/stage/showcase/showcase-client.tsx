@@ -336,9 +336,8 @@ export function ShowcaseClient({
 							) : (
 								<Card className="gap-0 py-2">
 									{sortedApps.map((app) => (
-										<button
+										<div
 											key={app.id}
-											type="button"
 											className="group flex items-center justify-between px-2 py-3 first:border-t-0 border-t-[0.5px] border-white/10 cursor-pointer hover:bg-white/5 transition-colors w-full text-left"
 											onClick={() => router.push(`/stage/showcase/${app.id}`)}
 										>
@@ -415,14 +414,14 @@ export function ShowcaseClient({
 												<button
 													type="button"
 													className="p-1.5 rounded-md text-white/60 hover:text-white transition-colors"
-													onClick={(e) => {
-														e.stopPropagation();
+													onClick={() => {
+														// TODO: Add favorite functionality
 													}}
 												>
 													<Star className="h-4 w-4 hover:fill-current" />
 												</button>
 											</div>
-										</button>
+										</div>
 									))}
 								</Card>
 							)}

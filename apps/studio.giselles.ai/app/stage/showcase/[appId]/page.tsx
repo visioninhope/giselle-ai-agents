@@ -184,6 +184,8 @@ async function getAppDetails(appId: string) {
 			llm: await extractLLMLabels(agentData.workspaceId),
 			isFavorite: false,
 			favoriteCount: 42, // Mock favorite count
+			teamId: agentData.teamId,
+			workspaceId: agentData.workspaceId || "",
 			creator: {
 				name: agentData.creatorName || "Unknown Creator",
 				avatarUrl: agentData.creatorAvatarUrl || undefined,
