@@ -1,5 +1,9 @@
 import type { TextGenerationNode } from "@giselle-sdk/data-type";
-import type { CompletedGeneration, Generation } from "@giselle-sdk/giselle";
+import type {
+	CompletedGeneration,
+	FailedGeneration,
+	Generation,
+} from "@giselle-sdk/giselle";
 import {
 	useNodeGenerations,
 	useWorkflowDesigner,
@@ -98,6 +102,26 @@ function getGenerationTextContent(generation: Generation): string {
 		.join("\n");
 }
 
+// Helper function to extract error content from a failed generation
+function getGenerationErrorContent(generation: Generation): string {
+	if (generation.status === "failed") {
+		const failedGeneration = generation as FailedGeneration;
+		const error = failedGeneration.error;
+
+		// Create a comprehensive error message
+		let errorContent = `Error: ${error.name}\n\nMessage: ${error.message}`;
+
+		// Add dump information if available
+		if (error.dump) {
+			errorContent += `\n\nDump: ${JSON.stringify(error.dump, null, 2)}`;
+		}
+
+		return errorContent;
+	}
+
+	return "";
+}
+
 export function GenerationPanel({
 	node,
 	onClickGenerateButton,
@@ -177,6 +201,13 @@ export function GenerationPanel({
 					<ClipboardButton
 						text={getGenerationTextContent(currentGeneration)}
 						tooltip="Copy to clipboard"
+						className="text-black-400 hover:text-black-300"
+					/>
+				)}
+				{currentGeneration.status === "failed" && (
+					<ClipboardButton
+						text={getGenerationErrorContent(currentGeneration)}
+						tooltip="Copy error to clipboard"
 						className="text-black-400 hover:text-black-300"
 					/>
 				)}
