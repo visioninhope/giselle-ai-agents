@@ -1,4 +1,3 @@
-import type { GitHubQueryContext } from "@giselle-sdk/giselle";
 import { createPostgresQueryService } from "@giselle-sdk/rag";
 import { getTableName } from "drizzle-orm";
 import { githubRepositoryPullRequestEmbeddings } from "@/drizzle";
@@ -15,7 +14,6 @@ export const gitHubPullRequestQueryService = createPostgresQueryService({
 	tableName: getTableName(githubRepositoryPullRequestEmbeddings),
 	metadataSchema: gitHubPullRequestMetadataSchema,
 	contextToFilter: resolveGitHubPullRequestEmbeddingFilter,
-	contextToEmbeddingProfileId: (context: GitHubQueryContext) =>
-		context.embeddingProfileId,
+	contextToEmbeddingProfileId: (context) => context.embeddingProfileId,
 	additionalResolver: addPRContextToResults,
 });

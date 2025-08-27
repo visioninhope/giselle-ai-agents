@@ -8,12 +8,16 @@ import type {
 	GitHubPersonalAccessTokenAuth,
 } from "@giselle-sdk/github-tool";
 import type { LanguageModelProvider } from "@giselle-sdk/language-model";
-import type { QueryService } from "@giselle-sdk/rag";
+import type { EmbeddingMetrics, QueryService } from "@giselle-sdk/rag";
 import type { ModelMessage, ProviderMetadata } from "ai";
 import type { Storage } from "unstorage";
 import type { GiselleStorage } from "./experimental_storage";
 import type { VectorStore } from "./experimental_vector-store/types/interface";
-import type { CompletedGeneration, OutputFileBlob } from "./generations";
+import type {
+	CompletedGeneration,
+	OutputFileBlob,
+	RunningGeneration,
+} from "./generations";
 import type { TelemetrySettings } from "./telemetry";
 import type { UsageLimits } from "./usage-limits";
 import type { Vault } from "./vault";
@@ -26,6 +30,15 @@ export interface GenerationCompleteCallbackFunctionArgs {
 }
 type GenerationCompleteCallbackFunction = (
 	args: GenerationCompleteCallbackFunctionArgs,
+) => void | Promise<void>;
+
+export interface EmbeddingCompleteCallbackFunctionArgs {
+	embeddingMetrics: EmbeddingMetrics;
+	generation: RunningGeneration;
+	queryContext: GitHubQueryContext;
+}
+export type EmbeddingCompleteCallbackFunction = (
+	args: EmbeddingCompleteCallbackFunctionArgs,
 ) => void | Promise<void>;
 
 export interface GiselleEngineContext {
@@ -51,6 +64,7 @@ export interface GiselleEngineContext {
 	callbacks?: {
 		generationComplete?: GenerationCompleteCallbackFunction;
 		flowTriggerUpdate?: (flowTrigger: FlowTrigger) => Promise<void>;
+		embeddingComplete?: EmbeddingCompleteCallbackFunction;
 	};
 	vectorStore?: VectorStore;
 	aiGateway?: {
@@ -98,12 +112,15 @@ export type GithubEmbeddingMetadata = {
 };
 
 // GitHub Query Context for rag integration
-export interface GitHubQueryContext {
+export type GitHubQueryContext = {
+	provider: "github";
 	workspaceId: WorkspaceId;
 	owner: string;
 	repo: string;
+	contentType: "blob" | "pullRequest";
 	embeddingProfileId: EmbeddingProfileId;
-}
+};
+export type QueryContext = GitHubQueryContext;
 
 export type GitHubVectorStoreQueryService<
 	M extends Record<string, unknown> = Record<string, never>,
@@ -130,6 +147,7 @@ export interface GiselleEngineConfig {
 	callbacks?: {
 		generationComplete?: GenerationCompleteCallbackFunction;
 		flowTriggerUpdate?: (flowTrigger: FlowTrigger) => Promise<void>;
+		embeddingComplete?: EmbeddingCompleteCallbackFunction;
 	};
 	vectorStore?: VectorStore;
 	aiGateway?: {

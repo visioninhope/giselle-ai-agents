@@ -10,6 +10,10 @@ import {
 	type VectorStoreNode,
 	type WorkspaceId,
 } from "@giselle-sdk/data-type";
+import type {
+	EmbeddingCompleteCallback,
+	EmbeddingMetrics,
+} from "@giselle-sdk/rag";
 import {
 	isJsonContent,
 	jsonContentToText,
@@ -30,7 +34,28 @@ import {
 	getNodeGenerationIndexes,
 	queryResultToText,
 } from "../generations/utils";
-import type { GiselleEngineContext, GitHubQueryContext } from "../types";
+import type {
+	EmbeddingCompleteCallbackFunction,
+	GiselleEngineContext,
+	GitHubQueryContext,
+	QueryContext,
+} from "../types";
+
+function createEngineEmbeddingCallback(
+	generation: RunningGeneration,
+	queryContext: QueryContext,
+	callback?: EmbeddingCompleteCallbackFunction,
+): EmbeddingCompleteCallback | undefined {
+	if (!callback) return undefined;
+
+	return async (embeddingMetrics: EmbeddingMetrics) => {
+		try {
+			await callback({ embeddingMetrics, generation, queryContext });
+		} catch (error) {
+			console.error("Embedding callback error:", error);
+		}
+	};
+}
 
 export function executeQuery(args: {
 	context: GiselleEngineContext;
@@ -66,9 +91,11 @@ export function executeQuery(args: {
 							(connection) => connection.outputNode.id === node.id,
 						),
 				);
+
 				const queryResults = await queryVectorStore(
 					workspaceId,
 					query,
+					runningGeneration,
 					args.context,
 					vectorStoreNodes as VectorStoreNode[],
 					operationNode.content.maxResults,
@@ -276,6 +303,7 @@ function isConfiguredVectorStoreNode(
 async function queryVectorStore(
 	workspaceId: WorkspaceId,
 	query: string,
+	runningGeneration: RunningGeneration,
 	context: GiselleEngineContext,
 	vectorStoreNodes: VectorStoreNode[],
 	maxResults?: number,
@@ -308,72 +336,109 @@ async function queryVectorStore(
 
 						const embeddingProfileId =
 							state.embeddingProfileId ?? DEFAULT_EMBEDDING_PROFILE_ID;
-						const queryContext: GitHubQueryContext = {
-							workspaceId,
-							owner,
-							repo,
-							embeddingProfileId,
-						};
 
-						if (contentType === "pull_request") {
-							if (!vectorStoreQueryServices?.githubPullRequest) {
-								throw new Error(
-									"No github pull request vector store query service provided",
+						switch (contentType) {
+							case "blob": {
+								if (!vectorStoreQueryServices?.github) {
+									throw new Error(
+										"No github vector store query service provided",
+									);
+								}
+
+								const queryContext: GitHubQueryContext = {
+									provider: "github" as const,
+									workspaceId,
+									owner,
+									repo,
+									contentType: "blob",
+									embeddingProfileId,
+								};
+								const embeddingCallback = createEngineEmbeddingCallback(
+									runningGeneration,
+									queryContext,
+									context.callbacks?.embeddingComplete,
 								);
-							}
 
-							const res =
-								await vectorStoreQueryServices.githubPullRequest.search(
+								const res = await vectorStoreQueryServices.github.search(
 									query,
 									queryContext,
 									maxResults ?? DEFAULT_MAX_RESULTS,
 									similarityThreshold ?? DEFAULT_SIMILARITY_THRESHOLD,
+									embeddingCallback,
 								);
-							return {
-								type: "vector-store" as const,
-								source,
-								records: res.map((result) => ({
-									chunkContent: result.chunk.content,
-									chunkIndex: result.chunk.index,
-									score: result.similarity,
-									metadata: Object.fromEntries(
-										Object.entries(result.metadata ?? {}).map(([k, v]) => [
-											k,
-											String(v),
-										]),
-									),
-									additional: result.additional,
-								})),
-							};
-						}
+								return {
+									type: "vector-store" as const,
+									source,
+									records: res.map((result) => ({
+										chunkContent: result.chunk.content,
+										chunkIndex: result.chunk.index,
+										score: result.similarity,
+										metadata: Object.fromEntries(
+											Object.entries(result.metadata ?? {}).map(([k, v]) => [
+												k,
+												String(v),
+											]),
+										),
+									})),
+								};
+							}
 
-						// Default to blob content type
-						if (!vectorStoreQueryServices?.github) {
-							throw new Error("No github vector store query service provided");
-						}
+							case "pull_request": {
+								if (!vectorStoreQueryServices?.githubPullRequest) {
+									throw new Error(
+										"No github pull request vector store query service provided",
+									);
+								}
 
-						const res = await vectorStoreQueryServices.github.search(
-							query,
-							queryContext,
-							maxResults ?? DEFAULT_MAX_RESULTS,
-							similarityThreshold ?? DEFAULT_SIMILARITY_THRESHOLD,
-						);
-						return {
-							type: "vector-store" as const,
-							source,
-							records: res.map((result) => ({
-								chunkContent: result.chunk.content,
-								chunkIndex: result.chunk.index,
-								score: result.similarity,
-								metadata: Object.fromEntries(
-									Object.entries(result.metadata ?? {}).map(([k, v]) => [
-										k,
-										String(v),
-									]),
-								),
-							})),
-						};
+								const queryContext: GitHubQueryContext = {
+									provider: "github" as const,
+									workspaceId,
+									owner,
+									repo,
+									contentType: "pullRequest",
+									embeddingProfileId,
+								};
+								const embeddingCallback = createEngineEmbeddingCallback(
+									runningGeneration,
+									queryContext,
+									context.callbacks?.embeddingComplete,
+								);
+
+								const res =
+									await vectorStoreQueryServices.githubPullRequest.search(
+										query,
+										queryContext,
+										maxResults ?? DEFAULT_MAX_RESULTS,
+										similarityThreshold ?? DEFAULT_SIMILARITY_THRESHOLD,
+										embeddingCallback,
+									);
+								return {
+									type: "vector-store" as const,
+									source,
+									records: res.map((result) => ({
+										chunkContent: result.chunk.content,
+										chunkIndex: result.chunk.index,
+										score: result.similarity,
+										metadata: Object.fromEntries(
+											Object.entries(result.metadata ?? {}).map(([k, v]) => [
+												k,
+												String(v),
+											]),
+										),
+										additional: result.additional,
+									})),
+								};
+							}
+
+							default: {
+								const _exhaustiveCheck: never = contentType;
+								throw new Error(
+									`Unsupported vector store content type: ${_exhaustiveCheck}`,
+								);
+							}
+						}
 					}
+
 					default: {
 						const _exhaustiveCheck: never = provider;
 						throw new Error(
