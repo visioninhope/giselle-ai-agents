@@ -7,4 +7,9 @@ export {
 	type OpenAIEmbedderConfig,
 } from "./openai";
 export { createEmbedderFromProfile } from "./profiles";
-export type { EmbedderFunction } from "./types";
+export type {
+	EmbedderFunction,
+	EmbeddingCompleteCallback,
+	EmbeddingMetrics,
+	EmbeddingProfile,
+} from "./types";

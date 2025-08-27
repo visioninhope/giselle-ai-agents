@@ -11,7 +11,7 @@ import type { EmbedderFunction } from "./types";
 export function createEmbedderFromProfile(
 	profileId: EmbeddingProfileId,
 	apiKey: string,
-	options?: Pick<BaseEmbedderConfig, "maxRetries">,
+	options?: Pick<BaseEmbedderConfig, "maxRetries" | "embeddingComplete">,
 ): EmbedderFunction {
 	const profile = EMBEDDING_PROFILES[profileId];
 	if (!profile) {
@@ -26,13 +26,13 @@ export function createEmbedderFromProfile(
 		case "openai":
 			return createOpenAIEmbedder({
 				apiKey,
-				model: profile.model,
+				profile,
 				...options,
 			});
 		case "google":
 			return createGoogleEmbedder({
 				apiKey,
-				model: profile.model,
+				profile,
 				...options,
 			});
 		default: {
