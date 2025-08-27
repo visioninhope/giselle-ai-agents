@@ -78,12 +78,12 @@ export function AppDetailClient({ appDetails }: AppDetailClientProps) {
 					</div>
 				</div>
 
-				{/* Main Content - Horizontal Layout */}
-				<div className="flex p-6 gap-6">
-					{/* Left Side - App Thumbnail */}
-					<div className="w-96 flex-shrink-0">
+				{/* Main Content - Responsive Layout */}
+				<div className="flex flex-col lg:flex-row p-4 lg:p-6 gap-4 lg:gap-6">
+					{/* App Thumbnail */}
+					<div className="w-full lg:w-96 flex-shrink-0">
 						<div
-							className="relative flex h-60 w-full rounded-[12px] border-[0.5px] bg-[linear-gradient(135deg,rgba(100,130,200,0.20)_0%,rgba(60,80,120,0.35)_40%,rgba(20,30,60,0.85)_100%)]"
+							className="relative flex h-48 lg:h-60 w-full rounded-[12px] border-[0.5px] bg-[linear-gradient(135deg,rgba(100,130,200,0.20)_0%,rgba(60,80,120,0.35)_40%,rgba(20,30,60,0.85)_100%)]"
 							style={
 								{
 									"--spotlight-color": "rgba(255,255,255,0.15)",
@@ -116,7 +116,7 @@ export function AppDetailClient({ appDetails }: AppDetailClientProps) {
 						</div>
 					</div>
 
-					{/* Right Side - Details */}
+					{/* App Details */}
 					<div className="flex-1 flex flex-col justify-between">
 						<div>
 							{/* App Title */}
@@ -151,7 +151,7 @@ export function AppDetailClient({ appDetails }: AppDetailClientProps) {
 						</div>
 
 						{/* Stats and Action Buttons */}
-						<div className="flex items-center justify-between">
+						<div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-0">
 							{/* Left: Stats */}
 							<div className="flex items-center gap-3">
 								<div className="flex items-center gap-2 px-3 py-2 rounded-full bg-white/10 text-sm text-white/80">
@@ -174,15 +174,15 @@ export function AppDetailClient({ appDetails }: AppDetailClientProps) {
 								</button>
 							</div>
 
-							{/* Right: Action Buttons */}
-							<div className="flex items-center gap-2">
+							{/* Action Buttons */}
+							<div className="flex items-center gap-2 w-full sm:w-auto">
 								<Link
 									href={
 										appDetails.id
 											? `/workspaces/${appDetails.id}`
 											: "/playground"
 									}
-									className="rounded-lg px-3 py-2 text-white/80 transition-all duration-200 active:scale-[0.98] text-sm"
+									className="rounded-lg px-3 py-2 text-white/80 transition-all duration-200 active:scale-[0.98] text-sm flex-1 sm:flex-none text-center"
 									style={{
 										background:
 											"linear-gradient(180deg, #202530 0%, #12151f 100%)",
@@ -193,7 +193,10 @@ export function AppDetailClient({ appDetails }: AppDetailClientProps) {
 								>
 									Edit
 								</Link>
-								<GlassButton onClick={handleRunClick}>
+								<GlassButton
+									onClick={handleRunClick}
+									className="flex-1 sm:flex-none justify-center"
+								>
 									<Play className="h-3 w-3" />
 									Run
 								</GlassButton>
@@ -203,8 +206,8 @@ export function AppDetailClient({ appDetails }: AppDetailClientProps) {
 				</div>
 
 				{/* Additional Details Section */}
-				<div className="px-6 pb-6">
-					<div className="flex gap-6">
+				<div className="px-4 lg:px-6 pb-6">
+					<div className="flex flex-col lg:flex-row gap-6">
 						{/* Left Column - App History */}
 						<div className="flex-1 rounded-lg p-6">
 							<h3 className="text-lg font-medium text-white mb-4">
@@ -258,7 +261,7 @@ export function AppDetailClient({ appDetails }: AppDetailClientProps) {
 						</div>
 
 						{/* Divider */}
-						<div className="w-px bg-white/10"></div>
+						<div className="w-full lg:w-px h-px lg:h-auto bg-white/10"></div>
 
 						{/* Right Column - App Details */}
 						<div className="flex-1 rounded-lg p-6">
