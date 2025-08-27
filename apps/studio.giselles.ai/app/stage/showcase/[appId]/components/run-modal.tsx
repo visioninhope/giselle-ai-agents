@@ -96,7 +96,14 @@ export function RunModal({
 	return (
 		<>
 			{/* Backdrop */}
-			<div className="fixed inset-0 z-40" onClick={onClose} />
+			<div
+				className="fixed inset-0 z-40"
+				onClick={onClose}
+				onKeyDown={(e) => e.key === "Escape" && onClose()}
+				role="button"
+				tabIndex={0}
+				aria-label="Close modal"
+			/>
 
 			{/* Slide-up Modal */}
 			<div className="fixed inset-x-0 bottom-0 md:absolute md:left-0 md:right-0 z-50 animate-in slide-in-from-bottom-full duration-300">
