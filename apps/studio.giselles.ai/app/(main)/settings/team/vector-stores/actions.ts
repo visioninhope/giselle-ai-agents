@@ -16,11 +16,13 @@ import {
 	githubRepositoryIndex,
 } from "@/drizzle";
 import {
+	createManualIngestTrigger,
+	type IngestTrigger,
 	processRepository,
 	type RepositoryWithStatuses,
 } from "@/lib/vector-stores/github";
 import type { GitHubRepositoryIndexId } from "@/packages/types";
-import { getGitHubIdentityState } from "@/services/accounts";
+import { fetchCurrentUser, getGitHubIdentityState } from "@/services/accounts";
 import { buildAppInstallationClient } from "@/services/external/github";
 import { fetchCurrentTeam } from "@/services/teams";
 import type { ActionResult, DiagnosticResult } from "./types";
@@ -488,6 +490,7 @@ export async function triggerManualIngest(
 ): Promise<ActionResult> {
 	try {
 		const team = await fetchCurrentTeam();
+		const user = await fetchCurrentUser();
 
 		const repositoryData = await fetchRepositoryWithStatuses(
 			indexId,
@@ -507,8 +510,8 @@ export async function triggerManualIngest(
 				error: ingestCheck.reason || "Cannot ingest repository",
 			};
 		}
-
-		executeManualIngest(repositoryData);
+		const trigger = createManualIngestTrigger(user.id);
+		executeManualIngest(repositoryData, trigger);
 
 		// Immediately revalidate to show "running" status
 		revalidatePath("/settings/team/vector-stores");
@@ -597,8 +600,11 @@ function checkIngestability(
 /**
  * Execute manual ingest for a repository
  */
-function executeManualIngest(repositoryData: RepositoryWithStatuses): void {
+function executeManualIngest(
+	repositoryData: RepositoryWithStatuses,
+	trigger: IngestTrigger,
+): void {
 	after(async () => {
-		await processRepository(repositoryData);
+		await processRepository(repositoryData, trigger);
 	});
 }

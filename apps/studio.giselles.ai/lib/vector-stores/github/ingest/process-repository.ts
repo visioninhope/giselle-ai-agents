@@ -1,6 +1,7 @@
 import type { EmbeddingProfileId } from "@giselle-sdk/data-type";
 import { fetchDefaultBranchHead } from "@giselle-sdk/github-tool";
 import { DocumentLoaderError, RagError } from "@giselle-sdk/rag";
+import { createId } from "@paralleldrive/cuid2";
 import { captureException } from "@sentry/nextjs";
 import { and, eq, max } from "drizzle-orm";
 import {
@@ -9,16 +10,37 @@ import {
 	githubRepositoryContentStatus,
 	type githubRepositoryIndex,
 	githubRepositoryPullRequestEmbeddings,
+	type UserId,
 } from "@/drizzle";
+import type { TeamWithSubscription } from "@/services/teams";
+import { fetchTeamByDbId } from "@/services/teams/fetch-team";
 import type { RepositoryWithStatuses } from "../types";
 import { createBlobMetadata, createPullRequestMetadata } from "../types";
 import { ingestGitHubBlobs } from "./blobs/ingest-github-blobs";
 import { buildGitHubAuthConfig, buildOctokit } from "./build-octokit";
+import { createIngestEmbeddingCallback } from "./embedding-tracking";
 import { ingestGitHubPullRequests } from "./pull-requests/ingest-github-pull-requests";
+
+type IngestTriggerId = `ingtrg_${string}`;
+function createIngestTriggerId(): IngestTriggerId {
+	return `ingtrg_${createId()}`;
+}
+export type IngestTrigger = { id: IngestTriggerId } & (
+	| { type: "cron" }
+	| { type: "manual"; userId: UserId }
+);
+export function createCronIngestTrigger(): IngestTrigger {
+	return { id: createIngestTriggerId(), type: "cron" as const };
+}
+export function createManualIngestTrigger(userId: UserId): IngestTrigger {
+	return { id: createIngestTriggerId(), type: "manual" as const, userId };
+}
 
 type ProcessorConfig = {
 	repositoryIndex: typeof githubRepositoryIndex.$inferSelect;
 	embeddingProfileId: EmbeddingProfileId;
+	trigger: IngestTrigger;
+	team: TeamWithSubscription;
 };
 
 type ContentProcessor = (config: ProcessorConfig) => Promise<{
@@ -31,16 +53,28 @@ const CONTENT_PROCESSORS: Record<
 	GitHubRepositoryContentType,
 	ContentProcessor
 > = {
-	blob: async ({ repositoryIndex, embeddingProfileId }) => {
+	blob: async ({ repositoryIndex, embeddingProfileId, trigger, team }) => {
 		const { owner, repo, installationId, teamDbId } = repositoryIndex;
 		const octokit = buildOctokit(installationId);
 		const commit = await fetchDefaultBranchHead(octokit, owner, repo);
+
+		const embeddingComplete = createIngestEmbeddingCallback({
+			team,
+			trigger,
+			resource: {
+				provider: "github",
+				contentType: "blob",
+				owner,
+				repo,
+			},
+		});
 
 		await ingestGitHubBlobs({
 			octokitClient: octokit,
 			source: { owner, repo, commitSha: commit.sha },
 			teamDbId,
 			embeddingProfileId,
+			embeddingComplete,
 		});
 
 		return {
@@ -48,14 +82,31 @@ const CONTENT_PROCESSORS: Record<
 		};
 	},
 
-	pull_request: async ({ repositoryIndex, embeddingProfileId }) => {
+	pull_request: async ({
+		repositoryIndex,
+		embeddingProfileId,
+		trigger,
+		team,
+	}) => {
 		const { owner, repo, installationId, teamDbId, dbId } = repositoryIndex;
+
+		const embeddingComplete = createIngestEmbeddingCallback({
+			team,
+			trigger,
+			resource: {
+				provider: "github",
+				contentType: "pullRequest",
+				owner,
+				repo,
+			},
+		});
 
 		await ingestGitHubPullRequests({
 			githubAuthConfig: buildGitHubAuthConfig(installationId),
 			source: { owner, repo },
 			teamDbId,
 			embeddingProfileId,
+			embeddingComplete,
 		});
 
 		const lastPrNumber = await getLastIngestedPrNumber(
@@ -75,9 +126,15 @@ const CONTENT_PROCESSORS: Record<
  */
 export async function processRepository(
 	repositoryData: RepositoryWithStatuses,
+	trigger: IngestTrigger,
 ) {
 	const { repositoryIndex, contentStatuses } = repositoryData;
 	const { owner, repo, teamDbId } = repositoryIndex;
+
+	const team = await fetchTeamByDbId(teamDbId);
+	if (!team) {
+		throw new Error(`Team not found for dbId: ${teamDbId}`);
+	}
 
 	for (const contentStatus of contentStatuses) {
 		if (!contentStatus.enabled) {
@@ -98,6 +155,8 @@ export async function processRepository(
 			const { metadata } = await processor({
 				repositoryIndex,
 				embeddingProfileId: contentStatus.embeddingProfileId,
+				trigger,
+				team,
 			});
 
 			await updateContentStatus(

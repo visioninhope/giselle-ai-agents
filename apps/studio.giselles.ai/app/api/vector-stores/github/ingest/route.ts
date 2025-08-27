@@ -1,5 +1,8 @@
 import type { NextRequest } from "next/server";
-import { processRepository } from "@/lib/vector-stores/github";
+import {
+	createCronIngestTrigger,
+	processRepository,
+} from "@/lib/vector-stores/github";
 import { fetchIngestTargets } from "./fetch-ingest-targets";
 
 export const maxDuration = 800;
@@ -13,8 +16,11 @@ export async function GET(request: NextRequest) {
 	}
 
 	const targetGitHubRepositories = await fetchIngestTargets();
+	const trigger = createCronIngestTrigger();
 
-	await Promise.all(targetGitHubRepositories.map(processRepository));
+	await Promise.all(
+		targetGitHubRepositories.map((repo) => processRepository(repo, trigger)),
+	);
 
 	return new Response("ok", { status: 200 });
 }
