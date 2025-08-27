@@ -107,16 +107,7 @@ function getGenerationErrorContent(generation: Generation): string {
 	if (generation.status === "failed") {
 		const failedGeneration = generation as FailedGeneration;
 		const error = failedGeneration.error;
-
-		// Create a comprehensive error message
-		let errorContent = `Error: ${error.name}\n\nMessage: ${error.message}`;
-
-		// Add dump information if available
-		if (error.dump) {
-			errorContent += `\n\nDump: ${JSON.stringify(error.dump, null, 2)}`;
-		}
-
-		return errorContent;
+		return `${error.name}: ${error.message}`;
 	}
 
 	return "";
