@@ -7,7 +7,10 @@ import { createDefaultChunker } from "../chunker";
 import type { ChunkerFunction } from "../chunker/types";
 import type { Document, DocumentLoader } from "../document-loader/types";
 import { createEmbedderFromProfile } from "../embedder/profiles";
-import type { EmbedderFunction } from "../embedder/types";
+import type {
+	EmbedderFunction,
+	EmbeddingCompleteCallback,
+} from "../embedder/types";
 import { ConfigurationError, OperationError, RagError } from "../errors";
 import { embedContent } from "./embedder";
 import type { IngestError, IngestProgress, IngestResult } from "./types";
@@ -31,6 +34,7 @@ export interface IngestPipelineOptions<
 	// Optional processors
 	chunker?: ChunkerFunction;
 	embeddingProfileId: EmbeddingProfileId;
+	embeddingComplete?: EmbeddingCompleteCallback;
 
 	// Optional settings
 	maxBatchSize?: number;
@@ -66,6 +70,7 @@ export function createPipeline<
 		documentVersion,
 		metadataTransform,
 		chunker = createDefaultChunker(),
+		embeddingComplete,
 		maxBatchSize = DEFAULT_MAX_BATCH_SIZE,
 		maxRetries = DEFAULT_MAX_RETRIES,
 		retryDelay = DEFAULT_RETRY_DELAY,
@@ -96,6 +101,7 @@ export function createPipeline<
 	const resolvedEmbedder = createEmbedderFromProfile(
 		options.embeddingProfileId,
 		apiKey,
+		{ embeddingComplete },
 	);
 
 	/**

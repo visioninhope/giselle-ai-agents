@@ -10,6 +10,7 @@ import { PoolManager } from "../../database/postgres";
 import { ensurePgVectorTypes } from "../../database/postgres/pgvector-registry";
 import type { DatabaseConfig } from "../../database/types";
 import { createEmbedderFromProfile } from "../../embedder/profiles";
+import type { EmbeddingCompleteCallback } from "../../embedder/types";
 import {
 	ConfigurationError,
 	DatabaseError,
@@ -106,6 +107,7 @@ export function createPostgresQueryService<
 		context: TContext,
 		limit = 10,
 		similarityThreshold?: number,
+		embeddingComplete?: EmbeddingCompleteCallback,
 	): Promise<QueryResult<z.infer<TSchema>>[]> {
 		const pool = PoolManager.getPool(database);
 
@@ -137,7 +139,9 @@ export function createPostgresQueryService<
 				);
 			}
 
-			const embedder = createEmbedderFromProfile(profileId, apiKey, {});
+			const embedder = createEmbedderFromProfile(profileId, apiKey, {
+				embeddingComplete,
+			});
 			const queryEmbedding = await embedder.embed(query);
 
 			const filters = await config.contextToFilter(context);
