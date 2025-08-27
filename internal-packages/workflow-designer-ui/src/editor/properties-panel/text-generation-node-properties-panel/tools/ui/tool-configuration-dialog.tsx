@@ -16,7 +16,7 @@ export interface ToolConfigurationDialogProps
 	description: string;
 	onSubmit: React.FormEventHandler<HTMLFormElement>;
 	submitting: boolean;
-	trigger: React.ReactNode;
+	trigger: React.ReactNode | null;
 	disabled?: boolean;
 	size?: DialogSize;
 	submitText?: string;
@@ -38,7 +38,7 @@ export function ToolConfigurationDialog({
 }: PropsWithChildren<ToolConfigurationDialogProps>) {
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange} defaultOpen={defaultOpen}>
-			<DialogTrigger asChild>{trigger}</DialogTrigger>
+			{trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
 			<DialogContent size={size}>
 				<div className="mb-4">
 					<DialogTitle className="text-[20px] font-medium text-text tracking-tight font-sans">
