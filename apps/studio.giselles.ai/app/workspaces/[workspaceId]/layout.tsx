@@ -8,6 +8,7 @@ import {
 	experimental_storageFlag,
 	layoutV3Flag,
 	multiEmbeddingFlag,
+	resumableGenerationFlag,
 	runV3Flag,
 	stageFlag,
 	webSearchActionFlag,
@@ -52,6 +53,8 @@ export default async function Layout({
 	const stage = await stageFlag();
 	const multiEmbedding = await multiEmbeddingFlag();
 	const aiGateway = await aiGatewayFlag();
+	const resumableGeneration = await resumableGenerationFlag();
+
 	// return children
 	return (
 		<WorkspaceProvider
@@ -86,6 +89,7 @@ export default async function Layout({
 				stage,
 				multiEmbedding,
 				aiGateway,
+				resumableGeneration,
 			}}
 			flowTrigger={{
 				callbacks: {

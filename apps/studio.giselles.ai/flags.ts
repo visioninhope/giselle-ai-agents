@@ -153,3 +153,22 @@ export const aiGatewayFlag = flag<boolean>({
 		{ value: true, label: "Enable" },
 	],
 });
+
+export const resumableGenerationFlag = flag<boolean>({
+	key: "resumable-generation",
+	async decide() {
+		if (process.env.NODE_ENV === "development") {
+			return takeLocalEnv("RESUMABLE_GENERATION_FLAG");
+		}
+		const edgeConfig = await get(`flag__${this.key}`);
+		if (edgeConfig === undefined) {
+			return false;
+		}
+		return edgeConfig === true || edgeConfig === "true";
+	},
+	description: "Enable resumable generation",
+	options: [
+		{ value: false, label: "disable" },
+		{ value: true, label: "Enable" },
+	],
+});

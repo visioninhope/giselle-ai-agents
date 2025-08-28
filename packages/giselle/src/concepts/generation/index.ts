@@ -71,6 +71,7 @@ export const RunningGeneration = GenerationBase.extend({
 	queuedAt: z.number(),
 	startedAt: z.number(),
 	messages: z.array(Message),
+	resumePointer: z.string().optional(),
 });
 export type RunningGeneration = z.infer<typeof RunningGeneration>;
 
@@ -94,6 +95,7 @@ export const CompletedGeneration = GenerationBase.extend({
 	messages: z.array(Message),
 	outputs: z.array(GenerationOutput),
 	usage: GenerationUsage.optional(),
+	resumePointer: z.string().optional(),
 });
 export type CompletedGeneration = z.infer<typeof CompletedGeneration>;
 

@@ -37,11 +37,13 @@ export function generateText(args: {
 	generation: QueuedGeneration;
 	useExperimentalStorage: boolean;
 	useAiGateway: boolean;
+	useResumableGeneration: boolean;
 }) {
 	return useGenerationExecutor({
 		context: args.context,
 		generation: args.generation,
 		useExperimentalStorage: args.useExperimentalStorage,
+		useResumableGeneration: args.useResumableGeneration,
 		execute: async ({
 			completeGeneration,
 			runningGeneration,
