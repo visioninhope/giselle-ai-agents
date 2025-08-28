@@ -4,7 +4,7 @@ import type {
 	EmbeddingProvider,
 } from "./index";
 
-type EmbeddingProfile = {
+export type EmbeddingProfile = {
 	provider: EmbeddingProvider;
 	model: EmbeddingModelId;
 	dimensions: EmbeddingDimensions;

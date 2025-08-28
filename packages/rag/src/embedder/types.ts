@@ -1,12 +1,10 @@
+import type { EmbeddingProfile } from "@giselle-sdk/data-type";
+
 /**
- * Embedding profile configuration
+ * Embedding profile configuration (shared definition)
+ * Use the canonical type derived from @giselle-sdk/data-type
  */
-export interface EmbeddingProfile {
-	provider: "openai" | "google";
-	model: string;
-	dimensions: number;
-	name: string;
-}
+export type { EmbeddingProfile };
 
 /**
  * Metrics collected after embedding completion
