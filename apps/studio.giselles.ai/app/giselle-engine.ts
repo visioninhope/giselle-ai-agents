@@ -1,7 +1,13 @@
 import { WorkspaceId } from "@giselle-sdk/data-type";
-import type { CompletedGeneration, OutputFileBlob } from "@giselle-sdk/giselle";
+import type {
+	CompletedGeneration,
+	OutputFileBlob,
+	QueryContext,
+	RunningGeneration,
+} from "@giselle-sdk/giselle";
 import { NextGiselleEngine } from "@giselle-sdk/giselle/next";
-import { traceGeneration } from "@giselle-sdk/langfuse";
+import { traceEmbedding, traceGeneration } from "@giselle-sdk/langfuse";
+import type { EmbeddingMetrics } from "@giselle-sdk/rag";
 import {
 	supabaseStorageDriver as experimental_supabaseStorageDriver,
 	supabaseVaultDriver,
@@ -88,7 +94,7 @@ if (
 	throw new Error("missing github credentials");
 }
 
-type TeamForPlan = Pick<CurrentTeam, "activeSubscriptionId" | "type">;
+type TeamForPlan = Pick<CurrentTeam, "id" | "activeSubscriptionId" | "type">;
 
 async function traceGenerationForTeam(args: {
 	generation: CompletedGeneration;
@@ -118,6 +124,42 @@ async function traceGenerationForTeam(args: {
 			providerMetadata: args.providerMetadata,
 		},
 		sessionId: args.sessionId,
+	});
+}
+
+async function traceEmbeddingForTeam(args: {
+	metrics: EmbeddingMetrics;
+	generation: RunningGeneration;
+	queryContext: QueryContext;
+	sessionId?: string;
+	userId: string;
+	team: TeamForPlan;
+}) {
+	const isPro = isProPlan(args.team);
+	const planTag = isPro ? "plan:pro" : "plan:free";
+	const teamTypeTag = `teamType:${args.team.type}`;
+
+	if (args.queryContext.provider !== "github") {
+		throw new Error(`Unsupported provider: ${args.queryContext.provider}`);
+	}
+
+	await traceEmbedding({
+		metrics: args.metrics,
+		userId: args.userId,
+		sessionId: args.sessionId,
+		tags: [planTag, teamTypeTag, "embedding-purpose:query"],
+		metadata: {
+			generationId: args.generation.id,
+			teamId: args.team.id,
+			isProPlan: isPro,
+			teamType: args.team.type,
+			userId: args.userId,
+			subscriptionId: args.team.activeSubscriptionId ?? "",
+			resourceProvider: args.queryContext.provider,
+			resourceContentType: args.queryContext.contentType,
+			resourceOwner: args.queryContext.owner,
+			resourceRepo: args.queryContext.repo,
+		},
 	});
 }
 
@@ -202,6 +244,50 @@ export const giselleEngine = NextGiselleEngine({
 					}
 				} catch (error) {
 					console.error("Trace generation failed:", error);
+				}
+			});
+		},
+		embeddingComplete: (args) => {
+			after(async () => {
+				try {
+					switch (args.generation.context.origin.type) {
+						case "github-app": {
+							const team = await getWorkspaceTeam(
+								args.generation.context.origin.workspaceId,
+							);
+							await traceEmbeddingForTeam({
+								metrics: args.embeddingMetrics,
+								generation: args.generation,
+								queryContext: args.queryContext,
+								sessionId: args.generation.context.origin.actId,
+								userId: "github-app",
+								team,
+							});
+							break;
+						}
+						case "stage":
+						case "studio": {
+							const [currentUser, currentTeam] = await Promise.all([
+								fetchCurrentUser(),
+								fetchCurrentTeam(),
+							]);
+							await traceEmbeddingForTeam({
+								metrics: args.embeddingMetrics,
+								generation: args.generation,
+								queryContext: args.queryContext,
+								sessionId: args.generation.context.origin.actId,
+								userId: currentUser.id,
+								team: currentTeam,
+							});
+							break;
+						}
+						default: {
+							const _exhaustiveCheck: never = args.generation.context.origin;
+							throw new Error(`Unhandled origin type: ${_exhaustiveCheck}`);
+						}
+					}
+				} catch (error) {
+					console.error("Embedding callback failed:", error);
 				}
 			});
 		},
