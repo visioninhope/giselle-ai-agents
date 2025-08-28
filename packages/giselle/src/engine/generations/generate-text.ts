@@ -14,7 +14,7 @@ import {
 	hasCapability,
 	languageModels,
 } from "@giselle-sdk/language-model";
-import { AISDKError, stepCountIs, streamText } from "ai";
+import { AISDKError, streamText } from "ai";
 import type {
 	FailedGeneration,
 	GenerationOutput,
@@ -224,7 +224,6 @@ export function generateText(args: {
 						),
 					);
 				},
-				stopWhen: stepCountIs(Object.keys(preparedToolSet.toolSet).length + 1),
 				async onFinish() {
 					try {
 						await Promise.all(
