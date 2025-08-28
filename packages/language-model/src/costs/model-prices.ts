@@ -313,8 +313,8 @@ export function getValidPricing(
  * Embeddings charge per input token only (no output distinction)
  */
 type EmbeddingModelPrice = {
-  validFrom: string;
-  costPerMegaToken: number; // USD per 1,000,000 tokens
+	validFrom: string;
+	costPerMegaToken: number; // USD per 1,000,000 tokens
 };
 
 export type EmbeddingModelPriceTable = Record<
