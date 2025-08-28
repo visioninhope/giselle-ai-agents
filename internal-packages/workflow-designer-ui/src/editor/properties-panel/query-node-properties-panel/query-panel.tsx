@@ -60,7 +60,8 @@ function getDataSourceDisplayInfo(input: ConnectedSource): {
 }
 
 export function QueryPanel({ node }: { node: QueryNode }) {
-	const { updateNodeDataContent, deleteConnection } = useWorkflowDesigner();
+	const { updateNodeDataContent, deleteConnection, updateNodeData } =
+		useWorkflowDesigner();
 	const { all: connectedInputs } = useConnectedSources(node);
 	const connectedDatasourceInputs = useMemo(
 		() =>
@@ -131,9 +132,17 @@ export function QueryPanel({ node }: { node: QueryNode }) {
 											</div>
 											<button
 												type="button"
-												onClick={() =>
-													deleteConnection(dataSource.connection.id)
-												}
+												onClick={() => {
+													// Remove the connection between Vector Store and this Query node
+													deleteConnection(dataSource.connection.id);
+													// Also remove the dynamically created input associated with this connection
+													updateNodeData(node, {
+														inputs: node.inputs.filter(
+															(input) =>
+																input.id !== dataSource.connection.inputId,
+														),
+													});
+												}}
 												className="ml-1 p-0.5 rounded transition-colors"
 												style={{
 													color: "rgba(131, 157, 195, 0.7)",
