@@ -20,6 +20,7 @@ export default async function Layout({
 				experimental_storage: true,
 				stage: true,
 				multiEmbedding: false,
+				aiGateway: false,
 			}}
 		>
 			{children}

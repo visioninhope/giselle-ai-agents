@@ -134,3 +134,22 @@ export const multiEmbeddingFlag = flag<boolean>({
 		{ value: true, label: "Enable" },
 	],
 });
+
+export const aiGatewayFlag = flag<boolean>({
+	key: "ai-gateway",
+	async decide() {
+		if (process.env.NODE_ENV === "development") {
+			return takeLocalEnv("AI_GATEWAY_FLAG");
+		}
+		const edgeConfig = await get(`flag__${this.key}`);
+		if (edgeConfig === undefined) {
+			return false;
+		}
+		return edgeConfig === true || edgeConfig === "true";
+	},
+	description: "Enable AI Gateway",
+	options: [
+		{ value: false, label: "disable" },
+		{ value: true, label: "Enable" },
+	],
+});

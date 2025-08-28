@@ -1,6 +1,7 @@
 import { type AnthropicProviderOptions, anthropic } from "@ai-sdk/anthropic";
+import { createGateway } from "@ai-sdk/gateway";
 import { google } from "@ai-sdk/google";
-import { openai } from "@ai-sdk/openai";
+import { type OpenAIResponsesProviderOptions, openai } from "@ai-sdk/openai";
 import { perplexity } from "@ai-sdk/perplexity";
 import {
 	isTextGenerationNode,
@@ -35,6 +36,7 @@ export function generateText(args: {
 	context: GiselleEngineContext;
 	generation: QueuedGeneration;
 	useExperimentalStorage: boolean;
+	useAiGateway: boolean;
 }) {
 	return useGenerationExecutor({
 		context: args.context,
@@ -191,8 +193,13 @@ export function generateText(args: {
 
 			const providerOptions = getProviderOptions(operationNode.content.llm);
 
+			const model = generationModel(
+				operationNode.content.llm,
+				args.useAiGateway,
+				args.context.aiGateway,
+			);
 			const streamTextResult = streamText({
-				model: generationModel(operationNode.content.llm),
+				model,
 				providerOptions,
 				messages,
 				tools: preparedToolSet.toolSet,
@@ -275,6 +282,7 @@ export function generateText(args: {
 						outputs: generationOutputs,
 						usage: await streamTextResult.usage,
 						generateMessages: generateMessages,
+						providerMetadata: await streamTextResult.providerMetadata,
 					});
 				},
 			});
@@ -282,8 +290,40 @@ export function generateText(args: {
 	});
 }
 
-function generationModel(languageModel: TextGenerationLanguageModelData) {
+function generationModel(
+	languageModel: TextGenerationLanguageModelData,
+	useAiGateway: boolean,
+	gatewayOptions?: { httpReferer: string; xTitle: string },
+) {
 	const llmProvider = languageModel.provider;
+	if (useAiGateway) {
+		const gateway = createGateway(
+			gatewayOptions === undefined
+				? undefined
+				: {
+						headers: {
+							"http-referer": gatewayOptions.httpReferer,
+							"x-title": gatewayOptions.xTitle,
+						},
+					},
+		);
+		// Use AI Gateway model specifier: "<provider>/<modelId>"
+		// e.g. "openai/gpt-4o" or "anthropic/claude-3-5-sonnet-20240620"
+		switch (llmProvider) {
+			case "anthropic":
+			case "openai":
+			case "google":
+			case "perplexity": {
+				return gateway(`${llmProvider}/${languageModel.id}`);
+			}
+			default: {
+				const _exhaustiveCheck: never = llmProvider;
+				throw new Error(`Unknown LLM provider: ${_exhaustiveCheck}`);
+			}
+		}
+	}
+
+	// Default: use direct provider SDKs
 	switch (llmProvider) {
 		case "anthropic": {
 			return anthropic(languageModel.id);
@@ -308,6 +348,7 @@ function getProviderOptions(languageModelData: TextGenerationLanguageModelData):
 	| {
 			anthropic?: AnthropicProviderOptions;
 			perplexity?: PerplexityProviderOptions;
+			openai?: OpenAIResponsesProviderOptions;
 	  }
 	| undefined {
 	const languageModel = languageModels.find(
@@ -341,6 +382,18 @@ function getProviderOptions(languageModelData: TextGenerationLanguageModelData):
 				search_domain_filter: searchDomainFilter,
 			},
 		};
+	}
+	if (languageModel && languageModelData.provider === "openai") {
+		const openaiOptions: OpenAIResponsesProviderOptions = {};
+		if (hasCapability(languageModel, Capability.Reasoning)) {
+			openaiOptions.textVerbosity =
+				languageModelData.configurations.textVerbosity;
+			openaiOptions.reasoningSummary = "auto";
+			openaiOptions.reasoningEffort =
+				languageModelData.configurations.reasoningEffort;
+		}
+
+		return { openai: openaiOptions };
 	}
 	return undefined;
 }

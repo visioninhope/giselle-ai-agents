@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { after } from "next/server";
 import { giselleEngine } from "@/app/giselle-engine";
 import { acts as actsSchema, db } from "@/drizzle";
+import { aiGatewayFlag } from "@/flags";
 import { fetchCurrentUser } from "@/services/accounts";
 import type { PerformStagePayloads } from "./types";
 
@@ -39,9 +40,12 @@ export async function performStageAction(
 			sdkWorkspaceId: payloads.flowTrigger.workspaceId,
 		});
 
+		const useAiGateway = await aiGatewayFlag();
+
 		after(() =>
 			giselleEngine.startAct({
 				actId: act.id,
+				useAiGateway,
 			}),
 		);
 

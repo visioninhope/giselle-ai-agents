@@ -13,6 +13,8 @@ import {
 } from "../tool/toolbar";
 import type { Tool } from "../tool/types";
 
+type InputShortcutPolicy = "ignore" | "modifierOnly" | "always";
+
 // Browser shortcuts that should be prevented when canvas is focused
 const BROWSER_SHORTCUTS_TO_PREVENT = [
 	{ key: "d", modifiers: ["meta", "ctrl"] }, // Bookmark
@@ -26,13 +28,21 @@ function useKeyAction(
 	key: string | string[],
 	action: () => void,
 	enabled: boolean = false,
-	options?: { preventDefault?: boolean },
+	options: {
+		inputShortcutPolicy?: InputShortcutPolicy;
+		preventDefault?: boolean;
+	} = {
+		inputShortcutPolicy: "ignore",
+	},
 ) {
 	const wasPressed = useRef(false);
-	const isPressed = useKeyPress(key, {
-		actInsideInputWithModifier: false,
-		...options,
-	});
+
+	const useKeyPressOptions = {
+		actInsideInputWithModifier: options.inputShortcutPolicy === "modifierOnly",
+		preventDefault: options.preventDefault,
+	};
+
+	const isPressed = useKeyPress(key, useKeyPressOptions);
 
 	useEffect(() => {
 		if (isPressed && !wasPressed.current && enabled) {
@@ -55,15 +65,24 @@ function useToolAction(key: string, toolFunction: () => Tool) {
 	);
 }
 
-export function useKeyboardShortcuts() {
+interface UseKeyboardShortcutsOptions {
+	onGenerate?: () => void;
+}
+
+export function useKeyboardShortcuts(
+	options: UseKeyboardShortcutsOptions = {},
+) {
 	const { data } = useWorkflowDesigner();
 	const {
 		copy: handleCopy,
 		paste: handlePaste,
 		duplicate: handleDuplicate,
 	} = useNodeManipulation();
+	const { onGenerate } = options;
 
 	const isCanvasFocused = data.ui.currentShortcutScope === "canvas";
+	const isPropertiesPanelFocused =
+		data.ui.currentShortcutScope === "properties-panel";
 
 	// Tool shortcuts using the simplified hook
 	useToolAction("t", selectTriggerTool);
@@ -72,6 +91,14 @@ export function useKeyboardShortcuts() {
 	useToolAction("r", selectRetrievalCategoryTool);
 	useToolAction("d", selectActionTool);
 	useToolAction("Escape", moveTool);
+
+	// Generate shortcut for properties panel
+	useKeyAction(
+		["Meta+Enter", "Control+Enter"],
+		() => onGenerate?.(),
+		isPropertiesPanelFocused && !!onGenerate,
+		{ inputShortcutPolicy: "modifierOnly" },
+	);
 
 	// Copy/Paste/Duplicate shortcuts
 	useKeyAction(["Meta+c", "Control+c"], handleCopy, isCanvasFocused);

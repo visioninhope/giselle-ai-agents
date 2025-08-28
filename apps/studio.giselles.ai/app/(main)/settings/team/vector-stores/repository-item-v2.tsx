@@ -315,6 +315,12 @@ function EmbeddingModelCard({
 					contentType="pull_request"
 					status={pullRequestStatus}
 					isIngesting={isIngesting}
+					onVerify={
+						pullRequestStatus?.status === "failed" &&
+						pullRequestStatus?.errorCode === "DOCUMENT_NOT_FOUND"
+							? onShowDiagnostic
+							: undefined
+					}
 				/>
 			</div>
 		</div>

@@ -68,7 +68,7 @@ function TextGenerationRunner({ generation }: { generation: Generation }) {
 }
 
 function CompletionRunner({ generation }: { generation: Generation }) {
-	const { experimental_storage } = useFeatureFlag();
+	const { experimental_storage, aiGateway } = useFeatureFlag();
 	const {
 		generateTextApi,
 		updateGenerationStatusToRunning,
@@ -83,6 +83,7 @@ function CompletionRunner({ generation }: { generation: Generation }) {
 			body: {
 				generation,
 				useExperimentalStorage: experimental_storage,
+				useAiGateway: aiGateway,
 			},
 		}),
 		onFinish: async () => {

@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
 import { db, flowTriggers } from "@/drizzle";
 import {
+	aiGatewayFlag,
 	experimental_storageFlag,
 	layoutV3Flag,
 	multiEmbeddingFlag,
@@ -50,6 +51,7 @@ export default async function Layout({
 	const experimental_storage = await experimental_storageFlag();
 	const stage = await stageFlag();
 	const multiEmbedding = await multiEmbeddingFlag();
+	const aiGateway = await aiGatewayFlag();
 	// return children
 	return (
 		<WorkspaceProvider
@@ -83,6 +85,7 @@ export default async function Layout({
 				experimental_storage,
 				stage,
 				multiEmbedding,
+				aiGateway,
 			}}
 			flowTrigger={{
 				callbacks: {
