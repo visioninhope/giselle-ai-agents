@@ -25,7 +25,6 @@ import {
 	GenerationId,
 	GenerationOrigin,
 	QueuedGeneration,
-	type TelemetrySettings,
 } from "../engine/generations";
 import { JsonResponse } from "../utils";
 import { createHandler, withUsageLimitErrorHandler } from "./create-handler";
@@ -180,13 +179,11 @@ export const createJsonRouters = {
 				input: z.object({
 					generation: QueuedGeneration,
 					useExperimentalStorage: z.boolean(),
-					telemetry: z.custom<TelemetrySettings>().optional(),
 				}),
 				handler: async ({ input, signal }) => {
 					await giselleEngine.generateImage(
 						input.generation,
 						input.useExperimentalStorage,
-						input.telemetry,
 						signal,
 					);
 					return new Response(null, { status: 204 });

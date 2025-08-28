@@ -1,8 +1,4 @@
-import type { TelemetrySettings as AI_TelemetrySettings, ToolSet } from "ai";
-
-export interface TelemetrySettings {
-	metadata?: AI_TelemetrySettings["metadata"];
-}
+import type { ToolSet } from "ai";
 
 export type PreparedToolSet = {
 	toolSet: ToolSet;

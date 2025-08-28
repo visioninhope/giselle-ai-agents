@@ -8,7 +8,6 @@ import {
 	isQueuedGeneration,
 } from "../../concepts/generation";
 import { useFeatureFlag } from "../feature-flags";
-import { useTelemetry } from "../telemetry";
 import { useGiselleEngine } from "../use-giselle-engine";
 import { useGenerationRunnerSystem } from "./contexts/generation-runner-system";
 
@@ -124,7 +123,6 @@ function ImageGenerationRunner({ generation }: { generation: Generation }) {
 	} = useGenerationRunnerSystem();
 	const { experimental_storage } = useFeatureFlag();
 	const client = useGiselleEngine();
-	const telemetry = useTelemetry();
 	const abortControllerRef = useRef<AbortController | null>(null);
 
 	const stop = useCallback(() => {
@@ -155,7 +153,6 @@ function ImageGenerationRunner({ generation }: { generation: Generation }) {
 					await client.generateImage(
 						{
 							generation,
-							telemetry,
 							useExperimentalStorage: experimental_storage,
 						},
 						{ signal: abortController.signal },

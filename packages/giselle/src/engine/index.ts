@@ -44,7 +44,6 @@ import {
 	getNodeGenerations,
 	type QueuedGeneration,
 	setGeneration,
-	type TelemetrySettings,
 } from "./generations";
 import { flushGenerationIndexQueue } from "./generations/internal/act-generation-index-queue";
 import {
@@ -210,14 +209,12 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 		generateImage: async (
 			generation: QueuedGeneration,
 			useExperimentalStorage: boolean,
-			telemetry?: TelemetrySettings,
 			signal?: AbortSignal,
 		) => {
 			return await generateImage({
 				context,
 				generation,
 				useExperimentalStorage,
-				telemetry,
 				signal,
 			});
 		},

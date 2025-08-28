@@ -21,7 +21,6 @@ import {
 } from "../../concepts/generation";
 import type { GiselleEngineContext } from "../types";
 import { useGenerationExecutor } from "./internal/use-generation-executor";
-import type { TelemetrySettings } from "./types";
 import {
 	buildMessageObject,
 	detectImageType,
@@ -31,7 +30,6 @@ import {
 export function generateImage(args: {
 	context: GiselleEngineContext;
 	generation: QueuedGeneration;
-	telemetry?: TelemetrySettings;
 	useExperimentalStorage: boolean;
 	signal?: AbortSignal;
 }) {
