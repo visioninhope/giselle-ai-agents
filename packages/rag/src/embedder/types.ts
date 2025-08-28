@@ -1,11 +1,3 @@
-import type { EmbeddingProfile } from "@giselle-sdk/data-type";
-
-/**
- * Embedding profile configuration (shared definition)
- * Use the canonical type derived from @giselle-sdk/data-type
- */
-export type { EmbeddingProfile };
-
 /**
  * Metrics collected after embedding completion
  */

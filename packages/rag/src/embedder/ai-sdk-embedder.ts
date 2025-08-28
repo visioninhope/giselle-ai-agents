@@ -1,10 +1,7 @@
+import type { EmbeddingProfile } from "@giselle-sdk/data-type";
 import { type EmbeddingModel, embed, embedMany } from "ai";
 import { ConfigurationError, EmbeddingError } from "../errors";
-import type {
-	EmbedderFunction,
-	EmbeddingCompleteCallback,
-	EmbeddingProfile,
-} from "./types";
+import type { EmbedderFunction, EmbeddingCompleteCallback } from "./types";
 
 export interface BaseEmbedderConfig {
 	apiKey: string;

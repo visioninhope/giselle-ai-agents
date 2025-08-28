@@ -11,5 +11,4 @@ export type {
 	EmbedderFunction,
 	EmbeddingCompleteCallback,
 	EmbeddingMetrics,
-	EmbeddingProfile,
 } from "./types";
