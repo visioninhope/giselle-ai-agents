@@ -13,7 +13,16 @@ import { AnthropicCostCalculator } from "../anthropic";
 import { GoogleCostCalculator } from "../google";
 import { OpenAICostCalculator } from "../openai";
 import type { CostCalculator } from "./calculator";
-import { DefaultCostCalculator } from "./calculator";
+import {
+	calculateTokenCostForDisplay,
+	DefaultCostCalculator,
+} from "./calculator";
+import type { EmbeddingModelPriceTable } from "./model-prices";
+import {
+	getValidEmbeddingPricing,
+	googleEmbeddingPricing,
+	openAiEmbeddingPricing,
+} from "./model-prices";
 
 export function createDisplayCostCalculator(provider: string): CostCalculator {
 	switch (provider) {
@@ -45,4 +54,48 @@ export async function calculateDisplayCost(
 		outputCostForDisplay: result.output,
 		totalCostForDisplay: result.total,
 	};
+}
+
+/**
+ * Calculate display cost for embedding operations.
+ * Embeddings are priced per token (input only). Output token cost is always 0.
+ */
+export function calculateEmbeddingDisplayCost(
+	provider: "openai" | "google" | string,
+	modelId: string,
+	usage: { tokens: number },
+) {
+	try {
+		let priceTable: EmbeddingModelPriceTable | undefined;
+		switch (provider) {
+			case "openai":
+				priceTable = openAiEmbeddingPricing;
+				break;
+			case "google":
+				priceTable = googleEmbeddingPricing;
+				break;
+			default:
+				priceTable = undefined;
+		}
+
+		if (!priceTable) {
+			return { totalCostForDisplay: 0 };
+		}
+
+		const pricing = getValidEmbeddingPricing(modelId, priceTable);
+		const result = calculateTokenCostForDisplay(
+			{ inputTokens: usage.tokens, outputTokens: 0, totalTokens: usage.tokens },
+			{
+				input: { costPerMegaToken: pricing.costPerMegaToken },
+				output: { costPerMegaToken: 0 },
+			},
+		);
+		return { totalCostForDisplay: result.total };
+	} catch (error) {
+		console.warn(
+			`Embedding pricing not found for provider=${provider}, model=${modelId}.`,
+			error instanceof Error ? error.message : String(error),
+		);
+		return { totalCostForDisplay: 0 };
+	}
 }
