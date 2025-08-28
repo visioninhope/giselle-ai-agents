@@ -3,7 +3,7 @@ import { type EmbeddingModel, embed, embedMany } from "ai";
 import { ConfigurationError, EmbeddingError } from "../errors";
 import type { EmbedderFunction, EmbeddingCompleteCallback } from "./types";
 
-export interface BaseEmbedderConfig {
+export interface EmbedderConfig {
 	apiKey: string;
 	profile: EmbeddingProfile;
 	maxRetries?: number;
@@ -11,7 +11,7 @@ export interface BaseEmbedderConfig {
 }
 
 export function createAiSdkEmbedder(
-	config: BaseEmbedderConfig,
+	config: EmbedderConfig,
 	getModel: (modelName: string) => EmbeddingModel<string>,
 ): EmbedderFunction {
 	if (!config.apiKey || config.apiKey.length === 0) {
