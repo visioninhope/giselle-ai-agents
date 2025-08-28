@@ -38,6 +38,7 @@ async function executeStep(args: {
 		onFailed?: (generation: QueuedGeneration) => void | Promise<void>;
 	};
 	useAiGateway: boolean;
+	useResumableGeneration: boolean;
 }) {
 	try {
 		switch (args.generation.context.operationNode.content.type) {
@@ -51,7 +52,6 @@ async function executeStep(args: {
 				const generateTextStream = await generateText({
 					...args,
 					useExperimentalStorage: true,
-					useAiGateway: args.useAiGateway,
 				});
 
 				// Consume the stream to trigger completion callbacks and persist generation results
@@ -81,6 +81,7 @@ export const StartActInputs = z.object({
 	actId: ActId.schema,
 	callbacks: z.optional(z.custom<StartActCallbacks>()),
 	useAiGateway: z.boolean().default(false),
+	useResumableGeneration: z.boolean().default(false),
 });
 export type StartActInputs = z.infer<typeof StartActInputs>;
 
@@ -119,6 +120,7 @@ export async function startAct(
 					generation: queuedGeneration,
 					callbacks,
 					useAiGateway: args.useAiGateway,
+					useResumableGeneration: args.useResumableGeneration,
 				});
 			},
 			onSequenceStart: async (sequence) => {

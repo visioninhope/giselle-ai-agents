@@ -21,6 +21,7 @@ export default async function Layout({
 				stage: true,
 				multiEmbedding: false,
 				aiGateway: false,
+				resumableGeneration: false,
 			}}
 		>
 			{children}

@@ -491,6 +491,7 @@ export async function processEvent<TEventName extends WebhookEventName>(
 				},
 			},
 			useAiGateway: false,
+			useResumableGeneration: false,
 		});
 		const greeting = hasFlowError
 			? "Unexpected error on running flow"

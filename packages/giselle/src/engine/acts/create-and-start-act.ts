@@ -30,5 +30,6 @@ export async function createAndStartAct(
 		actId: act.id,
 		callbacks: args.callbacks,
 		useAiGateway: args.useAiGateway,
+		useResumableGeneration: args.useResumableGeneration,
 	});
 }
