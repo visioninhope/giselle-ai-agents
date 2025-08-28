@@ -3,7 +3,10 @@ import {
 	createGitHubArchiveLoader,
 	createGitHubTreeLoader,
 } from "@giselle-sdk/github-tool";
-import { createPipeline } from "@giselle-sdk/rag";
+import {
+	createPipeline,
+	type EmbeddingCompleteCallback,
+} from "@giselle-sdk/rag";
 import type { Octokit } from "@octokit/core";
 import { and, eq } from "drizzle-orm";
 import {
@@ -24,6 +27,7 @@ export async function ingestGitHubBlobs(params: {
 	source: { owner: string; repo: string; commitSha: string };
 	teamDbId: number;
 	embeddingProfileId: EmbeddingProfileId;
+	embeddingComplete?: EmbeddingCompleteCallback;
 }): Promise<void> {
 	const { repositoryIndexDbId, isInitialIngest } = await getRepositoryIndexInfo(
 		params.source,
@@ -54,6 +58,7 @@ export async function ingestGitHubBlobs(params: {
 			path: metadata.path,
 		}),
 		embeddingProfileId: params.embeddingProfileId,
+		embeddingComplete: params.embeddingComplete,
 	});
 
 	const result = await ingest();

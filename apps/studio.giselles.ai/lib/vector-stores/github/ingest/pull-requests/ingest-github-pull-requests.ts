@@ -3,7 +3,10 @@ import {
 	createGitHubPullRequestsLoader,
 	type GitHubAuthConfig,
 } from "@giselle-sdk/github-tool";
-import { createPipeline } from "@giselle-sdk/rag";
+import {
+	createPipeline,
+	type EmbeddingCompleteCallback,
+} from "@giselle-sdk/rag";
 import { and, eq } from "drizzle-orm";
 import {
 	db,
@@ -22,6 +25,7 @@ export async function ingestGitHubPullRequests(params: {
 	source: { owner: string; repo: string };
 	teamDbId: number;
 	embeddingProfileId: EmbeddingProfileId;
+	embeddingComplete?: EmbeddingCompleteCallback;
 }): Promise<void> {
 	const { repositoryIndexDbId } = await getRepositoryIndexInfo(
 		params.source,
@@ -54,6 +58,7 @@ export async function ingestGitHubPullRequests(params: {
 			prNumber: metadata.prNumber,
 		}),
 		embeddingProfileId: params.embeddingProfileId,
+		embeddingComplete: params.embeddingComplete,
 	});
 
 	const result = await ingest();
