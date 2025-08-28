@@ -307,3 +307,73 @@ export function getValidPricing(
 
 	return validPrices[0];
 }
+
+/**
+ * Embedding model pricing
+ * Embeddings charge per input token only (no output distinction)
+ */
+type EmbeddingModelPrice = {
+	validFrom: string;
+	costPerMegaToken: number; // USD per 1,000,000 tokens
+};
+
+export type EmbeddingModelPriceTable = Record<
+	string,
+	{ prices: EmbeddingModelPrice[] }
+>;
+
+export function getValidEmbeddingPricing(
+	modelId: string,
+	priceTable: EmbeddingModelPriceTable,
+): EmbeddingModelPrice {
+	const modelPricing = priceTable[modelId];
+	if (!modelPricing) {
+		throw new Error(`No embedding pricing found for model ${modelId}`);
+	}
+
+	const now = new Date();
+	const validPrices = modelPricing.prices
+		.filter((price) => new Date(price.validFrom) <= now)
+		.sort(
+			(a, b) =>
+				new Date(b.validFrom).getTime() - new Date(a.validFrom).getTime(),
+		);
+
+	if (validPrices.length === 0) {
+		throw new Error(`No valid embedding pricing found for model ${modelId}`);
+	}
+
+	return validPrices[0];
+}
+
+// Embedding pricing tables (per 1M tokens)
+// validFrom is unified per request
+export const openAiEmbeddingPricing: EmbeddingModelPriceTable = {
+	"text-embedding-3-small": {
+		prices: [
+			{
+				validFrom: "2025-08-28T00:00:00Z",
+				costPerMegaToken: 0.01,
+			},
+		],
+	},
+	"text-embedding-3-large": {
+		prices: [
+			{
+				validFrom: "2025-08-28T00:00:00Z",
+				costPerMegaToken: 0.065,
+			},
+		],
+	},
+};
+
+export const googleEmbeddingPricing: EmbeddingModelPriceTable = {
+	"gemini-embedding-001": {
+		prices: [
+			{
+				validFrom: "2025-08-28T00:00:00Z",
+				costPerMegaToken: 0.15,
+			},
+		],
+	},
+};

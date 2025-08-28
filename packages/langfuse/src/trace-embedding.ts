@@ -1,3 +1,4 @@
+import { calculateEmbeddingDisplayCost } from "@giselle-sdk/language-model";
 import type { EmbeddingMetrics } from "@giselle-sdk/rag";
 import { Langfuse } from "langfuse";
 
@@ -49,7 +50,11 @@ export async function traceEmbedding(args: {
 			],
 		});
 
-		// TODO: Calculate costs
+		const totalTokens = usage?.tokens ?? 0;
+		const cost = await calculateEmbeddingDisplayCost(provider, model, {
+			tokens: totalTokens,
+		});
+
 		trace.generation({
 			name: operation,
 			model: model,
@@ -57,8 +62,8 @@ export async function traceEmbedding(args: {
 			// output: args.metrics.embeddings,
 			usage: {
 				unit: "TOKENS",
-				totalTokens: usage?.tokens ?? 0,
-				totalCost: 0, // TODO: Calculate costs
+				totalTokens,
+				totalCost: cost.totalCostForDisplay,
 			},
 			startTime: startTime,
 			endTime: endTime,
