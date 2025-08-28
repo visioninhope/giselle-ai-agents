@@ -27,6 +27,7 @@
 		"@giselle-sdk/data-type": "workspace:^",
 		"@giselle-sdk/giselle": "workspace:^",
 		"@giselle-sdk/language-model": "workspace:^",
+		"@giselle-sdk/rag": "workspace:^",
 		"langfuse": "catalog:"
 	}
 }

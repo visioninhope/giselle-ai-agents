@@ -1,4 +1,5 @@
 import type { Chunk } from "../chunk-store/types";
+import type { EmbeddingCompleteCallback } from "../embedder/types";
 
 export interface QueryResult<
 	TMetadata extends Record<string, unknown> = Record<string, never>,
@@ -19,11 +20,13 @@ export interface QueryService<
 	 * @param context search context (filtering)
 	 * @param limit maximum number of results
 	 * @param similarityThreshold minimum similarity score (optional)
+	 * @param embeddingComplete callback invoked after embedding completion (optional)
 	 */
 	search(
 		query: string,
 		context: TContext,
 		limit?: number,
 		similarityThreshold?: number,
+		embeddingComplete?: EmbeddingCompleteCallback,
 	): Promise<QueryResult<TMetadata>[]>;
 }

@@ -1,4 +1,26 @@
 /**
+ * Metrics collected after embedding completion
+ */
+export interface EmbeddingMetrics {
+	texts: string[];
+	embeddings: number[][];
+	model: string;
+	provider: "openai" | "google";
+	dimensions: number;
+	usage?: { tokens: number };
+	operation: "embed" | "embedMany";
+	startTime: Date;
+	endTime: Date;
+}
+
+/**
+ * Callback function invoked when embedding is complete
+ */
+export type EmbeddingCompleteCallback = (
+	metrics: EmbeddingMetrics,
+) => void | Promise<void>;
+
+/**
  * Function type for embedding operations
  */
 export type EmbedderFunction = {
@@ -15,4 +37,9 @@ export type EmbedderFunction = {
 	 * @returns The array of embedding vectors
 	 */
 	embedMany(texts: string[]): Promise<number[][]>;
+
+	/**
+	 * Optional callback invoked after embedding completion
+	 */
+	embeddingComplete?: EmbeddingCompleteCallback;
 };

@@ -3,7 +3,7 @@ import {
 	type EmbeddingProfileId,
 } from "@giselle-sdk/data-type";
 import { ConfigurationError } from "../errors";
-import type { BaseEmbedderConfig } from "./ai-sdk-embedder";
+import type { EmbedderConfig } from "./ai-sdk-embedder";
 import { createGoogleEmbedder } from "./google";
 import { createOpenAIEmbedder } from "./openai";
 import type { EmbedderFunction } from "./types";
@@ -11,7 +11,7 @@ import type { EmbedderFunction } from "./types";
 export function createEmbedderFromProfile(
 	profileId: EmbeddingProfileId,
 	apiKey: string,
-	options?: Pick<BaseEmbedderConfig, "maxRetries">,
+	options?: Pick<EmbedderConfig, "maxRetries" | "embeddingComplete">,
 ): EmbedderFunction {
 	const profile = EMBEDDING_PROFILES[profileId];
 	if (!profile) {
@@ -26,13 +26,13 @@ export function createEmbedderFromProfile(
 		case "openai":
 			return createOpenAIEmbedder({
 				apiKey,
-				model: profile.model,
+				profile,
 				...options,
 			});
 		case "google":
 			return createGoogleEmbedder({
 				apiKey,
-				model: profile.model,
+				profile,
 				...options,
 			});
 		default: {
