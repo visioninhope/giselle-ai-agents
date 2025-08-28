@@ -261,7 +261,6 @@ function QueryRunner({ generation }: { generation: Generation }) {
 	} = useGenerationRunnerSystem();
 	const { experimental_storage } = useFeatureFlag();
 	const client = useGiselleEngine();
-	const telemetry = useTelemetry();
 	const stop = () => {};
 	useOnce(() => {
 		if (!isQueuedGeneration(generation)) {
@@ -278,7 +277,6 @@ function QueryRunner({ generation }: { generation: Generation }) {
 				client
 					.executeQuery({
 						generation,
-						telemetry,
 					})
 					.then(() => {
 						updateGenerationStatusToComplete(generation.id);

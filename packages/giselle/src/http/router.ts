@@ -326,7 +326,6 @@ export const createJsonRouters = {
 		createHandler({
 			input: z.object({
 				generation: QueuedGeneration,
-				telemetry: z.custom<TelemetrySettings>().optional(),
 			}),
 			handler: async ({ input }) => {
 				await giselleEngine.executeQuery(input.generation);
