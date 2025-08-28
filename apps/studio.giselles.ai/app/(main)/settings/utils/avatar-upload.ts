@@ -32,7 +32,7 @@ export function validateImageFile(file: File): {
 				"Invalid file format. Please upload a JPG, PNG, GIF, or WebP image.",
 		};
 	}
-	if (file.size > IMAGE_CONSTRAINTS.maxSize) {
+	if (file.size >= IMAGE_CONSTRAINTS.maxSize) {
 		return {
 			valid: false,
 			error: `File size exceeds ${IMAGE_CONSTRAINTS.maxSize / (1024 * 1024)}MB limit`,

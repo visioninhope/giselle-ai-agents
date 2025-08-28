@@ -95,7 +95,7 @@ export function ProfileEditModal({
 			return;
 		}
 
-		if (file.size > IMAGE_CONSTRAINTS.maxSize) {
+		if (file.size >= IMAGE_CONSTRAINTS.maxSize) {
 			setAvatarError(
 				`Please select an image under ${IMAGE_CONSTRAINTS.maxSize / (1024 * 1024)}MB in size`,
 			);
