@@ -2,7 +2,6 @@ import {
 	EMBEDDING_PROFILES,
 	type EmbeddingProfileId,
 } from "@giselle-sdk/data-type";
-import type { TelemetrySettings } from "ai";
 import { escapeIdentifier } from "pg";
 import * as pgvector from "pgvector/pg";
 import type { z } from "zod/v4";
@@ -107,7 +106,6 @@ export function createPostgresQueryService<
 		context: TContext,
 		limit = 10,
 		similarityThreshold?: number,
-		telemetry?: TelemetrySettings,
 	): Promise<QueryResult<z.infer<TSchema>>[]> {
 		const pool = PoolManager.getPool(database);
 
@@ -139,9 +137,7 @@ export function createPostgresQueryService<
 				);
 			}
 
-			const embedder = createEmbedderFromProfile(profileId, apiKey, {
-				telemetry,
-			});
+			const embedder = createEmbedderFromProfile(profileId, apiKey, {});
 			const queryEmbedding = await embedder.embed(query);
 
 			const filters = await config.contextToFilter(context);
