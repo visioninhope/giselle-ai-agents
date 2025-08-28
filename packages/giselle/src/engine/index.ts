@@ -122,12 +122,14 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 			generation: QueuedGeneration,
 			useExperimentalStorage: boolean,
 			useAiGateway: boolean,
+			useResumableGeneration: boolean,
 		) => {
 			return await generateText({
 				context,
 				generation,
 				useExperimentalStorage,
 				useAiGateway,
+				useResumableGeneration,
 			});
 		},
 		getGeneration: async (

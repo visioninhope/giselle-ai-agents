@@ -47,6 +47,7 @@ export async function useGenerationExecutor<T>(args: {
 	context: GiselleEngineContext;
 	generation: QueuedGeneration;
 	useExperimentalStorage?: boolean;
+	useResumableGeneration?: boolean;
 	signal?: AbortSignal;
 	execute: (utils: {
 		runningGeneration: RunningGeneration;

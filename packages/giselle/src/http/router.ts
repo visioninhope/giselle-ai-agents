@@ -84,12 +84,14 @@ export const createJsonRouters = {
 					generation: QueuedGeneration,
 					useExperimentalStorage: z.boolean(),
 					useAiGateway: z.boolean(),
+					useResumableGeneration: z.boolean(),
 				}),
 				handler: async ({ input }) => {
 					const stream = await giselleEngine.generateText(
 						input.generation,
 						input.useExperimentalStorage,
 						input.useAiGateway,
+						input.useResumableGeneration,
 					);
 					return createUIMessageStreamResponse({ stream });
 				},
