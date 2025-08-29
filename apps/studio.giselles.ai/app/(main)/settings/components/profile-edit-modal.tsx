@@ -53,8 +53,25 @@ export function ProfileEditModal({
 	const [error, setError] = useState<string>("");
 	const [avatarError, setAvatarError] = useState<string>("");
 	const [isLoading, setIsLoading] = useState(false);
-	const hasChanges =
-		selectedAvatarFile !== null || displayName !== initialDisplayName;
+
+	// Derived validity state (simple consts)
+	const trimmedDisplayName = displayName.trim();
+	const trimmedInitialDisplayName = (initialDisplayName ?? "").trim();
+	const isDisplayNameChanged = trimmedDisplayName !== trimmedInitialDisplayName;
+	let isDisplayNameValid = true;
+	if (isDisplayNameChanged) {
+		try {
+			parse(DisplayNameSchema, trimmedDisplayName);
+			isDisplayNameValid = true;
+		} catch {
+			isDisplayNameValid = false;
+		}
+	}
+	const isAvatarValid = avatarError === "";
+	const isFormSubmittable =
+		(selectedAvatarFile !== null || isDisplayNameChanged) &&
+		isDisplayNameValid &&
+		isAvatarValid;
 
 	// Reset when the modal opens/closes
 	useEffect(() => {
@@ -134,10 +151,10 @@ export function ProfileEditModal({
 			setError("");
 			setAvatarError("");
 
-			// Validate display name if changed
-			if (displayName !== initialDisplayName) {
+			// Validate display name if changed (trim-aware)
+			if (isDisplayNameChanged) {
 				try {
-					parse(DisplayNameSchema, displayName);
+					parse(DisplayNameSchema, trimmedDisplayName);
 				} catch (valError) {
 					if (valError instanceof Error) {
 						setError(valError.message);
@@ -150,10 +167,10 @@ export function ProfileEditModal({
 			// Save changes
 			const promises = [];
 
-			// Update display name if changed
-			if (displayName !== initialDisplayName) {
+			// Update display name if changed (trim-aware)
+			if (isDisplayNameChanged) {
 				const formData = new FormData();
-				formData.append("displayName", displayName);
+				formData.append("displayName", trimmedDisplayName);
 				promises.push(updateDisplayName(formData));
 			}
 
@@ -375,9 +392,9 @@ export function ProfileEditModal({
 										</Button>
 										<Button
 											type="button"
-											disabled={!hasChanges || isLoading}
+											disabled={!isFormSubmittable || isLoading}
 											onClick={handleSave}
-											className="flex-1 rounded-lg px-4 py-2 text-white/80 transition-all duration-200 active:scale-[0.98]"
+											className="flex-1 rounded-lg px-4 py-2 text-white/80 transition-all duration-200 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
 											style={{
 												background:
 													"linear-gradient(180deg, #202530 0%, #12151f 100%)",

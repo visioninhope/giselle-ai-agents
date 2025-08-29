@@ -53,8 +53,25 @@ export function TeamProfileEditModal({
 	const [error, setError] = useState<string>("");
 	const [profileImageError, setProfileImageError] = useState<string>("");
 	const [isLoading, setIsLoading] = useState(false);
-	const hasChanges =
-		selectedProfileImageFile !== null || teamName !== initialTeamName;
+
+	// Derived validity state (simple consts)
+	const trimmedTeamName = teamName.trim();
+	const trimmedInitialTeamName = initialTeamName.trim();
+	const isTeamNameChanged = trimmedTeamName !== trimmedInitialTeamName;
+	let isTeamNameValid = true;
+	if (isTeamNameChanged) {
+		try {
+			parse(TeamNameSchema, trimmedTeamName);
+			isTeamNameValid = true;
+		} catch {
+			isTeamNameValid = false;
+		}
+	}
+	const isProfileImageValid = profileImageError === "";
+	const isFormSubmittable =
+		(selectedProfileImageFile !== null || isTeamNameChanged) &&
+		isTeamNameValid &&
+		isProfileImageValid;
 
 	// Reset when the modal opens/closes
 	useEffect(() => {
@@ -143,9 +160,9 @@ export function TeamProfileEditModal({
 			setError("");
 			setProfileImageError("");
 
-			// Trim team name for validation and comparison
-			const trimmedName = teamName.trim();
-			const trimmedInitialName = initialTeamName.trim();
+			// Use memoized, trimmed values for validation and comparison
+			const trimmedName = trimmedTeamName;
+			const trimmedInitialName = trimmedInitialTeamName;
 
 			// Validate team name if changed
 			if (trimmedName !== trimmedInitialName) {
@@ -405,7 +422,7 @@ export function TeamProfileEditModal({
 										</button>
 										<button
 											type="button"
-											disabled={!hasChanges || isLoading}
+											disabled={!isFormSubmittable || isLoading}
 											onClick={handleSave}
 											className="flex-1 rounded-lg px-4 py-2 text-white/80 transition-all duration-200 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
 											style={{
