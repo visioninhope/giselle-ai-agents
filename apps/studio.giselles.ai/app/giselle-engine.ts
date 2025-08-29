@@ -27,6 +27,7 @@ import {
 	isProPlan,
 } from "@/services/teams";
 import supabaseStorageDriver from "@/supabase-storage-driver";
+import { logger } from "../lib/logger";
 import {
 	gitHubPullRequestQueryService,
 	gitHubQueryService,
@@ -301,4 +302,5 @@ export const giselleEngine = NextGiselleEngine({
 		xTitle:
 			process.env.VERCEL_ENV === "preview" ? "Giselle(preview)" : "Giselle",
 	},
+	logger,
 });

@@ -11,6 +11,7 @@ import type { LanguageModelProvider } from "@giselle-sdk/language-model";
 import type { EmbeddingMetrics, QueryService } from "@giselle-sdk/rag";
 import type { ModelMessage, ProviderMetadata } from "ai";
 import type { Storage } from "unstorage";
+import type { GiselleLogger } from "../logger/types";
 import type { GiselleStorage } from "./experimental_storage";
 import type { VectorStore } from "./experimental_vector-store/types/interface";
 import type {
@@ -71,6 +72,7 @@ export interface GiselleEngineContext {
 		httpReferer: string;
 		xTitle: string;
 	};
+	logger: GiselleLogger;
 }
 
 interface GitHubInstalltionAppAuthResolver {
@@ -154,4 +156,5 @@ export interface GiselleEngineConfig {
 		httpReferer: string;
 		xTitle: string;
 	};
+	logger?: GiselleLogger;
 }
