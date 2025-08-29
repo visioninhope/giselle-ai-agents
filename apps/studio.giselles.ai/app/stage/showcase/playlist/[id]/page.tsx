@@ -2,9 +2,9 @@ import { notFound } from "next/navigation";
 import { PlaylistDetailClient } from "./playlist-detail-client";
 
 interface PlaylistDetailPageProps {
-	params: {
+	params: Promise<{
 		id: string;
-	};
+	}>;
 }
 
 // Mock playlist data - replace with actual database query
@@ -69,7 +69,8 @@ function fetchPlaylistById(id: string) {
 export default async function PlaylistDetailPage({
 	params,
 }: PlaylistDetailPageProps) {
-	const playlist = await fetchPlaylistById(params.id);
+	const { id } = await params;
+	const playlist = await fetchPlaylistById(id);
 
 	if (!playlist) {
 		notFound();
