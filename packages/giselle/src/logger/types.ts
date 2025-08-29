@@ -1,14 +1,9 @@
-export type LogFn = {
-	(obj: Record<string, any>, msg?: string, ...args: any[]): void;
-	(msg: string, ...args: any[]): void;
-};
+import type { Logger } from "pino";
 
-export interface GiselleLogger {
-	info: LogFn;
-	warn: LogFn;
-	error: LogFn;
-	debug: LogFn;
-	trace: LogFn;
-	fatal: LogFn;
-	child(bindings: Record<string, any>): GiselleLogger;
-}
+/**
+ * A logger interface compatible with pino, focusing on core logging methods.
+ */
+export type GiselleLogger = Pick<
+	Logger,
+	"info" | "warn" | "error" | "debug" | "trace" | "fatal" | "child"
+>;
