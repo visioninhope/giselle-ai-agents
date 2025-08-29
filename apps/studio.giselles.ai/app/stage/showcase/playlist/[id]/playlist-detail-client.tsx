@@ -84,8 +84,7 @@ export function PlaylistDetailClient({ playlist }: PlaylistDetailClientProps) {
 				<div className="flex items-center justify-between mb-6">
 					<div className="flex items-center gap-4">
 						<Button
-							variant="ghost"
-							size="sm"
+							variant="link"
 							onClick={handleBackClick}
 							className="p-2 hover:bg-white/10 text-[hsl(192,73%,84%)]"
 						>
@@ -103,8 +102,7 @@ export function PlaylistDetailClient({ playlist }: PlaylistDetailClientProps) {
 
 					<div className="flex items-center gap-2">
 						<Button
-							variant="outline"
-							size="sm"
+							variant="link"
 							onClick={handleAddApps}
 							className="bg-transparent border-white/20 text-[hsl(192,73%,84%)] hover:bg-white/10"
 						>
@@ -112,8 +110,7 @@ export function PlaylistDetailClient({ playlist }: PlaylistDetailClientProps) {
 							Add Apps
 						</Button>
 						<Button
-							variant="outline"
-							size="sm"
+							variant="link"
 							onClick={handleEditPlaylist}
 							className="bg-transparent border-white/20 text-[hsl(192,73%,84%)] hover:bg-white/10"
 						>
@@ -121,8 +118,7 @@ export function PlaylistDetailClient({ playlist }: PlaylistDetailClientProps) {
 							Edit
 						</Button>
 						<Button
-							variant="outline"
-							size="sm"
+							variant="destructive"
 							onClick={handleDeletePlaylist}
 							className="bg-transparent border-red-400/40 text-red-400 hover:bg-red-500/10"
 						>
