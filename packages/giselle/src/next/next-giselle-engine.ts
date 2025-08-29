@@ -2,7 +2,7 @@ import {
 	GitHubWebhookUnauthorizedError,
 	verifyRequest as verifyRequestAsGitHubWebook,
 } from "@giselle-sdk/github-tool";
-import { after, type NextRequest } from "next/server";
+import { after } from "next/server";
 import { ZodError } from "zod";
 import {
 	GenerationId,
@@ -17,7 +17,7 @@ import {
 	isJsonRouterPath,
 	type JsonRouterHandlers,
 } from "../http";
-import { requestStore } from "./context";
+import { type RequestContext, requestContextStore } from "./context";
 
 interface NextGiselleEngineConfig extends GiselleEngineConfig {
 	basePath: string;
@@ -68,8 +68,21 @@ export function createHttpHandler({
 		}
 	}
 
-	return async function httpHandler(request: NextRequest) {
-		return await requestStore.run({ request }, async () => {
+	return async function httpHandler(request: Request) {
+		let ctx: RequestContext | undefined;
+		// Vercel sets the system env var `VERCEL` to "1" on all deployments
+		// (builds/functions). This is the supported way to detect Vercel runtime.
+		// Ref: Vercel Docs → System Environment Variables: VERCEL
+		// https://vercel.com/docs/projects/environment-variables/system-environment-variables
+		if (process.env.VERCEL === "1") {
+			ctx = {
+				// When on Vercel, `x-vercel-id` header can be used as a request correlation ID.
+				// Ref: Vercel Docs → Request headers: x-vercel-id
+				// https://vercel.com/docs/headers/request-headers#x-vercel-id
+				requestId: request.headers.get("x-vercel-id") ?? undefined,
+			};
+		}
+		return await requestContextStore.run(ctx, async () => {
 			const url = new URL(request.url);
 			const pathname = url.pathname;
 

@@ -6,8 +6,8 @@ import type {
 	RunningGeneration,
 } from "@giselle-sdk/giselle";
 import {
+	getRequestId,
 	NextGiselleEngine,
-	requestStore,
 } from "@giselle-sdk/giselle/next-internal";
 import { traceEmbedding, traceGeneration } from "@giselle-sdk/langfuse";
 import type { EmbeddingMetrics } from "@giselle-sdk/rag";
@@ -206,12 +206,7 @@ export const giselleEngine = NextGiselleEngine({
 	},
 	callbacks: {
 		generationComplete: (args) => {
-			const store = requestStore.getStore();
-			const header = Object.fromEntries(
-				store?.request?.headers?.entries() ?? [],
-			);
-			delete header.cookie;
-			logger.info({ request: header });
+			logger.info({ requestId: getRequestId() });
 			after(async () => {
 				try {
 					switch (args.generation.context.origin.type) {
