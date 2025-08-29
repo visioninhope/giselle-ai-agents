@@ -70,11 +70,11 @@ export function PlaylistDetailClient({ playlist }: PlaylistDetailClientProps) {
   };
 
   return (
-    <div className="flex-1 px-[24px] bg-[var(--color-stage-background)] pt-16 md:pt-0 pb-[calc(4rem+env(safe-area-inset-bottom))] md:pb-0 h-full flex flex-col">
-      <div className="py-6 h-full flex flex-col">
+    <div className="flex-1 px-4 md:px-[24px] bg-[var(--color-stage-background)] pt-16 md:pt-0 pb-[calc(4rem+env(safe-area-inset-bottom))] md:pb-0 h-full flex flex-col">
+      <div className="py-4 md:py-6 h-full flex flex-col">
         {/* Breadcrumb Navigation */}
-        <div className="mb-6">
-          <nav className="flex items-center text-sm text-[hsl(192,25%,65%)]">
+        <div className="mb-4 md:mb-6">
+          <nav className="flex items-center text-xs md:text-sm text-[hsl(192,25%,65%)]">
             <button
               onClick={() => router.push("/stage/showcase")}
               className="hover:text-white transition-colors"
@@ -94,22 +94,22 @@ export function PlaylistDetailClient({ playlist }: PlaylistDetailClientProps) {
         </div>
 
         {/* Spotify-like Header */}
-        <div className="flex items-end gap-6 mb-8">
+        <div className="flex flex-col md:flex-row md:items-end gap-6 mb-6 md:mb-8">
           {/* Playlist Thumbnail */}
-          <div className="w-[232px] h-[232px] rounded-lg bg-gradient-to-br from-orange-400 via-pink-500 to-purple-600 flex-shrink-0 shadow-2xl">
+          <div className="w-[160px] h-[160px] md:w-[232px] md:h-[232px] rounded-lg bg-gradient-to-br from-orange-400 via-pink-500 to-purple-600 flex-shrink-0 shadow-2xl mx-auto md:mx-0">
             <div className="w-full h-full rounded-lg bg-black/20" />
           </div>
 
           {/* Playlist Info */}
-          <div className="flex-1 pb-4">
-            <h1 className="text-[48px] font-black text-white mb-4 leading-none">
+          <div className="flex-1 pb-4 text-center md:text-left">
+            <h1 className="text-[32px] md:text-[48px] font-black text-white mb-3 md:mb-4 leading-tight md:leading-none">
               {playlist.title}
             </h1>
-            <p className="text-[hsl(192,25%,65%)] text-base mb-4 max-w-2xl">
+            <p className="text-[hsl(192,25%,65%)] text-sm md:text-base mb-4 max-w-2xl mx-auto md:mx-0">
               {playlist.description}
             </p>
-            <div className="flex items-center justify-between text-sm text-[hsl(192,25%,65%)]">
-              <div className="flex items-center gap-1">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 text-sm text-[hsl(192,25%,65%)]">
+              <div className="flex items-center justify-center md:justify-start gap-1">
                 <span className="text-white font-medium">Created by you</span>
                 <span>•</span>
                 <span>
@@ -117,13 +117,13 @@ export function PlaylistDetailClient({ playlist }: PlaylistDetailClientProps) {
                   {playlist.apps.length === 1 ? "app" : "apps"}
                 </span>
               </div>
-              <div className="flex items-center gap-4">
+              <div className="flex items-center justify-center md:justify-start gap-4">
                 <Button
                   onClick={handleAddApps}
                   variant="solid"
                   size="large"
                   leftIcon={<Plus size={16} />}
-                  className="px-6 py-3"
+                  className="px-4 py-2 md:px-6 md:py-3 text-sm md:text-base"
                 >
                   Add Apps
                 </Button>
@@ -184,14 +184,14 @@ export function PlaylistDetailClient({ playlist }: PlaylistDetailClientProps) {
         {/* Apps list */}
         <div className="flex-1 overflow-auto">
           {playlist.apps.length > 0 ? (
-            <Card className="gap-0 py-2">
+            <Card className="gap-0 py-1 md:py-2">
               {playlist.apps.map((app) => (
                 <div
                   key={app.id}
-                  className="group flex items-center justify-between px-2 py-3 first:border-t-0 border-t-[0.5px] border-white/10 cursor-pointer"
+                  className="group flex items-center justify-between px-3 md:px-2 py-4 md:py-3 first:border-t-0 border-t-[0.5px] border-white/10 cursor-pointer"
                 >
-                  <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-full bg-white/5 flex items-center justify-center flex-shrink-0 transition-all group-hover:bg-primary-100/20">
+                  <div className="flex items-center gap-3 min-w-0 flex-1">
+                    <div className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-white/5 flex items-center justify-center flex-shrink-0 transition-all group-hover:bg-primary-100/20">
                       <svg
                         role="img"
                         aria-label="App icon"
@@ -205,21 +205,21 @@ export function PlaylistDetailClient({ playlist }: PlaylistDetailClientProps) {
                         <path d="M370.506 0C370.506 55.3433 310.362 106.638 255.013 106.638C310.362 106.638 370.506 157.933 370.506 213.277C370.506 157.933 430.65 106.638 486 106.638C430.650 106.638 370.506 55.3433 370.506 0Z" />
                       </svg>
                     </div>
-                    <div className="flex flex-col gap-y-1">
-                      <p className="text-[14px] font-sans text-white-900">
+                    <div className="flex flex-col gap-y-1 min-w-0">
+                      <p className="text-sm md:text-[14px] font-sans text-white-900 truncate">
                         {app.name || "Untitled"}
                       </p>
-                      <p className="text-[12px] font-geist text-white-400">
+                      <p className="text-xs md:text-[12px] font-geist text-white-400">
                         Edited {app.updatedAt.toLocaleDateString("en-US")}
                       </p>
                     </div>
                   </div>
 
                   {/* Action buttons */}
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1 md:gap-2 flex-shrink-0">
                     <button
                       type="button"
-                      className="p-1.5 rounded-full hover:bg-white/10 text-white/60 hover:text-white transition-colors border border-white/20 hover:border-white/40"
+                      className="p-1 md:p-1.5 rounded-full hover:bg-white/10 text-white/60 hover:text-white transition-colors border border-white/20 hover:border-white/40"
                       title="Run app"
                       onClick={() => {
                         if (app.workspaceId) {
@@ -235,7 +235,7 @@ export function PlaylistDetailClient({ playlist }: PlaylistDetailClientProps) {
                           ? `/workspaces/${app.workspaceId}`
                           : "/playground"
                       }
-                      className="rounded-lg px-3 py-1.5 text-white/80 transition-all duration-200 active:scale-[0.98] text-sm"
+                      className="rounded-lg px-2 md:px-3 py-1 md:py-1.5 text-white/80 transition-all duration-200 active:scale-[0.98] text-xs md:text-sm"
                       style={{
                         background:
                           "linear-gradient(180deg, #202530 0%, #12151f 100%)",
@@ -248,17 +248,17 @@ export function PlaylistDetailClient({ playlist }: PlaylistDetailClientProps) {
                     </Link>
                     <button
                       type="button"
-                      className="p-1.5 rounded-md text-white/60 hover:text-white transition-colors"
+                      className="p-1 md:p-1.5 rounded-md text-white/60 hover:text-white transition-colors"
                     >
-                      <Star className="h-4 w-4 hover:fill-current" />
+                      <Star className="h-3 w-3 md:h-4 md:w-4 hover:fill-current" />
                     </button>
                   </div>
                 </div>
               ))}
             </Card>
           ) : (
-            <div className="flex flex-col items-center justify-center py-16 text-center">
-              <h3 className="text-[hsl(192,73%,84%)] text-lg font-medium mb-2">
+            <div className="flex flex-col items-center justify-center py-12 md:py-16 text-center px-4">
+              <h3 className="text-[hsl(192,73%,84%)] text-base md:text-lg font-medium mb-2">
                 No apps in this playlist
               </h3>
               <p className="text-[hsl(192,25%,65%)] text-sm mb-4">
@@ -266,9 +266,10 @@ export function PlaylistDetailClient({ playlist }: PlaylistDetailClientProps) {
               </p>
               <Button
                 onClick={handleAddApps}
-                className="bg-[hsl(192,73%,84%)] text-black hover:bg-[hsl(192,73%,88%)]"
+                className="bg-[hsl(192,73%,84%)] text-black hover:bg-[hsl(192,73%,88%)] text-sm"
+                size="large"
+                leftIcon={<Plus size={16} />}
               >
-                <Plus size={16} className="mr-2" />
                 Add Apps
               </Button>
             </div>
