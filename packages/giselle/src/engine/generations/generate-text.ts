@@ -208,19 +208,21 @@ export function generateText(args: {
 				tools: preparedToolSet.toolSet,
 				onError: async ({ error }) => {
 					isGenerationFailed = true;
-					if (AISDKError.isInstance(error)) {
-						const failedGeneration = {
-							...runningGeneration,
-							status: "failed",
-							failedAt: Date.now(),
-							error: {
-								name: error.name,
-								message: error.message,
-							},
-						} satisfies FailedGeneration;
+					const errInfo = AISDKError.isInstance(error)
+						? { name: error.name, message: error.message }
+						: {
+								name: "UnknownError",
+								message: error instanceof Error ? error.message : String(error),
+							};
 
-						await setGeneration(failedGeneration);
-					}
+					const failedGeneration = {
+						...runningGeneration,
+						status: "failed",
+						failedAt: Date.now(),
+						error: errInfo,
+					} satisfies FailedGeneration;
+
+					await setGeneration(failedGeneration);
 
 					await Promise.all(
 						preparedToolSet.cleanupFunctions.map((cleanupFunction) =>
