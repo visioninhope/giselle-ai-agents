@@ -201,20 +201,6 @@ export function generateText(args: {
 				args.context.aiGateway,
 			);
 			let isGenerationFailed = false;
-			let cleanedUp = false;
-			async function runCleanupOnce() {
-				if (cleanedUp) return;
-				cleanedUp = true;
-				try {
-					await Promise.all(
-						preparedToolSet.cleanupFunctions.map((cleanupFunction) =>
-							cleanupFunction(),
-						),
-					);
-				} catch (error) {
-					console.error("Cleanup process failed:", error);
-				}
-			}
 			const streamTextResult = streamText({
 				model,
 				providerOptions,
@@ -236,10 +222,22 @@ export function generateText(args: {
 						await setGeneration(failedGeneration);
 					}
 
-					await runCleanupOnce();
+					await Promise.all(
+						preparedToolSet.cleanupFunctions.map((cleanupFunction) =>
+							cleanupFunction(),
+						),
+					);
 				},
 				async onFinish() {
-					await runCleanupOnce();
+					try {
+						await Promise.all(
+							preparedToolSet.cleanupFunctions.map((cleanupFunction) =>
+								cleanupFunction(),
+							),
+						);
+					} catch (error) {
+						console.error("Cleanup process failed:", error);
+					}
 				},
 			});
 			return streamTextResult.toUIMessageStream({
