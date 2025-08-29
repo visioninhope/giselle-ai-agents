@@ -5,7 +5,7 @@ import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import React from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@giselle-internal/ui/button";
 import { Card } from "../../../../(main)/settings/components/card";
 
 interface App {
@@ -120,17 +120,20 @@ export function PlaylistDetailClient({ playlist }: PlaylistDetailClientProps) {
               <div className="flex items-center gap-4">
                 <Button
                   onClick={handleAddApps}
-                  className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 text-white border border-white/20 hover:border-white/40 rounded-md transition-all duration-200"
+                  variant="solid"
+                  size="large"
+                  leftIcon={<Plus size={16} />}
+                  className="px-6 py-3"
                 >
-                  <Plus size={16} />
                   Add Apps
                 </Button>
 
                 <DropdownMenu.Root>
                   <DropdownMenu.Trigger asChild>
                     <Button
-                      variant="link"
-                      className="w-8 h-8 p-0 text-[hsl(192,25%,65%)] hover:text-white transition-colors border-none"
+                      variant="subtle"
+                      size="compact"
+                      className="w-8 h-8 p-0 text-[hsl(192,25%,65%)] hover:text-white transition-colors"
                     >
                       <svg
                         width={24}
