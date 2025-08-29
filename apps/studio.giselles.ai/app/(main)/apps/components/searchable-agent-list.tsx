@@ -114,7 +114,7 @@ export function SearchableAgentList({
 					<Search className="absolute left-4 top-1/2 -translate-y-1/2 text-black-300 h-4 w-4" />
 					<Input
 						type="text"
-						placeholder="Search Projects..."
+						placeholder="Search Apps..."
 						value={searchQuery}
 						onChange={(e) => setSearchQuery(e.target.value)}
 						className="pl-12 pr-4 h-10 w-full bg-black-700/50 border-black-600 text-white placeholder:text-black-400"
