@@ -5,7 +5,10 @@ import type {
 	QueryContext,
 	RunningGeneration,
 } from "@giselle-sdk/giselle";
-import { NextGiselleEngine } from "@giselle-sdk/giselle/next";
+import {
+	NextGiselleEngine,
+	requestStore,
+} from "@giselle-sdk/giselle/next-internal";
 import { traceEmbedding, traceGeneration } from "@giselle-sdk/langfuse";
 import type { EmbeddingMetrics } from "@giselle-sdk/rag";
 import {
@@ -17,6 +20,7 @@ import type { ModelMessage, ProviderMetadata } from "ai";
 import { after } from "next/server";
 import { createStorage } from "unstorage";
 import { waitForLangfuseFlush } from "@/instrumentation.node";
+import { logger } from "@/lib/logger";
 import { getWorkspaceTeam } from "@/lib/workspaces/get-workspace-team";
 import { fetchUsageLimits } from "@/packages/lib/fetch-usage-limits";
 import { onConsumeAgentTime } from "@/packages/lib/on-consume-agent-time";
@@ -27,7 +31,6 @@ import {
 	isProPlan,
 } from "@/services/teams";
 import supabaseStorageDriver from "@/supabase-storage-driver";
-import { logger } from "../lib/logger";
 import {
 	gitHubPullRequestQueryService,
 	gitHubQueryService,
@@ -203,6 +206,12 @@ export const giselleEngine = NextGiselleEngine({
 	},
 	callbacks: {
 		generationComplete: (args) => {
+			const store = requestStore.getStore();
+			const header = Object.fromEntries(
+				store?.request?.headers?.entries() ?? [],
+			);
+			delete header.cookie;
+			logger.info({ request: header });
 			after(async () => {
 				try {
 					switch (args.generation.context.origin.type) {
