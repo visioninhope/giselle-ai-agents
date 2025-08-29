@@ -1,6 +1,6 @@
 import type { GiselleLogger } from "./types";
 
-const noop = () => {};
+const noop = (..._args: unknown[]): void => {};
 
 export const noopLogger: GiselleLogger = {
 	info: noop,
@@ -9,5 +9,4 @@ export const noopLogger: GiselleLogger = {
 	debug: noop,
 	trace: noop,
 	fatal: noop,
-	child: () => noopLogger,
 };
