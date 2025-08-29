@@ -200,12 +200,14 @@ export function generateText(args: {
 				args.useAiGateway,
 				args.context.aiGateway,
 			);
+			let isGenerationFailed = false;
 			const streamTextResult = streamText({
 				model,
 				providerOptions,
 				messages,
 				tools: preparedToolSet.toolSet,
 				onError: async ({ error }) => {
+					isGenerationFailed = true;
 					if (AISDKError.isInstance(error)) {
 						const failedGeneration = {
 							...runningGeneration,
@@ -241,6 +243,9 @@ export function generateText(args: {
 			return streamTextResult.toUIMessageStream({
 				sendReasoning: true,
 				onFinish: async ({ messages: generateMessages }) => {
+					if (isGenerationFailed) {
+						return;
+					}
 					const generationOutputs: GenerationOutput[] = [];
 					const generatedTextOutput =
 						generationContext.operationNode.outputs.find(
