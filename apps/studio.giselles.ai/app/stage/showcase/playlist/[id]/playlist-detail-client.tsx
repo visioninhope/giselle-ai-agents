@@ -1,21 +1,10 @@
 "use client";
 
-import {
-  ArrowLeft,
-  Edit3,
-  Play,
-  Plus,
-  Search,
-  Trash2,
-  MoreHorizontal,
-  Shuffle,
-  Heart,
-} from "lucide-react";
+import { Edit3, Play, Plus, Trash2, MoreHorizontal } from "lucide-react";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import React from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 
 interface App {
   id: string;
@@ -39,16 +28,6 @@ interface PlaylistDetailClientProps {
 
 export function PlaylistDetailClient({ playlist }: PlaylistDetailClientProps) {
   const router = useRouter();
-  const [searchQuery, setSearchQuery] = useState("");
-
-  const filteredApps = useMemo(() => {
-    if (!searchQuery) return playlist.apps;
-    const query = searchQuery.toLowerCase();
-    return playlist.apps.filter((app) => {
-      const appName = (app.name || "Untitled").toLowerCase();
-      return appName.includes(query);
-    });
-  }, [searchQuery, playlist.apps]);
 
   const handleBackClick = () => {
     router.push("/stage/showcase?tab=Playlist");
@@ -91,15 +70,25 @@ export function PlaylistDetailClient({ playlist }: PlaylistDetailClientProps) {
   return (
     <div className="flex-1 px-[24px] bg-[var(--color-stage-background)] pt-16 md:pt-0 pb-[calc(4rem+env(safe-area-inset-bottom))] md:pb-0 h-full flex flex-col">
       <div className="py-6 h-full flex flex-col">
-        {/* Back Button */}
+        {/* Breadcrumb Navigation */}
         <div className="mb-6">
-          <Button
-            variant="link"
-            onClick={handleBackClick}
-            className="p-2 hover:bg-white/10 text-[hsl(192,73%,84%)] -ml-2"
-          >
-            <ArrowLeft size={20} />
-          </Button>
+          <nav className="flex items-center text-sm text-[hsl(192,25%,65%)]">
+            <button
+              onClick={() => router.push("/stage/showcase")}
+              className="hover:text-white transition-colors"
+            >
+              Showcase
+            </button>
+            <span className="mx-2">›</span>
+            <button
+              onClick={() => router.push("/stage/showcase?tab=Playlist")}
+              className="hover:text-white transition-colors"
+            >
+              Playlist
+            </button>
+            <span className="mx-2">›</span>
+            <span className="text-white font-medium">{playlist.title}</span>
+          </nav>
         </div>
 
         {/* Spotify-like Header */}
@@ -111,107 +100,71 @@ export function PlaylistDetailClient({ playlist }: PlaylistDetailClientProps) {
 
           {/* Playlist Info */}
           <div className="flex-1 pb-4">
-            <p className="text-[hsl(192,25%,65%)] text-sm font-medium mb-2">
-              Playlist
-            </p>
             <h1 className="text-[48px] font-black text-white mb-4 leading-none">
               {playlist.title}
             </h1>
             <p className="text-[hsl(192,25%,65%)] text-base mb-4 max-w-2xl">
               {playlist.description}
             </p>
-            <div className="flex items-center gap-1 text-sm text-[hsl(192,25%,65%)]">
-              <span className="text-white font-medium">Created by you</span>
-              <span>•</span>
-              <span>
-                {playlist.apps.length}{" "}
-                {playlist.apps.length === 1 ? "app" : "apps"}
-              </span>
+            <div className="flex items-center justify-between text-sm text-[hsl(192,25%,65%)]">
+              <div className="flex items-center gap-1">
+                <span className="text-white font-medium">Created by you</span>
+                <span>•</span>
+                <span>
+                  {playlist.apps.length}{" "}
+                  {playlist.apps.length === 1 ? "app" : "apps"}
+                </span>
+              </div>
+              <div className="flex items-center gap-4">
+                <Button
+                  onClick={handleAddApps}
+                  className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 text-white border border-white/20 hover:border-white/40 rounded-md transition-all duration-200"
+                >
+                  <Plus size={16} />
+                  Add Apps
+                </Button>
+
+                <DropdownMenu.Root>
+                  <DropdownMenu.Trigger asChild>
+                    <Button
+                      variant="link"
+                      className="w-8 h-8 p-0 text-[hsl(192,25%,65%)] hover:text-white transition-colors"
+                    >
+                      <MoreHorizontal size={24} />
+                    </Button>
+                  </DropdownMenu.Trigger>
+                  <DropdownMenu.Portal>
+                    <DropdownMenu.Content
+                      className="bg-[#282828] border border-white/10 rounded-md p-1 shadow-lg min-w-[180px]"
+                      sideOffset={5}
+                    >
+                      <DropdownMenu.Item
+                        className="flex items-center gap-3 px-3 py-2 text-sm text-white hover:bg-white/10 rounded-sm cursor-pointer"
+                        onClick={handleEditPlaylist}
+                      >
+                        <Edit3 size={16} />
+                        Edit details
+                      </DropdownMenu.Item>
+                      <DropdownMenu.Item
+                        className="flex items-center gap-3 px-3 py-2 text-sm text-red-400 hover:bg-red-500/10 rounded-sm cursor-pointer"
+                        onClick={handleDeletePlaylist}
+                      >
+                        <Trash2 size={16} />
+                        Delete playlist
+                      </DropdownMenu.Item>
+                    </DropdownMenu.Content>
+                  </DropdownMenu.Portal>
+                </DropdownMenu.Root>
+              </div>
             </div>
-          </div>
-        </div>
-
-        {/* Action Bar */}
-        <div className="flex items-center gap-6 mb-6">
-          <Button
-            onClick={handleAddApps}
-            className="w-14 h-14 rounded-full bg-green-500 hover:bg-green-400 text-black hover:scale-105 transition-all duration-200"
-          >
-            <Play size={20} fill="currentColor" />
-          </Button>
-
-          <Button
-            variant="link"
-            className="w-8 h-8 p-0 text-[hsl(192,25%,65%)] hover:text-white transition-colors"
-          >
-            <Heart size={32} />
-          </Button>
-
-          <Button
-            onClick={handleAddApps}
-            variant="link"
-            className="w-8 h-8 p-0 text-[hsl(192,25%,65%)] hover:text-white transition-colors"
-          >
-            <Plus size={32} />
-          </Button>
-
-          <DropdownMenu.Root>
-            <DropdownMenu.Trigger asChild>
-              <Button
-                variant="link"
-                className="w-8 h-8 p-0 text-[hsl(192,25%,65%)] hover:text-white transition-colors"
-              >
-                <MoreHorizontal size={32} />
-              </Button>
-            </DropdownMenu.Trigger>
-            <DropdownMenu.Portal>
-              <DropdownMenu.Content
-                className="bg-[#282828] border border-white/10 rounded-md p-1 shadow-lg min-w-[180px]"
-                sideOffset={5}
-              >
-                <DropdownMenu.Item
-                  className="flex items-center gap-3 px-3 py-2 text-sm text-white hover:bg-white/10 rounded-sm cursor-pointer"
-                  onClick={handleEditPlaylist}
-                >
-                  <Edit3 size={16} />
-                  Edit details
-                </DropdownMenu.Item>
-                <DropdownMenu.Item
-                  className="flex items-center gap-3 px-3 py-2 text-sm text-red-400 hover:bg-red-500/10 rounded-sm cursor-pointer"
-                  onClick={handleDeletePlaylist}
-                >
-                  <Trash2 size={16} />
-                  Delete playlist
-                </DropdownMenu.Item>
-              </DropdownMenu.Content>
-            </DropdownMenu.Portal>
-          </DropdownMenu.Root>
-        </div>
-
-        {/* Search */}
-        <div className="flex items-center gap-4 mb-6">
-          <div className="relative flex-1 max-w-md">
-            <Search
-              size={16}
-              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[hsl(192,25%,65%)]"
-            />
-            <Input
-              type="text"
-              placeholder="Search apps in playlist..."
-              value={searchQuery}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setSearchQuery(e.target.value)
-              }
-              className="w-full pl-10 pr-4 py-2 bg-white/5 border border-white/10 rounded-lg text-[hsl(192,73%,84%)] placeholder-[hsl(192,25%,65%)] focus:outline-none focus:border-white/20 focus:bg-white/10"
-            />
           </div>
         </div>
 
         {/* Apps grid */}
         <div className="flex-1 overflow-auto">
-          {filteredApps.length > 0 ? (
+          {playlist.apps.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {filteredApps.map((app) => (
+              {playlist.apps.map((app) => (
                 <button
                   key={app.id}
                   type="button"
@@ -243,26 +196,19 @@ export function PlaylistDetailClient({ playlist }: PlaylistDetailClientProps) {
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center py-16 text-center">
-              <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mb-4">
-                <Search size={24} className="text-[hsl(192,25%,65%)]" />
-              </div>
               <h3 className="text-[hsl(192,73%,84%)] text-lg font-medium mb-2">
-                {searchQuery ? "No apps found" : "No apps in this playlist"}
+                No apps in this playlist
               </h3>
               <p className="text-[hsl(192,25%,65%)] text-sm mb-4">
-                {searchQuery
-                  ? "Try adjusting your search terms"
-                  : "Add some apps to get started"}
+                Add some apps to get started
               </p>
-              {!searchQuery && (
-                <Button
-                  onClick={handleAddApps}
-                  className="bg-[hsl(192,73%,84%)] text-black hover:bg-[hsl(192,73%,88%)]"
-                >
-                  <Plus size={16} className="mr-2" />
-                  Add Apps
-                </Button>
-              )}
+              <Button
+                onClick={handleAddApps}
+                className="bg-[hsl(192,73%,84%)] text-black hover:bg-[hsl(192,73%,88%)]"
+              >
+                <Plus size={16} className="mr-2" />
+                Add Apps
+              </Button>
             </div>
           )}
         </div>
