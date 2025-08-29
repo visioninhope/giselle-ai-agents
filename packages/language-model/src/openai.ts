@@ -150,7 +150,7 @@ const gpt5mini: OpenAILanguageModel = {
 		Capability.TextGeneration |
 		Capability.OptionalSearchGrounding |
 		Capability.Reasoning,
-	tier: Tier.enum.free,
+	tier: Tier.enum.pro,
 	configurations: defaultConfigurations,
 };
 
