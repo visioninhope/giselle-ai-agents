@@ -200,25 +200,29 @@ export function generateText(args: {
 				args.useAiGateway,
 				args.context.aiGateway,
 			);
+			let isGenerationFailed = false;
 			const streamTextResult = streamText({
 				model,
 				providerOptions,
 				messages,
 				tools: preparedToolSet.toolSet,
 				onError: async ({ error }) => {
-					if (AISDKError.isInstance(error)) {
-						const failedGeneration = {
-							...runningGeneration,
-							status: "failed",
-							failedAt: Date.now(),
-							error: {
-								name: error.name,
-								message: error.message,
-							},
-						} satisfies FailedGeneration;
+					isGenerationFailed = true;
+					const errInfo = AISDKError.isInstance(error)
+						? { name: error.name, message: error.message }
+						: {
+								name: "UnknownError",
+								message: error instanceof Error ? error.message : String(error),
+							};
 
-						await setGeneration(failedGeneration);
-					}
+					const failedGeneration = {
+						...runningGeneration,
+						status: "failed",
+						failedAt: Date.now(),
+						error: errInfo,
+					} satisfies FailedGeneration;
+
+					await setGeneration(failedGeneration);
 
 					await Promise.all(
 						preparedToolSet.cleanupFunctions.map((cleanupFunction) =>
@@ -241,6 +245,9 @@ export function generateText(args: {
 			return streamTextResult.toUIMessageStream({
 				sendReasoning: true,
 				onFinish: async ({ messages: generateMessages }) => {
+					if (isGenerationFailed) {
+						return;
+					}
 					const generationOutputs: GenerationOutput[] = [];
 					const generatedTextOutput =
 						generationContext.operationNode.outputs.find(
