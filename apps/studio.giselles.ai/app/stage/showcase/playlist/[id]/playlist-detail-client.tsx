@@ -70,7 +70,7 @@ export function PlaylistDetailClient({ playlist }: PlaylistDetailClientProps) {
   };
 
   return (
-    <div className="flex-1 px-4 md:px-[24px] bg-[var(--color-stage-background)] pt-16 md:pt-0 pb-[calc(4rem+env(safe-area-inset-bottom))] md:pb-0 h-full flex flex-col">
+    <div className="flex-1 px-4 md:px-[24px] bg-[var(--color-stage-background)] pt-6 md:pt-0 pb-[calc(4rem+env(safe-area-inset-bottom))] md:pb-0 h-full flex flex-col">
       <div className="py-4 md:py-6 h-full flex flex-col">
         {/* Breadcrumb Navigation */}
         <div className="mb-4 md:mb-6">
