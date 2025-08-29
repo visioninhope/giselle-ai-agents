@@ -2,9 +2,10 @@
 
 import { Edit3, Play, Plus, Trash2, Star } from "lucide-react";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
+import * as Dialog from "@radix-ui/react-dialog";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import React from "react";
+import React, { useState } from "react";
 import { Button } from "@giselle-internal/ui/button";
 import { Card } from "../../../../(main)/settings/components/card";
 
@@ -30,14 +31,51 @@ interface PlaylistDetailClientProps {
 
 export function PlaylistDetailClient({ playlist }: PlaylistDetailClientProps) {
   const router = useRouter();
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [editForm, setEditForm] = useState({
+    title: playlist.title,
+    description: playlist.description,
+  });
+  const [editError, setEditError] = useState("");
+  const [isEditLoading, setIsEditLoading] = useState(false);
 
   const handleBackClick = () => {
     router.push("/stage/showcase?tab=Playlist");
   };
 
   const handleEditPlaylist = () => {
-    // TODO: Implement edit functionality
-    console.log("Edit playlist:", playlist.id);
+    setIsEditDialogOpen(true);
+    setEditForm({
+      title: playlist.title,
+      description: playlist.description,
+    });
+    setEditError("");
+  };
+
+  const handleSaveEdit = async () => {
+    try {
+      setIsEditLoading(true);
+      setEditError("");
+
+      // Validate title
+      if (!editForm.title.trim()) {
+        setEditError("Playlist title is required");
+        setIsEditLoading(false);
+        return;
+      }
+
+      // TODO: Implement actual save functionality
+      console.log("Saving playlist:", editForm);
+
+      // Simulate API call
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      setIsEditDialogOpen(false);
+    } catch (error) {
+      setEditError("Failed to save playlist. Please try again.");
+    } finally {
+      setIsEditLoading(false);
+    }
   };
 
   const handleDeletePlaylist = () => {
@@ -276,6 +314,182 @@ export function PlaylistDetailClient({ playlist }: PlaylistDetailClientProps) {
           )}
         </div>
       </div>
+
+      {/* Edit Playlist Dialog */}
+      <Dialog.Root
+        open={isEditDialogOpen}
+        onOpenChange={(open) => {
+          if (!open && !isEditLoading) setIsEditDialogOpen(false);
+        }}
+      >
+        <Dialog.Portal>
+          <Dialog.Overlay className="fixed inset-0 bg-black/60 z-50" />
+          <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
+            <Dialog.Content
+              className="w-[90vw] max-w-[420px] max-h-[90vh] overflow-y-auto rounded-[12px] p-6 relative shadow-xl focus:outline-none"
+              style={{
+                animation: "fadeIn 0.2s ease-out",
+                transformOrigin: "center",
+              }}
+              onEscapeKeyDown={(e) => {
+                if (isEditLoading) {
+                  e.preventDefault();
+                  e.stopPropagation();
+                }
+              }}
+              onPointerDownOutside={(e) => {
+                if (isEditLoading) {
+                  e.preventDefault();
+                  e.stopPropagation();
+                }
+              }}
+            >
+              {/* Glass effect layers */}
+              <div
+                className="absolute inset-0 rounded-[12px] backdrop-blur-md"
+                style={{
+                  background:
+                    "linear-gradient(135deg, rgba(150, 150, 150, 0.03) 0%, rgba(60, 90, 160, 0.12) 100%)",
+                }}
+              />
+              <div className="absolute top-0 left-4 right-4 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
+              <div className="absolute inset-0 rounded-[12px] border border-white/10" />
+
+              <div className="relative z-10">
+                <div className="flex justify-between items-center">
+                  <Dialog.Title className="text-[20px] font-medium text-white-400 tracking-tight font-sans">
+                    Edit Playlist Details
+                  </Dialog.Title>
+                  <Dialog.Close
+                    onClick={(e) => {
+                      if (isEditLoading) {
+                        e.preventDefault();
+                        return;
+                      }
+                      setIsEditDialogOpen(false);
+                    }}
+                    disabled={isEditLoading}
+                    aria-disabled={isEditLoading}
+                    className={`rounded-sm text-white-400 focus:outline-none ${
+                      isEditLoading
+                        ? "opacity-30 cursor-not-allowed pointer-events-none"
+                        : "opacity-70 hover:opacity-100 cursor-pointer"
+                    }`}
+                  >
+                    <Plus className="h-5 w-5 rotate-45" />
+                    <span className="sr-only">Close</span>
+                  </Dialog.Close>
+                </div>
+                <p className="text-[14px] text-black-400 font-geist mt-2">
+                  Update your playlist's title and description.
+                </p>
+
+                <div className="mt-4 flex flex-col gap-4 w-full">
+                  {/* Playlist Title */}
+                  <div className="w-full">
+                    <label
+                      htmlFor="playlistTitle"
+                      className="block text-white-800 text-left font-medium text-[12px] leading-[170%] font-geist mb-2"
+                    >
+                      Playlist Title
+                    </label>
+                    <div
+                      className="flex flex-col items-start p-2 rounded-[8px] w-full"
+                      style={{
+                        background: "#00020A",
+                        boxShadow: "inset 0 1px 4px rgba(0,0,0,0.5)",
+                        border: "0.5px solid rgba(255,255,255,0.05)",
+                      }}
+                    >
+                      <input
+                        id="playlistTitle"
+                        value={editForm.title}
+                        onChange={(e) => {
+                          setEditError("");
+                          setEditForm({ ...editForm, title: e.target.value });
+                        }}
+                        className="w-full bg-transparent text-white-800 font-medium text-[14px] leading-[23.8px] font-geist shadow-none focus:text-white border-0 p-0 focus:outline-none"
+                        disabled={isEditLoading}
+                        placeholder="Enter playlist title"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Playlist Description */}
+                  <div className="w-full">
+                    <label
+                      htmlFor="playlistDescription"
+                      className="block text-white-800 text-left font-medium text-[12px] leading-[170%] font-geist mb-2"
+                    >
+                      Description
+                    </label>
+                    <div
+                      className="flex flex-col items-start p-2 rounded-[8px] w-full"
+                      style={{
+                        background: "#00020A",
+                        boxShadow: "inset 0 1px 4px rgba(0,0,0,0.5)",
+                        border: "0.5px solid rgba(255,255,255,0.05)",
+                      }}
+                    >
+                      <textarea
+                        id="playlistDescription"
+                        value={editForm.description}
+                        onChange={(e) => {
+                          setEditError("");
+                          setEditForm({
+                            ...editForm,
+                            description: e.target.value,
+                          });
+                        }}
+                        className="w-full bg-transparent text-white-800 font-medium text-[14px] leading-[23.8px] font-geist shadow-none focus:text-white border-0 p-0 focus:outline-none resize-none"
+                        disabled={isEditLoading}
+                        placeholder="Enter playlist description"
+                        rows={3}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Error message */}
+                  {editError && (
+                    <p className="text-[12px] leading-[20.4px] text-error-900 font-geist">
+                      {editError}
+                    </p>
+                  )}
+
+                  {/* Action buttons */}
+                  <div className="flex justify-end items-center mt-6 w-full">
+                    <div className="flex w-full max-w-[280px] space-x-2 ml-auto">
+                      <button
+                        type="button"
+                        onClick={() => setIsEditDialogOpen(false)}
+                        className="flex-1 text-white-400 hover:text-white-300 text-sm font-medium transition-colors"
+                        disabled={isEditLoading}
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="button"
+                        disabled={isEditLoading || !editForm.title.trim()}
+                        onClick={handleSaveEdit}
+                        className="flex-1 rounded-lg px-4 py-2 text-white/80 transition-all duration-200 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+                        style={{
+                          background:
+                            "linear-gradient(180deg, #202530 0%, #12151f 100%)",
+                          border: "1px solid rgba(0,0,0,0.7)",
+                          boxShadow:
+                            "inset 0 1px 1px rgba(255,255,255,0.05), 0 2px 8px rgba(5,10,20,0.4), 0 1px 2px rgba(0,0,0,0.3)",
+                        }}
+                      >
+                        {isEditLoading ? "Saving..." : "Save"}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </Dialog.Content>
+          </div>
+        </Dialog.Portal>
+      </Dialog.Root>
     </div>
   );
 }
