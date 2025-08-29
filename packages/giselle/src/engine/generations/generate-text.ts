@@ -39,6 +39,7 @@ export function generateText(args: {
 	useAiGateway: boolean;
 	useResumableGeneration: boolean;
 }) {
+	args.context.logger.info("generating text");
 	return useGenerationExecutor({
 		context: args.context,
 		generation: args.generation,
