@@ -108,6 +108,7 @@ async function traceGenerationForTeam(args: {
 	userId: string;
 	team: TeamForPlan;
 	providerMetadata?: ProviderMetadata;
+	requestId?: string;
 }) {
 	const isPro = isProPlan(args.team);
 	const planTag = isPro ? "plan:pro" : "plan:free";
@@ -126,6 +127,7 @@ async function traceGenerationForTeam(args: {
 			userId: args.userId,
 			subscriptionId: args.team.activeSubscriptionId ?? "",
 			providerMetadata: args.providerMetadata,
+			requestId: args.requestId,
 		},
 		sessionId: args.sessionId,
 	});
@@ -206,7 +208,8 @@ export const giselleEngine = NextGiselleEngine({
 	},
 	callbacks: {
 		generationComplete: (args) => {
-			logger.info({ requestId: getRequestId() });
+			const requestId = getRequestId();
+			logger.info(`requestId: ${String(requestId)}`);
 			after(async () => {
 				try {
 					switch (args.generation.context.origin.type) {
@@ -222,6 +225,7 @@ export const giselleEngine = NextGiselleEngine({
 								userId: "github-app",
 								team,
 								providerMetadata: args.providerMetadata,
+								requestId,
 							});
 							break;
 						}
@@ -239,6 +243,7 @@ export const giselleEngine = NextGiselleEngine({
 								userId: currentUser.id,
 								team: currentTeam,
 								providerMetadata: args.providerMetadata,
+								requestId,
 							});
 							break;
 						}
