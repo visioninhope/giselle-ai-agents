@@ -209,7 +209,6 @@ export const giselleEngine = NextGiselleEngine({
 	callbacks: {
 		generationComplete: (args) => {
 			const requestId = getRequestId();
-			logger.info(`requestId: ${String(requestId)}`);
 			after(async () => {
 				try {
 					switch (args.generation.context.origin.type) {
