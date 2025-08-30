@@ -220,7 +220,6 @@ export async function traceGeneration(args: {
 				metadata,
 			});
 
-			console.log(`errorM: ${args.generation.error.message}`);
 			trace.generation({
 				name: generationName,
 				model: llm.id,
