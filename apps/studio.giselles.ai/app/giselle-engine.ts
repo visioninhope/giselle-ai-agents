@@ -1,6 +1,7 @@
 import { WorkspaceId } from "@giselle-sdk/data-type";
 import type {
 	CompletedGeneration,
+	FailedGeneration,
 	OutputFileBlob,
 	QueryContext,
 	RunningGeneration,
@@ -101,9 +102,9 @@ if (
 type TeamForPlan = Pick<CurrentTeam, "id" | "activeSubscriptionId" | "type">;
 
 async function traceGenerationForTeam(args: {
-	generation: CompletedGeneration;
+	generation: CompletedGeneration | FailedGeneration;
 	inputMessages: ModelMessage[];
-	outputFileBlobs: OutputFileBlob[];
+	outputFileBlobs?: OutputFileBlob[];
 	sessionId?: string;
 	userId: string;
 	team: TeamForPlan;
@@ -255,6 +256,52 @@ export const giselleEngine = NextGiselleEngine({
 					console.error("Trace generation failed:", error);
 				}
 			});
+		},
+		generationFailed: async (args: {
+			generation: FailedGeneration;
+			inputMessages: ModelMessage[];
+		}) => {
+			const requestId = getRequestId();
+			try {
+				switch (args.generation.context.origin.type) {
+					case "github-app": {
+						const team = await getWorkspaceTeam(
+							args.generation.context.origin.workspaceId,
+						);
+						await traceGenerationForTeam({
+							generation: args.generation,
+							inputMessages: args.inputMessages,
+							sessionId: args.generation.context.origin.actId,
+							userId: "github-app",
+							team,
+							requestId,
+						});
+						break;
+					}
+					case "stage":
+					case "studio": {
+						const [currentUser, currentTeam] = await Promise.all([
+							fetchCurrentUser(),
+							fetchCurrentTeam(),
+						]);
+						await traceGenerationForTeam({
+							generation: args.generation,
+							inputMessages: args.inputMessages,
+							sessionId: args.generation.context.origin.actId,
+							userId: currentUser.id,
+							team: currentTeam,
+							requestId,
+						});
+						break;
+					}
+					default: {
+						const _exhaustiveCheck: never = args.generation.context.origin;
+						throw new Error(`Unhandled origin type: ${_exhaustiveCheck}`);
+					}
+				}
+			} catch (error) {
+				console.error("Trace generation failed:", error);
+			}
 		},
 		embeddingComplete: (args) => {
 			after(async () => {
