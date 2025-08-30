@@ -225,6 +225,11 @@ export function generateText(args: {
 
 					await setGeneration(failedGeneration);
 
+					await args.context.callbacks?.generationFailed?.({
+						generation: failedGeneration,
+						inputMessages: messages,
+					});
+
 					await Promise.all(
 						preparedToolSet.cleanupFunctions.map((cleanupFunction) =>
 							cleanupFunction(),
