@@ -369,7 +369,7 @@ export function Installed({
 													node.content.state.status === "reconfiguring" &&
 													flowTriggerId !== undefined
 												) {
-													const result = await client.updateTrigger({
+													const result = await client.reconfigureGitHubTrigger({
 														flowTriggerId,
 														repositoryNodeId: step.repoNodeId,
 														installationId: step.installationId,

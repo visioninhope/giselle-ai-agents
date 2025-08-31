@@ -12,7 +12,7 @@ import type { GiselleEngineContext } from "../types";
 import { getWorkspace, setWorkspace } from "../workspaces/utils";
 import { getFlowTrigger, setFlowTrigger } from "./utils";
 
-export async function updateTrigger(args: {
+export async function reconfigureGitHubTrigger(args: {
 	context: GiselleEngineContext;
 	flowTriggerId: FlowTriggerId;
 	repositoryNodeId: string;

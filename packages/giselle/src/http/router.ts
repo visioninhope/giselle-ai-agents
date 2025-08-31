@@ -287,7 +287,7 @@ export const createJsonRouters = {
 				});
 			},
 		}),
-	updateTrigger: (giselleEngine: GiselleEngine) =>
+	reconfigureGitHubTrigger: (giselleEngine: GiselleEngine) =>
 		createHandler({
 			input: z.object({
 				flowTriggerId: FlowTriggerId.schema,
@@ -297,7 +297,7 @@ export const createJsonRouters = {
 			}),
 			handler: async ({ input }) => {
 				return JsonResponse.json({
-					triggerId: await giselleEngine.updateTrigger(input),
+					triggerId: await giselleEngine.reconfigureGitHubTrigger(input),
 				});
 			},
 		}),

@@ -33,7 +33,7 @@ import {
 	getTrigger,
 	resolveTrigger,
 	setTrigger,
-	updateTrigger,
+	reconfigureGitHubTrigger,
 } from "./flows";
 import {
 	cancelGeneration,
@@ -281,13 +281,13 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 		},
 		setTrigger: async (args: { trigger: FlowTrigger }) =>
 			setTrigger({ ...args, context }),
-		updateTrigger: async (args: {
+		reconfigureGitHubTrigger: async (args: {
 			flowTriggerId: FlowTriggerId;
 			repositoryNodeId: string;
 			installationId: number;
 			useExperimentalStorage: boolean;
 		}) => {
-			return await updateTrigger({ ...args, context });
+			return await reconfigureGitHubTrigger({ ...args, context });
 		},
 		deleteTrigger: async (args: { flowTriggerId: FlowTriggerId }) =>
 			deleteTrigger({ ...args, context }),
