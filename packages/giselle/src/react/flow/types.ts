@@ -20,7 +20,7 @@ export type ConnectionCloneStrategy = "inputs-only" | "all" | "none";
 export interface WorkflowDesignerContextValue {
 	data: Workspace;
 	textGenerationApi: string;
-	addNode: (node: Node, options?: { ui?: NodeUIState }) => void;
+	addNode: (node: NodeLike, options?: { ui?: NodeUIState }) => void;
 	copyNode: (
 		sourceNode: Node,
 		options?: {

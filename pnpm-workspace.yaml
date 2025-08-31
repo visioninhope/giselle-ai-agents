@@ -93,3 +93,4 @@ catalog:
   "@ai-sdk/provider": 2.0.0
   nuqs: 2.4.3
   pino: 9.9.0
+  zustand: 5.0.8
