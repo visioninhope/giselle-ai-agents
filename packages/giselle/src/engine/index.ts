@@ -31,9 +31,9 @@ import {
 	configureTrigger,
 	deleteTrigger,
 	getTrigger,
+	reconfigureGitHubTrigger,
 	resolveTrigger,
 	setTrigger,
-	reconfigureGitHubTrigger,
 } from "./flows";
 import {
 	cancelGeneration,
