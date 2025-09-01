@@ -138,9 +138,10 @@ function getGenerationModelInfo(generation: Generation): {
 		generation.context.operationNode.content.type === "textGeneration" &&
 		"llm" in generation.context.operationNode.content
 	) {
+		const content = generation.context.operationNode.content as any;
 		return {
-			provider: generation.context.operationNode.content.llm.provider,
-			modelId: generation.context.operationNode.content.llm.id,
+			provider: content.llm?.provider || "Unknown",
+			modelId: content.llm?.id || "",
 		};
 	}
 	return { provider: "Unknown", modelId: "" };
