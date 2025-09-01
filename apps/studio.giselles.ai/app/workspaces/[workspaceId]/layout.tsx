@@ -16,7 +16,11 @@ import { getGitHubRepositoryIndexes } from "@/lib/vector-stores/github";
 import { getGitHubIntegrationState } from "@/packages/lib/github";
 import { getUsageLimitsForTeam } from "@/packages/lib/usage-limits";
 import { fetchCurrentUser } from "@/services/accounts";
-import { fetchCurrentTeam, isProPlan } from "@/services/teams";
+import {
+	checkUserTeamMembership,
+	fetchCurrentTeam,
+	isProPlan,
+} from "@/services/teams";
 
 export default async function Layout({
 	params,
@@ -38,7 +42,13 @@ export default async function Layout({
 	const currentUser = await fetchCurrentUser();
 
 	const currentTeam = await fetchCurrentTeam();
-	if (currentTeam.dbId !== agent.teamDbId) {
+
+	// Check if user is a member of the workspace's team
+	const isUserMemberOfWorkspaceTeam = await checkUserTeamMembership(
+		currentUser.dbId,
+		agent.teamDbId,
+	);
+	if (!isUserMemberOfWorkspaceTeam) {
 		return notFound();
 	}
 	const usageLimits = await getUsageLimitsForTeam(currentTeam);
