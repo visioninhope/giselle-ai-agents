@@ -6,7 +6,10 @@ import { memo, useMemo, useRef } from "react";
 import { shallow } from "zustand/shallow";
 import { Background } from "../../ui/background";
 import { isNodeId } from "../lib/is-node-id";
-import { selectUiSliceForRFNodes } from "../lib/selectors";
+import {
+	buildEdgesFromConnections,
+	selectUiSliceForRFNodes,
+} from "../lib/selectors";
 import { useEditorStore, useEditorStoreWithEqualityFn } from "../store/context";
 import { Node } from "./node";
 
@@ -14,6 +17,12 @@ export function NodeCanvas() {
 	// Subscribe only to UI state (position/selected) and order.
 	const uiSlice = useEditorStoreWithEqualityFn(
 		(s) => selectUiSliceForRFNodes(s),
+		shallow,
+	);
+
+	// Subscribe to connections by reference; derive edges with memoization.
+	const edges = useEditorStoreWithEqualityFn(
+		buildEdgesFromConnections,
 		shallow,
 	);
 
@@ -61,6 +70,7 @@ export function NodeCanvas() {
 	return (
 		<ReactFlow
 			nodes={nodes}
+			edges={edges}
 			onNodesChange={onNodesChange}
 			nodeTypes={nodeTypes}
 			className="flex-1"

@@ -1,6 +1,6 @@
 "use client";
 
-import type { Connection, NodeId, NodeLike } from "@giselle-sdk/data-type";
+import type { NodeId, NodeLike } from "@giselle-sdk/data-type";
 import type { Edge as RFEdge, Node as RFNode } from "@xyflow/react";
 import type { EditorAction, EditorState } from "../store/store";
 
@@ -66,10 +66,10 @@ export function selectNodePanelDataById(id: NodeId) {
 }
 
 export function buildEdgesFromConnections(
-	connections: Iterable<Connection>,
+	s: EditorState & EditorAction,
 ): RFEdge[] {
 	const edges: RFEdge[] = [];
-	for (const c of connections) {
+	for (const c of s.connections) {
 		edges.push({
 			id: c.id,
 			source: c.outputNode.id,
