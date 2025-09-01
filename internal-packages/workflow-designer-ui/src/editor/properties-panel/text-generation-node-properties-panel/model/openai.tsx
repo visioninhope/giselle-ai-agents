@@ -9,7 +9,6 @@ import {
 import { useMemo } from "react";
 import { Slider } from "../../../../ui/slider";
 import { Switch } from "../../../../ui/switch";
-import { languageModelAvailable } from "./utils";
 
 export function OpenAIModelPanel({
 	openaiLanguageModel,
@@ -24,7 +23,7 @@ export function OpenAIModelPanel({
 	onToolChange: (changedValue: ToolSet) => void;
 	onWebSearchChange: (enabled: boolean) => void;
 }) {
-	const limits = useUsageLimits();
+	const _limits = useUsageLimits();
 	const languageModel = useMemo(
 		() => openaiLanguageModels.find((lm) => lm.id === openaiLanguageModel.id),
 		[openaiLanguageModel.id],
@@ -36,29 +35,6 @@ export function OpenAIModelPanel({
 
 	return (
 		<div className="flex flex-col gap-[16px]">
-			<fieldset className="flex flex-col">
-				<label htmlFor="model" className="text-text text-[13px] mb-[2px]">
-					Model
-				</label>
-				<Select
-					id="model"
-					placeholder="Select a LLM"
-					value={openaiLanguageModel.id}
-					onValueChange={(value) => {
-						onModelChange(
-							OpenAILanguageModelData.parse({
-								...openaiLanguageModel,
-								id: value,
-							}),
-						);
-					}}
-					options={openaiLanguageModels.map((model) => ({
-						value: model.id,
-						label: model.id,
-						disabled: !languageModelAvailable(model, limits),
-					}))}
-				/>
-			</fieldset>
 			{hasCapability(languageModel, Capability.Reasoning) ? (
 				<>
 					<fieldset className="flex flex-col">

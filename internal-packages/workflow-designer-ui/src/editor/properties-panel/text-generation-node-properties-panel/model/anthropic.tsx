@@ -5,18 +5,9 @@ import {
 	Capability,
 	hasCapability,
 } from "@giselle-sdk/language-model";
-import { useCallback, useMemo } from "react";
-import {
-	Select,
-	SelectContent,
-	SelectGroup,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "../../../../ui/select";
+import { useMemo } from "react";
 import { Slider } from "../../../../ui/slider";
 import { Switch } from "../../../../ui/switch";
-import { languageModelAvailable } from "./utils";
 
 export function AnthropicModelPanel({
 	anthropicLanguageModel,
@@ -25,7 +16,7 @@ export function AnthropicModelPanel({
 	anthropicLanguageModel: AnthropicLanguageModelData;
 	onModelChange: (changedValue: AnthropicLanguageModelData) => void;
 }) {
-	const limits = useUsageLimits();
+	const _limits = useUsageLimits();
 
 	const hasReasoningCapability = useMemo(() => {
 		const languageModel = anthropicLanguageModels.find(
@@ -34,55 +25,8 @@ export function AnthropicModelPanel({
 		return languageModel && hasCapability(languageModel, Capability.Reasoning);
 	}, [anthropicLanguageModel.id]);
 
-	const handleModelChange = useCallback(
-		(value: string) => {
-			const newLanguageModel = anthropicLanguageModels.find(
-				(model) => model.id === value,
-			);
-			if (newLanguageModel === undefined) {
-				return;
-			}
-			onModelChange(
-				AnthropicLanguageModelData.parse({
-					...anthropicLanguageModel,
-					id: value,
-					configurations: {
-						...anthropicLanguageModel.configurations,
-						reasoningText:
-							anthropicLanguageModel.configurations.reasoningText &&
-							hasCapability(newLanguageModel, Capability.Reasoning),
-					},
-				}),
-			);
-		},
-		[anthropicLanguageModel, onModelChange],
-	);
-
 	return (
 		<div className="flex flex-col gap-[34px]">
-			<Select
-				value={anthropicLanguageModel.id}
-				onValueChange={handleModelChange}
-			>
-				<SelectTrigger>
-					<SelectValue placeholder="Select a LLM" />
-				</SelectTrigger>
-				<SelectContent>
-					<SelectGroup>
-						{anthropicLanguageModels.map((anthropicLanguageModel) => (
-							<SelectItem
-								key={anthropicLanguageModel.id}
-								value={anthropicLanguageModel.id}
-								disabled={
-									!languageModelAvailable(anthropicLanguageModel, limits)
-								}
-							>
-								{anthropicLanguageModel.id}
-							</SelectItem>
-						))}
-					</SelectGroup>
-				</SelectContent>
-			</Select>
 			<div>
 				<div className="grid grid-cols-2 gap-[24px]">
 					<Slider
