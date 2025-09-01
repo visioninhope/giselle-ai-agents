@@ -36,8 +36,8 @@ export function OpenAIModelPanel({
 	return (
 		<div className="flex flex-col gap-[16px]">
 			{hasCapability(languageModel, Capability.Reasoning) ? (
-				<>
-					<fieldset className="flex flex-col">
+				<div className="grid grid-cols-2 gap-[16px] mb-[16px]">
+					<fieldset className="flex flex-col min-w-0">
 						<label
 							htmlFor="reasoningEffort"
 							className="text-text text-[13px] mb-[2px]"
@@ -66,7 +66,7 @@ export function OpenAIModelPanel({
 						/>
 					</fieldset>
 
-					<fieldset className="flex flex-col">
+					<fieldset className="flex flex-col min-w-0">
 						<label
 							htmlFor="verbosity"
 							className="text-text text-[13px] mb-[2px]"
@@ -94,7 +94,7 @@ export function OpenAIModelPanel({
 							}))}
 						/>
 					</fieldset>
-				</>
+				</div>
 			) : (
 				<div>
 					<div className="grid grid-cols-2 gap-[24px]">
