@@ -1,8 +1,10 @@
 "use client";
 
 import type {
+	InputId,
 	NodeId,
 	NodeLike,
+	OutputId,
 	UIState,
 	Workspace,
 	WorkspaceId,
@@ -14,6 +16,8 @@ export interface EditorState {
 	workspaceId: WorkspaceId;
 	nodesById: Record<NodeId, NodeLike>;
 	nodeOrder: NodeId[];
+	inputsByNodeId: Record<NodeId, InputId[]>;
+	outputsByNodeId: Record<NodeId, OutputId[]>;
 	ui: UIState;
 }
 export interface EditorAction {
@@ -32,6 +36,18 @@ export function createEditorStore(initial: { workspace: Workspace }) {
 				),
 				nodeOrder: initial.workspace.nodes.map((node) => node.id),
 				ui: initial.workspace.ui,
+				inputsByNodeId: Object.fromEntries(
+					initial.workspace.nodes.map((node) => [
+						node.id,
+						node.inputs.map((input) => input.id),
+					]),
+				),
+				outputsByNodeId: Object.fromEntries(
+					initial.workspace.nodes.map((node) => [
+						node.id,
+						node.outputs.map((output) => output.id),
+					]),
+				),
 			},
 			(set) => ({
 				updateNode: (id, patch) =>
