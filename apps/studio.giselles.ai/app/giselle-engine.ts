@@ -170,6 +170,63 @@ async function traceEmbeddingForTeam(args: {
 	});
 }
 
+type GenerationTraceArgs = {
+	generation: CompletedGeneration | FailedGeneration;
+	inputMessages: ModelMessage[];
+	outputFileBlobs?: OutputFileBlob[];
+	providerMetadata?: ProviderMetadata;
+	requestId?: string;
+};
+
+function handleGenerationTrace(args: GenerationTraceArgs) {
+	after(async () => {
+		try {
+			switch (args.generation.context.origin.type) {
+				case "github-app": {
+					const team = await getWorkspaceTeam(
+						args.generation.context.origin.workspaceId,
+					);
+					await traceGenerationForTeam({
+						generation: args.generation,
+						inputMessages: args.inputMessages,
+						outputFileBlobs: args.outputFileBlobs,
+						sessionId: args.generation.context.origin.actId,
+						userId: "github-app",
+						team,
+						providerMetadata: args.providerMetadata,
+						requestId: args.requestId,
+					});
+					break;
+				}
+				case "stage":
+				case "studio": {
+					const [currentUser, currentTeam] = await Promise.all([
+						fetchCurrentUser(),
+						fetchCurrentTeam(),
+					]);
+					await traceGenerationForTeam({
+						generation: args.generation,
+						inputMessages: args.inputMessages,
+						outputFileBlobs: args.outputFileBlobs,
+						sessionId: args.generation.context.origin.actId,
+						userId: currentUser.id,
+						team: currentTeam,
+						providerMetadata: args.providerMetadata,
+						requestId: args.requestId,
+					});
+					break;
+				}
+				default: {
+					const _exhaustiveCheck: never = args.generation.context.origin;
+					throw new Error(`Unhandled origin type: ${_exhaustiveCheck}`);
+				}
+			}
+		} catch (error) {
+			console.error("Trace generation failed:", error);
+		}
+	});
+}
+
 export const giselleEngine = NextGiselleEngine({
 	basePath: "/api/giselle",
 	storage,
@@ -210,98 +267,11 @@ export const giselleEngine = NextGiselleEngine({
 	callbacks: {
 		generationComplete: (args) => {
 			const requestId = getRequestId();
-			after(async () => {
-				try {
-					switch (args.generation.context.origin.type) {
-						case "github-app": {
-							const team = await getWorkspaceTeam(
-								args.generation.context.origin.workspaceId,
-							);
-							await traceGenerationForTeam({
-								generation: args.generation,
-								inputMessages: args.inputMessages,
-								outputFileBlobs: args.outputFileBlobs,
-								sessionId: args.generation.context.origin.actId,
-								userId: "github-app",
-								team,
-								providerMetadata: args.providerMetadata,
-								requestId,
-							});
-							break;
-						}
-						case "stage":
-						case "studio": {
-							const [currentUser, currentTeam] = await Promise.all([
-								fetchCurrentUser(),
-								fetchCurrentTeam(),
-							]);
-							await traceGenerationForTeam({
-								generation: args.generation,
-								inputMessages: args.inputMessages,
-								outputFileBlobs: args.outputFileBlobs,
-								sessionId: args.generation.context.origin.actId,
-								userId: currentUser.id,
-								team: currentTeam,
-								providerMetadata: args.providerMetadata,
-								requestId,
-							});
-							break;
-						}
-						default: {
-							const _exhaustiveCheck: never = args.generation.context.origin;
-							throw new Error(`Unhandled origin type: ${_exhaustiveCheck}`);
-						}
-					}
-				} catch (error) {
-					console.error("Trace generation failed:", error);
-				}
-			});
+			handleGenerationTrace({ ...args, requestId });
 		},
-		generationFailed: async (args: {
-			generation: FailedGeneration;
-			inputMessages: ModelMessage[];
-		}) => {
+		generationFailed: (args) => {
 			const requestId = getRequestId();
-			try {
-				switch (args.generation.context.origin.type) {
-					case "github-app": {
-						const team = await getWorkspaceTeam(
-							args.generation.context.origin.workspaceId,
-						);
-						await traceGenerationForTeam({
-							generation: args.generation,
-							inputMessages: args.inputMessages,
-							sessionId: args.generation.context.origin.actId,
-							userId: "github-app",
-							team,
-							requestId,
-						});
-						break;
-					}
-					case "stage":
-					case "studio": {
-						const [currentUser, currentTeam] = await Promise.all([
-							fetchCurrentUser(),
-							fetchCurrentTeam(),
-						]);
-						await traceGenerationForTeam({
-							generation: args.generation,
-							inputMessages: args.inputMessages,
-							sessionId: args.generation.context.origin.actId,
-							userId: currentUser.id,
-							team: currentTeam,
-							requestId,
-						});
-						break;
-					}
-					default: {
-						const _exhaustiveCheck: never = args.generation.context.origin;
-						throw new Error(`Unhandled origin type: ${_exhaustiveCheck}`);
-					}
-				}
-			} catch (error) {
-				console.error("Trace generation failed:", error);
-			}
+			handleGenerationTrace({ ...args, requestId });
 		},
 		embeddingComplete: (args) => {
 			after(async () => {
