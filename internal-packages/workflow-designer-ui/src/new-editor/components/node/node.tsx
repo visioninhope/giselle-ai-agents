@@ -202,8 +202,7 @@ export function CanvasNode({
 				v.isFile && "from-file-node-1 to-file-node-2 shadow-file-node-1",
 				v.isWebPage &&
 					"from-webPage-node-1 to-webPage-node-2 shadow-webPage-node-1",
-				v.isTextGeneration &&
-					"from-generation-node-1 to-generation-node-2 shadow-generation-node-1",
+				v.isTextGeneration && "to-generation-node-2 shadow-generation-node-1",
 				v.isImageGeneration &&
 					"from-image-generation-node-1 to-image-generation-node-2 shadow-image-generation-node-1",
 				v.isGithub &&
