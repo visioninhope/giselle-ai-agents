@@ -12,7 +12,7 @@ import {
 import { isTextGenerationNode, type NodeId } from "@giselle-sdk/data-type";
 import { memo, useCallback } from "react";
 import { shallow } from "zustand/shallow";
-import { useEditorStore, useEditorStoreWithEqualityFn } from "./store/context";
+import { useEditorStore, useEditorStoreWithEqualityFn } from "../store/context";
 
 export function DebugViewer() {
 	// Subscribe only to the list of IDs so the viewer component doesn't rerender
