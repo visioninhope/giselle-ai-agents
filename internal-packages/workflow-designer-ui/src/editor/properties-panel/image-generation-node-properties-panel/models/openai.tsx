@@ -3,12 +3,10 @@ import { OpenAIImageLanguageModelData } from "@giselle-sdk/data-type";
 import { useUsageLimits } from "@giselle-sdk/giselle/react";
 import {
 	openaiImageBackground,
-	openaiImageModels,
 	openaiImageModeration,
 	openaiImageQuality,
 	openaiImageSize,
 } from "@giselle-sdk/language-model";
-import { languageModelAvailable } from "../utils";
 
 export function OpenAIImageModelPanel({
 	languageModel,
@@ -17,34 +15,10 @@ export function OpenAIImageModelPanel({
 	languageModel: OpenAIImageLanguageModelData;
 	onModelChange: (changedValue: OpenAIImageLanguageModelData) => void;
 }) {
-	const limits = useUsageLimits();
+	const _limits = useUsageLimits();
 
 	return (
 		<div className="flex flex-col gap-[16px]">
-			<fieldset className="flex flex-col">
-				<label htmlFor="model" className="text-text text-[13px] mb-[2px]">
-					Model
-				</label>
-				<Select
-					id="model"
-					placeholder="Select a LLM"
-					value={languageModel.id}
-					onValueChange={(value) => {
-						onModelChange(
-							OpenAIImageLanguageModelData.parse({
-								...languageModel,
-								id: value,
-							}),
-						);
-					}}
-					options={openaiImageModels.map((openaiImageModel) => ({
-						value: openaiImageModel.id,
-						label: openaiImageModel.id,
-						disabled: !languageModelAvailable(openaiImageModel, limits),
-					}))}
-				/>
-			</fieldset>
-
 			<div className="grid grid-cols-2 gap-[24px]">
 				<fieldset className="flex flex-col">
 					<label htmlFor="size" className="text-text text-[13px] mb-[2px]">

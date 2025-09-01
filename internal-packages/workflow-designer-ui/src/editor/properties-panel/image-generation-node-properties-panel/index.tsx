@@ -1,9 +1,18 @@
+import { Select } from "@giselle-internal/ui/select";
 import { useToasts } from "@giselle-internal/ui/toast";
 import type { ImageGenerationNode } from "@giselle-sdk/data-type";
+import {
+	FalLanguageModelData,
+	OpenAIImageLanguageModelData,
+} from "@giselle-sdk/data-type";
 import {
 	useNodeGenerations,
 	useWorkflowDesigner,
 } from "@giselle-sdk/giselle/react";
+import {
+	falLanguageModels,
+	openaiImageModels,
+} from "@giselle-sdk/language-model";
 import clsx from "clsx/lite";
 import { CommandIcon, CornerDownLeft } from "lucide-react";
 import { Tabs } from "radix-ui";
@@ -43,6 +52,71 @@ export function ImageGenerationNodePropertiesPanel({
 	const { error } = useToasts();
 
 	const uiState = useMemo(() => data.ui.nodeState[node.id], [data, node.id]);
+
+	// Get available models for current provider
+	const getAvailableModels = (): Array<{ value: string; label: string }> => {
+		switch (node.content.llm.provider) {
+			case "fal":
+				return falLanguageModels.map((model) => ({
+					value: model.id,
+					label: model.id,
+				}));
+			case "openai":
+				return openaiImageModels.map((model) => ({
+					value: model.id,
+					label: model.id,
+				}));
+			default:
+				return [];
+		}
+	};
+
+	// Create default model data for provider
+	const createDefaultModelData = (provider: "fal" | "openai") => {
+		switch (provider) {
+			case "fal":
+				return FalLanguageModelData.parse({
+					provider: "fal",
+					id: falLanguageModels[0]?.id || "fal-ai/flux/schnell",
+					configurations: {
+						size: "landscape_4_3",
+						n: 1,
+					},
+				});
+			case "openai":
+				return OpenAIImageLanguageModelData.parse({
+					provider: "openai",
+					id: openaiImageModels[0]?.id || "gpt-image-1",
+					configurations: {
+						n: 1,
+						size: "1024x1024",
+						quality: "auto",
+						background: "auto",
+						moderation: "auto",
+					},
+				});
+			default:
+				throw new Error(`Unsupported provider: ${provider}`);
+		}
+	};
+
+	// Update model ID while preserving provider-specific configurations
+	const updateModelId = (currentModel: any, newModelId: string) => {
+		switch (currentModel.provider) {
+			case "fal":
+				return FalLanguageModelData.parse({
+					...currentModel,
+					id: newModelId,
+				});
+			case "openai":
+				return OpenAIImageLanguageModelData.parse({
+					...currentModel,
+					id: newModelId,
+				});
+			default:
+				throw new Error(`Unsupported provider: ${currentModel.provider}`);
+		}
+	};
 
 	useKeyboardShortcuts({
 		onGenerate: () => {
@@ -149,8 +223,64 @@ export function ImageGenerationNodePropertiesPanel({
 							</Tabs.Content>
 							<Tabs.Content
 								value="model"
-								className="flex-1 flex flex-col overflow-y-auto"
+								className="flex-1 flex flex-col overflow-y-auto px-[4px] outline-none"
 							>
+								<div className="grid grid-cols-2 gap-[16px] mb-[16px] max-w-full">
+									<fieldset className="flex flex-col min-w-0">
+										<label
+											htmlFor="provider"
+											className="text-text text-[13px] mb-[2px]"
+										>
+											Provider
+										</label>
+										<Select
+											id="provider"
+											placeholder="Select a provider"
+											value={node.content.llm.provider}
+											onValueChange={(provider) => {
+												const validProvider = provider as "fal" | "openai";
+												const defaultModel =
+													createDefaultModelData(validProvider);
+
+												updateNodeDataContent(node, {
+													...node.content,
+													llm: defaultModel,
+												});
+											}}
+											options={[
+												{ value: "fal", label: "Fal" },
+												{ value: "openai", label: "OpenAI" },
+											]}
+										/>
+									</fieldset>
+
+									<fieldset className="flex flex-col min-w-0">
+										<label
+											htmlFor="model"
+											className="text-text text-[13px] mb-[2px]"
+										>
+											Model
+										</label>
+										<Select
+											id="model"
+											placeholder="Select a model"
+											value={node.content.llm.id}
+											widthClassName="w-full"
+											onValueChange={(modelId) => {
+												const updatedModel = updateModelId(
+													node.content.llm,
+													modelId,
+												);
+
+												updateNodeDataContent(node, {
+													...node.content,
+													llm: updatedModel,
+												});
+											}}
+											options={getAvailableModels()}
+										/>
+									</fieldset>
+								</div>
 								{node.content.llm.provider === "fal" && (
 									<FalModelPanel
 										languageModel={node.content.llm}

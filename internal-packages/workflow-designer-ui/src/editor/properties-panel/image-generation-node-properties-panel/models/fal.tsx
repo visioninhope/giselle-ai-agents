@@ -1,12 +1,8 @@
 import { Select } from "@giselle-internal/ui/select";
 import { FalLanguageModelData } from "@giselle-sdk/data-type";
 import { useUsageLimits } from "@giselle-sdk/giselle/react";
-import {
-	falLanguageModels,
-	imageGenerationSizes,
-} from "@giselle-sdk/language-model";
+import { imageGenerationSizes } from "@giselle-sdk/language-model";
 import { Slider } from "../../../../ui/slider";
-import { languageModelAvailable } from "../utils";
 
 export function FalModelPanel({
 	languageModel,
@@ -15,34 +11,10 @@ export function FalModelPanel({
 	languageModel: FalLanguageModelData;
 	onModelChange: (changedValue: FalLanguageModelData) => void;
 }) {
-	const limits = useUsageLimits();
+	const _limits = useUsageLimits();
 
 	return (
 		<div className="flex flex-col gap-[16px]">
-			<fieldset className="flex flex-col">
-				<label htmlFor="model" className="text-text text-[13px] mb-[2px]">
-					Model
-				</label>
-				<Select
-					id="model"
-					placeholder="Select a LLM"
-					value={languageModel.id}
-					onValueChange={(value) => {
-						onModelChange(
-							FalLanguageModelData.parse({
-								...languageModel,
-								id: value,
-							}),
-						);
-					}}
-					options={falLanguageModels.map((falLanguageModel) => ({
-						value: falLanguageModel.id,
-						label: falLanguageModel.id,
-						disabled: !languageModelAvailable(falLanguageModel, limits),
-					}))}
-				/>
-			</fieldset>
-
 			<fieldset className="flex flex-col">
 				<label htmlFor="size" className="text-text text-[13px] mb-[2px]">
 					Size
