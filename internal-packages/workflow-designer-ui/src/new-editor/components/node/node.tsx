@@ -12,6 +12,7 @@ import { shallow } from "zustand/shallow";
 import { NodeIcon } from "../../../icons/node";
 import { EditableText } from "../../../ui/editable-text";
 import { Tooltip } from "../../../ui/tooltip";
+import { selectNodePanelDataById } from "../../lib/selectors";
 import { useEditorStoreWithEqualityFn } from "../../store/context";
 
 export function Node({ id, selected }: RFNodeProps) {
@@ -22,20 +23,7 @@ export function Node({ id, selected }: RFNodeProps) {
 		highlighted,
 		updateNode,
 	} = useEditorStoreWithEqualityFn(
-		(s) => {
-			const node = s.nodesById[NodeId.parse(id)];
-			return {
-				node: node,
-				connectedInputIds: s.inputConnectionsByNodeId
-					?.get(node.id)
-					?.map((connection) => connection.inputId),
-				connectedOutputIds: s.outputConnectionsByNodeId
-					?.get(node.id)
-					?.map((connection) => connection.outputId),
-				highlighted: s.ui.nodeState[node.id]?.highlighted ?? false,
-				updateNode: s.updateNode,
-			};
-		},
+		selectNodePanelDataById(NodeId.parse(id)),
 		(a, b) => {
 			return (
 				a.node === b.node &&

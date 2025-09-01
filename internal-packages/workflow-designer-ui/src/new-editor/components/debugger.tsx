@@ -12,15 +12,13 @@ import {
 import { isTextGenerationNode, type NodeId } from "@giselle-sdk/data-type";
 import { memo, useCallback } from "react";
 import { shallow } from "zustand/shallow";
+import { selectNode, selectNodeIds } from "../lib/selectors";
 import { useEditorStore, useEditorStoreWithEqualityFn } from "../store/context";
 
 export function DebugViewer() {
 	// Subscribe only to the list of IDs so the viewer component doesn't rerender
 	// when node contents change (only when membership/order changes).
-	const nodeIds = useEditorStoreWithEqualityFn(
-		(s) => Object.keys(s.nodesById).sort() as NodeId[],
-		shallow,
-	);
+	const nodeIds = useEditorStoreWithEqualityFn(selectNodeIds, shallow);
 	return (
 		<Table>
 			<TableHeader>
@@ -40,11 +38,11 @@ export function DebugViewer() {
 }
 
 const ViewerRow = memo(function ViewerRow({ id }: { id: NodeId }) {
-	const node = useEditorStoreWithEqualityFn((s) => s.nodesById[id], shallow);
+	const node = useEditorStoreWithEqualityFn(selectNode(id), shallow);
 	return (
 		<TableRow>
-			<TableCell>{node.name}</TableCell>
-			<TableCell>{node.type}</TableCell>
+			<TableCell>{node?.name}</TableCell>
+			<TableCell>{node?.type}</TableCell>
 			{isTextGenerationNode(node) && (
 				<TableCell>{node.content.prompt}</TableCell>
 			)}
@@ -53,10 +51,7 @@ const ViewerRow = memo(function ViewerRow({ id }: { id: NodeId }) {
 });
 export function DebugForm() {
 	// Subscribe only to the list of IDs; individual rows subscribe to their node.
-	const nodeIds = useEditorStoreWithEqualityFn(
-		(s) => Object.keys(s.nodesById).sort() as NodeId[],
-		shallow,
-	);
+	const nodeIds = useEditorStoreWithEqualityFn(selectNodeIds, shallow);
 
 	return (
 		<form>
@@ -78,7 +73,7 @@ export function DebugForm() {
 }
 
 const FormRow = memo(function FormRow({ id }: { id: NodeId }) {
-	const node = useEditorStoreWithEqualityFn((s) => s.nodesById[id], shallow);
+	const node = useEditorStoreWithEqualityFn(selectNode(id), shallow);
 	const updateNode = useEditorStore((s) => s.updateNode);
 
 	const handleChangeName = useCallback(
@@ -91,9 +86,9 @@ const FormRow = memo(function FormRow({ id }: { id: NodeId }) {
 	return (
 		<TableRow>
 			<TableCell>
-				<Input value={node.name} onChange={handleChangeName} />
+				<Input value={node?.name} onChange={handleChangeName} />
 			</TableCell>
-			<TableCell>{node.type}</TableCell>
+			<TableCell>{node?.type}</TableCell>
 		</TableRow>
 	);
 });
