@@ -220,6 +220,12 @@ export function generateText(args: {
 						),
 					);
 					if (generationError) {
+						if (AISDKError.isInstance(generationError)) {
+							args.context.logger.error(
+								generationError,
+								`${args.generation.id} is failed`,
+							);
+						}
 						const errInfo = AISDKError.isInstance(generationError)
 							? { name: generationError.name, message: generationError.message }
 							: {
