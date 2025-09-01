@@ -47,6 +47,7 @@ export function NodeCanvas() {
 		cacheRef.current = next;
 		return arr;
 	}, [uiSlice]);
+	const onNodesChange = useEditorStoreWithEqualityFn((s) => s.onNodesChange);
 	const nodeTypes = useMemo(
 		() => ({
 			custom: memo(Node),
@@ -57,6 +58,7 @@ export function NodeCanvas() {
 		<ReactFlow
 			nodes={nodes}
 			edges={[]}
+			onNodesChange={onNodesChange}
 			nodeTypes={nodeTypes}
 			className="flex-1"
 		>

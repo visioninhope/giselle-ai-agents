@@ -8,6 +8,8 @@ import type {
 	Workspace,
 	WorkspaceId,
 } from "@giselle-sdk/data-type";
+import type { NodeChange } from "@xyflow/react";
+import { applyNodeChanges } from "@xyflow/react";
 import { createStore } from "zustand";
 import { combine } from "zustand/middleware";
 
@@ -21,6 +23,7 @@ export interface EditorState {
 }
 export interface EditorAction {
 	updateNode: (id: NodeId, patch: Partial<NodeLike>) => void;
+	onNodesChange: (changes: NodeChange[]) => void;
 }
 
 export type EditorStore = ReturnType<typeof createEditorStore>;
@@ -66,6 +69,30 @@ export function createEditorStore(initial: { workspace: Workspace }) {
 							[id]: { ...s.nodesById[id], ...patch },
 						},
 					})),
+				onNodesChange: (changes) => {
+					set((s) => {
+						const nodeState = { ...s.ui.nodeState };
+						for (const change of changes) {
+							if (change.type === "position" && change.position) {
+								const node = nodeState[change.id];
+								if (node) {
+									nodeState[change.id] = { ...node, position: change.position };
+								}
+							} else if (change.type === "select") {
+								const node = nodeState[change.id];
+								if (node) {
+									nodeState[change.id] = { ...node, selected: change.selected };
+								}
+							}
+						}
+						return {
+							ui: {
+								...s.ui,
+								nodeState,
+							},
+						};
+					});
+				},
 			}),
 		),
 	);
