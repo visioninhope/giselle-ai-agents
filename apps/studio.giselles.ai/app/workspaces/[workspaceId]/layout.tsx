@@ -18,7 +18,7 @@ import { getUsageLimitsForTeam } from "@/packages/lib/usage-limits";
 import { fetchCurrentUser } from "@/services/accounts";
 import {
 	checkUserTeamMembership,
-	fetchCurrentTeam,
+	fetchWorkspaceTeam,
 	isProPlan,
 } from "@/services/teams";
 
@@ -41,9 +41,7 @@ export default async function Layout({
 
 	const currentUser = await fetchCurrentUser();
 
-	const currentTeam = await fetchCurrentTeam();
-
-	// Check if user is a member of the workspace's team
+	// Check if user is a member of the workspace's team before other operations
 	const isUserMemberOfWorkspaceTeam = await checkUserTeamMembership(
 		currentUser.dbId,
 		agent.teamDbId,
@@ -51,9 +49,15 @@ export default async function Layout({
 	if (!isUserMemberOfWorkspaceTeam) {
 		return notFound();
 	}
-	const usageLimits = await getUsageLimitsForTeam(currentTeam);
+
+	const workspaceTeam = await fetchWorkspaceTeam(agent.teamDbId);
+	if (!workspaceTeam) {
+		return notFound();
+	}
+
+	const usageLimits = await getUsageLimitsForTeam(workspaceTeam);
 	const gitHubRepositoryIndexes = await getGitHubRepositoryIndexes(
-		currentTeam.dbId,
+		workspaceTeam.dbId,
 	);
 	const runV3 = await runV3Flag();
 	const webSearchAction = await webSearchActionFlag();
@@ -83,10 +87,10 @@ export default async function Layout({
 			usageLimits={usageLimits}
 			telemetry={{
 				metadata: {
-					isProPlan: isProPlan(currentTeam),
-					teamType: currentTeam.type,
+					isProPlan: isProPlan(workspaceTeam),
+					teamType: workspaceTeam.type,
 					userId: currentUser.id,
-					subscriptionId: currentTeam.activeSubscriptionId ?? "",
+					subscriptionId: workspaceTeam.activeSubscriptionId ?? "",
 				},
 			}}
 			featureFlag={{
@@ -105,7 +109,7 @@ export default async function Layout({
 						await db
 							.insert(flowTriggers)
 							.values({
-								teamDbId: currentTeam.dbId,
+								teamDbId: workspaceTeam.dbId,
 								sdkFlowTriggerId: flowTrigger.id,
 								sdkWorkspaceId: flowTrigger.workspaceId,
 								staged:
