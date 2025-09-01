@@ -16,7 +16,11 @@ import { getGitHubRepositoryIndexes } from "@/lib/vector-stores/github";
 import { getGitHubIntegrationState } from "@/packages/lib/github";
 import { getUsageLimitsForTeam } from "@/packages/lib/usage-limits";
 import { fetchCurrentUser } from "@/services/accounts";
-import { fetchCurrentTeam, isProPlan } from "@/services/teams";
+import {
+	fetchWorkspaceTeam,
+	isMemberOfTeam,
+	isProPlan,
+} from "@/services/teams";
 
 export default async function Layout({
 	params,
@@ -33,17 +37,27 @@ export default async function Layout({
 	if (agent === undefined) {
 		return notFound();
 	}
-	const gitHubIntegrationState = await getGitHubIntegrationState(agent.dbId);
-
 	const currentUser = await fetchCurrentUser();
 
-	const currentTeam = await fetchCurrentTeam();
-	if (currentTeam.dbId !== agent.teamDbId) {
+	// Check if user is a member of the workspace's team before other operations
+	const isUserMemberOfWorkspaceTeam = await isMemberOfTeam(
+		currentUser.dbId,
+		agent.teamDbId,
+	);
+	if (!isUserMemberOfWorkspaceTeam) {
 		return notFound();
 	}
-	const usageLimits = await getUsageLimitsForTeam(currentTeam);
+
+	const gitHubIntegrationState = await getGitHubIntegrationState(agent.dbId);
+
+	const workspaceTeam = await fetchWorkspaceTeam(agent.teamDbId);
+	if (!workspaceTeam) {
+		return notFound();
+	}
+
+	const usageLimits = await getUsageLimitsForTeam(workspaceTeam);
 	const gitHubRepositoryIndexes = await getGitHubRepositoryIndexes(
-		currentTeam.dbId,
+		workspaceTeam.dbId,
 	);
 	const runV3 = await runV3Flag();
 	const webSearchAction = await webSearchActionFlag();
@@ -73,10 +87,10 @@ export default async function Layout({
 			usageLimits={usageLimits}
 			telemetry={{
 				metadata: {
-					isProPlan: isProPlan(currentTeam),
-					teamType: currentTeam.type,
+					isProPlan: isProPlan(workspaceTeam),
+					teamType: workspaceTeam.type,
 					userId: currentUser.id,
-					subscriptionId: currentTeam.activeSubscriptionId ?? "",
+					subscriptionId: workspaceTeam.activeSubscriptionId ?? "",
 				},
 			}}
 			featureFlag={{
@@ -95,7 +109,7 @@ export default async function Layout({
 						await db
 							.insert(flowTriggers)
 							.values({
-								teamDbId: currentTeam.dbId,
+								teamDbId: workspaceTeam.dbId,
 								sdkFlowTriggerId: flowTrigger.id,
 								sdkWorkspaceId: flowTrigger.workspaceId,
 								staged:
