@@ -1,7 +1,6 @@
 import type { Workspace } from "@giselle-sdk/data-type";
 import { use } from "react";
 import { DebugForm, DebugViewer } from "./debugger";
-import { FlowDemo } from "./flow-demo";
 import { NodeCanvas } from "./node-canvas";
 import { EditorStoreProvider } from "./store/context";
 
@@ -13,8 +12,8 @@ export function NewEditor({
 	const workspace = use(workspacePromise);
 	return (
 		<EditorStoreProvider workspace={workspace}>
-			<div className="min-h-screen flex flex-col gap-4">
-				<div className="flex divide-x">
+			<div className="h-screen flex flex-col overflow-y-hidden">
+				<div className="flex divide-x shrink-0">
 					<div className="flex-1">
 						<DebugViewer />
 					</div>
@@ -22,8 +21,9 @@ export function NewEditor({
 						<DebugForm />
 					</div>
 				</div>
-				<NodeCanvas />
-				<FlowDemo />
+				<div className="flex-1 h-full min-h-0">
+					<NodeCanvas />
+				</div>
 			</div>
 		</EditorStoreProvider>
 	);
