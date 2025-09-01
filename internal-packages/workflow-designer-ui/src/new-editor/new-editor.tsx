@@ -2,6 +2,7 @@ import type { Workspace } from "@giselle-sdk/data-type";
 import { use } from "react";
 import { DebugForm, DebugViewer } from "./debugger";
 import { FlowDemo } from "./flow-demo";
+import { NodeCanvas } from "./node-canvas";
 import { EditorStoreProvider } from "./store/context";
 
 export function NewEditor({
@@ -21,6 +22,7 @@ export function NewEditor({
 						<DebugForm />
 					</div>
 				</div>
+				<NodeCanvas />
 				<FlowDemo />
 			</div>
 		</EditorStoreProvider>

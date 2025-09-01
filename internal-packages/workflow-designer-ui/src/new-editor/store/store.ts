@@ -3,6 +3,7 @@
 import type {
 	NodeId,
 	NodeLike,
+	UIState,
 	Workspace,
 	WorkspaceId,
 } from "@giselle-sdk/data-type";
@@ -12,6 +13,8 @@ import { combine } from "zustand/middleware";
 export interface EditorState {
 	workspaceId: WorkspaceId;
 	nodesById: Record<NodeId, NodeLike>;
+	nodeOrder: NodeId[];
+	ui: UIState;
 }
 export interface EditorAction {
 	updateNode: (id: NodeId, patch: Partial<NodeLike>) => void;
@@ -27,6 +30,8 @@ export function createEditorStore(initial: { workspace: Workspace }) {
 				nodesById: Object.fromEntries(
 					initial.workspace.nodes.map((node) => [node.id, node]),
 				),
+				nodeOrder: initial.workspace.nodes.map((node) => node.id),
+				ui: initial.workspace.ui,
 			},
 			(set) => ({
 				updateNode: (id, patch) =>
