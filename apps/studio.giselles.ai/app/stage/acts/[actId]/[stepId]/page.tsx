@@ -44,9 +44,6 @@ function getModelInfo(generation: Generation): {
 				case "google":
 					iconName = "search";
 					break;
-				case "perplexity":
-					iconName = "zap";
-					break;
 				case "fal":
 					iconName = "image";
 					break;
