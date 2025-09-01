@@ -1,15 +1,14 @@
 "use client";
 
-import type {
-	Connection,
+import {
+	type Connection,
 	NodeId,
-	NodeLike,
-	UIState,
-	Workspace,
-	WorkspaceId,
+	type NodeLike,
+	type UIState,
+	type Workspace,
+	type WorkspaceId,
 } from "@giselle-sdk/data-type";
 import type { NodeChange } from "@xyflow/react";
-import { applyNodeChanges } from "@xyflow/react";
 import { createStore } from "zustand";
 import { combine } from "zustand/middleware";
 
@@ -73,12 +72,16 @@ export function createEditorStore(initial: { workspace: Workspace }) {
 					set((s) => {
 						const nodeState = { ...s.ui.nodeState };
 						for (const change of changes) {
-							if (change.type === "position" && change.position) {
+							if (
+								change.type === "position" &&
+								change.position &&
+								isNodeId(change.id)
+							) {
 								const node = nodeState[change.id];
 								if (node) {
 									nodeState[change.id] = { ...node, position: change.position };
 								}
-							} else if (change.type === "select") {
+							} else if (change.type === "select" && isNodeId(change.id)) {
 								const node = nodeState[change.id];
 								if (node) {
 									nodeState[change.id] = { ...node, selected: change.selected };
@@ -96,4 +99,9 @@ export function createEditorStore(initial: { workspace: Workspace }) {
 			}),
 		),
 	);
+}
+
+function isNodeId(data: unknown): data is NodeId {
+	const nodeId = NodeId.safeParse(data);
+	return nodeId.success;
 }
