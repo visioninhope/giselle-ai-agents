@@ -1,10 +1,9 @@
 "use client";
 
 import type {
-	InputId,
+	Connection,
 	NodeId,
 	NodeLike,
-	OutputId,
 	UIState,
 	Workspace,
 	WorkspaceId,
@@ -16,8 +15,8 @@ export interface EditorState {
 	workspaceId: WorkspaceId;
 	nodesById: Record<NodeId, NodeLike>;
 	nodeOrder: NodeId[];
-	inputsByNodeId: Record<NodeId, InputId[]>;
-	outputsByNodeId: Record<NodeId, OutputId[]>;
+	inputConnectionsByNodeId: Map<NodeId, Connection[]>;
+	outputConnectionsByNodeId: Map<NodeId, Connection[]>;
 	ui: UIState;
 }
 export interface EditorAction {
@@ -25,6 +24,20 @@ export interface EditorAction {
 }
 
 export type EditorStore = ReturnType<typeof createEditorStore>;
+
+function groupByMap<T, K>(
+	items: readonly T[],
+	keyOf: (item: T) => K,
+): Map<K, T[]> {
+	const m = new Map<K, T[]>();
+	for (const it of items) {
+		const k = keyOf(it);
+		const bucket = m.get(k);
+		if (bucket) bucket.push(it);
+		else m.set(k, [it]);
+	}
+	return m;
+}
 
 export function createEditorStore(initial: { workspace: Workspace }) {
 	return createStore(
@@ -36,17 +49,13 @@ export function createEditorStore(initial: { workspace: Workspace }) {
 				),
 				nodeOrder: initial.workspace.nodes.map((node) => node.id),
 				ui: initial.workspace.ui,
-				inputsByNodeId: Object.fromEntries(
-					initial.workspace.nodes.map((node) => [
-						node.id,
-						node.inputs.map((input) => input.id),
-					]),
+				inputConnectionsByNodeId: groupByMap(
+					initial.workspace.connections,
+					(connection) => connection.inputNode.id,
 				),
-				outputsByNodeId: Object.fromEntries(
-					initial.workspace.nodes.map((node) => [
-						node.id,
-						node.outputs.map((output) => output.id),
-					]),
+				outputConnectionsByNodeId: groupByMap(
+					initial.workspace.connections,
+					(connection) => connection.outputNode.id,
 				),
 			},
 			(set) => ({

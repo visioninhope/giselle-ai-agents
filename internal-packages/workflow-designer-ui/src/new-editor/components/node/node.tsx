@@ -26,8 +26,12 @@ export function Node({ id, selected }: RFNodeProps) {
 			const node = s.nodesById[NodeId.parse(id)];
 			return {
 				node: node,
-				connectedInputIds: s.inputsByNodeId[node.id],
-				connectedOutputIds: s.outputsByNodeId[node.id],
+				connectedInputIds: s.inputConnectionsByNodeId
+					?.get(node.id)
+					?.map((connection) => connection.inputId),
+				connectedOutputIds: s.outputConnectionsByNodeId
+					?.get(node.id)
+					?.map((connection) => connection.outputId),
 				highlighted: s.ui.nodeState[node.id]?.highlighted ?? false,
 				updateNode: s.updateNode,
 			};
@@ -109,7 +113,7 @@ interface CanvasNodeProps {
 	onClickToEditMode: (e: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
-export function CanvasNode({
+function CanvasNode({
 	node,
 	name,
 	contentType,
@@ -322,7 +326,7 @@ export function CanvasNode({
 			{!preview && (
 				<div className="flex justify-between">
 					<div className="grid">
-						{node.inputs?.map((input: any) => (
+						{node.inputs?.map((input) => (
 							<div
 								className="relative flex items-center h-[28px]"
 								key={input.id}
@@ -355,13 +359,14 @@ export function CanvasNode({
 					</div>
 
 					<div className="grid">
-						{node.outputs?.map((output: any) => {
+						{node.outputs?.map((output) => {
 							const isConnected = connectedOutputIds?.some(
 								(connectedOutputId) => connectedOutputId === output.id,
 							);
 							return (
 								<div
 									className="relative group flex items-center h-[28px]"
+									data-connected={isConnected}
 									key={output.id}
 								>
 									<Handle
