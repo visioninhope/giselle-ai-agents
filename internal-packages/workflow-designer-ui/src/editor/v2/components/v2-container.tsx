@@ -68,24 +68,24 @@ function V2NodeCanvas() {
 
 	const { handleKeyDown } = useKeyboardShortcuts();
 
-	// useEffect(() => {
-	// 	reactFlowInstance.setNodes(
-	// 		Object.entries(data.ui.nodeState)
-	// 			.map(([nodeId, nodeState]) => {
-	// 				const nodeData = data.nodes.find((node) => node.id === nodeId);
-	// 				if (nodeData === undefined || nodeState === undefined) return null;
-	// 				return {
-	// 					id: nodeId,
-	// 					type: nodeData.content.type,
-	// 					position: { x: nodeState.position.x, y: nodeState.position.y },
-	// 					selected: nodeState.selected,
-	// 					data: { nodeData },
-	// 				} as GiselleWorkflowDesignerNode;
-	// 			})
-	// 			.filter((result) => result !== null),
-	// 	);
-	// 	updateNodeInternals(Object.keys(data.ui.nodeState));
-	// }, [data, reactFlowInstance.setNodes, updateNodeInternals]);
+	useEffect(() => {
+		reactFlowInstance.setNodes(
+			Object.entries(data.ui.nodeState)
+				.map(([nodeId, nodeState]) => {
+					const nodeData = data.nodes.find((node) => node.id === nodeId);
+					if (nodeData === undefined || nodeState === undefined) return null;
+					return {
+						id: nodeId,
+						type: nodeData.content.type,
+						position: { x: nodeState.position.x, y: nodeState.position.y },
+						selected: nodeState.selected,
+						data: { nodeData },
+					} as GiselleWorkflowDesignerNode;
+				})
+				.filter((result) => result !== null),
+		);
+		updateNodeInternals(Object.keys(data.ui.nodeState));
+	}, [data, reactFlowInstance.setNodes, updateNodeInternals]);
 
 	useEffect(() => {
 		reactFlowInstance.setEdges(
