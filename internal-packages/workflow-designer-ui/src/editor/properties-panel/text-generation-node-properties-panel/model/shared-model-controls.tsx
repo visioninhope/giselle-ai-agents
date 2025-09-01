@@ -12,9 +12,7 @@ interface CommonSliderProps<T> {
 	configurationKey: string;
 }
 
-function CommonSlider<
-	T extends { configurations: Record<string, unknown> },
->({
+function CommonSlider<T extends { configurations: Record<string, unknown> }>({
 	label,
 	value,
 	min,
