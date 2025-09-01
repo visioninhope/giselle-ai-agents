@@ -7,8 +7,13 @@ import {
 	openaiLanguageModels,
 } from "@giselle-sdk/language-model";
 import { useMemo } from "react";
-import { Slider } from "../../../../ui/slider";
 import { Switch } from "../../../../ui/switch";
+import {
+	FrequencyPenaltySlider,
+	PresencePenaltySlider,
+	TemperatureSlider,
+	TopPSlider,
+} from "./shared-model-controls";
 
 export function OpenAIModelPanel({
 	openaiLanguageModel,
@@ -23,7 +28,7 @@ export function OpenAIModelPanel({
 	onToolChange: (changedValue: ToolSet) => void;
 	onWebSearchChange: (enabled: boolean) => void;
 }) {
-	const _limits = useUsageLimits();
+	useUsageLimits();
 	const languageModel = useMemo(
 		() => openaiLanguageModels.find((lm) => lm.id === openaiLanguageModel.id),
 		[openaiLanguageModel.id],
@@ -98,77 +103,25 @@ export function OpenAIModelPanel({
 			) : (
 				<div>
 					<div className="grid grid-cols-2 gap-[24px]">
-						<Slider
-							label="Temperature"
-							value={openaiLanguageModel.configurations.temperature}
-							max={2.0}
-							min={0.0}
-							step={0.01}
-							onChange={(value) => {
-								onModelChange(
-									OpenAILanguageModelData.parse({
-										...openaiLanguageModel,
-										configurations: {
-											...openaiLanguageModel.configurations,
-											temperature: value,
-										},
-									}),
-								);
-							}}
+						<TemperatureSlider
+							onModelChange={onModelChange}
+							modelData={openaiLanguageModel}
+							parseModelData={OpenAILanguageModelData.parse}
 						/>
-						<Slider
-							label="Top P"
-							value={openaiLanguageModel.configurations.topP}
-							max={1.0}
-							min={0.0}
-							step={0.01}
-							onChange={(value) => {
-								onModelChange(
-									OpenAILanguageModelData.parse({
-										...openaiLanguageModel,
-										configurations: {
-											...openaiLanguageModel.configurations,
-											topP: value,
-										},
-									}),
-								);
-							}}
+						<TopPSlider
+							onModelChange={onModelChange}
+							modelData={openaiLanguageModel}
+							parseModelData={OpenAILanguageModelData.parse}
 						/>
-						<Slider
-							label="Frequency Penalty"
-							value={openaiLanguageModel.configurations.frequencyPenalty}
-							max={2.0}
-							min={0.0}
-							step={0.01}
-							onChange={(value) => {
-								onModelChange(
-									OpenAILanguageModelData.parse({
-										...openaiLanguageModel,
-										configurations: {
-											...openaiLanguageModel.configurations,
-											frequencyPenalty: value,
-										},
-									}),
-								);
-							}}
+						<FrequencyPenaltySlider
+							onModelChange={onModelChange}
+							modelData={openaiLanguageModel}
+							parseModelData={OpenAILanguageModelData.parse}
 						/>
-						<Slider
-							label="Presence Penalty"
-							value={openaiLanguageModel.configurations.presencePenalty}
-							max={2.0}
-							min={0.0}
-							step={0.01}
-							onChange={(value) => {
-								onModelChange(
-									OpenAILanguageModelData.parse({
-										...openaiLanguageModel,
-										configurations: {
-											...openaiLanguageModel.configurations,
-											presencePenalty: value,
-										},
-									}),
-								);
-							}}
+						<PresencePenaltySlider
+							onModelChange={onModelChange}
+							modelData={openaiLanguageModel}
+							parseModelData={OpenAILanguageModelData.parse}
 						/>
 					</div>
 				</div>

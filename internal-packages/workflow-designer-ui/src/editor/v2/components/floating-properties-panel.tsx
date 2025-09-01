@@ -62,10 +62,7 @@ export function FloatingPropertiesPanel({
 
 	const handleMouseDown = useCallback(
 		(e: React.MouseEvent) => {
-			console.log("Resize handle mousedown triggered", {
-				clientX: e.clientX,
-				width,
-			});
+			// Resize handle mousedown
 			e.preventDefault();
 			e.stopPropagation();
 			setIsResizing(true);
@@ -88,7 +85,7 @@ export function FloatingPropertiesPanel({
 			const throttledMouseMove = throttle(handleMouseMove, 16); // ~60fps throttling
 
 			const handleMouseUp = () => {
-				console.log("Resize handle mouseup triggered");
+				// Resize handle mouseup
 				setIsResizing(false);
 				document.removeEventListener("mousemove", throttledMouseMove);
 				document.removeEventListener("mouseup", handleMouseUp);

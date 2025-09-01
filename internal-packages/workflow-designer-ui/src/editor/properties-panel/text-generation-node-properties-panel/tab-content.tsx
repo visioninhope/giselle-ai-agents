@@ -1,15 +1,10 @@
 import { Select } from "@giselle-internal/ui/select";
 import type { Node, Workspace } from "@giselle-sdk/data-type";
 import {
-	AnthropicLanguageModelData,
-	GoogleLanguageModelData,
 	isImageGenerationNode,
 	isTextGenerationNode,
-	OpenAILanguageModelData,
 	type Output,
 	OutputId,
-	PerplexityLanguageModelData,
-	type TextGenerationLanguageModelData,
 	type TextGenerationNode,
 	type ToolSet,
 } from "@giselle-sdk/data-type";
@@ -29,6 +24,7 @@ import {
 	OpenAIModelPanel,
 	PerplexityModelPanel,
 } from "./model";
+import { createDefaultModelData, updateModelId } from "./model-defaults";
 import { PromptPanel } from "./prompt-panel";
 import { ToolsPanel } from "./tools";
 
@@ -58,7 +54,7 @@ export function TextGenerationTabContent({
 	data,
 	deleteConnection,
 }: TextGenerationTabContentProps) {
-	const _limits = useUsageLimits();
+	useUsageLimits();
 
 	// Get available models for current provider
 	const getAvailableModels = (): Array<{ value: string; label: string }> => {
@@ -136,57 +132,8 @@ export function TextGenerationTabContent({
 									| "anthropic"
 									| "google"
 									| "perplexity";
-								// Create default model data for the selected provider
-								let defaultModel: TextGenerationLanguageModelData;
-								switch (validProvider) {
-									case "openai":
-										defaultModel = OpenAILanguageModelData.parse({
-											provider: "openai",
-											id: "gpt-4o",
-											configurations: {
-												temperature: 0.7,
-												topP: 1.0,
-												frequencyPenalty: 0.0,
-												presencePenalty: 0.0,
-											},
-										});
-										break;
-									case "anthropic":
-										defaultModel = AnthropicLanguageModelData.parse({
-											provider: "anthropic",
-											id: "claude-3-5-sonnet-20241022",
-											configurations: {
-												temperature: 0.7,
-												topP: 1.0,
-												topK: 40,
-											},
-										});
-										break;
-									case "google":
-										defaultModel = GoogleLanguageModelData.parse({
-											provider: "google",
-											id: "gemini-2.0-flash-exp",
-											configurations: {
-												temperature: 0.7,
-												topP: 1.0,
-												topK: 40,
-												searchGrounding: false,
-											},
-										});
-										break;
-									case "perplexity":
-										defaultModel = PerplexityLanguageModelData.parse({
-											provider: "perplexity",
-											id: "llama-3.1-sonar-large-128k-online",
-											configurations: {
-												temperature: 0.7,
-												topP: 1.0,
-											},
-										});
-										break;
-									default:
-										return;
-								}
+
+								const defaultModel = createDefaultModelData(validProvider);
 
 								updateNodeDataContent(node, {
 									...node.content,
@@ -213,37 +160,7 @@ export function TextGenerationTabContent({
 							value={node.content.llm.id}
 							widthClassName="w-full"
 							onValueChange={(modelId) => {
-								const currentLlm = node.content.llm;
-								let updatedModel: TextGenerationLanguageModelData;
-
-								switch (currentLlm.provider) {
-									case "openai":
-										updatedModel = OpenAILanguageModelData.parse({
-											...currentLlm,
-											id: modelId,
-										});
-										break;
-									case "anthropic":
-										updatedModel = AnthropicLanguageModelData.parse({
-											...currentLlm,
-											id: modelId,
-										});
-										break;
-									case "google":
-										updatedModel = GoogleLanguageModelData.parse({
-											...currentLlm,
-											id: modelId,
-										});
-										break;
-									case "perplexity":
-										updatedModel = PerplexityLanguageModelData.parse({
-											...currentLlm,
-											id: modelId,
-										});
-										break;
-									default:
-										return;
-								}
+								const updatedModel = updateModelId(node.content.llm, modelId);
 
 								updateNodeDataContent(node, {
 									...node.content,
@@ -282,15 +199,20 @@ export function TextGenerationTabContent({
 										}
 									: undefined,
 							};
+							const hasSourceOutput = node.outputs.some(
+								(o) => o.accessor === "source",
+							);
 							const updateOutputs: Output[] = enable
-								? [
-										...node.outputs,
-										{
-											id: OutputId.generate(),
-											label: "Source",
-											accessor: "source",
-										},
-									]
+								? hasSourceOutput
+									? node.outputs
+									: [
+											...node.outputs,
+											{
+												id: OutputId.generate(),
+												label: "Source",
+												accessor: "source",
+											},
+										]
 								: node.outputs.filter((output) => output.accessor !== "source");
 							if (!enable) {
 								const sourceOutput = node.outputs.find(
@@ -375,14 +297,21 @@ export function TextGenerationTabContent({
 											},
 										},
 									},
-									outputs: [
-										...node.outputs,
-										{
-											id: OutputId.generate(),
-											label: "Source",
-											accessor: "source",
-										},
-									],
+									outputs: ((): Output[] => {
+										const hasSourceOutput = node.outputs.some(
+											(o) => o.accessor === "source",
+										);
+										return hasSourceOutput
+											? node.outputs
+											: [
+													...node.outputs,
+													{
+														id: OutputId.generate(),
+														label: "Source",
+														accessor: "source",
+													},
+												];
+									})(),
 								});
 							} else {
 								const sourceOutput = node.outputs.find(

@@ -1,6 +1,11 @@
 import { PerplexityLanguageModelData } from "@giselle-sdk/data-type";
 import { useUsageLimits } from "@giselle-sdk/giselle/react";
-import { Slider } from "../../../../ui/slider";
+import {
+	FrequencyPenaltySlider,
+	PresencePenaltySlider,
+	TemperatureSlider,
+	TopPSlider,
+} from "./shared-model-controls";
 import { SimpleDomainFilter } from "./simple-domain-filter";
 
 export function PerplexityModelPanel({
@@ -10,7 +15,7 @@ export function PerplexityModelPanel({
 	perplexityLanguageModel: PerplexityLanguageModelData;
 	onModelChange: (changedValue: PerplexityLanguageModelData) => void;
 }) {
-	const _limits = useUsageLimits();
+	useUsageLimits();
 
 	const handleSearchDomainFilterChange = (newFilter: string[]) => {
 		onModelChange(
@@ -28,76 +33,26 @@ export function PerplexityModelPanel({
 		<div className="flex flex-col gap-[34px]">
 			<div>
 				<div className="grid grid-cols-2 gap-[24px]">
-					<Slider
-						label="Temperature"
-						value={perplexityLanguageModel.configurations.temperature}
-						max={2.0}
-						min={0.0}
-						step={0.01}
-						onChange={(value) => {
-							onModelChange(
-								PerplexityLanguageModelData.parse({
-									...perplexityLanguageModel,
-									configurations: {
-										...perplexityLanguageModel.configurations,
-										temperature: value,
-									},
-								}),
-							);
-						}}
+					<TemperatureSlider
+						onModelChange={onModelChange}
+						modelData={perplexityLanguageModel}
+						parseModelData={PerplexityLanguageModelData.parse}
 					/>
-					<Slider
-						label="Top P"
-						value={perplexityLanguageModel.configurations.topP}
-						max={1.0}
-						min={0.0}
-						step={0.01}
-						onChange={(value) => {
-							onModelChange(
-								PerplexityLanguageModelData.parse({
-									...perplexityLanguageModel,
-									configurations: {
-										...perplexityLanguageModel.configurations,
-										topP: value,
-									},
-								}),
-							);
-						}}
+					<TopPSlider
+						onModelChange={onModelChange}
+						modelData={perplexityLanguageModel}
+						parseModelData={PerplexityLanguageModelData.parse}
 					/>
-					<Slider
-						label="Frequency Panalty"
-						value={perplexityLanguageModel.configurations.frequencyPenalty}
-						min={0.0}
-						step={0.01}
-						onChange={(value) => {
-							onModelChange(
-								PerplexityLanguageModelData.parse({
-									...perplexityLanguageModel,
-									configurations: {
-										...perplexityLanguageModel.configurations,
-										frequencyPenalty: value,
-									},
-								}),
-							);
-						}}
+					<FrequencyPenaltySlider
+						onModelChange={onModelChange}
+						modelData={perplexityLanguageModel}
+						parseModelData={PerplexityLanguageModelData.parse}
 					/>
-					<Slider
-						label="Presence Penalty"
-						value={perplexityLanguageModel.configurations.presencePenalty}
-						max={2.0}
+					<PresencePenaltySlider
+						onModelChange={onModelChange}
+						modelData={perplexityLanguageModel}
+						parseModelData={PerplexityLanguageModelData.parse}
 						min={-2.0}
-						step={0.01}
-						onChange={(value) => {
-							onModelChange(
-								PerplexityLanguageModelData.parse({
-									...perplexityLanguageModel,
-									configurations: {
-										...perplexityLanguageModel.configurations,
-										presencePenalty: value,
-									},
-								}),
-							);
-						}}
 					/>
 				</div>
 			</div>

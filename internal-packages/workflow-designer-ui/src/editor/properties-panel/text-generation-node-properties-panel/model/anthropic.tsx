@@ -6,8 +6,8 @@ import {
 	hasCapability,
 } from "@giselle-sdk/language-model";
 import { useMemo } from "react";
-import { Slider } from "../../../../ui/slider";
 import { Switch } from "../../../../ui/switch";
+import { TemperatureSlider, TopPSlider } from "./shared-model-controls";
 
 export function AnthropicModelPanel({
 	anthropicLanguageModel,
@@ -16,54 +16,30 @@ export function AnthropicModelPanel({
 	anthropicLanguageModel: AnthropicLanguageModelData;
 	onModelChange: (changedValue: AnthropicLanguageModelData) => void;
 }) {
-	const _limits = useUsageLimits();
+	useUsageLimits();
 
 	const hasReasoningCapability = useMemo(() => {
 		const languageModel = anthropicLanguageModels.find(
 			(lm) => lm.id === anthropicLanguageModel.id,
 		);
-		return languageModel && hasCapability(languageModel, Capability.Reasoning);
+		return (
+			!!languageModel && hasCapability(languageModel, Capability.Reasoning)
+		);
 	}, [anthropicLanguageModel.id]);
 
 	return (
 		<div className="flex flex-col gap-[34px]">
 			<div>
 				<div className="grid grid-cols-2 gap-[24px]">
-					<Slider
-						label="Temperature"
-						value={anthropicLanguageModel.configurations.temperature}
-						max={2.0}
-						min={0.0}
-						step={0.01}
-						onChange={(value) => {
-							onModelChange(
-								AnthropicLanguageModelData.parse({
-									...anthropicLanguageModel,
-									configurations: {
-										...anthropicLanguageModel.configurations,
-										temperature: value,
-									},
-								}),
-							);
-						}}
+					<TemperatureSlider
+						onModelChange={onModelChange}
+						modelData={anthropicLanguageModel}
+						parseModelData={AnthropicLanguageModelData.parse}
 					/>
-					<Slider
-						label="Top P"
-						value={anthropicLanguageModel.configurations.topP}
-						max={1.0}
-						min={0.0}
-						step={0.01}
-						onChange={(value) => {
-							onModelChange(
-								AnthropicLanguageModelData.parse({
-									...anthropicLanguageModel,
-									configurations: {
-										...anthropicLanguageModel.configurations,
-										topP: value,
-									},
-								}),
-							);
-						}}
+					<TopPSlider
+						onModelChange={onModelChange}
+						modelData={anthropicLanguageModel}
+						parseModelData={AnthropicLanguageModelData.parse}
 					/>
 
 					{hasReasoningCapability ? (
@@ -90,7 +66,7 @@ export function AnthropicModelPanel({
 								<div className="flex flex-row items-center justify-between">
 									<p className="text-[14px]">Reasoning</p>
 									<div className="flex-grow mx-[12px] h-[1px] bg-black-200/30" />
-									<p className="text-[12px]">Unsuported</p>
+									<p className="text-[12px]">Unsupported</p>
 								</div>
 							</div>
 						</>
