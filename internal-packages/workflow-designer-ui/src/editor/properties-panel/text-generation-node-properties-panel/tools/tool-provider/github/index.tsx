@@ -166,6 +166,11 @@ function GitHubToolConnectionDialog({
 	const [tokenValue, setTokenValue] = useState("");
 	const [tokenError, setTokenError] = useState<string | null>(null);
 
+	const handleResetToken = () => {
+		setTokenValue("");
+		setTokenError(null);
+	};
+
 	const handleTokenChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const value = e.target.value;
 		setTokenValue(value);
@@ -195,6 +200,14 @@ function GitHubToolConnectionDialog({
 		}
 
 		onSubmit(e);
+		handleResetToken();
+	};
+
+	const handleDialogOpenChange = (nextOpen: boolean) => {
+		if (!nextOpen) {
+			handleResetToken();
+		}
+		onOpenChange?.(nextOpen);
 	};
 
 	return (
@@ -215,7 +228,7 @@ function GitHubToolConnectionDialog({
 				)
 			}
 			open={open}
-			onOpenChange={onOpenChange}
+			onOpenChange={handleDialogOpenChange}
 		>
 			<Tabs
 				value={tabValue}
