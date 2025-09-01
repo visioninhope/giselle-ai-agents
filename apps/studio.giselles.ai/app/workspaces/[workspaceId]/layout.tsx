@@ -37,8 +37,6 @@ export default async function Layout({
 	if (agent === undefined) {
 		return notFound();
 	}
-	const gitHubIntegrationState = await getGitHubIntegrationState(agent.dbId);
-
 	const currentUser = await fetchCurrentUser();
 
 	// Check if user is a member of the workspace's team before other operations
@@ -49,6 +47,8 @@ export default async function Layout({
 	if (!isUserMemberOfWorkspaceTeam) {
 		return notFound();
 	}
+
+	const gitHubIntegrationState = await getGitHubIntegrationState(agent.dbId);
 
 	const workspaceTeam = await fetchWorkspaceTeam(agent.teamDbId);
 	if (!workspaceTeam) {
