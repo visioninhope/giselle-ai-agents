@@ -201,52 +201,49 @@ export function generateText(args: {
 				args.useAiGateway,
 				args.context.aiGateway,
 			);
-			let isGenerationFailed = false;
+			let generationError: unknown | undefined;
 			const streamTextResult = streamText({
 				model,
 				providerOptions,
 				messages,
 				tools: preparedToolSet.toolSet,
-				onError: async ({ error }) => {
-					isGenerationFailed = true;
-					const errInfo = AISDKError.isInstance(error)
-						? { name: error.name, message: error.message }
-						: {
-								name: "UnknownError",
-								message: error instanceof Error ? error.message : String(error),
-							};
-
-					const failedGeneration = {
-						...runningGeneration,
-						status: "failed",
-						failedAt: Date.now(),
-						error: errInfo,
-					} satisfies FailedGeneration;
-
-					await setGeneration(failedGeneration);
-
-					await Promise.all(
-						preparedToolSet.cleanupFunctions.map((cleanupFunction) =>
-							cleanupFunction(),
-						),
-					);
-				},
-				async onFinish() {
-					try {
-						await Promise.all(
-							preparedToolSet.cleanupFunctions.map((cleanupFunction) =>
-								cleanupFunction(),
-							),
-						);
-					} catch (error) {
-						console.error("Cleanup process failed:", error);
-					}
+				onError: ({ error }) => {
+					generationError = error;
 				},
 			});
 			return streamTextResult.toUIMessageStream({
 				sendReasoning: true,
 				onFinish: async ({ messages: generateMessages }) => {
-					if (isGenerationFailed) {
+					await Promise.all(
+						preparedToolSet.cleanupFunctions.map((cleanupFunction) =>
+							cleanupFunction(),
+						),
+					);
+					if (generationError) {
+						const errInfo = AISDKError.isInstance(generationError)
+							? { name: generationError.name, message: generationError.message }
+							: {
+									name: "UnknownError",
+									message:
+										generationError instanceof Error
+											? generationError.message
+											: String(generationError),
+								};
+
+						const failedGeneration = {
+							...runningGeneration,
+							status: "failed",
+							failedAt: Date.now(),
+							error: errInfo,
+						} satisfies FailedGeneration;
+
+						await Promise.all([
+							setGeneration(failedGeneration),
+							args.context.callbacks?.generationFailed?.({
+								generation: failedGeneration,
+								inputMessages: messages,
+							}),
+						]);
 						return;
 					}
 					const generationOutputs: GenerationOutput[] = [];

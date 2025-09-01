@@ -16,6 +16,7 @@ import type { GiselleStorage } from "./experimental_storage";
 import type { VectorStore } from "./experimental_vector-store/types/interface";
 import type {
 	CompletedGeneration,
+	FailedGeneration,
 	OutputFileBlob,
 	RunningGeneration,
 } from "./generations";
@@ -31,6 +32,14 @@ export interface GenerationCompleteCallbackFunctionArgs {
 }
 type GenerationCompleteCallbackFunction = (
 	args: GenerationCompleteCallbackFunctionArgs,
+) => void | Promise<void>;
+
+export interface GenerationFailedCallbackFunctionArgs {
+	generation: FailedGeneration;
+	inputMessages: ModelMessage[];
+}
+export type GenerationFailedCallbackFunction = (
+	args: GenerationFailedCallbackFunctionArgs,
 ) => void | Promise<void>;
 
 export interface EmbeddingCompleteCallbackFunctionArgs {
@@ -64,6 +73,7 @@ export interface GiselleEngineContext {
 	};
 	callbacks?: {
 		generationComplete?: GenerationCompleteCallbackFunction;
+		generationFailed?: GenerationFailedCallbackFunction;
 		flowTriggerUpdate?: (flowTrigger: FlowTrigger) => Promise<void>;
 		embeddingComplete?: EmbeddingCompleteCallbackFunction;
 	};
@@ -148,6 +158,7 @@ export interface GiselleEngineConfig {
 	};
 	callbacks?: {
 		generationComplete?: GenerationCompleteCallbackFunction;
+		generationFailed?: GenerationFailedCallbackFunction;
 		flowTriggerUpdate?: (flowTrigger: FlowTrigger) => Promise<void>;
 		embeddingComplete?: EmbeddingCompleteCallbackFunction;
 	};
