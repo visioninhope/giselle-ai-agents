@@ -5,7 +5,7 @@ import { ReactFlow, type Node as RFNode } from "@xyflow/react";
 import { memo, useMemo, useRef } from "react";
 import { shallow } from "zustand/shallow";
 import { Background } from "../../ui/background";
-import { useEditorStoreWithEqualityFn } from "../store/context";
+import { useEditorStore, useEditorStoreWithEqualityFn } from "../store/context";
 import { Node } from "./node";
 
 export function NodeCanvas() {
@@ -47,7 +47,7 @@ export function NodeCanvas() {
 		cacheRef.current = next;
 		return arr;
 	}, [uiSlice]);
-	const onNodesChange = useEditorStoreWithEqualityFn((s) => s.onNodesChange);
+	const onNodesChange = useEditorStore((s) => s.onNodesChange);
 	const nodeTypes = useMemo(
 		() => ({
 			custom: memo(Node),
