@@ -17,8 +17,8 @@ import { getGitHubIntegrationState } from "@/packages/lib/github";
 import { getUsageLimitsForTeam } from "@/packages/lib/usage-limits";
 import { fetchCurrentUser } from "@/services/accounts";
 import {
-	checkUserTeamMembership,
 	fetchWorkspaceTeam,
+	isMemberOfTeam,
 	isProPlan,
 } from "@/services/teams";
 
@@ -40,7 +40,7 @@ export default async function Layout({
 	const currentUser = await fetchCurrentUser();
 
 	// Check if user is a member of the workspace's team before other operations
-	const isUserMemberOfWorkspaceTeam = await checkUserTeamMembership(
+	const isUserMemberOfWorkspaceTeam = await isMemberOfTeam(
 		currentUser.dbId,
 		agent.teamDbId,
 	);

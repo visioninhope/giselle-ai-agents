@@ -4,7 +4,7 @@ import { db, teamMemberships } from "@/drizzle";
 /**
  * Checks if the specified user is a member of the specified team
  */
-export async function checkUserTeamMembership(
+export async function isMemberOfTeam(
 	userDbId: number,
 	teamDbId: number,
 ): Promise<boolean> {
