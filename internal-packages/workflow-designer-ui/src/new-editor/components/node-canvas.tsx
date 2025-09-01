@@ -4,9 +4,9 @@ import type { NodeId } from "@giselle-sdk/data-type";
 import { ReactFlow, type Node as RFNode } from "@xyflow/react";
 import { memo, useMemo, useRef } from "react";
 import { shallow } from "zustand/shallow";
-import { Background } from "../ui/background";
-import { Node } from "./components";
-import { useEditorStoreWithEqualityFn } from "./store/context";
+import { Background } from "../../ui/background";
+import { useEditorStoreWithEqualityFn } from "../store/context";
+import { Node } from "./node";
 
 export function NodeCanvas() {
 	// Subscribe only to UI state (position/selected) and order.
