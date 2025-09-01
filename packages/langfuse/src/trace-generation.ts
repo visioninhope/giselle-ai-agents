@@ -6,7 +6,11 @@ import {
 	isTextGenerationNode,
 	type TextGenerationNode,
 } from "@giselle-sdk/data-type";
-import type { CompletedGeneration, OutputFileBlob } from "@giselle-sdk/giselle";
+import type {
+	CompletedGeneration,
+	FailedGeneration,
+	OutputFileBlob,
+} from "@giselle-sdk/giselle";
 import { calculateDisplayCost } from "@giselle-sdk/language-model";
 import type { DataContent, ModelMessage } from "ai";
 import { type ApiMediaContentType, Langfuse, LangfuseMedia } from "langfuse";
@@ -156,12 +160,12 @@ function extractMetadata(
 }
 
 export async function traceGeneration(args: {
-	generation: CompletedGeneration;
+	generation: CompletedGeneration | FailedGeneration;
 	inputMessages: ModelMessage[];
 	userId?: string;
 	metadata?: Record<string, unknown>;
 	tags?: string[];
-	outputFileBlobs: OutputFileBlob[];
+	outputFileBlobs?: OutputFileBlob[];
 	sessionId?: string;
 }) {
 	try {
@@ -203,6 +207,34 @@ export async function traceGeneration(args: {
 		};
 
 		const { llm } = operationNode.content;
+
+		const generationName = isTextGenerationNode(operationNode)
+			? "generateText"
+			: isImageGenerationNode(operationNode)
+				? "generateImage"
+				: undefined;
+
+		if (args.generation.status === "failed") {
+			trace.update({
+				tags,
+				metadata,
+			});
+
+			trace.generation({
+				name: generationName,
+				model: llm.id,
+				modelParameters: llm.configurations,
+				input: langfuseInput,
+				startTime: new Date(args.generation.startedAt),
+				endTime: new Date(args.generation.failedAt),
+				metadata,
+				level: "ERROR",
+				statusMessage: args.generation.error.message,
+			});
+			await langfuse.flushAsync();
+			return;
+		}
+
 		// Handle text generation telemetry
 		if (isTextGenerationNode(operationNode)) {
 			const usage = args.generation.usage ?? {
@@ -224,7 +256,7 @@ export async function traceGeneration(args: {
 			});
 
 			trace.generation({
-				name: "generateText",
+				name: generationName,
 				model: llm.id,
 				modelParameters: llm.configurations,
 				input: langfuseInput,
@@ -241,13 +273,14 @@ export async function traceGeneration(args: {
 				startTime: new Date(args.generation.startedAt),
 				endTime: new Date(args.generation.completedAt),
 				metadata,
+				level: "DEFAULT",
 			});
 		}
 
 		// Handle image generation telemetry
 		if (isImageGenerationNode(operationNode)) {
 			// Convert output files to Langfuse media references
-			const mediaReferences = args.outputFileBlobs.map(
+			const mediaReferences = (args.outputFileBlobs ?? []).map(
 				(file) =>
 					new LangfuseMedia({
 						contentType: file.contentType as ApiMediaContentType,
@@ -263,7 +296,7 @@ export async function traceGeneration(args: {
 				});
 
 				trace.generation({
-					name: "generateImage",
+					name: generationName,
 					model: llm.id,
 					modelParameters: llm.configurations,
 					input: langfuseInput,

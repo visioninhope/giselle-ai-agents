@@ -48,6 +48,7 @@
 		"@types/pg": "catalog:",
 		"@types/react": "catalog:",
 		"@zod/core": "0.11.6",
+		"pino": "catalog:",
 		"tsup": "catalog:",
 		"vitest": "catalog:"
 	},

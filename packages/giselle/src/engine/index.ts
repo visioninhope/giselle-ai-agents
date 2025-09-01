@@ -8,6 +8,7 @@ import type {
 	Workspace,
 	WorkspaceId,
 } from "@giselle-sdk/data-type";
+import { noopLogger } from "../logger/noop-logger";
 import {
 	type CreateActInputs,
 	type CreateAndStartActInputs,
@@ -84,6 +85,7 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 		llmProviders: config.llmProviders ?? [],
 		integrationConfigs: config.integrationConfigs ?? {},
 		callbacks: config.callbacks,
+		logger: config.logger ?? noopLogger,
 	};
 	return {
 		copyWorkspace: async (workspaceId: WorkspaceId, name?: string) => {

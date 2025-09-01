@@ -38,13 +38,13 @@ jobs:
           private-key: ${{ secrets.LICENSE_CI_TRIGGER_APP_PRIVATE_KEY }}
       - name: Checkout code for non-fork PRs
         if: steps.fork-check.outputs.is_fork != 'true'
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           ref: ${{ github.event.pull_request.head.ref }}
           token: ${{ steps.app-token.outputs.token }}
       - name: Checkout code for forked PRs
         if: steps.fork-check.outputs.is_fork == 'true'
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       # To make the success of this job a prerequisite for merging into the main branch,
       # set a filter here instead of on: to determine whether or not to proceed to the next step.
       - name: Cache dependency files
@@ -70,7 +70,7 @@ jobs:
         if: steps.determine.outputs.files_changed == 'true'
       - run: pnpm install
         if: steps.determine.outputs.files_changed == 'true'
-      - uses: ruby/setup-ruby@2a7b30092b0caf9c046252510f9273b4875f3db9 # v1.254.0
+      - uses: ruby/setup-ruby@44511735964dcb71245e7e55f72539531f7bc0eb # v1.257.0
         if: steps.determine.outputs.files_changed == 'true'
         with:
           ruby-version: '3.3'
