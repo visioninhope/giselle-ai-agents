@@ -768,6 +768,9 @@ importers:
       ai:
         specifier: 'catalog:'
         version: 5.0.22(zod@3.25.76)
+      pino:
+        specifier: 'catalog:'
+        version: 9.9.0
       tailwindcss:
         specifier: 'catalog:'
         version: 4.1.10

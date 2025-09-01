@@ -11,6 +11,7 @@ import {
 import type { NodeChange } from "@xyflow/react";
 import { createStore } from "zustand";
 import { combine } from "zustand/middleware";
+import { logger } from "../lib/logger";
 
 export interface EditorState {
 	workspaceId: WorkspaceId;
@@ -72,19 +73,48 @@ export function createEditorStore(initial: { workspace: Workspace }) {
 					set((s) => {
 						const nodeState = { ...s.ui.nodeState };
 						for (const change of changes) {
-							if (
-								change.type === "position" &&
-								change.position &&
-								isNodeId(change.id)
-							) {
-								const node = nodeState[change.id];
-								if (node) {
+							switch (change.type) {
+								case "position": {
+									if (!isNodeId(change.id) || change.position === undefined) {
+										break;
+									}
+									const node = nodeState[change.id];
+									if (node === undefined) {
+										break;
+									}
 									nodeState[change.id] = { ...node, position: change.position };
+									break;
 								}
-							} else if (change.type === "select" && isNodeId(change.id)) {
-								const node = nodeState[change.id];
-								if (node) {
+								case "select": {
+									if (!isNodeId(change.id)) {
+										break;
+									}
+									const node = nodeState[change.id];
+									if (node === undefined) {
+										break;
+									}
 									nodeState[change.id] = { ...node, selected: change.selected };
+									break;
+								}
+								case "add": {
+									logger.trace(change, "add node");
+									break;
+								}
+								case "dimensions": {
+									logger.trace(change, "update dimensions");
+									break;
+								}
+								case "remove": {
+									logger.trace(change, "remove node");
+									break;
+								}
+								case "replace": {
+									logger.trace(change, "replace node");
+									break;
+								}
+								default: {
+									const _exhaustiveCheck: never = change;
+									throw new Error(`Unhandled change type: ${_exhaustiveCheck}`);
 								}
 							}
 						}
