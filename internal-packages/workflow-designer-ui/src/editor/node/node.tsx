@@ -22,8 +22,7 @@ import {
 import {
 	defaultName,
 	useNodeGenerations,
-	useWorkflow,
-	useWorkflowActions,
+	useWorkflowDesigner,
 } from "@giselle-sdk/giselle/react";
 import {
 	Handle,
@@ -36,7 +35,6 @@ import clsx from "clsx/lite";
 import { CheckIcon, SquareIcon } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useMemo, useRef, useTransition } from "react";
-import { shallow } from "zustand/shallow";
 import { NodeIcon } from "../../icons/node";
 import { EditableText } from "../../ui/editable-text";
 import { Tooltip } from "../../ui/tooltip";
@@ -129,22 +127,24 @@ function CustomXyFlowNode({
 	data,
 	selected,
 }: NodeProps<GiselleWorkflowDesignerNode>) {
-	const connectedInputIds = useWorkflow(
-		(s) =>
-			s.workspace.connections
-				.filter((c) => c.inputNode.id === data.nodeData.id)
-				.map((c) => c.inputId),
-		shallow,
+	const { data: workspace } = useWorkflowDesigner();
+	const connectedInputIds = useMemo(
+		() =>
+			workspace.connections
+				.filter((connection) => connection.inputNode.id === data.nodeData.id)
+				.map((connection) => connection.inputId),
+		[workspace, data.nodeData.id],
 	);
-	const connectedOutputIds = useWorkflow(
-		(s) =>
-			s.workspace.connections
-				.filter((c) => c.outputNode.id === data.nodeData.id)
-				.map((c) => c.outputId),
-		shallow,
+	const connectedOutputIds = useMemo(
+		() =>
+			workspace.connections
+				.filter((connection) => connection.outputNode.id === data.nodeData.id)
+				.map((connection) => connection.outputId),
+		[workspace, data.nodeData.id],
 	);
-	const highlighted = useWorkflow(
-		(s) => s.workspace.ui.nodeState?.[data.nodeData.id]?.highlighted ?? false,
+	const highlighted = useMemo(
+		() => workspace.ui.nodeState?.[data.nodeData.id]?.highlighted ?? false,
+		[workspace, data.nodeData.id],
 	);
 
 	return (
@@ -173,11 +173,10 @@ export function NodeComponent({
 	connectedInputIds?: InputId[];
 	connectedOutputIds?: OutputId[];
 }) {
-	const { updateNodeData } = useWorkflowActions();
-	const workspaceId = useWorkflow((s) => s.workspace.id);
+	const { updateNodeData, data } = useWorkflowDesigner();
 	const { stopGenerationRunner, currentGeneration } = useNodeGenerations({
 		nodeId: node.id,
-		origin: { type: "studio", workspaceId },
+		origin: { type: "studio", workspaceId: data.id },
 	});
 	const prevGenerationStatusRef = useRef(currentGeneration?.status);
 	const [showCompleteLabel, startTransition] = useTransition();
