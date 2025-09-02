@@ -6,23 +6,14 @@ import { memo, useMemo, useRef } from "react";
 import { shallow } from "zustand/shallow";
 import { Background } from "../../ui/background";
 import { isNodeId } from "../lib/is-node-id";
-import {
-	buildEdgesFromConnections,
-	selectUiSliceForRFNodes,
-} from "../lib/selectors";
+import { selectCanvasData } from "../lib/selectors";
 import { useEditorStore, useEditorStoreWithEqualityFn } from "../store/context";
 import { Node } from "./node";
 
 export function NodeCanvas() {
-	// Subscribe only to UI state (position/selected) and order.
-	const uiSlice = useEditorStoreWithEqualityFn(
-		selectUiSliceForRFNodes,
-		shallow,
-	);
-
-	// Subscribe to connections by reference; derive edges with memoization.
-	const edges = useEditorStoreWithEqualityFn(
-		buildEdgesFromConnections,
+	// Subscribe to node UI data and edges in a single selector
+	const { nodeUiData, edges } = useEditorStoreWithEqualityFn(
+		selectCanvasData,
 		shallow,
 	);
 
@@ -30,7 +21,7 @@ export function NodeCanvas() {
 	const cacheRef = useRef<Map<NodeId, RFNode>>(new Map());
 	const nodes = useMemo(() => {
 		const next = new Map<NodeId, RFNode>();
-		const arr = uiSlice
+		const arr = nodeUiData
 			.map(({ id, position, selected }) => {
 				if (!isNodeId(id)) {
 					return null;
@@ -58,7 +49,7 @@ export function NodeCanvas() {
 			.filter((node) => node !== null);
 		cacheRef.current = next;
 		return arr;
-	}, [uiSlice]);
+	}, [nodeUiData]);
 	const onNodesChange = useEditorStore((s) => s.onNodesChange);
 	const nodeTypes = useMemo(
 		() => ({

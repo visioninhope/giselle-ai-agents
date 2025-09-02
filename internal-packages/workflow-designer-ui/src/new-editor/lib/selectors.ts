@@ -6,19 +6,6 @@ import type { EditorAction, EditorState } from "../store/store";
 
 // Narrow, reusable selectors to keep components minimal and stable.
 
-export function selectUiSliceForRFNodes(
-	s: EditorState & EditorAction,
-): Pick<RFNode, "id" | "position" | "selected">[] {
-	return s.nodes.map((node) => {
-		const ui = s.ui.nodeState[node.id];
-		return {
-			id: node.id,
-			position: ui.position,
-			selected: ui.selected ?? false,
-		};
-	});
-}
-
 function groupByMap<T, K>(
 	items: readonly T[],
 	keyOf: (item: T) => K,
@@ -65,9 +52,19 @@ export function selectNodePanelDataById(id: NodeId) {
 	};
 }
 
-export function buildEdgesFromConnections(
-	s: EditorState & EditorAction,
-): RFEdge[] {
+export function selectCanvasData(s: EditorState & EditorAction): {
+	nodeUiData: Pick<RFNode, "id" | "position" | "selected">[];
+	edges: RFEdge[];
+} {
+	const nodeUiData = s.nodes.map((node) => {
+		const ui = s.ui.nodeState[node.id];
+		return {
+			id: node.id,
+			position: ui.position,
+			selected: ui.selected ?? false,
+		};
+	});
+
 	const edges: RFEdge[] = [];
 	for (const c of s.connections) {
 		edges.push({
@@ -78,7 +75,11 @@ export function buildEdgesFromConnections(
 			targetHandle: c.inputId,
 		});
 	}
-	return edges;
+
+	return {
+		nodeUiData,
+		edges,
+	};
 }
 
 export function selectNodeIds(s: EditorState & EditorAction) {
