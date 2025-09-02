@@ -20,6 +20,7 @@ export interface EditorAction {
 	updateNode: (id: NodeId, patch: Partial<NodeLike>) => void;
 	onNodesChange: OnNodesChange;
 	onNodeClick: NodeMouseHandler;
+	setInspectedNodeId: (id: NodeId | undefined) => void;
 }
 
 export type EditorStore = ReturnType<typeof createEditorStore>;
@@ -37,6 +38,13 @@ export function createEditorStore(initial: { workspace: Workspace }) {
 						nodes: s.nodes.map((node) =>
 							node.id === id ? ({ ...node, ...patch } as NodeLike) : node,
 						),
+					})),
+				setInspectedNodeId: (id) =>
+					set((s) => ({
+						ui: {
+							...s.ui,
+							inspectedNodeId: id,
+						},
 					})),
 				onNodeClick: (_event, node) => {
 					set((s) => {
