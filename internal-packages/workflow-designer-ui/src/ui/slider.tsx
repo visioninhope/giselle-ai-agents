@@ -1,6 +1,6 @@
 import clsx from "clsx/lite";
 import { Slider as SliderPrimitive } from "radix-ui";
-import { type ComponentProps, useState } from "react";
+import type { ComponentProps } from "react";
 
 function SliderInner({
 	className,
@@ -40,7 +40,6 @@ interface SliderProps
 	onChange?: (value: number) => void;
 }
 export function Slider(props: SliderProps) {
-	const [value, setValue] = useState(props.value);
 	return (
 		<div className="flex flex-col">
 			<div className="text-[14px] mb-[8px]">{props.label}</div>
@@ -50,12 +49,11 @@ export function Slider(props: SliderProps) {
 					max={props.max}
 					min={props.min}
 					step={props.step}
-					defaultValue={[value]}
-					onValueChange={(v) => setValue(v[0])}
-					onValueCommit={(v) => props.onChange?.(v[0])}
+					value={[props.value]}
+					onValueChange={(v) => props.onChange?.(v[0])}
 				/>
 				<div className="text-[12px] font-[700] text-white-900 w-[3em] text-right">
-					{value.toFixed(2)}
+					{props.value.toFixed(2)}
 				</div>
 			</div>
 		</div>
