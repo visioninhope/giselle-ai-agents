@@ -6,7 +6,7 @@ import type {
 	Workspace,
 	WorkspaceId,
 } from "@giselle-sdk/data-type";
-import type { NodeChange } from "@xyflow/react";
+import type { NodeMouseHandler, OnNodesChange } from "@xyflow/react";
 import { createStore } from "zustand";
 import { combine } from "zustand/middleware";
 import { isNodeId } from "../lib/is-node-id";
@@ -18,7 +18,8 @@ export interface EditorState extends Omit<Workspace, "id"> {
 
 export interface EditorAction {
 	updateNode: (id: NodeId, patch: Partial<NodeLike>) => void;
-	onNodesChange: (changes: NodeChange[]) => void;
+	onNodesChange: OnNodesChange;
+	onNodeClick: NodeMouseHandler;
 }
 
 export type EditorStore = ReturnType<typeof createEditorStore>;
@@ -37,6 +38,19 @@ export function createEditorStore(initial: { workspace: Workspace }) {
 							node.id === id ? ({ ...node, ...patch } as NodeLike) : node,
 						),
 					})),
+				onNodeClick: (_event, node) => {
+					set((s) => {
+						if (!isNodeId(node.id)) {
+							return s;
+						}
+						return {
+							ui: {
+								...s.ui,
+								inspectedNodeId: node.id,
+							},
+						};
+					});
+				},
 				onNodesChange: (changes) => {
 					set((s) => {
 						const nodeState = { ...s.ui.nodeState };
