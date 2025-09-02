@@ -6,11 +6,8 @@ import type {
 	Workspace,
 	WorkspaceId,
 } from "@giselle-sdk/data-type";
-import type { NodeMouseHandler, OnNodesChange } from "@xyflow/react";
 import { createStore } from "zustand";
 import { combine } from "zustand/middleware";
-import { isNodeId } from "../lib/is-node-id";
-import { logger } from "../lib/logger";
 
 export interface EditorState extends Omit<Workspace, "id"> {
 	workspaceId: WorkspaceId;
@@ -18,9 +15,10 @@ export interface EditorState extends Omit<Workspace, "id"> {
 
 export interface EditorAction {
 	updateNode: (id: NodeId, patch: Partial<NodeLike>) => void;
-	onNodesChange: OnNodesChange;
-	onNodeClick: NodeMouseHandler;
 	setInspectedNodeId: (id: NodeId | undefined) => void;
+	setNodePosition: (id: NodeId, position: { x: number; y: number }) => void;
+	setNodeSelected: (id: NodeId, selected: boolean) => void;
+	removeNode: (id: NodeId) => void;
 }
 
 export type EditorStore = ReturnType<typeof createEditorStore>;
@@ -46,83 +44,51 @@ export function createEditorStore(initial: { workspace: Workspace }) {
 							inspectedNodeId: id,
 						},
 					})),
-				onNodeClick: (_event, node) => {
+				setNodePosition: (id, position) =>
 					set((s) => {
-						if (!isNodeId(node.id)) {
-							return s;
-						}
+						const node = s.ui.nodeState[id];
+						if (!node) return s;
 						return {
 							ui: {
 								...s.ui,
-								inspectedNodeId: node.id,
+								nodeState: {
+									...s.ui.nodeState,
+									[id]: { ...node, position },
+								},
 							},
 						};
-					});
-				},
-				onNodesChange: (changes) => {
+					}),
+				setNodeSelected: (id, selected) =>
 					set((s) => {
-						const nodeState = { ...s.ui.nodeState };
-						let nodes = s.nodes;
-						for (const change of changes) {
-							switch (change.type) {
-								case "position": {
-									if (!isNodeId(change.id) || change.position === undefined) {
-										break;
-									}
-									const node = nodeState[change.id];
-									if (node === undefined) {
-										break;
-									}
-									nodeState[change.id] = { ...node, position: change.position };
-									break;
-								}
-								case "select": {
-									if (!isNodeId(change.id)) {
-										break;
-									}
-									const node = nodeState[change.id];
-									if (node === undefined) {
-										break;
-									}
-									nodeState[change.id] = { ...node, selected: change.selected };
-									break;
-								}
-								case "add": {
-									logger.trace(change, "add node");
-									break;
-								}
-								case "dimensions": {
-									logger.trace(change, "update dimensions");
-									break;
-								}
-								case "remove": {
-									if (!isNodeId(change.id)) {
-										break;
-									}
-									logger.trace(change, "remove node");
-									delete nodeState[change.id];
-									nodes = nodes.filter((node) => node.id !== change.id);
-									break;
-								}
-								case "replace": {
-									logger.trace(change, "replace node");
-									break;
-								}
-								default: {
-									const _exhaustiveCheck: never = change;
-									throw new Error(`Unhandled change type: ${_exhaustiveCheck}`);
-								}
-							}
-						}
+						const node = s.ui.nodeState[id];
+						if (!node) return s;
 						return {
-							nodes,
 							ui: {
 								...s.ui,
-								nodeState,
+								nodeState: {
+									...s.ui.nodeState,
+									[id]: { ...node, selected },
+								},
 							},
 						};
-					});
-				},
+					}),
+				removeNode: (id) =>
+					set((s) => {
+						const nextState = { ...s.ui.nodeState };
+						delete nextState[id];
+						const nextNodes = s.nodes.filter((n) => n.id !== id);
+						return {
+							nodes: nextNodes,
+							ui: {
+								...s.ui,
+								nodeState: nextState,
+								inspectedNodeId:
+									s.ui.inspectedNodeId === id
+										? undefined
+										: s.ui.inspectedNodeId,
+							},
+						};
+					}),
 			}),
 		),
 	);

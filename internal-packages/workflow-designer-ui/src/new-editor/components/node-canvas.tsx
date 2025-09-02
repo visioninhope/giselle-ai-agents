@@ -1,8 +1,13 @@
 "use client";
 
 import type { NodeId } from "@giselle-sdk/data-type";
-import { ReactFlow, type Node as RFNode } from "@xyflow/react";
-import { memo, useMemo, useRef } from "react";
+import {
+	type NodeMouseHandler,
+	type OnNodesChange,
+	ReactFlow,
+	type Node as RFNode,
+} from "@xyflow/react";
+import { memo, useCallback, useMemo, useRef } from "react";
 import { shallow } from "zustand/shallow";
 import { Background } from "../../ui/background";
 import { isNodeId } from "../lib/is-node-id";
@@ -50,8 +55,8 @@ export function NodeCanvas() {
 		cacheRef.current = next;
 		return arr;
 	}, [nodeUiData]);
-	const onNodesChange = useEditorStore((s) => s.onNodesChange);
-	const onNodeClick = useEditorStore((s) => s.onNodeClick);
+	const setNodePosition = useEditorStore((s) => s.setNodePosition);
+	const setNodeSelected = useEditorStore((s) => s.setNodeSelected);
 	const setInspectedNodeId = useEditorStore((s) => s.setInspectedNodeId);
 	const nodeTypes = useMemo(
 		() => ({
@@ -59,6 +64,47 @@ export function NodeCanvas() {
 		}),
 		[],
 	);
+
+	const onNodesChange = useCallback<OnNodesChange>(
+		(changes) => {
+			for (const change of changes) {
+				switch (change.type) {
+					case "position": {
+						if (isNodeId(change.id) && change.position) {
+							setNodePosition(change.id, change.position);
+						}
+						break;
+					}
+					case "select": {
+						if (isNodeId(change.id)) {
+							setNodeSelected(change.id, !!change.selected);
+						}
+						break;
+					}
+					case "remove": {
+						// We don't modify nodes here; deletion is handled elsewhere if enabled.
+						break;
+					}
+					default:
+						break;
+				}
+			}
+		},
+		[setNodePosition, setNodeSelected],
+	);
+
+	const onNodeClick = useCallback<NodeMouseHandler>(
+		(_event, node) => {
+			if (isNodeId(node.id)) {
+				setInspectedNodeId(node.id);
+			}
+		},
+		[setInspectedNodeId],
+	);
+
+	const onPaneClick = useCallback(() => {
+		setInspectedNodeId(undefined);
+	}, [setInspectedNodeId]);
 
 	return (
 		<ReactFlow
@@ -68,7 +114,7 @@ export function NodeCanvas() {
 			nodeTypes={nodeTypes}
 			className="flex-1"
 			onNodeClick={onNodeClick}
-			onPaneClick={() => setInspectedNodeId(undefined)}
+			onPaneClick={onPaneClick}
 		>
 			<Background />
 		</ReactFlow>
