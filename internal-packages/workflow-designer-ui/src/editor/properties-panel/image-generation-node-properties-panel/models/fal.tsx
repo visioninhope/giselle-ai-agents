@@ -14,7 +14,7 @@ export function FalModelPanel({
 	const _limits = useUsageLimits();
 
 	return (
-		<div className="flex flex-col gap-[16px]">
+		<div className="grid grid-cols-2 gap-[16px]">
 			<fieldset className="flex flex-col">
 				<label htmlFor="size" className="text-text text-[13px] mb-[2px]">
 					Size
@@ -41,26 +41,24 @@ export function FalModelPanel({
 				/>
 			</fieldset>
 			<div>
-				<div className="grid grid-cols-2 gap-[24px]">
-					<Slider
-						label="Number of Images"
-						value={languageModel.configurations.n}
-						max={4.0}
-						min={1.0}
-						step={1.0}
-						onChange={(value) => {
-							onModelChange(
-								FalLanguageModelData.parse({
-									...languageModel,
-									configurations: {
-										...languageModel.configurations,
-										n: value,
-									},
-								}),
-							);
-						}}
-					/>
-				</div>
+				<Slider
+					label="Number of Images"
+					value={languageModel.configurations.n}
+					max={4.0}
+					min={1.0}
+					step={1.0}
+					onChange={(value) => {
+						onModelChange(
+							FalLanguageModelData.parse({
+								...languageModel,
+								configurations: {
+									...languageModel.configurations,
+									n: value,
+								},
+							}),
+						);
+					}}
+				/>
 			</div>
 		</div>
 	);

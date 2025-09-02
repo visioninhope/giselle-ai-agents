@@ -3,10 +3,6 @@ import {
 	type ImageGenerationLanguageModelData,
 	OpenAIImageLanguageModelData,
 } from "@giselle-sdk/data-type";
-import {
-	falLanguageModels,
-	openaiImageModels,
-} from "@giselle-sdk/language-model";
 
 type Provider = "fal" | "openai";
 
@@ -17,16 +13,16 @@ export function createDefaultModelData(
 		case "fal":
 			return FalLanguageModelData.parse({
 				provider: "fal",
-				id: falLanguageModels[0]?.id || "fal-ai/flux/schnell",
+				id: "fal-ai/flux/schnell",
 				configurations: {
-					size: "landscape_4_3",
+					size: "1152x864",
 					n: 1,
 				},
 			});
 		case "openai":
 			return OpenAIImageLanguageModelData.parse({
 				provider: "openai",
-				id: openaiImageModels[0]?.id || "gpt-image-1",
+				id: "gpt-image-1",
 				configurations: {
 					n: 1,
 					size: "1024x1024",
