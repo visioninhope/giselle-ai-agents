@@ -9601,7 +9601,7 @@ BlueOak-1.0.0 permitted
 
 
 <a name="pino"></a>
-### pino v9.5.0
+### pino v9.9.0
 #### 
 
 ##### Paths
@@ -9810,7 +9810,7 @@ BlueOak-1.0.0 permitted
 
 
 <a name="process-warning"></a>
-### process-warning v4.0.1
+### process-warning v5.0.0
 #### 
 
 ##### Paths

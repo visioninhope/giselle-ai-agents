@@ -20,6 +20,7 @@ export const UIState = z.object({
 	nodeState: z.record(NodeId.schema, NodeUIState),
 	viewport: Viewport,
 	currentShortcutScope: ShortcutScope.optional().default("canvas"),
+	inspectedNodeId: z.optional(NodeId.schema),
 });
 export type UIState = z.infer<typeof UIState>;
 

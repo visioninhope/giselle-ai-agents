@@ -85,7 +85,7 @@
 		"nuqs": "catalog:",
 		"openai": "catalog:",
 		"pg": "catalog:",
-		"pino": "9.5.0",
+		"pino": "catalog:",
 		"posthog-js": "1.194.2",
 		"react": "catalog:",
 		"react-dom": "catalog:",
