@@ -4,7 +4,7 @@
 ## Summary
 * 818 MIT
 * 184 Apache 2.0
-* 47 ISC
+* 46 ISC
 * 27 New BSD
 * 13 Simplified BSD
 * 5 BlueOak-1.0.0
@@ -49,7 +49,7 @@
 
 
 <a name="@ai-sdk/anthropic"></a>
-### @ai-sdk/anthropic v2.0.6
+### @ai-sdk/anthropic v2.0.9
 #### 
 
 ##### Paths
@@ -60,7 +60,7 @@
 
 
 <a name="@ai-sdk/fal"></a>
-### @ai-sdk/fal v1.0.0
+### @ai-sdk/fal v1.0.11
 #### 
 
 ##### Paths
@@ -71,7 +71,7 @@
 
 
 <a name="@ai-sdk/gateway"></a>
-### @ai-sdk/gateway v1.0.11
+### @ai-sdk/gateway v1.0.15
 #### 
 
 ##### Paths
@@ -82,7 +82,7 @@
 
 
 <a name="@ai-sdk/google"></a>
-### @ai-sdk/google v2.0.8
+### @ai-sdk/google v2.0.11
 #### 
 
 ##### Paths
@@ -93,7 +93,7 @@
 
 
 <a name="@ai-sdk/openai"></a>
-### @ai-sdk/openai v2.0.19
+### @ai-sdk/openai v2.0.23
 #### 
 
 ##### Paths
@@ -104,7 +104,7 @@
 
 
 <a name="@ai-sdk/perplexity"></a>
-### @ai-sdk/perplexity v2.0.5
+### @ai-sdk/perplexity v2.0.7
 #### 
 
 ##### Paths
@@ -126,7 +126,7 @@
 
 
 <a name="@ai-sdk/provider-utils"></a>
-### @ai-sdk/provider-utils v3.0.0
+### @ai-sdk/provider-utils v3.0.7
 #### 
 
 ##### Paths
@@ -137,7 +137,7 @@
 
 
 <a name="@ai-sdk/react"></a>
-### @ai-sdk/react v2.0.22
+### @ai-sdk/react v2.0.29
 #### 
 
 ##### Paths
@@ -5186,7 +5186,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="ai"></a>
-### ai v5.0.22
+### ai v5.0.29
 #### 
 
 ##### Paths
@@ -6620,7 +6620,7 @@ BlueOak-1.0.0 permitted
 
 
 <a name="eventsource-parser"></a>
-### eventsource-parser v3.0.3
+### eventsource-parser v3.0.6
 #### 
 
 ##### Paths
@@ -12223,17 +12223,6 @@ BlueOak-1.0.0 permitted
 * /home/runner/work/giselle/giselle
 
 <a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-
-
-<a name="zod-to-json-schema"></a>
-### zod-to-json-schema v3.24.1
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://en.wikipedia.org/wiki/ISC_license">ISC</a> permitted
 
 
 
