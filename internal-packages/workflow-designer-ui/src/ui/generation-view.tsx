@@ -96,14 +96,17 @@ export function GenerationView({ generation }: { generation: Generation }) {
 			isImageGeneration &&
 			"llm" in generation.context.operationNode.content
 		) {
+			const config = generation.context.operationNode.content
+				.llm as import("@giselle-sdk/data-type").ImageGenerationLanguageModelData;
+			const imageCount = config.configurations.n || 1;
+			
 			return (
-				<div className="pt-[8px]">
-					<ImageGenerationLoading
-						configuration={
-							generation.context.operationNode.content
-								.llm as import("@giselle-sdk/data-type").ImageGenerationLanguageModelData
-						}
-					/>
+				<div className="flex gap-[12px] pt-[8px] overflow-x-auto">
+					{Array.from({ length: imageCount }).map((_, index) => (
+						<div key={index} className="flex-shrink-0">
+							<ImageGenerationLoading configuration={config} />
+						</div>
+					))}
 				</div>
 			);
 		}
@@ -123,14 +126,17 @@ export function GenerationView({ generation }: { generation: Generation }) {
 		isImageGeneration &&
 		"llm" in generation.context.operationNode.content
 	) {
+		const config = generation.context.operationNode.content
+			.llm as import("@giselle-sdk/data-type").ImageGenerationLanguageModelData;
+		const imageCount = config.configurations.n || 1;
+		
 		return (
-			<div className="pt-[8px]">
-				<ImageGenerationLoading
-					configuration={
-						generation.context.operationNode.content
-							.llm as import("@giselle-sdk/data-type").ImageGenerationLanguageModelData
-					}
-				/>
+			<div className="flex gap-[12px] pt-[8px] overflow-x-auto">
+				{Array.from({ length: imageCount }).map((_, index) => (
+					<div key={index} className="flex-shrink-0">
+						<ImageGenerationLoading configuration={config} />
+					</div>
+				))}
 			</div>
 		);
 	}
@@ -145,17 +151,17 @@ export function GenerationView({ generation }: { generation: Generation }) {
 					return (
 						<div
 							key={output.outputId}
-							className="h-full flex gap-[12px] pt-[8px]"
+							className="flex gap-[12px] pt-[8px] overflow-x-auto"
 						>
 							{output.contents.map((content) => (
 								<div
 									key={content.filename}
-									className="relative h-full group cursor-pointer"
+									className="relative flex-shrink-0 group cursor-pointer"
 								>
 									<img
 										src={`${client.basePath}/${content.pathname}`}
 										alt="generated file"
-										className="h-full rounded-[8px]"
+										className="h-[300px] w-auto object-contain rounded-[8px]"
 									/>
 									<div className="absolute inset-0 bg-black/40 rounded-[8px] opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-start justify-end p-2">
 										<div className="flex gap-1">
