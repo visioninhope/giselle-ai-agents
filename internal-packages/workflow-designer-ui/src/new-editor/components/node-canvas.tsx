@@ -11,6 +11,7 @@ import { memo, useCallback, useMemo, useRef } from "react";
 import { shallow } from "zustand/shallow";
 import { Background } from "../../ui/background";
 import { isNodeId } from "../lib/is-node-id";
+import { logger } from "../lib/logger";
 import { selectCanvasData } from "../lib/selectors";
 import { useEditorStore, useEditorStoreWithEqualityFn } from "../store/context";
 import { Node } from "./node";
@@ -82,7 +83,8 @@ export function NodeCanvas() {
 						break;
 					}
 					case "remove": {
-						// We don't modify nodes here; deletion is handled elsewhere if enabled.
+						/** @todo */
+						logger.trace(change, "Removing node");
 						break;
 					}
 					default:
