@@ -19,25 +19,21 @@ const defaultConfigurations: GoogleLanguageModelConfigurations = {
 };
 
 export const GoogleLanguageModelId = z
-	.enum([
-		"gemini-2.5-pro",
-		"gemini-2.5-flash",
-		"gemini-2.5-flash-lite-preview-06-17",
-	])
+	.enum(["gemini-2.5-pro", "gemini-2.5-flash", "gemini-2.5-flash-lite"])
 	.catch((ctx) => {
 		if (typeof ctx.value !== "string") {
-			return "gemini-2.5-flash-lite-preview-06-17";
+			return "gemini-2.5-flash-lite";
 		}
 		if (/^gemini-\d+(?:\.\d+)?-pro/.test(ctx.value)) {
 			return "gemini-2.5-pro";
 		}
 		if (/^gemini-\d+(?:\.\d+)?-flash-lite/.test(ctx.value)) {
-			return "gemini-2.5-flash-lite-preview-06-17";
+			return "gemini-2.5-flash-lite";
 		}
 		if (/^gemini-\d+(?:\.\d+)?-flash/.test(ctx.value)) {
 			return "gemini-2.5-flash";
 		}
-		return "gemini-2.5-flash-lite-preview-06-17";
+		return "gemini-2.5-flash-lite";
 	});
 
 const GoogleLanguageModel = LanguageModelBase.extend({
@@ -71,9 +67,9 @@ const gemini25Flash: GoogleLanguageModel = {
 	configurations: defaultConfigurations,
 };
 
-const gemini25FlashLitePreview: GoogleLanguageModel = {
+const gemini25FlashLite: GoogleLanguageModel = {
 	provider: "google",
-	id: "gemini-2.5-flash-lite-preview-06-17",
+	id: "gemini-2.5-flash-lite",
 	capabilities:
 		Capability.TextGeneration |
 		Capability.OptionalSearchGrounding |
@@ -82,7 +78,7 @@ const gemini25FlashLitePreview: GoogleLanguageModel = {
 	configurations: defaultConfigurations,
 };
 
-export const models = [gemini25Pro, gemini25Flash, gemini25FlashLitePreview];
+export const models = [gemini25Pro, gemini25Flash, gemini25FlashLite];
 
 export const LanguageModel = GoogleLanguageModel;
 export type LanguageModel = GoogleLanguageModel;
