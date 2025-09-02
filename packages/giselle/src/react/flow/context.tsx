@@ -8,15 +8,13 @@ import {
 	type FileNode,
 	type Node,
 	NodeId,
-	type NodeLike,
 	type NodeUIState,
-	type ShortcutScope,
 	type UploadedFileData,
 	type Viewport,
 	type Workspace,
 } from "@giselle-sdk/data-type";
 import type { LanguageModelProvider } from "@giselle-sdk/language-model";
-import { createContext, useCallback, useEffect, useRef, useState } from "react";
+import { createContext, useCallback, useEffect, useState } from "react";
 import { APICallError } from "../errors";
 import { useFeatureFlag } from "../feature-flags";
 import { useGiselleEngine } from "../use-giselle-engine";
@@ -28,8 +26,6 @@ import {
 	usePropertiesPanel,
 	useWorkspaceReducer,
 } from "./hooks";
-import { WorkflowStoreContext } from "./store/context";
-import { createWorkflowStore } from "./store/workflow-store";
 import type { WorkflowDesignerContextValue } from "./types";
 import { isSupportedConnection } from "./utils";
 
@@ -70,10 +66,6 @@ export function WorkflowDesignerProvider({
 	);
 	const [isLoading, setIsLoading] = useState(true);
 	const [llmProviders, setLLMProviders] = useState<LanguageModelProvider[]>([]);
-	const [copiedNode, setCopiedNode] = useState<NodeLike | null>(null);
-
-	// Initialize Zustand store once per provider instance
-	const storeRef = useRef<ReturnType<typeof createWorkflowStore> | null>(null);
 
 	const addNode = useAddNode(dispatch);
 	const addConnection = useAddConnection(dispatch);
@@ -86,8 +78,6 @@ export function WorkflowDesignerProvider({
 			.then(setLLMProviders)
 			.then(() => setIsLoading(false));
 	}, [client]);
-
-	// Store initialization and syncing are placed after callbacks defined
 
 	const setUiNodeState = useCallback(
 		(
@@ -109,13 +99,6 @@ export function WorkflowDesignerProvider({
 	const setUiViewport = useCallback(
 		(viewport: Viewport) => {
 			dispatch({ type: "SET_UI_VIEWPORT", viewport });
-		},
-		[dispatch],
-	);
-
-	const setCurrentShortcutScope = useCallback(
-		(scope: ShortcutScope) => {
-			dispatch({ type: "SET_CURRENT_SHORTCUT_SCOPE", scope });
 		},
 		[dispatch],
 	);
@@ -229,78 +212,30 @@ export function WorkflowDesignerProvider({
 
 	const propertiesPanelHelper = usePropertiesPanel();
 
-	// Create store on first render with current workspace and bound actions
-	if (storeRef.current === null) {
-		storeRef.current = createWorkflowStore({
-			workspace,
-			isLoading,
-			llmProviders,
-			copiedNode,
-			actions: {
+	return (
+		<WorkflowDesignerContext.Provider
+			value={{
+				data: workspace,
+				textGenerationApi,
 				addNode,
+				copyNode,
 				addConnection,
 				updateNodeData,
 				updateNodeDataContent,
 				setUiNodeState,
-				setUiViewport,
-				setCurrentShortcutScope,
-				updateName,
 				deleteNode,
 				deleteConnection,
 				uploadFile,
 				removeFile,
-				setCopiedNode,
-			},
-		});
-	}
-
-	// Keep store state in sync when provider state changes
-	useEffect(() => {
-		storeRef.current?.setState({ workspace });
-	}, [workspace]);
-
-	useEffect(() => {
-		storeRef.current?.setState({ isLoading });
-	}, [isLoading]);
-
-	useEffect(() => {
-		storeRef.current?.setState({ llmProviders });
-	}, [llmProviders]);
-
-	useEffect(() => {
-		storeRef.current?.setState({ copiedNode });
-	}, [copiedNode]);
-
-	const store = storeRef.current as NonNullable<typeof storeRef.current>;
-	return (
-		<WorkflowStoreContext.Provider value={store}>
-			<WorkflowDesignerContext.Provider
-				value={{
-					data: workspace,
-					textGenerationApi,
-					addNode,
-					copyNode,
-					addConnection,
-					updateNodeData,
-					updateNodeDataContent,
-					setUiNodeState,
-					deleteNode,
-					deleteConnection,
-					uploadFile,
-					removeFile,
-					llmProviders,
-					isLoading,
-					setUiViewport,
-					updateName,
-					isSupportedConnection: isSupportedConnectionCb,
-					setCurrentShortcutScope,
-					copiedNode,
-					setCopiedNode,
-					...propertiesPanelHelper,
-				}}
-			>
-				{children}
-			</WorkflowDesignerContext.Provider>
-		</WorkflowStoreContext.Provider>
+				llmProviders,
+				isLoading,
+				setUiViewport,
+				updateName,
+				isSupportedConnection: isSupportedConnectionCb,
+				...propertiesPanelHelper,
+			}}
+		>
+			{children}
+		</WorkflowDesignerContext.Provider>
 	);
 }

@@ -73,7 +73,6 @@
 		"react": "catalog:",
 		"swr": "catalog:",
 		"unstorage": "catalog:",
-		"zod": "catalog:",
-		"zustand": "catalog:"
+		"zod": "catalog:"
 	}
 }

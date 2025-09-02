@@ -8,7 +8,6 @@ import type {
 	NodeLike,
 	NodeUIState,
 	OutputId,
-	ShortcutScope,
 	UploadedFileData,
 	Viewport,
 	Workspace,
@@ -20,7 +19,7 @@ export type ConnectionCloneStrategy = "inputs-only" | "all" | "none";
 export interface WorkflowDesignerContextValue {
 	data: Workspace;
 	textGenerationApi: string;
-	addNode: (node: NodeLike, options?: { ui?: NodeUIState }) => void;
+	addNode: (node: Node, options?: { ui?: NodeUIState }) => void;
 	copyNode: (
 		sourceNode: Node,
 		options?: {
@@ -60,7 +59,4 @@ export interface WorkflowDesignerContextValue {
 		outputNode: NodeLike,
 		inputNode: NodeLike,
 	) => { canConnect: boolean; message?: string };
-	setCurrentShortcutScope: (scope: ShortcutScope) => void;
-	copiedNode: NodeLike | null;
-	setCopiedNode: (node: NodeLike | null) => void;
 }
