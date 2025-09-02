@@ -52,6 +52,7 @@ export function NodeCanvas() {
 	}, [nodeUiData]);
 	const onNodesChange = useEditorStore((s) => s.onNodesChange);
 	const onNodeClick = useEditorStore((s) => s.onNodeClick);
+	const setInspectedNodeId = useEditorStore((s) => s.setInspectedNodeId);
 	const nodeTypes = useMemo(
 		() => ({
 			custom: memo(Node),
@@ -67,6 +68,7 @@ export function NodeCanvas() {
 			nodeTypes={nodeTypes}
 			className="flex-1"
 			onNodeClick={onNodeClick}
+			onPaneClick={() => setInspectedNodeId(undefined)}
 		>
 			<Background />
 		</ReactFlow>
