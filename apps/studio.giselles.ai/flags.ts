@@ -153,3 +153,22 @@ export const resumableGenerationFlag = flag<boolean>({
 		{ value: true, label: "Enable" },
 	],
 });
+
+export const newEditorFlag = flag<boolean>({
+	key: "new-editor",
+	async decide() {
+		if (process.env.NODE_ENV === "development") {
+			return takeLocalEnv("NEW_EDITOR_FLAG");
+		}
+		const edgeConfig = await get(`flag__${this.key}`);
+		if (edgeConfig === undefined) {
+			return false;
+		}
+		return edgeConfig === true || edgeConfig === "true";
+	},
+	description: "Enable new editor",
+	options: [
+		{ value: false, label: "disable" },
+		{ value: true, label: "Enable" },
+	],
+});
