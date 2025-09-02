@@ -1,6 +1,7 @@
 import { type AnthropicProviderOptions, anthropic } from "@ai-sdk/anthropic";
 import { createGateway } from "@ai-sdk/gateway";
-import { google } from "@ai-sdk/google";
+import { googleTools } from "@ai-sdk/google/internal";
+import { vertex } from "@ai-sdk/google-vertex/edge";
 import { type OpenAIResponsesProviderOptions, openai } from "@ai-sdk/openai";
 import { perplexity } from "@ai-sdk/perplexity";
 import {
@@ -14,6 +15,7 @@ import {
 	hasCapability,
 	languageModels,
 } from "@giselle-sdk/language-model";
+import type { LanguageModel } from "ai";
 import { AISDKError, streamText } from "ai";
 import type {
 	FailedGeneration,
@@ -174,7 +176,7 @@ export function generateText(args: {
 					...preparedToolSet,
 					toolSet: {
 						...preparedToolSet.toolSet,
-						googleWebSearch: google.tools.googleSearch({}),
+						google_search: googleTools.googleSearch({}),
 					},
 				};
 			}
@@ -344,7 +346,7 @@ function generationModel(
 			return openai.responses(languageModel.id);
 		}
 		case "google": {
-			return google(languageModel.id);
+			return vertex(languageModel.id) as LanguageModel;
 		}
 		case "perplexity": {
 			return perplexity(languageModel.id);
