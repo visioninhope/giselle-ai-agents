@@ -16,7 +16,7 @@ import { Node } from "./node";
 export function NodeCanvas() {
 	// Subscribe only to UI state (position/selected) and order.
 	const uiSlice = useEditorStoreWithEqualityFn(
-		(s) => selectUiSliceForRFNodes(s),
+		selectUiSliceForRFNodes,
 		shallow,
 	);
 

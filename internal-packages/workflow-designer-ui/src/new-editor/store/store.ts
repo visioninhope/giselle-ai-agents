@@ -40,6 +40,7 @@ export function createEditorStore(initial: { workspace: Workspace }) {
 				onNodesChange: (changes) => {
 					set((s) => {
 						const nodeState = { ...s.ui.nodeState };
+						let nodes = s.nodes;
 						for (const change of changes) {
 							switch (change.type) {
 								case "position": {
@@ -73,7 +74,12 @@ export function createEditorStore(initial: { workspace: Workspace }) {
 									break;
 								}
 								case "remove": {
+									if (!isNodeId(change.id)) {
+										break;
+									}
 									logger.trace(change, "remove node");
+									delete nodeState[change.id];
+									nodes = nodes.filter((node) => node.id !== change.id);
 									break;
 								}
 								case "replace": {
@@ -87,6 +93,7 @@ export function createEditorStore(initial: { workspace: Workspace }) {
 							}
 						}
 						return {
+							nodes,
 							ui: {
 								...s.ui,
 								nodeState,
