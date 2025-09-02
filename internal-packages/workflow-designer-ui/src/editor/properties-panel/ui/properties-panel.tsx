@@ -1,6 +1,6 @@
 "use client";
 
-import type { Node } from "@giselle-sdk/data-type";
+import type { NodeLike } from "@giselle-sdk/data-type";
 import { defaultName } from "@giselle-sdk/giselle/react";
 import type { ReactNode } from "react";
 import { EditableText } from "../../../ui/editable-text";
@@ -27,7 +27,7 @@ export function PropertiesPanelHeader({
 	onChangeName,
 	action,
 }: {
-	node: Node;
+	node: NodeLike;
 	description?: string;
 	icon: ReactNode;
 	onChangeName?: (name?: string) => void;

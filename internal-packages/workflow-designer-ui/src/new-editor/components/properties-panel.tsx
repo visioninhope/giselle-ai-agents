@@ -1,6 +1,6 @@
 "use client";
 
-import type { NodeId, NodeLike } from "@giselle-sdk/data-type";
+import type { NodeId } from "@giselle-sdk/data-type";
 import clsx from "clsx/lite";
 import {
 	PropertiesPanelContent,
@@ -18,9 +18,7 @@ export function PropertiesPanel() {
 	const { node, updateNode } = useEditorStoreWithEqualityFn(
 		(s) => ({
 			node: inspectedNodeId
-				? (s.nodes.find((n) => n.id === inspectedNodeId) as
-						| NodeLike
-						| undefined)
+				? s.nodes.find((n) => n.id === inspectedNodeId)
 				: undefined,
 			updateNode: s.updateNode,
 		}),
@@ -39,7 +37,7 @@ export function PropertiesPanel() {
 		>
 			<PropertiesPanelRoot>
 				<PropertiesPanelHeader
-					node={node as unknown as import("@giselle-sdk/data-type").Node}
+					node={node}
 					description={node.content.type}
 					icon={<NodeIcon node={node} className="size-[20px] text-black-900" />}
 					onChangeName={(name) => {
