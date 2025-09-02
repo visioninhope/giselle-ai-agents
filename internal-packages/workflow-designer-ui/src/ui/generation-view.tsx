@@ -81,13 +81,16 @@ export function GenerationView({ generation }: { generation: Generation }) {
 						return null;
 					}
 					return (
-						<div key={output.outputId} className="h-full flex gap-[12px]">
+						<div
+							key={output.outputId}
+							className="h-full flex gap-[12px] pt-[8px]"
+						>
 							{output.contents.map((content) => (
 								<img
 									src={`${client.basePath}/${content.pathname}`}
 									alt="generated file"
 									key={content.filename}
-									className="h-full"
+									className="h-full rounded-[8px]"
 								/>
 							))}
 						</div>
