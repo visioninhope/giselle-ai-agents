@@ -2,10 +2,6 @@ import { Select } from "@giselle-internal/ui/select";
 import { useToasts } from "@giselle-internal/ui/toast";
 import type { ImageGenerationNode } from "@giselle-sdk/data-type";
 import {
-  FalLanguageModelData,
-  OpenAIImageLanguageModelData,
-} from "@giselle-sdk/data-type";
-import {
   useNodeGenerations,
   useWorkflowDesigner,
 } from "@giselle-sdk/giselle/react";
@@ -31,6 +27,7 @@ import {
 } from "../ui";
 import { GenerationPanel } from "./generation-panel";
 import { InputPanel } from "./input-panel";
+import { createDefaultModelData, updateModelId } from "./model-defaults";
 import { FalModelPanel, OpenAIImageModelPanel } from "./models";
 import { PromptPanel } from "./prompt-panel";
 import { useConnectedSources } from "./sources";
@@ -68,53 +65,6 @@ export function ImageGenerationNodePropertiesPanel({
         }));
       default:
         return [];
-    }
-  };
-
-  // Create default model data for provider
-  const createDefaultModelData = (provider: "fal" | "openai") => {
-    switch (provider) {
-      case "fal":
-        return FalLanguageModelData.parse({
-          provider: "fal",
-          id: falLanguageModels[0]?.id || "fal-ai/flux/schnell",
-          configurations: {
-            size: "landscape_4_3",
-            n: 1,
-          },
-        });
-      case "openai":
-        return OpenAIImageLanguageModelData.parse({
-          provider: "openai",
-          id: openaiImageModels[0]?.id || "gpt-image-1",
-          configurations: {
-            n: 1,
-            size: "1024x1024",
-            quality: "auto",
-            background: "auto",
-            moderation: "auto",
-          },
-        });
-      default:
-        throw new Error(`Unsupported provider: ${provider}`);
-    }
-  };
-
-  // Update model ID while preserving provider-specific configurations
-  const updateModelId = (currentModel: any, newModelId: string) => {
-    switch (currentModel.provider) {
-      case "fal":
-        return FalLanguageModelData.parse({
-          ...currentModel,
-          id: newModelId,
-        });
-      case "openai":
-        return OpenAIImageLanguageModelData.parse({
-          ...currentModel,
-          id: newModelId,
-        });
-      default:
-        throw new Error(`Unsupported provider: ${currentModel.provider}`);
     }
   };
 
