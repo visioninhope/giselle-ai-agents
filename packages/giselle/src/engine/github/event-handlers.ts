@@ -295,6 +295,39 @@ export function handlePullRequestClosed<TEventName extends WebhookEventName>(
 	return { shouldRun: true, reactionNodeId: pullRequest.node_id };
 }
 
+export function handleIssueLabelAdded<TEventName extends WebhookEventName>(
+	args: EventHandlerArgs<TEventName>,
+): EventHandlerResult {
+	if (
+		!args.deps.ensureWebhookEvent(args.event, "issues.labeled") ||
+		args.trigger.configuration.event.id !== "github.issue.labeled"
+	) {
+		return { shouldRun: false };
+	}
+
+	const issue = args.event.data.payload.issue;
+	const addedLabel = args.event.data.payload.label;
+
+	if (!issue || !addedLabel) {
+		return { shouldRun: false };
+	}
+
+	const conditions =
+		args.trigger.configuration.event.id === "github.issue.labeled"
+			? args.trigger.configuration.event.conditions
+			: undefined;
+
+	if (!conditions?.labels || !Array.isArray(conditions.labels)) {
+		return { shouldRun: false };
+	}
+
+	const shouldRun = conditions.labels.includes(addedLabel.name);
+
+	return shouldRun
+		? { shouldRun: true, reactionNodeId: issue.node_id }
+		: { shouldRun: false };
+}
+
 const eventHandlers = [
 	handleIssueOpened,
 	handleIssueClosed,
@@ -304,6 +337,7 @@ const eventHandlers = [
 	handlePullRequestOpened,
 	handlePullRequestReadyForReview,
 	handlePullRequestClosed,
+	handleIssueLabelAdded,
 ];
 
 export async function processEvent<TEventName extends WebhookEventName>(
@@ -401,7 +435,8 @@ export async function processEvent<TEventName extends WebhookEventName>(
 					if (
 						deps.ensureWebhookEvent(args.event, "issue_comment.created") ||
 						deps.ensureWebhookEvent(args.event, "issues.opened") ||
-						deps.ensureWebhookEvent(args.event, "issues.closed")
+						deps.ensureWebhookEvent(args.event, "issues.closed") ||
+						deps.ensureWebhookEvent(args.event, "issues.labeled")
 					) {
 						const issueNumber = args.event.data.payload.issue.number;
 						const comment = await deps.createIssueComment({
