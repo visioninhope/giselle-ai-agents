@@ -47,9 +47,10 @@ export interface WorkspaceSlice {
 		options?: { save?: boolean },
 	) => void;
 	updateWorkspaceName: (name: string | undefined) => void;
-	updateNodeContent: (
-		nodeId: NodeId,
-		content: Partial<Node["content"]>,
+	updateNodeData: <T extends NodeBase>(node: T, data: Partial<T>) => void;
+	updateNodeDataContent: <T extends Node>(
+		node: T,
+		content: Partial<T["content"]>,
 	) => void;
 	updateFileStatus: (nodeId: NodeId, files: FileData[]) => void;
 }
@@ -251,17 +252,34 @@ export const createWorkspaceSlice: StateCreator<
 			if (!state.workspace) return {};
 			return { workspace: { ...state.workspace, name: name } };
 		}),
-	updateNodeContent: (nodeId, content) =>
+	updateNodeData: (node, data) =>
 		set((state) => {
 			if (!state.workspace) return {};
 			return {
 				workspace: {
 					...state.workspace,
 					nodes: state.workspace.nodes.map((n) =>
-						n.id === nodeId
+						n.id === node.id
 							? ({
 									...n,
-									content: { ...(n as Node).content, ...content },
+									...data,
+								} as NodeLike)
+							: n,
+					),
+				},
+			};
+		}),
+	updateNodeDataContent: (node, content) =>
+		set((state) => {
+			if (!state.workspace) return {};
+			return {
+				workspace: {
+					...state.workspace,
+					nodes: state.workspace.nodes.map((n) =>
+						n.id === node.id
+							? ({
+									...n,
+									content: { ...n.content, ...content },
 								} as NodeLike)
 							: n,
 					),

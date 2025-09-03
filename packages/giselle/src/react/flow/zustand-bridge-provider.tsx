@@ -102,7 +102,7 @@ export function ZustandBridgeProvider({
 				state.addConnection({ ...args, id: ConnectionId.generate() }),
 			updateNodeData: (node, data) => state.updateNode(node.id, data),
 			updateNodeDataContent: (node, content) =>
-				state.updateNodeContent(node.id, content),
+				state.updateNodeDataContent(node, content),
 			setUiNodeState: state.setUiNodeState,
 			deleteNode: state.deleteNode,
 			deleteConnection: state.deleteConnection,
