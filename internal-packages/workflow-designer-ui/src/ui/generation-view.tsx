@@ -66,11 +66,11 @@ function renderImageLoadingGrid(generation: Generation, keyPrefix: string) {
 	const imageCount = config.configurations.n || 1;
 
 	return (
-		<div className="flex gap-[12px] pt-[8px] overflow-x-auto">
+		<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[12px] pt-[8px]">
 			{Array.from({ length: imageCount }).map((_, index) => (
 				<div
 					key={`${generation.id}-${keyPrefix}-${index}`}
-					className="flex-shrink-0"
+					className="justify-self-center"
 				>
 					<ImageGenerationLoading configuration={config} />
 				</div>
@@ -145,17 +145,17 @@ export function GenerationView({ generation }: { generation: Generation }) {
 					return (
 						<div
 							key={output.outputId}
-							className="flex gap-[12px] pt-[8px] overflow-x-auto"
+							className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[12px] pt-[8px]"
 						>
 							{output.contents.map((content) => (
 								<div
 									key={content.filename}
-									className="relative flex-shrink-0 group cursor-pointer"
+									className="relative group cursor-pointer justify-self-center"
 								>
 									<img
 										src={`${client.basePath}/${content.pathname}`}
 										alt="generated file"
-										className="h-[200px] sm:h-[250px] md:h-[300px] lg:h-[350px] w-auto object-contain rounded-[8px]"
+										className="h-[25vh] max-h-[400px] min-h-[150px] w-auto object-contain rounded-[8px]"
 									/>
 									<div className="absolute inset-0 bg-black/40 rounded-[8px] opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-start justify-end p-2">
 										<div className="flex gap-1">
