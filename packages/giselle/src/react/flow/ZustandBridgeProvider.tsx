@@ -92,14 +92,25 @@ export function ZustandBridgeProvider({
 		});
 	}, [client, experimental_storage, saveWorkflowDelay]);
 
-	// Initialize store with workspace data
+	// Update workspace when data prop changes
 	useEffect(() => {
 		store.getState().initWorkspace(data);
 	}, [store, data]);
 
-	// Load initial data
+	// Load LLM providers
 	useEffect(() => {
-		store.getState().loadInitialData(client);
+		const loadProviders = async () => {
+			store.getState().setIsLoading(true);
+			try {
+				const providers = await client.getLanguageModelProviders();
+				store.getState().setLLMProviders(providers);
+			} catch (error) {
+				console.error("Failed to load language model providers:", error);
+			} finally {
+				store.getState().setIsLoading(false);
+			}
+		};
+		loadProviders();
 	}, [store, client]);
 
 	// Get current state
