@@ -265,12 +265,12 @@ function GitHubToolConnectionDialog({
                 </label>
                 <a
                   href="https://github.com/settings/personal-access-tokens"
-                  className="flex items-center gap-[4px] text-[13px] text-text-muted hover:bg-ghost-element-hover transition-colors px-[4px] rounded-[2px]"
+                  className="flex items-center gap-[4px] text-[13px] text-text-muted transition-colors px-[4px] rounded-[2px]"
                   target="_blank"
                   rel="noreferrer"
                   tabIndex={-1}
                 >
-                  <span>GitHub</span>
+                  <span className="hover:underline">GitHub</span>
                   <MoveUpRightIcon className="size-[13px]" />
                 </a>
               </div>
@@ -308,7 +308,7 @@ function GitHubToolConnectionDialog({
           {isLoading ? (
             <p>Loading...</p>
           ) : (secrets ?? []).length < 1 ? (
-            <div className="h-[160px] flex flex-col items-center justify-center">
+            <div className="h-[184px] flex flex-col items-center justify-center">
               <div className="flex-1 flex items-center justify-center">
                 <EmptyState description="No saved tokens." />
               </div>
