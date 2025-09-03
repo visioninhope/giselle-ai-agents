@@ -5,18 +5,10 @@ import {
 	type Workspace,
 } from "@giselle-sdk/data-type";
 import { useEffect, useMemo } from "react";
-import { create } from "zustand";
 import { useFeatureFlag } from "../feature-flags";
 import { useGiselleEngine } from "../use-giselle-engine";
 import { WorkflowDesignerContext } from "./context";
-import {
-	type AppStore,
-	createFileSlice,
-	createPropertiesPanelSlice,
-	createViewSlice,
-	createWorkspaceSlice,
-	isSupportedConnection,
-} from "./hooks";
+import { type AppStore, isSupportedConnection, useAppStore } from "./hooks";
 import type { WorkflowDesignerContextValue } from "./types";
 
 const DEFAULT_SAVE_DELAY = 1000;
@@ -37,8 +29,8 @@ export function ZustandBridgeProvider({
 	const client = useGiselleEngine();
 	const { experimental_storage } = useFeatureFlag();
 
-	// Create store with auto-save directly integrated
-	const store = useMemo(() => {
+	// Subscribe to global store changes for auto-save
+	useEffect(() => {
 		let saveTimeout: ReturnType<typeof setTimeout> | null = null;
 
 		const performSave = async (state: AppStore) => {
@@ -54,67 +46,50 @@ export function ZustandBridgeProvider({
 		};
 
 		const scheduleAutoSave = (state: AppStore) => {
-			// Skip save if explicitly requested
-			if (state._skipNextSave) {
-				return;
-			}
-
-			if (saveTimeout) {
-				clearTimeout(saveTimeout);
-			}
-
-			saveTimeout = setTimeout(() => {
-				performSave(state);
-			}, saveWorkflowDelay);
+			if (state._skipNextSave) return;
+			if (saveTimeout) clearTimeout(saveTimeout);
+			saveTimeout = setTimeout(() => performSave(state), saveWorkflowDelay);
 		};
 
-		return create<AppStore>()((set, get, api) => {
-			// Subscribe to changes for auto-save
-			api.subscribe((state, prevState) => {
-				// Reset skip flag if it was set
-				if (state._skipNextSave) {
-					set({ _skipNextSave: false });
-					return;
-				}
-
-				// Only save if workspace actually changed
-				if (state.workspace !== prevState.workspace) {
-					scheduleAutoSave(state);
-				}
-			});
-
-			return {
-				...createWorkspaceSlice(set, get, api),
-				...createViewSlice(set, get, api),
-				...createFileSlice(set, get, api),
-				...createPropertiesPanelSlice(set, get, api),
-			};
+		const unsubscribe = useAppStore.subscribe((state, prevState) => {
+			if (state._skipNextSave) {
+				useAppStore.setState({ _skipNextSave: false } as Partial<AppStore>);
+				return;
+			}
+			if (state.workspace !== prevState.workspace) {
+				scheduleAutoSave(state);
+			}
 		});
+
+		return () => {
+			if (saveTimeout) clearTimeout(saveTimeout);
+			unsubscribe();
+		};
 	}, [client, experimental_storage, saveWorkflowDelay]);
 
-	// Update workspace when data prop changes
+	// Initialize or update workspace in the global store when data changes
 	useEffect(() => {
-		store.getState().initWorkspace(data);
-	}, [store, data]);
+		useAppStore.getState().initWorkspace(data);
+	}, [data]);
 
 	// Load LLM providers
 	useEffect(() => {
 		const loadProviders = async () => {
-			store.getState().setIsLoading(true);
+			useAppStore.getState().setIsLoading(true);
 			try {
 				const providers = await client.getLanguageModelProviders();
-				store.getState().setLLMProviders(providers);
+				useAppStore.getState().setLLMProviders(providers);
 			} catch (error) {
 				console.error("Failed to load language model providers:", error);
 			} finally {
-				store.getState().setIsLoading(false);
+				useAppStore.getState().setIsLoading(false);
 			}
 		};
 		loadProviders();
-	}, [store, client]);
+	}, [client]);
 
 	// Get current state
-	const state = store();
+	const state = useAppStore();
 
 	// Create context value that matches the existing API
 	const contextValue = useMemo<WorkflowDesignerContextValue>(

@@ -12,9 +12,6 @@ export function useWorkflowDesigner() {
 	return context;
 }
 
-// Hook to access Zustand store directly
-export const useWorkflowDesignerStore = useAppStore;
-
 // Safe workspace selector - throws error if workspace is null
 export function useWorkspace() {
 	return useAppStore((state) => {
@@ -26,13 +23,16 @@ export function useWorkspace() {
 }
 
 // Safe workspace selector with optional fallback
-export function useWorkspaceSelector<T>(
-	selector: (workspace: NonNullable<AppStore["workspace"]>) => T,
+type NonNullWorkspaceAppStore = Omit<AppStore, "workspace"> & {
+	workspace: NonNullable<AppStore["workspace"]>;
+};
+export function useWorkflowDesignerStore<T>(
+	selector: (state2: NonNullWorkspaceAppStore) => T,
 ) {
 	return useAppStore((state) => {
 		if (!state.workspace) {
 			throw new Error("Workspace is not initialized");
 		}
-		return selector(state.workspace);
+		return selector(state as NonNullWorkspaceAppStore);
 	});
 }

@@ -23,7 +23,6 @@ import {
 	defaultName,
 	useNodeGenerations,
 	useWorkflowDesignerStore,
-	useWorkspaceSelector,
 } from "@giselle-sdk/giselle/react";
 import {
 	Handle,
@@ -36,6 +35,7 @@ import clsx from "clsx/lite";
 import { CheckIcon, SquareIcon } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useMemo, useRef, useTransition } from "react";
+import { useShallow } from "zustand/react/shallow";
 import { NodeIcon } from "../../icons/node";
 import { EditableText } from "../../ui/editable-text";
 import { Tooltip } from "../../ui/tooltip";
@@ -128,11 +128,13 @@ function CustomXyFlowNode({
 	data,
 	selected,
 }: NodeProps<GiselleWorkflowDesignerNode>) {
-	const workspace = useWorkspaceSelector((s) => ({
-		connections: s.connections,
-		nodes: s.nodes,
-		nodeState: s.ui.nodeState,
-	}));
+	const workspace = useWorkflowDesignerStore(
+		useShallow((s) => ({
+			connections: s.workspace.connections,
+			nodes: s.workspace.nodes,
+			nodeState: s.workspace.ui.nodeState,
+		})),
+	);
 
 	const connectedInputIds = useMemo(
 		() =>
@@ -185,7 +187,7 @@ export function NodeComponent({
 	connectedOutputIds?: OutputId[];
 }) {
 	const updateNodeData = useWorkflowDesignerStore((state) => state.updateNode);
-	const workspaceId = useWorkspaceSelector((ws) => ws.id);
+	const workspaceId = useWorkflowDesignerStore((state) => state.workspace.id);
 
 	const { stopGenerationRunner, currentGeneration } = useNodeGenerations({
 		nodeId: node.id,
