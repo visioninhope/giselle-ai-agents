@@ -1,4 +1,5 @@
 import type { ActId } from "@giselle-sdk/giselle";
+import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { getSidebarDataObject } from "./lib/data";
 import { NavSkelton } from "./ui/nav-skelton";
@@ -19,7 +20,7 @@ export default async function ({
 
 	// Validate actId parameter
 	if (!isValidActId(actIdParam)) {
-		throw new Error(`Invalid actId: ${actIdParam}`);
+		notFound();
 	}
 	const actId: ActId = actIdParam;
 	const data = getSidebarDataObject(actId);
