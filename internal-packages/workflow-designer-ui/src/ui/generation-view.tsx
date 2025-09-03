@@ -49,6 +49,35 @@ function Spinner() {
 		</div>
 	);
 }
+
+function renderImageLoadingGrid(generation: Generation, keyPrefix: string) {
+	const isImageGeneration =
+		generation.context.operationNode.content.type === "imageGeneration";
+
+	if (
+		!isImageGeneration ||
+		!("llm" in generation.context.operationNode.content)
+	) {
+		return null;
+	}
+
+	const config = generation.context.operationNode.content
+		.llm as import("@giselle-sdk/data-type").ImageGenerationLanguageModelData;
+	const imageCount = config.configurations.n || 1;
+
+	return (
+		<div className="flex gap-[12px] pt-[8px] overflow-x-auto">
+			{Array.from({ length: imageCount }).map((_, index) => (
+				<div
+					key={`${generation.id}-${keyPrefix}-${index}`}
+					className="flex-shrink-0"
+				>
+					<ImageGenerationLoading configuration={config} />
+				</div>
+			))}
+		</div>
+	);
+}
 export function GenerationView({ generation }: { generation: Generation }) {
 	const client = useGiselleEngine();
 	const [lightboxImage, setLightboxImage] = useState<string | null>(null);
@@ -88,30 +117,9 @@ export function GenerationView({ generation }: { generation: Generation }) {
 		generation.status !== "completed" &&
 		generation.status !== "cancelled"
 	) {
-		// Check if this is image generation
-		const isImageGeneration =
-			generation.context.operationNode.content.type === "imageGeneration";
-
-		if (
-			isImageGeneration &&
-			"llm" in generation.context.operationNode.content
-		) {
-			const config = generation.context.operationNode.content
-				.llm as import("@giselle-sdk/data-type").ImageGenerationLanguageModelData;
-			const imageCount = config.configurations.n || 1;
-
-			return (
-				<div className="flex gap-[12px] pt-[8px] overflow-x-auto">
-					{Array.from({ length: imageCount }).map((_, index) => (
-						<div
-							key={`${generation.id}-loading-${index}`}
-							className="flex-shrink-0"
-						>
-							<ImageGenerationLoading configuration={config} />
-						</div>
-					))}
-				</div>
-			);
+		const imageLoadingGrid = renderImageLoadingGrid(generation, "loading");
+		if (imageLoadingGrid) {
+			return imageLoadingGrid;
 		}
 
 		return (
@@ -120,31 +128,11 @@ export function GenerationView({ generation }: { generation: Generation }) {
 			</div>
 		);
 	}
-	// Check if this is image generation during running state
-	const isImageGeneration =
-		generation.context.operationNode.content.type === "imageGeneration";
-
-	if (
-		generation.status === "running" &&
-		isImageGeneration &&
-		"llm" in generation.context.operationNode.content
-	) {
-		const config = generation.context.operationNode.content
-			.llm as import("@giselle-sdk/data-type").ImageGenerationLanguageModelData;
-		const imageCount = config.configurations.n || 1;
-
-		return (
-			<div className="flex gap-[12px] pt-[8px] overflow-x-auto">
-				{Array.from({ length: imageCount }).map((_, index) => (
-					<div
-						key={`${generation.id}-running-${index}`}
-						className="flex-shrink-0"
-					>
-						<ImageGenerationLoading configuration={config} />
-					</div>
-				))}
-			</div>
-		);
+	if (generation.status === "running") {
+		const imageLoadingGrid = renderImageLoadingGrid(generation, "running");
+		if (imageLoadingGrid) {
+			return imageLoadingGrid;
+		}
 	}
 
 	return (
