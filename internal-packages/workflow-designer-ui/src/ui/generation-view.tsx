@@ -99,11 +99,14 @@ export function GenerationView({ generation }: { generation: Generation }) {
 			const config = generation.context.operationNode.content
 				.llm as import("@giselle-sdk/data-type").ImageGenerationLanguageModelData;
 			const imageCount = config.configurations.n || 1;
-			
+
 			return (
 				<div className="flex gap-[12px] pt-[8px] overflow-x-auto">
 					{Array.from({ length: imageCount }).map((_, index) => (
-						<div key={index} className="flex-shrink-0">
+						<div
+							key={`${generation.id}-loading-${index}`}
+							className="flex-shrink-0"
+						>
 							<ImageGenerationLoading configuration={config} />
 						</div>
 					))}
@@ -129,11 +132,14 @@ export function GenerationView({ generation }: { generation: Generation }) {
 		const config = generation.context.operationNode.content
 			.llm as import("@giselle-sdk/data-type").ImageGenerationLanguageModelData;
 		const imageCount = config.configurations.n || 1;
-		
+
 		return (
 			<div className="flex gap-[12px] pt-[8px] overflow-x-auto">
 				{Array.from({ length: imageCount }).map((_, index) => (
-					<div key={index} className="flex-shrink-0">
+					<div
+						key={`${generation.id}-running-${index}`}
+						className="flex-shrink-0"
+					>
 						<ImageGenerationLoading configuration={config} />
 					</div>
 				))}
