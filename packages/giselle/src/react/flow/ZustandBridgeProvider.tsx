@@ -4,14 +4,13 @@ import {
 	type UploadedFileData,
 	type Workspace,
 } from "@giselle-sdk/data-type";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { create } from "zustand";
 import { useFeatureFlag } from "../feature-flags";
 import { useGiselleEngine } from "../use-giselle-engine";
 import { WorkflowDesignerContext } from "./context";
 import {
 	type AppStore,
-	autoSave,
 	createFileSlice,
 	createPropertiesPanelSlice,
 	createViewSlice,
@@ -21,28 +20,6 @@ import {
 import type { WorkflowDesignerContextValue } from "./types";
 
 const DEFAULT_SAVE_DELAY = 1000;
-
-// The store creator function, now wrapped with the auto-save middleware
-const createAppStore = (
-	save: (ws: AppStore) => Promise<void>,
-	saveDelay: number,
-) => {
-	return create<AppStore>()(
-		autoSave(
-			(...a) => ({
-				...createWorkspaceSlice(...a),
-				...createViewSlice(...a),
-				...createFileSlice(...a),
-				...createPropertiesPanelSlice(...a),
-			}),
-			{
-				save,
-				saveDelay,
-				skipSaveFlag: "_skipNextSave",
-			},
-		),
-	);
-};
 
 export function ZustandBridgeProvider({
 	children,
@@ -60,73 +37,111 @@ export function ZustandBridgeProvider({
 	const client = useGiselleEngine();
 	const { experimental_storage } = useFeatureFlag();
 
-	// Create the store instance, but only once, using useState
-	const [useStore] = useState(() => {
-		const save = async (storeState: AppStore) => {
-			if (!storeState.workspace) return;
+	// Create store with auto-save directly integrated
+	const store = useMemo(() => {
+		let saveTimeout: ReturnType<typeof setTimeout> | null = null;
+
+		const performSave = async (state: AppStore) => {
+			if (!state.workspace) return;
 			try {
 				await client.updateWorkspace({
-					workspace: storeState.workspace,
+					workspace: state.workspace,
 					useExperimentalStorage: experimental_storage,
 				});
 			} catch (error) {
-				console.error("Failed to persist graph:", error);
+				console.error("Failed to persist workspace:", error);
 			}
 		};
-		return createAppStore(save, saveWorkflowDelay);
-	});
 
-	// Initialize the store with data from props
+		const scheduleAutoSave = (state: AppStore) => {
+			// Skip save if explicitly requested
+			if (state._skipNextSave) {
+				return;
+			}
+
+			if (saveTimeout) {
+				clearTimeout(saveTimeout);
+			}
+
+			saveTimeout = setTimeout(() => {
+				performSave(state);
+			}, saveWorkflowDelay);
+		};
+
+		return create<AppStore>()((set, get, api) => {
+			// Subscribe to changes for auto-save
+			api.subscribe((state, prevState) => {
+				// Reset skip flag if it was set
+				if (state._skipNextSave) {
+					set({ _skipNextSave: false });
+					return;
+				}
+
+				// Only save if workspace actually changed
+				if (state.workspace !== prevState.workspace) {
+					scheduleAutoSave(state);
+				}
+			});
+
+			return {
+				...createWorkspaceSlice(set, get, api),
+				...createViewSlice(set, get, api),
+				...createFileSlice(set, get, api),
+				...createPropertiesPanelSlice(set, get, api),
+			};
+		});
+	}, [client, experimental_storage, saveWorkflowDelay]);
+
+	// Initialize store with workspace data
 	useEffect(() => {
-		useStore.getState().initWorkspace(data);
-	}, [useStore, data]);
+		store.getState().initWorkspace(data);
+	}, [store, data]);
 
-	// Trigger initial data loading
+	// Load initial data
 	useEffect(() => {
-		useStore.getState().loadInitialData(client);
-	}, [useStore, client]);
+		store.getState().loadInitialData(client);
+	}, [store, client]);
 
-	// Select all state and actions from the store
-	const store = useStore();
+	// Get current state
+	const state = store();
 
-	// Assemble the value for the old context to ensure the API is identical
+	// Create context value that matches the existing API
 	const contextValue = useMemo<WorkflowDesignerContextValue>(
 		() => ({
 			data,
 			textGenerationApi,
-			addNode: (node, options) => store.addNode(node, options?.ui),
-			copyNode: store.copyNode,
+			addNode: (node, options) => state.addNode(node, options?.ui),
+			copyNode: state.copyNode,
 			addConnection: (args) =>
-				store.addConnection({ ...args, id: ConnectionId.generate() }),
-			updateNodeData: (node, data) => store.updateNode(node.id, data),
+				state.addConnection({ ...args, id: ConnectionId.generate() }),
+			updateNodeData: (node, data) => state.updateNode(node.id, data),
 			updateNodeDataContent: (node, content) =>
-				store.updateNodeContent(node.id, content),
-			setUiNodeState: store.setUiNodeState,
-			deleteNode: store.deleteNode,
-			deleteConnection: store.deleteConnection,
+				state.updateNodeContent(node.id, content),
+			setUiNodeState: state.setUiNodeState,
+			deleteNode: state.deleteNode,
+			deleteConnection: state.deleteConnection,
 			uploadFile: (files: File[], node: FileNode) =>
-				store.uploadFile(client, data.id, experimental_storage, files, node),
+				state.uploadFile(client, data.id, experimental_storage, files, node),
 			removeFile: (uploadedFile: UploadedFileData) =>
-				store.removeFile(client, data.id, experimental_storage, uploadedFile),
-			llmProviders: store.llmProviders,
-			isLoading: store.isLoading,
-			setUiViewport: store.setUiViewport,
-			updateName: store.updateWorkspaceName,
-			isSupportedConnection: isSupportedConnection,
-			setCurrentShortcutScope: store.setCurrentShortcutScope,
-			copiedNode: store.copiedNode,
-			setCopiedNode: store.setCopiedNode,
-			propertiesTab: store.propertiesTab,
-			setPropertiesTab: store.setPropertiesTab,
-			openPropertiesPanel: store.openPropertiesPanel,
-			setOpenPropertiesPanel: store.setOpenPropertiesPanel,
+				state.removeFile(client, data.id, experimental_storage, uploadedFile),
+			llmProviders: state.llmProviders,
+			isLoading: state.isLoading,
+			setUiViewport: state.setUiViewport,
+			updateName: state.updateWorkspaceName,
+			isSupportedConnection,
+			setCurrentShortcutScope: state.setCurrentShortcutScope,
+			copiedNode: state.copiedNode,
+			setCopiedNode: state.setCopiedNode,
+			propertiesTab: state.propertiesTab,
+			setPropertiesTab: state.setPropertiesTab,
+			openPropertiesPanel: state.openPropertiesPanel,
+			setOpenPropertiesPanel: state.setOpenPropertiesPanel,
 		}),
-		[store, textGenerationApi, client, data, experimental_storage],
+		[state, textGenerationApi, client, data, experimental_storage],
 	);
 
-	// Render the old context provider with the new value from the Zustand store
-	// The null check is for the initial render before the store is initialized
-	if (!store.workspace) {
+	// Wait for workspace to be initialized
+	if (!state.workspace) {
 		return null;
 	}
 

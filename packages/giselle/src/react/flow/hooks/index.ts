@@ -1,5 +1,5 @@
 export * from "../utils/is-supported-connection";
-export * from "./autoSaveMiddleware";
+
 export * from "./fileSlice";
 export * from "./propertiesPanelSlice";
 export * from "./store";
