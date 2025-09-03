@@ -23,16 +23,16 @@ export function useWorkspace() {
 }
 
 // Safe workspace selector with optional fallback
-type NonNullWorkspaceAppStore = Omit<AppStore, "workspace"> & {
+type WorkflowDesignerStore = Omit<AppStore, "workspace"> & {
 	workspace: NonNullable<AppStore["workspace"]>;
 };
 export function useWorkflowDesignerStore<T>(
-	selector: (state2: NonNullWorkspaceAppStore) => T,
+	selector: (workflowDesignerStore: WorkflowDesignerStore) => T,
 ) {
-	return useAppStore((state) => {
-		if (!state.workspace) {
+	return useAppStore((appStore) => {
+		if (!appStore.workspace) {
 			throw new Error("Workspace is not initialized");
 		}
-		return selector(state as NonNullWorkspaceAppStore);
+		return selector(appStore as WorkflowDesignerStore);
 	});
 }
