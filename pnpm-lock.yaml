@@ -18,6 +18,9 @@ catalogs:
     '@ai-sdk/google':
       specifier: 2.0.11
       version: 2.0.11
+    '@ai-sdk/google-vertex':
+      specifier: 3.0.16
+      version: 3.0.16
     '@ai-sdk/openai':
       specifier: 2.0.23
       version: 2.0.23
@@ -833,6 +836,9 @@ importers:
       '@ai-sdk/google':
         specifier: 'catalog:'
         version: 2.0.11(zod@3.25.76)
+      '@ai-sdk/google-vertex':
+        specifier: 'catalog:'
+        version: 3.0.16(zod@3.25.76)
       '@ai-sdk/openai':
         specifier: 'catalog:'
         version: 2.0.23(zod@3.25.76)
@@ -1267,6 +1273,12 @@ packages:
 
   '@ai-sdk/gateway@1.0.15':
     resolution: {integrity: sha512-xySXoQ29+KbGuGfmDnABx+O6vc7Gj7qugmj1kGpn0rW0rQNn6UKUuvscKMzWyv1Uv05GyC1vqHq8ZhEOLfXscQ==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      zod: ^3.25.76 || ^4
+
+  '@ai-sdk/google-vertex@3.0.16':
+    resolution: {integrity: sha512-tStlnOCRGRqKKJSCOtXhijX4r9kYVK2v+Vs7miJnfvr3sZfO8nRS0xnNhfgu17xuNi5LMMufeCYURTz4lKxzUQ==}
     engines: {node: '>=18'}
     peerDependencies:
       zod: ^3.25.76 || ^4
@@ -8303,6 +8315,18 @@ snapshots:
       '@ai-sdk/provider': 2.0.0
       '@ai-sdk/provider-utils': 3.0.7(zod@3.25.76)
       zod: 3.25.76
+
+  '@ai-sdk/google-vertex@3.0.16(zod@3.25.76)':
+    dependencies:
+      '@ai-sdk/anthropic': 2.0.9(zod@3.25.76)
+      '@ai-sdk/google': 2.0.11(zod@3.25.76)
+      '@ai-sdk/provider': 2.0.0
+      '@ai-sdk/provider-utils': 3.0.7(zod@3.25.76)
+      google-auth-library: 9.15.0
+      zod: 3.25.76
+    transitivePeerDependencies:
+      - encoding
+      - supports-color
 
   '@ai-sdk/google@2.0.11(zod@3.25.76)':
     dependencies:
