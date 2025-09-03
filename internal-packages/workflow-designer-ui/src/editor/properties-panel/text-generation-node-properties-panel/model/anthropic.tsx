@@ -1,4 +1,7 @@
-import { AnthropicLanguageModelData } from "@giselle-sdk/data-type";
+import {
+	AnthropicLanguageModelData,
+	type ToolSet,
+} from "@giselle-sdk/data-type";
 import { useUsageLimits } from "@giselle-sdk/giselle/react";
 import {
 	anthropicLanguageModels,
@@ -21,9 +24,15 @@ import { languageModelAvailable } from "./utils";
 export function AnthropicModelPanel({
 	anthropicLanguageModel,
 	onModelChange,
+	tools,
+	onToolChange,
+	onWebSearchChange,
 }: {
 	anthropicLanguageModel: AnthropicLanguageModelData;
 	onModelChange: (changedValue: AnthropicLanguageModelData) => void;
+	tools?: ToolSet;
+	onToolChange: (changedValue: ToolSet) => void;
+	onWebSearchChange: (enabled: boolean) => void;
 }) {
 	const limits = useUsageLimits();
 
@@ -151,6 +160,39 @@ export function AnthropicModelPanel({
 							</div>
 						</>
 					)}
+
+					<Switch
+						label="Web Search"
+						name="webSearch"
+						checked={!!tools?.anthropicWebSearch}
+						onCheckedChange={(checked) => {
+							let changedTools: ToolSet = {};
+							for (const toolName of Object.keys(tools ?? {})) {
+								const tool = tools?.[toolName as keyof ToolSet];
+
+								if (
+									tool === undefined ||
+									(!checked && toolName === "anthropicWebSearch")
+								) {
+									continue;
+								}
+								changedTools = {
+									...changedTools,
+									[toolName]: tool,
+								};
+							}
+							if (checked) {
+								changedTools = {
+									...tools,
+									anthropicWebSearch: {
+										maxUses: 3,
+									},
+								};
+							}
+							onToolChange(changedTools);
+							onWebSearchChange(checked);
+						}}
+					/>
 				</div>
 			</div>
 		</div>

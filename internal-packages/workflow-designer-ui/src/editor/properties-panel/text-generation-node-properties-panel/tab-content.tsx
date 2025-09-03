@@ -293,12 +293,102 @@ export function TextGenerationTabContent({
 				{node.content.llm.provider === "anthropic" && (
 					<AnthropicModelPanel
 						anthropicLanguageModel={node.content.llm}
+						tools={node.content.tools}
 						onModelChange={(value) =>
 							updateNodeDataContent(node, {
 								...node.content,
 								llm: value,
 							})
 						}
+						onToolChange={(changedTool) =>
+							updateNodeDataContent(node, {
+								...node.content,
+								tools: changedTool,
+							})
+						}
+						onWebSearchChange={(enable) => {
+							if (node.content.llm.provider !== "anthropic") {
+								return;
+							}
+							const updateTools: ToolSet = {
+								...node.content.tools,
+								anthropicWebSearch: enable
+									? {
+											maxUses: 3,
+										}
+									: undefined,
+							};
+							const updateOutputs: Output[] = enable
+								? [
+										...node.outputs,
+										{
+											id: OutputId.generate(),
+											label: "Source",
+											accessor: "source",
+										},
+									]
+								: node.outputs.filter((output) => output.accessor !== "source");
+							if (!enable) {
+								const sourceOutput = node.outputs.find(
+									(output) => output.accessor === "source",
+								);
+								if (sourceOutput) {
+									for (const connection of data.connections) {
+										if (connection.outputId !== sourceOutput.id) {
+											continue;
+										}
+										deleteConnection(connection.id);
+
+										const connectedNode = data.nodes.find(
+											(node) => node.id === connection.inputNode.id,
+										);
+										if (connectedNode === undefined) {
+											continue;
+										}
+										if (connectedNode.type === "operation") {
+											switch (connectedNode.content.type) {
+												case "textGeneration":
+												case "imageGeneration": {
+													if (
+														!isTextGenerationNode(connectedNode) &&
+														!isImageGenerationNode(connectedNode)
+													) {
+														throw new Error(
+															`Expected text generation or image generation node, got ${JSON.stringify(connectedNode)}`,
+														);
+													}
+													updateNodeData(connectedNode, {
+														inputs: connectedNode.inputs.filter(
+															(input) => input.id !== connection.inputId,
+														),
+													});
+													break;
+												}
+												case "trigger":
+												case "action":
+												case "query":
+													break;
+												default: {
+													const _exhaustiveCheck: never =
+														connectedNode.content.type;
+													throw new Error(
+														`Unhandled node type: ${_exhaustiveCheck}`,
+													);
+												}
+											}
+										}
+									}
+								}
+							}
+							updateNodeData(node, {
+								...node,
+								content: {
+									...node.content,
+									tools: updateTools,
+								},
+								outputs: updateOutputs,
+							});
+						}}
 					/>
 				)}
 				{node.content.llm.provider === "perplexity" && (
