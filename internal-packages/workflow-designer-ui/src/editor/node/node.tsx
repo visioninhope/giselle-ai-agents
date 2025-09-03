@@ -22,7 +22,8 @@ import {
 import {
 	defaultName,
 	useNodeGenerations,
-	useWorkflowDesigner,
+	useWorkflowDesignerStore,
+	useWorkspaceSelector,
 } from "@giselle-sdk/giselle/react";
 import {
 	Handle,
@@ -127,7 +128,12 @@ function CustomXyFlowNode({
 	data,
 	selected,
 }: NodeProps<GiselleWorkflowDesignerNode>) {
-	const { data: workspace } = useWorkflowDesigner();
+	const workspace = useWorkspaceSelector((s) => ({
+		connections: s.connections,
+		nodes: s.nodes,
+		nodeState: s.ui.nodeState,
+	}));
+
 	const connectedInputIds = useMemo(
 		() =>
 			workspace.connections
@@ -143,9 +149,14 @@ function CustomXyFlowNode({
 		[workspace, data.nodeData.id],
 	);
 	const highlighted = useMemo(
-		() => workspace.ui.nodeState?.[data.nodeData.id]?.highlighted ?? false,
+		() => workspace.nodeState?.[data.nodeData.id]?.highlighted ?? false,
 		[workspace, data.nodeData.id],
 	);
+
+	// Early return if workspace is not yet initialized
+	if (!workspace) {
+		return null;
+	}
 
 	return (
 		<NodeComponent
@@ -173,10 +184,15 @@ export function NodeComponent({
 	connectedInputIds?: InputId[];
 	connectedOutputIds?: OutputId[];
 }) {
-	const { updateNodeData, data } = useWorkflowDesigner();
+	const updateNodeData = useWorkflowDesignerStore((state) => state.updateNode);
+	const workspaceId = useWorkspaceSelector((ws) => ws.id);
+
 	const { stopGenerationRunner, currentGeneration } = useNodeGenerations({
 		nodeId: node.id,
-		origin: { type: "studio", workspaceId: data.id },
+		origin: {
+			type: "studio",
+			workspaceId,
+		},
 	});
 	const prevGenerationStatusRef = useRef(currentGeneration?.status);
 	const [showCompleteLabel, startTransition] = useTransition();
@@ -403,10 +419,10 @@ export function NodeComponent({
 									return;
 								}
 								if (value.trim().length === 0) {
-									updateNodeData(node, { name: undefined });
+									updateNodeData(node.id, { name: undefined });
 									return;
 								}
-								updateNodeData(node, { name: value });
+								updateNodeData(node.id, { name: value });
 							}}
 							onClickToEditMode={(e) => {
 								if (!selected) {
