@@ -155,7 +155,7 @@ export function GenerationView({ generation }: { generation: Generation }) {
 									<img
 										src={`${client.basePath}/${content.pathname}`}
 										alt="generated file"
-										className="h-[300px] w-auto object-contain rounded-[8px]"
+										className="max-h-[200px] max-w-[250px] w-auto object-contain rounded-[8px]"
 									/>
 									<div className="absolute inset-0 bg-black/40 rounded-[8px] opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-start justify-end p-2">
 										<div className="flex gap-1">
