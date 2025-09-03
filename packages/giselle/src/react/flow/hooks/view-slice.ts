@@ -1,7 +1,7 @@
 import type { NodeLike } from "@giselle-sdk/data-type";
 import type { LanguageModelProvider } from "@giselle-sdk/language-model";
 import type { StateCreator } from "zustand";
-import type { WorkspaceSlice } from "./workspaceSlice";
+import type { WorkspaceSlice } from "./workspace-slice";
 
 // A creator function for a slice must now include the full store type
 // to enable cross-slice actions, e.g., get().deleteNode()
