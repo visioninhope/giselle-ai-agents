@@ -216,8 +216,10 @@ function GitHubToolConnectionDialog({
       description={description}
       onSubmit={handleFormSubmit}
       submitting={isPending}
-      submitText={tabValue === "select" ? "" : submitText}
-      disabled={tabValue === "select"}
+      submitText={
+        tabValue === "select" && (secrets ?? []).length < 1 ? "" : submitText
+      }
+      disabled={tabValue === "select" && (secrets ?? []).length < 1}
       trigger={
         hideTrigger ? null : (
           <Button
