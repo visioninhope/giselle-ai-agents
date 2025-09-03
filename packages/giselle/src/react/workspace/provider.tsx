@@ -1,13 +1,11 @@
 "use client";
 
-import type { Workspace, WorkspaceId } from "@giselle-sdk/data-type";
-import { type ReactNode, useEffect, useState } from "react";
+import type { ReactNode } from "react";
 import type { TelemetrySettings, UsageLimits } from "../../engine";
 import {
 	FeatureFlagContext,
 	type FeatureFlagContextValue,
 } from "../feature-flags";
-import { WorkflowDesignerProvider } from "../flow";
 import {
 	FlowTriggerContext,
 	type FlowTriggerContextValue,
@@ -19,7 +17,6 @@ import {
 } from "../integrations";
 import { TelemetryProvider } from "../telemetry";
 import { UsageLimitsProvider } from "../usage-limits";
-import { useGiselleEngine } from "../use-giselle-engine";
 import {
 	type VectorStoreContextValue,
 	VectorStoreProvider,
@@ -27,7 +24,6 @@ import {
 
 export function WorkspaceProvider({
 	children,
-	workspaceId,
 	integration,
 	usageLimits,
 	telemetry,
@@ -36,7 +32,6 @@ export function WorkspaceProvider({
 	flowTrigger,
 }: {
 	children: ReactNode;
-	workspaceId: WorkspaceId;
 	integration?: IntegrationProviderProps;
 	usageLimits?: UsageLimits;
 	telemetry?: TelemetrySettings;
@@ -44,22 +39,6 @@ export function WorkspaceProvider({
 	vectorStore?: VectorStoreContextValue;
 	flowTrigger?: FlowTriggerContextValue;
 }) {
-	const client = useGiselleEngine();
-
-	const [workspace, setWorkspace] = useState<Workspace | undefined>();
-	useEffect(() => {
-		client
-			.getWorkspace({
-				workspaceId,
-				useExperimentalStorage: featureFlag?.experimental_storage ?? false,
-			})
-			.then((workspace) => {
-				setWorkspace(workspace);
-			});
-	}, [workspaceId, client, featureFlag?.experimental_storage]);
-	if (workspace === undefined) {
-		return null;
-	}
 	return (
 		<FeatureFlagContext
 			value={{
@@ -77,11 +56,9 @@ export function WorkspaceProvider({
 					<UsageLimitsProvider limits={usageLimits}>
 						<IntegrationProvider {...integration}>
 							<VectorStoreProvider value={vectorStore}>
-								<WorkflowDesignerProvider data={workspace}>
-									<GenerationRunnerSystemProvider>
-										{children}
-									</GenerationRunnerSystemProvider>
-								</WorkflowDesignerProvider>
+								<GenerationRunnerSystemProvider>
+									{children}
+								</GenerationRunnerSystemProvider>
 							</VectorStoreProvider>
 						</IntegrationProvider>
 					</UsageLimitsProvider>

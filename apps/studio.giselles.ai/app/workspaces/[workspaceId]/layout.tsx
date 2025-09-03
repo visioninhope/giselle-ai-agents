@@ -1,7 +1,11 @@
 import { WorkspaceId } from "@giselle-sdk/data-type";
-import { WorkspaceProvider } from "@giselle-sdk/giselle/react";
+import {
+	WorkflowDesignerProvider,
+	WorkspaceProvider,
+} from "@giselle-sdk/giselle/react";
 import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
+import { giselleEngine } from "@/app/giselle-engine";
 import { db, flowTriggers } from "@/drizzle";
 import {
 	aiGatewayFlag,
@@ -66,11 +70,11 @@ export default async function Layout({
 	const stage = await stageFlag();
 	const aiGateway = await aiGatewayFlag();
 	const resumableGeneration = await resumableGenerationFlag();
+	const data = await giselleEngine.getWorkspace(workspaceId, true);
 
 	// return children
 	return (
 		<WorkspaceProvider
-			workspaceId={workspaceId}
 			integration={{
 				value: {
 					github: gitHubIntegrationState,
@@ -128,7 +132,9 @@ export default async function Layout({
 				},
 			}}
 		>
-			{children}
+			<WorkflowDesignerProvider data={data}>
+				{children}
+			</WorkflowDesignerProvider>
 		</WorkspaceProvider>
 	);
 }
