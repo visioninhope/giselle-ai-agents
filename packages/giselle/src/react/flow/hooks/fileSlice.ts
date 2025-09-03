@@ -2,9 +2,11 @@ import {
 	createFailedFileData,
 	createUploadedFileData,
 	createUploadingFileData,
+	type FileContent,
 	type FileData,
 	type FileNode,
 	type UploadedFileData,
+	type WorkspaceId,
 } from "@giselle-sdk/data-type";
 import type { StateCreator } from "zustand";
 import { APICallError } from "../../errors";
@@ -14,7 +16,7 @@ import type { AppStore } from "./store";
 export interface FileSlice {
 	uploadFile: (
 		client: GiselleEngineClient,
-		workspaceId: string,
+		workspaceId: WorkspaceId,
 		useExperimentalStorage: boolean,
 		files: File[],
 		node: FileNode,
@@ -22,15 +24,14 @@ export interface FileSlice {
 	) => Promise<void>;
 	removeFile: (
 		client: GiselleEngineClient,
-		workspaceId: string,
+		workspaceId: WorkspaceId,
 		useExperimentalStorage: boolean,
 		uploadedFile: UploadedFileData,
-		node: FileNode,
 	) => Promise<void>;
 }
 
 export const createFileSlice: StateCreator<AppStore, [], [], FileSlice> = (
-	set,
+	_set,
 	get,
 ) => ({
 	uploadFile: async (
@@ -121,20 +122,32 @@ export const createFileSlice: StateCreator<AppStore, [], [], FileSlice> = (
 		workspaceId,
 		useExperimentalStorage,
 		uploadedFile,
-		node,
 	) => {
+		const allNodes = get().workspace?.nodes ?? [];
+		const parentNode = allNodes.find(
+			(n) =>
+				n.content.type === "file" &&
+				(n.content as FileContent).files?.some(
+					(f: FileData) => f.id === uploadedFile.id,
+				),
+		) as FileNode | undefined;
+
+		if (!parentNode) {
+			console.error("Could not find parent node for file to remove");
+			return;
+		}
+
 		await client.removeFile({
 			workspaceId: workspaceId,
 			fileId: uploadedFile.id,
 			useExperimentalStorage: useExperimentalStorage,
 		});
 
-		const currentFiles = get().workspace?.nodes.find((n) => n.id === node.id)
-			?.content.files as FileData[] | undefined;
+		const currentFiles = parentNode.content.files;
 
 		if (currentFiles) {
 			get().updateFileStatus(
-				node.id,
+				parentNode.id,
 				currentFiles.filter((f) => f.id !== uploadedFile.id),
 			);
 		}

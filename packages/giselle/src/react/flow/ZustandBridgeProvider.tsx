@@ -1,11 +1,10 @@
-"use client";
-
-import type {
-	FileNode,
-	UploadedFileData,
-	Workspace,
+import {
+	ConnectionId,
+	type FileNode,
+	type UploadedFileData,
+	type Workspace,
 } from "@giselle-sdk/data-type";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { create } from "zustand";
 import { useFeatureFlag } from "../feature-flags";
 import { useGiselleEngine } from "../use-giselle-engine";
@@ -19,6 +18,7 @@ import {
 	createWorkspaceSlice,
 	isSupportedConnection,
 } from "./hooks";
+import type { WorkflowDesignerContextValue } from "./types";
 
 const DEFAULT_SAVE_DELAY = 1000;
 
@@ -90,40 +90,39 @@ export function ZustandBridgeProvider({
 	const store = useStore();
 
 	// Assemble the value for the old context to ensure the API is identical
-	const contextValue = {
-		data: store.workspace!,
-		textGenerationApi,
-		addNode: store.addNode,
-		copyNode: store.copyNode,
-		addConnection: store.addConnection,
-		updateNodeData: store.updateNode,
-		updateNodeDataContent: store.updateNodeContent,
-		setUiNodeState: store.setUiNodeState,
-		deleteNode: store.deleteNode,
-		deleteConnection: store.deleteConnection,
-		uploadFile: (files: File[], node: FileNode) =>
-			store.uploadFile(client, data.id, experimental_storage, files, node),
-		removeFile: (uploadedFile: UploadedFileData, node: FileNode) =>
-			store.removeFile(
-				client,
-				data.id,
-				experimental_storage,
-				uploadedFile,
-				node,
-			),
-		llmProviders: store.llmProviders,
-		isLoading: store.isLoading,
-		setUiViewport: store.setUiViewport,
-		updateName: store.updateWorkspaceName,
-		isSupportedConnection: isSupportedConnection,
-		setCurrentShortcutScope: store.setCurrentShortcutScope,
-		copiedNode: store.copiedNode,
-		setCopiedNode: store.setCopiedNode,
-		propertiesTab: store.propertiesTab,
-		setPropertiesTab: store.setPropertiesTab,
-		openPropertiesPanel: store.openPropertiesPanel,
-		setOpenPropertiesPanel: store.setOpenPropertiesPanel,
-	};
+	const contextValue = useMemo<WorkflowDesignerContextValue>(
+		() => ({
+			data,
+			textGenerationApi,
+			addNode: (node, options) => store.addNode(node, options?.ui),
+			copyNode: store.copyNode,
+			addConnection: (args) =>
+				store.addConnection({ ...args, id: ConnectionId.generate() }),
+			updateNodeData: (node, data) => store.updateNode(node.id, data),
+			updateNodeDataContent: (node, content) =>
+				store.updateNodeContent(node.id, content),
+			setUiNodeState: store.setUiNodeState,
+			deleteNode: store.deleteNode,
+			deleteConnection: store.deleteConnection,
+			uploadFile: (files: File[], node: FileNode) =>
+				store.uploadFile(client, data.id, experimental_storage, files, node),
+			removeFile: (uploadedFile: UploadedFileData) =>
+				store.removeFile(client, data.id, experimental_storage, uploadedFile),
+			llmProviders: store.llmProviders,
+			isLoading: store.isLoading,
+			setUiViewport: store.setUiViewport,
+			updateName: store.updateWorkspaceName,
+			isSupportedConnection: isSupportedConnection,
+			setCurrentShortcutScope: store.setCurrentShortcutScope,
+			copiedNode: store.copiedNode,
+			setCopiedNode: store.setCopiedNode,
+			propertiesTab: store.propertiesTab,
+			setPropertiesTab: store.setPropertiesTab,
+			openPropertiesPanel: store.openPropertiesPanel,
+			setOpenPropertiesPanel: store.setOpenPropertiesPanel,
+		}),
+		[store, textGenerationApi, client, data, experimental_storage],
+	);
 
 	// Render the old context provider with the new value from the Zustand store
 	// The null check is for the initial render before the store is initialized

@@ -1,4 +1,5 @@
-import type { LanguageModelProvider, NodeLike } from "@giselle-sdk/data-type";
+import type { NodeLike } from "@giselle-sdk/data-type";
+import type { LanguageModelProvider } from "@giselle-sdk/language-model";
 import type { StateCreator } from "zustand";
 import type { GiselleEngineClient } from "../../use-giselle-engine";
 import type { WorkspaceSlice } from "./workspaceSlice";

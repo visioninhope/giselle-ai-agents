@@ -1,6 +1,6 @@
 import {
 	type Connection,
-	type ConnectionId,
+	ConnectionId,
 	type FileData,
 	type FileNode,
 	type Node,
@@ -37,7 +37,7 @@ export interface WorkspaceSlice {
 		},
 	) => Node | undefined;
 	setUiNodeState: (
-		nodeId: NodeId,
+		nodeId: NodeId | string,
 		ui: Partial<NodeUIState>,
 		options?: { save?: boolean },
 	) => void;
@@ -163,6 +163,7 @@ export const createWorkspaceSlice: StateCreator<
 					).canConnect;
 					if (!connectionExists && connectionValid) {
 						get().addConnection({
+							id: ConnectionId.generate(),
 							outputNode,
 							outputId: originalConnection.outputId,
 							inputNode: newNode,
@@ -192,6 +193,7 @@ export const createWorkspaceSlice: StateCreator<
 					).canConnect;
 					if (!connectionExists && connectionValid) {
 						get().addConnection({
+							id: ConnectionId.generate(),
 							outputNode: newNode,
 							outputId: newOutputId,
 							inputNode,
