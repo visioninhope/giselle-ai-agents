@@ -10,6 +10,7 @@ import {
 	isTriggerNode,
 	isVectorStoreNode,
 	type Node,
+	type NodeId,
 	type NodeLike,
 	type OutputId,
 	QueryNode,
@@ -125,44 +126,44 @@ export const nodeTypes: NodeTypes = {
 };
 
 function CustomXyFlowNode({
-	data,
+	id,
 	selected,
 }: NodeProps<GiselleWorkflowDesignerNode>) {
-	const workspace = useWorkflowDesignerStore(
+	const { node, connections, nodeState } = useWorkflowDesignerStore(
 		useShallow((s) => ({
+			node: s.workspace.nodes.find((node) => node.id === id),
 			connections: s.workspace.connections,
-			nodes: s.workspace.nodes,
 			nodeState: s.workspace.ui.nodeState,
 		})),
 	);
 
 	const connectedInputIds = useMemo(
 		() =>
-			workspace.connections
-				.filter((connection) => connection.inputNode.id === data.nodeData.id)
+			connections
+				.filter((connection) => connection.inputNode.id === id)
 				.map((connection) => connection.inputId),
-		[workspace, data.nodeData.id],
+		[connections, id],
 	);
 	const connectedOutputIds = useMemo(
 		() =>
-			workspace.connections
-				.filter((connection) => connection.outputNode.id === data.nodeData.id)
+			connections
+				.filter((connection) => connection.outputNode.id === id)
 				.map((connection) => connection.outputId),
-		[workspace, data.nodeData.id],
+		[connections, id],
 	);
 	const highlighted = useMemo(
-		() => workspace.nodeState?.[data.nodeData.id]?.highlighted ?? false,
-		[workspace, data.nodeData.id],
+		() => nodeState?.[id as NodeId]?.highlighted ?? false,
+		[nodeState, id],
 	);
 
 	// Early return if workspace is not yet initialized
-	if (!workspace) {
+	if (!node) {
 		return null;
 	}
 
 	return (
 		<NodeComponent
-			node={data.nodeData}
+			node={node as Node}
 			selected={selected}
 			highlighted={highlighted}
 			connectedInputIds={connectedInputIds}
