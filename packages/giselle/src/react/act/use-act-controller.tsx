@@ -1,4 +1,4 @@
-import { useCallback, useRef } from "react";
+import { useCallback } from "react";
 import type { Generation } from "../../concepts/generation";
 import type { ActExecutorOptions, CreateActInputs } from "../../engine/acts";
 import { executeAct } from "../../engine/acts/shared/act-execution-utils";
@@ -35,7 +35,6 @@ export function useActController() {
 	const client = useGiselleEngine();
 	const { addGenerationRunner, startGenerationRunner, stopGenerationRunner } =
 		useGenerationRunnerSystem();
-	const actGenerationsRef = useRef<Generation[]>([]);
 
 	const createAndStartAct = useCallback(
 		async ({
@@ -52,7 +51,6 @@ export function useActController() {
 				inputs,
 			});
 			addGenerationRunner(generations);
-			actGenerationsRef.current = generations;
 
 			const { onActStart, onActComplete, ...rest } = options;
 
@@ -71,7 +69,7 @@ export function useActController() {
 				onActStart: async () => {
 					await onActStart?.(async () => {
 						await Promise.all(
-							actGenerationsRef.current.map((generation) =>
+							generations.map((generation) =>
 								stopGenerationRunner(generation.id),
 							),
 						);
