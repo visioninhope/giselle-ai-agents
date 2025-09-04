@@ -322,17 +322,18 @@ function EmbeddingModelCard({
 							</span>
 							{blobStatus.metadata &&
 								(() => {
-									try {
-										const metadata = JSON.parse(blobStatus.metadata);
-										if (metadata.lastIngestedCommitSha) {
-											return (
-												<span>
-													Commit:{" "}
-													{metadata.lastIngestedCommitSha.substring(0, 7)}
-												</span>
-											);
-										}
-									} catch {}
+									const metadata = blobStatus.metadata;
+									if (
+										metadata &&
+										"lastIngestedCommitSha" in metadata &&
+										metadata.lastIngestedCommitSha
+									) {
+										return (
+											<span>
+												Commit: {metadata.lastIngestedCommitSha.substring(0, 7)}
+											</span>
+										);
+									}
 									return null;
 								})()}
 						</div>
@@ -380,12 +381,14 @@ function EmbeddingModelCard({
 							</span>
 							{pullRequestStatus.metadata &&
 								(() => {
-									try {
-										const metadata = JSON.parse(pullRequestStatus.metadata);
-										if (metadata.lastIngestedPrNumber) {
-											return <span>PR: #{metadata.lastIngestedPrNumber}</span>;
-										}
-									} catch {}
+									const metadata = pullRequestStatus.metadata;
+									if (
+										metadata &&
+										"lastIngestedPrNumber" in metadata &&
+										metadata.lastIngestedPrNumber
+									) {
+										return <span>PR: #{metadata.lastIngestedPrNumber}</span>;
+									}
 									return null;
 								})()}
 						</div>
