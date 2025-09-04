@@ -156,7 +156,7 @@ export function ConfigureSourcesDialog({
                   return (
                     <label
                       key={profileId}
-                      className="flex items-start gap-3 p-3 rounded-lg bg-black-700/50 hover:bg-black-700/70 transition-colors cursor-pointer"
+                      className="flex items-start gap-3 p-2 rounded-lg bg-black-700/50 hover:bg-black-700/70 transition-colors cursor-pointer"
                     >
                       <input
                         type="checkbox"
