@@ -27,6 +27,7 @@ export function Button({
 		<Comp
 			className={clsx(
 				"relative flex items-center justify-center outline-none overflow-hidden",
+				"focus-visible:ring-2 focus-visible:ring-primary-700/60 focus-visible:ring-offset-1",
 				"data-[size=default]:px-[8px] data-[size=default]:py-[2px] data-[size=default]:rounded-[2px] data-[size=default]:gap-[4px]",
 				"data-[size=large]:px-5 data-[size=large]:py-2 data-[size=large]:h-[40px] data-[size=large]:rounded-lg data-[size=large]:gap-[6px]",
 				"data-[size=compact]:px-[4px] data-[size=compact]:py-[0px] data-[size=compact]:rounded-[2px] data-[size=compact]:gap-[2px]",
@@ -37,7 +38,7 @@ export function Button({
 				"data-[style=glass]:after:absolute data-[style=glass]:after:bg-linear-to-r data-[style=glass]:after:from-transparent data-[style=glass]:after:via-glass-highlight/60 data-[style=glass]:after:left-4 data-[style=glass]:after:right-4 data-[style=glass]:after:h-px data-[style=glass]:after:top-0",
 				"data-[style=glass]:border data-[style=glass]:border-glass-border/20",
 				"data-[style=outline]:border data-[style=outline]:border-t-border/60 data-[style=outline]:border-x-border/40 data-[style=outline]:border-b-black/60",
-				"data-[style=link]:hover:underline",
+				"data-[style=link]:p-0 data-[style=link]:h-auto data-[style=link]:hover:underline",
 				"cursor-pointer transition-colors",
 				className,
 			)}

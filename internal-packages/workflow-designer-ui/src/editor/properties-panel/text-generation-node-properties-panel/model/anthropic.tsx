@@ -155,7 +155,7 @@ export function AnthropicModelPanel({
 								<div className="flex flex-row items-center justify-between">
 									<p className="text-[14px]">Reasoning</p>
 									<div className="flex-grow mx-[12px] h-[1px] bg-black-200/30" />
-									<p className="text-[12px]">Unsuported</p>
+									<p className="text-[12px]">Unsupported</p>
 								</div>
 							</div>
 						</>
@@ -166,30 +166,11 @@ export function AnthropicModelPanel({
 						name="webSearch"
 						checked={!!tools?.anthropicWebSearch}
 						onCheckedChange={(checked) => {
-							let changedTools: ToolSet = {};
-							for (const toolName of Object.keys(tools ?? {})) {
-								const tool = tools?.[toolName as keyof ToolSet];
-
-								if (
-									tool === undefined ||
-									(!checked && toolName === "anthropicWebSearch")
-								) {
-									continue;
-								}
-								changedTools = {
-									...changedTools,
-									[toolName]: tool,
-								};
-							}
-							if (checked) {
-								changedTools = {
-									...tools,
-									anthropicWebSearch: {
-										maxUses: 3,
-									},
-								};
-							}
-							onToolChange(changedTools);
+							const { anthropicWebSearch: _removed, ...rest } = tools ?? {};
+							const changedTools = checked
+								? { ...rest, anthropicWebSearch: { maxUses: 3 } }
+								: rest;
+							onToolChange(changedTools as ToolSet);
 							onWebSearchChange(checked);
 						}}
 					/>

@@ -166,10 +166,15 @@ function PostgresToolConnectionDialog({
 								value={connectionString}
 								onChange={(e) => handleConnectionStringChange(e.target.value)}
 								className={validationError ? "border-red-500" : ""}
+								aria-invalid={!!validationError}
+								aria-describedby={
+									validationError ? "postgres-conn-error" : undefined
+								}
 							/>
 							{validationError ? (
 								<p className="text-[11px] text-red-500 px-[4px] mt-[1px]">
-									{validationError}
+									{/* id referenced by aria-describedby above */}
+									<span id="postgres-conn-error">{validationError}</span>
 								</p>
 							) : (
 								<p className="text-[11px] text-text-muted px-[4px] mt-[1px]">
@@ -307,12 +312,11 @@ function PostgresToolConfigurationDialogInternal({
 					<Button
 						type="button"
 						onClick={() => {
+							const { postgres: _removed, ...otherTools } =
+								node.content.tools || {};
 							updateNodeDataContent(node, {
 								...node.content,
-								tools: {
-									...node.content.tools,
-									postgres: undefined,
-								},
+								tools: otherTools,
 							});
 						}}
 						leftIcon={<TrashIcon className="size-[12px]" />}
