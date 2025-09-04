@@ -16,10 +16,18 @@ type CreateAndStartActParams = Omit<
 		| "applyPatches"
 		| "generationAdapter"
 		| "onActStart"
-		| "applyPatches"
+		| "onActComplete"
 		| "startGeneration"
 	> & {
-		onActStart: (cancel: () => Promise<void>) => void | Promise<void>;
+		onActStart: (
+			cancel: () => Promise<void>,
+			actId: string,
+		) => void | Promise<void>;
+		onActComplete?: (
+			hasError: boolean,
+			duration: number,
+			actId: string,
+		) => void | Promise<void>;
 	};
 
 export function useActController() {
@@ -46,8 +54,10 @@ export function useActController() {
 			addGenerationRunner(generations);
 			actGenerationsRef.current = generations;
 
+			const { onActStart, onActComplete, ...rest } = options;
+
 			await executeAct({
-				...options,
+				...(rest as Omit<ActExecutorOptions, "act">),
 				act,
 				applyPatches: async (actId, patches) => {
 					await client.patchAct({ actId, patches });
@@ -59,13 +69,16 @@ export function useActController() {
 					});
 				},
 				onActStart: () => {
-					options.onActStart?.(async () => {
+					onActStart?.(async () => {
 						await Promise.all(
 							actGenerationsRef.current.map((generation) =>
 								stopGenerationRunner(generation.id),
 							),
 						);
-					});
+					}, act.id);
+				},
+				onActComplete: async (hasError, duration) => {
+					await onActComplete?.(hasError, duration, act.id);
 				},
 			});
 		},
