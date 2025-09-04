@@ -35,7 +35,7 @@ import clsx from "clsx/lite";
 import { CheckIcon, SquareIcon } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useMemo, useRef, useTransition } from "react";
-import { useShallow } from "zustand/react/shallow";
+import { useShallow } from "zustand/shallow";
 import { NodeIcon } from "../../icons/node";
 import { EditableText } from "../../ui/editable-text";
 import { Tooltip } from "../../ui/tooltip";

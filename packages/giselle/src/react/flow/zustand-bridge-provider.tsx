@@ -1,8 +1,7 @@
-import {
-	ConnectionId,
-	type FileNode,
-	type UploadedFileData,
-	type Workspace,
+import type {
+	FileNode,
+	UploadedFileData,
+	Workspace,
 } from "@giselle-sdk/data-type";
 import { useEffect, useMemo } from "react";
 import { useFeatureFlag } from "../feature-flags";
@@ -98,8 +97,7 @@ export function ZustandBridgeProvider({
 			textGenerationApi,
 			addNode: (node, options) => state.addNode(node, options?.ui),
 			copyNode: state.copyNode,
-			addConnection: (args) =>
-				state.addConnection({ ...args, id: ConnectionId.generate() }),
+			addConnection: (args) => state.addConnection(args),
 			updateNodeData: (node, data) => state.updateNode(node.id, data),
 			updateNodeDataContent: (node, content) =>
 				state.updateNodeDataContent(node, content),

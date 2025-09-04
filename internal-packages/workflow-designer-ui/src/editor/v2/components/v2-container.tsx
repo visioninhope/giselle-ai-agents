@@ -17,10 +17,15 @@ import {
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { useToasts } from "@giselle-internal/ui/toast";
-import { useWorkflowDesigner } from "@giselle-sdk/giselle/react";
+import {
+	isSupportedConnection,
+	useWorkflowDesigner,
+	useWorkflowDesignerStore,
+} from "@giselle-sdk/giselle/react";
 import clsx from "clsx/lite";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
+import { useShallow } from "zustand/shallow";
 import { Background } from "../../../ui/background";
 import { edgeTypes } from "../../connector";
 import { type ConnectorType, GradientDef } from "../../connector/component";
@@ -42,8 +47,15 @@ interface V2ContainerProps extends V2LayoutState {
 }
 
 function V2NodeCanvas() {
+	const data = useWorkflowDesignerStore(
+		useShallow((s) => ({
+			nodes: s.workspace.nodes,
+			connections: s.workspace.connections,
+			nodeState: s.workspace.ui.nodeState,
+			viewport: s.workspace.ui.viewport,
+		})),
+	);
 	const {
-		data,
 		setUiNodeState,
 		setUiViewport,
 		setCurrentShortcutScope,
@@ -52,8 +64,18 @@ function V2NodeCanvas() {
 		updateNodeData,
 		addNode,
 		addConnection,
-		isSupportedConnection,
-	} = useWorkflowDesigner();
+	} = useWorkflowDesignerStore(
+		useShallow((s) => ({
+			setUiNodeState: s.setUiNodeState,
+			setUiViewport: s.setUiViewport,
+			setCurrentShortcutScope: s.setCurrentShortcutScope,
+			deleteNode: s.deleteNode,
+			deleteConnection: s.deleteConnection,
+			updateNodeData: s.updateNodeData,
+			addNode: s.addNode,
+			addConnection: s.addConnection,
+		})),
+	);
 	const reactFlowInstance = useReactFlow<
 		GiselleWorkflowDesignerNode,
 		ConnectorType
@@ -70,7 +92,7 @@ function V2NodeCanvas() {
 
 	useEffect(() => {
 		reactFlowInstance.setNodes(
-			Object.entries(data.ui.nodeState)
+			Object.entries(data.nodeState)
 				.map(([nodeId, nodeState]) => {
 					const nodeData = data.nodes.find((node) => node.id === nodeId);
 					if (nodeData === undefined || nodeState === undefined) return null;
@@ -84,7 +106,7 @@ function V2NodeCanvas() {
 				})
 				.filter((result) => result !== null),
 		);
-		updateNodeInternals(Object.keys(data.ui.nodeState));
+		updateNodeInternals(Object.keys(data.nodeState));
 	}, [data, reactFlowInstance.setNodes, updateNodeInternals]);
 
 	useEffect(() => {
@@ -151,7 +173,7 @@ function V2NodeCanvas() {
 				);
 			}
 		},
-		[addConnection, data.nodes, toast, isSupportedConnection, updateNodeData],
+		[addConnection, data.nodes, toast, updateNodeData],
 	);
 
 	const handleEdgesDelete = useCallback(
@@ -209,7 +231,7 @@ function V2NodeCanvas() {
 			defaultEdges={[]}
 			nodeTypes={nodeTypes}
 			edgeTypes={edgeTypes}
-			defaultViewport={data.ui.viewport}
+			defaultViewport={data.viewport}
 			onConnect={handleConnect}
 			onEdgesDelete={handleEdgesDelete}
 			isValidConnection={isValidConnection}
@@ -219,7 +241,7 @@ function V2NodeCanvas() {
 			onMoveEnd={(_, viewport) => setUiViewport(viewport)}
 			onNodesChange={async (nodesChange) => {
 				await Promise.all(
-					nodesChange.map(async (nodeChange) => {
+					nodesChange.map((nodeChange) => {
 						switch (nodeChange.type) {
 							case "remove": {
 								for (const connection of data.connections) {
@@ -243,7 +265,7 @@ function V2NodeCanvas() {
 										}
 									}
 								}
-								await deleteNode(nodeChange.id);
+								deleteNode(nodeChange.id);
 								break;
 							}
 						}
@@ -272,7 +294,7 @@ function V2NodeCanvas() {
 					y: event.clientY,
 				});
 				if (selectedTool?.action === "addNode") {
-					addNode(selectedTool.node, { ui: { position } });
+					addNode(selectedTool.node, { position });
 				}
 				reset();
 				// Set canvas focus when clicking on canvas

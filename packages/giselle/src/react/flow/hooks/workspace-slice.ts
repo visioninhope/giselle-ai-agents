@@ -3,11 +3,13 @@ import {
 	ConnectionId,
 	type FileData,
 	type FileNode,
+	type InputId,
 	type Node,
 	type NodeBase,
 	NodeId,
 	type NodeLike,
 	type NodeUIState,
+	type OutputId,
 	type ShortcutScope,
 	type Viewport,
 	type Workspace,
@@ -27,7 +29,12 @@ export interface WorkspaceSlice {
 	addNode: (node: NodeLike, ui?: NodeUIState) => void;
 	updateNode: (nodeId: NodeId, data: Partial<NodeBase>) => void;
 	deleteNode: (nodeId: NodeId | string) => void;
-	addConnection: (connection: Connection) => void;
+	addConnection: (args: {
+		outputNode: NodeLike;
+		outputId: OutputId;
+		inputNode: NodeLike;
+		inputId: InputId;
+	}) => void;
 	deleteConnection: (connectionId: ConnectionId) => void;
 	copyNode: (
 		sourceNode: Node,
@@ -108,13 +115,30 @@ export const createWorkspaceSlice: StateCreator<
 				},
 			};
 		}),
-	addConnection: (connection) =>
+	addConnection: ({ outputNode, outputId, inputNode, inputId }) =>
 		set((state) => {
 			if (!state.workspace) return {};
 			return {
 				workspace: {
 					...state.workspace,
-					connections: [...state.workspace.connections, connection],
+					connections: [
+						...state.workspace.connections,
+						{
+							id: ConnectionId.generate(),
+							outputNode: {
+								id: outputNode.id,
+								type: outputNode.type,
+								content: { type: outputNode.content.type },
+							},
+							outputId,
+							inputNode: {
+								id: inputNode.id,
+								type: inputNode.type,
+								content: { type: inputNode.content.type },
+							},
+							inputId,
+						} as Connection,
+					],
 				},
 			};
 		}),
@@ -164,7 +188,6 @@ export const createWorkspaceSlice: StateCreator<
 					).canConnect;
 					if (!connectionExists && connectionValid) {
 						get().addConnection({
-							id: ConnectionId.generate(),
 							outputNode,
 							outputId: originalConnection.outputId,
 							inputNode: newNode,
@@ -194,7 +217,6 @@ export const createWorkspaceSlice: StateCreator<
 					).canConnect;
 					if (!connectionExists && connectionValid) {
 						get().addConnection({
-							id: ConnectionId.generate(),
 							outputNode: newNode,
 							outputId: newOutputId,
 							inputNode,
