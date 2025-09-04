@@ -68,8 +68,8 @@ export function useActController() {
 						onGenerationFailed: callbacks?.onFailed,
 					});
 				},
-				onActStart: () => {
-					onActStart?.(async () => {
+				onActStart: async () => {
+					await onActStart?.(async () => {
 						await Promise.all(
 							actGenerationsRef.current.map((generation) =>
 								stopGenerationRunner(generation.id),
