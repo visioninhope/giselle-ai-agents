@@ -228,13 +228,12 @@ export const createWorkspaceSlice: StateCreator<
 		}
 		return newNode;
 	},
-	setUiNodeState: (nodeId, ui, options) =>
+	setUiNodeState: (nodeId, ui) =>
 		set((state) => {
 			if (!state.workspace) return {};
 			const parsedNodeId = NodeId.parse(nodeId);
 			const nodeState = state.workspace.ui.nodeState[parsedNodeId] ?? {};
 			return {
-				_skipNextSave: !options?.save,
 				workspace: {
 					...state.workspace,
 					ui: {
