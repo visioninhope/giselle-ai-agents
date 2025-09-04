@@ -189,8 +189,8 @@ export function RepositoryItem({
           </div>
         </div>
 
-        {/* Embedding Model Cards */}
-        <div className="space-y-0">
+        {/* Embedding Model Cards - Grid Layout */}
+        <div className="grid grid-cols-3 gap-3 w-full">
           {embeddingProfileIds.map((profileId) => {
             const profile =
               EMBEDDING_PROFILES[profileId as keyof typeof EMBEDDING_PROFILES];
@@ -275,7 +275,7 @@ function EmbeddingModelCard({
 
   return (
     <div
-      className="rounded-lg p-4 mb-4"
+      className="rounded-lg p-3 min-h-0 w-full"
       style={{
         background: "linear-gradient(180deg, #202530 0%, #12151f 100%)",
         border: "0.5px solid rgba(255, 255, 255, 0.15)",
@@ -283,42 +283,127 @@ function EmbeddingModelCard({
       }}
     >
       {/* Model Header */}
-      <div className="flex items-center gap-2 mb-3">
-        <span className="text-xs text-white/60 bg-white/5 px-2 py-1 rounded font-medium">
+      <div className="mb-3">
+        <div className="text-xs text-white/80 font-medium mb-2">
           {profile?.name || `Profile ${profileId}`}
-        </span>
+        </div>
       </div>
 
-      {/* Content Type Sections */}
-      <div className="space-y-0">
+      {/* Content Type Status - Compact Layout */}
+      <div className="space-y-3 text-xs">
         {/* Code Section */}
-        <ContentTypeSection
-          contentType="blob"
-          status={blobStatus}
-          isIngesting={isIngesting}
-          onVerify={
-            blobStatus?.status === "failed" &&
-            blobStatus?.errorCode === "DOCUMENT_NOT_FOUND"
-              ? onShowDiagnostic
-              : undefined
-          }
-        />
-
-        {/* Divider between Code and Pull Requests */}
-        <div className="border-t border-white/10 my-3"></div>
+        <div>
+          <div className="flex items-center justify-between">
+            <span className="text-gray-300">Code</span>
+            <div className="flex items-center gap-2">
+              {blobStatus?.enabled ? (
+                blobStatus.status === "completed" ? (
+                  <StatusBadge status="success" variant="dot">
+                    Enabled
+                  </StatusBadge>
+                ) : (
+                  <SyncStatusBadge
+                    status={
+                      isIngesting && blobStatus.enabled
+                        ? "running"
+                        : blobStatus.status
+                    }
+                    onVerify={
+                      blobStatus?.status === "failed" &&
+                      blobStatus?.errorCode === "DOCUMENT_NOT_FOUND"
+                        ? onShowDiagnostic
+                        : undefined
+                    }
+                  />
+                )
+              ) : (
+                <StatusBadge status="ignored" variant="dot">
+                  Disabled
+                </StatusBadge>
+              )}
+            </div>
+          </div>
+          {blobStatus?.enabled && (
+            <div className="text-[10px] text-gray-500 flex justify-between">
+              <span>
+                {blobStatus.lastSyncedAt
+                  ? `Last sync: ${formatTimestamp.toRelativeTime(new Date(blobStatus.lastSyncedAt).getTime())}`
+                  : "Never synced"}
+              </span>
+              {blobStatus.metadata &&
+                (() => {
+                  try {
+                    const metadata = JSON.parse(blobStatus.metadata);
+                    if (metadata.lastIngestedCommitSha) {
+                      return (
+                        <span>
+                          Commit:{" "}
+                          {metadata.lastIngestedCommitSha.substring(0, 7)}
+                        </span>
+                      );
+                    }
+                  } catch {}
+                  return null;
+                })()}
+            </div>
+          )}
+        </div>
 
         {/* Pull Requests Section */}
-        <ContentTypeSection
-          contentType="pull_request"
-          status={pullRequestStatus}
-          isIngesting={isIngesting}
-          onVerify={
-            pullRequestStatus?.status === "failed" &&
-            pullRequestStatus?.errorCode === "DOCUMENT_NOT_FOUND"
-              ? onShowDiagnostic
-              : undefined
-          }
-        />
+        <div>
+          <div className="flex items-center justify-between">
+            <span className="text-gray-300">Pull Requests</span>
+            <div className="flex items-center gap-2">
+              {pullRequestStatus?.enabled ? (
+                pullRequestStatus.status === "completed" ? (
+                  <StatusBadge status="success" variant="dot">
+                    Enabled
+                  </StatusBadge>
+                ) : (
+                  <SyncStatusBadge
+                    status={
+                      isIngesting && pullRequestStatus.enabled
+                        ? "running"
+                        : pullRequestStatus.status
+                    }
+                    onVerify={
+                      pullRequestStatus?.status === "failed" &&
+                      pullRequestStatus?.errorCode === "DOCUMENT_NOT_FOUND"
+                        ? onShowDiagnostic
+                        : undefined
+                    }
+                  />
+                )
+              ) : (
+                <StatusBadge status="ignored" variant="dot">
+                  Disabled
+                </StatusBadge>
+              )}
+            </div>
+          </div>
+          {pullRequestStatus?.enabled && (
+            <div className="text-[10px] text-gray-500 flex justify-between">
+              <span>
+                {pullRequestStatus.lastSyncedAt
+                  ? `Last sync: ${formatTimestamp.toRelativeTime(new Date(pullRequestStatus.lastSyncedAt).getTime())}`
+                  : "Never synced"}
+              </span>
+              {pullRequestStatus.metadata &&
+                (() => {
+                  try {
+                    const metadata = JSON.parse(pullRequestStatus.metadata);
+                    if (metadata.lastIngestedPrNumber) {
+                      return <span>PR: #{metadata.lastIngestedPrNumber}</span>;
+                    }
+                  } catch {}
+                  return null;
+                })()}
+            </div>
+          )}
+          {!pullRequestStatus?.enabled && pullRequestStatus === undefined && (
+            <div className="text-[10px] text-gray-500">Not configured</div>
+          )}
+        </div>
       </div>
     </div>
   );
