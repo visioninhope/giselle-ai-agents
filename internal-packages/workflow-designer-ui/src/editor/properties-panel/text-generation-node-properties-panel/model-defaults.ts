@@ -36,7 +36,7 @@ export function createDefaultModelData(
 		case "google":
 			return GoogleLanguageModelData.parse({
 				provider: "google",
-				id: "gemini-2.0-flash-exp",
+				id: "gemini-2.5-flash-lite",
 				configurations: {
 					temperature: 0.7,
 					topP: 1.0,
