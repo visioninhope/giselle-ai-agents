@@ -15,7 +15,7 @@ export function createDefaultModelData(
 		case "openai":
 			return OpenAILanguageModelData.parse({
 				provider: "openai",
-				id: "gpt-4o",
+				id: "gpt-5-nano",
 				configurations: {
 					temperature: 0.7,
 					topP: 1.0,
