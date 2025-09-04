@@ -4,14 +4,7 @@ import { StatusBadge } from "@giselle-internal/ui/status-badge";
 import { EMBEDDING_PROFILES } from "@giselle-sdk/data-type";
 import { formatTimestamp } from "@giselles-ai/lib/utils";
 import * as Dialog from "@radix-ui/react-dialog";
-import {
-	Code,
-	GitPullRequest,
-	MoreVertical,
-	RefreshCw,
-	Settings,
-	Trash,
-} from "lucide-react";
+import { MoreVertical, RefreshCw, Settings, Trash } from "lucide-react";
 import { useMemo, useState, useTransition } from "react";
 import {
 	DropdownMenu,
@@ -27,7 +20,6 @@ import type {
 } from "@/drizzle";
 import { cn } from "@/lib/utils";
 import type { RepositoryWithStatuses } from "@/lib/vector-stores/github";
-import { getContentStatusMetadata } from "@/lib/vector-stores/github/types";
 import type { GitHubRepositoryIndexId } from "@/packages/types";
 import {
 	GlassDialogContent,
@@ -36,8 +28,6 @@ import {
 } from "../components/glass-dialog-content";
 import { ConfigureSourcesDialog } from "./configure-sources-dialog";
 import { DiagnosticModal } from "./diagnostic-modal";
-import { getErrorMessage } from "./error-messages";
-import type { DocumentLoaderErrorCode } from "./types";
 
 // Status configuration for sync badges
 const STATUS_CONFIG = {
@@ -405,45 +395,6 @@ function EmbeddingModelCard({
 					)}
 				</div>
 			</div>
-		</div>
-	);
-}
-								Enabled
-							</span>
-						</div>
-					) : (
-						<SyncStatusBadge
-							status={displayStatus}
-							onVerify={
-								syncStatus === "failed" && onVerify ? onVerify : undefined
-							}
-						/>
-					)}
-				</div>
-			</div>
-			{enabled && (
-				<div className="text-xs text-gray-500 flex justify-between">
-					{lastSyncedAt ? (
-						<span>
-							Last sync:{" "}
-							{formatTimestamp.toRelativeTime(new Date(lastSyncedAt).getTime())}
-						</span>
-					) : (
-						<span>Never synced</span>
-					)}
-					{config.metadataLabel && <span>{config.metadataLabel}</span>}
-				</div>
-			)}
-			{enabled && syncStatus === "failed" && errorCode && (
-				<div className="text-xs text-red-400 mt-1">
-					{getErrorMessage(errorCode as DocumentLoaderErrorCode)}
-					{retryAfter &&
-						` • Retry ${formatTimestamp.toRelativeTime(new Date(retryAfter).getTime())}`}
-				</div>
-			)}
-			{!enabled && contentType === "pull_request" && (
-				<div className="text-xs text-gray-500">Not configured</div>
-			)}
 		</div>
 	);
 }
