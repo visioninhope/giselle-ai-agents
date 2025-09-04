@@ -225,6 +225,7 @@ function GitHubToolConnectionDialog({
           <Button
             type="button"
             leftIcon={<PlusIcon data-dialog-trigger-icon />}
+            variant="link"
           >
             Connect
           </Button>

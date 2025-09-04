@@ -112,7 +112,11 @@ function PostgresToolConnectionDialog({
         (tabValue === "select" && (secrets ?? []).length < 1)
       }
       trigger={
-        <Button type="button" leftIcon={<PlusIcon data-dialog-trigger-icon />}>
+        <Button
+          type="button"
+          leftIcon={<PlusIcon data-dialog-trigger-icon />}
+          variant="link"
+        >
           Connect
         </Button>
       }

@@ -1,7 +1,7 @@
 import clsx from "clsx/lite";
 import { Slot } from "radix-ui";
 
-type ButtonStyle = "subtle" | "filled" | "solid" | "glass" | "outline";
+type ButtonStyle = "subtle" | "filled" | "solid" | "glass" | "outline" | "link";
 type ButtonSize = "compact" | "default" | "large";
 interface ButtonProps
   extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "style"> {
@@ -37,6 +37,7 @@ export function Button({
         "data-[style=glass]:after:absolute data-[style=glass]:after:bg-linear-to-r data-[style=glass]:after:from-transparent data-[style=glass]:after:via-glass-highlight/60 data-[style=glass]:after:left-4 data-[style=glass]:after:right-4 data-[style=glass]:after:h-px data-[style=glass]:after:top-0",
         "data-[style=glass]:border data-[style=glass]:border-glass-border/20",
         "data-[style=outline]:border data-[style=outline]:border-t-border/60 data-[style=outline]:border-x-border/40 data-[style=outline]:border-b-black/60",
+        "data-[style=link]:hover:underline",
         "cursor-pointer transition-colors",
         className,
       )}
