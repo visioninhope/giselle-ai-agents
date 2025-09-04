@@ -19,7 +19,7 @@ type CreateAndStartActParams = Omit<
 		| "onActComplete"
 		| "startGeneration"
 	> & {
-		onActStart: (
+		onActStart?: (
 			cancel: () => Promise<void>,
 			actId: string,
 		) => void | Promise<void>;
