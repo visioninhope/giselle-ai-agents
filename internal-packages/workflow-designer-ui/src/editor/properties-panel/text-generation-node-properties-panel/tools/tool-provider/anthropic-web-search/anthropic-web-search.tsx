@@ -189,7 +189,7 @@ export function AnthropicWebSearchToolConfigurationDialog({
 								className="mt-1 w-4 h-4"
 							/>
 							<div className="flex flex-col gap-1">
-								<span className="text-base font-medium text-text">
+								<span className="text-sm font-medium text-text">
 									No Filtering
 								</span>
 								<span className="text-sm text-text-muted">
@@ -215,7 +215,7 @@ export function AnthropicWebSearchToolConfigurationDialog({
 								className="mt-1 w-4 h-4"
 							/>
 							<div className="flex flex-col gap-1">
-								<span className="text-base font-medium text-text">
+								<span className="text-sm font-medium text-text">
 									Allow Specific Domains
 								</span>
 								<span className="text-sm text-text-muted">
@@ -241,7 +241,7 @@ export function AnthropicWebSearchToolConfigurationDialog({
 								className="mt-1 w-4 h-4"
 							/>
 							<div className="flex flex-col gap-1">
-								<span className="text-base font-medium text-text">
+								<span className="text-sm font-medium text-text">
 									Block Specific Domains
 								</span>
 								<span className="text-sm text-text-muted">
