@@ -261,32 +261,28 @@ export function AnthropicWebSearchToolConfigurationDialog({
 									: "Blocked Domains"}
 							</h4>
 
-							{/* 2-column layout */}
-							<div className="flex items-center gap-4">
-								<span className="text-sm text-text-muted italic flex-1">
+							{/* 1-column layout */}
+							<div className="flex flex-col gap-4">
+								<span className="text-sm text-text-muted italic">
 									{filteringMode === "allow"
 										? "No domains specified - all domains will be blocked"
 										: "No domains specified"}
 								</span>
-								<div className="flex-1">
-									<BasicTagInput
-										placeholder="Enter domain (e.g., example.com)"
-										initialTags={
-											filteringMode === "allow"
-												? allowedDomains
-												: blockedDomains
+								<BasicTagInput
+									placeholder="Enter domain (e.g., example.com)"
+									initialTags={
+										filteringMode === "allow" ? allowedDomains : blockedDomains
+									}
+									onTagsChange={(tags) => {
+										if (filteringMode === "allow") {
+											setAllowedDomains(tags);
+										} else {
+											setBlockedDomains(tags);
 										}
-										onTagsChange={(tags) => {
-											if (filteringMode === "allow") {
-												setAllowedDomains(tags);
-											} else {
-												setBlockedDomains(tags);
-											}
-											if (domainListError) setDomainListError(null);
-										}}
-										validateInput={isValidDomain}
-									/>
-								</div>
+										if (domainListError) setDomainListError(null);
+									}}
+									validateInput={isValidDomain}
+								/>
 							</div>
 
 							{domainListError && (
