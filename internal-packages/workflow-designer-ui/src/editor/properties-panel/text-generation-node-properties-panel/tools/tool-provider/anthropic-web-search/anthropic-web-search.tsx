@@ -226,7 +226,7 @@ export function AnthropicWebSearchToolConfigurationDialog({
 							</div>
 						</div>
 						<Switch
-							label="Web Search"
+							label=""
 							name="web-search-enabled"
 							checked={webSearchEnabled}
 							onCheckedChange={handleWebSearchToggle}
