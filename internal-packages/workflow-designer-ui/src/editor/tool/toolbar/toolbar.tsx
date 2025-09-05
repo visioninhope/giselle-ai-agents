@@ -91,6 +91,8 @@ export function Toolbar() {
 	const { setSelectedTool, selectedTool } = useToolbar();
 	const [languageModelMouseHovered, setLanguageModelMouseHovered] =
 		useState<LanguageModel | null>(null);
+	const [capabilityPanelHovered, setCapabilityPanelHovered] = useState(false);
+	const [hoverTimeout, setHoverTimeout] = useState<NodeJS.Timeout | null>(null);
 	const [searchQuery, setSearchQuery] = useState<string>("");
 	const [selectedCategory, setSelectedCategory] = useState<string>("All");
 	const { llmProviders } = useWorkflowDesigner();
@@ -122,6 +124,15 @@ export function Toolbar() {
 			setSelectedCategory("All");
 		}
 	}, [searchQuery, modelsFilteredBySearchOnly]);
+
+	// Cleanup timeout on unmount to prevent memory leaks
+	useEffect(() => {
+		return () => {
+			if (hoverTimeout) {
+				clearTimeout(hoverTimeout);
+			}
+		};
+	}, [hoverTimeout]);
 
 	// Models filtered by both search and category
 	const filteredModels = modelsFilteredBySearchOnly.filter((model) =>
@@ -164,16 +175,59 @@ export function Toolbar() {
 		...googleModels.slice(0, 1),
 	];
 
+	// Helper functions for robust hover management
+	const handleModelHover = (model: LanguageModel) => {
+		// Clear any existing timeout
+		if (hoverTimeout) {
+			clearTimeout(hoverTimeout);
+			setHoverTimeout(null);
+		}
+		setLanguageModelMouseHovered(model);
+	};
+
+	const handleModelLeave = () => {
+		// Set a reasonable timeout to allow mouse movement to capability panel
+		const timeout = setTimeout(() => {
+			// Only clear if capability panel is not being hovered
+			if (!capabilityPanelHovered) {
+				setLanguageModelMouseHovered(null);
+			}
+		}, 150); // Reduced from 300ms for more responsive feel
+		setHoverTimeout(timeout);
+	};
+
+	const handleCapabilityPanelEnter = () => {
+		// Clear any pending timeout when entering capability panel
+		if (hoverTimeout) {
+			clearTimeout(hoverTimeout);
+			setHoverTimeout(null);
+		}
+		setCapabilityPanelHovered(true);
+	};
+
+	const handleCapabilityPanelLeave = () => {
+		setCapabilityPanelHovered(false);
+		// Immediately clear the hovered model when leaving capability panel
+		setLanguageModelMouseHovered(null);
+	};
+
 	// Rendering function for each model button
 	const renderModelButton = (model: LanguageModel) => {
+		const isProModelForFreeUser = isFreeUser && !hasTierAccess(model, userTier);
+
 		return (
 			<button
 				type="button"
 				key={model.id}
-				className="flex gap-[12px] items-center hover:bg-white-850/10 focus:bg-white-850/10 p-[4px] rounded-[4px]"
+				className={clsx(
+					"flex gap-[12px] items-center p-[4px] rounded-[4px]",
+					isProModelForFreeUser
+						? "opacity-50 cursor-not-allowed"
+						: "hover:bg-white-850/10 focus:bg-white-850/10 cursor-pointer",
+				)}
 				onClick={() => {
 					// Prevent adding pro models for free users
-					if (isFreeUser && !hasTierAccess(model, userTier)) {
+					if (isProModelForFreeUser) {
 						return;
 					}
 
@@ -195,8 +249,8 @@ export function Toolbar() {
 						);
 					}
 				}}
-				onMouseEnter={() => setLanguageModelMouseHovered(model)}
-				onMouseLeave={() => setLanguageModelMouseHovered(null)}
+				onMouseEnter={() => handleModelHover(model)}
+				onMouseLeave={handleModelLeave}
 			>
 				<div className="flex items-center">
 					{model.provider === "anthropic" && (
@@ -598,12 +652,8 @@ export function Toolbar() {
 																		);
 																	}
 																}}
-																onMouseEnter={() =>
-																	setLanguageModelMouseHovered(model)
-																}
-																onMouseLeave={() =>
-																	setLanguageModelMouseHovered(null)
-																}
+																onMouseEnter={() => handleModelHover(model)}
+																onMouseLeave={handleModelLeave}
 															>
 																<div className="flex items-center">
 																	{model.provider === "anthropic" && (
@@ -670,33 +720,38 @@ export function Toolbar() {
 												onOpenAutoFocus={(e) => {
 													e.preventDefault();
 												}}
+												onMouseEnter={handleCapabilityPanelEnter}
+												onMouseLeave={handleCapabilityPanelLeave}
 											>
 												<div className="absolute z-0 rounded-[8px] inset-0 border mask-fill bg-gradient-to-br from-[hsla(232,37%,72%,0.2)] to-[hsla(218,58%,21%,0.9)] bg-origin-border bg-clip-boarder border-transparent" />
-												<div className="relative text-white-800 h-[200px]">
-													{/* Pro plan overlay for free users */}
-													{isFreeUser &&
-														languageModelMouseHovered &&
-														!hasTierAccess(
-															languageModelMouseHovered,
-															userTier,
-														) && (
-															<div className="absolute inset-0 z-10 bg-black/80 backdrop-blur-sm rounded-[8px] flex items-center justify-center">
-																<div className="text-center">
-																	<p className="text-blue-400 text-[14px] font-medium mb-3">
-																		This model is available on Pro plan
-																	</p>
-																	<button
-																		type="button"
-																		className="bg-blue-600 hover:bg-blue-700 text-white text-[12px] px-4 py-2 rounded-[6px] font-medium transition-colors"
-																		onClick={() => {
-																			window.open("/pricing", "_blank");
-																		}}
-																	>
-																		Upgrade to Pro
-																	</button>
-																</div>
+												{/* Pro plan overlay for free users */}
+												{isFreeUser &&
+													languageModelMouseHovered &&
+													!hasTierAccess(
+														languageModelMouseHovered,
+														userTier,
+													) && (
+														<div
+															role="tooltip"
+															className="absolute inset-[2px] z-10 bg-black/80 backdrop-blur-sm rounded-[6px] flex items-center justify-center"
+														>
+															<div className="text-center">
+																<p className="text-blue-400 text-[14px] font-medium mb-3">
+																	This model is available on Pro plan
+																</p>
+																<button
+																	type="button"
+																	className="text-blue-400 hover:text-blue-300 border border-blue-400 hover:border-blue-300 text-[12px] px-4 py-2 rounded-[6px] font-medium transition-colors"
+																	onClick={() => {
+																		window.open("/pricing", "_blank");
+																	}}
+																>
+																	Upgrade to Pro
+																</button>
 															</div>
-														)}
+														</div>
+													)}
+												<div className="relative text-white-800 h-[200px]">
 													{languageModelMouseHovered ? (
 														<div className="px-[16px] py-[16px] flex flex-col gap-[24px]">
 															<div className="flex items-start gap-[16px]">
@@ -906,7 +961,7 @@ export function Toolbar() {
 														</div>
 													) : (
 														<div className="flex h-full items-center justify-center">
-															<p className="text-[14px] text-black-400">
+															<p className="text-[14px] text-black-400 text-center">
 																Hover over a model to view details
 															</p>
 														</div>
