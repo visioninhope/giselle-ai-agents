@@ -59,29 +59,31 @@ export function TextGenerationTabContent({
 	const userTier = usageLimits?.featureTier ?? Tier.enum.free;
 	const accessibleTiers = TierAccess[userTier];
 
-	// Get available models for current provider, filtered by user's tier
+	// Get all models for current provider, with disabled state for Pro models when user is on free tier
 	const getAvailableModels = useCallback((): Array<{
 		value: string;
 		label: string;
+		disabled?: boolean;
+		tier?: "free" | "pro";
 	}> => {
-		const filterModelsByTier = (
+		const prepareModelsWithTierInfo = (
 			models: Array<{ id: string; tier: "free" | "pro" }>,
 		) => {
-			return models
-				.filter((model) => accessibleTiers.includes(model.tier))
-				.map((model) => ({
-					value: model.id,
-					label: model.id,
-				}));
+			return models.map((model) => ({
+				value: model.id,
+				label: model.id,
+				disabled: !accessibleTiers.includes(model.tier),
+				tier: model.tier,
+			}));
 		};
 
 		switch (node.content.llm.provider) {
 			case "openai":
-				return filterModelsByTier(openaiLanguageModels);
+				return prepareModelsWithTierInfo(openaiLanguageModels);
 			case "anthropic":
-				return filterModelsByTier(anthropicLanguageModels);
+				return prepareModelsWithTierInfo(anthropicLanguageModels);
 			case "google":
-				return filterModelsByTier(googleLanguageModels);
+				return prepareModelsWithTierInfo(googleLanguageModels);
 			default:
 				return [];
 		}
@@ -107,11 +109,14 @@ export function TextGenerationTabContent({
 	useEffect(() => {
 		const currentModel = getCurrentModelInfo();
 		if (currentModel && !accessibleTiers.includes(currentModel.tier)) {
-			// Find the first available model for this provider
+			// Find the first available (non-disabled) model for this provider
 			const availableModels = getAvailableModels();
-			if (availableModels.length > 0) {
-				const newModelId = availableModels[0].value;
-				const updatedModel = updateModelId(node.content.llm, newModelId);
+			const compatibleModel = availableModels.find((model) => !model.disabled);
+			if (compatibleModel) {
+				const updatedModel = updateModelId(
+					node.content.llm,
+					compatibleModel.value,
+				);
 				updateNodeDataContent(node, {
 					...node.content,
 					llm: updatedModel,
@@ -208,6 +213,11 @@ export function TextGenerationTabContent({
 								});
 							}}
 							options={getAvailableModels()}
+							renderOption={(option) => (
+								<span className={option.disabled ? "opacity-50" : ""}>
+									{option.label}
+								</span>
+							)}
 						/>
 					</fieldset>
 				</div>
