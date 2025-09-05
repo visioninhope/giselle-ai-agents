@@ -30,6 +30,7 @@ import {
 import {
 	Capability,
 	hasCapability,
+	hasTierAccess,
 	type LanguageModel,
 	languageModels,
 	Tier,
@@ -171,6 +172,11 @@ export function Toolbar() {
 				key={model.id}
 				className="flex gap-[12px] items-center hover:bg-white-850/10 focus:bg-white-850/10 p-[4px] rounded-[4px]"
 				onClick={() => {
+					// Prevent adding pro models for free users
+					if (isFreeUser && !hasTierAccess(model, userTier)) {
+						return;
+					}
+
 					const languageModelData = {
 						id: model.id,
 						provider: model.provider,
@@ -550,6 +556,14 @@ export function Toolbar() {
 																key={model.id}
 																className="flex gap-[12px] items-center hover:bg-white-850/10 focus:bg-white-850/10 p-[4px] rounded-[4px]"
 																onClick={() => {
+																	// Prevent adding pro models for free users
+																	if (
+																		isFreeUser &&
+																		!hasTierAccess(model, userTier)
+																	) {
+																		return;
+																	}
+
 																	const languageModelData = {
 																		id: model.id,
 																		provider: model.provider,
@@ -659,6 +673,21 @@ export function Toolbar() {
 											>
 												<div className="absolute z-0 rounded-[8px] inset-0 border mask-fill bg-gradient-to-br from-[hsla(232,37%,72%,0.2)] to-[hsla(218,58%,21%,0.9)] bg-origin-border bg-clip-boarder border-transparent" />
 												<div className="relative text-white-800 h-[200px]">
+													{/* Pro plan overlay for free users */}
+													{isFreeUser &&
+														languageModelMouseHovered &&
+														!hasTierAccess(
+															languageModelMouseHovered,
+															userTier,
+														) && (
+															<div className="absolute inset-0 z-10 bg-black/60 backdrop-blur-sm rounded-[8px] flex items-center justify-center">
+																<div className="text-center px-4">
+																	<p className="text-blue-400 text-[14px] font-medium">
+																		This model is available on Pro plan
+																	</p>
+																</div>
+															</div>
+														)}
 													{languageModelMouseHovered ? (
 														<div className="px-[16px] py-[16px] flex flex-col gap-[24px]">
 															<div className="flex items-start gap-[16px]">
