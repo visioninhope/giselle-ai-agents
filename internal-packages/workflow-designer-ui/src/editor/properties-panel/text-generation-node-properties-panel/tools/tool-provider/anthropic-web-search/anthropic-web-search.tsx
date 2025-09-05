@@ -253,41 +253,37 @@ export function AnthropicWebSearchToolConfigurationDialog({
 
 					{/* Domain Input Section */}
 					{filteringMode !== "none" && (
-						<div className="flex gap-6 mt-4">
-							<div className="flex-shrink-0 w-32">
-								<h4 className="text-sm font-medium text-text">
-									{filteringMode === "allow"
+						<div className="flex flex-col gap-2 mt-4">
+							<BasicTagInput
+								label={
+									filteringMode === "allow"
 										? "Allowed Domains"
-										: "Blocked Domains"}
-								</h4>
-							</div>
-							<div className="flex-1 flex flex-col gap-2">
-								<BasicTagInput
-									placeholder="Enter domain (e.g., example.com)"
-									initialTags={
-										filteringMode === "allow" ? allowedDomains : blockedDomains
+										: "Blocked Domains"
+								}
+								placeholder="Enter domain (e.g., example.com)"
+								initialTags={
+									filteringMode === "allow" ? allowedDomains : blockedDomains
+								}
+								onTagsChange={(tags) => {
+									if (filteringMode === "allow") {
+										setAllowedDomains(tags);
+									} else {
+										setBlockedDomains(tags);
 									}
-									onTagsChange={(tags) => {
-										if (filteringMode === "allow") {
-											setAllowedDomains(tags);
-										} else {
-											setBlockedDomains(tags);
-										}
-										if (domainListError) setDomainListError(null);
-									}}
-									validateInput={isValidDomain}
-									emptyStateText={
-										filteringMode === "allow"
-											? "No domains specified - all domains will be blocked"
-											: "No domains specified"
-									}
-								/>
-								{domainListError && (
-									<p className="text-sm text-red-600" role="alert">
-										{domainListError}
-									</p>
-								)}
-							</div>
+									if (domainListError) setDomainListError(null);
+								}}
+								validateInput={isValidDomain}
+								emptyStateText={
+									filteringMode === "allow"
+										? "No domains specified - all domains will be blocked"
+										: "No domains specified"
+								}
+							/>
+							{domainListError && (
+								<p className="text-sm text-red-600" role="alert">
+									{domainListError}
+								</p>
+							)}
 						</div>
 					)}
 				</div>
