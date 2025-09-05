@@ -97,7 +97,7 @@ export function ConfigureSourcesDialog({
 				onPointerDownOutside={() => setOpen(false)}
 			>
 				<GlassDialogHeader
-					title="Configure Vectorstore"
+					title="Configure Vector Stores"
 					description="Configure sources and embedding models for this repository"
 					onClose={() => setOpen(false)}
 				/>
