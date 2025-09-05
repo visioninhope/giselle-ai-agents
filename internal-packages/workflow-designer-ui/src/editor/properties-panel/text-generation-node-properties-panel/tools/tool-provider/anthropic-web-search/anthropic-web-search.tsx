@@ -124,7 +124,8 @@ export function AnthropicWebSearchToolConfigurationDialog({
 
 	return (
 		<ToolConfigurationDialog
-			title="Anthropic Web Search Configuration"
+			title="Web Search Configuration"
+			description=""
 			onSubmit={updateAnthropicWebSearchToolConfiguration}
 			submitting={false}
 			trigger={
@@ -137,225 +138,156 @@ export function AnthropicWebSearchToolConfigurationDialog({
 			}
 			open={open}
 			onOpenChange={setOpen}
-			size="wide"
 		>
 			<div className="flex flex-col gap-6">
-				{/* Tool Settings Section */}
-				<div className="flex flex-col gap-4">
-					{/* Maximum Uses Input */}
-					<fieldset className="flex flex-col gap-2">
-						<label htmlFor="max-uses" className="text-sm text-text">
-							Maximum Uses
-						</label>
-						<Input
-							type="number"
-							id="max-uses"
-							min="1"
-							max={MAX_USES_LIMIT}
-							value={maxUses}
-							onChange={handleMaxUsesChange}
-							aria-invalid={!!maxUsesError}
-							aria-describedby={maxUsesError ? "max-uses-error" : undefined}
-						/>
-						{maxUsesError ? (
-							<p
-								id="max-uses-error"
-								className="text-xs text-red-600 px-1"
-								role="alert"
-							>
-								{maxUsesError}
-							</p>
-						) : (
-							<p className="text-xs text-text-muted px-1">
-								Set the maximum number of web searches allowed (1-
-								{MAX_USES_LIMIT})
-							</p>
-						)}
-					</fieldset>
+				{/* Maximum Uses Input */}
+				<div className="flex flex-col gap-2">
+					<label htmlFor="max-uses" className="text-base font-medium text-text">
+						Maximum Uses (1-{MAX_USES_LIMIT})
+					</label>
+					<Input
+						type="number"
+						id="max-uses"
+						min="1"
+						max={MAX_USES_LIMIT}
+						value={maxUses}
+						onChange={handleMaxUsesChange}
+						className="w-full"
+					/>
+					{maxUsesError && (
+						<p className="text-sm text-red-600" role="alert">
+							{maxUsesError}
+						</p>
+					)}
 				</div>
 
 				{/* Domain Filtering Section */}
 				<div className="flex flex-col gap-4">
-					<h3 className="text-sm font-medium text-text">Domain Filtering</h3>
+					<div className="flex flex-col gap-2">
+						<h3 className="text-base font-medium text-text">
+							Domain Filtering
+						</h3>
+						<p className="text-sm text-text-muted">
+							Choose how to filter search domains:
+						</p>
+					</div>
 
 					<div className="flex flex-col gap-3">
-						<p className="text-sm text-text-muted">
-							Choose your filtering approach:
-						</p>
-
-						{/* Filtering Mode Selection */}
-						<div className="grid grid-cols-1 gap-3 md:grid-cols-3">
-							{/* No Filtering */}
-							<label
-								className={`relative flex flex-col gap-3 rounded-lg border p-4 cursor-pointer transition-colors ${
-									filteringMode === "none"
-										? "border-blue-500 bg-blue-50/10"
-										: "border-border hover:border-border-hover"
-								}`}
-							>
-								<div className="flex items-start gap-2">
-									<input
-										type="radio"
-										name="filtering-mode"
-										value="none"
-										checked={filteringMode === "none"}
-										onChange={(e) => {
-											if (e.target.checked) {
-												setFilteringMode("none");
-												setAllowedDomains([]);
-												setBlockedDomains([]);
-												if (domainListError) setDomainListError(null);
-											}
-										}}
-										className="sr-only"
-									/>
-									<div className="flex flex-col gap-2 flex-1">
-										<div className="flex items-center gap-2">
-											<div className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-500/20">
-												<div className="h-3 w-3 rounded-full bg-blue-500" />
-											</div>
-											<span className="font-medium text-sm">No Filtering</span>
-										</div>
-										<p className="text-xs text-text-muted">
-											Search all domains without any restrictions.
-										</p>
-										{filteringMode === "none" && (
-											<span className="inline-flex items-center rounded-full bg-blue-500/20 px-2 py-1 text-xs text-blue-700">
-												Active
-											</span>
-										)}
-									</div>
-								</div>
-							</label>
-
-							{/* Allow Specific Domains */}
-							<label
-								className={`relative flex flex-col gap-3 rounded-lg border p-4 cursor-pointer transition-colors ${
-									filteringMode === "allow"
-										? "border-green-500 bg-green-50/10"
-										: "border-border hover:border-border-hover"
-								}`}
-							>
-								<div className="flex items-start gap-2">
-									<input
-										type="radio"
-										name="filtering-mode"
-										value="allow"
-										checked={filteringMode === "allow"}
-										onChange={(e) => {
-											if (e.target.checked) {
-												setFilteringMode("allow");
-												setBlockedDomains([]);
-												if (domainListError) setDomainListError(null);
-											}
-										}}
-										className="sr-only"
-									/>
-									<div className="flex flex-col gap-2 flex-1">
-										<div className="flex items-center gap-2">
-											<div className="flex h-6 w-6 items-center justify-center rounded-full bg-green-500/20">
-												<div className="h-3 w-3 rounded-full bg-green-500" />
-											</div>
-											<span className="font-medium text-sm">
-												Allow Specific Domains
-											</span>
-										</div>
-										<p className="text-xs text-text-muted">
-											Only search within specified domains. All other domains
-											will be blocked.
-										</p>
-										{filteringMode === "allow" && (
-											<span className="inline-flex items-center rounded-full bg-green-500/20 px-2 py-1 text-xs text-green-700">
-												Active
-											</span>
-										)}
-									</div>
-								</div>
-							</label>
-
-							{/* Block Specific Domains */}
-							<label
-								className={`relative flex flex-col gap-3 rounded-lg border p-4 cursor-pointer transition-colors ${
-									filteringMode === "block"
-										? "border-red-500 bg-red-50/10"
-										: "border-border hover:border-border-hover"
-								}`}
-							>
-								<div className="flex items-start gap-2">
-									<input
-										type="radio"
-										name="filtering-mode"
-										value="block"
-										checked={filteringMode === "block"}
-										onChange={(e) => {
-											if (e.target.checked) {
-												setFilteringMode("block");
-												setAllowedDomains([]);
-												if (domainListError) setDomainListError(null);
-											}
-										}}
-										className="sr-only"
-									/>
-									<div className="flex flex-col gap-2 flex-1">
-										<div className="flex items-center gap-2">
-											<div className="flex h-6 w-6 items-center justify-center rounded-full bg-red-500/20">
-												<div className="h-3 w-3 rounded-full bg-red-500" />
-											</div>
-											<span className="font-medium text-sm">
-												Block Specific Domains
-											</span>
-										</div>
-										<p className="text-xs text-text-muted">
-											Search all domains except the ones you specify. Blocked
-											domains will be excluded.
-										</p>
-										{filteringMode === "block" && (
-											<span className="inline-flex items-center rounded-full bg-red-500/20 px-2 py-1 text-xs text-red-700">
-												Active
-											</span>
-										)}
-									</div>
-								</div>
-							</label>
-						</div>
-
-						{/* Domain Input Section */}
-						{filteringMode !== "none" && (
-							<div className="flex flex-col gap-2">
-								<BasicTagInput
-									label={
-										filteringMode === "allow"
-											? "Allowed Domains"
-											: "Blocked Domains"
-									}
-									placeholder="Enter domain (e.g., example.com)"
-									initialTags={
-										filteringMode === "allow" ? allowedDomains : blockedDomains
-									}
-									onTagsChange={(tags) => {
-										if (filteringMode === "allow") {
-											setAllowedDomains(tags);
-										} else {
-											setBlockedDomains(tags);
-										}
+						{/* No Filtering */}
+						<label className="flex items-start gap-3 cursor-pointer">
+							<input
+								type="radio"
+								name="filtering-mode"
+								value="none"
+								checked={filteringMode === "none"}
+								onChange={(e) => {
+									if (e.target.checked) {
+										setFilteringMode("none");
+										setAllowedDomains([]);
+										setBlockedDomains([]);
 										if (domainListError) setDomainListError(null);
-									}}
-									validateInput={isValidDomain}
-									emptyStateText={
-										filteringMode === "allow"
-											? "No domains specified - all domains will be blocked"
-											: "No domains specified"
 									}
-								/>
-
-								{domainListError && (
-									<p className="text-xs text-red-600 px-1" role="alert">
-										{domainListError}
-									</p>
-								)}
+								}}
+								className="mt-1 w-4 h-4"
+							/>
+							<div className="flex flex-col gap-1">
+								<span className="text-base font-medium text-text">
+									No Filtering
+								</span>
+								<span className="text-sm text-text-muted">
+									Search all domains
+								</span>
 							</div>
-						)}
+						</label>
+
+						{/* Allow Specific Domains */}
+						<label className="flex items-start gap-3 cursor-pointer">
+							<input
+								type="radio"
+								name="filtering-mode"
+								value="allow"
+								checked={filteringMode === "allow"}
+								onChange={(e) => {
+									if (e.target.checked) {
+										setFilteringMode("allow");
+										setBlockedDomains([]);
+										if (domainListError) setDomainListError(null);
+									}
+								}}
+								className="mt-1 w-4 h-4"
+							/>
+							<div className="flex flex-col gap-1">
+								<span className="text-base font-medium text-text">
+									Allow Specific Domains
+								</span>
+								<span className="text-sm text-text-muted">
+									Only search within listed domains
+								</span>
+							</div>
+						</label>
+
+						{/* Block Specific Domains */}
+						<label className="flex items-start gap-3 cursor-pointer">
+							<input
+								type="radio"
+								name="filtering-mode"
+								value="block"
+								checked={filteringMode === "block"}
+								onChange={(e) => {
+									if (e.target.checked) {
+										setFilteringMode("block");
+										setAllowedDomains([]);
+										if (domainListError) setDomainListError(null);
+									}
+								}}
+								className="mt-1 w-4 h-4"
+							/>
+							<div className="flex flex-col gap-1">
+								<span className="text-base font-medium text-text">
+									Block Specific Domains
+								</span>
+								<span className="text-sm text-text-muted">
+									Exclude blocked domains
+								</span>
+							</div>
+						</label>
 					</div>
+
+					{/* Domain Input Section */}
+					{filteringMode !== "none" && (
+						<div className="flex flex-col gap-2 mt-4">
+							<BasicTagInput
+								label={
+									filteringMode === "allow"
+										? "Allowed Domains"
+										: "Blocked Domains"
+								}
+								placeholder="Enter domain (e.g., example.com)"
+								initialTags={
+									filteringMode === "allow" ? allowedDomains : blockedDomains
+								}
+								onTagsChange={(tags) => {
+									if (filteringMode === "allow") {
+										setAllowedDomains(tags);
+									} else {
+										setBlockedDomains(tags);
+									}
+									if (domainListError) setDomainListError(null);
+								}}
+								validateInput={isValidDomain}
+								emptyStateText={
+									filteringMode === "allow"
+										? "No domains specified - all domains will be blocked"
+										: "No domains specified"
+								}
+							/>
+							{domainListError && (
+								<p className="text-sm text-red-600" role="alert">
+									{domainListError}
+								</p>
+							)}
+						</div>
+					)}
 				</div>
 			</div>
 		</ToolConfigurationDialog>
