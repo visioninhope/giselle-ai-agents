@@ -253,12 +253,23 @@ export function AnthropicWebSearchToolConfigurationDialog({
 
 					{/* Domain Input Section */}
 					{filteringMode !== "none" && (
-						<div className="flex flex-col gap-2 mt-4">
+						<div className="flex flex-col gap-4 mt-4">
+							{/* 1-column header */}
+							<h4 className="text-sm font-medium text-text">
+								{filteringMode === "allow"
+									? "Allowed Domains"
+									: "Blocked Domains"}
+							</h4>
+
+							{/* 3-column layout */}
 							<div className="flex items-center gap-4">
 								<span className="text-sm font-medium text-text whitespace-nowrap">
+									Tags
+								</span>
+								<span className="text-sm text-text-muted italic flex-1">
 									{filteringMode === "allow"
-										? "Allowed Domains"
-										: "Blocked Domains"}
+										? "No domains specified - all domains will be blocked"
+										: "No domains specified"}
 								</span>
 								<div className="flex-1">
 									<BasicTagInput
@@ -277,14 +288,10 @@ export function AnthropicWebSearchToolConfigurationDialog({
 											if (domainListError) setDomainListError(null);
 										}}
 										validateInput={isValidDomain}
-										emptyStateText={
-											filteringMode === "allow"
-												? "No domains specified - all domains will be blocked"
-												: "No domains specified"
-										}
 									/>
 								</div>
 							</div>
+
 							{domainListError && (
 								<p className="text-sm text-red-600" role="alert">
 									{domainListError}
