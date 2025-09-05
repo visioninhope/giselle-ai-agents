@@ -1,9 +1,9 @@
 import { Button } from "@giselle-internal/ui/button";
-import { Input } from "@giselle-internal/ui/input";
 import type { TextGenerationNode } from "@giselle-sdk/data-type";
 import { useWorkflowDesigner } from "@giselle-sdk/giselle/react";
 import { Settings2Icon, XIcon } from "lucide-react";
 import { useCallback, useState } from "react";
+import { Slider } from "../../../../../../ui/slider";
 
 import { ToolConfigurationDialog } from "../../ui/tool-configuration-dialog";
 
@@ -59,25 +59,16 @@ export function AnthropicWebSearchToolConfigurationDialog({
 	const [blockedDomains, setBlockedDomains] = useState<string[]>(
 		currentConfig?.blockedDomains ?? [],
 	);
-	const [maxUsesError, setMaxUsesError] = useState<string | null>(null);
+
 	const [domainListError, setDomainListError] = useState<string | null>(null);
 	const [domainInput, setDomainInput] = useState("");
 	const [domainErrors, setDomainErrors] = useState<
 		{ message: string; domains?: string[] }[]
 	>([]);
 
-	const handleMaxUsesChange = useCallback(
-		(e: React.ChangeEvent<HTMLInputElement>) => {
-			const value = parseInt(e.target.value, 10);
-			if (Number.isNaN(value) || value < 1 || value > MAX_USES_LIMIT) {
-				setMaxUsesError(`Maximum uses must be between 1 and ${MAX_USES_LIMIT}`);
-			} else {
-				setMaxUsesError(null);
-				setMaxUses(value);
-			}
-		},
-		[],
-	);
+	const handleMaxUsesChange = useCallback((value: number) => {
+		setMaxUses(value);
+	}, []);
 
 	const addDomainTags = () => {
 		if (!domainInput.trim()) return;
@@ -177,12 +168,6 @@ export function AnthropicWebSearchToolConfigurationDialog({
 			const finalBlockedDomains =
 				filteringMode === "block" ? blockedDomains : undefined;
 
-			// Validate max uses
-			if (maxUses < 1 || maxUses > MAX_USES_LIMIT) {
-				setMaxUsesError(`Maximum uses must be between 1 and ${MAX_USES_LIMIT}`);
-				return;
-			}
-
 			// Update node configuration
 			updateNodeDataContent(node, {
 				...node.content,
@@ -229,30 +214,29 @@ export function AnthropicWebSearchToolConfigurationDialog({
 			onOpenChange={setOpen}
 		>
 			<div className="flex flex-col gap-6">
-				{/* Maximum Uses Input */}
-				<div className="flex flex-col gap-2">
-					<label htmlFor="max-uses" className="text-sm font-medium text-text">
-						Maximum Uses (1-{MAX_USES_LIMIT})
-					</label>
-					<Input
-						type="number"
-						id="max-uses"
-						min="1"
-						max={MAX_USES_LIMIT}
+				{/* Maximum Uses Slider */}
+				<div className="flex flex-col gap-4">
+					<div className="flex flex-col">
+						<div className="text-[14px] py-[1.5px]">
+							Maximum Uses (1-{MAX_USES_LIMIT})
+						</div>
+						<div className="text-[12px] text-text-muted mt-1">
+							Set the maximum number of web searches allowed (1-10)
+						</div>
+					</div>
+					<Slider
+						label=""
 						value={maxUses}
+						min={1}
+						max={MAX_USES_LIMIT}
+						step={1}
 						onChange={handleMaxUsesChange}
-						className="w-full"
 					/>
-					{maxUsesError && (
-						<p className="text-sm text-red-600" role="alert">
-							{maxUsesError}
-						</p>
-					)}
 				</div>
 
 				{/* Domain Filtering Section */}
 				<div className="flex flex-col gap-4">
-					<div className="flex items-center gap-4">
+					<div className="flex flex-col gap-1">
 						<h3 className="text-sm font-medium text-text">Domain Filtering</h3>
 						<p className="text-xs text-text-muted">
 							Choose how to filter search domains:
@@ -344,7 +328,7 @@ export function AnthropicWebSearchToolConfigurationDialog({
 					{filteringMode !== "none" && (
 						<div className="flex flex-col gap-4 mt-4">
 							{/* Header with status text on same line */}
-							<div className="flex items-center gap-4">
+							<div className="flex items-center gap-2">
 								<h4
 									className={`text-sm font-medium ${
 										filteringMode === "allow" ? "text-success" : "text-error"
