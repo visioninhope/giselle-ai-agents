@@ -29,11 +29,18 @@ function isValidDomain(domain: string): { isValid: boolean; message?: string } {
 
 export function AnthropicWebSearchToolConfigurationDialog({
 	node,
+	open: externalOpen,
+	onOpenChange: externalOnOpenChange,
 }: {
 	node: TextGenerationNode;
+	open?: boolean;
+	onOpenChange?: (open: boolean) => void;
 }) {
 	const { updateNodeDataContent } = useWorkflowDesigner();
-	const [open, setOpen] = useState(false);
+	const [internalOpen, setInternalOpen] = useState(false);
+
+	const open = externalOpen ?? internalOpen;
+	const setOpen = externalOnOpenChange ?? setInternalOpen;
 
 	// Get current configuration or set defaults
 	const currentConfig = node.content.tools?.anthropicWebSearch;
@@ -115,6 +122,7 @@ export function AnthropicWebSearchToolConfigurationDialog({
 			filteringMode,
 			allowedDomains,
 			blockedDomains,
+			setOpen,
 		],
 	);
 
