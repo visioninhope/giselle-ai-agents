@@ -165,7 +165,7 @@ export function AnthropicWebSearchToolConfigurationDialog({
 				<div className="flex flex-col gap-4">
 					<div className="flex flex-col gap-2">
 						<h3 className="text-sm font-medium text-text">Domain Filtering</h3>
-						<p className="text-sm text-text-muted">
+						<p className="text-xs text-text-muted">
 							Choose how to filter search domains:
 						</p>
 					</div>
