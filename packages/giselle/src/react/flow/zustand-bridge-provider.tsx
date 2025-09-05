@@ -93,7 +93,7 @@ export function ZustandBridgeProvider({
 	// Create context value that matches the existing API
 	const contextValue = useMemo<WorkflowDesignerContextValue>(
 		() => ({
-			data,
+			data: state.workspace ?? data,
 			textGenerationApi,
 			addNode: (node, options) => state.addNode(node, options?.ui),
 			copyNode: state.copyNode,
