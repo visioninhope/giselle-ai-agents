@@ -220,13 +220,13 @@ export function AnthropicWebSearchToolConfigurationDialog({
 					{/* Enable tool */}
 					<div className="flex items-center justify-between">
 						<div className="flex flex-col">
-							<div className="text-[14px] py-[1.5px]">Enable tool</div>
+							<div className="text-[14px] py-[1.5px]">Web Search</div>
 							<div className="text-[12px] text-text-muted mt-1">
-								Enable web search functionality for this model
+								Enable for this model
 							</div>
 						</div>
 						<Switch
-							label="Enable tool"
+							label="Web Search"
 							name="web-search-enabled"
 							checked={webSearchEnabled}
 							onCheckedChange={handleWebSearchToggle}
