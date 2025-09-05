@@ -13,9 +13,12 @@ import {
 	anthropicLanguageModels,
 	googleLanguageModels,
 	openaiLanguageModels,
+	Tier,
+	TierAccess,
 } from "@giselle-sdk/language-model";
 import clsx from "clsx/lite";
 import { Tabs } from "radix-ui";
+import { useCallback, useEffect } from "react";
 import { InputPanel } from "./input-panel";
 import {
 	AnthropicModelPanel,
@@ -52,30 +55,76 @@ export function TextGenerationTabContent({
 	data,
 	deleteConnection,
 }: TextGenerationTabContentProps) {
-	useUsageLimits();
+	const usageLimits = useUsageLimits();
+	const userTier = usageLimits?.featureTier ?? Tier.enum.free;
+	const accessibleTiers = TierAccess[userTier];
 
-	// Get available models for current provider
-	const getAvailableModels = (): Array<{ value: string; label: string }> => {
+	// Get available models for current provider, filtered by user's tier
+	const getAvailableModels = useCallback((): Array<{
+		value: string;
+		label: string;
+	}> => {
+		const filterModelsByTier = (
+			models: Array<{ id: string; tier: "free" | "pro" }>,
+		) => {
+			return models
+				.filter((model) => accessibleTiers.includes(model.tier))
+				.map((model) => ({
+					value: model.id,
+					label: model.id,
+				}));
+		};
+
 		switch (node.content.llm.provider) {
 			case "openai":
-				return openaiLanguageModels.map((model) => ({
-					value: model.id,
-					label: model.id,
-				}));
+				return filterModelsByTier(openaiLanguageModels);
 			case "anthropic":
-				return anthropicLanguageModels.map((model) => ({
-					value: model.id,
-					label: model.id,
-				}));
+				return filterModelsByTier(anthropicLanguageModels);
 			case "google":
-				return googleLanguageModels.map((model) => ({
-					value: model.id,
-					label: model.id,
-				}));
+				return filterModelsByTier(googleLanguageModels);
 			default:
 				return [];
 		}
-	};
+	}, [accessibleTiers, node.content.llm.provider]);
+
+	// Check if current model is accessible to the user
+	const getCurrentModelInfo = useCallback(() => {
+		switch (node.content.llm.provider) {
+			case "openai":
+				return openaiLanguageModels.find((m) => m.id === node.content.llm.id);
+			case "anthropic":
+				return anthropicLanguageModels.find(
+					(m) => m.id === node.content.llm.id,
+				);
+			case "google":
+				return googleLanguageModels.find((m) => m.id === node.content.llm.id);
+			default:
+				return null;
+		}
+	}, [node.content.llm.provider, node.content.llm.id]);
+
+	// Auto-switch to a compatible model if current one is not accessible
+	useEffect(() => {
+		const currentModel = getCurrentModelInfo();
+		if (currentModel && !accessibleTiers.includes(currentModel.tier)) {
+			// Find the first available model for this provider
+			const availableModels = getAvailableModels();
+			if (availableModels.length > 0) {
+				const newModelId = availableModels[0].value;
+				const updatedModel = updateModelId(node.content.llm, newModelId);
+				updateNodeDataContent(node, {
+					...node.content,
+					llm: updatedModel,
+				});
+			}
+		}
+	}, [
+		accessibleTiers,
+		node,
+		updateNodeDataContent,
+		getAvailableModels,
+		getCurrentModelInfo,
+	]); // Re-run when dependencies change
 
 	return (
 		<Tabs.Root

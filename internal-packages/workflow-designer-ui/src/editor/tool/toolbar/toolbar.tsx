@@ -24,6 +24,7 @@ import {
 	createWebPageNode,
 	triggerNodeDefaultName,
 	useFeatureFlag,
+	useUsageLimits,
 	useWorkflowDesigner,
 } from "@giselle-sdk/giselle/react";
 import {
@@ -31,6 +32,7 @@ import {
 	hasCapability,
 	type LanguageModel,
 	languageModels,
+	Tier,
 } from "@giselle-sdk/language-model";
 import clsx from "clsx/lite";
 import {
@@ -125,21 +127,30 @@ export function Toolbar() {
 		filterModelsByCategory(model, selectedCategory),
 	);
 
-	// Recommended models for each provider
+	// Get user's tier for recommended models
+	const usageLimits = useUsageLimits();
+	const userTier = usageLimits?.featureTier ?? Tier.enum.free;
+	const isFreeUser = userTier === Tier.enum.free;
+
+	// Recommended models for each provider - adjust based on user tier
 	const openaiModels = getAvailableModels(
-		["gpt-5"],
+		isFreeUser ? ["gpt-5-nano"] : ["gpt-5"],
 		"openai",
 		llmProviders,
 		languageModels,
 	);
 	const anthropicModels = getAvailableModels(
-		["claude-3-opus-20240229", "claude-3-sonnet-20240229"],
+		isFreeUser
+			? ["claude-3-5-haiku-20241022"]
+			: ["claude-3-opus-20240229", "claude-3-sonnet-20240229"],
 		"anthropic",
 		llmProviders,
 		languageModels,
 	);
 	const googleModels = getAvailableModels(
-		["gemini-2.5-pro-exp-03-25", "gemini-1.5-pro-latest", "gemini-1.0-pro"],
+		isFreeUser
+			? ["gemini-2.5-flash-lite-preview-06-17"]
+			: ["gemini-2.5-pro-exp-03-25", "gemini-1.5-pro-latest", "gemini-1.0-pro"],
 		"google",
 		llmProviders,
 		languageModels,
