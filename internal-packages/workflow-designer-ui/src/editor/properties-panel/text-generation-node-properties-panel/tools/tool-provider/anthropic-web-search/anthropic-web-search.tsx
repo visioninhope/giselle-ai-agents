@@ -240,7 +240,7 @@ export function AnthropicWebSearchToolConfigurationDialog({
 									Maximum Uses (1-{MAX_USES_LIMIT})
 								</div>
 								<div className="text-[12px] text-text-muted mt-1">
-									Set the maximum number of web searches allowed (1-10)
+									Max searches (1-10)
 								</div>
 							</div>
 							<Slider
