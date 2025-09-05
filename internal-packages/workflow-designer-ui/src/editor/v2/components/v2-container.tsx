@@ -58,6 +58,9 @@ function V2NodeCanvas() {
 			viewport: s.workspace.ui.viewport,
 		})),
 	);
+	const nodeIds = useWorkflowDesignerStore(
+		useShallow((s) => s.workspace.nodes.map((node) => node.id)),
+	);
 	const {
 		setUiNodeState,
 		setUiViewport,
@@ -252,13 +255,13 @@ function V2NodeCanvas() {
 	};
 	const handleNodeClick: NodeMouseHandler = useCallback(
 		(_event, nodeClicked) => {
-			for (const node of data.nodes) {
-				setUiNodeState(node.id, { selected: node.id === nodeClicked.id });
+			for (const nodeId of nodeIds) {
+				setUiNodeState(nodeId, { selected: nodeId === nodeClicked.id });
 			}
 			// Always maintain canvas focus when clicking nodes
 			setCurrentShortcutScope("canvas");
 		},
-		[setCurrentShortcutScope, setUiNodeState, data.nodes],
+		[setCurrentShortcutScope, nodeIds, setUiNodeState],
 	);
 
 	const handleNodesChange: OnNodesChange = useCallback(
@@ -279,6 +282,10 @@ function V2NodeCanvas() {
 								height: nodeChange.dimensions?.height,
 							},
 						});
+						break;
+					}
+					case "select": {
+						setUiNodeState(nodeChange.id, { selected: nodeChange.selected });
 						break;
 					}
 					case "remove": {
