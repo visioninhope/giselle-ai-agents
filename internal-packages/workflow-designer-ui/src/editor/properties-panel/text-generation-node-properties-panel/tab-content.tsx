@@ -299,7 +299,7 @@ export function TextGenerationTabContent({
 					{node.content.llm.provider === "anthropic" && (
 						<AnthropicModelPanel
 							anthropicLanguageModel={node.content.llm}
-							tools={node.content.tools}
+							_tools={node.content.tools}
 							node={node}
 							onModelChange={(value) =>
 								updateNodeDataContent(node, {
@@ -307,13 +307,13 @@ export function TextGenerationTabContent({
 									llm: value,
 								})
 							}
-							onToolChange={(changedTool) =>
+							_onToolChange={(changedTool) =>
 								updateNodeDataContent(node, {
 									...node.content,
 									tools: changedTool,
 								})
 							}
-							onWebSearchChange={(enable) => {
+							_onWebSearchChange={(enable) => {
 								if (node.content.llm.provider !== "anthropic") {
 									return;
 								}
