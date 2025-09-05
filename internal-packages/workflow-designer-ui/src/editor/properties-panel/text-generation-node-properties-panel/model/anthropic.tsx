@@ -1,5 +1,6 @@
 import {
 	AnthropicLanguageModelData,
+	type TextGenerationNode,
 	type ToolSet,
 } from "@giselle-sdk/data-type";
 import { useUsageLimits } from "@giselle-sdk/giselle/react";
@@ -8,7 +9,8 @@ import {
 	Capability,
 	hasCapability,
 } from "@giselle-sdk/language-model";
-import { useCallback, useMemo } from "react";
+import { SlidersHorizontal } from "lucide-react";
+import { useCallback, useMemo, useState } from "react";
 import {
 	Select,
 	SelectContent,
@@ -19,22 +21,26 @@ import {
 } from "../../../../ui/select";
 import { Slider } from "../../../../ui/slider";
 import { Switch } from "../../../../ui/switch";
+import { AnthropicWebSearchToolConfigurationDialog } from "../tools/tool-provider/anthropic-web-search/anthropic-web-search";
 import { languageModelAvailable } from "./utils";
 
 export function AnthropicModelPanel({
 	anthropicLanguageModel,
 	onModelChange,
-	tools,
-	onToolChange,
-	onWebSearchChange,
+	_tools,
+	_onToolChange,
+	_onWebSearchChange,
+	node,
 }: {
 	anthropicLanguageModel: AnthropicLanguageModelData;
 	onModelChange: (changedValue: AnthropicLanguageModelData) => void;
-	tools?: ToolSet;
-	onToolChange: (changedValue: ToolSet) => void;
-	onWebSearchChange: (enabled: boolean) => void;
+	_tools?: ToolSet;
+	_onToolChange: (changedValue: ToolSet) => void;
+	_onWebSearchChange: (enabled: boolean) => void;
+	node: TextGenerationNode;
 }) {
 	const limits = useUsageLimits();
+	const [webSearchDialogOpen, setWebSearchDialogOpen] = useState(false);
 
 	const hasReasoningCapability = useMemo(() => {
 		const languageModel = anthropicLanguageModels.find(
@@ -161,21 +167,27 @@ export function AnthropicModelPanel({
 						</>
 					)}
 
-					<Switch
-						label="Web Search"
-						name="webSearch"
-						checked={!!tools?.anthropicWebSearch}
-						onCheckedChange={(checked) => {
-							const { anthropicWebSearch: _removed, ...rest } = tools ?? {};
-							const changedTools = checked
-								? { ...rest, anthropicWebSearch: { maxUses: 3 } }
-								: rest;
-							onToolChange(changedTools as ToolSet);
-							onWebSearchChange(checked);
-						}}
-					/>
+					<div className="flex flex-col">
+						<div className="flex flex-row items-center justify-between">
+							<p className="text-[14px]">Web Search</p>
+							<div className="flex-grow mx-[12px] h-[1px] bg-black-200/30" />
+							<button
+								type="button"
+								onClick={() => setWebSearchDialogOpen(true)}
+								className="p-1 hover:bg-black-100/10 rounded"
+							>
+								<SlidersHorizontal className="w-4 h-4" />
+							</button>
+						</div>
+					</div>
 				</div>
 			</div>
+
+			<AnthropicWebSearchToolConfigurationDialog
+				node={node}
+				open={webSearchDialogOpen}
+				onOpenChange={setWebSearchDialogOpen}
+			/>
 		</div>
 	);
 }

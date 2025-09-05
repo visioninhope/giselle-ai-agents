@@ -300,6 +300,7 @@ export function TextGenerationTabContent({
 						<AnthropicModelPanel
 							anthropicLanguageModel={node.content.llm}
 							tools={node.content.tools}
+							node={node}
 							onModelChange={(value) =>
 								updateNodeDataContent(node, {
 									...node.content,

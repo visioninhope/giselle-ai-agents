@@ -217,12 +217,15 @@ export function AnthropicWebSearchToolConfigurationDialog({
 			<div className="flex flex-col gap-6">
 				{/* Web Search Toggle */}
 				<div className="flex items-center justify-between">
-					<div className="flex flex-col">
-						<div className="text-[14px] py-[1.5px]">Web Search</div>
-						<div className="text-[12px] text-text-muted mt-1">
+					<div className="flex items-center gap-4">
+						<div className="text-[14px] py-[1.5px] whitespace-nowrap">
+							Web Search
+						</div>
+						<div className="text-[12px] text-text-muted whitespace-nowrap">
 							Enable for this model
 						</div>
 					</div>
+					<div className="flex-1 h-px bg-border ml-4"></div>
 					<Switch
 						label=""
 						name="web-search-enabled"
@@ -233,12 +236,12 @@ export function AnthropicWebSearchToolConfigurationDialog({
 
 				{/* Maximum Uses Slider */}
 				{webSearchEnabled && (
-					<div className="flex flex-col gap-4">
-						<div className="flex flex-col">
+					<div className="flex flex-col gap-2">
+						<div className="flex items-center gap-4">
 							<div className="text-[14px] py-[1.5px]">
 								Maximum Uses (1-{MAX_USES_LIMIT})
 							</div>
-							<div className="text-[12px] text-text-muted mt-1">
+							<div className="text-[12px] text-text-muted">
 								Max searches (1-10)
 							</div>
 						</div>
@@ -257,7 +260,7 @@ export function AnthropicWebSearchToolConfigurationDialog({
 					<>
 						{/* Domain Filtering Section */}
 						<div className="flex flex-col gap-4">
-							<div className="flex flex-col gap-1">
+							<div className="flex items-center gap-4">
 								<h3 className="text-sm font-medium text-text">
 									Domain Filtering
 								</h3>
