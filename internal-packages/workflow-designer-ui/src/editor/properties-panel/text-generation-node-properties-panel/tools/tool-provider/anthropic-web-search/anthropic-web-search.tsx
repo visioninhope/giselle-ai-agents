@@ -261,11 +261,8 @@ export function AnthropicWebSearchToolConfigurationDialog({
 									: "Blocked Domains"}
 							</h4>
 
-							{/* 3-column layout */}
+							{/* 2-column layout */}
 							<div className="flex items-center gap-4">
-								<span className="text-sm font-medium text-text whitespace-nowrap">
-									Tags
-								</span>
 								<span className="text-sm text-text-muted italic flex-1">
 									{filteringMode === "allow"
 										? "No domains specified - all domains will be blocked"
