@@ -254,20 +254,22 @@ export function AnthropicWebSearchToolConfigurationDialog({
 					{/* Domain Input Section */}
 					{filteringMode !== "none" && (
 						<div className="flex flex-col gap-4 mt-4">
-							{/* 1-column header */}
-							<h4 className="text-sm font-medium text-text">
-								{filteringMode === "allow"
-									? "Allowed Domains"
-									: "Blocked Domains"}
-							</h4>
-
-							{/* 1-column layout */}
-							<div className="flex flex-col gap-4">
-								<span className="text-sm text-text-muted italic">
+							{/* Header with status text on same line */}
+							<div className="flex items-center gap-4">
+								<h4 className="text-sm font-medium text-text">
+									{filteringMode === "allow"
+										? "Allowed Domains"
+										: "Blocked Domains"}
+								</h4>
+								<span className="text-xs text-text-muted italic">
 									{filteringMode === "allow"
 										? "No domains specified - all domains will be blocked"
 										: "No domains specified"}
 								</span>
+							</div>
+
+							{/* Input field */}
+							<div>
 								<BasicTagInput
 									placeholder="Enter domain (e.g., example.com)"
 									initialTags={
