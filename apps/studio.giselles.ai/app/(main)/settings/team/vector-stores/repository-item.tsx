@@ -28,6 +28,8 @@ import {
 } from "../components/glass-dialog-content";
 import { ConfigureSourcesDialog } from "./configure-sources-dialog";
 import { DiagnosticModal } from "./diagnostic-modal";
+import { getErrorMessage } from "./error-messages";
+import type { DocumentLoaderErrorCode } from "./types";
 
 // Status configuration for sync badges
 const STATUS_CONFIG = {
@@ -338,6 +340,17 @@ function EmbeddingModelCard({
 								})()}
 						</div>
 					)}
+					{blobStatus?.enabled &&
+						blobStatus.status === "failed" &&
+						blobStatus.errorCode && (
+							<div className="text-xs text-red-400 mt-1">
+								{getErrorMessage(
+									blobStatus.errorCode as DocumentLoaderErrorCode,
+								)}
+								{blobStatus.retryAfter &&
+									` • Retry ${formatTimestamp.toRelativeTime(new Date(blobStatus.retryAfter).getTime())}`}
+							</div>
+						)}
 				</div>
 
 				{/* Pull Requests Section */}
@@ -393,6 +406,17 @@ function EmbeddingModelCard({
 								})()}
 						</div>
 					)}
+					{pullRequestStatus?.enabled &&
+						pullRequestStatus.status === "failed" &&
+						pullRequestStatus.errorCode && (
+							<div className="text-xs text-red-400 mt-1">
+								{getErrorMessage(
+									pullRequestStatus.errorCode as DocumentLoaderErrorCode,
+								)}
+								{pullRequestStatus.retryAfter &&
+									` • Retry ${formatTimestamp.toRelativeTime(new Date(pullRequestStatus.retryAfter).getTime())}`}
+							</div>
+						)}
 					{!pullRequestStatus?.enabled && pullRequestStatus === undefined && (
 						<div className="text-[10px] text-gray-500">Not configured</div>
 					)}

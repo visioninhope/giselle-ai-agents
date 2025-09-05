@@ -1,3 +1,9 @@
+export type DocumentLoaderErrorCode =
+	| "DOCUMENT_NOT_FOUND"
+	| "DOCUMENT_FETCH_ERROR"
+	| "DOCUMENT_RATE_LIMITED"
+	| "DOCUMENT_TOO_LARGE";
+
 type Installation = {
 	id: number;
 	name: string;
