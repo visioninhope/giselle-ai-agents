@@ -215,48 +215,43 @@ export function AnthropicWebSearchToolConfigurationDialog({
 			onOpenChange={setOpen}
 		>
 			<div className="flex flex-col gap-6">
-				{/* Enable tool and Maximum Uses - 2 column layout */}
-				<div className="grid grid-cols-2 gap-6">
-					{/* Enable tool */}
-					<div className="flex items-center justify-between">
+				{/* Web Search Toggle */}
+				<div className="flex items-center justify-between">
+					<div className="flex flex-col">
+						<div className="text-[14px] py-[1.5px]">Web Search</div>
+						<div className="text-[12px] text-text-muted mt-1">
+							Enable for this model
+						</div>
+					</div>
+					<Switch
+						label=""
+						name="web-search-enabled"
+						checked={webSearchEnabled}
+						onCheckedChange={handleWebSearchToggle}
+					/>
+				</div>
+
+				{/* Maximum Uses Slider */}
+				{webSearchEnabled && (
+					<div className="flex flex-col gap-4">
 						<div className="flex flex-col">
-							<div className="text-[14px] py-[1.5px]">Web Search</div>
+							<div className="text-[14px] py-[1.5px]">
+								Maximum Uses (1-{MAX_USES_LIMIT})
+							</div>
 							<div className="text-[12px] text-text-muted mt-1">
-								Enable for this model
+								Max searches (1-10)
 							</div>
 						</div>
-						<Switch
+						<Slider
 							label=""
-							name="web-search-enabled"
-							checked={webSearchEnabled}
-							onCheckedChange={handleWebSearchToggle}
+							value={maxUses}
+							min={1}
+							max={MAX_USES_LIMIT}
+							step={1}
+							onChange={handleMaxUsesChange}
 						/>
 					</div>
-
-					{/* Maximum Uses Slider */}
-					{webSearchEnabled ? (
-						<div className="flex flex-col gap-4">
-							<div className="flex flex-col">
-								<div className="text-[14px] py-[1.5px]">
-									Maximum Uses (1-{MAX_USES_LIMIT})
-								</div>
-								<div className="text-[12px] text-text-muted mt-1">
-									Max searches (1-10)
-								</div>
-							</div>
-							<Slider
-								label=""
-								value={maxUses}
-								min={1}
-								max={MAX_USES_LIMIT}
-								step={1}
-								onChange={handleMaxUsesChange}
-							/>
-						</div>
-					) : (
-						<div />
-					)}
-				</div>
+				)}
 
 				{webSearchEnabled && (
 					<>
