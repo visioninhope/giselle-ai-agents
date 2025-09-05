@@ -680,11 +680,20 @@ export function Toolbar() {
 															languageModelMouseHovered,
 															userTier,
 														) && (
-															<div className="absolute inset-0 z-10 bg-black/60 backdrop-blur-sm rounded-[8px] flex items-center justify-center">
-																<div className="text-center px-4">
-																	<p className="text-blue-400 text-[14px] font-medium">
+															<div className="absolute inset-0 z-10 bg-black/80 backdrop-blur-sm rounded-[8px] flex items-center justify-center">
+																<div className="text-center">
+																	<p className="text-blue-400 text-[14px] font-medium mb-3">
 																		This model is available on Pro plan
 																	</p>
+																	<button
+																		type="button"
+																		className="bg-blue-600 hover:bg-blue-700 text-white text-[12px] px-4 py-2 rounded-[6px] font-medium transition-colors"
+																		onClick={() => {
+																			window.open("/pricing", "_blank");
+																		}}
+																	>
+																		Upgrade to Pro
+																	</button>
 																</div>
 															</div>
 														)}
