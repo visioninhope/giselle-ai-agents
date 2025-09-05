@@ -125,7 +125,6 @@ export function AnthropicWebSearchToolConfigurationDialog({
 	return (
 		<ToolConfigurationDialog
 			title="Anthropic Web Search Configuration"
-			description="Configure the Anthropic Web Search tool to provide direct access to real-time web content, allowing it to answer questions with up-to-date information beyond its knowledge cutoff."
 			onSubmit={updateAnthropicWebSearchToolConfiguration}
 			submitting={false}
 			trigger={
