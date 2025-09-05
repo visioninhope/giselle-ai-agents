@@ -254,31 +254,37 @@ export function AnthropicWebSearchToolConfigurationDialog({
 					{/* Domain Input Section */}
 					{filteringMode !== "none" && (
 						<div className="flex flex-col gap-2 mt-4">
-							<BasicTagInput
-								label={
-									filteringMode === "allow"
+							<div className="flex items-center gap-4">
+								<span className="text-sm font-medium text-text whitespace-nowrap">
+									{filteringMode === "allow"
 										? "Allowed Domains"
-										: "Blocked Domains"
-								}
-								placeholder="Enter domain (e.g., example.com)"
-								initialTags={
-									filteringMode === "allow" ? allowedDomains : blockedDomains
-								}
-								onTagsChange={(tags) => {
-									if (filteringMode === "allow") {
-										setAllowedDomains(tags);
-									} else {
-										setBlockedDomains(tags);
-									}
-									if (domainListError) setDomainListError(null);
-								}}
-								validateInput={isValidDomain}
-								emptyStateText={
-									filteringMode === "allow"
-										? "No domains specified - all domains will be blocked"
-										: "No domains specified"
-								}
-							/>
+										: "Blocked Domains"}
+								</span>
+								<div className="flex-1">
+									<BasicTagInput
+										placeholder="Enter domain (e.g., example.com)"
+										initialTags={
+											filteringMode === "allow"
+												? allowedDomains
+												: blockedDomains
+										}
+										onTagsChange={(tags) => {
+											if (filteringMode === "allow") {
+												setAllowedDomains(tags);
+											} else {
+												setBlockedDomains(tags);
+											}
+											if (domainListError) setDomainListError(null);
+										}}
+										validateInput={isValidDomain}
+										emptyStateText={
+											filteringMode === "allow"
+												? "No domains specified - all domains will be blocked"
+												: "No domains specified"
+										}
+									/>
+								</div>
+							</div>
 							{domainListError && (
 								<p className="text-sm text-red-600" role="alert">
 									{domainListError}
