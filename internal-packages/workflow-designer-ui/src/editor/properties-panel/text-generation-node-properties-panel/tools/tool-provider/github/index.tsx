@@ -42,9 +42,13 @@ function getTokenDisplay(
 
 // GitHub token validation
 function isValidGitHubPAT(token: string): boolean {
-	// GitHub token formats evolve; validate by prefix to reduce false rejects.
-	// Covers classic (ghp_), OAuth (gho_), user-to-server (ghu_), server-to-server (ghs_), refresh (ghr_), and fine-grained (github_pat_).
-	return /^(gh(p|o|u|s|r)_|github_pat_)/.test(token) && token.length >= 40;
+	// GitHub token formats:
+	// Classic PAT: ghp_ followed by 36 alphanumeric characters (total 40 chars)
+	// Fine-grained PAT: github_pat_ followed by 82 alphanumeric characters (total 93 chars)
+	// OAuth token: gho_ followed by 36 alphanumeric characters (total 40 chars)
+	return /^(ghp_[a-zA-Z0-9]{36}|github_pat_[a-zA-Z0-9_]{82}|gho_[a-zA-Z0-9]{36})$/.test(
+		token,
+	);
 }
 
 export function GitHubToolConfigurationDialog({
