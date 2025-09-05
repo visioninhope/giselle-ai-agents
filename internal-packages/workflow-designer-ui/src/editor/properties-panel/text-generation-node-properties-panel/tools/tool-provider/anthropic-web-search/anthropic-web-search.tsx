@@ -1,11 +1,10 @@
 import { Button } from "@giselle-internal/ui/button";
 import { Input } from "@giselle-internal/ui/input";
-
 import type { TextGenerationNode } from "@giselle-sdk/data-type";
 import { useWorkflowDesigner } from "@giselle-sdk/giselle/react";
-import { Settings2Icon } from "lucide-react";
+import { Settings2Icon, XIcon } from "lucide-react";
 import { useCallback, useState } from "react";
-import { BasicTagInput } from "../../../../../../ui/basic-tag-input";
+
 import { ToolConfigurationDialog } from "../../ui/tool-configuration-dialog";
 
 // Configuration
@@ -62,6 +61,10 @@ export function AnthropicWebSearchToolConfigurationDialog({
 	);
 	const [maxUsesError, setMaxUsesError] = useState<string | null>(null);
 	const [domainListError, setDomainListError] = useState<string | null>(null);
+	const [domainInput, setDomainInput] = useState("");
+	const [domainErrors, setDomainErrors] = useState<
+		{ message: string; domains?: string[] }[]
+	>([]);
 
 	const handleMaxUsesChange = useCallback(
 		(e: React.ChangeEvent<HTMLInputElement>) => {
@@ -75,6 +78,92 @@ export function AnthropicWebSearchToolConfigurationDialog({
 		},
 		[],
 	);
+
+	const addDomainTags = () => {
+		if (!domainInput.trim()) return;
+
+		// Parse domains
+		const domains = domainInput
+			.trim()
+			.split(/[,;\s]+/)
+			.filter((domain) => domain.trim());
+
+		// Remove duplicates within the input batch
+		const uniqueDomains = [...new Set(domains)];
+
+		const validTags: string[] = [];
+		const invalidDomains: string[] = [];
+		const duplicateDomains: string[] = [];
+
+		const currentDomains =
+			filteringMode === "allow" ? allowedDomains : blockedDomains;
+
+		for (const domain of uniqueDomains) {
+			const validation = isValidDomain(domain);
+
+			if (!validation.isValid) {
+				invalidDomains.push(domain);
+			} else if (currentDomains.includes(domain)) {
+				duplicateDomains.push(domain);
+			} else {
+				validTags.push(domain);
+			}
+		}
+
+		// Show errors
+		const errorList: { message: string; domains?: string[] }[] = [];
+		if (invalidDomains.length > 0) {
+			errorList.push({
+				message: "Invalid domain format",
+				domains: invalidDomains,
+			});
+		}
+		if (duplicateDomains.length > 0) {
+			errorList.push({ message: "Already added", domains: duplicateDomains });
+		}
+		if (errorList.length > 0) {
+			setDomainErrors(errorList);
+		} else {
+			setDomainErrors([]);
+		}
+
+		// Add valid tags
+		if (validTags.length > 0) {
+			if (filteringMode === "allow") {
+				setAllowedDomains([...allowedDomains, ...validTags]);
+			} else {
+				setBlockedDomains([...blockedDomains, ...validTags]);
+			}
+		}
+
+		// Update input field
+		if (invalidDomains.length > 0 || duplicateDomains.length > 0) {
+			// Keep problematic domains in input for correction
+			setDomainInput([...invalidDomains, ...duplicateDomains].join(", "));
+		} else {
+			// Clear input when all domains were processed successfully
+			setDomainInput("");
+		}
+	};
+
+	const removeDomainTag = (domainToRemove: string) => {
+		if (filteringMode === "allow") {
+			setAllowedDomains(
+				allowedDomains.filter((domain) => domain !== domainToRemove),
+			);
+		} else {
+			setBlockedDomains(
+				blockedDomains.filter((domain) => domain !== domainToRemove),
+			);
+		}
+	};
+
+	const handleDomainKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+		if (e.key === "Enter") {
+			e.preventDefault();
+			addDomainTags();
+		}
+	};
 
 	const updateAnthropicWebSearchToolConfiguration = useCallback<
 		React.FormEventHandler<HTMLFormElement>
@@ -256,41 +345,97 @@ export function AnthropicWebSearchToolConfigurationDialog({
 						<div className="flex flex-col gap-4 mt-4">
 							{/* Header with status text on same line */}
 							<div className="flex items-center gap-4">
-								<h4 className="text-sm font-medium text-text">
+								<h4
+									className={`text-sm font-medium ${
+										filteringMode === "allow" ? "text-success" : "text-error"
+									}`}
+								>
 									{filteringMode === "allow"
 										? "Allowed Domains"
 										: "Blocked Domains"}
 								</h4>
-								<span className="text-xs text-text-muted italic">
+								<span
+									className={`text-xs italic ${
+										filteringMode === "allow"
+											? "text-success/70"
+											: "text-error/70"
+									}`}
+								>
 									{filteringMode === "allow"
 										? "No domains specified - all domains will be blocked"
 										: "No domains specified"}
 								</span>
 							</div>
 
-							{/* Input field */}
-							<div>
-								<BasicTagInput
-									placeholder="Enter domain (e.g., example.com)"
-									initialTags={
-										filteringMode === "allow" ? allowedDomains : blockedDomains
-									}
-									onTagsChange={(tags) => {
-										if (filteringMode === "allow") {
-											setAllowedDomains(tags);
-										} else {
-											setBlockedDomains(tags);
+							{/* Domain Input */}
+							<div className="flex items-start gap-3 rounded-lg bg-black/80 p-1">
+								<div className="flex min-h-[40px] flex-grow flex-wrap items-center gap-1">
+									{(filteringMode === "allow"
+										? allowedDomains
+										: blockedDomains
+									).map((domain) => (
+										<div
+											key={domain}
+											className="mb-1 mr-2 flex items-center rounded-[4px] p-[1px] w-fit"
+										>
+											<div
+												className={`px-[8px] py-[2px] rounded-[3px] text-[12px] flex items-center gap-[4px] border ${
+													filteringMode === "allow"
+														? "bg-[rgba(var(--color-success-rgb),0.05)] text-[var(--color-success)] border-[rgba(var(--color-success-rgb),0.1)]"
+														: "bg-[rgba(var(--color-error-rgb),0.05)] text-[var(--color-error)] border-[rgba(var(--color-error-rgb),0.1)]"
+												}`}
+											>
+												<span className="max-w-[180px] truncate">{domain}</span>
+												<button
+													type="button"
+													onClick={() => removeDomainTag(domain)}
+													className="ml-1 hover:opacity-70 *:size-[12px]"
+												>
+													<XIcon />
+												</button>
+											</div>
+										</div>
+									))}
+									<input
+										type="text"
+										placeholder={
+											(filteringMode === "allow"
+												? allowedDomains
+												: blockedDomains
+											).length > 0
+												? "Add more domains..."
+												: "Domain Names (separate with commas)"
 										}
-										if (domainListError) setDomainListError(null);
-									}}
-									validateInput={isValidDomain}
-								/>
+										value={domainInput}
+										onChange={(e) => {
+											setDomainErrors([]);
+											setDomainInput(e.target.value);
+										}}
+										onKeyDown={handleDomainKeyDown}
+										onBlur={() => addDomainTags()}
+										className="min-w-[200px] flex-1 border-none bg-transparent px-1 py-1 text-[14px] text-white-400 outline-none placeholder:text-white/30"
+									/>
+								</div>
 							</div>
 
-							{domainListError && (
-								<p className="text-sm text-red-600" role="alert">
-									{domainListError}
-								</p>
+							{domainErrors.length > 0 && (
+								<div className="mt-1 space-y-1">
+									{domainErrors.map((error) => (
+										<div
+											key={`${error.message}-${error.domains?.join(",") || ""}`}
+											className="text-sm text-error-500"
+										>
+											{error.domains && error.domains.length > 0 ? (
+												<>
+													<span className="font-medium">{error.message}:</span>{" "}
+													<span>{error.domains.join(", ")}</span>
+												</>
+											) : (
+												<span>{error.message}</span>
+											)}
+										</div>
+									))}
+								</div>
 							)}
 						</div>
 					)}
