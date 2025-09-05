@@ -142,7 +142,7 @@ export function AnthropicWebSearchToolConfigurationDialog({
 			<div className="flex flex-col gap-6">
 				{/* Maximum Uses Input */}
 				<div className="flex flex-col gap-2">
-					<label htmlFor="max-uses" className="text-base font-medium text-text">
+					<label htmlFor="max-uses" className="text-sm font-medium text-text">
 						Maximum Uses (1-{MAX_USES_LIMIT})
 					</label>
 					<Input
@@ -164,9 +164,7 @@ export function AnthropicWebSearchToolConfigurationDialog({
 				{/* Domain Filtering Section */}
 				<div className="flex flex-col gap-4">
 					<div className="flex flex-col gap-2">
-						<h3 className="text-base font-medium text-text">
-							Domain Filtering
-						</h3>
+						<h3 className="text-sm font-medium text-text">Domain Filtering</h3>
 						<p className="text-sm text-text-muted">
 							Choose how to filter search domains:
 						</p>
