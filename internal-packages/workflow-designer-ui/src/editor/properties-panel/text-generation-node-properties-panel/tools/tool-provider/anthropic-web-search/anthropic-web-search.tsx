@@ -215,25 +215,26 @@ export function AnthropicWebSearchToolConfigurationDialog({
 			onOpenChange={setOpen}
 		>
 			<div className="flex flex-col gap-6">
-				{/* Web Search Toggle */}
-				<div className="flex items-center justify-between">
-					<div className="flex flex-col">
-						<div className="text-[14px] py-[1.5px]">Enable tool</div>
-						<div className="text-[12px] text-text-muted mt-1">
-							Enable web search functionality for this model
+				{/* Enable tool and Maximum Uses - 2 column layout */}
+				<div className="grid grid-cols-2 gap-6">
+					{/* Enable tool */}
+					<div className="flex items-center justify-between">
+						<div className="flex flex-col">
+							<div className="text-[14px] py-[1.5px]">Enable tool</div>
+							<div className="text-[12px] text-text-muted mt-1">
+								Enable web search functionality for this model
+							</div>
 						</div>
+						<Switch
+							label="Enable tool"
+							name="web-search-enabled"
+							checked={webSearchEnabled}
+							onCheckedChange={handleWebSearchToggle}
+						/>
 					</div>
-					<Switch
-						label="Enable tool"
-						name="web-search-enabled"
-						checked={webSearchEnabled}
-						onCheckedChange={handleWebSearchToggle}
-					/>
-				</div>
 
-				{webSearchEnabled && (
-					<>
-						{/* Maximum Uses Slider */}
+					{/* Maximum Uses Slider */}
+					{webSearchEnabled ? (
 						<div className="flex flex-col gap-4">
 							<div className="flex flex-col">
 								<div className="text-[14px] py-[1.5px]">
@@ -252,7 +253,13 @@ export function AnthropicWebSearchToolConfigurationDialog({
 								onChange={handleMaxUsesChange}
 							/>
 						</div>
+					) : (
+						<div />
+					)}
+				</div>
 
+				{webSearchEnabled && (
+					<>
 						{/* Domain Filtering Section */}
 						<div className="flex flex-col gap-4">
 							<div className="flex flex-col gap-1">
