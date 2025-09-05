@@ -122,8 +122,6 @@ function getProviderDisplayName(provider: string): string {
 			return "Anthropic";
 		case "google":
 			return "Google";
-		case "perplexity":
-			return "Perplexity";
 		default:
 			return provider;
 	}

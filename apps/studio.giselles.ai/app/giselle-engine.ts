@@ -231,7 +231,7 @@ export const giselleEngine = NextGiselleEngine({
 	basePath: "/api/giselle",
 	storage,
 	experimental_storage,
-	llmProviders: ["openai", "anthropic", "google", "perplexity", "fal"],
+	llmProviders: ["openai", "anthropic", "google", "fal"],
 	onConsumeAgentTime,
 	telemetry: {
 		isEnabled: true,
