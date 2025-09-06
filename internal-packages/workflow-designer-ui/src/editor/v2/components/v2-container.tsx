@@ -12,6 +12,7 @@ import {
 	type Edge,
 	type IsValidConnection,
 	type NodeMouseHandler,
+	type OnEdgesChange,
 	type OnNodesChange,
 	ReactFlow,
 	type Node as RFNode,
@@ -56,6 +57,7 @@ function V2NodeCanvas() {
 			connections: s.workspace.connections,
 			nodeState: s.workspace.ui.nodeState,
 			viewport: s.workspace.ui.viewport,
+			selectedConnectionIds: s.workspace.ui.selectedConnectionIds,
 		})),
 	);
 	const nodeIds = useWorkflowDesignerStore(
@@ -70,6 +72,7 @@ function V2NodeCanvas() {
 		updateNodeData,
 		addNode,
 		addConnection,
+		setSelectedConnectionId,
 	} = useWorkflowDesignerStore(
 		useShallow((s) => ({
 			setUiNodeState: s.setUiNodeState,
@@ -80,6 +83,7 @@ function V2NodeCanvas() {
 			updateNodeData: s.updateNodeData,
 			addNode: s.addNode,
 			addConnection: s.addConnection,
+			setSelectedConnectionId: s.setSelectedConnectionId,
 		})),
 	);
 	const { selectedTool, reset } = useToolbar();
@@ -146,6 +150,7 @@ function V2NodeCanvas() {
 				target: connection.inputNode.id,
 				targetHandle: connection.inputId,
 				type: "giselleConnector",
+				selected: data.selectedConnectionIds.includes(connection.id),
 				data: { connection },
 			};
 			next.set(connection.id, nextEdge);
@@ -153,7 +158,7 @@ function V2NodeCanvas() {
 		});
 		cacheEdgesRef.current = next;
 		return arr;
-	}, [data.connections]);
+	}, [data.connections, data.selectedConnectionIds]);
 
 	const handleConnect = useCallback(
 		(connection: Connection) => {
@@ -325,6 +330,23 @@ function V2NodeCanvas() {
 			deleteNode,
 		],
 	);
+
+	const handleEdgesChange: OnEdgesChange = useCallback(
+		(changes) => {
+			for (const change of changes) {
+				switch (change.type) {
+					case "select":
+						setSelectedConnectionId(change.id);
+						break;
+					case "remove": {
+						deleteConnection(change.id);
+						break;
+					}
+				}
+			}
+		},
+		[setSelectedConnectionId, deleteConnection],
+	);
 	const handlePanelClick = useCallback(
 		(e: React.MouseEvent) => {
 			setMenu(null);
@@ -394,6 +416,7 @@ function V2NodeCanvas() {
 			onPaneClick={handlePanelClick}
 			onKeyDown={handleKeyDown}
 			onNodeContextMenu={handleNodeContextMenu}
+			onEdgesChange={handleEdgesChange}
 		>
 			<Background />
 			{selectedTool?.action === "addNode" && (

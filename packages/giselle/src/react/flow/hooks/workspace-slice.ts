@@ -4,6 +4,8 @@ import {
 	type FileData,
 	type FileNode,
 	type InputId,
+	isActionNode,
+	isOperationNode,
 	type Node,
 	type NodeBase,
 	NodeId,
@@ -35,7 +37,7 @@ export interface WorkspaceSlice {
 		inputNode: NodeLike;
 		inputId: InputId;
 	}) => void;
-	deleteConnection: (connectionId: ConnectionId) => void;
+	deleteConnection: (connectionIdLike: string) => void;
 	copyNode: (
 		sourceNode: Node,
 		options?: {
@@ -53,6 +55,7 @@ export interface WorkspaceSlice {
 		scope: ShortcutScope,
 		options?: { save?: boolean },
 	) => void;
+	setSelectedConnectionId: (connectionId: string) => void;
 	updateWorkspaceName: (name: string | undefined) => void;
 	updateNodeData: <T extends NodeBase>(node: T, data: Partial<T>) => void;
 	updateNodeDataContent: <T extends Node>(
@@ -145,12 +148,44 @@ export const createWorkspaceSlice: StateCreator<
 	deleteConnection: (connectionId) =>
 		set((state) => {
 			if (!state.workspace) return {};
+			const targetConnection = state.workspace.connections.find(
+				(c) => c.id === connectionId,
+			);
+			if (targetConnection === undefined) {
+				return state;
+			}
+			const nextConnections = state.workspace.connections.filter(
+				(c) => c.id !== connectionId,
+			);
+
+			const targetNode = state.workspace.nodes.find(
+				(node) => node.id === targetConnection.inputNode.id,
+			);
+
+			if (
+				targetNode === undefined ||
+				!isOperationNode(targetNode) ||
+				isActionNode(targetNode)
+			) {
+				return {
+					workspace: {
+						...state.workspace,
+						connections: nextConnections,
+					},
+				};
+			}
+			const updatedInputs = targetNode.inputs.filter(
+				(input) => input.id !== targetConnection.inputId,
+			);
+
+			const nextNodes = state.workspace.nodes.map((node) =>
+				node.id === targetNode.id ? { ...node, inputs: updatedInputs } : node,
+			);
 			return {
 				workspace: {
 					...state.workspace,
-					connections: state.workspace.connections.filter(
-						(c) => c.id !== connectionId,
-					),
+					connections: nextConnections,
+					nodes: nextNodes,
 				},
 			};
 		}),
@@ -265,6 +300,28 @@ export const createWorkspaceSlice: StateCreator<
 				workspace: {
 					...state.workspace,
 					ui: { ...state.workspace.ui, currentShortcutScope: scope },
+				},
+			};
+		}),
+	setSelectedConnectionId: (connectionId) =>
+		set((state) => {
+			if (!state.workspace) return {};
+			const connection = state.workspace.connections.find(
+				(connection) => connection.id === connectionId,
+			);
+			if (connection === undefined) {
+				return state;
+			}
+			return {
+				workspace: {
+					...state.workspace,
+					ui: {
+						...state.workspace.ui,
+						selectedConnectionIds: [
+							...(state.workspace.ui.selectedConnectionIds ?? []),
+							connection.id,
+						],
+					},
 				},
 			};
 		}),
