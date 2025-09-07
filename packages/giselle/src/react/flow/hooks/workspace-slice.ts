@@ -400,3 +400,16 @@ export const createWorkspaceSlice: StateCreator<
 			};
 		}),
 });
+
+export const workspaceActions = (s: WorkspaceSlice) => ({
+	setUiNodeState: s.setUiNodeState,
+	setUiViewport: s.setUiViewport,
+	setCurrentShortcutScope: s.setCurrentShortcutScope,
+	deleteNode: s.deleteNode,
+	deleteConnection: s.deleteConnection,
+	updateNodeData: s.updateNodeData,
+	addNode: s.addNode,
+	addConnection: s.addConnection,
+	selectConnection: s.selectConnection,
+	deselectConnection: s.deselectConnection,
+});

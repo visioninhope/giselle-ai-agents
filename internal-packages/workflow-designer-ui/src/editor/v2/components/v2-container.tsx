@@ -25,6 +25,7 @@ import { useToasts } from "@giselle-internal/ui/toast";
 import {
 	isSupportedConnection,
 	useWorkflowDesignerStore,
+	workspaceActions,
 } from "@giselle-sdk/giselle/react";
 import clsx from "clsx/lite";
 import { useCallback, useMemo, useRef, useState } from "react";
@@ -74,20 +75,7 @@ function V2NodeCanvas() {
 		addConnection,
 		selectConnection,
 		deselectConnection,
-	} = useWorkflowDesignerStore(
-		useShallow((s) => ({
-			setUiNodeState: s.setUiNodeState,
-			setUiViewport: s.setUiViewport,
-			setCurrentShortcutScope: s.setCurrentShortcutScope,
-			deleteNode: s.deleteNode,
-			deleteConnection: s.deleteConnection,
-			updateNodeData: s.updateNodeData,
-			addNode: s.addNode,
-			addConnection: s.addConnection,
-			selectConnection: s.selectConnection,
-			deselectConnection: s.deselectConnection,
-		})),
-	);
+	} = useWorkflowDesignerStore(useShallow(workspaceActions));
 	const { selectedTool, reset } = useToolbar();
 	const toast = useToasts();
 	const [menu, setMenu] = useState<Omit<ContextMenuProps, "onClose"> | null>(
