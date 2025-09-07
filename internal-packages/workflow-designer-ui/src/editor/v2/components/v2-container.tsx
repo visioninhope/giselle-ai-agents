@@ -60,10 +60,6 @@ function V2NodeCanvas() {
 			selectedConnectionIds: s.workspace.ui.selectedConnectionIds,
 		})),
 	);
-	const a = useWorkflowDesignerStore(
-		(s) => s.workspace.ui.selectedConnectionIds,
-	);
-	console.log(`debug: ${data.selectedConnectionIds.length}, ${a.length}`);
 	const nodeIds = useWorkflowDesignerStore(
 		useShallow((s) => s.workspace.nodes.map((node) => node.id)),
 	);
@@ -147,8 +143,6 @@ function V2NodeCanvas() {
 		const arr = data.connections.map((connection) => {
 			const prev = cacheEdgesRef.current.get(connection.id);
 			const selected = data.selectedConnectionIds.includes(connection.id);
-			console.log(data.selectedConnectionIds);
-			console.log(`current :${selected}, prev: ${prev?.selected}`);
 			if (prev !== undefined && selected === prev.selected) {
 				return prev;
 			}
