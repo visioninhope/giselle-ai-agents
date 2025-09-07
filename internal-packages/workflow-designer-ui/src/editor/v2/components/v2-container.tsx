@@ -3,7 +3,6 @@
 import {
 	InputId,
 	isActionNode,
-	isOperationNode,
 	type NodeId,
 	OutputId,
 } from "@giselle-sdk/data-type";

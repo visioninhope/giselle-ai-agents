@@ -335,7 +335,7 @@ export const createWorkspaceSlice: StateCreator<
 					ui: {
 						...state.workspace.ui,
 						selectedConnectionIds:
-							state.workspace.ui.selectedConnectionIds?.filter(
+							state.workspace.ui.selectedConnectionIds.filter(
 								(id) => id !== connectionId,
 							),
 					},
