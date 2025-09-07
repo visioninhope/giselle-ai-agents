@@ -60,6 +60,10 @@ function V2NodeCanvas() {
 			selectedConnectionIds: s.workspace.ui.selectedConnectionIds,
 		})),
 	);
+	const a = useWorkflowDesignerStore(
+		(s) => s.workspace.ui.selectedConnectionIds,
+	);
+	console.log(`debug: ${data.selectedConnectionIds.length}, ${a.length}`);
 	const nodeIds = useWorkflowDesignerStore(
 		useShallow((s) => s.workspace.nodes.map((node) => node.id)),
 	);
@@ -73,6 +77,8 @@ function V2NodeCanvas() {
 		addNode,
 		addConnection,
 		setSelectedConnectionId,
+		setSelectedConnectionIds,
+		unselectConnectionId,
 	} = useWorkflowDesignerStore(
 		useShallow((s) => ({
 			setUiNodeState: s.setUiNodeState,
@@ -84,6 +90,8 @@ function V2NodeCanvas() {
 			addNode: s.addNode,
 			addConnection: s.addConnection,
 			setSelectedConnectionId: s.setSelectedConnectionId,
+			setSelectedConnectionIds: s.setSelectedConnectionIds,
+			unselectConnectionId: s.unselectConnectionId,
 		})),
 	);
 	const { selectedTool, reset } = useToolbar();
@@ -140,7 +148,10 @@ function V2NodeCanvas() {
 		const next = new Map<string, Edge>();
 		const arr = data.connections.map((connection) => {
 			const prev = cacheEdgesRef.current.get(connection.id);
-			if (prev !== undefined) {
+			const selected = data.selectedConnectionIds.includes(connection.id);
+			console.log(data.selectedConnectionIds);
+			console.log(`current :${selected}, prev: ${prev?.selected}`);
+			if (prev !== undefined && selected === prev.selected) {
 				return prev;
 			}
 			const nextEdge: Edge = {
@@ -150,7 +161,7 @@ function V2NodeCanvas() {
 				target: connection.inputNode.id,
 				targetHandle: connection.inputId,
 				type: "giselleConnector",
-				selected: data.selectedConnectionIds.includes(connection.id),
+				selected,
 				data: { connection },
 			};
 			next.set(connection.id, nextEdge);
@@ -336,7 +347,11 @@ function V2NodeCanvas() {
 			for (const change of changes) {
 				switch (change.type) {
 					case "select":
-						setSelectedConnectionId(change.id);
+						if (change.selected) {
+							setSelectedConnectionId(change.id);
+						} else {
+							unselectConnectionId(change.id);
+						}
 						break;
 					case "remove": {
 						deleteConnection(change.id);
@@ -345,7 +360,7 @@ function V2NodeCanvas() {
 				}
 			}
 		},
-		[setSelectedConnectionId, deleteConnection],
+		[setSelectedConnectionId, deleteConnection, unselectConnectionId],
 	);
 	const handlePanelClick = useCallback(
 		(e: React.MouseEvent) => {
@@ -363,6 +378,7 @@ function V2NodeCanvas() {
 			reset();
 			// Set canvas focus when clicking on canvas
 			setCurrentShortcutScope("canvas");
+			// setSelectedConnectionIds([]);
 		},
 		[
 			data.nodes,

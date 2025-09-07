@@ -56,6 +56,8 @@ export interface WorkspaceSlice {
 		options?: { save?: boolean },
 	) => void;
 	setSelectedConnectionId: (connectionId: string) => void;
+	setSelectedConnectionIds: (connectionIds: string[]) => void;
+	unselectConnectionId: (connectionId: string) => void;
 	updateWorkspaceName: (name: string | undefined) => void;
 	updateNodeData: <T extends NodeBase>(node: T, data: Partial<T>) => void;
 	updateNodeDataContent: <T extends Node>(
@@ -325,6 +327,42 @@ export const createWorkspaceSlice: StateCreator<
 				},
 			};
 		}),
+
+	setSelectedConnectionIds: (connectionIds) =>
+		set((state) => {
+			if (!state.workspace) return {};
+			const newConnectionIds = state.workspace.connections
+				.filter((connection) => connectionIds.includes(connection.id))
+				.map((connection) => connection.id);
+			console.log(newConnectionIds);
+			return {
+				workspace: {
+					...state.workspace,
+					ui: {
+						...state.workspace.ui,
+						selectedConnectionIds: newConnectionIds,
+					},
+				},
+			};
+		}),
+
+	unselectConnectionId: (connectionId) =>
+		set((state) => {
+			if (!state.workspace) return {};
+			return {
+				workspace: {
+					...state.workspace,
+					ui: {
+						...state.workspace.ui,
+						selectedConnectionIds:
+							state.workspace.ui.selectedConnectionIds?.filter(
+								(id) => id !== connectionId,
+							),
+					},
+				},
+			};
+		}),
+
 	updateWorkspaceName: (name) =>
 		set((state) => {
 			if (!state.workspace) return {};
