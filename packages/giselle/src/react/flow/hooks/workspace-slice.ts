@@ -55,9 +55,8 @@ export interface WorkspaceSlice {
 		scope: ShortcutScope,
 		options?: { save?: boolean },
 	) => void;
-	setSelectedConnectionId: (connectionId: string) => void;
-	setSelectedConnectionIds: (connectionIds: string[]) => void;
-	unselectConnectionId: (connectionId: string) => void;
+	selectConnection: (connectionId: string) => void;
+	deselectConnection: (connectionId: string) => void;
 	updateWorkspaceName: (name: string | undefined) => void;
 	updateNodeData: <T extends NodeBase>(node: T, data: Partial<T>) => void;
 	updateNodeDataContent: <T extends Node>(
@@ -305,7 +304,7 @@ export const createWorkspaceSlice: StateCreator<
 				},
 			};
 		}),
-	setSelectedConnectionId: (connectionId) =>
+	selectConnection: (connectionId) =>
 		set((state) => {
 			if (!state.workspace) return {};
 			const connection = state.workspace.connections.find(
@@ -327,26 +326,7 @@ export const createWorkspaceSlice: StateCreator<
 				},
 			};
 		}),
-
-	setSelectedConnectionIds: (connectionIds) =>
-		set((state) => {
-			if (!state.workspace) return {};
-			const newConnectionIds = state.workspace.connections
-				.filter((connection) => connectionIds.includes(connection.id))
-				.map((connection) => connection.id);
-			console.log(newConnectionIds);
-			return {
-				workspace: {
-					...state.workspace,
-					ui: {
-						...state.workspace.ui,
-						selectedConnectionIds: newConnectionIds,
-					},
-				},
-			};
-		}),
-
-	unselectConnectionId: (connectionId) =>
+	deselectConnection: (connectionId) =>
 		set((state) => {
 			if (!state.workspace) return {};
 			return {

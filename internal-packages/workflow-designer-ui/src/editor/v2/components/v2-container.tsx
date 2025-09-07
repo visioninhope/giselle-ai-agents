@@ -76,9 +76,8 @@ function V2NodeCanvas() {
 		updateNodeData,
 		addNode,
 		addConnection,
-		setSelectedConnectionId,
-		setSelectedConnectionIds,
-		unselectConnectionId,
+		selectConnection,
+		deselectConnection,
 	} = useWorkflowDesignerStore(
 		useShallow((s) => ({
 			setUiNodeState: s.setUiNodeState,
@@ -89,9 +88,8 @@ function V2NodeCanvas() {
 			updateNodeData: s.updateNodeData,
 			addNode: s.addNode,
 			addConnection: s.addConnection,
-			setSelectedConnectionId: s.setSelectedConnectionId,
-			setSelectedConnectionIds: s.setSelectedConnectionIds,
-			unselectConnectionId: s.unselectConnectionId,
+			selectConnection: s.selectConnection,
+			deselectConnection: s.deselectConnection,
 		})),
 	);
 	const { selectedTool, reset } = useToolbar();
@@ -348,9 +346,9 @@ function V2NodeCanvas() {
 				switch (change.type) {
 					case "select":
 						if (change.selected) {
-							setSelectedConnectionId(change.id);
+							selectConnection(change.id);
 						} else {
-							unselectConnectionId(change.id);
+							deselectConnection(change.id);
 						}
 						break;
 					case "remove": {
@@ -360,7 +358,7 @@ function V2NodeCanvas() {
 				}
 			}
 		},
-		[setSelectedConnectionId, deleteConnection, unselectConnectionId],
+		[selectConnection, deleteConnection, deselectConnection],
 	);
 	const handlePanelClick = useCallback(
 		(e: React.MouseEvent) => {
