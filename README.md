@@ -6,7 +6,11 @@
     <div style="display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; margin-bottom: 10px; width: 100%;">
       <span style="font-size: 14px; font-weight: 900; letter-spacing: 2px; text-align: left;">MADE IN JPN</span>
       <span style="font-size: 18px;">▼</span>
-      <span style="font-size: 20px; text-align: right;">🌐</span>
+      <div style="text-align: right;">
+        <a href="https://github.com/giselles-ai/giselle"><img src="https://img.shields.io/github/stars/giselles-ai/giselle.svg?style=social&label=Star" alt="GitHub stars" style="margin-right: 5px;"></a>
+        <img src="https://img.shields.io/badge/License-Apache2.0-blue.svg" alt="License" style="margin-right: 5px;">
+        <a href="CONTRIBUTING.md"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs Welcome"></a>
+      </div>
     </div>
   </div>
   
@@ -15,7 +19,11 @@
     <div style="display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; margin-bottom: 10px; width: 100%;">
       <span style="font-size: 14px; font-weight: 900; letter-spacing: 2px; text-align: left;">MADE IN JPN</span>
       <span style="font-size: 18px;">▼</span>
-      <span style="font-size: 20px; text-align: right;">🌐</span>
+      <div style="text-align: right;">
+        <a href="https://github.com/giselles-ai/giselle"><img src="https://img.shields.io/github/stars/giselles-ai/giselle.svg?style=social&label=Star" alt="GitHub stars" style="margin-right: 5px;"></a>
+        <img src="https://img.shields.io/badge/License-Apache2.0-blue.svg" alt="License" style="margin-right: 5px;">
+        <a href="CONTRIBUTING.md"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs Welcome"></a>
+      </div>
     </div>
   </div>
   
@@ -35,23 +43,83 @@
     <source src="./docs/assets/introduction.webm" type="video/webm">
     Your browser does not support the video tag.
   </video>
-</div>
 
-## Introduction
+  <!-- Light/Dark Mode GIFs -->
+  <img src="./docs/assets/copy-light.gif#gh-light-mode-only" alt="Giselle Demo" width="400" style="margin-top: 20px; border-radius: 8px;">
+  <img src="./docs/assets/copy-dark.gif#gh-dark-mode-only" alt="Giselle Demo" width="400" style="margin-top: 20px; border-radius: 8px;">
+</div>
+</thinking>
+
+## 👋 Introduction
 
 Giselle is an open source AI for agentic workflows, enabling seamless human-AI collaboration.
 
-## Using Giselle
 
-### Cloud
+
+## ⚡ Quick Start
+
+Get Giselle running locally in under 2 minutes:
+
+```bash
+# Clone the repository
+git clone https://github.com/giselles-ai/giselle.git
+cd giselle
+
+# Install dependencies
+pnpm install
+
+# Create environment file
+touch .env.local
+
+# Add your API key (at least one required)
+echo 'OPENAI_API_KEY="your_openai_api_key_here"' >> .env.local
+
+# Start development server
+pnpm turbo dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) and start building your AI agents!
+
+> **Note**: You need at least one AI provider API key. Supported providers: OpenAI, Anthropic, Google AI.
+
+## ✨ Features
+
+<div align="center">
+
+<img src="./docs/assets/featured/pdt1.png" width="100" alt="GitHub AI Operations" style="margin-right: 15px;">
+<img src="./docs/assets/featured/pdt2.png" width="100" alt="Visual Agent Builder" style="margin-right: 15px;">
+<img src="./docs/assets/featured/pdt3.png" width="100" alt="Multi-Model Composition" style="margin-right: 15px;">
+<img src="./docs/assets/featured/pdt4.png" width="100" alt="Knowledge Store" style="margin-right: 15px;">
+<img src="./docs/assets/featured/pdt5.png" width="100" alt="Team Collaboration" style="margin-right: 15px;">
+<img src="./docs/assets/featured/pdt6.png" width="100" alt="Template Hub">
+
+</div>
+
+- **⚡ GitHub AI Operations** - Automates issues, PRs, and deployments with AI
+- **🎨 Visual Agent Builder** - Create and modify agents in minutes using an intuitive drag-and-drop interface
+- **🤖 Multi-Model Composition** - Leverage GPT, Claude, Gemini, and more—agents select the best model for each task
+- **📁 Knowledge Store** - Access and search your code and data from one place. GitHub vector store integration supported
+- **👥 Team Collaboration** - Design agents collaboratively with shared configurations and contextual awareness *(In Development)*
+- **🚀 Template Hub** - Kickstart projects with one-click agent templates—contributed by the community *(In Development)*
+
+## 🎯 Use Cases
+
+- **📚 Research Assistant** - Automatically gather information from web and internal docs
+- **🔍 Code Reviewer** - AI-powered code review that integrates with your GitHub workflow  
+- **📄 Document Generator** - Auto-create PRDs, specs, and release notes from your codebase
+- **🔄 Workflow Automator** - Chain multiple AI models to handle complex business processes
+
+## 🚀 Using Giselle
+
+### ☁️ Cloud
 
 We host [Giselle](https://giselles.ai/) as a cloud service for anyone to use instantly. It has all the same features as the self-hosted version, and includes 30 minutes of free Agent time per month in the free plan.
 
-### Self-hosting
+### 🏠 Self-hosting
 
 Follow this [starter guide](CONTRIBUTING.md#development-environment-setup) to get Giselle running in your environment.
 
-### Vibe Coding Guide
+### 🎵 Vibe Coding Guide
 
 If you're using AI coding assistants like Claude, Cursor, or WindSurf to help build with Giselle, check out our [Vibe Coding Guide](/docs/vibe/01-introduction.md). This guide explains:
 
@@ -62,11 +130,11 @@ If you're using AI coding assistants like Claude, Cursor, or WindSurf to help bu
 
 Designed for both developers and non-engineers, this guide will help you harness the power of AI to build with Giselle without needing traditional coding expertise.
 
-## Roadmap
+## 🗺️ Roadmap
 
 Giselle is currently still in active development. The roadmap for the public repository is currently being created, and once it's finalized, we will update this README accordingly.
 
-## Contributing
+## 🤝 Contributing
 
 Your contributions — big or small — help Giselle evolve and improve. Interested in joining us?
 
@@ -80,7 +148,7 @@ Here's how you can contribute:
 
 For more details, please see our [contributing guide](CONTRIBUTING.md).
 
-## License
+## 📄 License
 
 Giselle is licensed under the [Apache License Version 2.0](LICENSE).
 
