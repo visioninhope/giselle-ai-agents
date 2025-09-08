@@ -55,7 +55,7 @@ export function useActController() {
 			const { onActStart, onActComplete, ...rest } = options;
 
 			await executeAct({
-				...(rest as Omit<ActExecutorOptions, "act">),
+				...rest,
 				act,
 				applyPatches: async (actId, patches) => {
 					await client.patchAct({ actId, patches });
