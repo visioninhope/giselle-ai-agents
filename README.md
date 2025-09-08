@@ -1,12 +1,34 @@
 <div align="center">
-  <a href="https://giselles.ai">
-    <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="./docs/assets/giselle-circular-logo.png">
-      <img alt="Giselle logo" src="./docs/assets/giselle-circular-logo.png" height="128">
-    </picture>
-  </a>
-  <h1>Giselle</h1>
-  <a href="https://www.producthunt.com/posts/giselle?embed=true&utm_source=badge-featured&utm_medium=badge&utm_souce=badge-giselle" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=924550&theme=light&t=1742787056002" alt="Giselle - AI&#0032;Agent&#0032;Builder | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
+  
+  <!-- Retro 80s Header -->
+  <!-- Light Mode -->
+  <div style="color: #010318; margin-bottom: 20px;">
+    <div style="display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; margin-bottom: 10px; width: 100%;">
+      <span style="font-size: 14px; font-weight: 900; letter-spacing: 2px; text-align: left;">MADE IN JPN</span>
+      <span style="font-size: 18px;">▼</span>
+      <span style="font-size: 20px; text-align: right;">🌐</span>
+    </div>
+  </div>
+  
+  <!-- Dark Mode -->
+  <div style="color: #B8E8F4; text-shadow: 0 0 10px #B8E8F4; margin-bottom: 20px;">
+    <div style="display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; margin-bottom: 10px; width: 100%;">
+      <span style="font-size: 14px; font-weight: 900; letter-spacing: 2px; text-align: left;">MADE IN JPN</span>
+      <span style="font-size: 18px;">▼</span>
+      <span style="font-size: 20px; text-align: right;">🌐</span>
+    </div>
+  </div>
+  
+  <img src="./docs/assets/giselle-logo-light.svg#gh-light-mode-only" alt="Giselle logo" height="100">
+  <img src="./docs/assets/giselle-logo-dark.svg#gh-dark-mode-only" alt="Giselle logo" height="100">
+
+  <p style="font-size: 18px; color: #666; margin: 20px 0;">the AI agent studio powering product delivery</p>
+
+  <!-- Light Mode Badge -->
+  <a href="https://www.producthunt.com/products/giselle?embed=true&utm_source=badge-featured&utm_medium=badge&utm_source=badge-giselle" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=924550&theme=dark&t=1757315890418#gh-light-mode-only" alt="Giselle - AI&#0032;App&#0032;Builder | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
+  
+  <!-- Dark Mode Badge -->
+  <a href="https://www.producthunt.com/products/giselle?embed=true&utm_source=badge-featured&utm_medium=badge&utm_source=badge-giselle" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=924550&theme=neutral&t=1757315863282#gh-dark-mode-only" alt="Giselle - AI&#0032;App&#0032;Builder | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
 </div>
 
 ## Introduction
