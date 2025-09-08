@@ -1,6 +1,6 @@
 import type { NodeId } from "@giselle-sdk/data-type";
 import type { UIMessage } from "ai";
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useRef } from "react";
 import { useShallow } from "zustand/shallow";
 import {
 	type CancelledGeneration,
@@ -64,19 +64,20 @@ export function ZustandBridgeGenerationProvider({
 }) {
 	const client = useGiselleEngine();
 	const { experimental_storage } = useFeatureFlag();
-	const { generations, generationListener, stopHandlers } = useGenerationStore(
+	const { generations } = useGenerationStore(
 		useShallow((s) => ({
 			generations: s.generations,
-			generationListener: s.generationListener,
-			stopHandlers: s.stopHandlers,
 		})),
 	);
 	const {
 		addGenerationRunner,
 		updateGeneration,
 		updateMessages: updateMessagesStore,
-		addStopHandler: addStopHandlerStore,
+		// addStopHandler: addStopHandlerStore,
 	} = useGenerationStore();
+
+	const stopHandlers = useRef<Record<GenerationId, () => void>>({});
+	const generationListener = useRef<Record<GenerationId, Generation>>({});
 
 	const nodeGenerationMap = useNodeGenerationMap(generations);
 
@@ -92,7 +93,7 @@ export function ZustandBridgeGenerationProvider({
 				onUpdateMessages?: (generation: RunningGeneration) => void;
 			},
 		) => {
-			let generation = generationListener[generationId];
+			let generation = generationListener.current[generationId];
 			let status = generation.status;
 			let messages =
 				"messages" in generation ? (generation.messages ?? []) : [];
@@ -101,7 +102,7 @@ export function ZustandBridgeGenerationProvider({
 
 			while (true) {
 				if (Date.now() - startTime > timeoutDuration) {
-					generation = generationListener[generationId];
+					generation = generationListener.current[generationId];
 					const failedGeneration: FailedGeneration = {
 						id: generation.id,
 						context: generation.context,
@@ -124,12 +125,12 @@ export function ZustandBridgeGenerationProvider({
 						},
 					};
 					options?.onError?.(failedGeneration);
-					const handler = stopHandlers[generation.id];
+					const handler = stopHandlers.current[generation.id];
 					handler?.();
 					updateGeneration(failedGeneration);
 					return;
 				}
-				generation = generationListener[generationId];
+				generation = generationListener.current[generationId];
 				if (status !== generation.status) {
 					status = generation.status;
 					if (isRunningGeneration(generation)) {
@@ -158,7 +159,7 @@ export function ZustandBridgeGenerationProvider({
 				await new Promise((resolve) => setTimeout(resolve, 500));
 			}
 		},
-		[updateGeneration, generationListener, stopHandlers],
+		[updateGeneration],
 	);
 
 	const createGenerationRunner: CreateGenerationRunner = useCallback(
@@ -171,6 +172,7 @@ export function ZustandBridgeGenerationProvider({
 				createdAt: Date.now(),
 			};
 			addGenerationRunner(createdGeneration);
+			generationListener.current[createdGeneration.id] = createdGeneration;
 			return createdGeneration;
 		},
 		[addGenerationRunner],
@@ -178,7 +180,8 @@ export function ZustandBridgeGenerationProvider({
 
 	const startGenerationRunner: StartGenerationRunner = useCallback(
 		async (id, options = {}) => {
-			const generation = generationListener[id];
+			const generation = generationListener.current[id];
+			console.log(`generation: ${generation.id}`);
 			if (!isCreatedGeneration(generation)) {
 				return;
 			}
@@ -197,15 +200,18 @@ export function ZustandBridgeGenerationProvider({
 				onError: options.onGenerationFailed,
 			});
 		},
-		[updateGeneration, waitForGeneration, generationListener],
+		[updateGeneration, waitForGeneration],
 	);
 
 	const createAndStartGenerationRunner: CreateAndStartGenerationRunner =
 		useCallback(
 			async (generationContext, options = {}) => {
+				console.log("Creating and starting generation runner");
 				const createdGeneration = createGenerationRunner(generationContext);
 				options?.onGenerationCreated?.(createdGeneration);
+				console.log("Created generation runner");
 				await startGenerationRunner(createdGeneration.id, options);
+				console.log("Started generation runner");
 			},
 			[createGenerationRunner, startGenerationRunner],
 		);
@@ -221,6 +227,13 @@ export function ZustandBridgeGenerationProvider({
 	const updateMessages = useCallback(
 		(id: GenerationId, messages: UIMessage[]) => {
 			updateMessagesStore(id, messages);
+			const targetGeneration = generationListener.current[id];
+			if (isRunningGeneration(targetGeneration)) {
+				generationListener.current[id] = {
+					...targetGeneration,
+					messages,
+				};
+			}
 		},
 		[updateMessagesStore],
 	);
@@ -236,6 +249,7 @@ export function ZustandBridgeGenerationProvider({
 				generationId,
 			);
 			updateGeneration(generation);
+			generationListener.current[generationId] = generation;
 			return generation;
 		},
 		[client, experimental_storage, updateGeneration],
@@ -252,6 +266,7 @@ export function ZustandBridgeGenerationProvider({
 				generationId,
 			);
 			updateGeneration(generation);
+			generationListener.current[generationId] = generation;
 			return generation;
 		},
 		[client, experimental_storage, updateGeneration],
@@ -268,6 +283,7 @@ export function ZustandBridgeGenerationProvider({
 				generationId,
 			);
 			updateGeneration(generation);
+			generationListener.current[generationId] = generation;
 			return generation;
 		},
 		[client, experimental_storage, updateGeneration],
@@ -275,20 +291,20 @@ export function ZustandBridgeGenerationProvider({
 
 	const addStopHandler = useCallback(
 		(generationId: GenerationId, handler: () => void) => {
-			addStopHandlerStore(generationId, handler);
+			stopHandlers.current[generationId] = handler;
 		},
-		[addStopHandlerStore],
+		[],
 	);
 
 	const stopGenerationRunner = useCallback(
 		async (generationId: GenerationId) => {
-			const handler = stopHandlers[generationId];
+			const handler = stopHandlers.current[generationId];
 			handler?.();
 			await client.cancelGeneration({
 				generationId,
 				useExperimentalStorage: experimental_storage,
 			});
-			const generation = generationListener[generationId];
+			const generation = generationListener.current[generationId];
 			const cancelled: CancelledGeneration = {
 				...generation,
 				status: "cancelled",
@@ -296,13 +312,7 @@ export function ZustandBridgeGenerationProvider({
 			};
 			updateGeneration(cancelled);
 		},
-		[
-			client,
-			experimental_storage,
-			updateGeneration,
-			generationListener,
-			stopHandlers,
-		],
+		[client, experimental_storage, updateGeneration],
 	);
 
 	const contextValue = {
