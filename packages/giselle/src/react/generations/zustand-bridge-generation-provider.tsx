@@ -184,12 +184,9 @@ export function ZustandBridgeGenerationProvider({
 	const createAndStartGenerationRunner: CreateAndStartGenerationRunner =
 		useCallback(
 			async (generationContext, options = {}) => {
-				console.log("Creating and starting generation runner");
 				const createdGeneration = createGenerationRunner(generationContext);
 				options?.onGenerationCreated?.(createdGeneration);
-				console.log("Created generation runner");
 				await startGenerationRunner(createdGeneration.id, options);
-				console.log("Started generation runner");
 			},
 			[createGenerationRunner, startGenerationRunner],
 		);
@@ -287,16 +284,12 @@ export function ZustandBridgeGenerationProvider({
 
 	const addGenerationRunner = useCallback(
 		(generation: Generation | Generation[]) => {
-			console.log({ generation });
-			console.log("add generation runner");
 			addGenerationRunnerStore(generation);
 			const generationsArray = Array.isArray(generation)
 				? generation
 				: [generation];
 
-			console.log(`generationsArray length: ${generationsArray.length}`);
 			for (const generation of generationsArray) {
-				console.log(`add generation: ${generation.id}`);
 				generationListener.current[generation.id] = generation;
 			}
 		},
