@@ -13,8 +13,6 @@ interface GenerationStore {
 
 export const useGenerationStore = create<GenerationStore>((set) => ({
 	generations: [],
-	generationListener: {},
-	stopHandlers: {},
 	setGenerations: (generations) =>
 		set({
 			generations,
