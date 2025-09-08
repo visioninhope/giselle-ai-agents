@@ -270,6 +270,9 @@ export function ZustandBridgeGenerationProvider({
 			const handler = stopHandlers.current[generationId];
 			handler?.();
 			const generation = generationListener.current[generationId];
+			if (!generation) {
+				return;
+			}
 			const cancelled: CancelledGeneration = {
 				...generation,
 				status: "cancelled",
@@ -277,10 +280,12 @@ export function ZustandBridgeGenerationProvider({
 			};
 			updateGeneration(cancelled);
 			generationListener.current[generationId] = cancelled;
-			await client.cancelGeneration({
-				generationId,
-				useExperimentalStorage: experimental_storage,
-			});
+			if (isRunningGeneration(generation)) {
+				await client.cancelGeneration({
+					generationId,
+					useExperimentalStorage: experimental_storage,
+				});
+			}
 		},
 		[client, experimental_storage, updateGeneration],
 	);
