@@ -1,6 +1,6 @@
 import type { UIMessage } from "ai";
 import { create } from "zustand";
-import type { Generation, RunningGeneration } from "../../concepts/generation";
+import type { Generation } from "../../concepts/generation";
 import type { GenerationId } from "../../concepts/identifiers";
 
 interface GenerationStore {
@@ -9,8 +9,6 @@ interface GenerationStore {
 	addGenerationRunner: (generation: Generation | Generation[]) => void;
 	updateGeneration: (generation: Generation) => void;
 	updateMessages: (id: GenerationId, messages: UIMessage[]) => void;
-	// addStopHandler: (id: GenerationId, handler: () => void) => void;
-	// removeStopHandler: (id: GenerationId) => void;
 }
 
 export const useGenerationStore = create<GenerationStore>((set) => ({
@@ -47,13 +45,4 @@ export const useGenerationStore = create<GenerationStore>((set) => ({
 				),
 			};
 		}),
-	// addStopHandler: (id, handler) =>
-	// 	set((state) => ({
-	// 		stopHandlers: { ...state.stopHandlers, [id]: handler },
-	// 	})),
-	// removeStopHandler: (id) =>
-	// 	set((state) => {
-	// 		const { [id]: _, ...rest } = state.stopHandlers;
-	// 		return { stopHandlers: rest };
-	// 	}),
 }));

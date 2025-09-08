@@ -49,9 +49,6 @@ interface GenerationRunnerSystemContextValue {
 	createGenerationRunner: CreateGenerationRunner;
 	startGenerationRunner: StartGenerationRunner;
 	createAndStartGenerationRunner: CreateAndStartGenerationRunner;
-	getGeneration: (generationId: GenerationId) => Generation | undefined;
-	generations: Generation[];
-	nodeGenerationMap: Map<NodeId, Generation[]>;
 	updateGenerationStatusToRunning: (
 		generationId: GenerationId,
 	) => Promise<

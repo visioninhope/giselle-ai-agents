@@ -18,7 +18,13 @@ export function useNodeGenerations({
 	nodeId: NodeId;
 	origin: GenerationOrigin;
 }) {
-	const generations = useGenerationStore(useShallow((s) => s.generations));
+	const generations = useGenerationStore(
+		useShallow((s) =>
+			s.generations.filter(
+				(generation) => generation.context.operationNode.id === nodeId,
+			),
+		),
+	);
 	const {
 		createGenerationRunner,
 		startGenerationRunner,

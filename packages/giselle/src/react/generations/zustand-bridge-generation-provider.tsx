@@ -1,4 +1,3 @@
-import type { NodeId } from "@giselle-sdk/data-type";
 import type { UIMessage } from "ai";
 import { useCallback, useMemo, useRef } from "react";
 import { useShallow } from "zustand/shallow";
@@ -36,25 +35,6 @@ import {
 } from "./helpers";
 import { useGenerationStore } from "./store";
 
-function useNodeGenerationMap(generations: Generation[]) {
-	return useMemo(() => {
-		const map = new Map<NodeId, Generation[]>();
-		for (const generation of generations) {
-			if (generation.status === "created") {
-				continue;
-			}
-			const nodeId = generation.context.operationNode.id;
-			const list = map.get(nodeId) ?? [];
-			list.push(generation);
-			map.set(
-				nodeId,
-				list.sort((a, b) => a.createdAt - b.createdAt),
-			);
-		}
-		return map;
-	}, [generations]);
-}
-
 export function ZustandBridgeGenerationProvider({
 	children,
 	generateTextApi = "/api/giselle/generateText",
@@ -64,22 +44,21 @@ export function ZustandBridgeGenerationProvider({
 }) {
 	const client = useGiselleEngine();
 	const { experimental_storage } = useFeatureFlag();
-	const { generations } = useGenerationStore(
-		useShallow((s) => ({
-			generations: s.generations,
-		})),
-	);
+	const generations = useGenerationStore(useShallow((s) => s.generations));
 	const {
 		addGenerationRunner,
 		updateGeneration,
 		updateMessages: updateMessagesStore,
-		// addStopHandler: addStopHandlerStore,
-	} = useGenerationStore();
+	} = useGenerationStore(
+		useShallow((s) => ({
+			addGenerationRunner: s.addGenerationRunner,
+			updateGeneration: s.updateGeneration,
+			updateMessages: s.updateMessages,
+		})),
+	);
 
 	const stopHandlers = useRef<Record<GenerationId, () => void>>({});
 	const generationListener = useRef<Record<GenerationId, Generation>>({});
-
-	const nodeGenerationMap = useNodeGenerationMap(generations);
 
 	const waitForGeneration = useCallback(
 		async (
@@ -216,14 +195,6 @@ export function ZustandBridgeGenerationProvider({
 			[createGenerationRunner, startGenerationRunner],
 		);
 
-	const getGeneration = useCallback(
-		(generationId: GenerationId) =>
-			useGenerationStore
-				.getState()
-				.generations.find((g) => g.id === generationId),
-		[],
-	);
-
 	const updateMessages = useCallback(
 		(id: GenerationId, messages: UIMessage[]) => {
 			updateMessagesStore(id, messages);
@@ -315,22 +286,34 @@ export function ZustandBridgeGenerationProvider({
 		[client, experimental_storage, updateGeneration],
 	);
 
-	const contextValue = {
-		generateTextApi,
-		createGenerationRunner,
-		startGenerationRunner,
-		createAndStartGenerationRunner,
-		getGeneration,
-		generations,
-		updateGenerationStatusToRunning,
-		updateGenerationStatusToComplete,
-		updateGenerationStatusToFailure,
-		updateMessages,
-		nodeGenerationMap,
-		addStopHandler,
-		stopGenerationRunner,
-		addGenerationRunner,
-	};
+	const contextValue = useMemo(
+		() => ({
+			generateTextApi,
+			createGenerationRunner,
+			startGenerationRunner,
+			createAndStartGenerationRunner,
+			updateGenerationStatusToRunning,
+			updateGenerationStatusToComplete,
+			updateGenerationStatusToFailure,
+			updateMessages,
+			addStopHandler,
+			stopGenerationRunner,
+			addGenerationRunner,
+		}),
+		[
+			generateTextApi,
+			createGenerationRunner,
+			startGenerationRunner,
+			createAndStartGenerationRunner,
+			updateGenerationStatusToRunning,
+			updateGenerationStatusToComplete,
+			updateGenerationStatusToFailure,
+			updateMessages,
+			addStopHandler,
+			stopGenerationRunner,
+			addGenerationRunner,
+		],
+	);
 
 	return (
 		<GenerationRunnerSystemContext.Provider value={contextValue}>
