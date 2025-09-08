@@ -107,6 +107,7 @@ export function ZustandBridgeGenerationProvider({
 					const handler = stopHandlers.current[generation.id];
 					handler?.();
 					updateGeneration(failedGeneration);
+					generationListener.current[generationId] = failedGeneration;
 					return;
 				}
 				generation = generationListener.current[generationId];
@@ -170,6 +171,7 @@ export function ZustandBridgeGenerationProvider({
 			};
 			options.onGenerationQueued?.(queuedGeneration);
 			updateGeneration(queuedGeneration);
+			generationListener.current[id] = queuedGeneration;
 			await waitForGeneration(generation.id, {
 				onStart: options.onGenerationStarted,
 				onComplete: options.onGenerationCompleted,
@@ -267,10 +269,6 @@ export function ZustandBridgeGenerationProvider({
 		async (generationId: GenerationId) => {
 			const handler = stopHandlers.current[generationId];
 			handler?.();
-			await client.cancelGeneration({
-				generationId,
-				useExperimentalStorage: experimental_storage,
-			});
 			const generation = generationListener.current[generationId];
 			const cancelled: CancelledGeneration = {
 				...generation,
@@ -278,6 +276,11 @@ export function ZustandBridgeGenerationProvider({
 				cancelledAt: Date.now(),
 			};
 			updateGeneration(cancelled);
+			generationListener.current[generationId] = cancelled;
+			await client.cancelGeneration({
+				generationId,
+				useExperimentalStorage: experimental_storage,
+			});
 		},
 		[client, experimental_storage, updateGeneration],
 	);
