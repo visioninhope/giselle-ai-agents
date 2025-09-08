@@ -2,10 +2,6 @@
 
 import {
 	type ConnectionId,
-	createFailedFileData,
-	createUploadedFileData,
-	createUploadingFileData,
-	type FileNode,
 	type Node,
 	NodeId,
 	type NodeLike,
@@ -17,13 +13,13 @@ import {
 } from "@giselle-sdk/data-type";
 import type { LanguageModelProvider } from "@giselle-sdk/language-model";
 import { createContext, useCallback, useEffect, useState } from "react";
-import { APICallError } from "../errors";
 import { useFeatureFlag } from "../feature-flags";
 import { useGiselleEngine } from "../use-giselle-engine";
 import {
 	useAddConnection,
 	useAddNode,
 	useCopyNode,
+	useFileUploads,
 	useNodeUpdate,
 	usePropertiesPanel,
 	useWorkspaceReducer,
@@ -145,86 +141,12 @@ export function WorkflowDesignerProvider({
 
 	const isSupportedConnectionCb = useCallback(isSupportedConnection, []);
 
-	const uploadFile = useCallback<
-		(
-			files: File[],
-			node: FileNode,
-			options?: { onError?: (error: string) => void },
-		) => Promise<void>
-	>(
-		async (files, node, options) => {
-			// Track existing names and mark duplicates (exact match: name including extension)
-			const reservedNames = new Set<string>(
-				node.content.files.map((f) => f.name),
-			);
-			const preparedFiles = files.map((originalFile) => {
-				const name = originalFile.name;
-				const isDuplicate = reservedNames.has(name);
-				if (!isDuplicate) {
-					reservedNames.add(name);
-				}
-				return { file: originalFile, name, isDuplicate };
-			});
-
-			let fileContents = node.content.files;
-			for (const { file, name, isDuplicate } of preparedFiles) {
-				if (isDuplicate) {
-					options?.onError?.(`duplicate file name: ${name}`);
-					continue;
-				}
-				const uploadingFileData = createUploadingFileData({
-					name,
-					type: file.type,
-					size: file.size,
-				});
-				fileContents = [...fileContents, uploadingFileData];
-				dispatch({
-					type: "UPDATE_FILE_STATUS",
-					nodeId: node.id,
-					files: fileContents,
-				});
-
-				try {
-					await client.uploadFile({
-						workspaceId: data.id,
-						file,
-						fileId: uploadingFileData.id,
-						fileName: name,
-						useExperimentalStorage: experimental_storage,
-					});
-
-					const uploadedFileData = createUploadedFileData(
-						uploadingFileData,
-						Date.now(),
-					);
-					fileContents = [
-						...fileContents.filter((f) => f.id !== uploadedFileData.id),
-						uploadedFileData,
-					];
-				} catch (error) {
-					if (APICallError.isInstance(error)) {
-						const message =
-							error.statusCode === 413 ? "filesize too large" : error.message;
-						options?.onError?.(message);
-						const failedFileData = createFailedFileData(
-							uploadingFileData,
-							message,
-						);
-						fileContents = [
-							...fileContents.filter((f) => f.id !== failedFileData.id),
-							failedFileData,
-						];
-					}
-				}
-				dispatch({
-					type: "UPDATE_FILE_STATUS",
-					nodeId: node.id,
-					files: fileContents,
-				});
-			}
-		},
-		[dispatch, client, data.id, experimental_storage],
-	);
+	const { uploadFile } = useFileUploads({
+		dispatch,
+		client,
+		workspaceId: data.id,
+		useExperimentalStorage: experimental_storage,
+	});
 
 	const removeFile = useCallback(
 		async (uploadedFile: UploadedFileData) => {
