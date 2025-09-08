@@ -30,11 +30,12 @@ interface TriggerConfigResult {
 }
 
 /**
- * Creates a GitHubFlowTriggerEvent based on the event ID and optional callsign
+ * Creates a GitHubFlowTriggerEvent based on the event ID and optional callsign/labels
  */
 export function createTriggerEvent(
 	eventId: GitHubTriggerEventId,
 	callsign?: string,
+	labels?: string[],
 ): GitHubFlowTriggerEvent {
 	switch (eventId) {
 		case "github.issue.created":
@@ -56,6 +57,14 @@ export function createTriggerEvent(
 				conditions: {
 					callsign,
 				},
+			};
+		case "github.issue.labeled":
+			if (!labels || labels.length === 0) {
+				throw new Error("Labels are required for this trigger type");
+			}
+			return {
+				id: eventId,
+				conditions: { labels },
 			};
 		default: {
 			const _exhaustiveCheck: never = eventId;

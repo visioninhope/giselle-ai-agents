@@ -17,6 +17,13 @@ const IssueCommentCreated = z.object({
 	}),
 });
 
+const IssueLabelAdded = z.object({
+	id: z.literal("github.issue.labeled"),
+	conditions: z.object({
+		labels: z.array(z.string()).min(1),
+	}),
+});
+
 const PullRequestCommentCreated = z.object({
 	id: z.literal("github.pull_request_comment.created"),
 	conditions: z.object({
@@ -46,6 +53,7 @@ export const GitHubFlowTriggerEvent = z.discriminatedUnion("id", [
 	IssueCreated,
 	IssueClosed,
 	IssueCommentCreated,
+	IssueLabelAdded,
 	PullRequestCommentCreated,
 	PullRequestReviewCommentCreated,
 	PullRequestOpened,

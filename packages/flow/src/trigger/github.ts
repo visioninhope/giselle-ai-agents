@@ -49,6 +49,23 @@ const githubIssueCommentCreatedTrigger = {
 	},
 } as const satisfies GitHubTrigger;
 
+const githubIssueLabeledTrigger = {
+	provider,
+	event: {
+		id: "github.issue.labeled",
+		label: "Issue Label Added",
+		payloads: z.object({
+			issueNumber: z.number(),
+			title: z.string(),
+			body: z.string(),
+			labelName: z.string(),
+		}),
+		conditions: z.object({
+			labels: z.array(z.string()).min(1),
+		}),
+	},
+} as const satisfies GitHubTrigger;
+
 const githubPullRequestCommentCreatedTrigger = {
 	provider,
 	event: {
@@ -135,6 +152,7 @@ export const triggers = {
 	[githubIssueCreatedTrigger.event.id]: githubIssueCreatedTrigger,
 	[githubIssueClosedTrigger.event.id]: githubIssueClosedTrigger,
 	[githubIssueCommentCreatedTrigger.event.id]: githubIssueCommentCreatedTrigger,
+	[githubIssueLabeledTrigger.event.id]: githubIssueLabeledTrigger,
 	[githubPullRequestCommentCreatedTrigger.event.id]:
 		githubPullRequestCommentCreatedTrigger,
 	[githubPullRequestReviewCommentCreatedTrigger.event.id]:
@@ -165,6 +183,8 @@ export function triggerIdToLabel(triggerId: TriggerEventId) {
 			return githubPullRequestReadyForReviewTrigger.event.label;
 		case "github.pull_request.closed":
 			return githubPullRequestClosedTrigger.event.label;
+		case "github.issue.labeled":
+			return githubIssueLabeledTrigger.event.label;
 		default: {
 			const exhaustiveCheck: never = triggerId;
 			throw new Error(`Unknown trigger ID: ${exhaustiveCheck}`);

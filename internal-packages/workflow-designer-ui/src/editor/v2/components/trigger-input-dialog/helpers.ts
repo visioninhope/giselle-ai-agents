@@ -41,6 +41,12 @@ const githubEventInputs: GithubEventInputMap = {
 		title: { label: "Title", type: "text", required: true },
 		body: { label: "Body", type: "multiline-text", required: false },
 	},
+	"github.issue.labeled": {
+		issueNumber: { label: "Issue Number", type: "number", required: true },
+		title: { label: "Title", type: "text", required: true },
+		body: { label: "Body", type: "multiline-text", required: false },
+		labelName: { label: "Label Name", type: "text", required: true },
+	},
 	"github.issue_comment.created": {
 		issueNumber: { label: "Issue Number", type: "number", required: true },
 		issueTitle: { label: "Issue Title", type: "text", required: true },

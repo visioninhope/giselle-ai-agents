@@ -22,6 +22,7 @@ import { GitHubRepositoryBlock } from "../";
 const EVENT_ICON_MAP = {
 	"github.issue.created": IssueCreatedIcon,
 	"github.issue.closed": IssueClosedIcon,
+	"github.issue.labeled": IssueCreatedIcon, // Using same icon as issue.created for now
 	"github.issue_comment.created": IssueCommentCreatedIcon,
 	"github.pull_request_comment.created": PullRequestCommentCreatedIcon,
 	"github.pull_request_review_comment.created":
@@ -244,6 +245,31 @@ export function GitHubTriggerConfiguredView({
 								/{data.trigger.configuration.event.conditions.callsign}
 							</span>{" "}
 							in GitHub comments to trigger this workflow.
+						</p>
+					</div>
+				</div>
+			)}
+			{data.trigger.configuration.event.id === "github.issue.labeled" && (
+				<div>
+					<div className="space-y-[4px]">
+						<p className="text-[14px] py-[1.5px] text-[#F7F9FD]">Labels</p>
+						<div className="px-[4px] py-[9px] w-full bg-transparent text-[14px]">
+							<div className="flex flex-wrap gap-[4px]">
+								{data.trigger.configuration.event.conditions.labels.map(
+									(label) => (
+										<span
+											key={label}
+											className="bg-blue-500/20 text-blue-400 px-2 py-1 rounded-md text-[12px]"
+										>
+											{label}
+										</span>
+									),
+								)}
+							</div>
+						</div>
+						<p className="text-[12px] text-white-400 px-[4px]">
+							This workflow triggers when any of these labels are added to an
+							issue.
 						</p>
 					</div>
 				</div>
