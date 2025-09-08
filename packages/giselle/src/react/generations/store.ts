@@ -1,6 +1,4 @@
-import type { NodeId } from "@giselle-sdk/data-type";
 import type { UIMessage } from "ai";
-import { useMemo } from "react";
 import { create } from "zustand";
 import type { Generation, RunningGeneration } from "../../concepts/generation";
 import type { GenerationId } from "../../concepts/identifiers";
@@ -76,22 +74,3 @@ export const useGenerationStore = create<GenerationStore>((set) => ({
 			return { stopHandlers: rest };
 		}),
 }));
-
-function useNodeGenerationMap(generations: Generation[]) {
-	return useMemo(() => {
-		const map = new Map<NodeId, Generation[]>();
-		for (const generation of generations) {
-			if (generation.status === "created") {
-				continue;
-			}
-			const nodeId = generation.context.operationNode.id;
-			const list = map.get(nodeId) ?? [];
-			list.push(generation);
-			map.set(
-				nodeId,
-				list.sort((a, b) => a.createdAt - b.createdAt),
-			);
-		}
-		return map;
-	}, [generations]);
-}
