@@ -153,59 +153,77 @@ export function WorkflowDesignerProvider({
 		) => Promise<void>
 	>(
 		async (files, node, options) => {
-			const uploaders = files.map((file) => {
-				return async () => {
-					let fileContents = node.content.files;
-					if (fileContents.some((f) => f.name === file.name)) {
-						options?.onError?.("duplicate file name");
-						return;
-					}
-					const uploadingFileData = createUploadingFileData({
-						name: file.name,
-						type: file.type,
-						size: file.size,
+			// Track existing names and mark duplicates (exact match: name including extension)
+			const reservedNames = new Set<string>(
+				node.content.files.map((f) => f.name),
+			);
+			const preparedFiles = files.map((originalFile) => {
+				const name = originalFile.name;
+				const isDuplicate = reservedNames.has(name);
+				if (!isDuplicate) {
+					reservedNames.add(name);
+				}
+				return { file: originalFile, name, isDuplicate };
+			});
+
+			let fileContents = node.content.files;
+			for (const { file, name, isDuplicate } of preparedFiles) {
+				if (isDuplicate) {
+					options?.onError?.(`duplicate file name: ${name}`);
+					continue;
+				}
+				const uploadingFileData = createUploadingFileData({
+					name,
+					type: file.type,
+					size: file.size,
+				});
+				fileContents = [...fileContents, uploadingFileData];
+				dispatch({
+					type: "UPDATE_FILE_STATUS",
+					nodeId: node.id,
+					files: fileContents,
+				});
+
+				try {
+					await client.uploadFile({
+						workspaceId: data.id,
+						file,
+						fileId: uploadingFileData.id,
+						fileName: name,
+						useExperimentalStorage: experimental_storage,
 					});
-					fileContents = [...fileContents, uploadingFileData];
-					updateNodeDataContent(node, { files: fileContents });
-					try {
-						await client.uploadFile({
-							workspaceId: data.id,
-							file,
-							fileId: uploadingFileData.id,
-							fileName: file.name,
-							useExperimentalStorage: experimental_storage,
-						});
-						const uploadedFileData = createUploadedFileData(
+
+					const uploadedFileData = createUploadedFileData(
+						uploadingFileData,
+						Date.now(),
+					);
+					fileContents = [
+						...fileContents.filter((f) => f.id !== uploadedFileData.id),
+						uploadedFileData,
+					];
+				} catch (error) {
+					if (APICallError.isInstance(error)) {
+						const message =
+							error.statusCode === 413 ? "filesize too large" : error.message;
+						options?.onError?.(message);
+						const failedFileData = createFailedFileData(
 							uploadingFileData,
-							Date.now(),
+							message,
 						);
 						fileContents = [
-							...fileContents.filter((f) => f.id !== uploadedFileData.id),
-							uploadedFileData,
+							...fileContents.filter((f) => f.id !== failedFileData.id),
+							failedFileData,
 						];
-					} catch (error) {
-						if (APICallError.isInstance(error)) {
-							const message =
-								error.statusCode === 413 ? "filesize too large" : error.message;
-							options?.onError?.(message);
-							const failedFileData = createFailedFileData(
-								uploadingFileData,
-								message,
-							);
-							fileContents = [
-								...fileContents.filter((f) => f.id !== failedFileData.id),
-								failedFileData,
-							];
-						}
 					}
-					updateNodeDataContent(node, { files: fileContents });
-				};
-			});
-			for (const uploader of uploaders) {
-				await uploader();
+				}
+				dispatch({
+					type: "UPDATE_FILE_STATUS",
+					nodeId: node.id,
+					files: fileContents,
+				});
 			}
 		},
-		[updateNodeDataContent, client, data.id, experimental_storage],
+		[dispatch, client, data.id, experimental_storage],
 	);
 
 	const removeFile = useCallback(
