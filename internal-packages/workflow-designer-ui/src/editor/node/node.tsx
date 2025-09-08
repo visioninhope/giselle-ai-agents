@@ -11,7 +11,6 @@ import {
 } from "@giselle-sdk/data-type";
 import {
 	defaultName,
-	useNodeGenerations,
 	useWorkflowDesignerStore,
 } from "@giselle-sdk/giselle/react";
 import {
@@ -30,6 +29,7 @@ import { EditableText } from "../../ui/editable-text";
 import { Tooltip } from "../../ui/tooltip";
 import { GitHubNodeInfo } from "./ui";
 import { GitHubTriggerStatusBadge } from "./ui/github-trigger/status-badge";
+import { useCurrentNodeGeneration } from "./use-current-node-generation";
 
 // Helper function to get completion label from node LLM provider
 function getCompletionLabel(node: NodeLike): string {
@@ -113,15 +113,10 @@ export function NodeComponent({
 	connectedOutputIds?: OutputId[];
 }) {
 	const updateNodeData = useWorkflowDesignerStore((state) => state.updateNode);
-	const workspaceId = useWorkflowDesignerStore((state) => state.workspace.id);
+	const { currentGeneration, stopCurrentGeneration } = useCurrentNodeGeneration(
+		node.id,
+	);
 
-	const { stopGenerationRunner, currentGeneration } = useNodeGenerations({
-		nodeId: node.id,
-		origin: {
-			type: "studio",
-			workspaceId,
-		},
-	});
 	const prevGenerationStatusRef = useRef(currentGeneration?.status);
 	const [showCompleteLabel, startTransition] = useTransition();
 	useEffect(() => {
@@ -213,7 +208,7 @@ export function NodeComponent({
 								type="button"
 								onClick={(e) => {
 									e.stopPropagation();
-									stopGenerationRunner();
+									stopCurrentGeneration();
 								}}
 								className="ml-1 p-1 rounded-full bg-blue-500 hover:bg-blue-600 transition-colors"
 							>
