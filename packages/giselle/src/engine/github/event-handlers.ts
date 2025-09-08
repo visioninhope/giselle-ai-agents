@@ -15,6 +15,7 @@ import type { createAndStartAct } from "../acts";
 import type { GiselleEngineContext } from "../types";
 import { getWorkspace } from "../workspaces";
 import type { parseCommand } from "./utils";
+import de from "zod/v4/locales/de.cjs";
 
 // Since we can't access node information from the new Act structure,
 // we'll simplify the progress tracking
@@ -328,6 +329,39 @@ export function handleIssueLabelAdded<TEventName extends WebhookEventName>(
 		: { shouldRun: false };
 }
 
+export function handlePullRequestLabelAdded<
+	TEventName extends WebhookEventName,
+>(args: EventHandlerArgs<TEventName>): EventHandlerResult {
+	if (
+		!args.deps.ensureWebhookEvent(args.event, "pull_request.labeled") ||
+		args.trigger.configuration.event.id !== "github.pull_request.labeled"
+	) {
+		return { shouldRun: false };
+	}
+
+	const pullRequest = args.event.data.payload.pull_request;
+	const addedLabel = args.event.data.payload.label;
+
+	if (!pullRequest || !addedLabel) {
+		return { shouldRun: false };
+	}
+
+	const conditions =
+		args.trigger.configuration.event.id === "github.pull_request.labeled"
+			? args.trigger.configuration.event.conditions
+			: undefined;
+
+	if (!conditions?.labels || !Array.isArray(conditions.labels)) {
+		return { shouldRun: false };
+	}
+
+	const shouldRun = conditions.labels.includes(addedLabel.name);
+
+	return shouldRun
+		? { shouldRun: true, reactionNodeId: pullRequest.node_id }
+		: { shouldRun: false };
+}
+
 const eventHandlers = [
 	handleIssueOpened,
 	handleIssueClosed,
@@ -338,6 +372,7 @@ const eventHandlers = [
 	handlePullRequestReadyForReview,
 	handlePullRequestClosed,
 	handleIssueLabelAdded,
+	handlePullRequestLabelAdded,
 ];
 
 export async function processEvent<TEventName extends WebhookEventName>(
@@ -356,6 +391,7 @@ export async function processEvent<TEventName extends WebhookEventName>(
 	) {
 		return false;
 	}
+	console.log(args);
 
 	const repositoryNodeId = args.trigger.configuration.repositoryNodeId;
 	const installationId = args.trigger.configuration.installationId;
@@ -432,6 +468,7 @@ export async function processEvent<TEventName extends WebhookEventName>(
 
 					const body = `Running flow...\n\n${buildProgressTable(progressTableData)}`;
 
+					console.log(args.event);
 					if (
 						deps.ensureWebhookEvent(args.event, "issue_comment.created") ||
 						deps.ensureWebhookEvent(args.event, "issues.opened") ||
@@ -452,7 +489,8 @@ export async function processEvent<TEventName extends WebhookEventName>(
 							args.event,
 							"pull_request.ready_for_review",
 						) ||
-						deps.ensureWebhookEvent(args.event, "pull_request.closed")
+						deps.ensureWebhookEvent(args.event, "pull_request.closed") ||
+						deps.ensureWebhookEvent(args.event, "pull_request.labeled")
 					) {
 						const pullNumber = args.event.data.payload.pull_request.number;
 						const comment = await deps.createPullRequestComment({

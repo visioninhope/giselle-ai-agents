@@ -49,6 +49,13 @@ const PullRequestClosed = z.object({
 	id: z.literal("github.pull_request.closed"),
 });
 
+const PullRequestLabelAdded = z.object({
+	id: z.literal("github.pull_request.labeled"),
+	conditions: z.object({
+		labels: z.array(z.string()).min(1),
+	}),
+});
+
 export const GitHubFlowTriggerEvent = z.discriminatedUnion("id", [
 	IssueCreated,
 	IssueClosed,
@@ -59,6 +66,7 @@ export const GitHubFlowTriggerEvent = z.discriminatedUnion("id", [
 	PullRequestOpened,
 	PullRequestReadyForReview,
 	PullRequestClosed,
+	PullRequestLabelAdded,
 ]);
 export type GitHubFlowTriggerEvent = z.infer<typeof GitHubFlowTriggerEvent>;
 

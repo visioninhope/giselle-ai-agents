@@ -59,6 +59,7 @@ export function createTriggerEvent(
 				},
 			};
 		case "github.issue.labeled":
+		case "github.pull_request.labeled":
 			if (!labels || labels.length === 0) {
 				throw new Error("Labels are required for this trigger type");
 			}

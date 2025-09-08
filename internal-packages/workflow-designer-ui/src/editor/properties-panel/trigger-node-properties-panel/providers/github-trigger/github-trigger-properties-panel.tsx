@@ -148,8 +148,11 @@ function isTriggerRequiringCallsign(eventId: GitHubTriggerEventId): boolean {
 /**
  * Determines if a trigger type requires labels
  */
-function isTriggerRequiringLabels(eventId: GitHubTriggerEventId): boolean {
-	return eventId === "github.issue.labeled";
+function isTriggerRequiringLabels(eventId: GitHubTriggerEventId) {
+	return (
+		eventId === "github.issue.labeled" ||
+		eventId === "github.pull_request.labeled"
+	);
 }
 
 export function Installed({

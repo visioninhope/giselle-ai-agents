@@ -27,6 +27,7 @@ const events: WebhookEventName[] = [
 	"pull_request.opened",
 	"pull_request.ready_for_review",
 	"pull_request.closed",
+	"pull_request.labeled",
 ];
 
 export async function handleGitHubWebhookV2(args: {

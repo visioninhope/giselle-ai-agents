@@ -30,6 +30,7 @@ const EVENT_ICON_MAP = {
 	"github.pull_request.opened": PullRequestOpenedIcon,
 	"github.pull_request.ready_for_review": PullRequestReadyForReviewIcon,
 	"github.pull_request.closed": PullRequestClosedIcon,
+	"github.pull_request.labeled": IssueCreatedIcon, // Using same icon as issue.created for now
 } as const;
 
 // Default icon for unknown events
@@ -249,7 +250,9 @@ export function GitHubTriggerConfiguredView({
 					</div>
 				</div>
 			)}
-			{data.trigger.configuration.event.id === "github.issue.labeled" && (
+			{(data.trigger.configuration.event.id === "github.issue.labeled" ||
+				data.trigger.configuration.event.id ===
+					"github.pull_request.labeled") && (
 				<div>
 					<div className="space-y-[4px]">
 						<p className="text-[14px] py-[1.5px] text-[#F7F9FD]">Labels</p>

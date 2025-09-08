@@ -109,6 +109,12 @@ const githubEventInputs: GithubEventInputMap = {
 		diff: { label: "diff", type: "multiline-text", required: true },
 		id: { label: "ID", type: "number", required: true },
 	},
+	"github.pull_request.labeled": {
+		pullRequestNumber: { label: "Pull Request Number", type: "number", required: true },
+		pullRequestTitle: { label: "Pull Request Title", type: "text", required: true },
+		pullRequestBody: { label: "Pull Request Body", type: "multiline-text", required: false },
+		labelName: { label: "Label Name", type: "text", required: true },
+	},
 };
 
 export function createInputsFromTrigger(
