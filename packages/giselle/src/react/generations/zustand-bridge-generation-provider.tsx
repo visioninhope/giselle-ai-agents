@@ -46,12 +46,12 @@ export function ZustandBridgeGenerationProvider({
 	const { experimental_storage } = useFeatureFlag();
 	const generations = useGenerationStore(useShallow((s) => s.generations));
 	const {
-		addGenerationRunner,
+		addGenerationRunnerStore,
 		updateGeneration,
 		updateMessages: updateMessagesStore,
 	} = useGenerationStore(
 		useShallow((s) => ({
-			addGenerationRunner: s.addGenerationRunner,
+			addGenerationRunnerStore: s.addGenerationRunner,
 			updateGeneration: s.updateGeneration,
 			updateMessages: s.updateMessages,
 		})),
@@ -150,17 +150,16 @@ export function ZustandBridgeGenerationProvider({
 				status: "created",
 				createdAt: Date.now(),
 			};
-			addGenerationRunner(createdGeneration);
+			addGenerationRunnerStore(createdGeneration);
 			generationListener.current[createdGeneration.id] = createdGeneration;
 			return createdGeneration;
 		},
-		[addGenerationRunner],
+		[addGenerationRunnerStore],
 	);
 
 	const startGenerationRunner: StartGenerationRunner = useCallback(
 		async (id, options = {}) => {
 			const generation = generationListener.current[id];
-			console.log(`generation: ${generation.id}`);
 			if (!isCreatedGeneration(generation)) {
 				return;
 			}
@@ -284,6 +283,24 @@ export function ZustandBridgeGenerationProvider({
 			updateGeneration(cancelled);
 		},
 		[client, experimental_storage, updateGeneration],
+	);
+
+	const addGenerationRunner = useCallback(
+		(generation: Generation | Generation[]) => {
+			console.log({ generation });
+			console.log("add generation runner");
+			addGenerationRunnerStore(generation);
+			const generationsArray = Array.isArray(generation)
+				? generation
+				: [generation];
+
+			console.log(`generationsArray length: ${generationsArray.length}`);
+			for (const generation of generationsArray) {
+				console.log(`add generation: ${generation.id}`);
+				generationListener.current[generation.id] = generation;
+			}
+		},
+		[addGenerationRunnerStore],
 	);
 
 	const contextValue = useMemo(
