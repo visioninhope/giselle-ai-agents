@@ -547,7 +547,7 @@ export function Toolbar() {
 																	type="button"
 																	className="text-blue-400 hover:text-blue-300 border border-blue-400 hover:border-blue-300 text-[12px] px-4 py-2 rounded-[6px] font-medium transition-colors"
 																	onClick={() => {
-																		window.open("/pricing", "_blank");
+																		window.open("/settings/team", "_blank");
 																	}}
 																>
 																	Upgrade to Pro
