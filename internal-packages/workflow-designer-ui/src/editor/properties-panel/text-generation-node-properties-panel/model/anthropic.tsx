@@ -1,7 +1,4 @@
-import {
-	AnthropicLanguageModelData,
-	type ToolSet,
-} from "@giselle-sdk/data-type";
+import { AnthropicLanguageModelData } from "@giselle-sdk/data-type";
 import { useUsageLimits } from "@giselle-sdk/giselle/react";
 import {
 	anthropicLanguageModels,
@@ -26,15 +23,9 @@ import { languageModelAvailable } from "./utils";
 export function AnthropicModelPanel({
 	anthropicLanguageModel,
 	onModelChange,
-	_tools,
-	_onToolChange,
-	_onWebSearchChange,
 }: {
 	anthropicLanguageModel: AnthropicLanguageModelData;
 	onModelChange: (changedValue: AnthropicLanguageModelData) => void;
-	_tools?: ToolSet;
-	_onToolChange: (changedValue: ToolSet) => void;
-	_onWebSearchChange: (enabled: boolean) => void;
 }) {
 	const limits = useUsageLimits();
 
