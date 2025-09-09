@@ -297,20 +297,12 @@ export function TextGenerationTabContent({
 					{node.content.llm.provider === "anthropic" && (
 						<AnthropicModelPanel
 							anthropicLanguageModel={node.content.llm}
-							_tools={node.content.tools}
 							onModelChange={(value) =>
 								updateNodeDataContent(node, {
 									...node.content,
 									llm: value,
 								})
 							}
-							_onToolChange={(changedTool) =>
-								updateNodeDataContent(node, {
-									...node.content,
-									tools: changedTool,
-								})
-							}
-							_onWebSearchChange={() => {}}
 						/>
 					)}
 					{node.content.llm.provider === "perplexity" && (
