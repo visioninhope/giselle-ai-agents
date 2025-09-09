@@ -1,36 +1,14 @@
 <div align="center">
   
-  <!-- Retro 80s Header -->
-  <!-- Light Mode -->
-  <div style="color: #010318; margin-bottom: 20px;">
-    <div style="display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; margin-bottom: 10px; width: 100%;">
-      <span style="font-size: 14px; font-weight: 900; letter-spacing: 2px; text-align: left;">MADE IN JPN</span>
-      <span style="font-size: 18px;">▼</span>
-      <div style="text-align: right;">
-        <a href="https://github.com/giselles-ai/giselle"><img src="https://img.shields.io/github/stars/giselles-ai/giselle.svg?style=social&label=Star" alt="GitHub stars" style="margin-right: 5px;"></a>
-        <img src="https://img.shields.io/badge/License-Apache2.0-blue.svg" alt="License" style="margin-right: 5px;">
-        <a href="CONTRIBUTING.md"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs Welcome"></a>
-      </div>
-    </div>
-  </div>
-  
-  <!-- Dark Mode -->
-  <div style="color: #B8E8F4; text-shadow: 0 0 10px #B8E8F4; margin-bottom: 20px;">
-    <div style="display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; margin-bottom: 10px; width: 100%;">
-      <span style="font-size: 14px; font-weight: 900; letter-spacing: 2px; text-align: left;">MADE IN JPN</span>
-      <span style="font-size: 18px;">▼</span>
-      <div style="text-align: right;">
-        <a href="https://github.com/giselles-ai/giselle"><img src="https://img.shields.io/github/stars/giselles-ai/giselle.svg?style=social&label=Star" alt="GitHub stars" style="margin-right: 5px;"></a>
-        <img src="https://img.shields.io/badge/License-Apache2.0-blue.svg" alt="License" style="margin-right: 5px;">
-        <a href="CONTRIBUTING.md"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs Welcome"></a>
-      </div>
-    </div>
-  </div>
+  <a href="https://github.com/giselles-ai/giselle"><img src="https://img.shields.io/github/stars/giselles-ai/giselle.svg?style=social&label=Star" alt="GitHub stars" style="margin-right: 5px;"></a>
+  <img src="https://img.shields.io/badge/License-Apache2.0-blue.svg" alt="License" style="margin-right: 5px;">
+  <a href="CONTRIBUTING.md"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs Welcome"></a>
+  <span style="font-size: 18px; color: #666; margin-left: 15px;">the AI agent studio powering product delivery</span>
   
   <img src="./docs/assets/giselle-logo-light.svg#gh-light-mode-only" alt="Giselle logo" height="100">
   <img src="./docs/assets/giselle-logo-dark.svg#gh-dark-mode-only" alt="Giselle logo" height="100">
 
-  <p style="font-size: 18px; color: #666; margin: 20px 0;">the AI agent studio powering product delivery</p>
+
 
   <!-- Light Mode Badge -->
   <a href="https://www.producthunt.com/products/giselle?embed=true&utm_source=badge-featured&utm_medium=badge&utm_source=badge-giselle" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=924550&theme=dark&t=1757315890418#gh-light-mode-only" alt="Giselle - AI&#0032;App&#0032;Builder | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
@@ -45,8 +23,8 @@
   </video>
 
   <!-- Light/Dark Mode GIFs -->
-  <img src="./docs/assets/copy-light.gif#gh-light-mode-only" alt="Giselle Demo" width="400" style="margin-top: 20px; border-radius: 8px;">
-  <img src="./docs/assets/copy-dark.gif#gh-dark-mode-only" alt="Giselle Demo" width="400" style="margin-top: 20px; border-radius: 8px;">
+  <img src="./docs/assets/copy-light.gif#gh-light-mode-only" alt="Giselle Demo" width="400">
+  <img src="./docs/assets/copy-dark.gif#gh-dark-mode-only" alt="Giselle Demo" width="400">
 </div>
 </thinking>
 
