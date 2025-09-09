@@ -16,10 +16,8 @@
 [Introduciong Giselle](https://github.com/user-attachments/assets/e6add6b6-d24d-4e8c-8d24-fa626c064a5d)
 
   <!-- Light/Dark Mode GIFs -->
-  <div>
-    <img src="./docs/assets/copy-light.gif#gh-light-mode-only" alt="Giselle Demo" width="400">
-    <img src="./docs/assets/copy-dark.gif#gh-dark-mode-only" alt="Giselle Demo" width="400">
-  </div>
+  <img src="./docs/assets/copy-light.gif#gh-light-mode-only" alt="Giselle Demo" width="400">
+  <img src="./docs/assets/copy-dark.gif#gh-dark-mode-only" alt="Giselle Demo" width="400">
 </div>
 </thinking>
 
@@ -59,11 +57,11 @@ Open [http://localhost:3000](http://localhost:3000) and start building your AI a
 
 <div align="center">
 
-<img src="./docs/assets/featured/pdt1.png" width="100" alt="GitHub AI Operations" style="margin-right: 15px;">
-<img src="./docs/assets/featured/pdt2.png" width="100" alt="Visual Agent Builder" style="margin-right: 15px;">
-<img src="./docs/assets/featured/pdt3.png" width="100" alt="Multi-Model Composition" style="margin-right: 15px;">
-<img src="./docs/assets/featured/pdt4.png" width="100" alt="Knowledge Store" style="margin-right: 15px;">
-<img src="./docs/assets/featured/pdt5.png" width="100" alt="Team Collaboration" style="margin-right: 15px;">
+<img src="./docs/assets/featured/pdt1.png" width="100" alt="GitHub AI Operations" style="margin-right: 25px;">
+<img src="./docs/assets/featured/pdt2.png" width="100" alt="Visual Agent Builder" style="margin-right: 25px;">
+<img src="./docs/assets/featured/pdt3.png" width="100" alt="Multi-Model Composition" style="margin-right: 25px;">
+<img src="./docs/assets/featured/pdt4.png" width="100" alt="Knowledge Store" style="margin-right: 25px;">
+<img src="./docs/assets/featured/pdt5.png" width="100" alt="Team Collaboration" style="margin-right: 25px;">
 <img src="./docs/assets/featured/pdt6.png" width="100" alt="Template Hub">
 
 </div>
