@@ -17,10 +17,7 @@
   <a href="https://www.producthunt.com/products/giselle?embed=true&utm_source=badge-featured&utm_medium=badge&utm_source=badge-giselle" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=924550&theme=neutral&t=1757315863282#gh-dark-mode-only" alt="Giselle - AI&#0032;App&#0032;Builder | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
 
   <!-- Demo Video -->
-  <video width="100%" height="auto" controls style="border-radius: 8px; margin-top: 30px;">
-    <source src="./docs/assets/introduction.webm" type="video/webm">
-    Your browser does not support the video tag.
-  </video>
+[Introduciong Giselle](https://github.com/user-attachments/assets/e6add6b6-d24d-4e8c-8d24-fa626c064a5d)
 
   <!-- Light/Dark Mode GIFs -->
   <img src="./docs/assets/copy-light.gif#gh-light-mode-only" alt="Giselle Demo" width="400">
