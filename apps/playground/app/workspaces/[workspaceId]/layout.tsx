@@ -1,22 +1,5 @@
-import { Workspace, WorkspaceId } from "@giselle-sdk/data-type";
-import {
-	WorkspaceProvider,
-	ZustandBridgeProvider,
-} from "@giselle-sdk/giselle/react";
+import { WorkspaceProvider } from "@giselle-sdk/giselle/react";
 import type { ReactNode } from "react";
-
-// Create a mock workspace for playground
-const mockWorkspace = Workspace.parse({
-	id: WorkspaceId.generate(),
-	name: "Playground Workspace",
-	schemaVersion: "20250221" as const,
-	nodes: [],
-	connections: [],
-	ui: {
-		nodeState: {},
-		viewport: { x: 0, y: 0, zoom: 1 },
-	},
-});
 
 export default function Layout({ children }: { children: ReactNode }) {
 	return (
@@ -31,9 +14,7 @@ export default function Layout({ children }: { children: ReactNode }) {
 				resumableGeneration: false,
 			}}
 		>
-			<ZustandBridgeProvider data={mockWorkspace}>
-				{children}
-			</ZustandBridgeProvider>
+			{children}
 		</WorkspaceProvider>
 	);
 }
