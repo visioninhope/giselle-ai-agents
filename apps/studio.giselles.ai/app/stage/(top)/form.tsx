@@ -46,7 +46,7 @@ function assertNotUndefined<T>(
 type AppId = FlowTriggerId;
 type App = FlowTriggerUIItem;
 
-export const displayCategories = {
+const displayCategories = {
 	all: { value: "all", label: "All" },
 	history: { value: "history", label: "History" },
 	latest: { value: "latest", label: "Latest" },
