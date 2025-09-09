@@ -9,9 +9,11 @@ import type { ReactNode } from "react";
 const mockWorkspace = Workspace.parse({
   id: WorkspaceId.generate(),
   name: "Playground Workspace",
+  schemaVersion: "20250221" as const,
   nodes: [],
   connections: [],
   ui: {
+    nodeState: {},
     viewport: { x: 0, y: 0, zoom: 1 },
   },
 });
