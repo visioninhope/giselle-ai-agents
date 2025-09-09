@@ -6,7 +6,7 @@ import type { FlowTriggerId } from "@giselle-sdk/data-type";
 import clsx from "clsx/lite";
 import { Settings, X } from "lucide-react";
 
-import { useActionState, useCallback, useMemo, useState } from "react";
+import { useActionState, useCallback, useMemo } from "react";
 import { cn } from "@/lib/utils";
 import { AvatarImage } from "@/services/accounts/components/user-button/avatar-image";
 import { buttonVariants } from "../../(main)/settings/components/button";
@@ -18,134 +18,38 @@ import {
 	parseFormInputs,
 	toParameterItems,
 } from "./helpers";
+import { useFilterState } from "./hooks/use-filter-state";
+import { useFormState } from "./hooks/use-form-state";
 import { useUIState } from "./hooks/use-ui-state";
 import { SettingsDialog } from "./settings-dialog";
 import type {
+	FilterType,
 	FlowTriggerUIItem,
 	PerformStageAction,
 	TeamId,
 	TeamOption,
-	ValidationErrors,
 } from "./types";
+import { FILTER_OPTIONS } from "./types";
 
-function assertNonEmpty<T>(
-	arr: readonly T[],
-	msg: string,
-): asserts arr is readonly [T, ...T[]] {
-	if (arr.length === 0) throw new Error(msg);
-}
-
-function assertNotUndefined<T>(
-	value: T | undefined,
-	msg: string,
-): asserts value is T {
-	if (value === undefined) throw new Error(msg);
-}
-
-/** FlowTrigger is essentially an app (we'll change other parts going forward) */
-type AppId = FlowTriggerId;
-type App = FlowTriggerUIItem;
-
-export const displayCategories = {
-	all: { value: "all", label: "All" },
-	history: { value: "history", label: "History" },
-	latest: { value: "latest", label: "Latest" },
-	favorites: { value: "favorites", label: "Favorites" },
-} as const;
-
-type DisplayCategory = keyof typeof displayCategories;
-
-export function FormContainer({
-	flowTriggers: propApps,
+/** @deprecated */
+export function Form({
 	teamOptions,
+	flowTriggers,
 	performStageAction,
-	defaultFlowTriggerId: propDefaultAppId,
-	...props
 }: {
 	teamOptions: TeamOption[];
 	flowTriggers: FlowTriggerUIItem[];
 	performStageAction: PerformStageAction;
-	defaultTeamId?: TeamId;
-	defaultFlowTriggerId?: FlowTriggerId;
 }) {
-	const defaultTeamId = useMemo(() => {
-		if (props.defaultTeamId !== undefined) {
-			return props.defaultTeamId;
-		}
-		assertNonEmpty(teamOptions, "No team options available");
-		return teamOptions[0].value;
-	}, [props.defaultTeamId, teamOptions]);
-	const [teamId, setTeamId] = useState<TeamId>(defaultTeamId);
-	const defaultAppId = useMemo(() => {
-		if (propDefaultAppId !== undefined) {
-			return propDefaultAppId;
-		}
-		const app = propApps.find((app) => app.teamId === teamId);
-		assertNotUndefined(app, "No app available");
-		return app.id;
-	}, [teamId, propApps, propDefaultAppId]);
+	const {
+		selectedTeamId,
+		setSelectedTeamId,
+		selectedFilter,
+		setSelectedFilter,
+		handleFilterChange,
+		handleTeamChange,
+	} = useFilterState({ teamOptions });
 
-	const [appId, setAppId] = useState<AppId>(defaultAppId);
-
-	const handleTeamIdChange = useCallback((newTeamId: TeamId) => {
-		setTeamId(newTeamId);
-	}, []);
-
-	const handleAppIdChange = useCallback((newAppId: AppId) => {
-		setAppId(newAppId);
-	}, []);
-
-	// TODO: Add filtering logic in the future, currently UI only
-	const [displayCategory, setDisplayCategory] =
-		useState<DisplayCategory>("all");
-	const handleDisplayCategoryChange = useCallback(
-		(newCategory: DisplayCategory) => {
-			setDisplayCategory(newCategory);
-		},
-		[],
-	);
-
-	const apps = useMemo(
-		() => propApps.filter((app) => app.teamId === teamId),
-		[propApps, teamId],
-	);
-
-	return (
-		<FormV2
-			teamOptions={teamOptions}
-			teamId={teamId}
-			onTeamIdChange={handleTeamIdChange}
-			apps={apps}
-			appId={appId}
-			onAppIdChange={handleAppIdChange}
-			displayCategory={displayCategory}
-			onDisplayCategoryChange={handleDisplayCategoryChange}
-			performStageAction={performStageAction}
-		/>
-	);
-}
-
-function FormV2({
-	apps,
-	appId,
-	onAppIdChange,
-	teamOptions,
-	teamId,
-	onTeamIdChange,
-	displayCategory,
-	onDisplayCategoryChange,
-	performStageAction,
-}: {
-	teamId: TeamId;
-	teamOptions: TeamOption[];
-	onTeamIdChange: (teamId: TeamId) => void;
-	appId: AppId;
-	apps: App[];
-	onAppIdChange: (appId: AppId) => void;
-	displayCategory: DisplayCategory;
-	onDisplayCategoryChange: (category: DisplayCategory) => void;
-	performStageAction: PerformStageAction;
-}) {
 	const {
 		isMobile,
 		isCarouselView,
@@ -153,10 +57,6 @@ function FormV2({
 		isSettingsModalOpen,
 		setIsSettingsModalOpen,
 	} = useUIState();
-
-	const [validationErrors, setValidationErrors] = useState<ValidationErrors>(
-		{},
-	);
 
 	const teamOptionsWithIcons = useMemo(
 		() =>
@@ -174,16 +74,33 @@ function FormV2({
 		[teamOptions],
 	);
 
-	const app = useMemo(() => {
-		const app = apps.find((app) => app.id === appId);
-		assertNotUndefined(app, `App with id ${appId} not found`);
-		return app;
-	}, [apps, appId]);
-	const inputs = useMemo(() => createInputsFromTrigger(app?.sdkData), [app]);
+	const filteredFlowTriggers = useMemo(
+		() =>
+			flowTriggers.filter(
+				(flowTrigger) => flowTrigger.teamId === selectedTeamId,
+			),
+		[flowTriggers, selectedTeamId],
+	);
+
+	const {
+		selectedFlowTriggerId,
+		setSelectedFlowTriggerId,
+		selectedTrigger,
+		validationErrors,
+		setValidationErrors,
+		userHasSelectedRef,
+		handleFlowTriggerSelect,
+		handleFlowTriggerDeselect,
+	} = useFormState({ filteredFlowTriggers });
+
+	const inputs = useMemo(
+		() => createInputsFromTrigger(selectedTrigger?.sdkData),
+		[selectedTrigger],
+	);
 
 	const formAction = useCallback(
 		async (_prevState: unknown, formData: FormData) => {
-			if (app === undefined) {
+			if (selectedFlowTriggerId === undefined) {
 				return null;
 			}
 			const { errors, values } = parseFormInputs(inputs, formData);
@@ -195,14 +112,30 @@ function FormV2({
 
 			setValidationErrors({});
 
+			const flowTrigger = filteredFlowTriggers.find(
+				(flowTrigger) => flowTrigger.id === selectedFlowTriggerId,
+			);
+			if (flowTrigger === undefined) {
+				throw new Error(
+					`Flow trigger with ID ${selectedFlowTriggerId} not found`,
+				);
+			}
+
 			await performStageAction({
-				teamId,
-				flowTrigger: app.sdkData,
+				teamId: selectedTeamId,
+				flowTrigger: flowTrigger.sdkData,
 				parameterItems: toParameterItems(inputs, values),
 			});
 			return null;
 		},
-		[inputs, performStageAction, teamId, app],
+		[
+			inputs,
+			performStageAction,
+			selectedFlowTriggerId,
+			selectedTeamId,
+			filteredFlowTriggers,
+			setValidationErrors,
+		],
 	);
 
 	const [, action, isPending] = useActionState(formAction, null);
@@ -245,9 +178,13 @@ function FormV2({
 							placeholder="Select team"
 							options={teamOptionsWithIcons}
 							renderOption={(o) => o.label}
-							value={teamId}
+							value={selectedTeamId}
 							onValueChange={(value) => {
-								onTeamIdChange(value as TeamId);
+								const newTeamId = value as TeamId;
+								setSelectedTeamId(newTeamId);
+								userHasSelectedRef.current = true;
+								setSelectedFlowTriggerId(undefined);
+								handleTeamChange(newTeamId);
 							}}
 						/>
 					</div>
@@ -256,10 +193,15 @@ function FormV2({
 					<Select
 						id="filter"
 						placeholder="Filter"
-						options={Object.values(displayCategories)}
-						value={displayCategory}
+						options={FILTER_OPTIONS}
+						renderOption={(o) => o.label}
+						value={selectedFilter}
 						onValueChange={(value) => {
-							onDisplayCategoryChange(value as DisplayCategory);
+							const newFilter = value as FilterType;
+							setSelectedFilter(newFilter);
+							userHasSelectedRef.current = true;
+							setSelectedFlowTriggerId(undefined);
+							handleFilterChange(newFilter);
 						}}
 					/>
 				</div>
@@ -272,19 +214,20 @@ function FormV2({
 			<div className="mt-4 flex flex-col justify-start">
 				{isCarouselView ? (
 					<CircularCarousel
-						items={apps.map((app) => ({
-							id: app.id,
-							name: app.workspaceName,
+						items={filteredFlowTriggers.map((trigger) => ({
+							id: trigger.id,
+							name: trigger.workspaceName,
 							profileImageUrl: undefined,
 						}))}
-						selectedId={appId}
+						selectedId={selectedFlowTriggerId}
 						onItemSelect={(item) => {
-							onAppIdChange(item.id as AppId);
+							handleFlowTriggerSelect(item.id as FlowTriggerId);
 						}}
+						onItemDeselect={handleFlowTriggerDeselect}
 					/>
 				) : (
 					<div className="w-full px-4 max-w-4xl mx-auto">
-						{apps.length === 0 ? (
+						{filteredFlowTriggers.length === 0 ? (
 							<div className="text-center py-8">
 								<p className="text-white-400 text-sm">
 									No apps available for the selected team
@@ -295,19 +238,21 @@ function FormV2({
 								<div
 									className={clsx(
 										"grid grid-cols-2 gap-3 overflow-y-auto transition-all duration-300",
-										"pb-40 max-h-[30vh] md:max-h-[60vh]",
+										!isCarouselView && selectedFlowTriggerId !== undefined
+											? "pb-40 max-h-[30vh] md:max-h-[60vh]"
+											: "max-h-[50vh] md:max-h-[70vh] pb-28 md:pb-0",
 									)}
 								>
-									{apps.map((app) => (
+									{filteredFlowTriggers.map((trigger) => (
 										<button
-											key={app.id}
+											key={trigger.id}
 											type="button"
 											onClick={() => {
-												onAppIdChange(app.id);
+												handleFlowTriggerSelect(trigger.id);
 											}}
 											className={clsx(
 												"group flex items-center gap-3 p-3 rounded-lg border transition-all cursor-pointer relative z-20 w-full text-left",
-												appId === app.id
+												selectedFlowTriggerId === trigger.id
 													? "bg-blue-500/10 border-blue-500/50"
 													: "bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20",
 											)}
@@ -321,18 +266,19 @@ function FormV2({
 												<p
 													className={clsx(
 														"text-[14px] font-sans truncate",
-														appId === app.id
+														selectedFlowTriggerId === trigger.id
 															? "text-blue-400"
 															: "text-white-900",
 													)}
 												>
-													{app.workspaceName || "Untitled"}
+													{trigger.workspaceName || "Untitled"}
 												</p>
-												{app.label && app.label !== "Manual Trigger" && (
-													<p className="text-[12px] font-geist text-white-400 truncate">
-														{app.label}
-													</p>
-												)}
+												{trigger.label &&
+													trigger.label !== "Manual Trigger" && (
+														<p className="text-[12px] font-geist text-white-400 truncate">
+															{trigger.label}
+														</p>
+													)}
 											</div>
 										</button>
 									))}
@@ -344,7 +290,7 @@ function FormV2({
 			</div>
 
 			{/* Slide-up Modal */}
-			{!isCarouselView && (
+			{!isCarouselView && selectedFlowTriggerId !== undefined && (
 				<div className="fixed inset-x-0 bottom-0 md:absolute md:left-0 md:right-0 z-50 animate-in slide-in-from-bottom-full duration-300">
 					<div className="relative z-10 rounded-t-2xl shadow-xl focus:outline-none">
 						<div
@@ -365,17 +311,19 @@ function FormV2({
 								{/* App Title */}
 								<div className="flex flex-col">
 									<h3 className="font-sans text-[16px] font-medium tracking-tight text-white-100">
-										{app.workspaceName || "Untitled"}
+										{selectedTrigger?.workspaceName || "Untitled"}
 									</h3>
-									{app.label && app.label !== "Manual Trigger" && (
-										<p className="text-[12px] text-white-400 font-geist">
-											{app.label}
-										</p>
-									)}
+									{selectedTrigger?.label &&
+										selectedTrigger.label !== "Manual Trigger" && (
+											<p className="text-[12px] text-white-400 font-geist">
+												{selectedTrigger.label}
+											</p>
+										)}
 								</div>
 							</div>
 							<button
 								type="button"
+								onClick={handleFlowTriggerDeselect}
 								className="rounded-full p-2 text-white-400 opacity-70 hover:opacity-100 hover:bg-white/10 focus:outline-none transition-all"
 							>
 								<X className="h-5 w-5" />
@@ -392,6 +340,7 @@ function FormV2({
 							<div className="mt-6 flex justify-end gap-x-3 pb-6">
 								<button
 									type="button"
+									onClick={handleFlowTriggerDeselect}
 									disabled={isPending}
 									className={cn(buttonVariants({ variant: "link" }))}
 								>
@@ -413,7 +362,7 @@ function FormV2({
 				</div>
 			)}
 
-			{isCarouselView && apps.length > 0 && (
+			{isCarouselView && filteredFlowTriggers.length > 0 && (
 				<form
 					action={action}
 					className="backdrop-blur-3xl rounded-2xl p-6 text-[14px] text-text resize-none outline-none relative mb-28 md:mb-0"
@@ -434,24 +383,34 @@ function FormV2({
 						}}
 					/>
 					<div className="flex flex-col gap-[8px] mb-[8px]">
-						<FormInputRenderer
-							inputs={inputs}
-							validationErrors={validationErrors}
-							isPending={isPending}
-						/>
+						{selectedFlowTriggerId === undefined ? (
+							<div className="text-center py-8">
+								<p className="text-white-400 text-[14px] font-medium font-['DM_Sans']">
+									Please select an app to execute
+								</p>
+							</div>
+						) : (
+							<FormInputRenderer
+								inputs={inputs}
+								validationErrors={validationErrors}
+								isPending={isPending}
+							/>
+						)}
 					</div>
-					<div className="flex justify-end gap-x-3">
-						<button
-							type="submit"
-							disabled={isPending}
-							className={cn(
-								buttonVariants({ variant: "primary" }),
-								"whitespace-nowrap",
-							)}
-						>
-							{isPending ? "Setting the stage…" : "Start"}
-						</button>
-					</div>
+					{selectedFlowTriggerId !== undefined && (
+						<div className="flex justify-end gap-x-3">
+							<button
+								type="submit"
+								disabled={isPending}
+								className={cn(
+									buttonVariants({ variant: "primary" }),
+									"whitespace-nowrap",
+								)}
+							>
+								{isPending ? "Setting the stage…" : "Start"}
+							</button>
+						</div>
+					)}
 				</form>
 			)}
 
