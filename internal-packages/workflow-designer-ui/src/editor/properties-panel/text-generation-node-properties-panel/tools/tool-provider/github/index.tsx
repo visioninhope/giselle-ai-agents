@@ -260,16 +260,18 @@ function GitHubToolConnectionDialog({
 								<label htmlFor="pat" className="text-text text-[13px]">
 									Personal Access Token (PAT)
 								</label>
-								<a
-									href="https://github.com/settings/personal-access-tokens"
-									className="flex items-center gap-[4px] text-[13px] text-text-muted transition-colors px-[4px] rounded-[2px]"
-									target="_blank"
-									rel="noreferrer"
-									tabIndex={-1}
-								>
-									<span className="hover:underline">GitHub</span>
-									<MoveUpRightIcon className="size-[13px]" />
-								</a>
+								<div className="flex items-end pb-[3px]">
+									<a
+										href="https://github.com/settings/personal-access-tokens"
+										className="flex items-center gap-[4px] text-[13px] text-text-muted transition-colors px-[1px] leading-[13px] pb-[0px] border-b border-transparent hover:border-text-muted"
+										target="_blank"
+										rel="noopener noreferrer"
+										tabIndex={-1}
+									>
+										<span>GitHub</span>
+										<MoveUpRightIcon className="size-[13px]" />
+									</a>
+								</div>
 							</div>
 							<Input
 								type="password"
