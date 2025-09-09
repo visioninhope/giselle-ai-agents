@@ -1,6 +1,6 @@
 import { createLoader, parseAsString } from "nuqs/server";
 
-export const stageTopSearchParams = {
+const stageTopSearchParams = {
 	appId: parseAsString.withDefault(""),
 };
 
