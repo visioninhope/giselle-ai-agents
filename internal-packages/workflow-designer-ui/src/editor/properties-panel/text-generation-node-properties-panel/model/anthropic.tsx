@@ -157,7 +157,6 @@ export function AnthropicModelPanel({
 								<div className="flex-grow mx-[12px] h-[1px] bg-black-200/30" />
 								<p className="text-[12px]">Unsupported</p>
 							</div>
-						</div>							</div>
 						</div>
 					)}
 				</div>
