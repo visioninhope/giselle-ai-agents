@@ -185,9 +185,18 @@ function GitHubToolConnectionDialog({
 	};
 
 	const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-		if (tabValue === "create" && tokenError) {
+		if (tabValue === "create" && tokenValue && !isValidGitHubPAT(tokenValue)) {
 			e.preventDefault();
 			return;
+		}
+
+		if (tabValue === "select") {
+			const formData = new FormData(e.currentTarget);
+			const secretId = formData.get("secretId");
+			if (!secretId || secretId === "") {
+				e.preventDefault();
+				return;
+			}
 		}
 
 		onSubmit(e);
