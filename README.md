@@ -1,4 +1,3 @@
-<thinking>
 <div align="center">
   
   <a href="https://github.com/giselles-ai/giselle"><img src="https://img.shields.io/github/stars/giselles-ai/giselle.svg?style=social&label=Star" alt="GitHub stars" style="margin-right: 5px;"></a>  <img src="https://img.shields.io/badge/License-Apache2.0-blue.svg" alt="License" style="margin-right: 5px;">
@@ -25,7 +24,6 @@
   <img src="./docs/assets/copy-dark.gif#gh-dark-mode-only" alt="Giselle Demo" width="400">
 
 </div>
-</thinking>
 
 ## 👋 Introduction
 
