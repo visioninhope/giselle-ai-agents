@@ -9,7 +9,7 @@ import {
 } from "@giselle-sdk/data-type";
 import clsx from "clsx/lite";
 import { Tabs } from "radix-ui";
-import { Fragment, useState } from "react";
+import { Fragment } from "react";
 import { InputPanel } from "./input-panel";
 import {
 	AnthropicModelPanel,
@@ -19,7 +19,6 @@ import {
 } from "./model";
 import { PromptPanel } from "./prompt-panel";
 import { ToolsPanel } from "./tools";
-import { AnthropicWebSearchToolConfigurationDialog } from "./tools/tool-provider/anthropic-web-search";
 
 interface TextGenerationTabContentProps {
 	node: TextGenerationNode;
@@ -47,7 +46,6 @@ export function TextGenerationTabContent({
 	data,
 	deleteConnection,
 }: TextGenerationTabContentProps) {
-	const [webSearchConfigOpen, setWebSearchConfigOpen] = useState(false);
 	return (
 		<Fragment>
 			<Tabs.Root
@@ -300,7 +298,6 @@ export function TextGenerationTabContent({
 						<AnthropicModelPanel
 							anthropicLanguageModel={node.content.llm}
 							_tools={node.content.tools}
-							node={node}
 							onModelChange={(value) =>
 								updateNodeDataContent(node, {
 									...node.content,
@@ -313,96 +310,7 @@ export function TextGenerationTabContent({
 									tools: changedTool,
 								})
 							}
-							_onWebSearchChange={(enable) => {
-								if (node.content.llm.provider !== "anthropic") {
-									return;
-								}
-								const updateTools: ToolSet = {
-									...node.content.tools,
-									anthropicWebSearch: enable
-										? {
-												maxUses: 3,
-											}
-										: undefined,
-								};
-
-								// Auto-open configuration dialog when enabling web search
-								if (enable) {
-									setWebSearchConfigOpen(true);
-								}
-								const updateOutputs: Output[] = enable
-									? [
-											...node.outputs,
-											{
-												id: OutputId.generate(),
-												label: "Source",
-												accessor: "source",
-											},
-										]
-									: node.outputs.filter(
-											(output) => output.accessor !== "source",
-										);
-								if (!enable) {
-									const sourceOutput = node.outputs.find(
-										(output) => output.accessor === "source",
-									);
-									if (sourceOutput) {
-										for (const connection of data.connections) {
-											if (connection.outputId !== sourceOutput.id) {
-												continue;
-											}
-											deleteConnection(connection.id);
-
-											const connectedNode = data.nodes.find(
-												(node) => node.id === connection.inputNode.id,
-											);
-											if (connectedNode === undefined) {
-												continue;
-											}
-											if (connectedNode.type === "operation") {
-												switch (connectedNode.content.type) {
-													case "textGeneration":
-													case "imageGeneration": {
-														if (
-															!isTextGenerationNode(connectedNode) &&
-															!isImageGenerationNode(connectedNode)
-														) {
-															throw new Error(
-																`Expected text generation or image generation node, got ${JSON.stringify(connectedNode)}`,
-															);
-														}
-														updateNodeData(connectedNode, {
-															inputs: connectedNode.inputs.filter(
-																(input) => input.id !== connection.inputId,
-															),
-														});
-														break;
-													}
-													case "trigger":
-													case "action":
-													case "query":
-														break;
-													default: {
-														const _exhaustiveCheck: never =
-															connectedNode.content.type;
-														throw new Error(
-															`Unhandled node type: ${_exhaustiveCheck}`,
-														);
-													}
-												}
-											}
-										}
-									}
-								}
-								updateNodeData(node, {
-									...node,
-									content: {
-										...node.content,
-										tools: updateTools,
-									},
-									outputs: updateOutputs,
-								});
-							}}
+							_onWebSearchChange={() => {}}
 						/>
 					)}
 					{node.content.llm.provider === "perplexity" && (
@@ -430,15 +338,6 @@ export function TextGenerationTabContent({
 					<ToolsPanel node={node} />
 				</Tabs.Content>
 			</Tabs.Root>
-
-			{/* Web Search Configuration Dialog */}
-			{node.content.llm.provider === "anthropic" && (
-				<AnthropicWebSearchToolConfigurationDialog
-					node={node}
-					open={webSearchConfigOpen}
-					onOpenChange={setWebSearchConfigOpen}
-				/>
-			)}
 		</Fragment>
 	);
 }

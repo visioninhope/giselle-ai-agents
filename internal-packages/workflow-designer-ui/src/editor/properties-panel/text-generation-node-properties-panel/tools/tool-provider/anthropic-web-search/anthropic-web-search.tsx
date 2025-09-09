@@ -1,6 +1,7 @@
+import { Button } from "@giselle-internal/ui/button";
 import type { TextGenerationNode } from "@giselle-sdk/data-type";
 import { useWorkflowDesigner } from "@giselle-sdk/giselle/react";
-import { XIcon } from "lucide-react";
+import { Settings2Icon, XIcon } from "lucide-react";
 import { useCallback, useState } from "react";
 import { Slider } from "../../../../../../ui/slider";
 import { Switch } from "../../../../../../ui/switch";
@@ -210,7 +211,15 @@ export function AnthropicWebSearchToolConfigurationDialog({
 			description=""
 			onSubmit={updateAnthropicWebSearchToolConfiguration}
 			submitting={false}
-			trigger={null}
+			trigger={
+				<Button
+					type="button"
+					leftIcon={<Settings2Icon data-dialog-trigger-icon />}
+					variant="link"
+				>
+					Configure
+				</Button>
+			}
 			open={open}
 			onOpenChange={setOpen}
 		>

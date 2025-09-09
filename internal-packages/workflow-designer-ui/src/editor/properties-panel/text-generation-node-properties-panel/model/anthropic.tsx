@@ -1,6 +1,5 @@
 import {
 	AnthropicLanguageModelData,
-	type TextGenerationNode,
 	type ToolSet,
 } from "@giselle-sdk/data-type";
 import { useUsageLimits } from "@giselle-sdk/giselle/react";
@@ -9,8 +8,8 @@ import {
 	Capability,
 	hasCapability,
 } from "@giselle-sdk/language-model";
-import { SlidersHorizontal } from "lucide-react";
-import { useCallback, useMemo, useState } from "react";
+
+import { useCallback, useMemo } from "react";
 import {
 	Select,
 	SelectContent,
@@ -21,7 +20,7 @@ import {
 } from "../../../../ui/select";
 import { Slider } from "../../../../ui/slider";
 import { Switch } from "../../../../ui/switch";
-import { AnthropicWebSearchToolConfigurationDialog } from "../tools/tool-provider/anthropic-web-search/anthropic-web-search";
+
 import { languageModelAvailable } from "./utils";
 
 export function AnthropicModelPanel({
@@ -30,17 +29,14 @@ export function AnthropicModelPanel({
 	_tools,
 	_onToolChange,
 	_onWebSearchChange,
-	node,
 }: {
 	anthropicLanguageModel: AnthropicLanguageModelData;
 	onModelChange: (changedValue: AnthropicLanguageModelData) => void;
 	_tools?: ToolSet;
 	_onToolChange: (changedValue: ToolSet) => void;
 	_onWebSearchChange: (enabled: boolean) => void;
-	node: TextGenerationNode;
 }) {
 	const limits = useUsageLimits();
-	const [webSearchDialogOpen, setWebSearchDialogOpen] = useState(false);
 
 	const hasReasoningCapability = useMemo(() => {
 		const languageModel = anthropicLanguageModels.find(
@@ -166,28 +162,8 @@ export function AnthropicModelPanel({
 							</div>
 						</>
 					)}
-
-					<div className="flex flex-col">
-						<div className="flex flex-row items-center justify-between">
-							<p className="text-[14px]">Web Search</p>
-							<div className="flex-grow mx-[12px] h-[1px] bg-black-200/30" />
-							<button
-								type="button"
-								onClick={() => setWebSearchDialogOpen(true)}
-								className="p-1 hover:bg-black-100/10 rounded"
-							>
-								<SlidersHorizontal className="w-4 h-4" />
-							</button>
-						</div>
-					</div>
 				</div>
 			</div>
-
-			<AnthropicWebSearchToolConfigurationDialog
-				node={node}
-				open={webSearchDialogOpen}
-				onOpenChange={setWebSearchDialogOpen}
-			/>
 		</div>
 	);
 }
