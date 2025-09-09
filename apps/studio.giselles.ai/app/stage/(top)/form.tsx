@@ -59,14 +59,14 @@ export function FormContainer({
 	flowTriggers: propApps,
 	teamOptions,
 	performStageAction,
-	defaultFlowTriggerId: propDefaultAppId,
+	defaultAppId: propDefaultAppId,
 	...props
 }: {
 	teamOptions: TeamOption[];
 	flowTriggers: FlowTriggerUIItem[];
 	performStageAction: PerformStageAction;
 	defaultTeamId?: TeamId;
-	defaultFlowTriggerId?: FlowTriggerId;
+	defaultAppId?: AppId;
 }) {
 	const defaultTeamId = useMemo(() => {
 		if (props.defaultTeamId !== undefined) {
