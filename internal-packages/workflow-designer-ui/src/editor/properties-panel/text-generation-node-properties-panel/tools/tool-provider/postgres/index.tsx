@@ -312,11 +312,12 @@ function PostgresToolConfigurationDialogInternal({
 					<Button
 						type="button"
 						onClick={() => {
-							const { postgres: _removed, ...otherTools } =
-								node.content.tools || {};
 							updateNodeDataContent(node, {
 								...node.content,
-								tools: otherTools,
+								tools: {
+									...node.content.tools,
+									postgres: undefined,
+								},
 							});
 						}}
 						leftIcon={<TrashIcon className="size-[12px]" />}
