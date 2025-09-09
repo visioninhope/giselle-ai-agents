@@ -146,15 +146,6 @@ function FormV2({
 	onDisplayCategoryChange: (category: DisplayCategory) => void;
 	performStageAction: PerformStageAction;
 }) {
-	// const {
-	// 	selectedTeamId,
-	// 	setSelectedTeamId,
-	// 	selectedFilter,
-	// 	setSelectedFilter,
-	// 	handleFilterChange,
-	// 	handleTeamChange,
-	// } = useFilterState({ teamOptions });
-
 	const {
 		isMobile,
 		isCarouselView,
@@ -182,17 +173,6 @@ function FormV2({
 			})),
 		[teamOptions],
 	);
-
-	// const {
-	// 	selectedFlowTriggerId,
-	// 	setSelectedFlowTriggerId,
-	// 	selectedTrigger,
-	// 	validationErrors,
-	// 	setValidationErrors,
-	// 	userHasSelectedRef,
-	// 	handleFlowTriggerSelect,
-	// 	handleFlowTriggerDeselect,
-	// } = useFormState({ filteredFlowTriggers });
 
 	const app = useMemo(() => {
 		const app = apps.find((app) => app.id === appId);
