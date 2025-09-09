@@ -1,7 +1,6 @@
 "use client";
 
 import {
-	type ConnectionId,
 	type Node,
 	NodeId,
 	type NodeLike,
@@ -124,7 +123,7 @@ export function WorkflowDesignerProvider({
 	);
 
 	const deleteConnection = useCallback(
-		(connectionId: ConnectionId) => {
+		(connectionId: string) => {
 			dispatch({ type: "DELETE_CONNECTION", connectionId });
 		},
 		[dispatch],
