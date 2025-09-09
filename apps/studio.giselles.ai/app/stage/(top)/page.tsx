@@ -13,7 +13,7 @@ import { stageFlag } from "@/flags";
 import { fetchCurrentUser } from "@/services/accounts";
 import { fetchUserTeams } from "@/services/teams";
 import { performStageAction } from "./actions";
-import { FormContainer } from "./form.v2";
+import { FormContainer } from "./form";
 import { ResizableLayout } from "./resizable-layout";
 import { fetchEnrichedActs, fetchFlowTriggers } from "./services";
 import type { FilterType } from "./types";
