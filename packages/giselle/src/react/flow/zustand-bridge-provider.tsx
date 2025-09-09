@@ -50,17 +50,15 @@ export function ZustandBridgeProvider({
 			saveTimeout = setTimeout(() => performSave(state), saveWorkflowDelay);
 		};
 
-		const unsubscribe = useAppStore.subscribe(
-			(state: AppStore, prevState: AppStore) => {
-				if (state._skipNextSave) {
-					useAppStore.setState({ _skipNextSave: false } as Partial<AppStore>);
-					return;
-				}
-				if (state.workspace !== prevState.workspace) {
-					scheduleAutoSave(state);
-				}
-			},
-		);
+		const unsubscribe = useAppStore.subscribe((state, prevState) => {
+			if (state._skipNextSave) {
+				useAppStore.setState({ _skipNextSave: false } as Partial<AppStore>);
+				return;
+			}
+			if (state.workspace !== prevState.workspace) {
+				scheduleAutoSave(state);
+			}
+		});
 
 		return () => {
 			if (saveTimeout) clearTimeout(saveTimeout);
