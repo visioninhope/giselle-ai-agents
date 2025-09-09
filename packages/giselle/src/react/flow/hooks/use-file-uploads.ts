@@ -22,6 +22,16 @@ type FileUploadClient = {
 	}) => Promise<unknown>;
 };
 
+function getUploadErrorMessage(error: unknown): string {
+	if (APICallError.isInstance(error)) {
+		return error.statusCode === 413 ? "filesize too large" : error.message;
+	}
+	if (error instanceof Error) {
+		return error.message || "upload failed";
+	}
+	return "upload failed";
+}
+
 export function useFileUploads(args: {
 	dispatch: React.Dispatch<WorkspaceAction>;
 	client: FileUploadClient;
@@ -79,19 +89,16 @@ export function useFileUploads(args: {
 						uploadedFileData,
 					];
 				} catch (error) {
-					if (APICallError.isInstance(error)) {
-						const message =
-							error.statusCode === 413 ? "filesize too large" : error.message;
-						options?.onError?.(message);
-						const failedFileData = createFailedFileData(
-							uploadingFileData,
-							message,
-						);
-						fileContents = [
-							...fileContents.filter((f) => f.id !== failedFileData.id),
-							failedFileData,
-						];
-					}
+					const message = getUploadErrorMessage(error);
+					options?.onError?.(message);
+					const failedFileData = createFailedFileData(
+						uploadingFileData,
+						message,
+					);
+					fileContents = [
+						...fileContents.filter((f) => f.id !== failedFileData.id),
+						failedFileData,
+					];
 				}
 				dispatch({
 					type: "UPDATE_FILE_STATUS",
