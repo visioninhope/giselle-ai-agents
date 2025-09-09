@@ -111,7 +111,7 @@ export function FormContainer({
 	);
 
 	return (
-		<FormV2
+		<Form
 			teamOptions={teamOptions}
 			teamId={teamId}
 			onTeamIdChange={handleTeamIdChange}
@@ -125,7 +125,7 @@ export function FormContainer({
 	);
 }
 
-function FormV2({
+function Form({
 	apps,
 	appId,
 	onAppIdChange,
