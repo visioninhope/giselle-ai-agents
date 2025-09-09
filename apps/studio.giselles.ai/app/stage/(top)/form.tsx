@@ -4,7 +4,7 @@ import { Select } from "@giselle-internal/ui/select";
 import type { FlowTriggerId } from "@giselle-sdk/data-type";
 
 import clsx from "clsx/lite";
-import { Settings, X } from "lucide-react";
+import { X } from "lucide-react";
 
 import { useActionState, useCallback, useMemo, useState } from "react";
 import { cn } from "@/lib/utils";
@@ -217,18 +217,6 @@ function Form({
 					: "h-full",
 			)}
 		>
-			{/* Settings Icon */}
-			<button
-				type="button"
-				onClick={() => setIsSettingsModalOpen(true)}
-				className={clsx(
-					"absolute right-2 p-2 rounded-lg hover:bg-white/10 transition-colors z-20",
-					isMobile ? "top-2" : "-top-16",
-				)}
-			>
-				<Settings className="w-4 h-4 text-white-400" />
-			</button>
-
 			{/* Team Selection Container */}
 			<div className="flex justify-center gap-2">
 				<div
