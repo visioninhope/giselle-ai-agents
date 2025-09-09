@@ -13,8 +13,7 @@ import { stageFlag } from "@/flags";
 import { fetchCurrentUser } from "@/services/accounts";
 import { fetchUserTeams } from "@/services/teams";
 import { performStageAction } from "./actions";
-import { Form } from "./form";
-
+import { FormContainer } from "./form.v2";
 import { ResizableLayout } from "./resizable-layout";
 import { fetchEnrichedActs, fetchFlowTriggers } from "./services";
 import type { FilterType } from "./types";
@@ -54,7 +53,7 @@ export default async function StagePage({
 						<div className="text-center text-[24px] font-mono font-light text-white-100 bg-transparent px-6">
 							What are we perform next ?
 						</div>
-						<Form
+						<FormContainer
 							teamOptions={teamOptions}
 							flowTriggers={flowTriggers}
 							performStageAction={performStageAction}
