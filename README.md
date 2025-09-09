@@ -15,7 +15,7 @@
   <a href="https://www.producthunt.com/products/giselle?embed=true&utm_source=badge-featured&utm_medium=badge&utm_source=badge-giselle" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=924550&theme=light&t=1757315890418" alt="Giselle - AI&#0032;App&#0032;Builder | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
 
   <!-- Demo Video -->
-![introducing](https://github.com/user-attachments/assets/7f8f32ef-2f5f-4f16-9ae9-1bcde994df57)
+ <img src="./docs/assets/introducing.gif" alt="Giselle Video" width="100%"> <br/>
 
 ▶︎▶︎ [The YouTube video with audio can be found here](https://www.youtube.com/watch?v=g1siFWk0GNs) ◀︎◀︎
 
@@ -63,11 +63,11 @@ Open [http://localhost:3000](http://localhost:3000) and start building your AI a
 
 <div align="center">
 
-<img src="./docs/assets/featured/pdt1.png" width="100" alt="GitHub AI Operations" style="margin-right: 25px;">
-<img src="./docs/assets/featured/pdt2.png" width="100" alt="Visual Agent Builder" style="margin-right: 25px;">
-<img src="./docs/assets/featured/pdt3.png" width="100" alt="Multi-Model Composition" style="margin-right: 25px;">
-<img src="./docs/assets/featured/pdt4.png" width="100" alt="Knowledge Store" style="margin-right: 25px;">
-<img src="./docs/assets/featured/pdt5.png" width="100" alt="Team Collaboration" style="margin-right: 25px;">
+<img src="./docs/assets/featured/pdt1.png" width="100" alt="GitHub AI Operations" style="margin-right: 25px;">&nbsp;&nbsp;&nbsp;
+<img src="./docs/assets/featured/pdt2.png" width="100" alt="Visual Agent Builder" style="margin-right: 25px;">&nbsp;&nbsp;&nbsp;
+<img src="./docs/assets/featured/pdt3.png" width="100" alt="Multi-Model Composition" style="margin-right: 25px;">&nbsp;&nbsp;&nbsp;
+<img src="./docs/assets/featured/pdt4.png" width="100" alt="Knowledge Store" style="margin-right: 25px;">&nbsp;&nbsp;&nbsp;
+<img src="./docs/assets/featured/pdt5.png" width="100" alt="Team Collaboration" style="margin-right: 25px;">&nbsp;&nbsp;&nbsp;
 <img src="./docs/assets/featured/pdt6.png" width="100" alt="Template Hub">
 
 </div>
