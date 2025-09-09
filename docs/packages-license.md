@@ -2,7 +2,7 @@
 
 
 ## Summary
-* 818 MIT
+* 817 MIT
 * 185 Apache 2.0
 * 46 ISC
 * 27 New BSD
@@ -8874,17 +8874,6 @@ BlueOak-1.0.0 permitted
 
 
 
-<a name="mitt"></a>
-### mitt v3.0.1
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-
-
 <a name="mkdirp"></a>
 ### mkdirp v3.0.1
 #### 
@@ -9128,7 +9117,7 @@ MIT-0 permitted
 
 
 <a name="nuqs"></a>
-### nuqs v2.4.3
+### nuqs v2.6.0
 #### 
 
 ##### Paths
