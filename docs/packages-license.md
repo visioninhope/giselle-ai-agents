@@ -2,8 +2,8 @@
 
 
 ## Summary
-* 817 MIT
-* 185 Apache 2.0
+* 815 MIT
+* 184 Apache 2.0
 * 46 ISC
 * 27 New BSD
 * 13 Simplified BSD
@@ -6411,7 +6411,7 @@ BlueOak-1.0.0 permitted
 
 
 <a name="enhanced-resolve"></a>
-### enhanced-resolve v5.18.1
+### enhanced-resolve v5.18.3
 #### 
 
 ##### Paths
@@ -7940,7 +7940,7 @@ BlueOak-1.0.0 permitted
 
 
 <a name="langfuse"></a>
-### langfuse v3.37.0
+### langfuse v3.38.4
 #### 
 
 ##### Paths
@@ -11035,7 +11035,7 @@ Unknown manually approved
 
 
 <a name="tapable"></a>
-### tapable v2.2.1
+### tapable v2.2.3
 #### 
 
 ##### Paths
