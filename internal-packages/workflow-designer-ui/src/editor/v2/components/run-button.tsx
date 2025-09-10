@@ -81,7 +81,7 @@ function RunOptionItem({
 function useRunAct() {
 	const { setUiNodeState } = useWorkflowDesigner();
 	const { createAndStartAct } = useActController();
-	const { progress } = useToasts();
+	const { toast } = useToasts();
 
 	return async (item: RunItem) => {
 		for (const nodeId of item.nodeIds) {
@@ -96,7 +96,9 @@ function useRunAct() {
 			nodeId,
 			inputs: [],
 			onActStart(cancel, actId) {
-				progress.start(actId, "Workflow submitted successfully", {
+				toast("Workflow submitted successfully", {
+					id: actId,
+					preserve: true,
 					action: {
 						label: "Cancel",
 						onClick: async () => {
@@ -106,7 +108,7 @@ function useRunAct() {
 				});
 			},
 			onActComplete: (_hasError, _duration, actId) => {
-				progress.finish(actId);
+				toast.dismiss(actId);
 			},
 		});
 	};

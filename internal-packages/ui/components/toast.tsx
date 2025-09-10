@@ -3,13 +3,7 @@
 import clsx from "clsx/lite";
 import { XIcon } from "lucide-react";
 import { Toast as ToastPrimitive } from "radix-ui";
-import {
-	createContext,
-	useCallback,
-	useContext,
-	useRef,
-	useState,
-} from "react";
+import { createContext, useCallback, useContext, useState } from "react";
 import { Button } from "./button";
 
 interface Action {
@@ -24,15 +18,22 @@ interface Toast {
 	action?: Action;
 }
 
-type AddToastOption = Pick<Toast, "action">;
+type ToastActionOptions = Pick<Toast, "action">;
+
+type ToastOptions = ToastActionOptions & {
+	id?: string;
+	type?: Toast["type"];
+	preserve?: boolean;
+};
+
+type ToastFn = ((message: string, options?: ToastOptions) => string) & {
+	dismiss: (id?: string) => void;
+};
 
 interface ToastContextType {
-	info: (message: string, option?: AddToastOption) => void;
+	toast: ToastFn;
+	info: (message: string, option?: ToastActionOptions) => void;
 	error: (message: string) => void;
-	progress: {
-		start: (key: string, message: string, option?: AddToastOption) => void;
-		finish: (key: string) => void;
-	};
 }
 
 const ToastContext = createContext<ToastContextType | undefined>(undefined);
@@ -49,77 +50,54 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({
 	children,
 }) => {
 	const [toasts, setToasts] = useState<Toast[]>([]);
-	const keyMapRef = useRef<Record<string, string>>({});
 
-	const addToast = useCallback((toast: Omit<Toast, "id">) => {
-		const id = Math.random().toString(36).substring(2);
-		const newToast = {
-			...toast,
-			id,
-		};
-
-		setToasts((prevToasts) => [...prevToasts, newToast]);
-		return id;
-	}, []);
-
-	const closeToastById = useCallback((id: string) => {
-		setToasts((prevToasts) => prevToasts.filter((t) => t.id !== id));
-	}, []);
-
-	const startProgress = useCallback(
-		(key: string, message: string, option?: AddToastOption) => {
-			const existingId = keyMapRef.current[key];
-			if (existingId) {
-				setToasts((prevToasts) =>
-					prevToasts.filter((t) => t.id !== existingId),
-				);
-			}
-			const id = addToast({
+	const _toast = ((message: string, options?: ToastOptions) => {
+		const id = options?.id ?? Math.random().toString(36).substring(2);
+		setToasts((prev) => {
+			const idx = prev.findIndex((t) => t.id === id);
+			const next: Toast = {
+				id,
 				message,
-				type: "info",
-				preserve: true,
-				action: option?.action,
-			});
-			keyMapRef.current[key] = id;
-		},
-		[addToast],
-	);
+				type: options?.type ?? "info",
+				preserve: options?.preserve ?? true,
+				action: options?.action,
+			};
+			if (idx === -1) return [...prev, next];
+			const copy = prev.slice();
+			copy[idx] = { ...copy[idx], ...next, id: copy[idx].id };
+			return copy;
+		});
+		return id;
+	}) as ToastFn;
 
-	const finishProgress = useCallback((key: string) => {
-		const id = keyMapRef.current[key];
-		if (id) {
-			setToasts((prevToasts) => prevToasts.filter((t) => t.id !== id));
-			delete keyMapRef.current[key];
+	_toast.dismiss = (id?: string) => {
+		if (!id) {
+			setToasts([]);
+			return;
 		}
-	}, []);
+		setToasts((prev) => prev.filter((t) => t.id !== id));
+	};
 
 	const error = useCallback(
 		(message: string) => {
-			addToast({ message, type: "error", preserve: true });
+			_toast(message, { type: "error", preserve: true });
 		},
-		[addToast],
+		[_toast],
 	);
 
 	const info = useCallback(
-		(message: string, option?: AddToastOption) => {
-			addToast({
-				message,
+		(message: string, option?: ToastActionOptions) => {
+			_toast(message, {
 				type: "info",
 				preserve: true,
 				action: option?.action,
 			});
 		},
-		[addToast],
+		[_toast],
 	);
 
 	return (
-		<ToastContext.Provider
-			value={{
-				error,
-				info,
-				progress: { start: startProgress, finish: finishProgress },
-			}}
-		>
+		<ToastContext.Provider value={{ toast: _toast, info, error }}>
 			<ToastPrimitive.Provider swipeDirection="right">
 				{children}
 				{toasts.map((toast) => (
@@ -133,7 +111,7 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({
 						data-type={toast.type}
 						duration={toast.preserve ? Number.POSITIVE_INFINITY : undefined}
 						onOpenChange={(open) => {
-							if (!open) closeToastById(toast.id);
+							if (!open) _toast.dismiss(toast.id);
 						}}
 					>
 						<div
