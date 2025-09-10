@@ -42,6 +42,44 @@ interface ToastContextType {
 	error: (message: string) => void;
 }
 
+function mergeToastWithOptions(
+	existing: Toast,
+	message: string,
+	options?: ToastOptions,
+): Toast {
+	return {
+		...existing,
+		message,
+		type: options?.type ?? existing.type,
+		preserve: options?.preserve ?? existing.preserve,
+		action: options?.action ?? existing.action,
+	};
+}
+
+function upsertToastArray(
+	prev: Toast[],
+	id: string,
+	message: string,
+	options?: ToastOptions,
+): Toast[] {
+	const idx = prev.findIndex((t) => t.id === id);
+	if (idx === -1) {
+		return [
+			...prev,
+			{
+				id,
+				message,
+				type: options?.type ?? "info",
+				preserve: options?.preserve ?? true,
+				action: options?.action,
+			},
+		];
+	}
+	const copy = prev.slice();
+	copy[idx] = mergeToastWithOptions(copy[idx], message, options);
+	return copy;
+}
+
 const ToastContext = createContext<ToastContextType | undefined>(undefined);
 
 export const useToasts = () => {
@@ -60,38 +98,7 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({
 	const _toast = useMemo(() => {
 		const fn = ((message: string, options?: ToastOptions) => {
 			const id = options?.id ?? Math.random().toString(36).substring(2);
-			setToasts((prev) => {
-				const idx = prev.findIndex((t) => t.id === id);
-				if (idx === -1) {
-					const next: Toast = {
-						id,
-						message,
-						type: options?.type ?? "info",
-						preserve: options?.preserve ?? true,
-						action: options?.action,
-					};
-					return [...prev, next];
-				}
-
-				const existing = prev[idx];
-				const next: Toast = {
-					...existing,
-					id: existing.id,
-					message,
-					...(options && options.type !== undefined
-						? { type: options.type }
-						: {}),
-					...(options && options.preserve !== undefined
-						? { preserve: options.preserve }
-						: {}),
-					...(options && options.action !== undefined
-						? { action: options.action }
-						: {}),
-				};
-				const copy = prev.slice();
-				copy[idx] = next;
-				return copy;
-			});
+			setToasts((prev) => upsertToastArray(prev, id, message, options));
 			return id;
 		}) as ToastFn;
 
