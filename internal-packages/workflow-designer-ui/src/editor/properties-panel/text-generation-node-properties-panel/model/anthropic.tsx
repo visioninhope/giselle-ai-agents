@@ -69,7 +69,7 @@ export function AnthropicModelPanel({
 									<p className="text-[12px]">Unsupported</p>
 								</div>
 							</div>
-						</>
+						</div>
 					)}
 				</div>
 			</div>

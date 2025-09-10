@@ -92,8 +92,8 @@ export function DiagnosticModal({
 						</h4>
 					</div>
 					<p className="text-black-300 text-[14px] font-geist">
-						The GitHub App installation has been updated. Click "Restore
-						Connection" to fix this repository.
+						Click Restore Connection to reconnect and continue ingesting data
+						from this repository.
 					</p>
 				</div>
 			);

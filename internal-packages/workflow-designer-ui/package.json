@@ -36,7 +36,8 @@
 		"rehype-raw": "^7.0.0",
 		"remark-gfm": "^4.0.1",
 		"swr": "catalog:",
-		"zod": "catalog:"
+		"zod": "catalog:",
+		"zustand": "catalog:"
 	},
 	"devDependencies": {
 		"@giselle/giselle-sdk-tsconfig": "workspace:*",
@@ -46,8 +47,12 @@
 		"@types/react": "catalog:",
 		"@types/react-dom": "catalog:",
 		"ai": "catalog:",
+		"pino": "catalog:",
 		"tailwindcss": "catalog:",
 		"typescript": "catalog:",
 		"vitest": "catalog:"
+	},
+	"peerDependencies": {
+		"pino": "catalog:"
 	}
 }

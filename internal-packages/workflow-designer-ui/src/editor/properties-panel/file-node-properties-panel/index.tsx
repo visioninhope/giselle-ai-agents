@@ -21,7 +21,6 @@ const fileType: Record<FileCategory, FileTypeConfig> = {
 	image: {
 		accept: ["image/png", "image/jpeg", "image/gif", "image/svg"],
 		label: "Image",
-		maxSize: 1024 * 1024,
 	},
 };
 

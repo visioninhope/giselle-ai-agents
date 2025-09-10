@@ -10,9 +10,9 @@ describe("google llm", () => {
 			expect(GoogleLanguageModelId.parse("gemini-2.5-flash")).toBe(
 				"gemini-2.5-flash",
 			);
-			expect(
-				GoogleLanguageModelId.parse("gemini-2.5-flash-lite-preview-06-17"),
-			).toBe("gemini-2.5-flash-lite-preview-06-17");
+			expect(GoogleLanguageModelId.parse("gemini-2.5-flash-lite")).toBe(
+				"gemini-2.5-flash-lite",
+			);
 		});
 
 		it("should fallback gemini-2.5-pro-preview variants to gemini-2.5-pro", () => {
@@ -68,27 +68,30 @@ describe("google llm", () => {
 			);
 		});
 
-		it("should fallback all known gemini-2.5-flash-lite variants and any version to gemini-2.5-flash-lite-preview-06-17", () => {
-			expect(
-				GoogleLanguageModelId.parse("gemini-2.5-flash-lite-preview-06-17"),
-			).toBe("gemini-2.5-flash-lite-preview-06-17");
+		it("should fallback all known gemini-2.5-flash-lite variants and any version to gemini-2.5-flash-lite", () => {
+			expect(GoogleLanguageModelId.parse("gemini-2.5-flash-lite")).toBe(
+				"gemini-2.5-flash-lite",
+			);
 			expect(GoogleLanguageModelId.parse("gemini-2.0-flash-lite")).toBe(
-				"gemini-2.5-flash-lite-preview-06-17",
+				"gemini-2.5-flash-lite",
 			);
 			expect(GoogleLanguageModelId.parse("gemini-1.5-flash-lite")).toBe(
-				"gemini-2.5-flash-lite-preview-06-17",
+				"gemini-2.5-flash-lite",
 			);
+			expect(
+				GoogleLanguageModelId.parse("gemini-2.5-flash-lite-preview-06-17"),
+			).toBe("gemini-2.5-flash-lite");
 		});
 
-		it("should fallback unknown or non-matching variants to gemini-2.5-flash-lite-preview-06-17", () => {
+		it("should fallback unknown or non-matching variants to gemini-2.5-flash-lite", () => {
 			expect(GoogleLanguageModelId.parse("gemini-unknown-model")).toBe(
-				"gemini-2.5-flash-lite-preview-06-17",
+				"gemini-2.5-flash-lite",
 			);
 			expect(GoogleLanguageModelId.parse("gemini-foo-bar")).toBe(
-				"gemini-2.5-flash-lite-preview-06-17",
+				"gemini-2.5-flash-lite",
 			);
 			expect(GoogleLanguageModelId.parse("random-model")).toBe(
-				"gemini-2.5-flash-lite-preview-06-17",
+				"gemini-2.5-flash-lite",
 			);
 		});
 	});
