@@ -35,13 +35,6 @@ function assertNonEmpty<T>(
 	if (arr.length === 0) throw new Error(msg);
 }
 
-function assertNotUndefined<T>(
-	value: T | undefined,
-	msg: string,
-): asserts value is T {
-	if (value === undefined) throw new Error(msg);
-}
-
 /** FlowTrigger is essentially an app (we'll change other parts going forward) */
 type AppId = FlowTriggerId;
 type App = FlowTriggerUIItem;
@@ -81,15 +74,19 @@ export function FormContainer({
 			return propDefaultAppId;
 		}
 		const app = propApps.find((app) => app.teamId === teamId);
-		assertNotUndefined(app, "No app available");
-		return app.id;
+		return app?.id;
 	}, [teamId, propApps, propDefaultAppId]);
 
-	const [appId, setAppId] = useState<AppId>(defaultAppId);
+	const [appId, setAppId] = useState<AppId | undefined>(defaultAppId);
 
-	const handleTeamIdChange = useCallback((newTeamId: TeamId) => {
-		setTeamId(newTeamId);
-	}, []);
+	const handleTeamIdChange = useCallback(
+		(newTeamId: TeamId) => {
+			setTeamId(newTeamId);
+			const app = propApps.find((app) => app.teamId === newTeamId);
+			setAppId(app?.id);
+		},
+		[propApps],
+	);
 
 	const handleAppIdChange = useCallback((newAppId: AppId) => {
 		setAppId(newAppId);
@@ -139,7 +136,7 @@ function Form({
 	teamId: TeamId;
 	teamOptions: TeamOption[];
 	onTeamIdChange: (teamId: TeamId) => void;
-	appId: AppId;
+	appId: AppId | undefined;
 	apps: App[];
 	onAppIdChange: (appId: AppId) => void;
 	displayCategory: DisplayCategory;
@@ -176,7 +173,6 @@ function Form({
 
 	const app = useMemo(() => {
 		const app = apps.find((app) => app.id === appId);
-		assertNotUndefined(app, `App with id ${appId} not found`);
 		return app;
 	}, [apps, appId]);
 	const inputs = useMemo(() => createInputsFromTrigger(app?.sdkData), [app]);
@@ -344,7 +340,7 @@ function Form({
 			</div>
 
 			{/* Slide-up Modal */}
-			{!isCarouselView && (
+			{!isCarouselView && app && (
 				<div className="fixed inset-x-0 bottom-0 md:absolute md:left-0 md:right-0 z-50 animate-in slide-in-from-bottom-full duration-300">
 					<div className="relative z-10 rounded-t-2xl shadow-xl focus:outline-none">
 						<div
