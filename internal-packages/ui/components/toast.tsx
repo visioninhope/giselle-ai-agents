@@ -3,7 +3,13 @@
 import clsx from "clsx/lite";
 import { XIcon } from "lucide-react";
 import { Toast as ToastPrimitive } from "radix-ui";
-import { createContext, useCallback, useContext, useState } from "react";
+import {
+	createContext,
+	useCallback,
+	useContext,
+	useMemo,
+	useState,
+} from "react";
 import { Button } from "./button";
 
 interface Action {
@@ -51,32 +57,54 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
 	const [toasts, setToasts] = useState<Toast[]>([]);
 
-	const _toast = ((message: string, options?: ToastOptions) => {
-		const id = options?.id ?? Math.random().toString(36).substring(2);
-		setToasts((prev) => {
-			const idx = prev.findIndex((t) => t.id === id);
-			const next: Toast = {
-				id,
-				message,
-				type: options?.type ?? "info",
-				preserve: options?.preserve ?? true,
-				action: options?.action,
-			};
-			if (idx === -1) return [...prev, next];
-			const copy = prev.slice();
-			copy[idx] = { ...copy[idx], ...next, id: copy[idx].id };
-			return copy;
-		});
-		return id;
-	}) as ToastFn;
+	const _toast = useMemo(() => {
+		const fn = ((message: string, options?: ToastOptions) => {
+			const id = options?.id ?? Math.random().toString(36).substring(2);
+			setToasts((prev) => {
+				const idx = prev.findIndex((t) => t.id === id);
+				if (idx === -1) {
+					const next: Toast = {
+						id,
+						message,
+						type: options?.type ?? "info",
+						preserve: options?.preserve ?? true,
+						action: options?.action,
+					};
+					return [...prev, next];
+				}
 
-	_toast.dismiss = (id?: string) => {
-		if (!id) {
-			setToasts([]);
-			return;
-		}
-		setToasts((prev) => prev.filter((t) => t.id !== id));
-	};
+				const existing = prev[idx];
+				const next: Toast = {
+					...existing,
+					id: existing.id,
+					message,
+					...(options && options.type !== undefined
+						? { type: options.type }
+						: {}),
+					...(options && options.preserve !== undefined
+						? { preserve: options.preserve }
+						: {}),
+					...(options && options.action !== undefined
+						? { action: options.action }
+						: {}),
+				};
+				const copy = prev.slice();
+				copy[idx] = next;
+				return copy;
+			});
+			return id;
+		}) as ToastFn;
+
+		fn.dismiss = (id?: string) => {
+			if (!id) {
+				setToasts([]);
+				return;
+			}
+			setToasts((prev) => prev.filter((t) => t.id !== id));
+		};
+
+		return fn;
+	}, []);
 
 	const error = useCallback(
 		(message: string) => {
