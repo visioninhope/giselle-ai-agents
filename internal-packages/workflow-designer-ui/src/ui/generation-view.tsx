@@ -61,7 +61,7 @@ export function GenerationView({ generation }: { generation: Generation }) {
 	if (generation.status === "failed") {
 		return (
 			<div>
-				<p>generation.error.message</p>
+				<p>{generation.error.message}</p>
 				<p>id: {generation.id}</p>
 			</div>
 		);
