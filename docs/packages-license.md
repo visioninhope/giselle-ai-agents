@@ -1237,7 +1237,7 @@ MIT-0 permitted
 
 
 <a name="@img/sharp-libvips-linux-x64"></a>
-### @img/sharp-libvips-linux-x64 v1.1.0
+### @img/sharp-libvips-linux-x64 v1.2.0
 #### 
 
 ##### Paths
@@ -1248,7 +1248,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@img/sharp-libvips-linuxmusl-x64"></a>
-### @img/sharp-libvips-linuxmusl-x64 v1.1.0
+### @img/sharp-libvips-linuxmusl-x64 v1.2.0
 #### 
 
 ##### Paths
@@ -1259,7 +1259,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@img/sharp-linux-x64"></a>
-### @img/sharp-linux-x64 v0.34.1
+### @img/sharp-linux-x64 v0.34.3
 #### 
 
 ##### Paths
@@ -1270,7 +1270,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@img/sharp-linuxmusl-x64"></a>
-### @img/sharp-linuxmusl-x64 v0.34.1
+### @img/sharp-linuxmusl-x64 v0.34.3
 #### 
 
 ##### Paths
@@ -1435,7 +1435,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@next/env"></a>
-### @next/env v15.3.4
+### @next/env v15.5.2
 #### 
 
 ##### Paths
@@ -1446,7 +1446,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@next/swc-linux-x64-gnu"></a>
-### @next/swc-linux-x64-gnu v15.3.4
+### @next/swc-linux-x64-gnu v15.5.2
 #### 
 
 ##### Paths
@@ -1457,7 +1457,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@next/swc-linux-x64-musl"></a>
-### @next/swc-linux-x64-musl v15.3.4
+### @next/swc-linux-x64-musl v15.5.2
 #### 
 
 ##### Paths
@@ -1468,7 +1468,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@next/third-parties"></a>
-### @next/third-parties v15.3.4
+### @next/third-parties v15.5.2
 #### 
 
 ##### Paths
@@ -3920,17 +3920,6 @@ LGPL-3.0-or-later permitted
 
 
 
-<a name="@swc/counter"></a>
-### @swc/counter v0.1.3
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
-
-
-
 <a name="@swc/helpers"></a>
 ### @swc/helpers v0.5.15
 #### 
@@ -5554,17 +5543,6 @@ Python-2.0 manually approved
 
 <a name="bundle-require"></a>
 ### bundle-require v5.1.0
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-
-
-<a name="busboy"></a>
-### busboy v1.6.0
 #### 
 
 ##### Paths
@@ -9018,7 +8996,7 @@ BlueOak-1.0.0 permitted
 
 
 <a name="next"></a>
-### next v15.3.4
+### next v15.5.2
 #### 
 
 ##### Paths
@@ -10580,7 +10558,7 @@ BlueOak-1.0.0 permitted
 
 
 <a name="sharp"></a>
-### sharp v0.34.1
+### sharp v0.34.3
 #### 
 
 ##### Paths
@@ -10849,17 +10827,6 @@ Unknown manually approved
 
 <a name="std-env"></a>
 ### std-env v3.9.0
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-
-
-<a name="streamsearch"></a>
-### streamsearch v1.1.0
 #### 
 
 ##### Paths
