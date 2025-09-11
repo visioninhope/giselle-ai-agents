@@ -1,5 +1,5 @@
 import { GiselleIcon } from "@giselle-internal/workflow-designer-ui";
-import { PanelLeftOpenIcon } from "lucide-react";
+import { ChevronsRightIcon } from "lucide-react";
 import { Suspense } from "react";
 import { MenuButton } from "./menu-button";
 import { navigationItems } from "./navigation-items";
@@ -27,7 +27,7 @@ export function NavigationRailCollapsed({
 					className="cursor-e-resize"
 				>
 					<GiselleIcon className="size-6 text-text-muted stroke-1 group-hover:hidden" />
-					<PanelLeftOpenIcon className="size-6 text-text-muted stroke-1 hidden group-hover:block" />
+					<ChevronsRightIcon className="size-6 text-text-muted stroke-1 hidden group-hover:block" />
 				</MenuButton>
 			</NavigationRailHeader>
 			<NavigationRailContentsContainer>
