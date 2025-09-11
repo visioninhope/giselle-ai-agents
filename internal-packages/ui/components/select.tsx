@@ -3,7 +3,7 @@ import { CheckIcon, ChevronDownIcon } from "lucide-react";
 import { Select as SelectPrimitive } from "radix-ui";
 import { PopoverContent } from "./popover";
 
-type SelectOption = {
+export type SelectOption = {
 	value: string | number;
 	label: string;
 	icon?: React.ReactNode;

@@ -14,7 +14,7 @@ import {
 import clsx from "clsx/lite";
 import { ArrowDownIcon, ArrowUpIcon, TimerIcon } from "lucide-react";
 import { useCallback } from "react";
-import { StackBlicksIcon } from "../../../icons";
+import { TextGenerationIcon } from "../../../icons";
 import ClipboardButton from "../../../ui/clipboard-button";
 import { EmptyState } from "../../../ui/empty-state";
 import { GenerationView } from "../../../ui/generation-view";
@@ -23,7 +23,7 @@ function Empty({ onGenerate }: { onGenerate?: () => void }) {
 	return (
 		<div className="bg-white-900/10 h-full rounded-[8px] flex justify-center items-center text-black-400">
 			<EmptyState
-				icon={<StackBlicksIcon />}
+				icon={<TextGenerationIcon width={24} height={24} />}
 				title="Nothing generated yet."
 				description="Generate with the current Prompt or adjust the Prompt and the results will be displayed."
 				className="text-black-400"

@@ -5,19 +5,15 @@ import {
 } from "@giselle-sdk/giselle/react";
 import clsx from "clsx/lite";
 import { useCallback } from "react";
-import { StackBlicksIcon } from "../../../icons";
+import { GenerateImageIcon } from "../../../icons";
 import { EmptyState } from "../../../ui/empty-state";
 import { GenerationView } from "../../../ui/generation-view";
-import {
-	getGenerationContentClasses,
-	getGenerationHeaderClasses,
-} from "../ui/panel-spacing";
 
 function Empty({ onGenerate }: { onGenerate?: () => void }) {
 	return (
 		<div className="bg-white-900/10 h-full rounded-[8px] flex justify-center items-center text-black-400">
 			<EmptyState
-				icon={<StackBlicksIcon />}
+				icon={<GenerateImageIcon width={24} height={24} />}
 				title="Nothing generated yet."
 				description="Generate with the current Prompt or adjust the Prompt and the results will be displayed."
 				className="text-black-400"
@@ -79,8 +75,13 @@ export function GenerationPanel({
 		return <Empty onGenerate={handleGenerate} />;
 	}
 	return (
-		<div className="bg-white-900/10 h-full rounded-[8px] flex flex-col">
-			<div className={clsx(getGenerationHeaderClasses())}>
+		<div className="flex flex-col bg-white-900/10 h-full rounded-[8px] py-[8px]">
+			<div
+				className={clsx(
+					"border-b border-white-400/20 py-[4px] px-[16px] flex items-center gap-[8px]",
+					"**:data-header-text:font-[700]",
+				)}
+			>
 				{(currentGeneration.status === "created" ||
 					currentGeneration.status === "queued" ||
 					currentGeneration.status === "running") && (
@@ -94,10 +95,8 @@ export function GenerationPanel({
 					<p data-header-text>Result</p>
 				)}
 			</div>
-			<div className={getGenerationContentClasses()}>
-				<div className="h-full overflow-x-auto">
-					<GenerationView generation={currentGeneration} />
-				</div>
+			<div className="flex-1 py-[4px] px-[16px] overflow-y-auto">
+				<GenerationView generation={currentGeneration} />
 			</div>
 		</div>
 	);
