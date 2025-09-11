@@ -116,7 +116,7 @@ export function IssueCommentCreatedIcon({
 	);
 }
 
-export function IssueLabelAddedIcon({
+export function IssueLabeledIcon({
 	className = "text-white",
 	size = 18,
 	title = "Issue Created",
@@ -316,7 +316,7 @@ export function PullRequestClosedIcon({
 	);
 }
 
-export function PullRequestLabelAddedIcon({
+export function PullRequestLabeledIcon({
 	className = "text-white",
 	size = 18,
 	title = "Issue Created",
@@ -432,7 +432,7 @@ export function getTriggerIcon(
 		case "github.issue_comment.created":
 			return <IssueCommentCreatedIcon {...props} />;
 		case "github.issue.labeled":
-			return <IssueLabelAddedIcon {...props} />;
+			return <IssueLabeledIcon {...props} />;
 		case "github.pull_request_comment.created":
 			return <PullRequestCommentCreatedIcon {...props} />;
 		case "github.pull_request_review_comment.created":
@@ -444,7 +444,7 @@ export function getTriggerIcon(
 		case "github.pull_request.closed":
 			return <PullRequestClosedIcon {...props} />;
 		case "github.pull_request.labeled":
-			return <PullRequestLabelAddedIcon {...props} />;
+			return <PullRequestLabeledIcon {...props} />;
 		default:
 			return <DefaultGitHubIcon {...props} />;
 	}

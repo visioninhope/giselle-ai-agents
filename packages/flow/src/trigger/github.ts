@@ -53,7 +53,7 @@ const githubIssueLabeledTrigger = {
 	provider,
 	event: {
 		id: "github.issue.labeled",
-		label: "Issue Label Added",
+		label: "Issue Labeled",
 		payloads: z.object({
 			issueNumber: z.number(),
 			title: z.string(),
@@ -152,7 +152,7 @@ const githubPullRequestLabeledTrigger = {
 	provider,
 	event: {
 		id: "github.pull_request.labeled",
-		label: "Pull Request Label Added",
+		label: "Pull Request Labeled",
 		payloads: z.object({
 			pullRequestNumber: z.number(),
 			pullRequestTitle: z.string(),

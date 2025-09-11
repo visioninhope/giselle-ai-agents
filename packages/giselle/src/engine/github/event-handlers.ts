@@ -295,7 +295,7 @@ export function handlePullRequestClosed<TEventName extends WebhookEventName>(
 	return { shouldRun: true, reactionNodeId: pullRequest.node_id };
 }
 
-export function handleIssueLabelAdded<TEventName extends WebhookEventName>(
+export function handleIssueLabeled<TEventName extends WebhookEventName>(
 	args: EventHandlerArgs<TEventName>,
 ): EventHandlerResult {
 	if (
@@ -328,7 +328,7 @@ export function handleIssueLabelAdded<TEventName extends WebhookEventName>(
 		: { shouldRun: false };
 }
 
-export function handlePullRequestLabelAdded<
+export function handlePullRequestLabeled<
 	TEventName extends WebhookEventName,
 >(args: EventHandlerArgs<TEventName>): EventHandlerResult {
 	if (
@@ -365,13 +365,13 @@ const eventHandlers = [
 	handleIssueOpened,
 	handleIssueClosed,
 	handleIssueCommentCreated,
+	handleIssueLabeled,
 	handlePullRequestCommentCreated,
 	handlePullRequestReviewCommentCreated,
 	handlePullRequestOpened,
 	handlePullRequestReadyForReview,
 	handlePullRequestClosed,
-	handleIssueLabelAdded,
-	handlePullRequestLabelAdded,
+	handlePullRequestLabeled,
 ];
 
 export async function processEvent<TEventName extends WebhookEventName>(

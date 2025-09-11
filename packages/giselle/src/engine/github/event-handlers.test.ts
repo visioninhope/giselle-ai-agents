@@ -19,11 +19,11 @@ import {
 	type EventHandlerDependencies,
 	handleIssueClosed,
 	handleIssueCommentCreated,
-	handleIssueLabelAdded,
+	handleIssueLabeled,
 	handleIssueOpened,
 	handlePullRequestClosed,
 	handlePullRequestCommentCreated,
-	handlePullRequestLabelAdded,
+	handlePullRequestLabeled,
 	handlePullRequestOpened,
 	handlePullRequestReadyForReview,
 	handlePullRequestReviewCommentCreated,
@@ -643,7 +643,7 @@ describe("GitHub Event Handlers", () => {
 		});
 	});
 
-	describe("handleIssueLabelAdded", () => {
+	describe("handleIssueLabeled", () => {
 		it("should handle issue labeled event with matching label", () => {
 			// Arrange
 			const args = {
@@ -666,7 +666,7 @@ describe("GitHub Event Handlers", () => {
 			};
 
 			// Act
-			const result = handleIssueLabelAdded(args);
+			const result = handleIssueLabeled(args);
 
 			// Assert
 			expect(result).toEqual({
@@ -698,7 +698,7 @@ describe("GitHub Event Handlers", () => {
 			};
 
 			// Act
-			const result = handleIssueLabelAdded(args);
+			const result = handleIssueLabeled(args);
 
 			// Assert
 			expect(result).toEqual({
@@ -730,7 +730,7 @@ describe("GitHub Event Handlers", () => {
 			};
 
 			// Act
-			const result = handleIssueLabelAdded(args);
+			const result = handleIssueLabeled(args);
 
 			// Assert
 			expect(result).toEqual({ shouldRun: false });
@@ -763,7 +763,7 @@ describe("GitHub Event Handlers", () => {
 			};
 
 			// Act
-			const result = handleIssueLabelAdded(args);
+			const result = handleIssueLabeled(args);
 
 			// Assert
 			expect(result).toEqual({ shouldRun: false });
@@ -789,7 +789,7 @@ describe("GitHub Event Handlers", () => {
 			args.trigger.configuration.event.id = "github.issue.created";
 
 			// Act
-			const result = handleIssueLabelAdded(args);
+			const result = handleIssueLabeled(args);
 
 			// Assert
 			expect(result).toEqual({ shouldRun: false });
@@ -817,7 +817,7 @@ describe("GitHub Event Handlers", () => {
 			};
 
 			// Act
-			const result = handleIssueLabelAdded(args);
+			const result = handleIssueLabeled(args);
 
 			// Assert
 			expect(result).toEqual({ shouldRun: false });
@@ -845,7 +845,7 @@ describe("GitHub Event Handlers", () => {
 			};
 
 			// Act
-			const result = handleIssueLabelAdded(args);
+			const result = handleIssueLabeled(args);
 
 			// Assert
 			expect(result).toEqual({ shouldRun: false });
@@ -873,7 +873,7 @@ describe("GitHub Event Handlers", () => {
 			} as GitHubFlowTriggerEvent;
 
 			// Act
-			const result = handleIssueLabelAdded(args);
+			const result = handleIssueLabeled(args);
 
 			// Assert
 			expect(result).toEqual({ shouldRun: false });
@@ -881,7 +881,7 @@ describe("GitHub Event Handlers", () => {
 		});
 	});
 
-	describe("handlePullRequestLabelAdded", () => {
+	describe("handlePullRequestLabeled", () => {
 		it("should handle pull request labeled event with matching label", () => {
 			// Arrange
 			const args = {
@@ -904,7 +904,7 @@ describe("GitHub Event Handlers", () => {
 			};
 
 			// Act
-			const result = handlePullRequestLabelAdded(args);
+			const result = handlePullRequestLabeled(args);
 
 			// Assert
 			expect(result).toEqual({
@@ -936,7 +936,7 @@ describe("GitHub Event Handlers", () => {
 			};
 
 			// Act
-			const result = handlePullRequestLabelAdded(args);
+			const result = handlePullRequestLabeled(args);
 
 			// Assert
 			expect(result).toEqual({
@@ -968,7 +968,7 @@ describe("GitHub Event Handlers", () => {
 			};
 
 			// Act
-			const result = handlePullRequestLabelAdded(args);
+			const result = handlePullRequestLabeled(args);
 
 			// Assert
 			expect(result).toEqual({ shouldRun: false });
@@ -1001,7 +1001,7 @@ describe("GitHub Event Handlers", () => {
 			};
 
 			// Act
-			const result = handlePullRequestLabelAdded(args);
+			const result = handlePullRequestLabeled(args);
 
 			// Assert
 			expect(result).toEqual({ shouldRun: false });
@@ -1027,7 +1027,7 @@ describe("GitHub Event Handlers", () => {
 			args.trigger.configuration.event.id = "github.issue.created";
 
 			// Act
-			const result = handlePullRequestLabelAdded(args);
+			const result = handlePullRequestLabeled(args);
 
 			// Assert
 			expect(result).toEqual({ shouldRun: false });
@@ -1055,7 +1055,7 @@ describe("GitHub Event Handlers", () => {
 			};
 
 			// Act
-			const result = handlePullRequestLabelAdded(args);
+			const result = handlePullRequestLabeled(args);
 
 			// Assert
 			expect(result).toEqual({ shouldRun: false });
@@ -1083,7 +1083,7 @@ describe("GitHub Event Handlers", () => {
 			};
 
 			// Act
-			const result = handlePullRequestLabelAdded(args);
+			const result = handlePullRequestLabeled(args);
 
 			// Assert
 			expect(result).toEqual({ shouldRun: false });
@@ -1111,7 +1111,7 @@ describe("GitHub Event Handlers", () => {
 			} as GitHubFlowTriggerEvent;
 
 			// Act
-			const result = handlePullRequestLabelAdded(args);
+			const result = handlePullRequestLabeled(args);
 
 			// Assert
 			expect(result).toEqual({ shouldRun: false });
