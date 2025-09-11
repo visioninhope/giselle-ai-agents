@@ -1,6 +1,6 @@
-import type {
-	TextGenerationContent,
-	TextGenerationNode,
+import {
+	isTextGenerationNode,
+	type TextGenerationNode,
 } from "@giselle-sdk/data-type";
 import type {
 	CompletedGeneration,
@@ -125,8 +125,6 @@ function getProviderDisplayName(provider: string): string {
 			return "Anthropic";
 		case "google":
 			return "Google";
-		case "perplexity":
-			return "Perplexity";
 		default:
 			return provider;
 	}
@@ -137,12 +135,8 @@ function getGenerationModelInfo(generation: Generation): {
 	provider: string;
 	modelId: string;
 } {
-	if (
-		generation.context.operationNode.content.type === "textGeneration" &&
-		"llm" in generation.context.operationNode.content
-	) {
-		const content = generation.context.operationNode
-			.content as TextGenerationContent;
+	if (isTextGenerationNode(generation.context.operationNode)) {
+		const content = generation.context.operationNode.content;
 		return {
 			provider: content.llm?.provider || "Unknown",
 			modelId: content.llm?.id || "",

@@ -2,9 +2,9 @@
 
 
 ## Summary
-* 818 MIT
+* 815 MIT
 * 184 Apache 2.0
-* 47 ISC
+* 46 ISC
 * 27 New BSD
 * 13 Simplified BSD
 * 5 BlueOak-1.0.0
@@ -49,7 +49,7 @@
 
 
 <a name="@ai-sdk/anthropic"></a>
-### @ai-sdk/anthropic v2.0.6
+### @ai-sdk/anthropic v2.0.9
 #### 
 
 ##### Paths
@@ -60,7 +60,7 @@
 
 
 <a name="@ai-sdk/fal"></a>
-### @ai-sdk/fal v1.0.0
+### @ai-sdk/fal v1.0.11
 #### 
 
 ##### Paths
@@ -71,7 +71,7 @@
 
 
 <a name="@ai-sdk/gateway"></a>
-### @ai-sdk/gateway v1.0.11
+### @ai-sdk/gateway v1.0.15
 #### 
 
 ##### Paths
@@ -82,7 +82,18 @@
 
 
 <a name="@ai-sdk/google"></a>
-### @ai-sdk/google v2.0.8
+### @ai-sdk/google v2.0.11
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
+
+
+
+<a name="@ai-sdk/google-vertex"></a>
+### @ai-sdk/google-vertex v3.0.16
 #### 
 
 ##### Paths
@@ -93,7 +104,7 @@
 
 
 <a name="@ai-sdk/openai"></a>
-### @ai-sdk/openai v2.0.19
+### @ai-sdk/openai v2.0.23
 #### 
 
 ##### Paths
@@ -104,7 +115,7 @@
 
 
 <a name="@ai-sdk/perplexity"></a>
-### @ai-sdk/perplexity v2.0.5
+### @ai-sdk/perplexity v2.0.7
 #### 
 
 ##### Paths
@@ -126,7 +137,7 @@
 
 
 <a name="@ai-sdk/provider-utils"></a>
-### @ai-sdk/provider-utils v3.0.0
+### @ai-sdk/provider-utils v3.0.7
 #### 
 
 ##### Paths
@@ -137,7 +148,7 @@
 
 
 <a name="@ai-sdk/react"></a>
-### @ai-sdk/react v2.0.22
+### @ai-sdk/react v2.0.29
 #### 
 
 ##### Paths
@@ -1226,7 +1237,7 @@ MIT-0 permitted
 
 
 <a name="@img/sharp-libvips-linux-x64"></a>
-### @img/sharp-libvips-linux-x64 v1.1.0
+### @img/sharp-libvips-linux-x64 v1.2.0
 #### 
 
 ##### Paths
@@ -1237,7 +1248,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@img/sharp-libvips-linuxmusl-x64"></a>
-### @img/sharp-libvips-linuxmusl-x64 v1.1.0
+### @img/sharp-libvips-linuxmusl-x64 v1.2.0
 #### 
 
 ##### Paths
@@ -1248,7 +1259,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@img/sharp-linux-x64"></a>
-### @img/sharp-linux-x64 v0.34.1
+### @img/sharp-linux-x64 v0.34.3
 #### 
 
 ##### Paths
@@ -1259,7 +1270,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@img/sharp-linuxmusl-x64"></a>
-### @img/sharp-linuxmusl-x64 v0.34.1
+### @img/sharp-linuxmusl-x64 v0.34.3
 #### 
 
 ##### Paths
@@ -1424,7 +1435,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@next/env"></a>
-### @next/env v15.3.4
+### @next/env v15.5.2
 #### 
 
 ##### Paths
@@ -1435,7 +1446,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@next/swc-linux-x64-gnu"></a>
-### @next/swc-linux-x64-gnu v15.3.4
+### @next/swc-linux-x64-gnu v15.5.2
 #### 
 
 ##### Paths
@@ -1446,7 +1457,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@next/swc-linux-x64-musl"></a>
-### @next/swc-linux-x64-musl v15.3.4
+### @next/swc-linux-x64-musl v15.5.2
 #### 
 
 ##### Paths
@@ -1457,7 +1468,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@next/third-parties"></a>
-### @next/third-parties v15.3.4
+### @next/third-parties v15.5.2
 #### 
 
 ##### Paths
@@ -3909,17 +3920,6 @@ LGPL-3.0-or-later permitted
 
 
 
-<a name="@swc/counter"></a>
-### @swc/counter v0.1.3
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
-
-
-
 <a name="@swc/helpers"></a>
 ### @swc/helpers v0.5.15
 #### 
@@ -5186,7 +5186,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="ai"></a>
-### ai v5.0.22
+### ai v5.0.29
 #### 
 
 ##### Paths
@@ -5543,17 +5543,6 @@ Python-2.0 manually approved
 
 <a name="bundle-require"></a>
 ### bundle-require v5.1.0
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-
-
-<a name="busboy"></a>
-### busboy v1.6.0
 #### 
 
 ##### Paths
@@ -6422,7 +6411,7 @@ BlueOak-1.0.0 permitted
 
 
 <a name="enhanced-resolve"></a>
-### enhanced-resolve v5.18.1
+### enhanced-resolve v5.18.3
 #### 
 
 ##### Paths
@@ -6620,7 +6609,7 @@ BlueOak-1.0.0 permitted
 
 
 <a name="eventsource-parser"></a>
-### eventsource-parser v3.0.3
+### eventsource-parser v3.0.6
 #### 
 
 ##### Paths
@@ -7951,7 +7940,7 @@ BlueOak-1.0.0 permitted
 
 
 <a name="langfuse"></a>
-### langfuse v3.37.0
+### langfuse v3.38.4
 #### 
 
 ##### Paths
@@ -8863,17 +8852,6 @@ BlueOak-1.0.0 permitted
 
 
 
-<a name="mitt"></a>
-### mitt v3.0.1
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-
-
 <a name="mkdirp"></a>
 ### mkdirp v3.0.1
 #### 
@@ -9018,7 +8996,7 @@ BlueOak-1.0.0 permitted
 
 
 <a name="next"></a>
-### next v15.3.4
+### next v15.5.2
 #### 
 
 ##### Paths
@@ -9117,7 +9095,7 @@ MIT-0 permitted
 
 
 <a name="nuqs"></a>
-### nuqs v2.4.3
+### nuqs v2.6.0
 #### 
 
 ##### Paths
@@ -9601,7 +9579,7 @@ BlueOak-1.0.0 permitted
 
 
 <a name="pino"></a>
-### pino v9.5.0
+### pino v9.9.0
 #### 
 
 ##### Paths
@@ -9810,7 +9788,7 @@ BlueOak-1.0.0 permitted
 
 
 <a name="process-warning"></a>
-### process-warning v4.0.1
+### process-warning v5.0.0
 #### 
 
 ##### Paths
@@ -10580,7 +10558,7 @@ BlueOak-1.0.0 permitted
 
 
 <a name="sharp"></a>
-### sharp v0.34.1
+### sharp v0.34.3
 #### 
 
 ##### Paths
@@ -10858,17 +10836,6 @@ Unknown manually approved
 
 
 
-<a name="streamsearch"></a>
-### streamsearch v1.1.0
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-
-
 <a name="string-width"></a>
 ### string-width v4.2.3
 #### 
@@ -11068,7 +11035,7 @@ Unknown manually approved
 
 
 <a name="tapable"></a>
-### tapable v2.2.1
+### tapable v2.2.3
 #### 
 
 ##### Paths
@@ -12223,17 +12190,6 @@ BlueOak-1.0.0 permitted
 * /home/runner/work/giselle/giselle
 
 <a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-
-
-<a name="zod-to-json-schema"></a>
-### zod-to-json-schema v3.24.1
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://en.wikipedia.org/wiki/ISC_license">ISC</a> permitted
 
 
 

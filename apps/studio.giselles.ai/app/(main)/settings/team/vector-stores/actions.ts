@@ -418,7 +418,7 @@ export async function diagnoseRepositoryConnection(
 				canBeFixed: false,
 				reason: "no-installation",
 				errorMessage:
-					"No GitHub App installation has access to this repository",
+					"No GitHub App installation has access to this repository. Please review your installation from the Integrations page.",
 			};
 		}
 

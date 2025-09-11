@@ -2,11 +2,10 @@ import {
 	AnthropicLanguageModelData,
 	GoogleLanguageModelData,
 	OpenAILanguageModelData,
-	PerplexityLanguageModelData,
 	type TextGenerationLanguageModelData,
 } from "@giselle-sdk/data-type";
 
-type Provider = "openai" | "anthropic" | "google" | "perplexity";
+type Provider = "openai" | "anthropic" | "google";
 
 export function createDefaultModelData(
 	provider: Provider,
@@ -15,7 +14,7 @@ export function createDefaultModelData(
 		case "openai":
 			return OpenAILanguageModelData.parse({
 				provider: "openai",
-				id: "gpt-4o",
+				id: "gpt-5-nano",
 				configurations: {
 					temperature: 0.7,
 					topP: 1.0,
@@ -26,31 +25,21 @@ export function createDefaultModelData(
 		case "anthropic":
 			return AnthropicLanguageModelData.parse({
 				provider: "anthropic",
-				id: "claude-3-5-sonnet-20241022",
+				id: "claude-3-5-haiku-20241022",
 				configurations: {
 					temperature: 0.7,
 					topP: 1.0,
-					topK: 40,
+					reasoningText: false,
 				},
 			});
 		case "google":
 			return GoogleLanguageModelData.parse({
 				provider: "google",
-				id: "gemini-2.0-flash-exp",
+				id: "gemini-2.5-flash-lite-preview-06-17",
 				configurations: {
 					temperature: 0.7,
 					topP: 1.0,
-					topK: 40,
 					searchGrounding: false,
-				},
-			});
-		case "perplexity":
-			return PerplexityLanguageModelData.parse({
-				provider: "perplexity",
-				id: "llama-3.1-sonar-large-128k-online",
-				configurations: {
-					temperature: 0.7,
-					topP: 1.0,
 				},
 			});
 		default: {
@@ -81,9 +70,16 @@ export function updateModelId(
 				id: newModelId,
 			});
 		case "perplexity":
-			return PerplexityLanguageModelData.parse({
-				...currentModel,
-				id: newModelId,
+			// Perplexity is deprecated, convert to OpenAI as a fallback
+			return OpenAILanguageModelData.parse({
+				provider: "openai",
+				id: "gpt-5-nano",
+				configurations: {
+					temperature: 0.7,
+					topP: 1.0,
+					frequencyPenalty: 0.0,
+					presencePenalty: 0.0,
+				},
 			});
 		default: {
 			const _exhaustiveCheck: never = currentModel;

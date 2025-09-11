@@ -1,6 +1,7 @@
 import { type AnthropicProviderOptions, anthropic } from "@ai-sdk/anthropic";
 import { createGateway } from "@ai-sdk/gateway";
-import { google } from "@ai-sdk/google";
+import { googleTools } from "@ai-sdk/google/internal";
+import { vertex } from "@ai-sdk/google-vertex/edge";
 import { type OpenAIResponsesProviderOptions, openai } from "@ai-sdk/openai";
 import { perplexity } from "@ai-sdk/perplexity";
 import {
@@ -14,6 +15,7 @@ import {
 	hasCapability,
 	languageModels,
 } from "@giselle-sdk/language-model";
+import type { LanguageModel } from "ai";
 import { AISDKError, streamText } from "ai";
 import type {
 	FailedGeneration,
@@ -39,7 +41,6 @@ export function generateText(args: {
 	useAiGateway: boolean;
 	useResumableGeneration: boolean;
 }) {
-	args.context.logger.info("generating text");
 	return useGenerationExecutor({
 		context: args.context,
 		generation: args.generation,
@@ -174,7 +175,7 @@ export function generateText(args: {
 					...preparedToolSet,
 					toolSet: {
 						...preparedToolSet.toolSet,
-						googleWebSearch: google.tools.googleSearch({}),
+						google_search: googleTools.googleSearch({}),
 					},
 				};
 			}
@@ -202,6 +203,7 @@ export function generateText(args: {
 				args.context.aiGateway,
 			);
 			let generationError: unknown | undefined;
+			const textGenerationStartTime = Date.now();
 			const streamTextResult = streamText({
 				model,
 				providerOptions,
@@ -210,14 +212,26 @@ export function generateText(args: {
 				onError: ({ error }) => {
 					generationError = error;
 				},
+				onFinish: () => {
+					args.context.logger.info(
+						`Text generation completed in ${Date.now() - textGenerationStartTime}ms`,
+					);
+				},
 			});
 			return streamTextResult.toUIMessageStream({
 				sendReasoning: true,
 				onFinish: async ({ messages: generateMessages }) => {
+					args.context.logger.info(
+						`Text generation stream completed in ${Date.now() - textGenerationStartTime}ms`,
+					);
+					const toolCleanupStartTime = Date.now();
 					await Promise.all(
 						preparedToolSet.cleanupFunctions.map((cleanupFunction) =>
 							cleanupFunction(),
 						),
+					);
+					args.context.logger.info(
+						`Tool cleanup completed in ${Date.now() - toolCleanupStartTime}ms`,
 					);
 					if (generationError) {
 						if (AISDKError.isInstance(generationError)) {
@@ -257,7 +271,11 @@ export function generateText(args: {
 						generationContext.operationNode.outputs.find(
 							(output: Output) => output.accessor === "generated-text",
 						);
+					const textRetrievalStartTime = Date.now();
 					const text = await streamTextResult.text;
+					args.context.logger.info(
+						`Text retrieval completed in ${Date.now() - textRetrievalStartTime}ms`,
+					);
 					if (generatedTextOutput !== undefined) {
 						generationOutputs.push({
 							type: "generated-text",
@@ -266,7 +284,11 @@ export function generateText(args: {
 						});
 					}
 
+					const reasoningRetrievalStartTime = Date.now();
 					const reasoningText = await streamTextResult.reasoningText;
+					args.context.logger.info(
+						`Reasoning retrieval completed in ${Date.now() - reasoningRetrievalStartTime}ms`,
+					);
 					const reasoningOutput = generationContext.operationNode.outputs.find(
 						(output: Output) => output.accessor === "reasoning",
 					);
@@ -278,7 +300,11 @@ export function generateText(args: {
 						});
 					}
 
+					const sourceRetrievalStartTime = Date.now();
 					const sources = await streamTextResult.sources;
+					args.context.logger.info(
+						`Source retrieval completed in ${Date.now() - sourceRetrievalStartTime}ms`,
+					);
 					const sourceOutput = generationContext.operationNode.outputs.find(
 						(output: Output) => output.accessor === "source",
 					);
@@ -289,6 +315,7 @@ export function generateText(args: {
 							sources,
 						});
 					}
+					const generationCompletionStartTime = Date.now();
 					await completeGeneration({
 						inputMessages: messages,
 						outputs: generationOutputs,
@@ -296,6 +323,9 @@ export function generateText(args: {
 						generateMessages: generateMessages,
 						providerMetadata: await streamTextResult.providerMetadata,
 					});
+					args.context.logger.info(
+						`Generation completion processing finished in ${Date.now() - generationCompletionStartTime}ms`,
+					);
 				},
 			});
 		},
@@ -344,7 +374,7 @@ function generationModel(
 			return openai.responses(languageModel.id);
 		}
 		case "google": {
-			return google(languageModel.id);
+			return vertex(languageModel.id) as LanguageModel;
 		}
 		case "perplexity": {
 			return perplexity(languageModel.id);

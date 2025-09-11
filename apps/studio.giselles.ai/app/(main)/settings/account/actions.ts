@@ -69,7 +69,7 @@ export async function getAccountInfo() {
 
 		return user;
 	} catch (error) {
-		logger.error("Failed to get account info:", error);
+		logger.error(error, "Failed to get account info:");
 		throw error;
 	}
 }
@@ -99,7 +99,7 @@ export async function updateDisplayName(formData: FormData) {
 
 		return { success: true };
 	} catch (error) {
-		logger.error("Failed to update display name:", error);
+		logger.error(error, "Failed to update display name:");
 		return { success: false, error };
 	}
 }
@@ -192,7 +192,7 @@ export async function updateAvatar(formData: FormData) {
 				await deleteAvatar(currentUser.avatarUrl);
 			} catch (error) {
 				// Log error but don't fail the request
-				logger.error("Failed to delete old avatar:", error);
+				logger.error(error, "Failed to delete old avatar:");
 			}
 		}
 
@@ -204,7 +204,7 @@ export async function updateAvatar(formData: FormData) {
 			avatarUrl,
 		};
 	} catch (error) {
-		logger.error("Failed to update avatar:", error);
+		logger.error(error, "Failed to update avatar:");
 		throw error;
 	}
 }

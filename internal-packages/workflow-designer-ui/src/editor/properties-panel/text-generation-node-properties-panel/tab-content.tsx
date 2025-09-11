@@ -13,16 +13,17 @@ import {
 	anthropicLanguageModels,
 	googleLanguageModels,
 	openaiLanguageModels,
-	perplexityLanguageModels,
+	Tier,
+	TierAccess,
 } from "@giselle-sdk/language-model";
 import clsx from "clsx/lite";
 import { Tabs } from "radix-ui";
+import { useCallback, useEffect } from "react";
 import { InputPanel } from "./input-panel";
 import {
 	AnthropicModelPanel,
 	GoogleModelPanel,
 	OpenAIModelPanel,
-	PerplexityModelPanel,
 } from "./model";
 import { createDefaultModelData, updateModelId } from "./model-defaults";
 import { PromptPanel } from "./prompt-panel";
@@ -54,35 +55,81 @@ export function TextGenerationTabContent({
 	data,
 	deleteConnection,
 }: TextGenerationTabContentProps) {
-	useUsageLimits();
+	const usageLimits = useUsageLimits();
+	const userTier = usageLimits?.featureTier ?? Tier.enum.free;
+	const accessibleTiers = TierAccess[userTier];
 
-	// Get available models for current provider
-	const getAvailableModels = (): Array<{ value: string; label: string }> => {
+	// Get all models for current provider, with disabled state for Pro models when user is on free tier
+	const getAvailableModels = useCallback((): Array<{
+		value: string;
+		label: string;
+		disabled?: boolean;
+		tier?: "free" | "pro";
+	}> => {
+		const prepareModelsWithTierInfo = (
+			models: Array<{ id: string; tier: "free" | "pro" }>,
+		) => {
+			return models.map((model) => ({
+				value: model.id,
+				label: model.id,
+				disabled: !accessibleTiers.includes(model.tier),
+				tier: model.tier,
+			}));
+		};
+
 		switch (node.content.llm.provider) {
 			case "openai":
-				return openaiLanguageModels.map((model) => ({
-					value: model.id,
-					label: model.id,
-				}));
+				return prepareModelsWithTierInfo(openaiLanguageModels);
 			case "anthropic":
-				return anthropicLanguageModels.map((model) => ({
-					value: model.id,
-					label: model.id,
-				}));
+				return prepareModelsWithTierInfo(anthropicLanguageModels);
 			case "google":
-				return googleLanguageModels.map((model) => ({
-					value: model.id,
-					label: model.id,
-				}));
-			case "perplexity":
-				return perplexityLanguageModels.map((model) => ({
-					value: model.id,
-					label: model.id,
-				}));
+				return prepareModelsWithTierInfo(googleLanguageModels);
 			default:
 				return [];
 		}
-	};
+	}, [accessibleTiers, node.content.llm.provider]);
+
+	// Check if current model is accessible to the user
+	const getCurrentModelInfo = useCallback(() => {
+		switch (node.content.llm.provider) {
+			case "openai":
+				return openaiLanguageModels.find((m) => m.id === node.content.llm.id);
+			case "anthropic":
+				return anthropicLanguageModels.find(
+					(m) => m.id === node.content.llm.id,
+				);
+			case "google":
+				return googleLanguageModels.find((m) => m.id === node.content.llm.id);
+			default:
+				return null;
+		}
+	}, [node.content.llm.provider, node.content.llm.id]);
+
+	// Auto-switch to a compatible model if current one is not accessible
+	useEffect(() => {
+		const currentModel = getCurrentModelInfo();
+		if (currentModel && !accessibleTiers.includes(currentModel.tier)) {
+			// Find the first available (non-disabled) model for this provider
+			const availableModels = getAvailableModels();
+			const compatibleModel = availableModels.find((model) => !model.disabled);
+			if (compatibleModel) {
+				const updatedModel = updateModelId(
+					node.content.llm,
+					compatibleModel.value,
+				);
+				updateNodeDataContent(node, {
+					...node.content,
+					llm: updatedModel,
+				});
+			}
+		}
+	}, [
+		accessibleTiers,
+		node,
+		updateNodeDataContent,
+		getAvailableModels,
+		getCurrentModelInfo,
+	]); // Re-run when dependencies change
 
 	return (
 		<Tabs.Root
@@ -130,8 +177,7 @@ export function TextGenerationTabContent({
 								const validProvider = provider as
 									| "openai"
 									| "anthropic"
-									| "google"
-									| "perplexity";
+									| "google";
 
 								const defaultModel = createDefaultModelData(validProvider);
 
@@ -145,7 +191,6 @@ export function TextGenerationTabContent({
 								{ value: "openai", label: "OpenAI" },
 								{ value: "anthropic", label: "Anthropic" },
 								{ value: "google", label: "Google" },
-								{ value: "perplexity", label: "Perplexity" },
 							]}
 						/>
 					</fieldset>
@@ -168,6 +213,11 @@ export function TextGenerationTabContent({
 								});
 							}}
 							options={getAvailableModels()}
+							renderOption={(option) => (
+								<span className={option.disabled ? "opacity-50" : ""}>
+									{option.label}
+								</span>
+							)}
 						/>
 					</fieldset>
 				</div>
@@ -401,17 +451,6 @@ export function TextGenerationTabContent({
 				{node.content.llm.provider === "anthropic" && (
 					<AnthropicModelPanel
 						anthropicLanguageModel={node.content.llm}
-						onModelChange={(value) =>
-							updateNodeDataContent(node, {
-								...node.content,
-								llm: value,
-							})
-						}
-					/>
-				)}
-				{node.content.llm.provider === "perplexity" && (
-					<PerplexityModelPanel
-						perplexityLanguageModel={node.content.llm}
 						onModelChange={(value) =>
 							updateNodeDataContent(node, {
 								...node.content,

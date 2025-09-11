@@ -1,5 +1,5 @@
 import { z } from "zod/v4";
-import { Connection } from "../connection";
+import { Connection, ConnectionId } from "../connection";
 import { NodeId, NodeLike, NodeUIState } from "../node";
 import { WorkspaceId } from "./id";
 
@@ -20,6 +20,8 @@ export const UIState = z.object({
 	nodeState: z.record(NodeId.schema, NodeUIState),
 	viewport: Viewport,
 	currentShortcutScope: ShortcutScope.optional().default("canvas"),
+	inspectedNodeId: z.optional(NodeId.schema),
+	selectedConnectionIds: z.array(ConnectionId.schema).default([]),
 });
 export type UIState = z.infer<typeof UIState>;
 
@@ -48,5 +50,5 @@ export function generateInitialWorkspace() {
 			},
 			currentShortcutScope: "canvas",
 		},
-	} satisfies Workspace;
+	} satisfies z.input<typeof Workspace>;
 }
