@@ -120,38 +120,14 @@ export function GenerationPanel({
 				{(currentGeneration.status === "created" ||
 					currentGeneration.status === "queued" ||
 					currentGeneration.status === "running") && (
-					<p data-header-text>
-						Result{" "}
-						<span className="text-[12px] font-normal">
-							from {(() => {
-								const modelInfo = getGenerationModelInfo(currentGeneration);
-								return `${getProviderDisplayName(modelInfo.provider)} ${modelInfo.modelId}`;
-							})()}
-						</span>
-					</p>
+					<p data-header-text>Generating...</p>
 				)}
 				{currentGeneration.status === "completed" && (
-					<p data-header-text>
-						Result{" "}
-						<span className="text-[12px] font-normal">
-							from {(() => {
-								const modelInfo = getGenerationModelInfo(currentGeneration);
-								return `${getProviderDisplayName(modelInfo.provider)} ${modelInfo.modelId}`;
-							})()}
-						</span>
-					</p>
+					<p data-header-text>Result</p>
 				)}
 				{currentGeneration.status === "failed" && <p data-header-text>Error</p>}
 				{currentGeneration.status === "cancelled" && (
-					<p data-header-text>
-						Result{" "}
-						<span className="text-[12px] font-normal">
-							from {(() => {
-								const modelInfo = getGenerationModelInfo(currentGeneration);
-								return `${getProviderDisplayName(modelInfo.provider)} ${modelInfo.modelId}`;
-							})()}
-						</span>
-					</p>
+					<p data-header-text>Result</p>
 				)}
 			</div>
 			<div className="flex-1 py-[4px] px-[16px] overflow-y-auto">
