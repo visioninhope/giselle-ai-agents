@@ -119,7 +119,7 @@ export function IssueCommentCreatedIcon({
 export function IssueLabeledIcon({
 	className = "text-white",
 	size = 18,
-	title = "Issue Created",
+	title = "Issue Labeled",
 }: IconProps) {
 	return (
 		<svg
@@ -319,7 +319,7 @@ export function PullRequestClosedIcon({
 export function PullRequestLabeledIcon({
 	className = "text-white",
 	size = 18,
-	title = "Issue Created",
+	title = "Pull Request Labeled",
 }: IconProps) {
 	return (
 		<svg
