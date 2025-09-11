@@ -1,6 +1,5 @@
 import { Select } from "@giselle-internal/ui/select";
 import { OpenAIImageLanguageModelData } from "@giselle-sdk/data-type";
-import { useUsageLimits } from "@giselle-sdk/giselle/react";
 import {
 	openaiImageBackground,
 	openaiImageModeration,
@@ -15,8 +14,6 @@ export function OpenAIImageModelPanel({
 	languageModel: OpenAIImageLanguageModelData;
 	onModelChange: (changedValue: OpenAIImageLanguageModelData) => void;
 }) {
-	const _limits = useUsageLimits();
-
 	return (
 		<div className="flex flex-col gap-[16px]">
 			<div className="grid grid-cols-2 gap-[24px]">

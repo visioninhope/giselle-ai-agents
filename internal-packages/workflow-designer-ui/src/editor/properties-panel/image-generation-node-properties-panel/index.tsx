@@ -19,6 +19,7 @@ import { NodeIcon } from "../../../icons/node";
 import { Button } from "../../../ui/button";
 import { UsageLimitWarning } from "../../../ui/usage-limit-warning";
 import { useKeyboardShortcuts } from "../../hooks/use-keyboard-shortcuts";
+import { useModelEligibility } from "../../lib/use-model-eligibility";
 import {
 	PropertiesPanelContent,
 	PropertiesPanelHeader,
@@ -48,6 +49,8 @@ export function ImageGenerationNodePropertiesPanel({
 	const usageLimitsReached = useUsageLimitsReached();
 	const { error } = useToasts();
 
+	const checkEligibility = useModelEligibility();
+
 	const uiState = useMemo(() => data.ui.nodeState[node.id], [data, node.id]);
 
 	// Get available models for current provider
@@ -57,18 +60,20 @@ export function ImageGenerationNodePropertiesPanel({
 				return falLanguageModels.map((model) => ({
 					value: model.id,
 					label: model.id,
+					disabled: !checkEligibility(model),
 				}));
 			case "openai":
 				return openaiImageModels.map((model) => ({
 					value: model.id,
 					label: model.id,
+					disabled: !checkEligibility(model),
 				}));
 			default: {
 				const _exhaustiveCheck: never = node.content.llm;
 				throw new Error(`Unhandled provider: ${_exhaustiveCheck}`);
 			}
 		}
-	}, [node.content.llm]);
+	}, [node.content.llm, checkEligibility]);
 
 	useKeyboardShortcuts({
 		onGenerate: () => {
