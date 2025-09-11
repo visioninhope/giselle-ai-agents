@@ -1,4 +1,4 @@
-import { Select } from "@giselle-internal/ui/select";
+import { Select, type SelectOption } from "@giselle-internal/ui/select";
 import { useToasts } from "@giselle-internal/ui/toast";
 import type { ImageGenerationNode } from "@giselle-sdk/data-type";
 import {
@@ -51,7 +51,7 @@ export function ImageGenerationNodePropertiesPanel({
 	const uiState = useMemo(() => data.ui.nodeState[node.id], [data, node.id]);
 
 	// Get available models for current provider
-	const getAvailableModels = (): Array<{ value: string; label: string }> => {
+	const models = useMemo<SelectOption[]>(() => {
 		switch (node.content.llm.provider) {
 			case "fal":
 				return falLanguageModels.map((model) => ({
@@ -63,10 +63,12 @@ export function ImageGenerationNodePropertiesPanel({
 					value: model.id,
 					label: model.id,
 				}));
-			default:
-				return [];
+			default: {
+				const _exhaustiveCheck: never = node.content.llm;
+				throw new Error(`Unhandled provider: ${_exhaustiveCheck}`);
+			}
 		}
-	};
+	}, [node.content.llm]);
 
 	useKeyboardShortcuts({
 		onGenerate: () => {
@@ -227,7 +229,7 @@ export function ImageGenerationNodePropertiesPanel({
 													llm: updatedModel,
 												});
 											}}
-											options={getAvailableModels()}
+											options={models}
 										/>
 									</fieldset>
 								</div>
