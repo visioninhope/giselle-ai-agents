@@ -1,8 +1,4 @@
-import type {
-	ImageGenerationContent,
-	ImageGenerationNode,
-} from "@giselle-sdk/data-type";
-import type { Generation } from "@giselle-sdk/giselle";
+import type { ImageGenerationNode } from "@giselle-sdk/data-type";
 import {
 	useNodeGenerations,
 	useWorkflowDesigner,
@@ -54,37 +50,6 @@ function Empty({ onGenerate }: { onGenerate?: () => void }) {
 			</EmptyState>
 		</div>
 	);
-}
-
-// Helper function to get LLM provider display name
-function getProviderDisplayName(provider: string): string {
-	switch (provider) {
-		case "fal":
-			return "Fal";
-		case "openai":
-			return "OpenAI";
-		default:
-			return provider;
-	}
-}
-
-// Helper function to get model info from generation context
-function getGenerationModelInfo(generation: Generation): {
-	provider: string;
-	modelId: string;
-} {
-	if (
-		generation.context.operationNode.content.type === "imageGeneration" &&
-		"llm" in generation.context.operationNode.content
-	) {
-		const content = generation.context.operationNode
-			.content as ImageGenerationContent;
-		return {
-			provider: content.llm?.provider || "Unknown",
-			modelId: content.llm?.id || "",
-		};
-	}
-	return { provider: "Unknown", modelId: "" };
 }
 
 export function GenerationPanel({
