@@ -15,7 +15,6 @@ import type { createAndStartAct } from "../acts";
 import type { GiselleEngineContext } from "../types";
 import { getWorkspace } from "../workspaces";
 import type { parseCommand } from "./utils";
-import de from "zod/v4/locales/de.cjs";
 
 // Since we can't access node information from the new Act structure,
 // we'll simplify the progress tracking
@@ -391,7 +390,6 @@ export async function processEvent<TEventName extends WebhookEventName>(
 	) {
 		return false;
 	}
-	console.log(args);
 
 	const repositoryNodeId = args.trigger.configuration.repositoryNodeId;
 	const installationId = args.trigger.configuration.installationId;
@@ -468,11 +466,9 @@ export async function processEvent<TEventName extends WebhookEventName>(
 
 					const body = `Running flow...\n\n${buildProgressTable(progressTableData)}`;
 
-					console.log(args.event);
 					if (
 						deps.ensureWebhookEvent(args.event, "issue_comment.created") ||
 						deps.ensureWebhookEvent(args.event, "issues.opened") ||
-						deps.ensureWebhookEvent(args.event, "issues.closed") ||
 						deps.ensureWebhookEvent(args.event, "issues.labeled")
 					) {
 						const issueNumber = args.event.data.payload.issue.number;
@@ -489,7 +485,6 @@ export async function processEvent<TEventName extends WebhookEventName>(
 							args.event,
 							"pull_request.ready_for_review",
 						) ||
-						deps.ensureWebhookEvent(args.event, "pull_request.closed") ||
 						deps.ensureWebhookEvent(args.event, "pull_request.labeled")
 					) {
 						const pullNumber = args.event.data.payload.pull_request.number;
