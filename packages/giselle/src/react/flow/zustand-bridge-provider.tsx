@@ -1,8 +1,4 @@
-import type {
-	FileNode,
-	UploadedFileData,
-	Workspace,
-} from "@giselle-sdk/data-type";
+import type { UploadedFileData, Workspace } from "@giselle-sdk/data-type";
 import { useEffect, useMemo } from "react";
 import { useFeatureFlag } from "../feature-flags";
 import { useGiselleEngine } from "../use-giselle-engine";
@@ -104,8 +100,15 @@ export function ZustandBridgeProvider({
 			setUiNodeState: state.setUiNodeState,
 			deleteNode: state.deleteNode,
 			deleteConnection: state.deleteConnection,
-			uploadFile: (files: File[], node: FileNode) =>
-				state.uploadFile(client, data.id, experimental_storage, files, node),
+			uploadFile: (files, node, options) =>
+				state.uploadFile(
+					client,
+					data.id,
+					experimental_storage,
+					files,
+					node,
+					options,
+				),
 			removeFile: (uploadedFile: UploadedFileData) =>
 				state.removeFile(client, data.id, experimental_storage, uploadedFile),
 			llmProviders: state.llmProviders,
