@@ -19,15 +19,15 @@ type CreateAndStartActParams = Omit<
 		| "onActComplete"
 		| "startGeneration"
 	> & {
-		onActStart?: (
-			cancel: () => Promise<void>,
-			actId: string,
-		) => void | Promise<void>;
-		onActComplete?: (
-			hasError: boolean,
-			duration: number,
-			actId: string,
-		) => void | Promise<void>;
+		onActStart?: (options: {
+			cancel: () => Promise<void>;
+			actId: string;
+		}) => void | Promise<void>;
+		onActComplete?: (options: {
+			hasError: boolean;
+			duration: number;
+			actId: string;
+		}) => void | Promise<void>;
 	};
 
 export function useActController() {
@@ -67,16 +67,19 @@ export function useActController() {
 					});
 				},
 				onActStart: async () => {
-					await onActStart?.(async () => {
-						await Promise.all(
-							generations.map((generation) =>
-								stopGenerationRunner(generation.id),
-							),
-						);
-					}, act.id);
+					await onActStart?.({
+						cancel: async () => {
+							await Promise.all(
+								generations.map((generation) =>
+									stopGenerationRunner(generation.id),
+								),
+							);
+						},
+						actId: act.id,
+					});
 				},
 				onActComplete: async (hasError, duration) => {
-					await onActComplete?.(hasError, duration, act.id);
+					await onActComplete?.({ hasError, duration, actId: act.id });
 				},
 			});
 		},

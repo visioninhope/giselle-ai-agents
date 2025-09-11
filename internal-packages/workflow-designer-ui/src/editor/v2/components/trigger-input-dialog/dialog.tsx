@@ -77,7 +77,7 @@ export function TriggerInputDialog({
 							items: parameterItems,
 						},
 					],
-					onActStart(cancel, actId) {
+					onActStart({ cancel, actId }) {
 						toast("Workflow submitted successfully", {
 							id: actId,
 							preserve: true,
@@ -89,7 +89,7 @@ export function TriggerInputDialog({
 							},
 						});
 					},
-					onActComplete: (_hasError, _duration, actId) => {
+					onActComplete: ({ actId }) => {
 						toast.dismiss(actId);
 					},
 				});

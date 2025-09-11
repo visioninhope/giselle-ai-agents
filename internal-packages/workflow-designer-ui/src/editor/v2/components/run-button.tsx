@@ -95,7 +95,7 @@ function useRunAct() {
 			connectionIds: item.connectionIds,
 			nodeId,
 			inputs: [],
-			onActStart(cancel, actId) {
+			onActStart({ cancel, actId }) {
 				toast("Workflow submitted successfully", {
 					id: actId,
 					preserve: true,
@@ -107,7 +107,7 @@ function useRunAct() {
 					},
 				});
 			},
-			onActComplete: (_hasError, _duration, actId) => {
+			onActComplete: ({ actId }) => {
 				toast.dismiss(actId);
 			},
 		});
