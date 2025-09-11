@@ -23,6 +23,7 @@ import {
 	handleIssueOpened,
 	handlePullRequestClosed,
 	handlePullRequestCommentCreated,
+	handlePullRequestLabelAdded,
 	handlePullRequestOpened,
 	handlePullRequestReadyForReview,
 	handlePullRequestReviewCommentCreated,
@@ -873,6 +874,244 @@ describe("GitHub Event Handlers", () => {
 
 			// Act
 			const result = handleIssueLabelAdded(args);
+
+			// Assert
+			expect(result).toEqual({ shouldRun: false });
+			expect(args.deps.addReaction).not.toHaveBeenCalled();
+		});
+	});
+
+	describe("handlePullRequestLabelAdded", () => {
+		it("should handle pull request labeled event with matching label", () => {
+			// Arrange
+			const args = {
+				...baseEventArgs,
+				event: {
+					name: "pull_request.labeled",
+					data: {
+						payload: {
+							installation: { id: 12345 },
+							repository: { node_id: "repo-node-id" },
+							pull_request: { node_id: "pr-node-id", number: 123 },
+							label: { name: "bug" },
+						},
+					},
+				} as TestWebhookEvent,
+			};
+			args.trigger.configuration.event = {
+				id: "github.pull_request.labeled",
+				conditions: { labels: ["bug", "feature"] },
+			};
+
+			// Act
+			const result = handlePullRequestLabelAdded(args);
+
+			// Assert
+			expect(result).toEqual({
+				shouldRun: true,
+				reactionNodeId: "pr-node-id",
+			});
+			expect(args.deps.addReaction).not.toHaveBeenCalled();
+		});
+
+		it("should handle pull request labeled event with one of multiple matching labels", () => {
+			// Arrange
+			const args = {
+				...baseEventArgs,
+				event: {
+					name: "pull_request.labeled",
+					data: {
+						payload: {
+							installation: { id: 12345 },
+							repository: { node_id: "repo-node-id" },
+							pull_request: { node_id: "pr-node-id", number: 123 },
+							label: { name: "feature" },
+						},
+					},
+				} as TestWebhookEvent,
+			};
+			args.trigger.configuration.event = {
+				id: "github.pull_request.labeled",
+				conditions: { labels: ["bug", "feature"] },
+			};
+
+			// Act
+			const result = handlePullRequestLabelAdded(args);
+
+			// Assert
+			expect(result).toEqual({
+				shouldRun: true,
+				reactionNodeId: "pr-node-id",
+			});
+			expect(args.deps.addReaction).not.toHaveBeenCalled();
+		});
+
+		it("should not run if added label doesn't match configured labels", () => {
+			// Arrange
+			const args = {
+				...baseEventArgs,
+				event: {
+					name: "pull_request.labeled",
+					data: {
+						payload: {
+							installation: { id: 12345 },
+							repository: { node_id: "repo-node-id" },
+							pull_request: { node_id: "pr-node-id", number: 123 },
+							label: { name: "documentation" },
+						},
+					},
+				} as TestWebhookEvent,
+			};
+			args.trigger.configuration.event = {
+				id: "github.pull_request.labeled",
+				conditions: { labels: ["bug", "feature"] },
+			};
+
+			// Act
+			const result = handlePullRequestLabelAdded(args);
+
+			// Assert
+			expect(result).toEqual({ shouldRun: false });
+			expect(args.deps.addReaction).not.toHaveBeenCalled();
+		});
+
+		it("should not run if event type doesn't match", () => {
+			// Arrange
+			const args = {
+				...baseEventArgs,
+				event: {
+					name: "pull_request.labeled",
+					data: {
+						payload: {
+							installation: { id: 12345 },
+							repository: { node_id: "repo-node-id" },
+							pull_request: { node_id: "pr-node-id", number: 123 },
+							label: { name: "bug" },
+						},
+					},
+				} as TestWebhookEvent,
+			};
+			args.trigger.configuration.event = {
+				id: "github.pull_request.labeled",
+				conditions: { labels: ["bug", "feature"] },
+			};
+			args.deps = {
+				...args.deps,
+				ensureWebhookEvent: createEnsureWebhookEventMock(false),
+			};
+
+			// Act
+			const result = handlePullRequestLabelAdded(args);
+
+			// Assert
+			expect(result).toEqual({ shouldRun: false });
+			expect(args.deps.addReaction).not.toHaveBeenCalled();
+		});
+
+		it("should not run if trigger event ID doesn't match", () => {
+			// Arrange
+			const args = {
+				...baseEventArgs,
+				event: {
+					name: "pull_request.labeled",
+					data: {
+						payload: {
+							installation: { id: 12345 },
+							repository: { node_id: "repo-node-id" },
+							pull_request: { node_id: "pr-node-id", number: 123 },
+							label: { name: "bug" },
+						},
+					},
+				} as TestWebhookEvent,
+			};
+			args.trigger.configuration.event.id = "github.issue.created";
+
+			// Act
+			const result = handlePullRequestLabelAdded(args);
+
+			// Assert
+			expect(result).toEqual({ shouldRun: false });
+			expect(args.deps.addReaction).not.toHaveBeenCalled();
+		});
+
+		it("should not run if pull_request object is missing", () => {
+			// Arrange
+			const args = {
+				...baseEventArgs,
+				event: {
+					name: "pull_request.labeled",
+					data: {
+						payload: {
+							installation: { id: 12345 },
+							repository: { node_id: "repo-node-id" },
+							label: { name: "bug" },
+						},
+					},
+				} as TestWebhookEvent,
+			};
+			args.trigger.configuration.event = {
+				id: "github.pull_request.labeled",
+				conditions: { labels: ["bug", "feature"] },
+			};
+
+			// Act
+			const result = handlePullRequestLabelAdded(args);
+
+			// Assert
+			expect(result).toEqual({ shouldRun: false });
+			expect(args.deps.addReaction).not.toHaveBeenCalled();
+		});
+
+		it("should not run if label object is missing", () => {
+			// Arrange
+			const args = {
+				...baseEventArgs,
+				event: {
+					name: "pull_request.labeled",
+					data: {
+						payload: {
+							installation: { id: 12345 },
+							repository: { node_id: "repo-node-id" },
+							pull_request: { node_id: "pr-node-id", number: 123 },
+						},
+					},
+				} as TestWebhookEvent,
+			};
+			args.trigger.configuration.event = {
+				id: "github.pull_request.labeled",
+				conditions: { labels: ["bug", "feature"] },
+			};
+
+			// Act
+			const result = handlePullRequestLabelAdded(args);
+
+			// Assert
+			expect(result).toEqual({ shouldRun: false });
+			expect(args.deps.addReaction).not.toHaveBeenCalled();
+		});
+
+		it("should not run if labels condition is missing", () => {
+			// Arrange
+			const args = {
+				...baseEventArgs,
+				event: {
+					name: "pull_request.labeled",
+					data: {
+						payload: {
+							installation: { id: 12345 },
+							repository: { node_id: "repo-node-id" },
+							pull_request: { node_id: "pr-node-id", number: 123 },
+							label: { name: "bug" },
+						},
+					},
+				} as TestWebhookEvent,
+			};
+			args.trigger.configuration.event = {
+				id: "github.pull_request.labeled",
+			} as GitHubFlowTriggerEvent;
+
+			// Act
+			const result = handlePullRequestLabelAdded(args);
 
 			// Assert
 			expect(result).toEqual({ shouldRun: false });
