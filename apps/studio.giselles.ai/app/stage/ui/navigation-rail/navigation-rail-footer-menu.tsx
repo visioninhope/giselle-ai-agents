@@ -1,9 +1,39 @@
-import { DropdownMenu } from "@giselle-internal/ui/dropdown-menu";
+"use client";
+
+import { PopoverContent } from "@giselle-internal/ui/popover";
+import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
+import { ChevronRight, ExternalLink } from "lucide-react";
 import Link from "next/link";
 import { use } from "react";
 import { AvatarImage } from "@/services/accounts/components/user-button/avatar-image";
 import { SignOutButton } from "@/services/accounts/components/user-button/sign-out-button";
 import type { NavigationRailState, UserDataForNavigationRail } from "./types";
+
+const HELP_ITEMS = [
+	{
+		label: "Docs",
+		href: "https://docs.giselles.ai/guides/introduction",
+		external: true,
+	},
+	{
+		label: "Terms",
+		href: "https://giselles.ai/legal/terms",
+		external: true,
+	},
+	{
+		label: "Privacy & Cookies",
+		href: "https://giselles.ai/legal/privacy",
+		external: true,
+	},
+	{
+		label: "Contact Us",
+		href: "mailto:support@giselles.ai",
+		external: true,
+	},
+] as const;
+
+const MENU_ITEM_CLASS =
+	"text-text outline-none cursor-pointer hover:bg-ghost-element-hover rounded-[4px] px-[8px] py-[6px] text-[14px]";
 
 export function NavigationRailFooterMenu({
 	user: userPromise,
@@ -13,64 +43,12 @@ export function NavigationRailFooterMenu({
 	variant: NavigationRailState;
 }) {
 	const user = use(userPromise);
+
 	return (
-		<DropdownMenu
-			items={[
-				{
-					value: "link-to-acctount-settings",
-					label: "Account settings",
-					href: "/settings/account",
-				},
-				{ value: "link-to-lobby", label: "Lobby", href: "/apps" },
-				{
-					value: "link-to-homepage",
-					label: "Home page",
-					href: "https://giselles.ai",
-					external: true,
-				},
-				{
-					value: "link-to-docs",
-					label: "Docs",
-					href: "https://docs.giselles.ai/guides/introduction",
-					external: true,
-				},
-				{ value: "log-out", label: "Log out" },
-			]}
-			renderItem={(item) => {
-				if (item.href !== undefined) {
-					if (item.external) {
-						return (
-							<a
-								href={item.href}
-								target="_blank"
-								rel="noopener"
-								className="w-full"
-							>
-								{item.label}
-							</a>
-						);
-					}
-					return (
-						<Link href={item.href} className="w-full">
-							{item.label}
-						</Link>
-					);
-				}
-				if (item.value === "log-out") {
-					return <SignOutButton>Log out</SignOutButton>;
-				}
-				console.warn("Unknown item value:", item.value);
-				return item.label;
-			}}
-			widthClassName={
-				variant === "expanded"
-					? "w-[var(--radix-dropdown-menu-trigger-width)]"
-					: ""
-			}
-			align={variant === "expanded" ? "center" : "start"}
-			trigger={
+		<DropdownMenuPrimitive.Root>
+			<DropdownMenuPrimitive.Trigger asChild>
 				<button
-					className="w-full hover:bg-ghost-element-hover h-full rounded-md cursor-pointer outline-none p-1.5 flex items-center"
+					className="w-full hover:bg-ghost-element-hover h-full rounded-md cursor-pointer outline-none p-1.5 flex items-center gap-2"
 					type="button"
 				>
 					<div className="size-8 flex items-center justify-center shrink-0">
@@ -83,12 +61,112 @@ export function NavigationRailFooterMenu({
 						/>
 					</div>
 					{variant === "expanded" && (
-						<p className="truncate text-text-muted text-sm">
-							{user.displayName ?? user.email}
-						</p>
+						<div className="flex flex-col min-w-0 flex-1 text-left">
+							<p className="truncate text-text-muted text-sm">
+								{user.displayName ?? user.email}
+							</p>
+							<p className="truncate text-[var(--color-stage-accent)] text-[10px]">
+								{user.planName}
+							</p>
+						</div>
 					)}
 				</button>
-			}
-		/>
+			</DropdownMenuPrimitive.Trigger>
+			<DropdownMenuPrimitive.Portal>
+				<DropdownMenuPrimitive.Content
+					align={variant === "expanded" ? "center" : "start"}
+					className={`z-50 ${
+						variant === "expanded"
+							? "w-[var(--radix-dropdown-menu-trigger-width)]"
+							: ""
+					}`}
+				>
+					<PopoverContent>
+						{/* Account Settings */}
+						<DropdownMenuPrimitive.Item
+							className={`${MENU_ITEM_CLASS} flex items-center justify-between`}
+							asChild
+						>
+							<Link href="/settings/account" className="w-full">
+								Account settings
+							</Link>
+						</DropdownMenuPrimitive.Item>
+
+						{/* Help with Submenu */}
+						<DropdownMenuPrimitive.Sub>
+							<DropdownMenuPrimitive.SubTrigger
+								className={`${MENU_ITEM_CLASS} flex items-center justify-between w-full`}
+							>
+								Help
+								<ChevronRight className="w-3 h-3" />
+							</DropdownMenuPrimitive.SubTrigger>
+							<DropdownMenuPrimitive.Portal>
+								<DropdownMenuPrimitive.SubContent
+									className="z-50 w-[180px]"
+									sideOffset={4}
+								>
+									<PopoverContent>
+										{HELP_ITEMS.map((item) => (
+											<DropdownMenuPrimitive.Item
+												key={item.label}
+												className={MENU_ITEM_CLASS}
+												asChild
+											>
+												{item.external ? (
+													<a
+														href={item.href}
+														target="_blank"
+														rel="noopener"
+														className="w-full flex items-center justify-between"
+													>
+														{item.label}
+														<ExternalLink className="w-3 h-3" />
+													</a>
+												) : (
+													<Link href={item.href} className="w-full block">
+														{item.label}
+													</Link>
+												)}
+											</DropdownMenuPrimitive.Item>
+										))}
+									</PopoverContent>
+								</DropdownMenuPrimitive.SubContent>
+							</DropdownMenuPrimitive.Portal>
+						</DropdownMenuPrimitive.Sub>
+
+						{/* Separator */}
+						<DropdownMenuPrimitive.Separator className="h-px bg-white/10 my-1" />
+
+						{/* Lobby */}
+						<DropdownMenuPrimitive.Item className={MENU_ITEM_CLASS} asChild>
+							<Link href="/apps" className="w-full block">
+								Lobby
+							</Link>
+						</DropdownMenuPrimitive.Item>
+
+						{/* Homepage */}
+						<DropdownMenuPrimitive.Item className={MENU_ITEM_CLASS} asChild>
+							<a
+								href="https://giselles.ai"
+								target="_blank"
+								rel="noopener"
+								className="w-full flex items-center justify-between"
+							>
+								Homepage
+								<ExternalLink className="w-3 h-3" />
+							</a>
+						</DropdownMenuPrimitive.Item>
+
+						{/* Separator */}
+						<DropdownMenuPrimitive.Separator className="h-px bg-white/10 my-1" />
+
+						{/* Logout */}
+						<DropdownMenuPrimitive.Item className={MENU_ITEM_CLASS}>
+							<SignOutButton className="text-[14px]">Log out</SignOutButton>
+						</DropdownMenuPrimitive.Item>
+					</PopoverContent>
+				</DropdownMenuPrimitive.Content>
+			</DropdownMenuPrimitive.Portal>
+		</DropdownMenuPrimitive.Root>
 	);
 }

@@ -9,6 +9,6 @@ export async function getSidebarData() {
 		displayName: accountInfo.displayName ?? undefined,
 		email: accountInfo.email ?? undefined,
 		avatarUrl: accountInfo.avatarUrl ?? undefined,
-		isPro,
+		planName: isPro ? "Pro plan" : "Free plan",
 	};
 }
