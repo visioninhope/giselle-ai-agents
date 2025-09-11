@@ -10,8 +10,10 @@ import {
 	IssueClosedIcon,
 	IssueCommentCreatedIcon,
 	IssueCreatedIcon,
+	IssueLabelAddedIcon,
 	PullRequestClosedIcon,
 	PullRequestCommentCreatedIcon,
+	PullRequestLabelAddedIcon,
 	PullRequestOpenedIcon,
 	PullRequestReadyForReviewIcon,
 	PullRequestReviewCommentCreatedIcon,
@@ -22,7 +24,7 @@ import { GitHubRepositoryBlock } from "../";
 const EVENT_ICON_MAP = {
 	"github.issue.created": IssueCreatedIcon,
 	"github.issue.closed": IssueClosedIcon,
-	"github.issue.labeled": IssueCreatedIcon, // Using same icon as issue.created for now
+	"github.issue.labeled": IssueLabelAddedIcon,
 	"github.issue_comment.created": IssueCommentCreatedIcon,
 	"github.pull_request_comment.created": PullRequestCommentCreatedIcon,
 	"github.pull_request_review_comment.created":
@@ -30,7 +32,7 @@ const EVENT_ICON_MAP = {
 	"github.pull_request.opened": PullRequestOpenedIcon,
 	"github.pull_request.ready_for_review": PullRequestReadyForReviewIcon,
 	"github.pull_request.closed": PullRequestClosedIcon,
-	"github.pull_request.labeled": IssueCreatedIcon, // Using same icon as issue.created for now
+	"github.pull_request.labeled": PullRequestLabelAddedIcon,
 } as const;
 
 // Default icon for unknown events
