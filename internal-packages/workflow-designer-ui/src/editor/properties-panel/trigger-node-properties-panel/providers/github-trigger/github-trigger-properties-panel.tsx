@@ -226,7 +226,7 @@ export function Installed({
 			) {
 				event = createCallsignEvent(eventId, formData);
 			} else {
-				event = createTriggerEvent(eventId);
+				event = createTriggerEvent({ eventId });
 			}
 
 			if (event === undefined) {
@@ -256,7 +256,7 @@ export function Installed({
 				return;
 			}
 
-			const event = createTriggerEvent(eventId, undefined, validLabels);
+			const event = createTriggerEvent({ eventId, labels: validLabels });
 			configureTrigger(event, step);
 		},
 		[configureTrigger, step, eventId],
@@ -385,7 +385,9 @@ export function Installed({
 													});
 													triggerId = result.triggerId;
 												} else {
-													const event = createTriggerEvent(step.eventId);
+													const event = createTriggerEvent({
+														eventId: step.eventId,
+													});
 													const result = await client.configureTrigger({
 														trigger: {
 															nodeId: node.id,

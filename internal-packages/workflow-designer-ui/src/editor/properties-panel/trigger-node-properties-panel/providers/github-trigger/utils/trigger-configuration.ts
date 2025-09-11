@@ -32,43 +32,43 @@ interface TriggerConfigResult {
 /**
  * Creates a GitHubFlowTriggerEvent based on the event ID and optional callsign/labels
  */
-export function createTriggerEvent(
-	eventId: GitHubTriggerEventId,
-	callsign?: string,
-	labels?: string[],
-): GitHubFlowTriggerEvent {
-	switch (eventId) {
+export function createTriggerEvent(args: {
+	eventId: GitHubTriggerEventId;
+	callsign?: string;
+	labels?: string[];
+}): GitHubFlowTriggerEvent {
+	switch (args.eventId) {
 		case "github.issue.created":
 		case "github.issue.closed":
 		case "github.pull_request.ready_for_review":
 		case "github.pull_request.closed":
 		case "github.pull_request.opened":
 			return {
-				id: eventId,
+				id: args.eventId,
 			};
 		case "github.issue_comment.created":
 		case "github.pull_request_comment.created":
 		case "github.pull_request_review_comment.created":
-			if (!callsign || callsign.length === 0) {
+			if (!args.callsign || args.callsign.length === 0) {
 				throw new Error("Callsign is required for this trigger type");
 			}
 			return {
-				id: eventId,
+				id: args.eventId,
 				conditions: {
-					callsign,
+					callsign: args.callsign,
 				},
 			};
 		case "github.issue.labeled":
 		case "github.pull_request.labeled":
-			if (!labels || labels.length === 0) {
+			if (!args.labels || args.labels.length === 0) {
 				throw new Error("Labels are required for this trigger type");
 			}
 			return {
-				id: eventId,
-				conditions: { labels },
+				id: args.eventId,
+				conditions: { labels: args.labels },
 			};
 		default: {
-			const _exhaustiveCheck: never = eventId;
+			const _exhaustiveCheck: never = args.eventId;
 			throw new Error(`Unhandled eventId: ${_exhaustiveCheck}`);
 		}
 	}
@@ -130,7 +130,7 @@ function createTriggerConfiguration(options: TriggerConfigOptions) {
 		throw new Error(`Callsign is required for trigger type: ${eventId}`);
 	}
 
-	const event = createTriggerEvent(eventId, callsign);
+	const event = createTriggerEvent({ eventId, callsign });
 	const outputs = generateTriggerOutputs(eventId);
 	const name = `On ${githubTriggers[eventId].event.label}`;
 
