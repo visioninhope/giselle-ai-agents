@@ -33,6 +33,7 @@ import { LabelsInputStep } from "./components/labels-input-step";
 import { RepositoryDisplay } from "./components/repository-display";
 import { Unauthorized } from "./components/unauthorized";
 import { createTriggerEvent } from "./utils/trigger-configuration";
+import { useTriggerConfiguration } from "./utils/use-trigger-configuration";
 
 export function GitHubTriggerPropertiesPanel({ node }: { node: TriggerNode }) {
 	const { value } = useIntegration();
@@ -100,7 +101,7 @@ interface SelectRepositoryStep {
 	eventId: GitHubTriggerEventId;
 }
 
-interface InputCallsignStep {
+export interface InputCallsignStep {
 	state: "input-callsign";
 	eventId: GitHubTriggerEventId;
 	owner: string;
@@ -109,7 +110,7 @@ interface InputCallsignStep {
 	installationId: number;
 }
 
-interface InputLabelsStep {
+export interface InputLabelsStep {
 	state: "input-labels";
 	eventId: GitHubTriggerEventId;
 	owner: string;
@@ -173,6 +174,10 @@ export function Installed({
 		reconfigStep ?? { state: "select-event" },
 	);
 	const { data: workspace, updateNodeData } = useWorkflowDesigner();
+	const { configureTrigger, isPending: isTriggerConfigPending } =
+		useTriggerConfiguration({
+			node,
+		});
 	const client = useGiselleEngine();
 	const [isPending, startTransition] = useTransition();
 	const [eventId, setEventId] = useState<GitHubTriggerEventId>(
@@ -227,62 +232,9 @@ export function Installed({
 			if (event === undefined) {
 				return;
 			}
-
-			const trigger = githubTriggers[event.id];
-			const outputs: Output[] = [];
-
-			for (const key of trigger.event.payloads.keyof().options) {
-				outputs.push({
-					id: OutputId.generate(),
-					label: key,
-					accessor: key,
-				});
-			}
-
-			startTransition(async () => {
-				try {
-					const { triggerId } = await client.configureTrigger({
-						trigger: {
-							nodeId: node.id,
-							workspaceId: workspace?.id,
-							enable: false,
-							configuration: {
-								provider: "github",
-								repositoryNodeId: step.repoNodeId,
-								installationId: step.installationId,
-								event,
-							},
-						},
-						useExperimentalStorage: experimental_storage,
-					});
-
-					updateNodeData(node, {
-						content: {
-							...node.content,
-							state: {
-								status: "configured",
-								flowTriggerId: triggerId,
-							},
-						},
-						outputs: [...node.outputs, ...outputs],
-						name: `On ${trigger.event.label}`,
-					});
-				} catch (_error) {
-					// Error is handled by the UI state
-				}
-			});
+			configureTrigger(event, step);
 		},
-		[
-			workspace?.id,
-			client.configureTrigger,
-			node,
-			updateNodeData,
-			step,
-			eventId,
-			experimental_storage,
-			CALLSIGN_EVENTS,
-			createCallsignEvent,
-		],
+		[configureTrigger, step, eventId, CALLSIGN_EVENTS, createCallsignEvent],
 	);
 
 	const handleLabelsSubmit = useCallback(
@@ -305,59 +257,9 @@ export function Installed({
 			}
 
 			const event = createTriggerEvent(eventId, undefined, validLabels);
-			const trigger = githubTriggers[event.id];
-			const outputs: Output[] = [];
-
-			for (const key of trigger.event.payloads.keyof().options) {
-				outputs.push({
-					id: OutputId.generate(),
-					label: key,
-					accessor: key,
-				});
-			}
-
-			startTransition(async () => {
-				try {
-					const { triggerId } = await client.configureTrigger({
-						trigger: {
-							nodeId: node.id,
-							workspaceId: workspace.id,
-							enable: false,
-							configuration: {
-								provider: "github",
-								repositoryNodeId: step.repoNodeId,
-								installationId: step.installationId,
-								event,
-							},
-						},
-						useExperimentalStorage: experimental_storage,
-					});
-
-					updateNodeData(node, {
-						content: {
-							...node.content,
-							state: {
-								status: "configured",
-								flowTriggerId: triggerId,
-							},
-						},
-						outputs,
-						name: `On ${trigger.event.label}`,
-					});
-				} catch (_error) {
-					// Error is handled by the UI state
-				}
-			});
+			configureTrigger(event, step);
 		},
-		[
-			workspace.id,
-			client.configureTrigger,
-			node,
-			updateNodeData,
-			step,
-			eventId,
-			experimental_storage,
-		],
+		[configureTrigger, step, eventId],
 	);
 
 	return (
@@ -620,19 +522,21 @@ export function Installed({
 									eventId: step.eventId,
 								});
 							}}
-							disabled={isPending}
+							disabled={isTriggerConfigPending}
 						>
-							<span className={isPending ? "opacity-0" : ""}>Back</span>
+							<span className={isTriggerConfigPending ? "opacity-0" : ""}>
+								Back
+							</span>
 						</button>
 						<button
 							type="submit"
 							className="flex-1 bg-primary-900 hover:bg-primary-800 text-white font-medium px-4 py-2 rounded-md text-[14px] transition-colors disabled:opacity-50 relative"
-							disabled={isPending}
+							disabled={isTriggerConfigPending}
 						>
-							<span className={isPending ? "opacity-0" : ""}>
-								{isPending ? "Setting up..." : "Set Up"}
+							<span className={isTriggerConfigPending ? "opacity-0" : ""}>
+								{isTriggerConfigPending ? "Setting up..." : "Set Up"}
 							</span>
-							{isPending && (
+							{isTriggerConfigPending && (
 								<span className="absolute inset-0 flex items-center justify-center">
 									<svg
 										className="animate-spin h-5 w-5 text-white"
@@ -675,7 +579,7 @@ export function Installed({
 						});
 					}}
 					onSubmit={handleLabelsSubmit}
-					isPending={isPending}
+					isPending={isTriggerConfigPending}
 				/>
 			)}
 
