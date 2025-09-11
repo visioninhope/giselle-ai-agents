@@ -328,9 +328,9 @@ export function handleIssueLabeled<TEventName extends WebhookEventName>(
 		: { shouldRun: false };
 }
 
-export function handlePullRequestLabeled<
-	TEventName extends WebhookEventName,
->(args: EventHandlerArgs<TEventName>): EventHandlerResult {
+export function handlePullRequestLabeled<TEventName extends WebhookEventName>(
+	args: EventHandlerArgs<TEventName>,
+): EventHandlerResult {
 	if (
 		!args.deps.ensureWebhookEvent(args.event, "pull_request.labeled") ||
 		args.trigger.configuration.event.id !== "github.pull_request.labeled"
