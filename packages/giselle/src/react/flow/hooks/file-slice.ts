@@ -128,20 +128,16 @@ export const createFileSlice: StateCreator<AppStore, [], [], FileSlice> = (
 				),
 		) as FileNode | undefined;
 
-		if (!parentNode) {
-			console.error("Could not find parent node for file to remove");
-			return;
-		}
-
+		// Remove from storage regardless of UI state; UI may have already pruned the file
 		await client.removeFile({
 			workspaceId: workspaceId,
 			fileId: uploadedFile.id,
 			useExperimentalStorage: useExperimentalStorage,
 		});
 
-		const currentFiles = parentNode.content.files;
-
-		if (currentFiles) {
+		// If the parent node is still present in state, reflect the deletion
+		if (parentNode) {
+			const currentFiles = parentNode.content.files;
 			get().updateFileStatus(
 				parentNode.id,
 				currentFiles.filter((f) => f.id !== uploadedFile.id),
