@@ -469,6 +469,7 @@ export async function processEvent<TEventName extends WebhookEventName>(
 					if (
 						deps.ensureWebhookEvent(args.event, "issue_comment.created") ||
 						deps.ensureWebhookEvent(args.event, "issues.opened") ||
+						deps.ensureWebhookEvent(args.event, "issues.closed") ||
 						deps.ensureWebhookEvent(args.event, "issues.labeled")
 					) {
 						const issueNumber = args.event.data.payload.issue.number;
@@ -485,6 +486,7 @@ export async function processEvent<TEventName extends WebhookEventName>(
 							args.event,
 							"pull_request.ready_for_review",
 						) ||
+						deps.ensureWebhookEvent(args.event, "pull_request.closed") ||
 						deps.ensureWebhookEvent(args.event, "pull_request.labeled")
 					) {
 						const pullNumber = args.event.data.payload.pull_request.number;
