@@ -179,7 +179,23 @@ export function FilePanel({ node, config }: FilePanelProps) {
 		(fileList: FileList) => {
 			try {
 				assertFiles(fileList);
-				addFilesInternal(Array.from(fileList));
+				const originals = Array.from(fileList);
+				let filesToAdd: File[] = originals;
+				if (node.content.category === "image") {
+					const used = new Set<string>(node.content.files.map((f) => f.name));
+					const renamed: File[] = [];
+					for (const f of originals) {
+						const name = generateIncrementalUniqueName(f.name, used);
+						renamed.push(
+							new File([f], name, {
+								type: f.type,
+								lastModified: f.lastModified,
+							}),
+						);
+					}
+					filesToAdd = renamed;
+				}
+				addFilesInternal(filesToAdd);
 			} catch (e) {
 				if (e instanceof InvalidFileTypeError) {
 					toasts.error(e.message);
@@ -190,7 +206,14 @@ export function FilePanel({ node, config }: FilePanelProps) {
 				}
 			}
 		},
-		[addFilesInternal, maxFileSize, assertFiles, toasts],
+		[
+			addFilesInternal,
+			maxFileSize,
+			assertFiles,
+			toasts,
+			node.content.category,
+			node.content.files,
+		],
 	);
 
 	const handlePaste = useCallback(
@@ -218,28 +241,16 @@ export function FilePanel({ node, config }: FilePanelProps) {
 				}
 			}
 
-			// Rename only on duplicates using `base N` pattern to mimic common UIs
-			const renamedFiles: File[] = [];
-			const usedNames = new Set<string>(node.content.files.map((f) => f.name));
-			for (const f of files) {
-				const newName = generateIncrementalUniqueName(f.name, usedNames);
-				const renamed = new File([f], newName, {
-					type: f.type,
-					lastModified: f.lastModified,
-				});
-				renamedFiles.push(renamed);
-			}
-
 			if (files.length > 0) {
 				// Create a FileList from File[] to use validation path
 				const dataTransfer = new DataTransfer();
-				for (const file of renamedFiles) {
+				for (const file of files) {
 					dataTransfer.items.add(file);
 				}
 				addFiles(dataTransfer.files); // Use validation path
 			}
 		},
-		[addFiles, node.content.files],
+		[addFiles],
 	);
 
 	useEffect(() => {
