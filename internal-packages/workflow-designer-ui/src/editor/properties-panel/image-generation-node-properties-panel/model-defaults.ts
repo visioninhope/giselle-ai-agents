@@ -1,10 +1,11 @@
 import {
 	FalLanguageModelData,
+	GoogleImageLanguageModelData,
 	type ImageGenerationLanguageModelData,
 	OpenAIImageLanguageModelData,
 } from "@giselle-sdk/data-type";
 
-type Provider = "fal" | "openai";
+type Provider = "fal" | "openai" | "google";
 
 export function createDefaultModelData(
 	provider: Provider,
@@ -31,6 +32,14 @@ export function createDefaultModelData(
 					moderation: "auto",
 				},
 			});
+		case "google":
+			return GoogleImageLanguageModelData.parse({
+				provider: "google",
+				id: "gemini-2.5-flash-image-preview",
+				configurations: {
+					responseModalities: ["TEXT", "IMAGE"],
+				},
+			});
 		default: {
 			const _exhaustiveCheck: never = provider;
 			throw new Error(`Unhandled provider: ${_exhaustiveCheck}`);
@@ -50,6 +59,11 @@ export function updateModelId(
 			});
 		case "openai":
 			return OpenAIImageLanguageModelData.parse({
+				...currentModel,
+				id: newModelId,
+			});
+		case "google":
+			return GoogleImageLanguageModelData.parse({
 				...currentModel,
 				id: newModelId,
 			});

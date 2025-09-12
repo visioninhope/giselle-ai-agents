@@ -7,6 +7,7 @@ import {
 } from "@giselle-sdk/giselle/react";
 import {
 	falLanguageModels,
+	googleImageLanguageModels,
 	openaiImageModels,
 } from "@giselle-sdk/language-model";
 import clsx from "clsx/lite";
@@ -29,11 +30,7 @@ import {
 import { GenerationPanel } from "./generation-panel";
 import { InputPanel } from "./input-panel";
 import { createDefaultModelData, updateModelId } from "./model-defaults";
-import {
-	FalModelPanel,
-	GoogleImageModelPanel,
-	OpenAIImageModelPanel,
-} from "./models";
+import { FalModelPanel, OpenAIImageModelPanel } from "./models";
 import { PromptPanel } from "./prompt-panel";
 import { useConnectedSources } from "./sources";
 
@@ -68,6 +65,12 @@ export function ImageGenerationNodePropertiesPanel({
 				}));
 			case "openai":
 				return openaiImageModels.map((model) => ({
+					value: model.id,
+					label: model.id,
+					disabled: !checkEligibility(model),
+				}));
+			case "google":
+				return googleImageLanguageModels.map((model) => ({
 					value: model.id,
 					label: model.id,
 					disabled: !checkEligibility(model),
@@ -199,7 +202,10 @@ export function ImageGenerationNodePropertiesPanel({
 											placeholder="Select a provider"
 											value={node.content.llm.provider}
 											onValueChange={(provider) => {
-												const validProvider = provider as "fal" | "openai";
+												const validProvider = provider as
+													| "fal"
+													| "openai"
+													| "google";
 												const defaultModel =
 													createDefaultModelData(validProvider);
 
@@ -211,6 +217,7 @@ export function ImageGenerationNodePropertiesPanel({
 											options={[
 												{ value: "fal", label: "Fal" },
 												{ value: "openai", label: "OpenAI" },
+												{ value: "google", label: "Google" },
 											]}
 										/>
 									</fieldset>
@@ -255,17 +262,6 @@ export function ImageGenerationNodePropertiesPanel({
 								)}
 								{node.content.llm.provider === "openai" && (
 									<OpenAIImageModelPanel
-										languageModel={node.content.llm}
-										onModelChange={(value) =>
-											updateNodeDataContent(node, {
-												...node.content,
-												llm: value,
-											})
-										}
-									/>
-								)}
-								{node.content.llm.provider === "google" && (
-									<GoogleImageModelPanel
 										languageModel={node.content.llm}
 										onModelChange={(value) =>
 											updateNodeDataContent(node, {
