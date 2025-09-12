@@ -2,14 +2,14 @@ import { z } from "zod/v4";
 import { Capability, LanguageModelBase } from "./base";
 
 const GoogleImageModelConfigurations = z.object({
-	responseModalities: z.tuple([z.literal("TEXT"), z.literal("IMAGE")]),
+	responseModalities: z.array(z.literal("IMAGE")),
 });
 type GoogleImageModelConfiguration = z.infer<
 	typeof GoogleImageModelConfigurations
 >;
 
 const defaultConfiguration: GoogleImageModelConfiguration = {
-	responseModalities: ["TEXT", "IMAGE"],
+	responseModalities: ["IMAGE"],
 };
 
 const GoogleImageLanguageModelId = z
