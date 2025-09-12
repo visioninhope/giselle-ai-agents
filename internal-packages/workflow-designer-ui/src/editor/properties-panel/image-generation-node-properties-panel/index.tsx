@@ -1,6 +1,9 @@
 import { Select, type SelectOption } from "@giselle-internal/ui/select";
 import { useToasts } from "@giselle-internal/ui/toast";
-import type { ImageGenerationNode } from "@giselle-sdk/data-type";
+import {
+	ImageGenerationLanguageModelProvider,
+	type ImageGenerationNode,
+} from "@giselle-sdk/data-type";
 import {
 	useNodeGenerations,
 	useWorkflowDesigner,
@@ -202,12 +205,14 @@ export function ImageGenerationNodePropertiesPanel({
 											placeholder="Select a provider"
 											value={node.content.llm.provider}
 											onValueChange={(provider) => {
-												const validProvider = provider as
-													| "fal"
-													| "openai"
-													| "google";
-												const defaultModel =
-													createDefaultModelData(validProvider);
+												const result =
+													ImageGenerationLanguageModelProvider.safeParse(
+														provider,
+													);
+												if (!result.success) return;
+												const defaultModel = createDefaultModelData(
+													result.data,
+												);
 
 												updateNodeDataContent(node, {
 													...node.content,

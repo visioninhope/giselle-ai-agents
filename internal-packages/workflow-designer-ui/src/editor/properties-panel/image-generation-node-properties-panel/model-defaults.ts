@@ -2,13 +2,12 @@ import {
 	FalLanguageModelData,
 	GoogleImageLanguageModelData,
 	type ImageGenerationLanguageModelData,
+	type ImageGenerationLanguageModelProvider,
 	OpenAIImageLanguageModelData,
 } from "@giselle-sdk/data-type";
 
-type Provider = "fal" | "openai" | "google";
-
 export function createDefaultModelData(
-	provider: Provider,
+	provider: ImageGenerationLanguageModelProvider,
 ): ImageGenerationLanguageModelData {
 	switch (provider) {
 		case "fal":
