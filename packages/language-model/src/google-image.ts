@@ -27,7 +27,7 @@ const gemini25FlashImagePreview: GoogleImageLanguageModel = {
 	provider: "google",
 	id: "gemini-2.5-flash-image-preview",
 	capabilities: Capability.ImageGeneration,
-	tier: "free",
+	tier: "pro",
 	configurations: defaultConfiguration,
 };
 
