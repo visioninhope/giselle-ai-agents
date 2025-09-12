@@ -29,7 +29,11 @@ import {
 import { GenerationPanel } from "./generation-panel";
 import { InputPanel } from "./input-panel";
 import { createDefaultModelData, updateModelId } from "./model-defaults";
-import { FalModelPanel, OpenAIImageModelPanel } from "./models";
+import {
+	FalModelPanel,
+	GoogleImageModelPanel,
+	OpenAIImageModelPanel,
+} from "./models";
 import { PromptPanel } from "./prompt-panel";
 import { useConnectedSources } from "./sources";
 
@@ -251,6 +255,17 @@ export function ImageGenerationNodePropertiesPanel({
 								)}
 								{node.content.llm.provider === "openai" && (
 									<OpenAIImageModelPanel
+										languageModel={node.content.llm}
+										onModelChange={(value) =>
+											updateNodeDataContent(node, {
+												...node.content,
+												llm: value,
+											})
+										}
+									/>
+								)}
+								{node.content.llm.provider === "google" && (
+									<GoogleImageModelPanel
 										languageModel={node.content.llm}
 										onModelChange={(value) =>
 											updateNodeDataContent(node, {

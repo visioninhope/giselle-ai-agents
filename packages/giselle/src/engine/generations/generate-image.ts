@@ -1,6 +1,9 @@
 import { fal } from "@ai-sdk/fal";
+import { google } from "@ai-sdk/google";
 import { openai } from "@ai-sdk/openai";
 import {
+	type FalLanguageModelData,
+	type GoogleImageLanguageModelData,
 	type ImageGenerationNode,
 	isImageGenerationNode,
 	type OpenAIImageLanguageModelData,
@@ -8,6 +11,7 @@ import {
 import type { GeneratedImageData } from "@giselle-sdk/language-model";
 import {
 	experimental_generateImage as generateImageAiSdk,
+	generateText,
 	type ModelMessage,
 } from "ai";
 import {
@@ -74,6 +78,16 @@ export function generateImage(args: {
 						break;
 					case "openai":
 						generationOutputs = await generateImageWithOpenAI({
+							messages,
+							runningGeneration,
+							generationContext,
+							languageModelData: operationNode.content.llm,
+							context: args.context,
+							signal,
+						});
+						break;
+					case "google":
+						generationOutputs = await generateImageWithGoogle({
 							messages,
 							runningGeneration,
 							generationContext,
@@ -247,6 +261,91 @@ async function generateImageWithOpenAI({
 	const generatedImageOutput = generationContext.operationNode.outputs.find(
 		(output) => output.accessor === "generated-image",
 	);
+	if (generatedImageOutput !== undefined) {
+		const contents = await Promise.all(
+			images.map(async (image) => {
+				const imageType = detectImageType(image.uint8Array);
+				if (imageType === null) {
+					return null;
+				}
+				const id = ImageId.generate();
+				const filename = `${id}.${imageType.ext}`;
+
+				await setGeneratedImage({
+					storage: context.storage,
+					experimental_storage: context.experimental_storage,
+					useExperimentalStorage,
+					generation: runningGeneration,
+					generatedImage: {
+						uint8Array: image.uint8Array,
+						base64: image.base64,
+					} satisfies GeneratedImageData,
+					generatedImageFilename: filename,
+				});
+
+				return {
+					id,
+					contentType: imageType.contentType,
+					filename,
+					pathname: `/generations/${runningGeneration.id}/generated-images/${filename}`,
+				} satisfies Image;
+			}),
+		).then((results) => results.filter((result) => result !== null));
+
+		generationOutputs.push({
+			type: "generated-image",
+			contents,
+			outputId: generatedImageOutput.id,
+		});
+	}
+
+	return generationOutputs;
+}
+
+async function generateImageWithGoogle({
+	messages,
+	generationContext,
+	runningGeneration,
+	languageModelData,
+	context,
+	useExperimentalStorage,
+	signal,
+}: {
+	messages: ModelMessage[];
+	generationContext: GenerationContext;
+	runningGeneration: RunningGeneration;
+	languageModelData: GoogleImageLanguageModelData;
+	context: GiselleEngineContext;
+	useExperimentalStorage?: boolean;
+	signal?: AbortSignal;
+}) {
+	let prompt = "";
+	for (const message of messages) {
+		if (!Array.isArray(message.content)) {
+			continue;
+		}
+		for (const content of message.content) {
+			if (content.type !== "text") {
+				continue;
+			}
+			prompt += content.text;
+		}
+	}
+
+	const { files } = await generateText({
+		model: google("gemini-2.5-flash-image-preview"),
+		providerOptions: {
+			google: languageModelData.configurations,
+		},
+		abortSignal: signal,
+		prompt,
+	});
+
+	const images = files.filter((file) => file.mediaType.startsWith("image/"));
+	const generatedImageOutput = generationContext.operationNode.outputs.find(
+		(output) => output.accessor === "generated-image",
+	);
+	const generationOutputs: GenerationOutput[] = [];
 	if (generatedImageOutput !== undefined) {
 		const contents = await Promise.all(
 			images.map(async (image) => {
