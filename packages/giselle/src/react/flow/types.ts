@@ -1,4 +1,5 @@
 import type {
+	FileData,
 	FileNode,
 	InputId,
 	Node,
@@ -8,7 +9,6 @@ import type {
 	NodeUIState,
 	OutputId,
 	ShortcutScope,
-	UploadedFileData,
 	Viewport,
 	Workspace,
 } from "@giselle-sdk/data-type";
@@ -52,7 +52,7 @@ export interface WorkflowDesignerContextValue {
 		node: FileNode,
 		options?: { onError?: (message: string) => void },
 	) => Promise<void>;
-	removeFile: (uploadedFile: UploadedFileData) => Promise<void>;
+	removeFile: (file: FileData) => Promise<void>;
 	llmProviders: LanguageModelProvider[];
 	isLoading: boolean;
 	isSupportedConnection: (
