@@ -72,6 +72,7 @@ export function generateImage(args: {
 							messages,
 							runningGeneration,
 							generationContext,
+							languageModelData: operationNode.content.llm,
 							context: args.context,
 							signal,
 						});
@@ -137,6 +138,7 @@ async function generateImageWithFal({
 	runningGeneration,
 	messages,
 	context,
+	languageModelData,
 	useExperimentalStorage,
 	signal,
 }: {
@@ -145,6 +147,7 @@ async function generateImageWithFal({
 	runningGeneration: RunningGeneration;
 	messages: ModelMessage[];
 	context: GiselleEngineContext;
+	languageModelData: FalLanguageModelData;
 	useExperimentalStorage?: boolean;
 	signal?: AbortSignal;
 }) {
@@ -164,8 +167,8 @@ async function generateImageWithFal({
 	const result = await generateImageAiSdk({
 		model: fal.image(operationNode.content.llm.id),
 		prompt,
-		n: operationNode.content.llm.configurations.n,
-		size: operationNode.content.llm.configurations.size,
+		n: languageModelData.configurations.n,
+		size: languageModelData.configurations.size,
 		abortSignal: signal,
 	});
 
