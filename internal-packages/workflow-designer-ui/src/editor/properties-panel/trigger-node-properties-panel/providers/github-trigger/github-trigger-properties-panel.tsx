@@ -16,6 +16,7 @@ import {
 import clsx from "clsx/lite";
 import { InfoIcon } from "lucide-react";
 import {
+	type FormEvent,
 	type FormEventHandler,
 	useCallback,
 	useState,
@@ -28,9 +29,11 @@ import { GitHubTriggerReconfiguringView } from "../../ui/reconfiguring-views/git
 import { EventSelectionStep } from "./components/event-selection-step";
 import { EventTypeDisplay } from "./components/event-type-display";
 import { InstallGitHubApplication } from "./components/install-application";
+import { LabelsInputStep } from "./components/labels-input-step";
 import { RepositoryDisplay } from "./components/repository-display";
 import { Unauthorized } from "./components/unauthorized";
 import { createTriggerEvent } from "./utils/trigger-configuration";
+import { useTriggerConfiguration } from "./utils/use-trigger-configuration";
 
 export function GitHubTriggerPropertiesPanel({ node }: { node: TriggerNode }) {
 	const { value } = useIntegration();
@@ -98,8 +101,17 @@ interface SelectRepositoryStep {
 	eventId: GitHubTriggerEventId;
 }
 
-interface InputCallsignStep {
+export interface InputCallsignStep {
 	state: "input-callsign";
+	eventId: GitHubTriggerEventId;
+	owner: string;
+	repo: string;
+	repoNodeId: string;
+	installationId: number;
+}
+
+export interface InputLabelsStep {
+	state: "input-labels";
 	eventId: GitHubTriggerEventId;
 	owner: string;
 	repo: string;
@@ -120,6 +132,7 @@ type GitHubTriggerSetupStep =
 	| SelectEventStep
 	| SelectRepositoryStep
 	| InputCallsignStep
+	| InputLabelsStep
 	| ConfirmRepositoryStep;
 
 /**
@@ -131,6 +144,16 @@ function isTriggerRequiringCallsign(eventId: GitHubTriggerEventId): boolean {
 		"github.pull_request_comment.created",
 		"github.pull_request_review_comment.created",
 	].includes(eventId);
+}
+
+/**
+ * Determines if a trigger type requires labels
+ */
+function isTriggerRequiringLabels(eventId: GitHubTriggerEventId) {
+	return (
+		eventId === "github.issue.labeled" ||
+		eventId === "github.pull_request.labeled"
+	);
 }
 
 export function Installed({
@@ -151,6 +174,10 @@ export function Installed({
 		reconfigStep ?? { state: "select-event" },
 	);
 	const { data: workspace, updateNodeData } = useWorkflowDesigner();
+	const { configureTrigger, isPending: isTriggerConfigPending } =
+		useTriggerConfiguration({
+			node,
+		});
 	const client = useGiselleEngine();
 	const [isPending, startTransition] = useTransition();
 	const [eventId, setEventId] = useState<GitHubTriggerEventId>(
@@ -182,7 +209,7 @@ export function Installed({
 		"github.pull_request_review_comment.created",
 	] as const;
 
-	const handleSubmit = useCallback<FormEventHandler<HTMLFormElement>>(
+	const handleCallsignSubmit = useCallback<FormEventHandler<HTMLFormElement>>(
 		(e) => {
 			e.preventDefault();
 
@@ -199,68 +226,40 @@ export function Installed({
 			) {
 				event = createCallsignEvent(eventId, formData);
 			} else {
-				event = createTriggerEvent(eventId);
+				event = createTriggerEvent({ eventId });
 			}
 
 			if (event === undefined) {
 				return;
 			}
+			configureTrigger(event, step);
+		},
+		[configureTrigger, step, eventId, CALLSIGN_EVENTS, createCallsignEvent],
+	);
 
-			const trigger = githubTriggers[event.id];
-			const outputs: Output[] = [];
+	const handleLabelsSubmit = useCallback(
+		(
+			e: FormEvent<HTMLFormElement>,
+			rawLabels: { id: number; value: string }[],
+		) => {
+			e.preventDefault();
 
-			for (const key of trigger.event.payloads.keyof().options) {
-				outputs.push({
-					id: OutputId.generate(),
-					label: key,
-					accessor: key,
-				});
+			if (step.state !== "input-labels") {
+				throw new Error("Unexpected state");
 			}
 
-			startTransition(async () => {
-				try {
-					const { triggerId } = await client.configureTrigger({
-						trigger: {
-							nodeId: node.id,
-							workspaceId: workspace?.id,
-							enable: false,
-							configuration: {
-								provider: "github",
-								repositoryNodeId: step.repoNodeId,
-								installationId: step.installationId,
-								event,
-							},
-						},
-						useExperimentalStorage: experimental_storage,
-					});
+			const validLabels = rawLabels
+				.map((label) => label.value.trim())
+				.filter((value) => value.length > 0);
 
-					updateNodeData(node, {
-						content: {
-							...node.content,
-							state: {
-								status: "configured",
-								flowTriggerId: triggerId,
-							},
-						},
-						outputs: [...node.outputs, ...outputs],
-						name: `On ${trigger.event.label}`,
-					});
-				} catch (_error) {
-					// Error is handled by the UI state
-				}
-			});
+			if (validLabels.length === 0) {
+				return;
+			}
+
+			const event = createTriggerEvent({ eventId, labels: validLabels });
+			configureTrigger(event, step);
 		},
-		[
-			workspace?.id,
-			client.configureTrigger,
-			node,
-			updateNodeData,
-			step,
-			eventId,
-			experimental_storage,
-			CALLSIGN_EVENTS,
-			createCallsignEvent,
-		],
+		[configureTrigger, step, eventId],
 	);
 
 	return (
@@ -349,6 +348,15 @@ export function Installed({
 											repo: step.repo,
 											repoNodeId: step.repoNodeId,
 										});
+									} else if (isTriggerRequiringLabels(step.eventId)) {
+										setStep({
+											state: "input-labels",
+											eventId: step.eventId,
+											installationId: step.installationId,
+											owner: step.owner,
+											repo: step.repo,
+											repoNodeId: step.repoNodeId,
+										});
 									} else {
 										startTransition(async () => {
 											try {
@@ -377,7 +385,9 @@ export function Installed({
 													});
 													triggerId = result.triggerId;
 												} else {
-													const event = createTriggerEvent(step.eventId);
+													const event = createTriggerEvent({
+														eventId: step.eventId,
+													});
 													const result = await client.configureTrigger({
 														trigger: {
 															nodeId: node.id,
@@ -415,7 +425,8 @@ export function Installed({
 								}}
 							>
 								<span className={isPending ? "opacity-0" : ""}>
-									{isTriggerRequiringCallsign(step.eventId)
+									{isTriggerRequiringCallsign(step.eventId) ||
+									isTriggerRequiringLabels(step.eventId)
 										? "Continue"
 										: "Set Up"}
 								</span>
@@ -454,7 +465,7 @@ export function Installed({
 			{step.state === "input-callsign" && (
 				<form
 					className="w-full flex flex-col gap-[8px] overflow-y-auto flex-1 pr-2 custom-scrollbar"
-					onSubmit={handleSubmit}
+					onSubmit={handleCallsignSubmit}
 				>
 					<p className="text-[14px] text-[#F7F9FD] mb-2">Event type</p>
 					<EventTypeDisplay eventId={step.eventId} showDescription={false} />
@@ -513,19 +524,21 @@ export function Installed({
 									eventId: step.eventId,
 								});
 							}}
-							disabled={isPending}
+							disabled={isTriggerConfigPending}
 						>
-							<span className={isPending ? "opacity-0" : ""}>Back</span>
+							<span className={isTriggerConfigPending ? "opacity-0" : ""}>
+								Back
+							</span>
 						</button>
 						<button
 							type="submit"
 							className="flex-1 bg-primary-900 hover:bg-primary-800 text-white font-medium px-4 py-2 rounded-md text-[14px] transition-colors disabled:opacity-50 relative"
-							disabled={isPending}
+							disabled={isTriggerConfigPending}
 						>
-							<span className={isPending ? "opacity-0" : ""}>
-								{isPending ? "Setting up..." : "Set Up"}
+							<span className={isTriggerConfigPending ? "opacity-0" : ""}>
+								{isTriggerConfigPending ? "Setting up..." : "Set Up"}
 							</span>
-							{isPending && (
+							{isTriggerConfigPending && (
 								<span className="absolute inset-0 flex items-center justify-center">
 									<svg
 										className="animate-spin h-5 w-5 text-white"
@@ -554,6 +567,22 @@ export function Installed({
 						</button>
 					</div>
 				</form>
+			)}
+
+			{step.state === "input-labels" && (
+				<LabelsInputStep
+					eventId={step.eventId}
+					owner={step.owner}
+					repo={step.repo}
+					onBack={() => {
+						setStep({
+							state: "select-repository",
+							eventId: step.eventId,
+						});
+					}}
+					onSubmit={handleLabelsSubmit}
+					isPending={isTriggerConfigPending}
+				/>
 			)}
 
 			<style jsx>{`

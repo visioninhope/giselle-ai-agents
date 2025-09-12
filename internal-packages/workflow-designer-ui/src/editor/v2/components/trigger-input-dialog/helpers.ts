@@ -41,6 +41,12 @@ const githubEventInputs: GithubEventInputMap = {
 		title: { label: "Title", type: "text", required: true },
 		body: { label: "Body", type: "multiline-text", required: false },
 	},
+	"github.issue.labeled": {
+		issueNumber: { label: "Issue Number", type: "number", required: true },
+		title: { label: "Title", type: "text", required: true },
+		body: { label: "Body", type: "multiline-text", required: false },
+		labelName: { label: "Label Name", type: "text", required: true },
+	},
 	"github.issue_comment.created": {
 		issueNumber: { label: "Issue Number", type: "number", required: true },
 		issueTitle: { label: "Issue Title", type: "text", required: true },
@@ -102,6 +108,24 @@ const githubEventInputs: GithubEventInputMap = {
 		},
 		diff: { label: "diff", type: "multiline-text", required: true },
 		id: { label: "ID", type: "number", required: true },
+	},
+	"github.pull_request.labeled": {
+		pullRequestNumber: {
+			label: "Pull Request Number",
+			type: "number",
+			required: true,
+		},
+		pullRequestTitle: {
+			label: "Pull Request Title",
+			type: "text",
+			required: true,
+		},
+		pullRequestBody: {
+			label: "Pull Request Body",
+			type: "multiline-text",
+			required: false,
+		},
+		labelName: { label: "Label Name", type: "text", required: true },
 	},
 };
 

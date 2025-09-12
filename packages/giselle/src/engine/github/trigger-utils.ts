@@ -22,10 +22,12 @@ export async function resolveTrigger(args: ResolveTriggerArgs) {
 	return (
 		resolveIssueCreatedTrigger(args) ||
 		resolveIssueClosedTrigger(args) ||
+		resolveIssueLabeledTrigger(args) ||
 		resolveIssueCommentTrigger(args) ||
 		(await resolvePullRequestOpenedTrigger(args)) ||
 		(await resolvePullRequestReadyForReviewTrigger(args)) ||
 		resolvePullRequestClosedTrigger(args) ||
+		resolvePullRequestLabeledTrigger(args) ||
 		(await resolvePullRequestCommentTrigger(args)) ||
 		(await resolvePullRequestReviewCommentTrigger(args))
 	);
@@ -114,6 +116,115 @@ function resolveIssueClosedTrigger(
 					type: "generated-text",
 					outputId: args.output.id,
 					content: args.webhookEvent.data.payload.issue.number.toString(),
+				} satisfies GenerationOutput;
+			default: {
+				const _exhaustiveCheck: never = payload;
+				throw new Error(`Unhandled payload id: ${_exhaustiveCheck}`);
+			}
+		}
+	}
+	return null;
+}
+
+function resolveIssueLabeledTrigger(args: ResolveTriggerArgs) {
+	if (
+		!ensureWebhookEvent(args.webhookEvent, "issues.labeled") ||
+		args.githubTrigger.event.id !== "github.issue.labeled"
+	) {
+		return null;
+	}
+	for (const payload of args.githubTrigger.event.payloads.keyof().options) {
+		switch (payload) {
+			case "title":
+				if (args.output.accessor !== payload) {
+					continue;
+				}
+				return {
+					type: "generated-text",
+					outputId: args.output.id,
+					content: args.webhookEvent.data.payload.issue.title,
+				} satisfies GenerationOutput;
+			case "body":
+				if (args.output.accessor !== payload) {
+					continue;
+				}
+				return {
+					type: "generated-text",
+					outputId: args.output.id,
+					content: args.webhookEvent.data.payload.issue.body ?? "",
+				} satisfies GenerationOutput;
+			case "issueNumber":
+				if (args.output.accessor !== payload) {
+					continue;
+				}
+				return {
+					type: "generated-text",
+					outputId: args.output.id,
+					content: args.webhookEvent.data.payload.issue.number.toString(),
+				} satisfies GenerationOutput;
+			case "labelName":
+				if (args.output.accessor !== payload) {
+					continue;
+				}
+				return {
+					type: "generated-text",
+					outputId: args.output.id,
+					content: args.webhookEvent.data.payload.label?.name ?? "",
+				} satisfies GenerationOutput;
+			default: {
+				const _exhaustiveCheck: never = payload;
+				throw new Error(`Unhandled payload id: ${_exhaustiveCheck}`);
+			}
+		}
+	}
+	return null;
+}
+
+function resolvePullRequestLabeledTrigger(args: ResolveTriggerArgs) {
+	if (
+		!ensureWebhookEvent(args.webhookEvent, "pull_request.labeled") ||
+		args.githubTrigger.event.id !== "github.pull_request.labeled"
+	) {
+		return null;
+	}
+	for (const payload of args.githubTrigger.event.payloads.keyof().options) {
+		switch (payload) {
+			case "pullRequestTitle":
+				if (args.output.accessor !== payload) {
+					continue;
+				}
+				return {
+					type: "generated-text",
+					outputId: args.output.id,
+					content: args.webhookEvent.data.payload.pull_request.title,
+				} satisfies GenerationOutput;
+			case "pullRequestBody":
+				if (args.output.accessor !== payload) {
+					continue;
+				}
+				return {
+					type: "generated-text",
+					outputId: args.output.id,
+					content: args.webhookEvent.data.payload.pull_request.body ?? "",
+				} satisfies GenerationOutput;
+			case "pullRequestNumber":
+				if (args.output.accessor !== payload) {
+					continue;
+				}
+				return {
+					type: "generated-text",
+					outputId: args.output.id,
+					content:
+						args.webhookEvent.data.payload.pull_request.number.toString(),
+				} satisfies GenerationOutput;
+			case "labelName":
+				if (args.output.accessor !== payload) {
+					continue;
+				}
+				return {
+					type: "generated-text",
+					outputId: args.output.id,
+					content: args.webhookEvent.data.payload.label?.name ?? "",
 				} satisfies GenerationOutput;
 			default: {
 				const _exhaustiveCheck: never = payload;

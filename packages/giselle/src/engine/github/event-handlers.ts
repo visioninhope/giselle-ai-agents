@@ -295,15 +295,83 @@ export function handlePullRequestClosed<TEventName extends WebhookEventName>(
 	return { shouldRun: true, reactionNodeId: pullRequest.node_id };
 }
 
+export function handleIssueLabeled<TEventName extends WebhookEventName>(
+	args: EventHandlerArgs<TEventName>,
+): EventHandlerResult {
+	if (
+		!args.deps.ensureWebhookEvent(args.event, "issues.labeled") ||
+		args.trigger.configuration.event.id !== "github.issue.labeled"
+	) {
+		return { shouldRun: false };
+	}
+
+	const issue = args.event.data.payload.issue;
+	const addedLabel = args.event.data.payload.label;
+
+	if (!issue || !addedLabel) {
+		return { shouldRun: false };
+	}
+
+	const conditions =
+		args.trigger.configuration.event.id === "github.issue.labeled"
+			? args.trigger.configuration.event.conditions
+			: undefined;
+
+	if (!conditions?.labels || !Array.isArray(conditions.labels)) {
+		return { shouldRun: false };
+	}
+
+	const shouldRun = conditions.labels.includes(addedLabel.name);
+
+	return shouldRun
+		? { shouldRun: true, reactionNodeId: issue.node_id }
+		: { shouldRun: false };
+}
+
+export function handlePullRequestLabeled<TEventName extends WebhookEventName>(
+	args: EventHandlerArgs<TEventName>,
+): EventHandlerResult {
+	if (
+		!args.deps.ensureWebhookEvent(args.event, "pull_request.labeled") ||
+		args.trigger.configuration.event.id !== "github.pull_request.labeled"
+	) {
+		return { shouldRun: false };
+	}
+
+	const pullRequest = args.event.data.payload.pull_request;
+	const addedLabel = args.event.data.payload.label;
+
+	if (!pullRequest || !addedLabel) {
+		return { shouldRun: false };
+	}
+
+	const conditions =
+		args.trigger.configuration.event.id === "github.pull_request.labeled"
+			? args.trigger.configuration.event.conditions
+			: undefined;
+
+	if (!conditions?.labels || !Array.isArray(conditions.labels)) {
+		return { shouldRun: false };
+	}
+
+	const shouldRun = conditions.labels.includes(addedLabel.name);
+
+	return shouldRun
+		? { shouldRun: true, reactionNodeId: pullRequest.node_id }
+		: { shouldRun: false };
+}
+
 const eventHandlers = [
 	handleIssueOpened,
 	handleIssueClosed,
 	handleIssueCommentCreated,
+	handleIssueLabeled,
 	handlePullRequestCommentCreated,
 	handlePullRequestReviewCommentCreated,
 	handlePullRequestOpened,
 	handlePullRequestReadyForReview,
 	handlePullRequestClosed,
+	handlePullRequestLabeled,
 ];
 
 export async function processEvent<TEventName extends WebhookEventName>(
@@ -401,7 +469,8 @@ export async function processEvent<TEventName extends WebhookEventName>(
 					if (
 						deps.ensureWebhookEvent(args.event, "issue_comment.created") ||
 						deps.ensureWebhookEvent(args.event, "issues.opened") ||
-						deps.ensureWebhookEvent(args.event, "issues.closed")
+						deps.ensureWebhookEvent(args.event, "issues.closed") ||
+						deps.ensureWebhookEvent(args.event, "issues.labeled")
 					) {
 						const issueNumber = args.event.data.payload.issue.number;
 						const comment = await deps.createIssueComment({
@@ -417,7 +486,8 @@ export async function processEvent<TEventName extends WebhookEventName>(
 							args.event,
 							"pull_request.ready_for_review",
 						) ||
-						deps.ensureWebhookEvent(args.event, "pull_request.closed")
+						deps.ensureWebhookEvent(args.event, "pull_request.closed") ||
+						deps.ensureWebhookEvent(args.event, "pull_request.labeled")
 					) {
 						const pullNumber = args.event.data.payload.pull_request.number;
 						const comment = await deps.createPullRequestComment({
