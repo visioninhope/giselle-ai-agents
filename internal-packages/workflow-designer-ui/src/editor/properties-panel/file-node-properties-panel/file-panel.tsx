@@ -74,6 +74,28 @@ function formatFileSize(size: number): string {
 	return `${formattedSize} ${units[i]}`;
 }
 
+function generateIncrementalUniqueName(
+	originalName: string,
+	usedNames: Set<string>,
+): string {
+	if (!usedNames.has(originalName)) {
+		usedNames.add(originalName);
+		return originalName;
+	}
+	const lastDot = originalName.lastIndexOf(".");
+	const hasExt = lastDot > 0 && lastDot < originalName.length - 1;
+	const base = hasExt ? originalName.slice(0, lastDot) : originalName;
+	const ext = hasExt ? originalName.slice(lastDot) : "";
+	let i = 1;
+	let candidate = `${base} ${i}${ext}`;
+	while (usedNames.has(candidate)) {
+		i += 1;
+		candidate = `${base} ${i}${ext}`;
+	}
+	usedNames.add(candidate);
+	return candidate;
+}
+
 export function FilePanel({ node, config }: FilePanelProps) {
 	const [isDragging, setIsDragging] = useState(false);
 	const [isValidFile, setIsValidFile] = useState(true);
@@ -196,16 +218,28 @@ export function FilePanel({ node, config }: FilePanelProps) {
 				}
 			}
 
+			// Rename only on duplicates using `base N` pattern to mimic common UIs
+			const renamedFiles: File[] = [];
+			const usedNames = new Set<string>(node.content.files.map((f) => f.name));
+			for (const f of files) {
+				const newName = generateIncrementalUniqueName(f.name, usedNames);
+				const renamed = new File([f], newName, {
+					type: f.type,
+					lastModified: f.lastModified,
+				});
+				renamedFiles.push(renamed);
+			}
+
 			if (files.length > 0) {
 				// Create a FileList from File[] to use validation path
 				const dataTransfer = new DataTransfer();
-				for (const file of files) {
+				for (const file of renamedFiles) {
 					dataTransfer.items.add(file);
 				}
 				addFiles(dataTransfer.files); // Use validation path
 			}
 		},
-		[addFiles],
+		[addFiles, node.content.files],
 	);
 
 	useEffect(() => {
