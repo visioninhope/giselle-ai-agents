@@ -5,6 +5,7 @@ import {
 	type FileContent,
 	type FileData,
 	type FileNode,
+	isFileNode,
 	type UploadedFileData,
 	type WorkspaceId,
 } from "@giselle-sdk/data-type";
@@ -42,79 +43,74 @@ export const createFileSlice: StateCreator<AppStore, [], [], FileSlice> = (
 		node,
 		options,
 	) => {
-		const uploaders = files.map((file) => {
-			return async () => {
-				const initialFiles = get().workspace?.nodes.find(
-					(n) => n.id === node.id,
-				)?.content.files as FileData[] | undefined;
+		const getCurrentFiles = (): FileData[] => {
+			const ws = get().workspace;
+			if (!ws) return [];
+			const found = ws.nodes.find((n) => n.id === node.id);
+			if (found && isFileNode(found)) {
+				return found.content.files;
+			}
+			return [];
+		};
 
-				if (!initialFiles) return; // Node not found or content is wrong type
+		let fileContents = getCurrentFiles();
+		const batchSeen = new Set<string>();
 
-				if (initialFiles.some((f) => f.name === file.name)) {
-					options?.onError?.("duplicate file name");
-					return;
-				}
+		for (const file of files) {
+			const name = file.name;
+			const currentNames = new Set<string>([
+				...getCurrentFiles().map((f) => f.name),
+				...fileContents.map((f) => f.name),
+			]);
+			const isDuplicate = batchSeen.has(name) || currentNames.has(name);
+			if (isDuplicate) {
+				options?.onError?.(`duplicate file name: ${name}`);
+				continue;
+			}
+			batchSeen.add(name);
 
-				const uploadingFileData = createUploadingFileData({
-					name: file.name,
-					type: file.type,
-					size: file.size,
+			const uploadingFileData = createUploadingFileData({
+				name,
+				type: file.type,
+				size: file.size,
+			});
+			fileContents = [...fileContents, uploadingFileData];
+			get().updateFileStatus(node.id, fileContents);
+
+			try {
+				await client.uploadFile({
+					workspaceId,
+					file,
+					fileId: uploadingFileData.id,
+					fileName: name,
+					useExperimentalStorage,
 				});
 
-				// Show uploading status immediately
-				get().updateFileStatus(node.id, [...initialFiles, uploadingFileData]);
-
-				try {
-					await client.uploadFile({
-						workspaceId: workspaceId,
-						file,
-						fileId: uploadingFileData.id,
-						fileName: file.name,
-						useExperimentalStorage: useExperimentalStorage,
-					});
-
-					const uploadedFileData = createUploadedFileData(
-						uploadingFileData,
-						Date.now(),
-					);
-
-					const filesAfterUpload = get().workspace?.nodes.find(
-						(n) => n.id === node.id,
-					)?.content.files as FileData[] | undefined;
-
-					get().updateFileStatus(node.id, [
-						...(filesAfterUpload?.filter((f) => f.id !== uploadedFileData.id) ||
-							[]),
-						uploadedFileData,
-					]);
-				} catch (error) {
-					const message = APICallError.isInstance(error)
-						? error.statusCode === 413
-							? "filesize too large"
-							: error.message
+				const uploadedFileData = createUploadedFileData(
+					uploadingFileData,
+					Date.now(),
+				);
+				fileContents = [
+					...getCurrentFiles().filter((f) => f.id !== uploadedFileData.id),
+					uploadedFileData,
+				];
+			} catch (error) {
+				const message = APICallError.isInstance(error)
+					? error.statusCode === 413
+						? "filesize too large"
+						: error.message
+					: error instanceof Error
+						? error.message || "upload failed"
 						: "upload failed";
+				options?.onError?.(message);
 
-					options?.onError?.(message);
-					const failedFileData = createFailedFileData(
-						uploadingFileData,
-						message,
-					);
-
-					const filesAfterError = get().workspace?.nodes.find(
-						(n) => n.id === node.id,
-					)?.content.files as FileData[] | undefined;
-
-					get().updateFileStatus(node.id, [
-						...(filesAfterError?.filter((f) => f.id !== failedFileData.id) ||
-							[]),
-						failedFileData,
-					]);
-				}
-			};
-		});
-
-		for (const uploader of uploaders) {
-			await uploader();
+				const failedFileData = createFailedFileData(uploadingFileData, message);
+				fileContents = [
+					...getCurrentFiles().filter((f) => f.id !== failedFileData.id),
+					failedFileData,
+				];
+			}
+			get().updateFileStatus(node.id, fileContents);
 		}
 	},
 	removeFile: async (
