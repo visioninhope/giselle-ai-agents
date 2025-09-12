@@ -6,7 +6,6 @@ import {
 	type FileData,
 	type FileNode,
 	isFileNode,
-	type UploadedFileData,
 	type WorkspaceId,
 } from "@giselle-sdk/data-type";
 import type { StateCreator } from "zustand";
@@ -27,7 +26,7 @@ export interface FileSlice {
 		client: GiselleEngineClient,
 		workspaceId: WorkspaceId,
 		useExperimentalStorage: boolean,
-		uploadedFile: UploadedFileData,
+		file: FileData,
 	) => Promise<void>;
 }
 
@@ -113,34 +112,31 @@ export const createFileSlice: StateCreator<AppStore, [], [], FileSlice> = (
 			get().updateFileStatus(node.id, fileContents);
 		}
 	},
-	removeFile: async (
-		client,
-		workspaceId,
-		useExperimentalStorage,
-		uploadedFile,
-	) => {
+	removeFile: async (client, workspaceId, useExperimentalStorage, file) => {
 		const allNodes = get().workspace?.nodes ?? [];
 		const parentNode = allNodes.find(
 			(n) =>
 				n.content.type === "file" &&
 				(n.content as FileContent).files?.some(
-					(f: FileData) => f.id === uploadedFile.id,
+					(f: FileData) => f.id === file.id,
 				),
 		) as FileNode | undefined;
 
-		// Remove from storage regardless of UI state; UI may have already pruned the file
-		await client.removeFile({
-			workspaceId: workspaceId,
-			fileId: uploadedFile.id,
-			useExperimentalStorage: useExperimentalStorage,
-		});
+		// Remove from storage only for uploaded files; otherwise just update state
+		if (file.status === "uploaded") {
+			await client.removeFile({
+				workspaceId: workspaceId,
+				fileId: file.id,
+				useExperimentalStorage: useExperimentalStorage,
+			});
+		}
 
 		// If the parent node is still present in state, reflect the deletion
 		if (parentNode) {
 			const currentFiles = parentNode.content.files;
 			get().updateFileStatus(
 				parentNode.id,
-				currentFiles.filter((f) => f.id !== uploadedFile.id),
+				currentFiles.filter((f) => f.id !== file.id),
 			);
 		}
 	},

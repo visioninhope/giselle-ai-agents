@@ -1,12 +1,12 @@
 "use client";
 
 import {
+	type FileData,
 	type Node,
 	NodeId,
 	type NodeLike,
 	type NodeUIState,
 	type ShortcutScope,
-	type UploadedFileData,
 	type Viewport,
 	type Workspace,
 } from "@giselle-sdk/data-type";
@@ -148,12 +148,14 @@ export function WorkflowDesignerProvider({
 	});
 
 	const removeFile = useCallback(
-		async (uploadedFile: UploadedFileData) => {
-			await client.removeFile({
-				workspaceId: data.id,
-				fileId: uploadedFile.id,
-				useExperimentalStorage: experimental_storage,
-			});
+		async (file: FileData) => {
+			if (file.status === "uploaded") {
+				await client.removeFile({
+					workspaceId: data.id,
+					fileId: file.id,
+					useExperimentalStorage: experimental_storage,
+				});
+			}
 			dispatch({ type: "NO_OP" });
 		},
 		[client, data.id, dispatch, experimental_storage],
