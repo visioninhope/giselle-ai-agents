@@ -36,7 +36,7 @@ export function createDefaultModelData(
 				provider: "google",
 				id: "gemini-2.5-flash-image-preview",
 				configurations: {
-					responseModalities: ["TEXT", "IMAGE"],
+					responseModalities: ["IMAGE"],
 				},
 			});
 		default: {
