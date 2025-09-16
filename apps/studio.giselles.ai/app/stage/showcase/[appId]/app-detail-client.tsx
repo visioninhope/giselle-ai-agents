@@ -1,5 +1,6 @@
 "use client";
 
+import { StatusBadge } from "@giselle-internal/ui/status-badge";
 import { Play, Star } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
@@ -221,19 +222,17 @@ export function AppDetailClient({ appDetails }: AppDetailClientProps) {
 											className="flex items-center justify-between py-2 border-b border-[var(--color-border)] last:border-b-0"
 										>
 											<div className="flex items-center gap-3">
-												<div
-													className={`w-2 h-2 rounded-full ${
-														execution.status === "success"
-															? "bg-green-400"
-															: "bg-red-400"
-													}`}
-												></div>
+												<StatusBadge
+													status={
+														execution.status === "success" ? "success" : "error"
+													}
+													variant="dot"
+												>
+													{execution.status === "success"
+														? "Success"
+														: "Failed"}
+												</StatusBadge>
 												<div>
-													<div className="text-sm text-[var(--color-text)]">
-														{execution.status === "success"
-															? "Successful execution"
-															: "Failed execution"}
-													</div>
 													<div className="text-xs text-[var(--color-text-60)]">
 														{new Intl.RelativeTimeFormat("en", {
 															numeric: "auto",
@@ -297,18 +296,14 @@ export function AppDetailClient({ appDetails }: AppDetailClientProps) {
 									<span className="text-[var(--color-text-muted)] text-sm">
 										Status
 									</span>
-									<div className="flex items-center gap-2">
-										<div
-											className={`w-2 h-2 rounded-full ${
-												appDetails.status === "Active"
-													? "bg-green-400"
-													: "bg-gray-400"
-											}`}
-										></div>
-										<span className="text-[var(--color-text)] text-sm">
-											{appDetails.status}
-										</span>
-									</div>
+									<StatusBadge
+										status={
+											appDetails.status === "Active" ? "success" : "ignored"
+										}
+										variant="dot"
+									>
+										{appDetails.status}
+									</StatusBadge>
 								</div>
 								<div className="flex justify-between">
 									<span className="text-[var(--color-text-muted)] text-sm">

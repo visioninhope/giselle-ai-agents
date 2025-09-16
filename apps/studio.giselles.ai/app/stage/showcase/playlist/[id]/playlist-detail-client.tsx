@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@giselle-internal/ui/button";
+import { StatusBadge } from "@giselle-internal/ui/status-badge";
 import * as Dialog from "@radix-ui/react-dialog";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { Edit3, Play, Plus, Star, Trash2 } from "lucide-react";
