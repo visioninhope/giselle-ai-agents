@@ -117,7 +117,7 @@ export function PlaylistDetailClient({ playlist }: PlaylistDetailClientProps) {
 						<button
 							type="button"
 							onClick={() => router.push("/stage/showcase")}
-							className="hover:text-white transition-colors"
+							className="hover:text-[var(--color-text)] transition-colors"
 						>
 							Showcase
 						</button>
@@ -125,12 +125,14 @@ export function PlaylistDetailClient({ playlist }: PlaylistDetailClientProps) {
 						<button
 							type="button"
 							onClick={() => router.push("/stage/showcase?tab=Playlist")}
-							className="hover:text-white transition-colors"
+							className="hover:text-[var(--color-text)] transition-colors"
 						>
 							Playlist
 						</button>
 						<span className="mx-2">›</span>
-						<span className="text-white font-medium">{playlist.title}</span>
+						<span className="text-[var(--color-text)] font-medium">
+							{playlist.title}
+						</span>
 					</nav>
 				</div>
 
@@ -143,7 +145,7 @@ export function PlaylistDetailClient({ playlist }: PlaylistDetailClientProps) {
 
 					{/* Playlist Info */}
 					<div className="flex-1 pb-4 text-center md:text-left">
-						<h1 className="text-[32px] md:text-[48px] font-black text-white mb-3 md:mb-4 leading-tight md:leading-none">
+						<h1 className="text-[32px] md:text-[48px] font-black text-[var(--color-text)] mb-3 md:mb-4 leading-tight md:leading-none">
 							{playlist.title}
 						</h1>
 						<p className="text-[hsl(192,25%,65%)] text-sm md:text-base mb-4 max-w-2xl mx-auto md:mx-0">
@@ -174,7 +176,7 @@ export function PlaylistDetailClient({ playlist }: PlaylistDetailClientProps) {
 										<Button
 											variant="subtle"
 											size="compact"
-											className="w-8 h-8 p-0 text-[hsl(192,25%,65%)] hover:text-white transition-colors"
+											className="w-8 h-8 p-0 text-[hsl(192,25%,65%)] hover:text-[var(--color-text)] transition-colors"
 										>
 											<svg
 												width={24}
@@ -227,7 +229,7 @@ export function PlaylistDetailClient({ playlist }: PlaylistDetailClientProps) {
 				{/* Apps Section */}
 				<div className="flex-1 flex flex-col">
 					<div className="mb-4">
-						<h2 className="text-white text-lg md:text-xl font-semibold">
+						<h2 className="text-[var(--color-text)] text-lg md:text-xl font-semibold">
 							Apps in this playlist
 						</h2>
 					</div>
@@ -249,7 +251,7 @@ export function PlaylistDetailClient({ playlist }: PlaylistDetailClientProps) {
 							{playlist.apps.map((app) => (
 								<div
 									key={app.id}
-									className="group flex items-center justify-between px-3 md:px-2 py-4 md:py-3 first:border-t-0 border-t-[0.5px] border-white/10 cursor-pointer"
+									className="group flex items-center justify-between px-3 md:px-2 py-4 md:py-3 first:border-t-0 border-t-[0.5px] border-[var(--color-border)] cursor-pointer"
 								>
 									<div className="flex items-center gap-3 min-w-0 flex-1">
 										<div className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-white/5 flex items-center justify-center flex-shrink-0 transition-all group-hover:bg-primary-100/20">
@@ -280,7 +282,7 @@ export function PlaylistDetailClient({ playlist }: PlaylistDetailClientProps) {
 									<div className="flex items-center gap-1 md:gap-2 flex-shrink-0">
 										<button
 											type="button"
-											className="p-1 md:p-1.5 rounded-full hover:bg-white/10 text-white/60 hover:text-white transition-colors border border-white/20 hover:border-white/40"
+											className="p-1 md:p-1.5 rounded-full hover:bg-white/10 text-[var(--color-text-muted)] hover:text-[var(--color-text)] transition-colors border border-white/20 hover:border-white/40"
 											title="Run app"
 											onClick={() => {
 												if (app.workspaceId) {
@@ -299,7 +301,7 @@ export function PlaylistDetailClient({ playlist }: PlaylistDetailClientProps) {
 													router.push("/playground");
 												}
 											}}
-											className="rounded-lg px-2 md:px-3 py-1 md:py-1.5 text-white/80 transition-all duration-200 active:scale-[0.98] text-xs md:text-sm"
+											className="rounded-lg px-2 md:px-3 py-1 md:py-1.5 text-[var(--color-text)] transition-all duration-200 active:scale-[0.98] text-xs md:text-sm"
 											style={{
 												background:
 													"linear-gradient(180deg, #202530 0%, #12151f 100%)",
@@ -312,7 +314,7 @@ export function PlaylistDetailClient({ playlist }: PlaylistDetailClientProps) {
 										</button>
 										<button
 											type="button"
-											className="p-1 md:p-1.5 rounded-md text-white/60 hover:text-white transition-colors"
+											className="p-1 md:p-1.5 rounded-md text-[var(--color-text-muted)] hover:text-[var(--color-text)] transition-colors"
 										>
 											<Star className="h-3 w-3 md:h-4 md:w-4 hover:fill-current" />
 										</button>
@@ -331,7 +333,7 @@ export function PlaylistDetailClient({ playlist }: PlaylistDetailClientProps) {
 					<Dialog.Content className="fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] w-full max-w-md mx-4 rounded-[12px] p-6 shadow-xl focus:outline-none z-50 backdrop-blur-md border border-white/10 bg-gradient-to-br from-white/10 to-white/5">
 						<div className="absolute top-0 left-4 right-4 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
 
-						<Dialog.Title className="text-white text-lg font-semibold mb-4">
+						<Dialog.Title className="text-[var(--color-text)] text-lg font-semibold mb-4">
 							Edit Playlist
 						</Dialog.Title>
 
@@ -339,7 +341,7 @@ export function PlaylistDetailClient({ playlist }: PlaylistDetailClientProps) {
 							<div>
 								<label
 									htmlFor="playlistTitle"
-									className="block text-sm font-medium text-white mb-2"
+									className="block text-sm font-medium text-[var(--color-text)] mb-2"
 								>
 									Title
 								</label>
@@ -350,7 +352,7 @@ export function PlaylistDetailClient({ playlist }: PlaylistDetailClientProps) {
 									onChange={(e) =>
 										setEditForm({ ...editForm, title: e.target.value })
 									}
-									className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-[hsl(192,25%,65%)] focus:outline-none focus:ring-2 focus:ring-blue-500"
+									className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-[var(--color-text)] placeholder-[hsl(192,25%,65%)] focus:outline-none focus:ring-2 focus:ring-blue-500"
 									placeholder="Enter playlist title"
 								/>
 							</div>
@@ -358,7 +360,7 @@ export function PlaylistDetailClient({ playlist }: PlaylistDetailClientProps) {
 							<div>
 								<label
 									htmlFor="playlistDescription"
-									className="block text-sm font-medium text-white mb-2"
+									className="block text-sm font-medium text-[var(--color-text)] mb-2"
 								>
 									Description
 								</label>
@@ -369,7 +371,7 @@ export function PlaylistDetailClient({ playlist }: PlaylistDetailClientProps) {
 										setEditForm({ ...editForm, description: e.target.value })
 									}
 									rows={3}
-									className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-[hsl(192,25%,65%)] focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+									className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-[var(--color-text)] placeholder-[hsl(192,25%,65%)] focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
 									placeholder="Enter playlist description"
 								/>
 							</div>
@@ -401,7 +403,7 @@ export function PlaylistDetailClient({ playlist }: PlaylistDetailClientProps) {
 						<Dialog.Close asChild>
 							<button
 								type="button"
-								className="absolute top-4 right-4 text-[hsl(192,25%,65%)] hover:text-white transition-colors"
+								className="absolute top-4 right-4 text-[hsl(192,25%,65%)] hover:text-[var(--color-text)] transition-colors"
 								aria-label="Close dialog"
 							>
 								<svg

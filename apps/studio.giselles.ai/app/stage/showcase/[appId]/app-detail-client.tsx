@@ -62,14 +62,14 @@ export function AppDetailClient({ appDetails }: AppDetailClientProps) {
 	};
 
 	return (
-		<div className="min-h-screen bg-[var(--color-stage-background)] text-white">
+		<div className="min-h-screen bg-[var(--color-stage-background)] text-[var(--color-text)]">
 			<div className="flex flex-col h-full">
 				{/* Breadcrumb */}
 				<div className="p-6 pb-0">
 					<div className="flex items-center gap-2 text-sm text-[var(--color-text-muted)] mb-6">
 						<Link
 							href="/stage/showcase"
-							className="hover:text-white/80 transition-colors"
+							className="hover:text-[var(--color-text)] transition-colors"
 						>
 							Showcase
 						</Link>
@@ -134,7 +134,7 @@ export function AppDetailClient({ appDetails }: AppDetailClientProps) {
 									/>
 								) : (
 									<div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center">
-										<span className="text-xs text-white/60">
+										<span className="text-xs text-[var(--color-text-muted)]">
 											{appDetails.creator.name.charAt(0).toUpperCase()}
 										</span>
 									</div>
@@ -154,7 +154,7 @@ export function AppDetailClient({ appDetails }: AppDetailClientProps) {
 						<div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-0">
 							{/* Left: Stats */}
 							<div className="flex items-center gap-3">
-								<div className="flex items-center gap-2 px-3 py-2 rounded-full bg-white/10 text-sm text-white/80">
+								<div className="flex items-center gap-2 px-3 py-2 rounded-full bg-white/10 text-sm text-[var(--color-text)]">
 									<Play className="h-4 w-4" fill="currentColor" />
 									<span>{appDetails.executionCount}</span>
 								</div>
@@ -164,7 +164,7 @@ export function AppDetailClient({ appDetails }: AppDetailClientProps) {
 									className={`group flex items-center gap-2 px-3 py-2 rounded-full text-sm transition-colors ${
 										isFavorite
 											? "bg-yellow-500/20 text-yellow-400"
-											: "bg-white/10 text-white/80 hover:bg-white/20"
+											: "bg-white/10 text-[var(--color-text)] hover:bg-white/20"
 									}`}
 								>
 									<Star
@@ -182,7 +182,7 @@ export function AppDetailClient({ appDetails }: AppDetailClientProps) {
 											? `/workspaces/${appDetails.id}`
 											: "/playground"
 									}
-									className="rounded-lg px-3 py-2 text-white/80 transition-all duration-200 active:scale-[0.98] text-sm flex-1 sm:flex-none text-center"
+									className="rounded-lg px-3 py-2 text-[var(--color-text)] transition-all duration-200 active:scale-[0.98] text-sm flex-1 sm:flex-none text-center"
 									style={{
 										background:
 											"linear-gradient(180deg, #202530 0%, #12151f 100%)",
@@ -218,7 +218,7 @@ export function AppDetailClient({ appDetails }: AppDetailClientProps) {
 									appDetails.executionHistory.map((execution) => (
 										<div
 											key={execution.id}
-											className="flex items-center justify-between py-2 border-b border-white/10 last:border-b-0"
+											className="flex items-center justify-between py-2 border-b border-[var(--color-border)] last:border-b-0"
 										>
 											<div className="flex items-center gap-3">
 												<div
@@ -229,7 +229,7 @@ export function AppDetailClient({ appDetails }: AppDetailClientProps) {
 													}`}
 												></div>
 												<div>
-													<div className="text-sm text-white">
+													<div className="text-sm text-[var(--color-text)]">
 														{execution.status === "success"
 															? "Successful execution"
 															: "Failed execution"}
@@ -273,13 +273,15 @@ export function AppDetailClient({ appDetails }: AppDetailClientProps) {
 									<span className="text-[var(--color-text-muted)] text-sm">
 										Team
 									</span>
-									<span className="text-white text-sm">{appDetails.owner}</span>
+									<span className="text-[var(--color-text)] text-sm">
+										{appDetails.owner}
+									</span>
 								</div>
 								<div className="flex justify-between">
 									<span className="text-[var(--color-text-muted)] text-sm">
 										Owner
 									</span>
-									<span className="text-white text-sm">
+									<span className="text-[var(--color-text)] text-sm">
 										{appDetails.creator.name}
 									</span>
 								</div>
@@ -287,7 +289,7 @@ export function AppDetailClient({ appDetails }: AppDetailClientProps) {
 									<span className="text-[var(--color-text-muted)] text-sm">
 										Updated
 									</span>
-									<span className="text-white text-sm">
+									<span className="text-[var(--color-text)] text-sm">
 										{appDetails.updatedAt}
 									</span>
 								</div>
@@ -303,7 +305,7 @@ export function AppDetailClient({ appDetails }: AppDetailClientProps) {
 													: "bg-gray-400"
 											}`}
 										></div>
-										<span className="text-white text-sm">
+										<span className="text-[var(--color-text)] text-sm">
 											{appDetails.status}
 										</span>
 									</div>
@@ -312,13 +314,15 @@ export function AppDetailClient({ appDetails }: AppDetailClientProps) {
 									<span className="text-[var(--color-text-muted)] text-sm">
 										LLM
 									</span>
-									<span className="text-white text-sm">{appDetails.llm}</span>
+									<span className="text-[var(--color-text)] text-sm">
+										{appDetails.llm}
+									</span>
 								</div>
 								<div className="flex justify-between">
 									<span className="text-[var(--color-text-muted)] text-sm">
 										Runtime
 									</span>
-									<span className="text-white text-sm">
+									<span className="text-[var(--color-text)] text-sm">
 										{appDetails.runTime}
 									</span>
 								</div>
@@ -326,7 +330,7 @@ export function AppDetailClient({ appDetails }: AppDetailClientProps) {
 									<span className="text-[var(--color-text-muted)] text-sm">
 										Requests
 									</span>
-									<span className="text-white text-sm">
+									<span className="text-[var(--color-text)] text-sm">
 										{appDetails.requests}
 									</span>
 								</div>
@@ -334,13 +338,15 @@ export function AppDetailClient({ appDetails }: AppDetailClientProps) {
 									<span className="text-[var(--color-text-muted)] text-sm">
 										Total output
 									</span>
-									<span className="text-white text-sm">
+									<span className="text-[var(--color-text)] text-sm">
 										{appDetails.totalOutput}
 									</span>
 								</div>
 								<div className="flex justify-between">
-									<span className="text-white/60 text-sm">Tokens</span>
-									<span className="text-white text-sm">
+									<span className="text-[var(--color-text-muted)] text-sm">
+										Tokens
+									</span>
+									<span className="text-[var(--color-text)] text-sm">
 										{appDetails.tokens}
 									</span>
 								</div>
