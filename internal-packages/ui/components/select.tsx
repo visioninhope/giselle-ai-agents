@@ -18,6 +18,7 @@ interface SelectProps<T extends SelectOption> {
 	onValueChange?: (value: string) => void;
 	defaultValue?: string;
 	widthClassName?: string;
+	triggerClassName?: string;
 	name?: string;
 	id?: string;
 	renderValue?: (options: T) => string | number;
@@ -31,6 +32,7 @@ export function Select<T extends SelectOption>({
 	onValueChange,
 	defaultValue,
 	widthClassName,
+	triggerClassName,
 	name,
 	id,
 	renderValue,
@@ -51,6 +53,7 @@ export function Select<T extends SelectOption>({
 						"bg-white/5 transition-colors hover:bg-ghost-element-hover",
 						"data-[placeholder]:text-text-muted",
 						widthClassName,
+						triggerClassName,
 					)}
 				>
 					<div className="flex-1 min-w-0 text-ellipsis overflow-hidden whitespace-nowrap">

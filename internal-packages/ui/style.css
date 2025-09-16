@@ -38,6 +38,11 @@
 	--color-text-accent: #74ade8;
 	--color-text-nav-active: #b5c0c9;
 	--color-text-nav-inactive: #515d7b;
+	/* derived thin levels (for white/80, white/60 equivalents) */
+	--color-text-80: color-mix(in srgb, var(--color-text), transparent 20%);
+	--color-text-60: color-mix(in srgb, var(--color-text), transparent 40%);
+	/* tabs */
+	--color-tabs-inactive-text: hsl(222, 21%, 40%);
 
 	/* panel */
 	--color-panel-background: #2f343e;

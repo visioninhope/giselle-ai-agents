@@ -66,7 +66,7 @@ export function AppDetailClient({ appDetails }: AppDetailClientProps) {
 			<div className="flex flex-col h-full">
 				{/* Breadcrumb */}
 				<div className="p-6 pb-0">
-					<div className="flex items-center gap-2 text-sm text-white/60 mb-6">
+					<div className="flex items-center gap-2 text-sm text-[var(--color-text-muted)] mb-6">
 						<Link
 							href="/stage/showcase"
 							className="hover:text-white/80 transition-colors"
@@ -139,13 +139,13 @@ export function AppDetailClient({ appDetails }: AppDetailClientProps) {
 										</span>
 									</div>
 								)}
-								<span className="text-sm text-white/70">
+								<span className="text-sm text-[var(--color-text-muted)]">
 									{appDetails.creator.name}
 								</span>
 							</div>
 
 							{/* Description */}
-							<p className="text-white/70 text-sm leading-relaxed">
+							<p className="text-[var(--color-text-muted)] text-sm leading-relaxed">
 								{appDetails.description}
 							</p>
 						</div>
@@ -210,7 +210,7 @@ export function AppDetailClient({ appDetails }: AppDetailClientProps) {
 					<div className="flex flex-col lg:flex-row gap-6">
 						{/* Left Column - App History */}
 						<div className="flex-1 rounded-lg p-6">
-							<h3 className="text-lg font-medium text-white mb-4">
+							<h3 className="text-lg font-medium text-[var(--color-text)] mb-4">
 								My Execution History
 							</h3>
 							<div className="space-y-3">
@@ -234,7 +234,7 @@ export function AppDetailClient({ appDetails }: AppDetailClientProps) {
 															? "Successful execution"
 															: "Failed execution"}
 													</div>
-													<div className="text-xs text-white/60">
+													<div className="text-xs text-[var(--color-text-60)]">
 														{new Intl.RelativeTimeFormat("en", {
 															numeric: "auto",
 														}).format(
@@ -247,13 +247,13 @@ export function AppDetailClient({ appDetails }: AppDetailClientProps) {
 													</div>
 												</div>
 											</div>
-											<div className="text-xs text-white/60">
+											<div className="text-xs text-[var(--color-text-60)]">
 												{execution.duration}
 											</div>
 										</div>
 									))
 								) : (
-									<div className="text-sm text-white/60 text-center py-4">
+									<div className="text-sm text-[var(--color-text-muted)] text-center py-4">
 										No execution history found
 									</div>
 								)}
@@ -265,28 +265,36 @@ export function AppDetailClient({ appDetails }: AppDetailClientProps) {
 
 						{/* Right Column - App Details */}
 						<div className="flex-1 rounded-lg p-6">
-							<h3 className="text-lg font-medium text-white mb-4">
+							<h3 className="text-lg font-medium text-[var(--color-text)] mb-4">
 								App Details
 							</h3>
 							<div className="space-y-4">
 								<div className="flex justify-between">
-									<span className="text-white/60 text-sm">Team</span>
+									<span className="text-[var(--color-text-muted)] text-sm">
+										Team
+									</span>
 									<span className="text-white text-sm">{appDetails.owner}</span>
 								</div>
 								<div className="flex justify-between">
-									<span className="text-white/60 text-sm">Owner</span>
+									<span className="text-[var(--color-text-muted)] text-sm">
+										Owner
+									</span>
 									<span className="text-white text-sm">
 										{appDetails.creator.name}
 									</span>
 								</div>
 								<div className="flex justify-between">
-									<span className="text-white/60 text-sm">Updated</span>
+									<span className="text-[var(--color-text-muted)] text-sm">
+										Updated
+									</span>
 									<span className="text-white text-sm">
 										{appDetails.updatedAt}
 									</span>
 								</div>
 								<div className="flex justify-between">
-									<span className="text-white/60 text-sm">Status</span>
+									<span className="text-[var(--color-text-muted)] text-sm">
+										Status
+									</span>
 									<div className="flex items-center gap-2">
 										<div
 											className={`w-2 h-2 rounded-full ${
@@ -301,23 +309,31 @@ export function AppDetailClient({ appDetails }: AppDetailClientProps) {
 									</div>
 								</div>
 								<div className="flex justify-between">
-									<span className="text-white/60 text-sm">LLM</span>
+									<span className="text-[var(--color-text-muted)] text-sm">
+										LLM
+									</span>
 									<span className="text-white text-sm">{appDetails.llm}</span>
 								</div>
 								<div className="flex justify-between">
-									<span className="text-white/60 text-sm">Runtime</span>
+									<span className="text-[var(--color-text-muted)] text-sm">
+										Runtime
+									</span>
 									<span className="text-white text-sm">
 										{appDetails.runTime}
 									</span>
 								</div>
 								<div className="flex justify-between">
-									<span className="text-white/60 text-sm">Requests</span>
+									<span className="text-[var(--color-text-muted)] text-sm">
+										Requests
+									</span>
 									<span className="text-white text-sm">
 										{appDetails.requests}
 									</span>
 								</div>
 								<div className="flex justify-between">
-									<span className="text-white/60 text-sm">Total output</span>
+									<span className="text-[var(--color-text-muted)] text-sm">
+										Total output
+									</span>
 									<span className="text-white text-sm">
 										{appDetails.totalOutput}
 									</span>

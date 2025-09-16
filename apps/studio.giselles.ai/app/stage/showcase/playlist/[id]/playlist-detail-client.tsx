@@ -267,10 +267,10 @@ export function PlaylistDetailClient({ playlist }: PlaylistDetailClientProps) {
 											</svg>
 										</div>
 										<div className="flex flex-col gap-y-1 min-w-0">
-											<p className="text-sm md:text-[14px] font-sans text-white-900 truncate">
+											<p className="text-sm md:text-[14px] font-sans text-[var(--color-text)] truncate">
 												{app.name || "Untitled"}
 											</p>
-											<p className="text-xs md:text-[12px] font-geist text-white-400">
+											<p className="text-xs md:text-[12px] font-geist text-[var(--color-text-muted)]">
 												Edited {app.updatedAt.toLocaleDateString("en-US")}
 											</p>
 										</div>
