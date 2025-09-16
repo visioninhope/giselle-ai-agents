@@ -1,6 +1,7 @@
 "use client";
 
 import { Select } from "@giselle-internal/ui/select";
+import { formatTimestamp } from "@giselles-ai/lib/utils";
 import {
 	ArrowDownAZ,
 	ArrowUpAZ,
@@ -23,11 +24,11 @@ type ViewMode = "grid" | "list";
 
 function ListItem({ agent }: { agent: typeof dbAgents.$inferSelect }) {
 	return (
-		<Link
-			href={`/workspaces/${agent.workspaceId}`}
-			className="group flex items-center justify-between px-2 py-3 first:border-t-0 border-t-[0.5px] border-white/10"
-		>
-			<div className="flex items-center gap-3">
+		<div className="group flex items-center justify-between px-2 py-3 first:border-t-0 border-t-[0.5px] border-white/10">
+			<Link
+				href={`/workspaces/${agent.workspaceId}`}
+				className="flex flex-1 items-center gap-3"
+			>
 				{/* Icon */}
 				<div className="w-9 h-9 rounded-full bg-white/5 flex items-center justify-center flex-shrink-0 transition-all group-hover:bg-primary-100/20">
 					<svg
@@ -50,10 +51,10 @@ function ListItem({ agent }: { agent: typeof dbAgents.$inferSelect }) {
 						{agent.name || "Untitled"}
 					</p>
 					<p className="text-[12px] font-geist text-white-400">
-						Edited {agent.updatedAt.toLocaleDateString()}
+						Edited {formatTimestamp.toShortDate(agent.updatedAt.getTime())}
 					</p>
 				</div>
-			</div>
+			</Link>
 
 			{/* Action buttons */}
 			<div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -66,7 +67,7 @@ function ListItem({ agent }: { agent: typeof dbAgents.$inferSelect }) {
 					agentName={agent.name || "Untitled"}
 				/>
 			</div>
-		</Link>
+		</div>
 	);
 }
 
