@@ -1,4 +1,5 @@
 import { ExternalLink } from "lucide-react";
+import { docVectorStoreFlag } from "@/flags";
 import { getGitHubIdentityState } from "@/services/accounts";
 import {
 	deleteRepositoryIndex,
@@ -7,6 +8,7 @@ import {
 	updateRepositoryIndex,
 } from "./actions";
 import { getGitHubRepositoryIndexes, getInstallationsWithRepos } from "./data";
+import { VectorStoresNavigationLayout } from "./navigation-layout";
 import { RepositoryList } from "./repository-list";
 import { RepositoryRegistrationDialog } from "./repository-registration-dialog";
 import {
@@ -37,10 +39,12 @@ export default async function TeamVectorStorePage() {
 		return <GitHubAppInstallRequiredCard />;
 	}
 
-	const [installationsWithRepos, repositoryIndexes] = await Promise.all([
-		getInstallationsWithRepos(),
-		getGitHubRepositoryIndexes(),
-	]);
+	const [installationsWithRepos, repositoryIndexes, isDocVectorStoreEnabled] =
+		await Promise.all([
+			getInstallationsWithRepos(),
+			getGitHubRepositoryIndexes(),
+			docVectorStoreFlag(),
+		]);
 
 	return (
 		<div className="flex flex-col gap-[24px]">
@@ -69,13 +73,14 @@ export default async function TeamVectorStorePage() {
 					/>
 				</div>
 			</div>
-
-			<RepositoryList
-				repositories={repositoryIndexes}
-				deleteRepositoryIndexAction={deleteRepositoryIndex}
-				triggerManualIngestAction={triggerManualIngest}
-				updateRepositoryIndexAction={updateRepositoryIndex}
-			/>
+			<VectorStoresNavigationLayout isEnabled={isDocVectorStoreEnabled}>
+				<RepositoryList
+					repositories={repositoryIndexes}
+					deleteRepositoryIndexAction={deleteRepositoryIndex}
+					triggerManualIngestAction={triggerManualIngest}
+					updateRepositoryIndexAction={updateRepositoryIndex}
+				/>
+			</VectorStoresNavigationLayout>
 		</div>
 	);
 }
