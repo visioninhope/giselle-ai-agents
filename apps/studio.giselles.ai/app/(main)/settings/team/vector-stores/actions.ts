@@ -2,6 +2,7 @@
 
 import {
 	DEFAULT_EMBEDDING_PROFILE_ID,
+	EMBEDDING_PROFILES,
 	isEmbeddingProfileId,
 } from "@giselle-sdk/data-type";
 import { createId } from "@paralleldrive/cuid2";
@@ -15,6 +16,7 @@ import {
 	githubRepositoryEmbeddingProfiles,
 	githubRepositoryIndex,
 } from "@/drizzle";
+import { docVectorStoreFlag } from "@/flags";
 import {
 	createManualIngestTrigger,
 	type IngestTrigger,
@@ -524,6 +526,46 @@ export async function triggerManualIngest(
 			error: "Failed to trigger manual ingest",
 		};
 	}
+}
+
+/**
+ * Create a new Document Vector Store (frontend stub)
+ * Frontend-only minimal implementation under feature flag doc-vector-store.
+ * This does not persist yet; it validates inputs and gates by flag.
+ */
+export async function createDocumentVectorStore(
+	name: string,
+	embeddingProfileIds: number[],
+): Promise<ActionResult> {
+	const enabled = await docVectorStoreFlag();
+	if (!enabled) {
+		return { success: false, error: "Feature disabled" };
+	}
+	if (!name || name.trim().length === 0) {
+		return { success: false, error: "Name is required" };
+	}
+	// Validate provided embedding profiles: non-empty and Cohere-only
+	if (!Array.isArray(embeddingProfileIds) || embeddingProfileIds.length === 0) {
+		return { success: false, error: "Select at least one embedding profile" };
+	}
+	for (const id of embeddingProfileIds) {
+		if (!isEmbeddingProfileId(id)) {
+			return { success: false, error: `Invalid embedding profile id: ${id}` };
+		}
+		const p = EMBEDDING_PROFILES[id];
+		if (p.provider !== "cohere") {
+			return {
+				success: false,
+				error: "Only Cohere profiles are supported for Document Vector Stores",
+			};
+		}
+	}
+	// Placeholder for future persistence into document_vector_stores table.
+	// Expected schema:
+	// - id (cuid), dbId (serial PK), teamDbId (FK), name, defaultEmbeddingProfileId?, createdAt, updatedAt
+	// Revalidate to reflect the new store once backend is wired.
+	revalidatePath("/settings/team/vector-stores");
+	return { success: true };
 }
 
 /**
