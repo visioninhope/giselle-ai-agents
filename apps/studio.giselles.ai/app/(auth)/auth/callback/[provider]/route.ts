@@ -3,6 +3,7 @@
 import type { Session, User } from "@supabase/supabase-js";
 import { eq } from "drizzle-orm";
 import { type NextRequest, NextResponse } from "next/server";
+import { isValidReturnUrl } from "@/app/(auth)/lib";
 import { db, oauthCredentials, supabaseUserMappings, users } from "@/drizzle";
 import { logger } from "@/lib/logger";
 import { createClient } from "@/lib/supabase";
@@ -34,8 +35,9 @@ export async function GET(
 		"'searchParams' and 'origin' got from request",
 	);
 
-	// Get the redirect URL - always respect the next parameter
-	const next = searchParams.get("next") ?? "/";
+	// Get and validate the redirect URL to prevent open redirects
+	const nextParam = searchParams.get("next");
+	const next = isValidReturnUrl(nextParam) ? nextParam : "/";
 
 	// Check for authentication errors using existing function
 	const errorMessage = checkError(searchParams);
