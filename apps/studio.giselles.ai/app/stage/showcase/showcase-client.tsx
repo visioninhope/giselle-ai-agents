@@ -237,7 +237,7 @@ export function ShowcaseClient({
 						>
 							Showcase
 						</h1>
-						<p className="text-sm text-[var(--color-text-muted)]">
+						<p className="text-sm text-text-muted">
 							Explore featured workflows and inspiring examples
 						</p>
 					</div>
@@ -259,7 +259,7 @@ export function ShowcaseClient({
 								value={selectedTeamId}
 								onValueChange={(value) => setSelectedTeamId(value)}
 								widthClassName="[&>button]:text-[14px] [&>button]:px-2 [&>button]:py-1 [&>button]:rounded-sm [&>button]:gap-2"
-								triggerClassName="text-[var(--color-text)]"
+								triggerClassName="text-text"
 							/>
 						</div>
 					</div>
@@ -355,10 +355,10 @@ export function ShowcaseClient({
 													</svg>
 												</div>
 												<div className="flex flex-col gap-y-1">
-													<p className="text-[14px] font-sans text-[var(--color-text)]">
+													<p className="text-[14px] font-sans text-text">
 														{app.name || "Untitled"}
 													</p>
-													<p className="text-[12px] font-geist text-[var(--color-text-muted)]">
+													<p className="text-[12px] font-geist text-text-muted">
 														Edited {app.updatedAt.toLocaleDateString("en-US")}
 													</p>
 												</div>
@@ -383,7 +383,7 @@ export function ShowcaseClient({
 															? `/workspaces/${app.workspaceId}`
 															: "/playground"
 													}
-													className="rounded-lg px-3 py-1.5 text-[var(--color-text)] transition-all duration-200 active:scale-[0.98] text-sm"
+													className="rounded-lg px-3 py-1.5 text-text transition-all duration-200 active:scale-[0.98] text-sm"
 													style={{
 														background:
 															"linear-gradient(180deg, #202530 0%, #12151f 100%)",
@@ -622,10 +622,10 @@ export function ShowcaseClient({
 													</svg>
 												</div>
 												<div className="flex flex-col gap-y-1">
-													<p className="text-[14px] font-sans text-[var(--color-text)]">
+													<p className="text-[14px] font-sans text-text">
 														{item.name || "Untitled"}
 													</p>
-													<p className="text-[12px] font-geist text-[var(--color-text-muted)]">
+													<p className="text-[12px] font-geist text-text-muted">
 														Executed{" "}
 														{item.updatedAt.toLocaleDateString("en-US")}
 													</p>

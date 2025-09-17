@@ -50,7 +50,7 @@ export function SearchHeader({
 	viewMode,
 	onViewModeChange,
 	className,
-	selectTextClassName = "text-[var(--color-text)]",
+	selectTextClassName = "text-text",
 }: SearchHeaderProps) {
 	const canToggleView =
 		showViewToggle && viewMode != null && !!onViewModeChange;
