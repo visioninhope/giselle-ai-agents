@@ -33,7 +33,7 @@ export const EMBEDDING_PROFILES = {
 	4: {
 		provider: "cohere" as const,
 		model: "embed-4" as const,
-		dimensions: 1024 as const,
+		dimensions: 1536 as const,
 		name: "Cohere embed-4",
 	},
 } as const satisfies Record<number, EmbeddingProfile>;
