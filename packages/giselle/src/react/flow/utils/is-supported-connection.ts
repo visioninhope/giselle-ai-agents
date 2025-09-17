@@ -107,7 +107,8 @@ export function isSupportedConnection(
 
 		return {
 			canConnect: false,
-			message: "Image generation node is not supported as an input for this node",
+			message:
+				"Image generation node is not supported as an input for this node",
 		};
 	}
 	if (outputNode.content.type === "github") {

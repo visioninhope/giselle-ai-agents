@@ -162,7 +162,10 @@ export function GradientDef() {
 					y2="0%"
 				>
 					<stop offset="0%" stopColor="var(--color-image-generation-node-1)" />
-					<stop offset="100%" stopColor="var(--color-image-generation-node-1)" />
+					<stop
+						offset="100%"
+						stopColor="var(--color-image-generation-node-1)"
+					/>
 				</linearGradient>
 				<linearGradient
 					id="textGenerationToImageGeneration"
