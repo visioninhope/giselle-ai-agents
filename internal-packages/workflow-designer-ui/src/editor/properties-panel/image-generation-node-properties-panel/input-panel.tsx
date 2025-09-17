@@ -560,6 +560,21 @@ export function InputPanel({
 						))}
 					</SourceListRoot>
 				)}
+				{connectedSources.image.length > 0 && (
+					<SourceListRoot title="Generated Image Sources">
+						{connectedSources.image.map((source) => (
+							<SourceListItem
+								key={source.connection.id}
+								icon={
+									<GeneratedContentIcon className="size-[24px] text-white-900" />
+								}
+								title={`${source.node.name ?? source.node.content.llm.id} / ${source.output.label}`}
+								subtitle={source.node.content.llm.provider}
+								onRemove={() => handleRemove(source.connection)}
+							/>
+						))}
+					</SourceListRoot>
+				)}
 			</div>
 		</div>
 	);

@@ -19,6 +19,7 @@ export function useConnectedSources(node: ImageGenerationNode) {
 		const connectedGeneratedSources: ConnectedSource<TextGenerationNode>[] = [];
 		const connectedVariableSources: ConnectedSource<VariableNode>[] = [];
 		const connectedQuerySources: ConnectedSource<QueryNode>[] = [];
+		const connectedImageSources: ConnectedSource<ImageGenerationNode>[] = [];
 		for (const connection of connectionsToThisNode) {
 			const node = data.nodes.find(
 				(node) => node.id === connection.outputNode.id,
@@ -51,6 +52,12 @@ export function useConnectedSources(node: ImageGenerationNode) {
 							});
 							break;
 						case "imageGeneration":
+							connectedImageSources.push({
+								output,
+								node: node as ImageGenerationNode,
+								connection,
+							});
+							break;
 						case "action":
 						case "trigger":
 							throw new Error("not implemented");
@@ -99,10 +106,12 @@ export function useConnectedSources(node: ImageGenerationNode) {
 				...connectedGeneratedSources,
 				...connectedVariableSources,
 				...connectedQuerySources,
+				...connectedImageSources,
 			],
 			generation: connectedGeneratedSources,
 			variable: connectedVariableSources,
 			query: connectedQuerySources,
+			image: connectedImageSources,
 		};
 	}, [node.id, data.connections, data.nodes]);
 }

@@ -1,16 +1,23 @@
 import { Select, type SelectOption } from "@giselle-internal/ui/select";
 import { useToasts } from "@giselle-internal/ui/toast";
 import {
+	type Connection,
 	ImageGenerationLanguageModelProvider,
 	type ImageGenerationNode,
+	type InputId,
+	isFileNode,
+	isImageGenerationNode,
 } from "@giselle-sdk/data-type";
 import {
 	useNodeGenerations,
 	useWorkflowDesigner,
 } from "@giselle-sdk/giselle/react";
 import {
+	Capability,
 	falLanguageModels,
 	googleImageLanguageModels,
+	hasCapability,
+	type LanguageModel,
 	openaiImageModels,
 } from "@giselle-sdk/language-model";
 import clsx from "clsx/lite";
@@ -42,8 +49,13 @@ export function ImageGenerationNodePropertiesPanel({
 }: {
 	node: ImageGenerationNode;
 }) {
-	const { data, updateNodeDataContent, updateNodeData, setUiNodeState } =
-		useWorkflowDesigner();
+	const {
+		data,
+		updateNodeDataContent,
+		updateNodeData,
+		setUiNodeState,
+		deleteConnection,
+	} = useWorkflowDesigner();
 	const { createAndStartGenerationRunner, isGenerating, stopGenerationRunner } =
 		useNodeGenerations({
 			nodeId: node.id,
@@ -56,6 +68,15 @@ export function ImageGenerationNodePropertiesPanel({
 	const checkEligibility = useModelEligibility();
 
 	const uiState = useMemo(() => data.ui.nodeState[node.id], [data, node.id]);
+
+	const allImageModels = useMemo(
+		() => [
+			...falLanguageModels,
+			...openaiImageModels,
+			...googleImageLanguageModels,
+		],
+		[],
+	);
 
 	// Get available models for current provider
 	const models = useMemo<SelectOption[]>(() => {
@@ -84,6 +105,61 @@ export function ImageGenerationNodePropertiesPanel({
 			}
 		}
 	}, [node.content.llm, checkEligibility]);
+
+	const checkAndDisconnectInvalidConnections = useCallback(
+		(newModel: LanguageModel) => {
+			const incomingConnections = data.connections.filter(
+				(c) => c.inputNode.id === node.id,
+			);
+			if (incomingConnections.length === 0) return;
+
+			const inputsToRemove = new Set<InputId>();
+			const connectionsToRemove: Connection[] = [];
+
+			for (const conn of incomingConnections) {
+				const sourceNode = data.nodes.find((n) => n.id === conn.outputNode.id);
+				if (!sourceNode) continue;
+
+				let isInvalid = false;
+				if (isImageGenerationNode(sourceNode)) {
+					if (!hasCapability(newModel, Capability.ImageGenerationInput)) {
+						isInvalid = true;
+					}
+				} else if (
+					isFileNode(sourceNode) &&
+					sourceNode.content.category === "image"
+				) {
+					if (!hasCapability(newModel, Capability.ImageFileInput)) {
+						isInvalid = true;
+					}
+				}
+
+				if (isInvalid) {
+					connectionsToRemove.push(conn);
+					inputsToRemove.add(conn.inputId);
+				}
+			}
+
+			if (connectionsToRemove.length > 0) {
+				for (const conn of connectionsToRemove) {
+					deleteConnection(conn.id);
+				}
+				const newInputs = node.inputs.filter(
+					(input) => !inputsToRemove.has(input.id),
+				);
+				updateNodeData(node, { inputs: newInputs });
+			}
+		},
+		[
+			node,
+			data.connections,
+			data.nodes,
+			deleteConnection,
+			updateNodeData,
+			node.id,
+			node.inputs,
+		],
+	);
 
 	useKeyboardShortcuts({
 		onGenerate: () => {
@@ -213,11 +289,16 @@ export function ImageGenerationNodePropertiesPanel({
 												const defaultModel = createDefaultModelData(
 													result.data,
 												);
+												const newModel = allImageModels.find(
+													(m) => m.id === defaultModel.id,
+												);
+												if (newModel === undefined) return;
 
 												updateNodeDataContent(node, {
 													...node.content,
-													llm: defaultModel,
+													llm: newModel,
 												});
+												checkAndDisconnectInvalidConnections(newModel);
 											}}
 											options={[
 												{ value: "fal", label: "Fal" },
@@ -240,6 +321,11 @@ export function ImageGenerationNodePropertiesPanel({
 											value={node.content.llm.id}
 											widthClassName="w-full"
 											onValueChange={(modelId) => {
+												const newModel = allImageModels.find(
+													(m) => m.id === modelId,
+												);
+												if (!newModel) return;
+
 												const updatedModel = updateModelId(
 													node.content.llm,
 													modelId,
@@ -249,6 +335,7 @@ export function ImageGenerationNodePropertiesPanel({
 													...node.content,
 													llm: updatedModel,
 												});
+												checkAndDisconnectInvalidConnections(newModel);
 											}}
 											options={models}
 										/>
