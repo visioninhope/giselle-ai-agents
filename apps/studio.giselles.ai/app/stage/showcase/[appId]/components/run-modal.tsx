@@ -127,10 +127,10 @@ export function RunModal({
 							</div>
 							{/* App Title */}
 							<div className="flex flex-col">
-								<h3 className="font-sans text-[16px] font-medium tracking-tight text-white-100">
+								<h3 className="font-sans text-[16px] font-medium tracking-tight text-text">
 									{appName}
 								</h3>
-								<p className="text-[12px] text-white-400 font-geist">
+								<p className="text-[12px] text-text-muted font-geist">
 									Configure and run
 								</p>
 							</div>
@@ -138,7 +138,7 @@ export function RunModal({
 						<button
 							type="button"
 							onClick={onClose}
-							className="rounded-full p-2 text-white-400 opacity-70 hover:opacity-100 hover:bg-white/10 focus:outline-none transition-all"
+							className="rounded-full p-2 text-text-muted opacity-70 hover:opacity-100 hover:bg-white/10 focus:outline-none transition-all"
 						>
 							<X className="h-5 w-5" />
 							<span className="sr-only">Close</span>

@@ -1,5 +1,6 @@
 "use client";
 
+import { StatusBadge } from "@giselle-internal/ui/status-badge";
 import { Play, Star } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
@@ -62,14 +63,14 @@ export function AppDetailClient({ appDetails }: AppDetailClientProps) {
 	};
 
 	return (
-		<div className="min-h-screen bg-[var(--color-stage-background)] text-white">
+		<div className="min-h-screen bg-[var(--color-stage-background)] text-text">
 			<div className="flex flex-col h-full">
 				{/* Breadcrumb */}
 				<div className="p-6 pb-0">
-					<div className="flex items-center gap-2 text-sm text-white/60 mb-6">
+					<div className="flex items-center gap-2 text-sm text-text-muted mb-6">
 						<Link
 							href="/stage/showcase"
-							className="hover:text-white/80 transition-colors"
+							className="hover:text-text transition-colors"
 						>
 							Showcase
 						</Link>
@@ -134,18 +135,18 @@ export function AppDetailClient({ appDetails }: AppDetailClientProps) {
 									/>
 								) : (
 									<div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center">
-										<span className="text-xs text-white/60">
+										<span className="text-xs text-text-muted">
 											{appDetails.creator.name.charAt(0).toUpperCase()}
 										</span>
 									</div>
 								)}
-								<span className="text-sm text-white/70">
+								<span className="text-sm text-text-muted">
 									{appDetails.creator.name}
 								</span>
 							</div>
 
 							{/* Description */}
-							<p className="text-white/70 text-sm leading-relaxed">
+							<p className="text-text-muted text-sm leading-relaxed">
 								{appDetails.description}
 							</p>
 						</div>
@@ -154,7 +155,7 @@ export function AppDetailClient({ appDetails }: AppDetailClientProps) {
 						<div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-0">
 							{/* Left: Stats */}
 							<div className="flex items-center gap-3">
-								<div className="flex items-center gap-2 px-3 py-2 rounded-full bg-white/10 text-sm text-white/80">
+								<div className="flex items-center gap-2 px-3 py-2 rounded-full bg-white/10 text-sm text-text">
 									<Play className="h-4 w-4" fill="currentColor" />
 									<span>{appDetails.executionCount}</span>
 								</div>
@@ -164,7 +165,7 @@ export function AppDetailClient({ appDetails }: AppDetailClientProps) {
 									className={`group flex items-center gap-2 px-3 py-2 rounded-full text-sm transition-colors ${
 										isFavorite
 											? "bg-yellow-500/20 text-yellow-400"
-											: "bg-white/10 text-white/80 hover:bg-white/20"
+											: "bg-white/10 text-text hover:bg-white/20"
 									}`}
 								>
 									<Star
@@ -182,7 +183,7 @@ export function AppDetailClient({ appDetails }: AppDetailClientProps) {
 											? `/workspaces/${appDetails.id}`
 											: "/playground"
 									}
-									className="rounded-lg px-3 py-2 text-white/80 transition-all duration-200 active:scale-[0.98] text-sm flex-1 sm:flex-none text-center"
+									className="rounded-lg px-3 py-2 text-text transition-all duration-200 active:scale-[0.98] text-sm flex-1 sm:flex-none text-center"
 									style={{
 										background:
 											"linear-gradient(180deg, #202530 0%, #12151f 100%)",
@@ -210,7 +211,7 @@ export function AppDetailClient({ appDetails }: AppDetailClientProps) {
 					<div className="flex flex-col lg:flex-row gap-6">
 						{/* Left Column - App History */}
 						<div className="flex-1 rounded-lg p-6">
-							<h3 className="text-lg font-medium text-white mb-4">
+							<h3 className="text-lg font-medium text-text mb-4">
 								My Execution History
 							</h3>
 							<div className="space-y-3">
@@ -218,23 +219,21 @@ export function AppDetailClient({ appDetails }: AppDetailClientProps) {
 									appDetails.executionHistory.map((execution) => (
 										<div
 											key={execution.id}
-											className="flex items-center justify-between py-2 border-b border-white/10 last:border-b-0"
+											className="flex items-center justify-between py-2 border-b border-border last:border-b-0"
 										>
 											<div className="flex items-center gap-3">
-												<div
-													className={`w-2 h-2 rounded-full ${
-														execution.status === "success"
-															? "bg-green-400"
-															: "bg-red-400"
-													}`}
-												></div>
+												<StatusBadge
+													status={
+														execution.status === "success" ? "success" : "error"
+													}
+													variant="dot"
+												>
+													{execution.status === "success"
+														? "Success"
+														: "Failed"}
+												</StatusBadge>
 												<div>
-													<div className="text-sm text-white">
-														{execution.status === "success"
-															? "Successful execution"
-															: "Failed execution"}
-													</div>
-													<div className="text-xs text-white/60">
+													<div className="text-xs text-[var(--color-text-60)]">
 														{new Intl.RelativeTimeFormat("en", {
 															numeric: "auto",
 														}).format(
@@ -247,13 +246,13 @@ export function AppDetailClient({ appDetails }: AppDetailClientProps) {
 													</div>
 												</div>
 											</div>
-											<div className="text-xs text-white/60">
+											<div className="text-xs text-text-muted">
 												{execution.duration}
 											</div>
 										</div>
 									))
 								) : (
-									<div className="text-sm text-white/60 text-center py-4">
+									<div className="text-sm text-text-muted text-center py-4">
 										No execution history found
 									</div>
 								)}
@@ -265,68 +264,62 @@ export function AppDetailClient({ appDetails }: AppDetailClientProps) {
 
 						{/* Right Column - App Details */}
 						<div className="flex-1 rounded-lg p-6">
-							<h3 className="text-lg font-medium text-white mb-4">
+							<h3 className="text-lg font-medium text-text mb-4">
 								App Details
 							</h3>
 							<div className="space-y-4">
 								<div className="flex justify-between">
-									<span className="text-white/60 text-sm">Team</span>
-									<span className="text-white text-sm">{appDetails.owner}</span>
+									<span className="text-text-muted text-sm">Team</span>
+									<span className="text-text text-sm">{appDetails.owner}</span>
 								</div>
 								<div className="flex justify-between">
-									<span className="text-white/60 text-sm">Owner</span>
-									<span className="text-white text-sm">
+									<span className="text-text-muted text-sm">Owner</span>
+									<span className="text-text text-sm">
 										{appDetails.creator.name}
 									</span>
 								</div>
 								<div className="flex justify-between">
-									<span className="text-white/60 text-sm">Updated</span>
-									<span className="text-white text-sm">
+									<span className="text-text-muted text-sm">Updated</span>
+									<span className="text-text text-sm">
 										{appDetails.updatedAt}
 									</span>
 								</div>
 								<div className="flex justify-between">
-									<span className="text-white/60 text-sm">Status</span>
-									<div className="flex items-center gap-2">
-										<div
-											className={`w-2 h-2 rounded-full ${
-												appDetails.status === "Active"
-													? "bg-green-400"
-													: "bg-gray-400"
-											}`}
-										></div>
-										<span className="text-white text-sm">
-											{appDetails.status}
-										</span>
-									</div>
+									<span className="text-text-muted text-sm">Status</span>
+									<StatusBadge
+										status={
+											appDetails.status === "Active" ? "success" : "ignored"
+										}
+										variant="dot"
+									>
+										{appDetails.status}
+									</StatusBadge>
 								</div>
 								<div className="flex justify-between">
-									<span className="text-white/60 text-sm">LLM</span>
-									<span className="text-white text-sm">{appDetails.llm}</span>
+									<span className="text-text-muted text-sm">LLM</span>
+									<span className="text-text text-sm">{appDetails.llm}</span>
 								</div>
 								<div className="flex justify-between">
-									<span className="text-white/60 text-sm">Runtime</span>
-									<span className="text-white text-sm">
+									<span className="text-text-muted text-sm">Runtime</span>
+									<span className="text-text text-sm">
 										{appDetails.runTime}
 									</span>
 								</div>
 								<div className="flex justify-between">
-									<span className="text-white/60 text-sm">Requests</span>
-									<span className="text-white text-sm">
+									<span className="text-text-muted text-sm">Requests</span>
+									<span className="text-text text-sm">
 										{appDetails.requests}
 									</span>
 								</div>
 								<div className="flex justify-between">
-									<span className="text-white/60 text-sm">Total output</span>
-									<span className="text-white text-sm">
+									<span className="text-text-muted text-sm">Total output</span>
+									<span className="text-text text-sm">
 										{appDetails.totalOutput}
 									</span>
 								</div>
 								<div className="flex justify-between">
-									<span className="text-white/60 text-sm">Tokens</span>
-									<span className="text-white text-sm">
-										{appDetails.tokens}
-									</span>
+									<span className="text-text-muted text-sm">Tokens</span>
+									<span className="text-text text-sm">{appDetails.tokens}</span>
 								</div>
 							</div>
 						</div>

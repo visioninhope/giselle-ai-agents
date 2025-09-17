@@ -2,21 +2,14 @@
 
 import { Select } from "@giselle-internal/ui/select";
 import * as Dialog from "@radix-ui/react-dialog";
-import {
-	ArrowDownAZ,
-	ArrowUpAZ,
-	Clock,
-	Play,
-	RotateCcw,
-	Search,
-	Star,
-} from "lucide-react";
+import { Play, RotateCcw, Star } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { GlassButton } from "@/components/ui/glass-button";
 import { Input } from "@/components/ui/input";
 import { AvatarImage } from "@/services/accounts/components/user-button/avatar-image";
+import { SearchHeader } from "../../(main)/apps/components/search-header";
 import { Card } from "../../(main)/settings/components/card";
 import {
 	GlassDialogBody,
@@ -244,7 +237,7 @@ export function ShowcaseClient({
 						>
 							Showcase
 						</h1>
-						<p className="text-sm text-black-400">
+						<p className="text-sm text-text-muted">
 							Explore featured workflows and inspiring examples
 						</p>
 					</div>
@@ -266,6 +259,7 @@ export function ShowcaseClient({
 								value={selectedTeamId}
 								onValueChange={(value) => setSelectedTeamId(value)}
 								widthClassName="[&>button]:text-[14px] [&>button]:px-2 [&>button]:py-1 [&>button]:rounded-sm [&>button]:gap-2"
+								triggerClassName="text-text"
 							/>
 						</div>
 					</div>
@@ -288,7 +282,7 @@ export function ShowcaseClient({
                     ${
 											isActive
 												? "text-primary-100 [text-shadow:0px_0px_20px_#0087f6] after:content-[''] after:absolute after:left-0 after:right-0 after:bottom-0 after:h-[2px] after:bg-primary-100"
-												: "text-black-70 hover:text-white-100 hover:after:content-[''] hover:after:absolute hover:after:left-0 hover:after:right-0 hover:after:bottom-0 hover:after:h-[2px] hover:after:bg-primary-100"
+												: "text-[var(--color-tabs-inactive-text)] hover:text-white-100 hover:after:content-[''] hover:after:absolute hover:after:left-0 hover:after:right-0 hover:after:bottom-0 hover:after:h-[2px] hover:after:bg-primary-100"
 										}`}
 									>
 										{tab}
@@ -303,50 +297,13 @@ export function ShowcaseClient({
 				<div className="flex-1 overflow-auto min-h-0">
 					{activeTab === "Apps" && (
 						<>
-							<div className="mb-4 flex flex-col sm:flex-row gap-3 items-center">
-								<div className="relative flex-1 w-full">
-									<Search className="absolute left-4 top-1/2 -translate-y-1/2 text-black-300 h-4 w-4" />
-									<Input
-										type="text"
-										placeholder="Search Apps..."
-										value={searchQuery}
-										onChange={(e) => setSearchQuery(e.target.value)}
-										className="pl-12 pr-4 h-10 w-full bg-black-700/50 border-black-600 text-white placeholder:text-black-400"
-									/>
-								</div>
-								<div className="flex gap-2">
-									{/* Sort Dropdown */}
-									<Select
-										options={[
-											{
-												value: "date-desc",
-												label: "Updated",
-												icon: <Clock className="h-4 w-4" />,
-											},
-											{
-												value: "date-asc",
-												label: "Oldest",
-												icon: <Clock className="h-4 w-4" />,
-											},
-											{
-												value: "name-asc",
-												label: "Name (A-Z)",
-												icon: <ArrowDownAZ className="h-4 w-4" />,
-											},
-											{
-												value: "name-desc",
-												label: "Name (Z-A)",
-												icon: <ArrowUpAZ className="h-4 w-4" />,
-											},
-										]}
-										placeholder="Sort"
-										value={sortOption}
-										onValueChange={(value) =>
-											setSortOption(value as SortOption)
-										}
-									/>
-								</div>
-							</div>
+							<SearchHeader
+								searchQuery={searchQuery}
+								onSearchChange={setSearchQuery}
+								searchPlaceholder="Search Apps..."
+								sortOption={sortOption}
+								onSortChange={(value) => setSortOption(value as SortOption)}
+							/>
 
 							{sortedApps.length === 0 ? (
 								searchQuery ? (
@@ -375,14 +332,14 @@ export function ShowcaseClient({
 							) : (
 								<Card className="gap-0 py-2">
 									{sortedApps.map((app) => (
-										<button
+										<div
 											key={app.id}
-											type="button"
-											className="group flex items-center justify-between px-2 py-3 first:border-t-0 border-t-[0.5px] border-white/10 cursor-pointer hover:bg-white/5 transition-colors w-full text-left"
-											onClick={() => router.push(`/stage/showcase/${app.id}`)}
-											aria-label={`View ${app.name} app details`}
+											className="group flex items-center justify-between px-2 py-3 first:border-t-0 border-t-[0.5px] border-[var(--color-border)] cursor-pointer"
 										>
-											<div className="flex items-center gap-3">
+											<Link
+												href={`/stage/showcase/${app.id}`}
+												className="flex items-center gap-3 min-w-0"
+											>
 												<div className="w-9 h-9 rounded-full bg-white/5 flex items-center justify-center flex-shrink-0 transition-all group-hover:bg-primary-100/20">
 													<svg
 														role="img"
@@ -398,14 +355,14 @@ export function ShowcaseClient({
 													</svg>
 												</div>
 												<div className="flex flex-col gap-y-1">
-													<p className="text-[14px] font-sans text-white-900">
+													<p className="text-[14px] font-sans text-text">
 														{app.name || "Untitled"}
 													</p>
-													<p className="text-[12px] font-geist text-white-400">
+													<p className="text-[12px] font-geist text-text-muted">
 														Edited {app.updatedAt.toLocaleDateString("en-US")}
 													</p>
 												</div>
-											</div>
+											</Link>
 
 											{/* Action buttons */}
 											<div className="flex items-center gap-2">
@@ -426,7 +383,7 @@ export function ShowcaseClient({
 															? `/workspaces/${app.workspaceId}`
 															: "/playground"
 													}
-													className="rounded-lg px-3 py-1.5 text-white/80 transition-all duration-200 active:scale-[0.98] text-sm"
+													className="rounded-lg px-3 py-1.5 text-text transition-all duration-200 active:scale-[0.98] text-sm"
 													style={{
 														background:
 															"linear-gradient(180deg, #202530 0%, #12151f 100%)",
@@ -458,7 +415,7 @@ export function ShowcaseClient({
 													<Star className="h-4 w-4 hover:fill-current" />
 												</button>
 											</div>
-										</button>
+										</div>
 									))}
 								</Card>
 							)}
@@ -610,50 +567,13 @@ export function ShowcaseClient({
 
 					{activeTab === "History" && (
 						<>
-							<div className="mb-4 flex flex-col sm:flex-row gap-3 items-center">
-								<div className="relative flex-1 w-full">
-									<Search className="absolute left-4 top-1/2 -translate-y-1/2 text-black-300 h-4 w-4" />
-									<Input
-										type="text"
-										placeholder="Search History..."
-										value={searchQuery}
-										onChange={(e) => setSearchQuery(e.target.value)}
-										className="pl-12 pr-4 h-10 w-full bg-black-700/50 border-black-600 text-white placeholder:text-black-400"
-									/>
-								</div>
-								<div className="flex gap-2">
-									{/* Sort Dropdown */}
-									<Select
-										options={[
-											{
-												value: "date-desc",
-												label: "Updated",
-												icon: <Clock className="h-4 w-4" />,
-											},
-											{
-												value: "date-asc",
-												label: "Oldest",
-												icon: <Clock className="h-4 w-4" />,
-											},
-											{
-												value: "name-asc",
-												label: "Name (A-Z)",
-												icon: <ArrowDownAZ className="h-4 w-4" />,
-											},
-											{
-												value: "name-desc",
-												label: "Name (Z-A)",
-												icon: <ArrowUpAZ className="h-4 w-4" />,
-											},
-										]}
-										placeholder="Sort"
-										value={sortOption}
-										onValueChange={(value) =>
-											setSortOption(value as SortOption)
-										}
-									/>
-								</div>
-							</div>
+							<SearchHeader
+								searchQuery={searchQuery}
+								onSearchChange={setSearchQuery}
+								searchPlaceholder="Search History..."
+								sortOption={sortOption}
+								onSortChange={(value) => setSortOption(value as SortOption)}
+							/>
 
 							{sortedHistory.length === 0 ? (
 								searchQuery ? (
@@ -684,7 +604,7 @@ export function ShowcaseClient({
 									{sortedHistory.map((item) => (
 										<div
 											key={item.id}
-											className="group flex items-center justify-between px-2 py-3 first:border-t-0 border-t-[0.5px] border-white/10 cursor-pointer"
+											className="group flex items-center justify-between px-2 py-3 first:border-t-0 border-t-[0.5px] border-[var(--color-border)] cursor-pointer"
 										>
 											<div className="flex items-center gap-3">
 												<div className="w-9 h-9 rounded-full bg-white/5 flex items-center justify-center flex-shrink-0 transition-all group-hover:bg-primary-100/20">
@@ -702,10 +622,10 @@ export function ShowcaseClient({
 													</svg>
 												</div>
 												<div className="flex flex-col gap-y-1">
-													<p className="text-[14px] font-sans text-white-900">
+													<p className="text-[14px] font-sans text-text">
 														{item.name || "Untitled"}
 													</p>
-													<p className="text-[12px] font-geist text-white-400">
+													<p className="text-[12px] font-geist text-text-muted">
 														Executed{" "}
 														{item.updatedAt.toLocaleDateString("en-US")}
 													</p>

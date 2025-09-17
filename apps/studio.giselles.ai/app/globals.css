@@ -36,6 +36,7 @@
 	--color-white-350: hsl(207, 19%, 77%);
 	--color-white-300: hsl(220, 24%, 67%);
 	--color-white-30: hsl(0, 0%, 100%);
+	--color-white: var(--color-white-900);
 
 	--color-blue-950: hsl(219, 90%, 52%);
 	--color-blue-900: hsl(219, 90%, 52%);
