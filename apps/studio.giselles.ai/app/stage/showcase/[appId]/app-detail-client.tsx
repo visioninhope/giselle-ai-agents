@@ -219,7 +219,7 @@ export function AppDetailClient({ appDetails }: AppDetailClientProps) {
 									appDetails.executionHistory.map((execution) => (
 										<div
 											key={execution.id}
-											className="flex items-center justify-between py-2 border-b border-[var(--color-border)] last:border-b-0"
+											className="flex items-center justify-between py-2 border-b border-border last:border-b-0"
 										>
 											<div className="flex items-center gap-3">
 												<StatusBadge
