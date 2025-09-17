@@ -246,7 +246,7 @@ export function AppDetailClient({ appDetails }: AppDetailClientProps) {
 													</div>
 												</div>
 											</div>
-											<div className="text-xs text-[var(--color-text-60)]">
+											<div className="text-xs text-text-muted">
 												{execution.duration}
 											</div>
 										</div>
