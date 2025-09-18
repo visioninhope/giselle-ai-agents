@@ -59,6 +59,10 @@ export function TextGenerationNodePropertiesPanel({
 			error("Please upgrade your plan to continue using this feature.");
 			return;
 		}
+		if (isPromptEmpty(node.content.prompt)) {
+			error(`Please enter a prompt for node: ${node.name || node.id}`);
+			return;
+		}
 
 		createAndStartGenerationRunner({
 			origin: {
