@@ -18,14 +18,11 @@ import {
 	useNodeGroups,
 	useWorkflowDesigner,
 } from "@giselle-sdk/giselle/react";
-import {
-	isJsonContent,
-	jsonContentToText,
-} from "@giselle-sdk/text-editor-utils";
 import clsx from "clsx/lite";
 import { PlayIcon, UngroupIcon } from "lucide-react";
 import { useMemo, useState } from "react";
 import { NodeIcon } from "../../../icons/node";
+import { isPromptEmpty } from "../../lib/validate-prompt";
 import { TriggerInputDialog } from "./trigger-input-dialog";
 
 type RunItem = {
@@ -95,13 +92,7 @@ function useRunAct() {
 		for (const nodeId of item.nodeIds) {
 			const node = data.nodes.find((n) => n.id === nodeId);
 			if (node && (isTextGenerationNode(node) || isImageGenerationNode(node))) {
-				const jsonOrText = node.content.prompt;
-				const text = isJsonContent(jsonOrText)
-					? jsonContentToText(JSON.parse(jsonOrText))
-					: jsonOrText;
-				const noWhitespaceText = text?.replace(/[\s\u3000]+/g, "");
-
-				if (!noWhitespaceText) {
+				if (isPromptEmpty(node.content.prompt)) {
 					error(`Please enter a prompt for node: ${node.name || node.id}`);
 					return;
 				}
