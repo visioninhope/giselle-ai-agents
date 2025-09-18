@@ -294,11 +294,11 @@ export function ImageGenerationNodePropertiesPanel({
 												);
 												if (newModel === undefined) return;
 
+												checkAndDisconnectInvalidConnections(newModel);
 												updateNodeDataContent(node, {
 													...node.content,
 													llm: newModel,
 												});
-												checkAndDisconnectInvalidConnections(newModel);
 											}}
 											options={[
 												{ value: "fal", label: "Fal" },
@@ -324,18 +324,18 @@ export function ImageGenerationNodePropertiesPanel({
 												const newModel = allImageModels.find(
 													(m) => m.id === modelId,
 												);
-												if (!newModel) return;
+												if (newModel === undefined) return;
 
 												const updatedModel = updateModelId(
 													node.content.llm,
 													modelId,
 												);
 
+												checkAndDisconnectInvalidConnections(newModel);
 												updateNodeDataContent(node, {
 													...node.content,
 													llm: updatedModel,
 												});
-												checkAndDisconnectInvalidConnections(newModel);
 											}}
 											options={models}
 										/>
