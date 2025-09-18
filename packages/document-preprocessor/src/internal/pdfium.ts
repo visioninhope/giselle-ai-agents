@@ -19,7 +19,7 @@ function createPdfiumLibrary(): Promise<PDFiumLibrary> {
 	return PDFiumLibrary.init({ wasmBinary: getPdfiumWasmBinary() });
 }
 
-export function getPdfiumLibrary(): Promise<PDFiumLibrary> {
+function getPdfiumLibrary(): Promise<PDFiumLibrary> {
 	if (pdfiumLibraryPromise === null) {
 		pdfiumLibraryPromise = createPdfiumLibrary();
 	}
