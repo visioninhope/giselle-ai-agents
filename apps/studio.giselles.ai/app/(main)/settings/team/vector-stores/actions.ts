@@ -11,6 +11,8 @@ import { revalidatePath } from "next/cache";
 import { after } from "next/server";
 import {
 	db,
+	documentEmbeddingProfiles,
+	documentVectorStores,
 	type GitHubRepositoryContentType,
 	githubRepositoryContentStatus,
 	githubRepositoryEmbeddingProfiles,
@@ -23,7 +25,10 @@ import {
 	processRepository,
 	type RepositoryWithStatuses,
 } from "@/lib/vector-stores/github";
-import type { GitHubRepositoryIndexId } from "@/packages/types";
+import type {
+	DocumentVectorStoreId,
+	GitHubRepositoryIndexId,
+} from "@/packages/types";
 import { fetchCurrentUser, getGitHubIdentityState } from "@/services/accounts";
 import { buildAppInstallationClient } from "@/services/external/github";
 import { fetchCurrentTeam } from "@/services/teams";
@@ -528,11 +533,6 @@ export async function triggerManualIngest(
 	}
 }
 
-/**
- * Create a new Document Vector Store (frontend stub)
- * Frontend-only minimal implementation under feature flag doc-vector-store.
- * This does not persist yet; it validates inputs and gates by flag.
- */
 export async function createDocumentVectorStore(
 	name: string,
 	embeddingProfileIds: number[],
@@ -541,7 +541,8 @@ export async function createDocumentVectorStore(
 	if (!enabled) {
 		return { success: false, error: "Feature disabled" };
 	}
-	if (!name || name.trim().length === 0) {
+	const trimmedName = name.trim();
+	if (trimmedName.length === 0) {
 		return { success: false, error: "Name is required" };
 	}
 	// Validate provided embedding profiles: non-empty and Cohere-only
@@ -560,12 +561,37 @@ export async function createDocumentVectorStore(
 			};
 		}
 	}
-	// Placeholder for future persistence into document_vector_stores table.
-	// Expected schema:
-	// - id (cuid), dbId (serial PK), teamDbId (FK), name, defaultEmbeddingProfileId?, createdAt, updatedAt
-	// Revalidate to reflect the new store once backend is wired.
-	revalidatePath("/settings/team/vector-stores");
-	return { success: true };
+	try {
+		const team = await fetchCurrentTeam();
+		const documentVectorStoreId = `dvs_${createId()}` as DocumentVectorStoreId;
+
+		await db.transaction(async (tx) => {
+			const [insertedStore] = await tx
+				.insert(documentVectorStores)
+				.values({
+					id: documentVectorStoreId,
+					teamDbId: team.dbId,
+					name: trimmedName,
+				})
+				.returning({ dbId: documentVectorStores.dbId });
+
+			const embeddingRows = embeddingProfileIds.map((profileId) => ({
+				documentVectorStoreDbId: insertedStore.dbId,
+				embeddingProfileId: profileId,
+				createdAt: new Date(),
+			}));
+			await tx.insert(documentEmbeddingProfiles).values(embeddingRows);
+		});
+
+		revalidatePath("/settings/team/vector-stores/document");
+		return { success: true };
+	} catch (error) {
+		console.error("Failed to create document vector store:", error);
+		return {
+			success: false,
+			error: "Failed to create vector store. Please try again.",
+		};
+	}
 }
 
 /**
