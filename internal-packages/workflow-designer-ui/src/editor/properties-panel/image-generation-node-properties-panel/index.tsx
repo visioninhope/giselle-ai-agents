@@ -24,6 +24,7 @@ import { Button } from "../../../ui/button";
 import { UsageLimitWarning } from "../../../ui/usage-limit-warning";
 import { useKeyboardShortcuts } from "../../hooks/use-keyboard-shortcuts";
 import { useModelEligibility } from "../../lib/use-model-eligibility";
+import { isPromptEmpty } from "../../lib/validate-prompt";
 import {
 	PropertiesPanelContent,
 	PropertiesPanelHeader,
@@ -98,6 +99,10 @@ export function ImageGenerationNodePropertiesPanel({
 			error("Please upgrade your plan to continue using this feature.");
 			return;
 		}
+		if (isPromptEmpty(node.content.prompt)) {
+			error("Please fill in the prompt to run.");
+			return;
+		}
 
 		createAndStartGenerationRunner({
 			origin: {
@@ -135,7 +140,7 @@ export function ImageGenerationNodePropertiesPanel({
 				action={
 					<Button
 						type="button"
-						disabled={usageLimitsReached}
+						disabled={usageLimitsReached || isPromptEmpty(node.content.prompt)}
 						loading={isGenerating}
 						onClick={() => {
 							if (isGenerating) {

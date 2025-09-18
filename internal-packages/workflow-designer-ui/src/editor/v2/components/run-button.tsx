@@ -9,6 +9,10 @@ import { DropdownMenu } from "@giselle-internal/ui/dropdown-menu";
 import { useToasts } from "@giselle-internal/ui/toast";
 import type { ConnectionId, NodeId, TriggerNode } from "@giselle-sdk/data-type";
 import {
+	isImageGenerationNode,
+	isTextGenerationNode,
+} from "@giselle-sdk/data-type";
+import {
 	defaultName,
 	useActController,
 	useNodeGroups,
@@ -18,6 +22,7 @@ import clsx from "clsx/lite";
 import { PlayIcon, UngroupIcon } from "lucide-react";
 import { useMemo, useState } from "react";
 import { NodeIcon } from "../../../icons/node";
+import { isPromptEmpty } from "../../lib/validate-prompt";
 import { TriggerInputDialog } from "./trigger-input-dialog";
 
 type RunItem = {
@@ -79,11 +84,21 @@ function RunOptionItem({
 }
 
 function useRunAct() {
-	const { setUiNodeState } = useWorkflowDesigner();
+	const { data, setUiNodeState } = useWorkflowDesigner();
 	const { createAndStartAct } = useActController();
-	const { toast } = useToasts();
+	const { toast, error } = useToasts();
 
 	return async (item: RunItem) => {
+		for (const nodeId of item.nodeIds) {
+			const node = data.nodes.find((n) => n.id === nodeId);
+			if (node && (isTextGenerationNode(node) || isImageGenerationNode(node))) {
+				if (isPromptEmpty(node.content.prompt)) {
+					error("Please fill in the prompt to run.");
+					return;
+				}
+			}
+		}
+
 		for (const nodeId of item.nodeIds) {
 			setUiNodeState(nodeId, { highlighted: false });
 		}

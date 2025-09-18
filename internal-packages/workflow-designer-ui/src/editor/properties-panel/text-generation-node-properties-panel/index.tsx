@@ -4,10 +4,6 @@ import {
 	useNodeGenerations,
 	useWorkflowDesigner,
 } from "@giselle-sdk/giselle/react";
-import {
-	isJsonContent,
-	jsonContentToText,
-} from "@giselle-sdk/text-editor-utils";
 import { CommandIcon, CornerDownLeft } from "lucide-react";
 import { useCallback, useMemo } from "react";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
@@ -15,6 +11,7 @@ import { useUsageLimitsReached } from "../../../hooks/usage-limits";
 import { Button } from "../../../ui/button";
 import { UsageLimitWarning } from "../../../ui/usage-limit-warning";
 import { useKeyboardShortcuts } from "../../hooks/use-keyboard-shortcuts";
+import { isPromptEmpty } from "../../lib/validate-prompt";
 import {
 	PropertiesPanelContent,
 	PropertiesPanelHeader,
@@ -62,6 +59,10 @@ export function TextGenerationNodePropertiesPanel({
 			error("Please upgrade your plan to continue using this feature.");
 			return;
 		}
+		if (isPromptEmpty(node.content.prompt)) {
+			error("Please fill in the prompt to run.");
+			return;
+		}
 
 		createAndStartGenerationRunner({
 			origin: {
@@ -86,13 +87,6 @@ export function TextGenerationNodePropertiesPanel({
 		error,
 	]);
 
-	const jsonOrText = node.content.prompt;
-	const text = isJsonContent(jsonOrText)
-		? jsonContentToText(JSON.parse(jsonOrText))
-		: jsonOrText;
-	const noWhitespaceText = text?.replace(/[\s\u3000]+/g, "");
-	const disabled = usageLimitsReached || !noWhitespaceText;
-
 	return (
 		<PropertiesPanelRoot>
 			{usageLimitsReached && <UsageLimitWarning />}
@@ -107,7 +101,7 @@ export function TextGenerationNodePropertiesPanel({
 					<Button
 						loading={isGenerating}
 						type="button"
-						disabled={disabled}
+						disabled={usageLimitsReached || isPromptEmpty(node.content.prompt)}
 						onClick={() => {
 							if (isGenerating) {
 								stopGenerationRunner();
