@@ -100,7 +100,7 @@ export function ImageGenerationNodePropertiesPanel({
 			return;
 		}
 		if (isPromptEmpty(node.content.prompt)) {
-			error(`Please enter a prompt for node: ${node.name || node.id}`);
+			error("Please fill in the prompt to run.");
 			return;
 		}
 

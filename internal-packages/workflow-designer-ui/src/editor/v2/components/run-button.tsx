@@ -93,7 +93,7 @@ function useRunAct() {
 			const node = data.nodes.find((n) => n.id === nodeId);
 			if (node && (isTextGenerationNode(node) || isImageGenerationNode(node))) {
 				if (isPromptEmpty(node.content.prompt)) {
-					error(`Please enter a prompt for node: ${node.name || node.id}`);
+					error("Please fill in the prompt to run.");
 					return;
 				}
 			}
