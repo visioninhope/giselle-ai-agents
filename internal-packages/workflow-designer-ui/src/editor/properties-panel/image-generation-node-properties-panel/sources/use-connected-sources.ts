@@ -16,10 +16,12 @@ export function useConnectedSources(node: ImageGenerationNode) {
 		const connectionsToThisNode = data.connections.filter(
 			(connection) => connection.inputNode.id === node.id,
 		);
-		const connectedGeneratedSources: ConnectedSource<TextGenerationNode>[] = [];
+		const connectedGeneratedTextSources: ConnectedSource<TextGenerationNode>[] =
+			[];
+		const connectedGeneratedImageSources: ConnectedSource<ImageGenerationNode>[] =
+			[];
 		const connectedVariableSources: ConnectedSource<VariableNode>[] = [];
 		const connectedQuerySources: ConnectedSource<QueryNode>[] = [];
-		const connectedImageSources: ConnectedSource<ImageGenerationNode>[] = [];
 		for (const connection of connectionsToThisNode) {
 			const node = data.nodes.find(
 				(node) => node.id === connection.outputNode.id,
@@ -38,7 +40,7 @@ export function useConnectedSources(node: ImageGenerationNode) {
 				case "operation":
 					switch (node.content.type) {
 						case "textGeneration":
-							connectedGeneratedSources.push({
+							connectedGeneratedTextSources.push({
 								output,
 								node: node as TextGenerationNode,
 								connection,
@@ -52,7 +54,7 @@ export function useConnectedSources(node: ImageGenerationNode) {
 							});
 							break;
 						case "imageGeneration":
-							connectedImageSources.push({
+							connectedGeneratedImageSources.push({
 								output,
 								node: node as ImageGenerationNode,
 								connection,
@@ -103,15 +105,15 @@ export function useConnectedSources(node: ImageGenerationNode) {
 
 		return {
 			all: [
-				...connectedGeneratedSources,
+				...connectedGeneratedTextSources,
 				...connectedVariableSources,
 				...connectedQuerySources,
-				...connectedImageSources,
+				...connectedGeneratedImageSources,
 			],
-			generation: connectedGeneratedSources,
+			generationText: connectedGeneratedTextSources,
+			generationImage: connectedGeneratedImageSources,
 			variable: connectedVariableSources,
 			query: connectedQuerySources,
-			image: connectedImageSources,
 		};
 	}, [node.id, data.connections, data.nodes]);
 }
