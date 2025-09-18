@@ -147,7 +147,7 @@ export async function useGenerationExecutor<T>(args: {
 		if (actId === undefined) {
 			return findGenerationByNode(nodeId);
 		}
-		return findGenerationByAct(nodeId, actId as ActId);
+		return findGenerationByAct(nodeId, actId);
 	}
 	async function findGenerationByNode(nodeId: NodeId) {
 		const generationLookupStartTime = Date.now();
