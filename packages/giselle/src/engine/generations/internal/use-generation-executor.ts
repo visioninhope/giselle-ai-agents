@@ -269,29 +269,32 @@ export async function useGenerationExecutor<T>(args: {
 			return undefined;
 		}
 
-		const imageParts: ImagePart[] = [];
-		for (const content of imageGenerationOutput.contents) {
-			try {
-				const image = await getGeneratedImage({
-					storage: args.context.storage,
-					experimental_storage: args.context.experimental_storage,
-					useExperimentalStorage: args.useExperimentalStorage,
-					generation,
-					filename: content.filename,
-				});
+		const imageParts = await Promise.all(
+			imageGenerationOutput.contents.map(async (content) => {
+				try {
+					const image = await getGeneratedImage({
+						storage: args.context.storage,
+						experimental_storage: args.context.experimental_storage,
+						useExperimentalStorage: args.useExperimentalStorage,
+						generation,
+						filename: content.filename,
+					});
 
-				imageParts.push({
-					type: "image",
-					image,
-					mediaType: content.contentType,
-				});
-			} catch (error) {
-				args.context.logger.error(
-					error instanceof Error ? error : new Error(String(error)),
-					`Failed to load generated image: ${content.filename}`,
-				);
-			}
-		}
+					return {
+						type: "image",
+						image,
+						mediaType: content.contentType,
+					} satisfies ImagePart;
+				} catch (error) {
+					args.context.logger.error(
+						error instanceof Error ? error : new Error(String(error)),
+						`Failed to load generated image: ${content.filename}`,
+					);
+					return undefined;
+				}
+			}),
+		).then((results) => results.filter((result) => result !== undefined));
+
 		return imageParts.length > 0 ? imageParts : undefined;
 	}
 
