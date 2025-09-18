@@ -1,23 +1,18 @@
 import { Select, type SelectOption } from "@giselle-internal/ui/select";
 import { useToasts } from "@giselle-internal/ui/toast";
 import {
-	type Connection,
+	type ImageGenerationLanguageModelData,
 	ImageGenerationLanguageModelProvider,
 	type ImageGenerationNode,
-	type InputId,
-	isFileNode,
-	isImageGenerationNode,
 } from "@giselle-sdk/data-type";
 import {
+	isSupportedConnection,
 	useNodeGenerations,
 	useWorkflowDesigner,
 } from "@giselle-sdk/giselle/react";
 import {
-	Capability,
 	falLanguageModels,
 	googleImageLanguageModels,
-	hasCapability,
-	type LanguageModel,
 	openaiImageModels,
 } from "@giselle-sdk/language-model";
 import clsx from "clsx/lite";
@@ -69,15 +64,6 @@ export function ImageGenerationNodePropertiesPanel({
 
 	const uiState = useMemo(() => data.ui.nodeState[node.id], [data, node.id]);
 
-	const allImageModels = useMemo(
-		() => [
-			...falLanguageModels,
-			...openaiImageModels,
-			...googleImageLanguageModels,
-		],
-		[],
-	);
-
 	// Get available models for current provider
 	const models = useMemo<SelectOption[]>(() => {
 		switch (node.content.llm.provider) {
@@ -106,59 +92,29 @@ export function ImageGenerationNodePropertiesPanel({
 		}
 	}, [node.content.llm, checkEligibility]);
 
-	const checkAndDisconnectInvalidConnections = useCallback(
-		(newModel: LanguageModel) => {
-			const incomingConnections = data.connections.filter(
+	const disconnectInvalidConnections = useCallback(
+		(model: ImageGenerationLanguageModelData) => {
+			const connections = data.connections.filter(
 				(c) => c.inputNode.id === node.id,
 			);
-			if (incomingConnections.length === 0) return;
+			if (connections.length === 0) return;
 
-			const inputsToRemove = new Set<InputId>();
-			const connectionsToRemove: Connection[] = [];
-
-			for (const conn of incomingConnections) {
-				const sourceNode = data.nodes.find((n) => n.id === conn.outputNode.id);
-				if (!sourceNode) continue;
-
-				let isInvalid = false;
-				if (isImageGenerationNode(sourceNode)) {
-					if (!hasCapability(newModel, Capability.ImageGenerationInput)) {
-						isInvalid = true;
-					}
-				} else if (
-					isFileNode(sourceNode) &&
-					sourceNode.content.category === "image"
-				) {
-					if (!hasCapability(newModel, Capability.ImageFileInput)) {
-						isInvalid = true;
-					}
-				}
-
-				if (isInvalid) {
-					connectionsToRemove.push(conn);
-					inputsToRemove.add(conn.inputId);
-				}
-			}
-
-			if (connectionsToRemove.length > 0) {
-				for (const conn of connectionsToRemove) {
-					deleteConnection(conn.id);
-				}
-				const newInputs = node.inputs.filter(
-					(input) => !inputsToRemove.has(input.id),
+			const newInputNode = {
+				...node,
+				content: { ...node.content, llm: model },
+			};
+			for (const connection of connections) {
+				const outputNode = data.nodes.find(
+					(n) => n.id === connection.outputNode.id,
 				);
-				updateNodeData(node, { inputs: newInputs });
+				if (!outputNode) continue;
+
+				if (!isSupportedConnection(outputNode, newInputNode).canConnect) {
+					deleteConnection(connection.id);
+				}
 			}
 		},
-		[
-			node,
-			data.connections,
-			data.nodes,
-			deleteConnection,
-			updateNodeData,
-			node.id,
-			node.inputs,
-		],
+		[node, data.connections, data.nodes, deleteConnection],
 	);
 
 	useKeyboardShortcuts({
@@ -289,12 +245,8 @@ export function ImageGenerationNodePropertiesPanel({
 												const defaultModel = createDefaultModelData(
 													result.data,
 												);
-												const newModel = allImageModels.find(
-													(m) => m.id === defaultModel.id,
-												);
-												if (newModel === undefined) return;
 
-												checkAndDisconnectInvalidConnections(newModel);
+												disconnectInvalidConnections(defaultModel);
 												updateNodeDataContent(node, {
 													...node.content,
 													llm: defaultModel,
@@ -321,17 +273,12 @@ export function ImageGenerationNodePropertiesPanel({
 											value={node.content.llm.id}
 											widthClassName="w-full"
 											onValueChange={(modelId) => {
-												const newModel = allImageModels.find(
-													(m) => m.id === modelId,
-												);
-												if (newModel === undefined) return;
-
 												const updatedModel = updateModelId(
 													node.content.llm,
 													modelId,
 												);
 
-												checkAndDisconnectInvalidConnections(newModel);
+												disconnectInvalidConnections(updatedModel);
 												updateNodeDataContent(node, {
 													...node.content,
 													llm: updatedModel,
