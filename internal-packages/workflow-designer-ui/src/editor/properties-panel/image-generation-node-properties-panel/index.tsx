@@ -297,7 +297,7 @@ export function ImageGenerationNodePropertiesPanel({
 												checkAndDisconnectInvalidConnections(newModel);
 												updateNodeDataContent(node, {
 													...node.content,
-													llm: newModel,
+													llm: defaultModel,
 												});
 											}}
 											options={[
