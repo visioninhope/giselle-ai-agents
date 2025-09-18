@@ -9,11 +9,19 @@ import { DropdownMenu } from "@giselle-internal/ui/dropdown-menu";
 import { useToasts } from "@giselle-internal/ui/toast";
 import type { ConnectionId, NodeId, TriggerNode } from "@giselle-sdk/data-type";
 import {
+	isImageGenerationNode,
+	isTextGenerationNode,
+} from "@giselle-sdk/data-type";
+import {
 	defaultName,
 	useActController,
 	useNodeGroups,
 	useWorkflowDesigner,
 } from "@giselle-sdk/giselle/react";
+import {
+	isJsonContent,
+	jsonContentToText,
+} from "@giselle-sdk/text-editor-utils";
 import clsx from "clsx/lite";
 import { PlayIcon, UngroupIcon } from "lucide-react";
 import { useMemo, useState } from "react";
@@ -79,11 +87,27 @@ function RunOptionItem({
 }
 
 function useRunAct() {
-	const { setUiNodeState } = useWorkflowDesigner();
+	const { data, setUiNodeState } = useWorkflowDesigner();
 	const { createAndStartAct } = useActController();
-	const { toast } = useToasts();
+	const { toast, error } = useToasts();
 
 	return async (item: RunItem) => {
+		for (const nodeId of item.nodeIds) {
+			const node = data.nodes.find((n) => n.id === nodeId);
+			if (node && (isTextGenerationNode(node) || isImageGenerationNode(node))) {
+				const jsonOrText = node.content.prompt;
+				const text = isJsonContent(jsonOrText)
+					? jsonContentToText(JSON.parse(jsonOrText))
+					: jsonOrText;
+				const noWhitespaceText = text?.replace(/[\s\u3000]+/g, "");
+
+				if (!noWhitespaceText) {
+					error(`Please enter a prompt for node: ${node.name || node.id}`);
+					return;
+				}
+			}
+		}
+
 		for (const nodeId of item.nodeIds) {
 			setUiNodeState(nodeId, { highlighted: false });
 		}
