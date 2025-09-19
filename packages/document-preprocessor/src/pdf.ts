@@ -87,7 +87,6 @@ export async function renderPdfPageImages(
 							);
 						},
 					});
-					markPdfiumPageClosed(page);
 
 					pages.push({
 						pageNumber: page.number + 1,
@@ -167,10 +166,6 @@ type PdfiumRenderInternals = {
 };
 
 const closedPdfiumPages = new WeakSet<PDFiumPage>();
-
-function markPdfiumPageClosed(page: PDFiumPage): void {
-	closedPdfiumPages.add(page);
-}
 
 function destroyPdfiumPage(page: PDFiumPage): void {
 	if (closedPdfiumPages.has(page)) {
