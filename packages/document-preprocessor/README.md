@@ -4,7 +4,7 @@ Utilities for turning raw document binaries into clean text and image payloads r
 
 ## Features
 
-- Password-aware PDF parsing via [`@hyzyla/pdfium`](https://www.npmjs.com/package/@hyzyla/pdfium)
+- Password-aware PDF parsing via [`@embedpdf/pdfium`](https://www.npmjs.com/package/@embedpdf/pdfium)
 - Normalised text extraction with whitespace cleanup and hyphen repair
 - Page-by-page PNG rendering using [`pngjs`](https://www.npmjs.com/package/pngjs)
 - Abort signal propagation so long-running conversions can be cancelled
@@ -19,7 +19,7 @@ This package is published inside the monorepo under the `@giselle-sdk/*` namespa
 ### Extract text from a PDF
 
 ```ts
-import { readFile, writeFile } from "node:fs/promises";
+import { readFile } from "node:fs/promises";
 import { extractPdfText } from "@giselle-sdk/document-preprocessor";
 
 const binary = await readFile("./contract.pdf");

@@ -1082,6 +1082,17 @@ MIT-0 permitted
 
 
 
+<a name="@embedpdf/pdfium"></a>
+### @embedpdf/pdfium v1.2.1
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
 <a name="@edge-runtime/cookies"></a>
 ### @edge-runtime/cookies v5.0.2
 #### 
@@ -1222,17 +1233,6 @@ MIT-0 permitted
 * /home/runner/work/giselle/giselle
 
 <a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
-
-
-
-<a name="@hyzyla/pdfium"></a>
-### @hyzyla/pdfium v2.1.9
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
 
 
 
@@ -12256,5 +12256,4 @@ BlueOak-1.0.0 permitted
 * /home/runner/work/giselle/giselle
 
 <a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
 

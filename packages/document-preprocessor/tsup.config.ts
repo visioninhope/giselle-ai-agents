@@ -7,5 +7,5 @@ export default defineConfig({
 	clean: true,
 	sourcemap: true,
 	target: "node18",
-	external: ["@hyzyla/pdfium", "pngjs"],
+	external: ["@embedpdf/pdfium", "pngjs"],
 });

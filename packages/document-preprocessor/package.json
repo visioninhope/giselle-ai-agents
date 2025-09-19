@@ -12,7 +12,7 @@
 		"format": "biome check --write ."
 	},
 	"dependencies": {
-		"@hyzyla/pdfium": "catalog:",
+		"@embedpdf/pdfium": "catalog:",
 		"pngjs": "catalog:"
 	},
 	"devDependencies": {

@@ -83,7 +83,7 @@ catalog:
   "@types/pg": 8.11.13
   pgvector: 0.2.1
   swr: 2.2.5
-  "@hyzyla/pdfium": 2.1.9
+  "@embedpdf/pdfium": 1.2.1
   pngjs: 7.0.0
   defuddle: 0.6.4
   "fast-levenshtein": 3.0.0

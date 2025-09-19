@@ -39,9 +39,9 @@ catalogs:
     '@biomejs/biome':
       specifier: 2.0.6
       version: 2.0.6
-    '@hyzyla/pdfium':
-      specifier: 2.1.9
-      version: 2.1.9
+    '@embedpdf/pdfium':
+      specifier: 1.2.1
+      version: 1.2.1
     '@next/env':
       specifier: 15.5.2
       version: 15.5.2
@@ -820,9 +820,9 @@ importers:
 
   packages/document-preprocessor:
     dependencies:
-      '@hyzyla/pdfium':
+      '@embedpdf/pdfium':
         specifier: 'catalog:'
-        version: 2.1.9
+        version: 1.2.1
       pngjs:
         specifier: 'catalog:'
         version: 7.0.0
@@ -1737,6 +1737,9 @@ packages:
     resolution: {integrity: sha512-Sd8LcWpZk/SWEeKGE8LT6gMm5MGfX/wm+GPnh1eBEtCpya3vYqn37wYknwAHw92ONoyyREl1hJwxV/Qx2DWNOg==}
     engines: {node: '>=16'}
 
+  '@embedpdf/pdfium@1.2.1':
+    resolution: {integrity: sha512-QWf1jg7EqUlku2q6KYhlXCNfk5IAykFerPuzKJepHTeAEaRcAfu84fJgEsoUTCK4D6dfzVNp2Iuxw6Kv7MpSeg==}
+
   '@emnapi/core@1.4.4':
     resolution: {integrity: sha512-A9CnAbC6ARNMKcIcrQwq6HeHCjpcBZ5wSx4U01WXCqEKlrzB9F9315WDNHkrs2xbx7YjjSxbUYxuN6EQzpcY2g==}
 
@@ -2239,9 +2242,6 @@ packages:
     resolution: {integrity: sha512-AiXO/bfe9bmxBjxxtYxFAXGZvMaN5s8kO+jBHAJCON8rJoB5YS/D6X7ZNc6XQkuHNmyl4CYaMI1fJ/Gn27RGGw==}
     engines: {node: '>=6'}
     hasBin: true
-
-  '@hyzyla/pdfium@2.1.9':
-    resolution: {integrity: sha512-c2T59buVQjjsqkuxjcUMQqy+M8CssAnK856ZBnzcy2KOauHSgJUOZIcsrXUR0poIh4RK9FYKD7PbyqjodooxUg==}
 
   '@icons-pack/react-simple-icons@10.0.0':
     resolution: {integrity: sha512-oU0PVDx9sbNQjRxJN555dsHbRApYN+aBq/O9+wo3JgNkEfvBMgAEtsSGtXWWXQsLAxJcYiFOCzBWege/Xj/JFQ==}
@@ -9178,6 +9178,8 @@ snapshots:
 
   '@edge-runtime/cookies@5.0.2': {}
 
+  '@embedpdf/pdfium@1.2.1': {}
+
   '@emnapi/core@1.4.4':
     dependencies:
       '@emnapi/wasi-threads': 1.0.3
@@ -9466,8 +9468,6 @@ snapshots:
       long: 5.2.4
       protobufjs: 7.4.0
       yargs: 17.7.2
-
-  '@hyzyla/pdfium@2.1.9': {}
 
   '@icons-pack/react-simple-icons@10.0.0(react@19.1.1)':
     dependencies:

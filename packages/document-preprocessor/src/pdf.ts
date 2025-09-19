@@ -1,5 +1,4 @@
 import { Buffer } from "node:buffer";
-import type { PDFiumPage, PDFiumPageRender } from "@hyzyla/pdfium";
 import { PNG } from "pngjs";
 
 import { assertNotAborted } from "./internal/abort.js";
@@ -36,7 +35,7 @@ export async function extractPdfText(
 
 			for (let index = 0; index < limit; index += 1) {
 				assertNotAborted(signal);
-				const page = document.getPage(index);
+				const page = document.loadPage(index);
 				try {
 					const rawText = page.getText();
 					const text = normalizeExtractedText(rawText);
@@ -45,7 +44,7 @@ export async function extractPdfText(
 						text,
 					});
 				} finally {
-					destroyPdfiumPage(page);
+					page.close();
 				}
 			}
 
@@ -73,18 +72,13 @@ export async function renderPdfPageImages(
 
 			for (let index = 0; index < limit; index += 1) {
 				assertNotAborted(signal);
-				const page = document.getPage(index);
-				let renderResult: PDFiumPageRender | null = null;
+				const page = document.loadPage(index);
 				try {
-					renderResult = await page.render({
+					const renderResult = await page.render({
 						scale,
 						renderFormFields: options.renderFormFields ?? true,
 						render: async ({ data, width, height }) => {
-							return await encodeRgbaToPng(
-								new Uint8Array(data.buffer, data.byteOffset, data.byteLength),
-								width,
-								height,
-							);
+							return await encodeRgbaToPng(data, width, height);
 						},
 					});
 
@@ -95,10 +89,7 @@ export async function renderPdfPageImages(
 						png: renderResult.data,
 					});
 				} finally {
-					if (renderResult !== null) {
-						destroyPdfiumRenderResult(renderResult);
-					}
-					destroyPdfiumPage(page);
+					page.close();
 				}
 			}
 
@@ -143,84 +134,4 @@ function calculatePageLimit(totalPages: number, maxPages?: number): number {
 		return totalPages;
 	}
 	return Math.min(totalPages, maxPages);
-}
-
-type PdfiumModuleInternals = {
-	_FPDF_ClosePage?: (pagePtr: number) => void;
-	_FORM_OnBeforeClosePage?: (pagePtr: number, formPtr: number) => void;
-};
-
-type PdfiumDocumentInternals = {
-	module?: PdfiumModuleInternals;
-	formIdx?: number | null;
-};
-
-type PdfiumPageInternals = {
-	destroy?: () => void;
-	pageIdx?: number;
-	document?: PdfiumDocumentInternals;
-};
-
-type PdfiumRenderInternals = {
-	destroy?: () => void;
-};
-
-const closedPdfiumPages = new WeakSet<PDFiumPage>();
-
-function destroyPdfiumPage(page: PDFiumPage): void {
-	if (closedPdfiumPages.has(page)) {
-		return;
-	}
-
-	const candidate = page as unknown as PdfiumPageInternals;
-	if (typeof candidate.destroy === "function") {
-		try {
-			candidate.destroy();
-		} catch {
-			// Ignore cleanup failures; the page is already being torn down.
-		}
-		closedPdfiumPages.add(page);
-		return;
-	}
-
-	const pageIdx = candidate.pageIdx;
-	const document = candidate.document;
-	const module = document?.module;
-	if (
-		typeof pageIdx !== "number" ||
-		!module ||
-		typeof module._FPDF_ClosePage !== "function"
-	) {
-		return;
-	}
-
-	if (
-		document &&
-		typeof document.formIdx === "number" &&
-		typeof module._FORM_OnBeforeClosePage === "function"
-	) {
-		try {
-			module._FORM_OnBeforeClosePage(pageIdx, document.formIdx);
-		} catch {
-			// Ignore cleanup failures; the form hooks are best-effort.
-		}
-	}
-
-	try {
-		module._FPDF_ClosePage(pageIdx);
-		closedPdfiumPages.add(page);
-	} catch {
-		// Ignore cleanup failures; the page pointer may already be closed.
-	}
-}
-
-function destroyPdfiumRenderResult(result: PDFiumPageRender): void {
-	const candidate = result as unknown as PdfiumRenderInternals;
-	if (typeof candidate.destroy === "function") {
-		try {
-			candidate.destroy();
-		} catch {
-			// Ignore cleanup failures; rendering buffers have already been released.
-		}
-	}
 }
