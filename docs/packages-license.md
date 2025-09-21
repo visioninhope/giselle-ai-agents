@@ -49,7 +49,7 @@
 
 
 <a name="@ai-sdk/anthropic"></a>
-### @ai-sdk/anthropic v2.0.9
+### @ai-sdk/anthropic v2.0.17
 #### 
 
 ##### Paths
@@ -60,7 +60,7 @@
 
 
 <a name="@ai-sdk/fal"></a>
-### @ai-sdk/fal v1.0.11
+### @ai-sdk/fal v1.0.13
 #### 
 
 ##### Paths
@@ -71,7 +71,7 @@
 
 
 <a name="@ai-sdk/gateway"></a>
-### @ai-sdk/gateway v1.0.15
+### @ai-sdk/gateway v1.0.23
 #### 
 
 ##### Paths
@@ -82,7 +82,7 @@
 
 
 <a name="@ai-sdk/google"></a>
-### @ai-sdk/google v2.0.11
+### @ai-sdk/google v2.0.14
 #### 
 
 ##### Paths
@@ -93,7 +93,7 @@
 
 
 <a name="@ai-sdk/google-vertex"></a>
-### @ai-sdk/google-vertex v3.0.16
+### @ai-sdk/google-vertex v3.0.27
 #### 
 
 ##### Paths
@@ -104,7 +104,7 @@
 
 
 <a name="@ai-sdk/openai"></a>
-### @ai-sdk/openai v2.0.23
+### @ai-sdk/openai v2.0.30
 #### 
 
 ##### Paths
@@ -115,7 +115,7 @@
 
 
 <a name="@ai-sdk/perplexity"></a>
-### @ai-sdk/perplexity v2.0.7
+### @ai-sdk/perplexity v2.0.9
 #### 
 
 ##### Paths
@@ -137,7 +137,7 @@
 
 
 <a name="@ai-sdk/provider-utils"></a>
-### @ai-sdk/provider-utils v3.0.7
+### @ai-sdk/provider-utils v3.0.9
 #### 
 
 ##### Paths
@@ -148,7 +148,7 @@
 
 
 <a name="@ai-sdk/react"></a>
-### @ai-sdk/react v2.0.29
+### @ai-sdk/react v2.0.44
 #### 
 
 ##### Paths
@@ -5186,7 +5186,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="ai"></a>
-### ai v5.0.29
+### ai v5.0.44
 #### 
 
 ##### Paths
@@ -10980,7 +10980,7 @@ Unknown manually approved
 
 
 <a name="swr"></a>
-### swr v2.2.5
+### swr v2.3.6
 #### 
 
 ##### Paths
