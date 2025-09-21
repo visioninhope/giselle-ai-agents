@@ -50,6 +50,7 @@ export function generateContent({
 			setGeneration,
 			fileResolver,
 			generationContentResolver,
+			imageGenerationResolver,
 		}) => {
 			const operationNode = generationContext.operationNode;
 			if (!isTextGenerationNode(operationNode)) {
@@ -68,6 +69,7 @@ export function generateContent({
 				generationContext.sourceNodes,
 				fileResolver,
 				generationContentResolver,
+				imageGenerationResolver,
 			);
 
 			let preparedToolSet: PreparedToolSet = {
