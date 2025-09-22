@@ -608,6 +608,56 @@ export async function createDocumentVectorStore(
 	}
 }
 
+export async function deleteDocumentVectorStore(
+	documentVectorStoreId: DocumentVectorStoreId,
+): Promise<ActionResult> {
+	const enabled = await docVectorStoreFlag();
+	if (!enabled) {
+		return { success: false, error: "Feature disabled" };
+	}
+
+	try {
+		const team = await fetchCurrentTeam();
+		const [documentVectorStore] = await db
+			.select({ dbId: documentVectorStores.dbId })
+			.from(documentVectorStores)
+			.where(
+				and(
+					eq(documentVectorStores.id, documentVectorStoreId),
+					eq(documentVectorStores.teamDbId, team.dbId),
+				),
+			)
+			.limit(1);
+
+		if (!documentVectorStore) {
+			return { success: false, error: "Vector store not found" };
+		}
+
+		await db.transaction(async (tx) => {
+			await tx
+				.delete(documentEmbeddingProfiles)
+				.where(
+					eq(
+						documentEmbeddingProfiles.documentVectorStoreDbId,
+						documentVectorStore.dbId,
+					),
+				);
+			await tx
+				.delete(documentVectorStores)
+				.where(eq(documentVectorStores.dbId, documentVectorStore.dbId));
+		});
+
+		revalidatePath("/settings/team/vector-stores/document");
+		return { success: true };
+	} catch (error) {
+		console.error("Failed to delete document vector store:", error);
+		return {
+			success: false,
+			error: "Failed to delete vector store. Please try again.",
+		};
+	}
+}
+
 /**
  * Fetch repository with all its content statuses
  */

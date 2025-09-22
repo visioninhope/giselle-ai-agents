@@ -1,7 +1,10 @@
 import { ExternalLink } from "lucide-react";
 import { notFound } from "next/navigation";
 import { docVectorStoreFlag } from "@/flags";
-import { createDocumentVectorStore } from "../actions";
+import {
+	createDocumentVectorStore,
+	deleteDocumentVectorStore,
+} from "../actions";
 import { getDocumentVectorStores } from "../data";
 import { DocumentVectorStoreCreateDialog } from "../document-store-create-dialog";
 import { DocumentVectorStoreList } from "../document-vector-store-list";
@@ -42,7 +45,10 @@ export default async function DocumentVectorStorePage() {
 				</div>
 			</div>
 			<VectorStoresNavigationLayout isEnabled={enabled}>
-				<DocumentVectorStoreList stores={vectorStores} />
+				<DocumentVectorStoreList
+					stores={vectorStores}
+					deleteAction={deleteDocumentVectorStore}
+				/>
 			</VectorStoresNavigationLayout>
 		</div>
 	);
