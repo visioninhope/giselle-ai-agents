@@ -4,6 +4,7 @@ import {
 	type Generation,
 	GenerationContext,
 	isQueuedGeneration,
+	type RunningGeneration,
 } from "../../concepts/generation";
 import { useFeatureFlag } from "../feature-flags";
 import { useGiselleEngine } from "../use-giselle-engine";
@@ -44,6 +45,14 @@ export function GenerationRunner({ generation }: { generation: Generation }) {
 }
 
 function TextGenerationRunner({ generation }: { generation: Generation }) {
+	const { updateGenerationListener } = useGenerationRunnerSystem();
+	const handleStart = useCallback(
+		(generation: RunningGeneration) => {
+			updateGenerationListener(generation);
+		},
+		[updateGenerationListener],
+	);
+
 	if (generation.status === "created") {
 		return null;
 	}
@@ -51,7 +60,9 @@ function TextGenerationRunner({ generation }: { generation: Generation }) {
 	if (!isTextGenerationNode(generationContext.operationNode)) {
 		throw new Error("Invalid generation type");
 	}
-	return <GenerateContentRunner generation={generation} />;
+	return (
+		<GenerateContentRunner generation={generation} onStart={handleStart} />
+	);
 }
 
 function ImageGenerationRunner({ generation }: { generation: Generation }) {

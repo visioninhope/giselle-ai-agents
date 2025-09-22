@@ -304,6 +304,10 @@ export function ZustandBridgeGenerationProvider({
 		[addGenerationRunnerStore],
 	);
 
+	const updateGenerationListener = useCallback((generation: Generation) => {
+		generationListener.current[generation.id] = generation;
+	}, []);
+
 	const contextValue = useMemo(
 		() => ({
 			generateTextApi,
@@ -317,6 +321,7 @@ export function ZustandBridgeGenerationProvider({
 			addStopHandler,
 			stopGenerationRunner,
 			addGenerationRunner,
+			updateGenerationListener,
 		}),
 		[
 			generateTextApi,
@@ -330,6 +335,7 @@ export function ZustandBridgeGenerationProvider({
 			addStopHandler,
 			stopGenerationRunner,
 			addGenerationRunner,
+			updateGenerationListener,
 		],
 	);
 

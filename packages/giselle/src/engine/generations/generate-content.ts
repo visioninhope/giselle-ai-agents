@@ -216,9 +216,19 @@ export function generateContent({
 						useExperimentalStorage: true,
 						generationId: generation.id,
 					});
+					context.logger.debug(
+						{ generationId: generation.id, status: currentGeneration?.status },
+						`streamText onChunk`,
+					);
 					if (currentGeneration?.status === "cancelled") {
 						abortController.abort();
 					}
+				},
+				onAbort: () => {
+					context.logger.debug(
+						{ generationId: generation.id },
+						"streamText onAbort",
+					);
 				},
 				onError: ({ error }) => {
 					generationError = error;

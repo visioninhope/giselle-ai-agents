@@ -1,6 +1,6 @@
 import { createUIMessageStream, readUIMessageStream, type UIMessage } from "ai";
 import { useCallback, useEffect, useRef } from "react";
-import type { Generation } from "../../concepts/generation";
+import type { Generation, RunningGeneration } from "../../concepts/generation";
 import { useGiselleEngine } from "../use-giselle-engine";
 import { useGenerationRunnerSystem } from "./contexts";
 import { useGenerationStore } from "./store";
@@ -44,21 +44,23 @@ type GenerateContentOnFinishCallback = (options: {
 }) => void;
 
 type GenerateContentOnErrorCallback = (error: Error) => void;
+type GenerateContentOnStart = (generation: RunningGeneration) => void;
 
 export function GenerateContentRunner({
 	generation,
+	onStart,
 	onFinish,
 	onError,
 }: {
 	generation: Generation;
+	onStart?: GenerateContentOnStart;
 	onFinish?: GenerateContentOnFinishCallback;
 	onError?: GenerateContentOnErrorCallback;
 }) {
 	const client = useGiselleEngine();
 	const upsertMessage = useGenerationStore((s) => s.upsertMessage);
 	const updateGeneration = useGenerationStore((s) => s.updateGeneration);
-	const { addStopHandler, updateGenerationStatusToComplete } =
-		useGenerationRunnerSystem();
+	const { updateGenerationStatusToComplete } = useGenerationRunnerSystem();
 	const didRun = useRef(false);
 	const reachedStreamEnd = useRef(false);
 	const messageUpdateQueue = useRef<Map<UIMessage["id"], UIMessage>>(new Map());
@@ -165,13 +167,13 @@ export function GenerateContentRunner({
 			return;
 		}
 		didRun.current = true;
-		addStopHandler(generation.id, stop);
-		client.startContentGeneration({ generation }).then(({ generation }) => {
-			updateGeneration(generation);
-			processStream();
-		});
-	}, [generation, addStopHandler, client, processStream, updateGeneration]);
-
-	useEffect(() => {}, []);
+		client
+			.startContentGeneration({ generation })
+			.then(({ generation: runningGeneration }) => {
+				onStart?.(runningGeneration);
+				updateGeneration(runningGeneration);
+				processStream();
+			});
+	}, [generation, client, processStream, updateGeneration, onStart]);
 	return null;
 }
