@@ -18,8 +18,10 @@ export function batchWriter<T>({
 		try {
 			await process(items);
 		} catch (error) {
-			// Restore items to buffer on error
-			buf = items.concat(buf);
+			// Restore items to buffer on error only if preserveItems is false
+			if (!preserveItems) {
+				buf = items.concat(buf);
+			}
 			throw error;
 		}
 	};
@@ -28,7 +30,7 @@ export function batchWriter<T>({
 		if (buf.length === 0) return;
 
 		// Extract items to flush
-		const items = buf;
+		const items = [...buf];
 		if (!preserveItems) {
 			buf = [];
 		}
