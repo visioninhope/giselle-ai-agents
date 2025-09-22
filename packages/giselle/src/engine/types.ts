@@ -24,6 +24,19 @@ import type { TelemetrySettings } from "./telemetry";
 import type { UsageLimits } from "./usage-limits";
 import type { Vault } from "./vault";
 
+type WaitUntilTask<T = unknown> = Promise<T> | WaitUntilCallback<T>;
+type WaitUntilCallback<T = unknown> = () => T | Promise<T>;
+
+export type WaitUntil<T = unknown> = (task: WaitUntilTask<T>) => void;
+
+type GenerateContentArgs = {
+	context: GiselleEngineContext;
+	generation: RunningGeneration;
+};
+type GenerateContentProcess =
+	| { type: "self" }
+	| { type: "external"; process: (args: GenerateContentArgs) => Promise<void> };
+
 export interface GenerationCompleteCallbackFunctionArgs {
 	generation: CompletedGeneration;
 	inputMessages: ModelMessage[];
@@ -83,6 +96,8 @@ export interface GiselleEngineContext {
 		xTitle: string;
 	};
 	logger: GiselleLogger;
+	waitUntil: WaitUntil;
+	generateContentProcess: GenerateContentProcess;
 }
 
 interface GitHubInstalltionAppAuthResolver {
@@ -168,4 +183,5 @@ export interface GiselleEngineConfig {
 		xTitle: string;
 	};
 	logger?: GiselleLogger;
+	waitUntil?: WaitUntil;
 }
