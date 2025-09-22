@@ -618,34 +618,35 @@ export async function deleteDocumentVectorStore(
 
 	try {
 		const team = await fetchCurrentTeam();
-		const [documentVectorStore] = await db
-			.select({ dbId: documentVectorStores.dbId })
-			.from(documentVectorStores)
-			.where(
-				and(
-					eq(documentVectorStores.id, documentVectorStoreId),
-					eq(documentVectorStores.teamDbId, team.dbId),
-				),
-			)
-			.limit(1);
+		const deleted = await db.transaction(async (tx) => {
+			const [store] = await tx
+				.select({ dbId: documentVectorStores.dbId })
+				.from(documentVectorStores)
+				.where(
+					and(
+						eq(documentVectorStores.id, documentVectorStoreId),
+						eq(documentVectorStores.teamDbId, team.dbId),
+					),
+				)
+				.for("update")
+				.limit(1);
 
-		if (!documentVectorStore) {
-			return { success: false, error: "Vector store not found" };
-		}
+			if (!store) return false;
 
-		await db.transaction(async (tx) => {
 			await tx
 				.delete(documentEmbeddingProfiles)
 				.where(
-					eq(
-						documentEmbeddingProfiles.documentVectorStoreDbId,
-						documentVectorStore.dbId,
-					),
+					eq(documentEmbeddingProfiles.documentVectorStoreDbId, store.dbId),
 				);
 			await tx
 				.delete(documentVectorStores)
-				.where(eq(documentVectorStores.dbId, documentVectorStore.dbId));
+				.where(eq(documentVectorStores.dbId, store.dbId));
+			return true;
 		});
+
+		if (!deleted) {
+			return { success: false, error: "Vector store not found" };
+		}
 
 		revalidatePath("/settings/team/vector-stores/document");
 		return { success: true };
