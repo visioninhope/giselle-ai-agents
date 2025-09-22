@@ -23,6 +23,18 @@ export async function getGenerationMessageChunkss({
 			},
 		};
 	}
+	const contentLength = await context.experimental_storage.contentLength(
+		generationUiMessageChunksPath(generationId),
+	);
+	if (startByte === contentLength) {
+		return {
+			messageChunks: [],
+			range: {
+				startByte,
+				endByte: startByte,
+			},
+		};
+	}
 	const messageChunks = await context.experimental_storage.getBlob(
 		generationUiMessageChunksPath(generationId),
 		{

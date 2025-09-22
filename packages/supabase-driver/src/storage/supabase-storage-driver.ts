@@ -152,5 +152,12 @@ export function supabaseStorageDriver(
 				throw err;
 			}
 		},
+
+		async contentLength(path: string): Promise<number> {
+			const response = await client.send(
+				new HeadObjectCommand({ Bucket: config.bucket, Key: path }),
+			);
+			return response.ContentLength ?? 0;
+		},
 	};
 }

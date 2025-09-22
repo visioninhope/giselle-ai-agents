@@ -40,4 +40,5 @@ export interface GiselleStorage {
 	copy: Copy;
 	remove: Remove;
 	exists: Exists;
+	contentLength: (path: string) => Promise<number>;
 }

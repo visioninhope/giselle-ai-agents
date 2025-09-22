@@ -133,5 +133,11 @@ export function fsStorageDriver(config: FsStorageDriverConfig): GiselleStorage {
 				return false;
 			}
 		},
+
+		async contentLength(path: string): Promise<number> {
+			const fullPath = join(config.root, path);
+			const stats = await fs.stat(fullPath);
+			return stats.size;
+		},
 	};
 }
