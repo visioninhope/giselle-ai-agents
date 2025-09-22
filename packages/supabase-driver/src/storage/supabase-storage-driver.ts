@@ -89,6 +89,8 @@ export function supabaseStorageDriver(
 			const command = new GetObjectCommand({
 				Bucket: config.bucket,
 				Key: path,
+				ResponseCacheControl: "no-cache, no-store, must-revalidate",
+				ResponseExpires: new Date(0),
 				...(options?.range && {
 					Range: `bytes=${options.range.start}-${options.range.end ?? ""}`,
 				}),
