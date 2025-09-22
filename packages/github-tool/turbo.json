@@ -10,6 +10,7 @@
 				"GITHUB_*",
 				"LANGFUSE_*",
 				"POSTGRES_*",
+				"REDIS_*",
 				"SIGNOZ_*",
 				"STRIPE_*",
 				"SMTP_*",
@@ -21,7 +22,7 @@
 				"SAMPLE_APP_WORKSPACE_IDS",
 				"INNGEST_*",
 				"OTEL_*",
-				"GOOGLE_OAUTH_CLIENT_*",
+				"GOOGLE_*",
 				"WAITUNTIL_OFFSET_MILLIS",
 				"EDGE_CONFIG"
 			]
