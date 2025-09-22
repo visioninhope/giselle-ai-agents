@@ -15,7 +15,7 @@ export async function startContentGeneration({
 	generation: Generation;
 }) {
 	if (!isQueuedGeneration(generation)) {
-		throw new Error(`Generation ${generation.id} is already queued`);
+		throw new Error(`Generation ${generation.id} is not queued`);
 	}
 	const runningGeneration: RunningGeneration = {
 		...generation,
