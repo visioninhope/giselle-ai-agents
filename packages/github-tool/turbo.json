@@ -10,7 +10,7 @@
 				"GITHUB_*",
 				"LANGFUSE_*",
 				"POSTGRES_*",
-				"REDIS_*",
+				"REDIS_URL",
 				"SIGNOZ_*",
 				"STRIPE_*",
 				"SMTP_*",
