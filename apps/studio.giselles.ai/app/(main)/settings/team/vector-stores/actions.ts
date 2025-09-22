@@ -33,7 +33,11 @@ import type {
 import { fetchCurrentUser, getGitHubIdentityState } from "@/services/accounts";
 import { buildAppInstallationClient } from "@/services/external/github";
 import { fetchCurrentTeam } from "@/services/teams";
-import type { ActionResult, DiagnosticResult } from "./types";
+import type {
+	ActionResult,
+	DiagnosticResult,
+	DocumentVectorStoreUpdateInput,
+} from "./types";
 
 type IngestabilityCheck = {
 	canIngest: boolean;
@@ -534,6 +538,34 @@ export async function triggerManualIngest(
 	}
 }
 
+function validateDocumentEmbeddingProfileIds(
+	embeddingProfileIds: number[],
+):
+	| { success: true; profileIds: EmbeddingProfileId[] }
+	| { success: false; error: string } {
+	if (!Array.isArray(embeddingProfileIds) || embeddingProfileIds.length === 0) {
+		return { success: false, error: "Select at least one embedding profile" };
+	}
+
+	const uniqueIds = new Set<EmbeddingProfileId>();
+
+	for (const id of embeddingProfileIds) {
+		if (!isEmbeddingProfileId(id)) {
+			return { success: false, error: `Invalid embedding profile id: ${id}` };
+		}
+		const profile = EMBEDDING_PROFILES[id];
+		if (profile.provider !== "cohere") {
+			return {
+				success: false,
+				error: "Only Cohere profiles are supported for Document Vector Stores",
+			};
+		}
+		uniqueIds.add(id);
+	}
+
+	return { success: true, profileIds: Array.from(uniqueIds) };
+}
+
 export async function createDocumentVectorStore(
 	name: string,
 	embeddingProfileIds: number[],
@@ -546,25 +578,12 @@ export async function createDocumentVectorStore(
 	if (trimmedName.length === 0) {
 		return { success: false, error: "Name is required" };
 	}
-	// Validate provided embedding profiles: non-empty and Cohere-only
-	if (!Array.isArray(embeddingProfileIds) || embeddingProfileIds.length === 0) {
-		return { success: false, error: "Select at least one embedding profile" };
+	const validationResult =
+		validateDocumentEmbeddingProfileIds(embeddingProfileIds);
+	if (!validationResult.success) {
+		return { success: false, error: validationResult.error };
 	}
-	for (const id of embeddingProfileIds) {
-		if (!isEmbeddingProfileId(id)) {
-			return { success: false, error: `Invalid embedding profile id: ${id}` };
-		}
-		const p = EMBEDDING_PROFILES[id];
-		if (p.provider !== "cohere") {
-			return {
-				success: false,
-				error: "Only Cohere profiles are supported for Document Vector Stores",
-			};
-		}
-	}
-	const profileIds = Array.from(
-		new Set(embeddingProfileIds),
-	) as EmbeddingProfileId[];
+	const { profileIds } = validationResult;
 	try {
 		const team = await fetchCurrentTeam();
 		const documentVectorStoreId = `dvs_${createId()}` as DocumentVectorStoreId;
@@ -604,6 +623,87 @@ export async function createDocumentVectorStore(
 		return {
 			success: false,
 			error: "Failed to create vector store. Please try again.",
+		};
+	}
+}
+
+export async function updateDocumentVectorStore(
+	documentVectorStoreId: DocumentVectorStoreId,
+	input: DocumentVectorStoreUpdateInput,
+): Promise<ActionResult> {
+	const enabled = await docVectorStoreFlag();
+	if (!enabled) {
+		return { success: false, error: "Feature disabled" };
+	}
+
+	const trimmedName = input.name.trim();
+	if (trimmedName.length === 0) {
+		return { success: false, error: "Name is required" };
+	}
+
+	const validationResult = validateDocumentEmbeddingProfileIds(
+		input.embeddingProfileIds,
+	);
+	if (!validationResult.success) {
+		return { success: false, error: validationResult.error };
+	}
+	const { profileIds } = validationResult;
+
+	try {
+		const team = await fetchCurrentTeam();
+		const updated = await db.transaction(async (tx) => {
+			const [store] = await tx
+				.select({ dbId: documentVectorStores.dbId })
+				.from(documentVectorStores)
+				.where(
+					and(
+						eq(documentVectorStores.id, documentVectorStoreId),
+						eq(documentVectorStores.teamDbId, team.dbId),
+					),
+				)
+				.for("update")
+				.limit(1);
+
+			if (!store) {
+				return false;
+			}
+
+			await tx
+				.update(documentVectorStores)
+				.set({ name: trimmedName })
+				.where(eq(documentVectorStores.dbId, store.dbId));
+
+			await tx
+				.delete(documentEmbeddingProfiles)
+				.where(
+					eq(documentEmbeddingProfiles.documentVectorStoreDbId, store.dbId),
+				);
+
+			if (profileIds.length > 0) {
+				const now = new Date();
+				await tx.insert(documentEmbeddingProfiles).values(
+					profileIds.map((profileId) => ({
+						documentVectorStoreDbId: store.dbId,
+						embeddingProfileId: profileId,
+						createdAt: now,
+					})),
+				);
+			}
+
+			return true;
+		});
+
+		if (!updated) {
+			return { success: false, error: "Vector store not found" };
+		}
+
+		revalidatePath("/settings/team/vector-stores/document");
+		return { success: true };
+	} catch (error) {
+		console.error("Failed to update document vector store:", error);
+		return {
+			success: false,
+			error: "Failed to update vector store. Please try again.",
 		};
 	}
 }

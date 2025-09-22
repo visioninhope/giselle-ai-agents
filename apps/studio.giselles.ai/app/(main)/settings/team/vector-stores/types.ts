@@ -24,6 +24,11 @@ export type ActionResult =
 	| { success: true }
 	| { success: false; error: string };
 
+export type DocumentVectorStoreUpdateInput = {
+	name: string;
+	embeddingProfileIds: number[];
+};
+
 export type DiagnosticResult =
 	| {
 			canBeFixed: true;
