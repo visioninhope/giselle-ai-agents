@@ -4,7 +4,9 @@ import type {
 	QueryNode,
 	TextGenerationNode,
 	TextNode,
+	TriggerNode,
 	VariableNode,
+	WebPageNode,
 } from "@giselle-sdk/data-type";
 import { useWorkflowDesigner } from "@giselle-sdk/giselle/react";
 import { useMemo } from "react";
@@ -22,6 +24,7 @@ export function useConnectedSources(node: ImageGenerationNode) {
 			[];
 		const connectedVariableSources: ConnectedSource<VariableNode>[] = [];
 		const connectedQuerySources: ConnectedSource<QueryNode>[] = [];
+		const connectedTriggerSources: ConnectedSource<TriggerNode>[] = [];
 		for (const connection of connectionsToThisNode) {
 			const node = data.nodes.find(
 				(node) => node.id === connection.outputNode.id,
@@ -53,6 +56,13 @@ export function useConnectedSources(node: ImageGenerationNode) {
 								connection,
 							});
 							break;
+						case "trigger":
+							connectedTriggerSources.push({
+								output,
+								node: node as TriggerNode,
+								connection,
+							});
+							break;
 						case "imageGeneration":
 							connectedGeneratedImageSources.push({
 								output,
@@ -61,7 +71,6 @@ export function useConnectedSources(node: ImageGenerationNode) {
 							});
 							break;
 						case "action":
-						case "trigger":
 							throw new Error("not implemented");
 						default: {
 							const _exhaustiveCheck: never = node.content.type;
@@ -85,9 +94,14 @@ export function useConnectedSources(node: ImageGenerationNode) {
 								connection,
 							});
 							break;
-
-						case "vectorStore":
 						case "webPage":
+							connectedVariableSources.push({
+								output,
+								node: node as WebPageNode,
+								connection,
+							});
+							break;
+						case "vectorStore":
 						case "github":
 							throw new Error("vectore store can not be connected");
 						default: {
@@ -109,11 +123,13 @@ export function useConnectedSources(node: ImageGenerationNode) {
 				...connectedVariableSources,
 				...connectedQuerySources,
 				...connectedGeneratedImageSources,
+				...connectedTriggerSources,
 			],
 			generationText: connectedGeneratedTextSources,
 			generationImage: connectedGeneratedImageSources,
 			variable: connectedVariableSources,
 			query: connectedQuerySources,
+			trigger: connectedTriggerSources,
 		};
 	}, [node.id, data.connections, data.nodes]);
 }
