@@ -25,6 +25,10 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+	DOCUMENT_VECTOR_STORE_MAX_FILE_SIZE_BYTES,
+	DOCUMENT_VECTOR_STORE_MAX_FILE_SIZE_LABEL,
+} from "@/lib/vector-stores/document/constants";
 import { useToast } from "@/packages/contexts/toast";
 import type { DocumentVectorStoreId } from "@/packages/types";
 import {
@@ -47,9 +51,6 @@ type DocumentVectorStoreItemProps = {
 		input: DocumentVectorStoreUpdateInput,
 	) => Promise<ActionResult>;
 };
-
-const MAX_UPLOAD_SIZE_BYTES = Math.floor(4.5 * 1024 * 1024);
-const MAX_UPLOAD_SIZE_LABEL = "4.5MB";
 
 function isPdfFile(file: File): boolean {
 	if (file.type === "application/pdf") {
@@ -264,9 +265,9 @@ function DocumentVectorStoreConfigureDialog({
 					errors.push(`${file.name} is empty and cannot be uploaded.`);
 					continue;
 				}
-				if (file.size > MAX_UPLOAD_SIZE_BYTES) {
+				if (file.size > DOCUMENT_VECTOR_STORE_MAX_FILE_SIZE_BYTES) {
 					errors.push(
-						`${file.name} exceeds the ${MAX_UPLOAD_SIZE_LABEL} limit.`,
+						`${file.name} exceeds the ${DOCUMENT_VECTOR_STORE_MAX_FILE_SIZE_LABEL} limit.`,
 					);
 					continue;
 				}
@@ -480,8 +481,9 @@ function DocumentVectorStoreConfigureDialog({
 								Source Files
 							</div>
 							<div className="text-white-400/60 text-[12px]">
-								Upload PDF files (maximum {MAX_UPLOAD_SIZE_LABEL} each) to
-								include in this vector store.
+								Upload PDF files (maximum{" "}
+								{DOCUMENT_VECTOR_STORE_MAX_FILE_SIZE_LABEL} each) to include in
+								this vector store.
 							</div>
 							<button
 								type="button"
@@ -498,7 +500,7 @@ function DocumentVectorStoreConfigureDialog({
 									Drop PDF files here to upload.
 								</p>
 								<p className="text-xs text-black-300">
-									Maximum {MAX_UPLOAD_SIZE_LABEL} per file.
+									Maximum {DOCUMENT_VECTOR_STORE_MAX_FILE_SIZE_LABEL} per file.
 								</p>
 								<span className="text-sm font-semibold text-white-400 underline">
 									Select files

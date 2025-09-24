@@ -8,6 +8,10 @@ import { NextResponse } from "next/server";
 
 import { db, documentVectorStores } from "@/drizzle";
 import { docVectorStoreFlag } from "@/flags";
+import {
+	DOCUMENT_VECTOR_STORE_MAX_FILE_SIZE_BYTES,
+	DOCUMENT_VECTOR_STORE_MAX_FILE_SIZE_MB,
+} from "@/lib/vector-stores/document/constants";
 import type { DocumentVectorStoreId } from "@/packages/types";
 import { fetchCurrentTeam } from "@/services/teams";
 
@@ -18,8 +22,6 @@ const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY;
 const STORAGE_BUCKET =
 	process.env.DOCUMENT_VECTOR_STORE_STORAGE_BUCKET ?? "app";
 const STORAGE_PREFIX = "vector-stores";
-const MAX_FILE_SIZE_MB = 4.5;
-const MAX_FILE_SIZE_BYTES = Math.floor(MAX_FILE_SIZE_MB * 1024 * 1024);
 
 if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) {
 	throw new Error(
@@ -137,10 +139,10 @@ export async function POST(
 			);
 		}
 
-		if (file.size > MAX_FILE_SIZE_BYTES) {
+		if (file.size > DOCUMENT_VECTOR_STORE_MAX_FILE_SIZE_BYTES) {
 			return NextResponse.json(
 				{
-					error: `${file.name} exceeds the ${MAX_FILE_SIZE_MB.toFixed(1)}MB limit`,
+					error: `${file.name} exceeds the ${DOCUMENT_VECTOR_STORE_MAX_FILE_SIZE_MB.toFixed(1)}MB limit`,
 				},
 				{ status: 413 },
 			);
