@@ -23,34 +23,18 @@
 		color: var(--color-text-inverse, var(--color-white, #fff)) !important;
 	}
 
-	/* Opacity variants for text-inverse */
-	.text-inverse\/20 {
-		color: color-mix(
-			in srgb,
-			var(--color-text-inverse, var(--color-white, #fff)) 20%,
-			transparent
-		) !important;
+	/* Focus and active variants (limited set for migration) */
+	.focus\:text-text:focus {
+		color: var(--color-text) !important;
 	}
-	.text-inverse\/40 {
-		color: color-mix(
-			in srgb,
-			var(--color-text-inverse, var(--color-white, #fff)) 40%,
-			transparent
-		) !important;
+	.focus\:text-inverse:focus {
+		color: var(--color-text-inverse, var(--color-white, #fff)) !important;
 	}
-	.text-inverse\/60 {
-		color: color-mix(
-			in srgb,
-			var(--color-text-inverse, var(--color-white, #fff)) 60%,
-			transparent
-		) !important;
+	.active\:text-text:active {
+		color: var(--color-text) !important;
 	}
-	.text-inverse\/80 {
-		color: color-mix(
-			in srgb,
-			var(--color-text-inverse, var(--color-white, #fff)) 80%,
-			transparent
-		) !important;
+	.active\:text-inverse:active {
+		color: var(--color-text-inverse, var(--color-white, #fff)) !important;
 	}
 
 	/* Hover opacity variants (limited set for migration) */
@@ -120,15 +104,6 @@
 	.bg-bg {
 		background-color: var(--color-bg, var(--color-background)) !important;
 	}
-	.hover\:bg-surface:hover {
-		background-color: var(
-			--color-surface,
-			var(--color-surface-background, var(--color-background))
-		) !important;
-	}
-	.hover\:bg-bg:hover {
-		background-color: var(--color-bg, var(--color-background)) !important;
-	}
 
 	/* Borders */
 	.border-border {
@@ -167,11 +142,5 @@
 			--color-border,
 			var(--color-border-variant, var(--color-dark-border))
 		) !important;
-	}
-	.fill-inverse {
-		fill: var(--color-text-inverse, var(--color-white, #fff)) !important;
-	}
-	.stroke-inverse {
-		stroke: var(--color-text-inverse, var(--color-white, #fff)) !important;
 	}
 }
