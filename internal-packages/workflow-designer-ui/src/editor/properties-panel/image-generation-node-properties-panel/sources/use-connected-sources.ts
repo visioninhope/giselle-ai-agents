@@ -1,4 +1,5 @@
 import type {
+	ActionNode,
 	FileNode,
 	ImageGenerationNode,
 	QueryNode,
@@ -25,6 +26,7 @@ export function useConnectedSources(node: ImageGenerationNode) {
 		const connectedVariableSources: ConnectedSource<VariableNode>[] = [];
 		const connectedQuerySources: ConnectedSource<QueryNode>[] = [];
 		const connectedTriggerSources: ConnectedSource<TriggerNode>[] = [];
+		const connectedActionSources: ConnectedSource<ActionNode>[] = [];
 		for (const connection of connectionsToThisNode) {
 			const node = data.nodes.find(
 				(node) => node.id === connection.outputNode.id,
@@ -71,7 +73,12 @@ export function useConnectedSources(node: ImageGenerationNode) {
 							});
 							break;
 						case "action":
-							throw new Error("not implemented");
+							connectedActionSources.push({
+								output,
+								node: node as ActionNode,
+								connection,
+							});
+							break;
 						default: {
 							const _exhaustiveCheck: never = node.content.type;
 							throw new Error(`Unhandled node type: ${_exhaustiveCheck}`);
@@ -124,12 +131,14 @@ export function useConnectedSources(node: ImageGenerationNode) {
 				...connectedQuerySources,
 				...connectedGeneratedImageSources,
 				...connectedTriggerSources,
+				...connectedActionSources,
 			],
 			generationText: connectedGeneratedTextSources,
 			generationImage: connectedGeneratedImageSources,
 			variable: connectedVariableSources,
 			query: connectedQuerySources,
 			trigger: connectedTriggerSources,
+			action: connectedActionSources,
 		};
 	}, [node.id, data.connections, data.nodes]);
 }

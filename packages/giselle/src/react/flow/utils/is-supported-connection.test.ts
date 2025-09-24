@@ -311,47 +311,6 @@ describe("isSupportedConnection", () => {
 			const result = isSupportedConnection(outputNode, inputNode);
 			expect(result.canConnect).toBe(true);
 		});
-		test("should reject WebPageNode as input", () => {
-			const outputNode = createWebPageNode(NodeId.generate());
-			const inputNode = createImageGenerationNode(NodeId.generate());
-
-			const result = isSupportedConnection(outputNode, inputNode);
-
-			expect(result.canConnect).toBe(false);
-			if (!result.canConnect) {
-				expect(result.message).toBe(
-					"Web page node is not supported as an input for this node",
-				);
-			}
-		});
-
-		test("should reject TriggerNode as input", () => {
-			const outputNode = createTriggerNode(NodeId.generate());
-			const inputNode = createImageGenerationNode(NodeId.generate());
-
-			const result = isSupportedConnection(outputNode, inputNode);
-
-			expect(result.canConnect).toBe(false);
-			if (!result.canConnect) {
-				expect(result.message).toBe(
-					"Trigger node is not supported as an input for this node",
-				);
-			}
-		});
-
-		test("should reject ActionNode as input", () => {
-			const outputNode = createActionNode(NodeId.generate());
-			const inputNode = createImageGenerationNode(NodeId.generate());
-
-			const result = isSupportedConnection(outputNode, inputNode);
-
-			expect(result.canConnect).toBe(false);
-			if (!result.canConnect) {
-				expect(result.message).toBe(
-					"Action node is not supported as an input for this node",
-				);
-			}
-		});
 
 		test("should reject GitHubNode as input", () => {
 			const outputNode = createGitHubNode(NodeId.generate());

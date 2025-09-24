@@ -560,7 +560,6 @@ async function buildGenerationMessageForImageGeneration(
 						);
 
 						attachedFiles.push(...fileContents);
-						// attachedFileNodeIds.push(contextNode.id);
 						break;
 					default: {
 						const _exhaustiveCheck: never = llmProvider;
@@ -568,16 +567,9 @@ async function buildGenerationMessageForImageGeneration(
 					}
 				}
 				break;
-
-				// userMessage = userMessage.replace(
-				// 	replaceKeyword,
-				// 	getFilesDescription(attachedFiles.length, fileContents.length),
-				// );
-
-				// attachedFiles.push(...fileContents);
-				// break;
 			}
 
+			case "action":
 			case "trigger":
 			case "query": {
 				const result = await textGenerationResolver(
@@ -608,9 +600,6 @@ async function buildGenerationMessageForImageGeneration(
 			}
 
 			case "github":
-			case "trigger":
-			case "imageGeneration":
-			case "action":
 			case "vectorStore":
 				throw new Error("Not implemented");
 
@@ -624,7 +613,6 @@ async function buildGenerationMessageForImageGeneration(
 		{
 			role: "user",
 			content: [
-				...attachedFiles,
 				{
 					type: "text",
 					text: userMessage,
