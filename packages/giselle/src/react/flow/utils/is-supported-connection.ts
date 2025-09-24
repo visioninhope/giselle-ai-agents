@@ -3,9 +3,7 @@ import {
 	isImageGenerationNode,
 	isQueryNode,
 	isTextGenerationNode,
-	isTriggerNode,
 	isVectorStoreNode,
-	isWebPageNode,
 	type NodeLike,
 } from "@giselle-sdk/data-type";
 import {

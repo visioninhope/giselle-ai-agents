@@ -11,7 +11,7 @@ import type {
 	VariableNode,
 	VectorStoreNode,
 } from "@giselle-sdk/data-type";
-import { NodeId, OutputId } from "@giselle-sdk/data-type";
+import { NodeId } from "@giselle-sdk/data-type";
 import {
 	anthropicLanguageModels,
 	falLanguageModels,
@@ -112,23 +112,6 @@ describe("isSupportedConnection", () => {
 		content: {
 			type: "vectorStore",
 			source: { provider: "github", state: { status: "unconfigured" } },
-		},
-	});
-
-	const createWebPageNode = (id: NodeId): VariableNode => ({
-		id,
-		type: "variable",
-		inputs: [],
-		outputs: [
-			{
-				id: OutputId.generate(),
-				label: "Output",
-				accessor: "web-page",
-			},
-		],
-		content: {
-			type: "webPage",
-			webpages: [],
 		},
 	});
 
