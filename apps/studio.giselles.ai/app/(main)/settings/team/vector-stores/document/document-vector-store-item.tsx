@@ -342,7 +342,7 @@ function DocumentVectorStoreConfigureDialog({
 	}, []);
 
 	const handleDragOver = useCallback(
-		(event: React.DragEvent<HTMLDivElement>) => {
+		(event: React.DragEvent<HTMLButtonElement>) => {
 			event.preventDefault();
 			setIsDragActive(true);
 		},
@@ -350,7 +350,7 @@ function DocumentVectorStoreConfigureDialog({
 	);
 
 	const handleDragLeave = useCallback(
-		(event: React.DragEvent<HTMLDivElement>) => {
+		(event: React.DragEvent<HTMLButtonElement>) => {
 			event.preventDefault();
 			setIsDragActive(false);
 		},
@@ -358,7 +358,7 @@ function DocumentVectorStoreConfigureDialog({
 	);
 
 	const handleDrop = useCallback(
-		(event: React.DragEvent<HTMLDivElement>) => {
+		(event: React.DragEvent<HTMLButtonElement>) => {
 			event.preventDefault();
 			setIsDragActive(false);
 			if (event.dataTransfer.files?.length) {
