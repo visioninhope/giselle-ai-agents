@@ -23,6 +23,78 @@
 		color: var(--color-text-inverse, var(--color-white, #fff)) !important;
 	}
 
+	/* Opacity variants for text-inverse */
+	.text-inverse\/20 {
+		color: color-mix(
+			in srgb,
+			var(--color-text-inverse, var(--color-white, #fff)) 20%,
+			transparent
+		) !important;
+	}
+	.text-inverse\/40 {
+		color: color-mix(
+			in srgb,
+			var(--color-text-inverse, var(--color-white, #fff)) 40%,
+			transparent
+		) !important;
+	}
+	.text-inverse\/60 {
+		color: color-mix(
+			in srgb,
+			var(--color-text-inverse, var(--color-white, #fff)) 60%,
+			transparent
+		) !important;
+	}
+	.text-inverse\/80 {
+		color: color-mix(
+			in srgb,
+			var(--color-text-inverse, var(--color-white, #fff)) 80%,
+			transparent
+		) !important;
+	}
+
+	/* Hover opacity variants (limited set for migration) */
+	.hover\:text-text\/20:hover {
+		color: color-mix(in srgb, var(--color-text) 20%, transparent) !important;
+	}
+	.hover\:text-text\/40:hover {
+		color: color-mix(in srgb, var(--color-text) 40%, transparent) !important;
+	}
+	.hover\:text-text\/60:hover {
+		color: color-mix(in srgb, var(--color-text) 60%, transparent) !important;
+	}
+	.hover\:text-text\/80:hover {
+		color: color-mix(in srgb, var(--color-text) 80%, transparent) !important;
+	}
+	.hover\:text-inverse\/20:hover {
+		color: color-mix(
+			in srgb,
+			var(--color-text-inverse, var(--color-white, #fff)) 20%,
+			transparent
+		) !important;
+	}
+	.hover\:text-inverse\/40:hover {
+		color: color-mix(
+			in srgb,
+			var(--color-text-inverse, var(--color-white, #fff)) 40%,
+			transparent
+		) !important;
+	}
+	.hover\:text-inverse\/60:hover {
+		color: color-mix(
+			in srgb,
+			var(--color-text-inverse, var(--color-white, #fff)) 60%,
+			transparent
+		) !important;
+	}
+	.hover\:text-inverse\/80:hover {
+		color: color-mix(
+			in srgb,
+			var(--color-text-inverse, var(--color-white, #fff)) 80%,
+			transparent
+		) !important;
+	}
+
 	/* Opacity variants for text-text */
 	.text-text\/20 {
 		color: color-mix(in srgb, var(--color-text) 20%, transparent) !important;
@@ -46,6 +118,15 @@
 		) !important;
 	}
 	.bg-bg {
+		background-color: var(--color-bg, var(--color-background)) !important;
+	}
+	.hover\:bg-surface:hover {
+		background-color: var(
+			--color-surface,
+			var(--color-surface-background, var(--color-background))
+		) !important;
+	}
+	.hover\:bg-bg:hover {
 		background-color: var(--color-bg, var(--color-background)) !important;
 	}
 
@@ -86,5 +167,11 @@
 			--color-border,
 			var(--color-border-variant, var(--color-dark-border))
 		) !important;
+	}
+	.fill-inverse {
+		fill: var(--color-text-inverse, var(--color-white, #fff)) !important;
+	}
+	.stroke-inverse {
+		stroke: var(--color-text-inverse, var(--color-white, #fff)) !important;
 	}
 }
