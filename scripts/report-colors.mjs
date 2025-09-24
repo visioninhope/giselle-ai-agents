@@ -49,29 +49,31 @@ function hasRg() {
  * @param {{ caseInsensitive?: boolean, svgOnly?: boolean }} opts
  * @returns {Finding[]}
  */
+// Shared constants to prevent duplication
+const EXCLUDE_GLOBS = [
+	"!**/node_modules/**",
+	"!**/.next/**",
+	"!**/dist/**",
+	"!**/build/**",
+	"!**/out/**",
+	"!**/coverage/**",
+];
+
+const INCLUDE_GLOBS_ALL = [
+	"**/*.css",
+	"**/*.scss",
+	"**/*.ts",
+	"**/*.tsx",
+	"**/*.js",
+	"**/*.jsx",
+	"**/*.md",
+	"**/*.mdx",
+	"**/*.svg",
+];
+
+const INCLUDE_GLOBS_SVG = ["**/*.svg"];
+
 function runRg(pattern, opts = {}) {
-	const excludeGlobs = [
-		"!**/node_modules/**",
-		"!**/.next/**",
-		"!**/dist/**",
-		"!**/build/**",
-		"!**/out/**",
-		"!**/coverage/**",
-	];
-
-	const includeGlobsAll = [
-		"**/*.css",
-		"**/*.scss",
-		"**/*.ts",
-		"**/*.tsx",
-		"**/*.js",
-		"**/*.jsx",
-		"**/*.md",
-		"**/*.mdx",
-		"**/*.svg",
-	];
-	const includeGlobsSvg = ["**/*.svg"];
-
 	const args = [
 		"-n", // show line numbers
 		"--json", // machine-readable
@@ -84,8 +86,8 @@ function runRg(pattern, opts = {}) {
 	}
 
 	// globs
-	const includeGlobs = opts.svgOnly ? includeGlobsSvg : includeGlobsAll;
-	for (const g of excludeGlobs) args.push("--glob", g);
+	const includeGlobs = opts.svgOnly ? INCLUDE_GLOBS_SVG : INCLUDE_GLOBS_ALL;
+	for (const g of EXCLUDE_GLOBS) args.push("--glob", g);
 	for (const g of includeGlobs) args.push("--glob", g);
 
 	// pattern
@@ -162,7 +164,7 @@ function buildReport(rootDir) {
 			"--(?:color|brand|text|bg|surface|border|ring|shadow)[-\\w]*\\s*:",
 
 		// SVG attributes (search *.svg only)
-		svgAttrs: "fill=|stroke=",
+		svgAttrs: "\\b(?:fill|stroke)\\s*=",
 	};
 
 	// Run searches
@@ -173,10 +175,14 @@ function buildReport(rootDir) {
 	const cssVariables = runRg(patterns.cssVariables, {});
 	const svgAttrs = runRg(patterns.svgAttrs, { svgOnly: true });
 
-	// Special items broken out
-	const textWhite900 = runRg("\\btext-white-900\\b", {});
-	const textBlack600_20 = runRg("\\btext-black-600/20\\b", {});
-	const colorBorderFocused = runRg("\\bcolor-border-focused\\b", {});
+	// Special items extracted from specific results to avoid redundant searches
+	const textWhite900 = specific.filter((f) => f.match === "text-white-900");
+	const textBlack600_20 = specific.filter(
+		(f) => f.match === "text-black-600/20",
+	);
+	const colorBorderFocused = specific.filter(
+		(f) => f.match === "color-border-focused",
+	);
 
 	// Summary
 	const breakdown = {
@@ -228,25 +234,8 @@ function buildReport(rootDir) {
 		rootDir,
 		options: {
 			caseInsensitive: true,
-			excludeGlobs: [
-				"!**/node_modules/**",
-				"!**/.next/**",
-				"!**/dist/**",
-				"!**/build/**",
-				"!**/out/**",
-				"!**/coverage/**",
-			],
-			includeGlobs: [
-				"**/*.css",
-				"**/*.scss",
-				"**/*.ts",
-				"**/*.tsx",
-				"**/*.js",
-				"**/*.jsx",
-				"**/*.md",
-				"**/*.mdx",
-				"**/*.svg",
-			],
+			excludeGlobs: EXCLUDE_GLOBS,
+			includeGlobs: INCLUDE_GLOBS_ALL,
 		},
 		patterns: {
 			tailwindUtilities: {
