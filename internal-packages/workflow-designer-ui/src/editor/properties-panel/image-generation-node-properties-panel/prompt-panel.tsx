@@ -21,6 +21,7 @@ export function PromptPanel({ node }: { node: ImageGenerationNode }) {
 
 	return (
 		<TextEditor
+			key={nodes.map((node) => node.id).join(":")}
 			value={node.content.prompt}
 			onValueChange={(value) => {
 				updateNodeDataContent(node, { prompt: value });
