@@ -15,6 +15,13 @@
 	.text-inverse {
 		color: var(--color-text-inverse, var(--color-white, #fff)) !important;
 	}
+	/* Hover variants (limited set for migration) */
+	.hover\:text-text:hover {
+		color: var(--color-text) !important;
+	}
+	.hover\:text-inverse:hover {
+		color: var(--color-text-inverse, var(--color-white, #fff)) !important;
+	}
 
 	/* Opacity variants for text-text */
 	.text-text\/20 {
