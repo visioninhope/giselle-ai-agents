@@ -29,6 +29,7 @@ import {
 	DOCUMENT_VECTOR_STORE_MAX_FILE_SIZE_BYTES,
 	DOCUMENT_VECTOR_STORE_MAX_FILE_SIZE_LABEL,
 } from "@/lib/vector-stores/document/constants";
+import { isPdfFile } from "@/lib/vector-stores/document/utils";
 import { useToast } from "@/packages/contexts/toast";
 import type { DocumentVectorStoreId } from "@/packages/types";
 import {
@@ -51,13 +52,6 @@ type DocumentVectorStoreItemProps = {
 		input: DocumentVectorStoreUpdateInput,
 	) => Promise<ActionResult>;
 };
-
-function isPdfFile(file: File): boolean {
-	if (file.type === "application/pdf") {
-		return true;
-	}
-	return file.name.toLowerCase().endsWith(".pdf");
-}
 
 export function DocumentVectorStoreItem({
 	store,

@@ -12,6 +12,7 @@ import {
 	DOCUMENT_VECTOR_STORE_MAX_FILE_SIZE_BYTES,
 	DOCUMENT_VECTOR_STORE_MAX_FILE_SIZE_MB,
 } from "@/lib/vector-stores/document/constants";
+import { isPdfFile } from "@/lib/vector-stores/document/utils";
 import type { DocumentVectorStoreId } from "@/packages/types";
 import { fetchCurrentTeam } from "@/services/teams";
 
@@ -63,13 +64,6 @@ async function verifyStoreAccess(
 		.limit(1);
 
 	return Boolean(store);
-}
-
-function isPdfFile(file: File) {
-	if (file.type === "application/pdf") {
-		return true;
-	}
-	return file.name.toLowerCase().endsWith(".pdf");
 }
 
 function sanitizePdfFileName(fileName: string): string {
