@@ -1,9 +1,23 @@
 "use client";
 
 import * as Dialog from "@radix-ui/react-dialog";
-import { MoreVertical, Settings, Trash } from "lucide-react";
+import {
+	ArrowUpFromLine,
+	Loader2,
+	MoreVertical,
+	Settings,
+	Trash,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useId, useMemo, useState, useTransition } from "react";
+import {
+	useCallback,
+	useEffect,
+	useId,
+	useMemo,
+	useRef,
+	useState,
+	useTransition,
+} from "react";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -33,6 +47,16 @@ type DocumentVectorStoreItemProps = {
 		input: DocumentVectorStoreUpdateInput,
 	) => Promise<ActionResult>;
 };
+
+const MAX_UPLOAD_SIZE_BYTES = Math.floor(4.5 * 1024 * 1024);
+const MAX_UPLOAD_SIZE_LABEL = "4.5MB";
+
+function isPdfFile(file: File): boolean {
+	if (file.type === "application/pdf") {
+		return true;
+	}
+	return file.name.toLowerCase().endsWith(".pdf");
+}
 
 export function DocumentVectorStoreItem({
 	store,
@@ -198,6 +222,10 @@ function DocumentVectorStoreConfigureDialog({
 	);
 	const [error, setError] = useState<string>("");
 	const [isPending, startTransition] = useTransition();
+	const [isUploadingDocuments, setIsUploadingDocuments] = useState(false);
+	const [isDragActive, setIsDragActive] = useState(false);
+	const [uploadMessage, setUploadMessage] = useState("");
+	const fileInputRef = useRef<HTMLInputElement>(null);
 
 	useEffect(() => {
 		onPendingChange(isPending);
@@ -214,7 +242,131 @@ function DocumentVectorStoreConfigureDialog({
 				? store.embeddingProfileIds
 				: defaultProfiles,
 		);
+		setUploadMessage("");
 	}, [open, store, defaultProfiles]);
+
+	const handleFilesUpload = useCallback(
+		async (fileList: FileList | File[]) => {
+			const filesArray = Array.from(fileList);
+			if (filesArray.length === 0) {
+				return;
+			}
+
+			const validFiles: File[] = [];
+			const errors: string[] = [];
+
+			for (const file of filesArray) {
+				if (!isPdfFile(file)) {
+					errors.push(`${file.name} is not a PDF file.`);
+					continue;
+				}
+				if (file.size === 0) {
+					errors.push(`${file.name} is empty and cannot be uploaded.`);
+					continue;
+				}
+				if (file.size > MAX_UPLOAD_SIZE_BYTES) {
+					errors.push(
+						`${file.name} exceeds the ${MAX_UPLOAD_SIZE_LABEL} limit.`,
+					);
+					continue;
+				}
+				validFiles.push(file);
+			}
+
+			if (errors.length > 0) {
+				showErrorToast(errors[0]);
+			}
+
+			if (validFiles.length === 0) {
+				return;
+			}
+
+			const formData = new FormData();
+			validFiles.forEach((file) => {
+				formData.append("files", file);
+			});
+
+			setIsUploadingDocuments(true);
+
+			try {
+				const response = await fetch(
+					`/api/vector-stores/document/${store.id}/documents`,
+					{
+						method: "POST",
+						body: formData,
+					},
+				);
+				const payload = (await response.json().catch(() => null)) as
+					| { error?: string }
+					| { success: true }
+					| null;
+				if (!response.ok || (payload && "error" in payload && payload.error)) {
+					const message =
+						payload && "error" in payload && payload.error
+							? payload.error
+							: "Failed to upload files";
+					throw new Error(message);
+				}
+				const uploadedCount = validFiles.length;
+				setUploadMessage(
+					uploadedCount === 1
+						? `${validFiles[0].name} uploaded successfully.`
+						: `${uploadedCount} files uploaded successfully.`,
+				);
+			} catch (uploadError) {
+				const message =
+					uploadError instanceof Error
+						? uploadError.message
+						: "Failed to upload files";
+				showErrorToast(message);
+				setUploadMessage("");
+			} finally {
+				setIsUploadingDocuments(false);
+			}
+		},
+		[showErrorToast, store.id],
+	);
+
+	const handleFileInputChange = useCallback(
+		(event: React.ChangeEvent<HTMLInputElement>) => {
+			if (event.target.files?.length) {
+				void handleFilesUpload(event.target.files);
+				event.target.value = "";
+			}
+		},
+		[handleFilesUpload],
+	);
+
+	const handleSelectFiles = useCallback(() => {
+		fileInputRef.current?.click();
+	}, []);
+
+	const handleDragOver = useCallback(
+		(event: React.DragEvent<HTMLDivElement>) => {
+			event.preventDefault();
+			setIsDragActive(true);
+		},
+		[],
+	);
+
+	const handleDragLeave = useCallback(
+		(event: React.DragEvent<HTMLDivElement>) => {
+			event.preventDefault();
+			setIsDragActive(false);
+		},
+		[],
+	);
+
+	const handleDrop = useCallback(
+		(event: React.DragEvent<HTMLDivElement>) => {
+			event.preventDefault();
+			setIsDragActive(false);
+			if (event.dataTransfer.files?.length) {
+				void handleFilesUpload(event.dataTransfer.files);
+			}
+		},
+		[handleFilesUpload],
+	);
 
 	const toggleProfile = (profileId: number) => {
 		setSelectedProfiles((prev) => {
@@ -261,7 +413,7 @@ function DocumentVectorStoreConfigureDialog({
 			<GlassDialogContent>
 				<GlassDialogHeader
 					title="Configure Sources"
-					description="Update the name and embedding models for this vector store."
+					description="Update the name, embedding models, and source files for this vector store."
 					onClose={() => onOpenChange(false)}
 				/>
 				<GlassDialogBody>
@@ -321,6 +473,54 @@ function DocumentVectorStoreConfigureDialog({
 									);
 								})}
 							</div>
+						</div>
+
+						<div className="space-y-3">
+							<div className="text-white-400 text-[16px] font-medium">
+								Source Files
+							</div>
+							<div className="text-white-400/60 text-[12px]">
+								Upload PDF files (maximum {MAX_UPLOAD_SIZE_LABEL} each) to
+								include in this vector store.
+							</div>
+							<button
+								type="button"
+								aria-label="Upload PDF files"
+								onClick={handleSelectFiles}
+								onDragOver={handleDragOver}
+								onDragLeave={handleDragLeave}
+								onDrop={handleDrop}
+								disabled={isUploadingDocuments}
+								className={`flex flex-col items-center gap-3 rounded-xl border border-dashed border-white/10 bg-black-950/20 px-6 py-8 text-center transition-colors focus:outline-none focus:ring-2 focus:ring-white/30 ${isDragActive ? "border-white/30 bg-white/5" : ""} ${isUploadingDocuments ? "opacity-60" : ""}`}
+							>
+								<ArrowUpFromLine className="h-8 w-8 text-black-300" />
+								<p className="text-white-400 text-sm">
+									Drop PDF files here to upload.
+								</p>
+								<p className="text-xs text-black-300">
+									Maximum {MAX_UPLOAD_SIZE_LABEL} per file.
+								</p>
+								<span className="text-sm font-semibold text-white-400 underline">
+									Select files
+								</span>
+								{isUploadingDocuments ? (
+									<div className="flex items-center gap-2 text-xs text-black-300">
+										<Loader2 className="h-3 w-3 animate-spin" />
+										Uploading...
+									</div>
+								) : null}
+							</button>
+							<input
+								ref={fileInputRef}
+								type="file"
+								accept="application/pdf,.pdf"
+								multiple
+								className="hidden"
+								onChange={handleFileInputChange}
+							/>
+							{uploadMessage ? (
+								<p className="text-xs text-black-300">{uploadMessage}</p>
+							) : null}
 						</div>
 
 						{error ? <p className="text-error-900 text-sm">{error}</p> : null}
