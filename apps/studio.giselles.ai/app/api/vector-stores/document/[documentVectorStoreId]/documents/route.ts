@@ -147,7 +147,11 @@ export async function POST(
 				{ status: 413 },
 			);
 		}
+	}
 
+	const uploadedKeys: string[] = [];
+
+	for (const file of files) {
 		const sanitizedFileName = sanitizePdfFileName(file.name);
 		const storageKey = buildStorageKey(
 			documentVectorStoreId,
@@ -164,11 +168,16 @@ export async function POST(
 			});
 
 		if (error) {
+			if (uploadedKeys.length > 0) {
+				await supabase.storage.from(STORAGE_BUCKET).remove(uploadedKeys);
+			}
 			return NextResponse.json(
 				{ error: `Failed to upload ${file.name}` },
 				{ status: 500 },
 			);
 		}
+
+		uploadedKeys.push(storageKey);
 	}
 
 	return NextResponse.json({ success: true });
