@@ -3,6 +3,7 @@ import { Buffer } from "node:buffer";
 import { createId } from "@paralleldrive/cuid2";
 import { createClient } from "@supabase/supabase-js";
 import { and, eq } from "drizzle-orm";
+import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
 import { db, documentVectorStores } from "@/drizzle";
@@ -88,8 +89,8 @@ function buildStorageKey(
 }
 
 export async function POST(
-	request: Request,
-	context: { params: { documentVectorStoreId: string } },
+	request: NextRequest,
+	{ params }: { params: Promise<{ documentVectorStoreId: string }> },
 ) {
 	const featureGuard = await ensureFeatureEnabled();
 	if (featureGuard) {
@@ -110,8 +111,9 @@ export async function POST(
 		return NextResponse.json({ error: "No files provided" }, { status: 400 });
 	}
 
-	const documentVectorStoreId = context.params
-		.documentVectorStoreId as DocumentVectorStoreId;
+	const { documentVectorStoreId: documentVectorStoreIdParam } = await params;
+	const documentVectorStoreId =
+		documentVectorStoreIdParam as DocumentVectorStoreId;
 	const hasAccess = await verifyStoreAccess(documentVectorStoreId, team.dbId);
 	if (!hasAccess) {
 		return NextResponse.json(
