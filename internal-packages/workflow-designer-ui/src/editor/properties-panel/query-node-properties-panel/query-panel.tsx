@@ -82,9 +82,11 @@ export function QueryPanel({ node }: { node: QueryNode }) {
 		<div className="flex flex-col h-full gap-4">
 			<div className="flex-1 min-h-0">
 				<TextEditor
-					key={connectedInputsWithoutDatasource
-						.map((connectedInput) => connectedInput.node.id)
-						.join(":")}
+					key={JSON.stringify(
+						connectedInputsWithoutDatasource.map(
+							(connectedInput) => connectedInput.node.id,
+						),
+					)}
 					placeholder="Write your query here..."
 					value={node.content.query}
 					onValueChange={(value) => {

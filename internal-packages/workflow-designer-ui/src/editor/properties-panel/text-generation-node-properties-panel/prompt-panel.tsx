@@ -17,9 +17,9 @@ export function PromptPanel({ node }: { node: TextGenerationNode }) {
 
 	return (
 		<TextEditor
-			key={connectedSources
-				.map((connectedSource) => connectedSource.id)
-				.join(":")}
+			key={JSON.stringify(
+				connectedSources.map((connectedSource) => connectedSource.node.id),
+			)}
 			placeholder="Write your prompt here..."
 			value={node.content.prompt}
 			onValueChange={(value) => {
