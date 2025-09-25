@@ -200,6 +200,7 @@ type DocumentUploadResponse = {
 	failures: Array<{
 		fileName: string;
 		error: string;
+		code?: string;
 	}>;
 };
 

@@ -179,7 +179,17 @@ export async function POST(
 		sourceId: DocumentVectorStoreSourceId;
 		storageKey: string;
 	}> = [];
-	const failures: Array<{ fileName: string; error: string }> = [];
+	const failures: Array<{
+		fileName: string;
+		error: string;
+		code:
+			| "not-pdf"
+			| "empty"
+			| "oversize"
+			| "read-error"
+			| "upload-error"
+			| "metadata-error";
+	}> = [];
 
 	for (const file of files) {
 		const sanitizedFileName = sanitizePdfFileName(file.name);
@@ -189,6 +199,7 @@ export async function POST(
 			failures.push({
 				fileName: originalFileName,
 				error: "File is not a PDF",
+				code: "not-pdf",
 			});
 			continue;
 		}
@@ -197,6 +208,7 @@ export async function POST(
 			failures.push({
 				fileName: originalFileName,
 				error: "File is empty and cannot be uploaded",
+				code: "empty",
 			});
 			continue;
 		}
@@ -205,6 +217,7 @@ export async function POST(
 			failures.push({
 				fileName: originalFileName,
 				error: `File exceeds the ${DOCUMENT_VECTOR_STORE_MAX_FILE_SIZE_MB.toFixed(1)}MB limit`,
+				code: "oversize",
 			});
 			continue;
 		}
@@ -223,6 +236,7 @@ export async function POST(
 			failures.push({
 				fileName: originalFileName,
 				error: "Failed to read file contents",
+				code: "read-error",
 			});
 			continue;
 		}
@@ -240,6 +254,7 @@ export async function POST(
 			failures.push({
 				fileName: originalFileName,
 				error: "Failed to upload file",
+				code: "upload-error",
 			});
 			continue;
 		}
@@ -281,13 +296,32 @@ export async function POST(
 			failures.push({
 				fileName: originalFileName,
 				error: "Failed to save metadata",
+				code: "metadata-error",
 			});
 		}
 	}
 
 	const hasSuccesses = successes.length > 0;
 	const hasFailures = failures.length > 0;
-	const status = hasSuccesses && hasFailures ? 207 : hasSuccesses ? 200 : 500;
+	const validationFailureCodes = new Set(["not-pdf", "empty", "oversize"]);
+	const allValidationFailures =
+		hasFailures &&
+		failures.every((failure) => validationFailureCodes.has(failure.code));
+	const hasOversizeFailure = failures.some(
+		(failure) => failure.code === "oversize",
+	);
+	let status: number;
+	if (hasSuccesses && hasFailures) {
+		status = 207;
+	} else if (hasSuccesses) {
+		status = 200;
+	} else if (allValidationFailures) {
+		status = hasOversizeFailure ? 413 : 400;
+	} else if (hasFailures) {
+		status = 500;
+	} else {
+		status = 200;
+	}
 
 	return NextResponse.json(
 		{
