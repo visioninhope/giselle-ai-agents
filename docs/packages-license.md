@@ -2,15 +2,15 @@
 
 
 ## Summary
-* 818 MIT
-* 184 Apache 2.0
+* 814 MIT
+* 182 Apache 2.0
 * 46 ISC
 * 27 New BSD
 * 13 Simplified BSD
 * 5 BlueOak-1.0.0
-* 3 MIT OR Apache-2.0
+* 2 MIT OR Apache-2.0
 * 2 MIT-0
-* 3 Mozilla Public License 2.0
+* 2 Mozilla Public License 2.0
 * 1 BSD
 * 1 (MIT OR CC0-1.0)
 * 1 BSD Zero Clause License
@@ -19,7 +19,7 @@
 * 1 (AFL-2.1 OR BSD-3-Clause)
 * 1 CC-BY-4.0
 * 1 Python-2.0
-* 2 LGPL-3.0-or-later
+* 1 LGPL-3.0-or-later
 
 
 
@@ -12157,4 +12157,5 @@ BlueOak-1.0.0 permitted
 * /home/runner/work/giselle/giselle
 
 <a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
 
