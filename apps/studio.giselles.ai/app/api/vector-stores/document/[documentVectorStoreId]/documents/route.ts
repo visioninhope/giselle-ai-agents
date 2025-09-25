@@ -1,19 +1,27 @@
 import { Buffer } from "node:buffer";
+import { createHash } from "node:crypto";
 
 import { createId } from "@paralleldrive/cuid2";
 import { createClient } from "@supabase/supabase-js";
-import { and, eq } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
-import { db, documentVectorStores } from "@/drizzle";
+import {
+	db,
+	documentVectorStoreSources,
+	documentVectorStores,
+} from "@/drizzle";
 import { docVectorStoreFlag } from "@/flags";
 import {
 	DOCUMENT_VECTOR_STORE_MAX_FILE_SIZE_BYTES,
 	DOCUMENT_VECTOR_STORE_MAX_FILE_SIZE_MB,
 } from "@/lib/vector-stores/document/constants";
 import { isPdfFile } from "@/lib/vector-stores/document/utils";
-import type { DocumentVectorStoreId } from "@/packages/types";
+import type {
+	DocumentVectorStoreId,
+	DocumentVectorStoreSourceId,
+} from "@/packages/types";
 import { fetchCurrentTeam } from "@/services/teams";
 
 export const runtime = "nodejs";
@@ -48,12 +56,15 @@ async function fetchTeam() {
 	}
 }
 
-async function verifyStoreAccess(
+async function findAccessibleStore(
 	documentVectorStoreId: DocumentVectorStoreId,
 	teamDbId: number,
 ) {
 	const [store] = await db
-		.select({ id: documentVectorStores.id })
+		.select({
+			dbId: documentVectorStores.dbId,
+			id: documentVectorStores.id,
+		})
 		.from(documentVectorStores)
 		.where(
 			and(
@@ -63,7 +74,36 @@ async function verifyStoreAccess(
 		)
 		.limit(1);
 
-	return Boolean(store);
+	return store ?? null;
+}
+
+async function rollbackUploads(
+	uploadedKeys: string[],
+	createdSourceIds: DocumentVectorStoreSourceId[],
+) {
+	if (uploadedKeys.length > 0) {
+		try {
+			await supabase.storage.from(STORAGE_BUCKET).remove(uploadedKeys);
+		} catch (cleanupError) {
+			console.error(
+				"Failed to roll back uploaded PDF files from storage:",
+				cleanupError,
+			);
+		}
+	}
+
+	if (createdSourceIds.length > 0) {
+		try {
+			await db
+				.delete(documentVectorStoreSources)
+				.where(inArray(documentVectorStoreSources.id, createdSourceIds));
+		} catch (cleanupError) {
+			console.error(
+				"Failed to roll back document vector store source records:",
+				cleanupError,
+			);
+		}
+	}
 }
 
 function sanitizePdfFileName(fileName: string): string {
@@ -110,8 +150,8 @@ export async function POST(
 	const { documentVectorStoreId: documentVectorStoreIdParam } = await params;
 	const documentVectorStoreId =
 		documentVectorStoreIdParam as DocumentVectorStoreId;
-	const hasAccess = await verifyStoreAccess(documentVectorStoreId, team.dbId);
-	if (!hasAccess) {
+	const store = await findAccessibleStore(documentVectorStoreId, team.dbId);
+	if (!store) {
 		return NextResponse.json(
 			{ error: "Vector store not found" },
 			{ status: 404 },
@@ -144,6 +184,7 @@ export async function POST(
 	}
 
 	const uploadedKeys: string[] = [];
+	const createdSourceIds: DocumentVectorStoreSourceId[] = [];
 
 	for (const file of files) {
 		const sanitizedFileName = sanitizePdfFileName(file.name);
@@ -153,6 +194,7 @@ export async function POST(
 		);
 		const arrayBuffer = await file.arrayBuffer();
 		const buffer = Buffer.from(arrayBuffer);
+		const checksum = createHash("sha256").update(buffer).digest("hex");
 
 		const { error } = await supabase.storage
 			.from(STORAGE_BUCKET)
@@ -162,9 +204,7 @@ export async function POST(
 			});
 
 		if (error) {
-			if (uploadedKeys.length > 0) {
-				await supabase.storage.from(STORAGE_BUCKET).remove(uploadedKeys);
-			}
+			await rollbackUploads(uploadedKeys, createdSourceIds);
 			return NextResponse.json(
 				{ error: `Failed to upload ${file.name}` },
 				{ status: 500 },
@@ -172,6 +212,35 @@ export async function POST(
 		}
 
 		uploadedKeys.push(storageKey);
+
+		const sourceId = `dvss_${createId()}` as DocumentVectorStoreSourceId;
+		const originalFileName = file.name.trim() || sanitizedFileName;
+
+		try {
+			await db.insert(documentVectorStoreSources).values({
+				id: sourceId,
+				documentVectorStoreDbId: store.dbId,
+				storageBucket: STORAGE_BUCKET,
+				storageKey,
+				fileName: originalFileName,
+				fileSizeBytes: file.size,
+				fileChecksum: checksum,
+				uploadStatus: "uploaded",
+			});
+			createdSourceIds.push(sourceId);
+		} catch (dbError) {
+			console.error(
+				"Failed to persist document vector store source metadata:",
+				dbError,
+			);
+			await rollbackUploads(uploadedKeys, createdSourceIds);
+			return NextResponse.json(
+				{
+					error: `Failed to save metadata for ${file.name}`,
+				},
+				{ status: 500 },
+			);
+		}
 	}
 
 	return NextResponse.json({ success: true });
