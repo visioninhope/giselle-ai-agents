@@ -334,7 +334,7 @@ function DocumentVectorStoreConfigureDialog({
 						showErrorToast(failureMessage);
 					}
 
-					if (!response.ok) {
+					if (!response.ok && response.status !== 207) {
 						setUploadMessage("");
 					}
 					return;
