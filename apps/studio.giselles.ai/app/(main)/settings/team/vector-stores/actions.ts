@@ -608,6 +608,57 @@ export async function createDocumentVectorStore(
 	}
 }
 
+export async function deleteDocumentVectorStore(
+	documentVectorStoreId: DocumentVectorStoreId,
+): Promise<ActionResult> {
+	const enabled = await docVectorStoreFlag();
+	if (!enabled) {
+		return { success: false, error: "Feature disabled" };
+	}
+
+	try {
+		const team = await fetchCurrentTeam();
+		const deleted = await db.transaction(async (tx) => {
+			const [store] = await tx
+				.select({ dbId: documentVectorStores.dbId })
+				.from(documentVectorStores)
+				.where(
+					and(
+						eq(documentVectorStores.id, documentVectorStoreId),
+						eq(documentVectorStores.teamDbId, team.dbId),
+					),
+				)
+				.for("update")
+				.limit(1);
+
+			if (!store) return false;
+
+			await tx
+				.delete(documentEmbeddingProfiles)
+				.where(
+					eq(documentEmbeddingProfiles.documentVectorStoreDbId, store.dbId),
+				);
+			await tx
+				.delete(documentVectorStores)
+				.where(eq(documentVectorStores.dbId, store.dbId));
+			return true;
+		});
+
+		if (!deleted) {
+			return { success: false, error: "Vector store not found" };
+		}
+
+		revalidatePath("/settings/team/vector-stores/document");
+		return { success: true };
+	} catch (error) {
+		console.error("Failed to delete document vector store:", error);
+		return {
+			success: false,
+			error: "Failed to delete vector store. Please try again.",
+		};
+	}
+}
+
 /**
  * Fetch repository with all its content statuses
  */
