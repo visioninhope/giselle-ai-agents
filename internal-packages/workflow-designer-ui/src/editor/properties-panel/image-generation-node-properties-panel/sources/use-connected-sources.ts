@@ -1,10 +1,13 @@
 import type {
+	ActionNode,
 	FileNode,
 	ImageGenerationNode,
 	QueryNode,
 	TextGenerationNode,
 	TextNode,
+	TriggerNode,
 	VariableNode,
+	WebPageNode,
 } from "@giselle-sdk/data-type";
 import { useWorkflowDesigner } from "@giselle-sdk/giselle/react";
 import { useMemo } from "react";
@@ -22,6 +25,8 @@ export function useConnectedSources(node: ImageGenerationNode) {
 			[];
 		const connectedVariableSources: ConnectedSource<VariableNode>[] = [];
 		const connectedQuerySources: ConnectedSource<QueryNode>[] = [];
+		const connectedTriggerSources: ConnectedSource<TriggerNode>[] = [];
+		const connectedActionSources: ConnectedSource<ActionNode>[] = [];
 		for (const connection of connectionsToThisNode) {
 			const node = data.nodes.find(
 				(node) => node.id === connection.outputNode.id,
@@ -53,6 +58,13 @@ export function useConnectedSources(node: ImageGenerationNode) {
 								connection,
 							});
 							break;
+						case "trigger":
+							connectedTriggerSources.push({
+								output,
+								node: node as TriggerNode,
+								connection,
+							});
+							break;
 						case "imageGeneration":
 							connectedGeneratedImageSources.push({
 								output,
@@ -61,8 +73,12 @@ export function useConnectedSources(node: ImageGenerationNode) {
 							});
 							break;
 						case "action":
-						case "trigger":
-							throw new Error("not implemented");
+							connectedActionSources.push({
+								output,
+								node: node as ActionNode,
+								connection,
+							});
+							break;
 						default: {
 							const _exhaustiveCheck: never = node.content.type;
 							throw new Error(`Unhandled node type: ${_exhaustiveCheck}`);
@@ -85,9 +101,14 @@ export function useConnectedSources(node: ImageGenerationNode) {
 								connection,
 							});
 							break;
-
-						case "vectorStore":
 						case "webPage":
+							connectedVariableSources.push({
+								output,
+								node: node as WebPageNode,
+								connection,
+							});
+							break;
+						case "vectorStore":
 						case "github":
 							throw new Error("vectore store can not be connected");
 						default: {
@@ -109,11 +130,15 @@ export function useConnectedSources(node: ImageGenerationNode) {
 				...connectedVariableSources,
 				...connectedQuerySources,
 				...connectedGeneratedImageSources,
+				...connectedTriggerSources,
+				...connectedActionSources,
 			],
 			generationText: connectedGeneratedTextSources,
 			generationImage: connectedGeneratedImageSources,
 			variable: connectedVariableSources,
 			query: connectedQuerySources,
+			trigger: connectedTriggerSources,
+			action: connectedActionSources,
 		};
 	}, [node.id, data.connections, data.nodes]);
 }
