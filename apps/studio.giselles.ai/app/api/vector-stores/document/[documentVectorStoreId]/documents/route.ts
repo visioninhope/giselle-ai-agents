@@ -264,7 +264,7 @@ export async function POST(
 			});
 		} catch (dbError) {
 			console.error(
-				"Failed to persist document vector store source metadata:",
+				`Failed to persist metadata for ${originalFileName}. Rolling back this file.`,
 				dbError,
 			);
 			try {
