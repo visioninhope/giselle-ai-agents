@@ -300,7 +300,8 @@ describe("resolveTrigger", () => {
 				["body", `${title} body`],
 				["number", "5"],
 				["pullRequestUrl", "https://example.com/pr/5"],
-			] as const)("resolve %s", async (accessor, expected) => {
+				["diff", "diff"],
+			])("resolve %s", async (accessor, expected) => {
 				const trigger = createTrigger(id);
 				const output = createOutput(accessor);
 				const result = await resolveTrigger({
