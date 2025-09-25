@@ -1,19 +1,24 @@
 import { Card } from "@/components/ui/card";
 import type { DocumentVectorStoreId } from "@/packages/types";
-import type { DocumentVectorStore } from "./data";
+import type { DocumentVectorStoreWithProfiles } from "./data";
 import { DocumentVectorStoreItem } from "./document/document-vector-store-item";
-import type { ActionResult } from "./types";
+import type { ActionResult, DocumentVectorStoreUpdateInput } from "./types";
 
 type DocumentVectorStoreListProps = {
-	stores: DocumentVectorStore[];
+	stores: DocumentVectorStoreWithProfiles[];
 	deleteAction: (
 		documentVectorStoreId: DocumentVectorStoreId,
+	) => Promise<ActionResult>;
+	updateAction: (
+		documentVectorStoreId: DocumentVectorStoreId,
+		input: DocumentVectorStoreUpdateInput,
 	) => Promise<ActionResult>;
 };
 
 export function DocumentVectorStoreList({
 	stores,
 	deleteAction,
+	updateAction,
 }: DocumentVectorStoreListProps) {
 	return (
 		<div className="flex flex-col gap-y-[16px]">
@@ -36,6 +41,7 @@ export function DocumentVectorStoreList({
 								key={store.id}
 								store={store}
 								deleteAction={deleteAction}
+								updateAction={updateAction}
 							/>
 						))}
 					</div>

@@ -2,6 +2,7 @@ import type { components } from "@octokit/openapi-types";
 import { desc, eq } from "drizzle-orm";
 import {
 	db,
+	documentEmbeddingProfiles,
 	documentVectorStores,
 	githubRepositoryContentStatus,
 	githubRepositoryIndex,
@@ -11,7 +12,10 @@ import { getGitHubIdentityState } from "@/services/accounts";
 import { fetchCurrentTeam } from "@/services/teams";
 import type { InstallationWithRepos } from "./types";
 
-export type DocumentVectorStore = typeof documentVectorStores.$inferSelect;
+type DocumentVectorStoreRow = typeof documentVectorStores.$inferSelect;
+export type DocumentVectorStoreWithProfiles = DocumentVectorStoreRow & {
+	embeddingProfileIds: number[];
+};
 
 export async function getGitHubRepositoryIndexes(): Promise<
 	RepositoryWithStatuses[]
@@ -59,17 +63,47 @@ export async function getGitHubRepositoryIndexes(): Promise<
 }
 
 export async function getDocumentVectorStores(): Promise<
-	DocumentVectorStore[]
+	DocumentVectorStoreWithProfiles[]
 > {
 	const team = await fetchCurrentTeam();
 
-	const vectorStores = await db
-		.select()
+	const records = await db
+		.select({
+			store: documentVectorStores,
+			embeddingProfileId: documentEmbeddingProfiles.embeddingProfileId,
+		})
 		.from(documentVectorStores)
+		.leftJoin(
+			documentEmbeddingProfiles,
+			eq(
+				documentEmbeddingProfiles.documentVectorStoreDbId,
+				documentVectorStores.dbId,
+			),
+		)
 		.where(eq(documentVectorStores.teamDbId, team.dbId))
 		.orderBy(desc(documentVectorStores.createdAt));
 
-	return vectorStores;
+	const storeMap = new Map<number, DocumentVectorStoreWithProfiles>();
+
+	for (const record of records) {
+		const { store, embeddingProfileId } = record;
+		const existing = storeMap.get(store.dbId);
+		if (!existing) {
+			storeMap.set(store.dbId, {
+				...store,
+				embeddingProfileIds:
+					embeddingProfileId !== null && embeddingProfileId !== undefined
+						? [embeddingProfileId]
+						: [],
+			});
+			continue;
+		}
+		if (embeddingProfileId !== null && embeddingProfileId !== undefined) {
+			existing.embeddingProfileIds.push(embeddingProfileId);
+		}
+	}
+
+	return Array.from(storeMap.values());
 }
 
 export async function getInstallationsWithRepos(): Promise<
