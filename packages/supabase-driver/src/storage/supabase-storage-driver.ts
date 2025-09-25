@@ -82,10 +82,19 @@ export function supabaseStorageDriver(
 			);
 		},
 
-		async getBlob(path: string): Promise<Uint8Array> {
-			const res = await client.send(
-				new GetObjectCommand({ Bucket: config.bucket, Key: path }),
-			);
+		async getBlob(
+			path: string,
+			options?: { range?: { start: number; end?: number } },
+		) {
+			const command = new GetObjectCommand({
+				Bucket: config.bucket,
+				Key: path,
+				...(options?.range && {
+					Range: `bytes=${options.range.start}-${options.range.end ?? ""}`,
+				}),
+			});
+
+			const res = await client.send(command);
 			if (!res.Body || !isReadable(res.Body as Readable)) {
 				throw new Error("Invalid body returned from storage");
 			}
@@ -140,6 +149,13 @@ export function supabaseStorageDriver(
 				// Re-throw other errors
 				throw err;
 			}
+		},
+
+		async contentLength(path: string): Promise<number> {
+			const response = await client.send(
+				new HeadObjectCommand({ Bucket: config.bucket, Key: path }),
+			);
+			return response.ContentLength ?? 0;
 		},
 	};
 }

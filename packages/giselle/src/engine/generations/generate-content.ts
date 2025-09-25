@@ -1,9 +1,7 @@
 import { type AnthropicProviderOptions, anthropic } from "@ai-sdk/anthropic";
 import { createGateway } from "@ai-sdk/gateway";
-import { googleTools } from "@ai-sdk/google/internal";
-import { vertex } from "@ai-sdk/google-vertex/edge";
+import { google } from "@ai-sdk/google";
 import { type OpenAIResponsesProviderOptions, openai } from "@ai-sdk/openai";
-import { perplexity } from "@ai-sdk/perplexity";
 import {
 	isTextGenerationNode,
 	type Output,
@@ -15,37 +13,36 @@ import {
 	hasCapability,
 	languageModels,
 } from "@giselle-sdk/language-model";
-import type { LanguageModel } from "ai";
-import { AISDKError, stepCountIs, streamText } from "ai";
+import { AISDKError, type AsyncIterableStream, streamText } from "ai";
 import type {
 	FailedGeneration,
 	GenerationOutput,
-	QueuedGeneration,
+	RunningGeneration,
 } from "../../concepts/generation";
+import { generationUiMessageChunksPath } from "../../concepts/path";
+import { batchWriter } from "../../utils";
 import { decryptSecret } from "../secrets";
 import type { GiselleEngineContext } from "../types";
 import { useGenerationExecutor } from "./internal/use-generation-executor";
 import { createPostgresTools } from "./tools/postgres";
 import type { PreparedToolSet } from "./types";
-import { buildMessageObject } from "./utils";
+import { buildMessageObject, getGeneration } from "./utils";
 
-// PerplexityProviderOptions is not exported from @ai-sdk/perplexity, so we define it here based on the model configuration
-type PerplexityProviderOptions = {
-	search_domain_filter?: string[];
-};
+type StreamItem<T> = T extends AsyncIterableStream<infer Inner> ? Inner : never;
 
-export function generateText(args: {
+export function generateContent({
+	context,
+	generation,
+}: {
 	context: GiselleEngineContext;
-	generation: QueuedGeneration;
-	useExperimentalStorage: boolean;
-	useAiGateway: boolean;
-	useResumableGeneration: boolean;
+	generation: RunningGeneration;
 }) {
+	context.logger.info(`generate content: ${generation.id}`);
 	return useGenerationExecutor({
-		context: args.context,
-		generation: args.generation,
-		useExperimentalStorage: args.useExperimentalStorage,
-		useResumableGeneration: args.useResumableGeneration,
+		context,
+		generation,
+		useExperimentalStorage: true,
+		useResumableGeneration: true,
 		execute: async ({
 			completeGeneration,
 			runningGeneration,
@@ -85,13 +82,11 @@ export function generateText(args: {
 				let decryptToken: string | undefined;
 				switch (githubTool.auth.type) {
 					case "pat":
-						decryptToken = await args.context.vault?.decrypt(
-							githubTool.auth.token,
-						);
+						decryptToken = await context.vault?.decrypt(githubTool.auth.token);
 						break;
 					case "secret":
 						decryptToken = await decryptSecret({
-							...args,
+							context,
 							secretId: githubTool.auth.secretId,
 						});
 						break;
@@ -122,7 +117,7 @@ export function generateText(args: {
 			const postgresToolData = operationNode.content.tools?.postgres;
 			if (postgresToolData?.secretId) {
 				const connectionString = await decryptSecret({
-					...args,
+					context,
 					secretId: postgresToolData.secretId,
 				});
 				if (connectionString === undefined) {
@@ -162,7 +157,7 @@ export function generateText(args: {
 					...preparedToolSet,
 					toolSet: {
 						...preparedToolSet.toolSet,
-						web_search_preview: openai.tools.webSearchPreview(
+						web_search: openai.tools.webSearch(
 							operationNode.content.tools.openaiWebSearch,
 						),
 					},
@@ -177,7 +172,7 @@ export function generateText(args: {
 					...preparedToolSet,
 					toolSet: {
 						...preparedToolSet.toolSet,
-						google_search: googleTools.googleSearch({}),
+						google_search: google.tools.googleSearch({}),
 					},
 				};
 			}
@@ -201,40 +196,52 @@ export function generateText(args: {
 
 			const model = generationModel(
 				operationNode.content.llm,
-				args.useAiGateway,
-				args.context.aiGateway,
+				context.aiGateway,
 			);
 			let generationError: unknown | undefined;
 			const textGenerationStartTime = Date.now();
-			const shouldDisableToolStepLimit =
-				operationNode.content.llm.provider === "openai" &&
-				["gpt-5", "gpt-5-mini", "gpt-5-nano"].includes(
-					operationNode.content.llm.id,
-				);
-			const preparedToolCount = Object.keys(preparedToolSet.toolSet).length;
+
+			const abortController = new AbortController();
+
 			const streamTextResult = streamText({
+				abortSignal: abortController.signal,
 				model,
 				providerOptions,
 				messages,
 				tools: preparedToolSet.toolSet,
-				...(shouldDisableToolStepLimit
-					? {}
-					: {
-							stopWhen: stepCountIs(preparedToolCount + 1),
-						}),
+				onChunk: async () => {
+					const currentGeneration = await getGeneration({
+						storage: context.storage,
+						experimental_storage: context.experimental_storage,
+						useExperimentalStorage: true,
+						generationId: generation.id,
+					});
+					context.logger.debug(
+						{ generationId: generation.id, status: currentGeneration?.status },
+						`streamText onChunk`,
+					);
+					if (currentGeneration?.status === "cancelled") {
+						abortController.abort();
+					}
+				},
+				onAbort: () => {
+					context.logger.debug(
+						{ generationId: generation.id },
+						"streamText onAbort",
+					);
+				},
 				onError: ({ error }) => {
 					generationError = error;
 				},
 				onFinish: () => {
-					args.context.logger.info(
+					context.logger.info(
 						`Text generation completed in ${Date.now() - textGenerationStartTime}ms`,
 					);
 				},
 			});
-			return streamTextResult.toUIMessageStream({
-				sendReasoning: true,
+			const uiMessageStream = streamTextResult.toUIMessageStream({
 				onFinish: async ({ messages: generateMessages }) => {
-					args.context.logger.info(
+					context.logger.info(
 						`Text generation stream completed in ${Date.now() - textGenerationStartTime}ms`,
 					);
 					const toolCleanupStartTime = Date.now();
@@ -243,18 +250,21 @@ export function generateText(args: {
 							cleanupFunction(),
 						),
 					);
-					args.context.logger.info(
+					context.logger.info(
 						`Tool cleanup completed in ${Date.now() - toolCleanupStartTime}ms`,
 					);
 					if (generationError) {
 						if (AISDKError.isInstance(generationError)) {
-							args.context.logger.error(
+							context.logger.error(
 								generationError,
-								`${args.generation.id} is failed`,
+								`${generation.id} is failed`,
 							);
 						}
 						const errInfo = AISDKError.isInstance(generationError)
-							? { name: generationError.name, message: generationError.message }
+							? {
+									name: generationError.name,
+									message: generationError.message,
+								}
 							: {
 									name: "UnknownError",
 									message:
@@ -272,7 +282,7 @@ export function generateText(args: {
 
 						await Promise.all([
 							setGeneration(failedGeneration),
-							args.context.callbacks?.generationFailed?.({
+							context.callbacks?.generationFailed?.({
 								generation: failedGeneration,
 								inputMessages: messages,
 							}),
@@ -286,7 +296,7 @@ export function generateText(args: {
 						);
 					const textRetrievalStartTime = Date.now();
 					const text = await streamTextResult.text;
-					args.context.logger.info(
+					context.logger.info(
 						`Text retrieval completed in ${Date.now() - textRetrievalStartTime}ms`,
 					);
 					if (generatedTextOutput !== undefined) {
@@ -299,7 +309,7 @@ export function generateText(args: {
 
 					const reasoningRetrievalStartTime = Date.now();
 					const reasoningText = await streamTextResult.reasoningText;
-					args.context.logger.info(
+					context.logger.info(
 						`Reasoning retrieval completed in ${Date.now() - reasoningRetrievalStartTime}ms`,
 					);
 					const reasoningOutput = generationContext.operationNode.outputs.find(
@@ -315,7 +325,7 @@ export function generateText(args: {
 
 					const sourceRetrievalStartTime = Date.now();
 					const sources = await streamTextResult.sources;
-					args.context.logger.info(
+					context.logger.info(
 						`Source retrieval completed in ${Date.now() - sourceRetrievalStartTime}ms`,
 					);
 					const sourceOutput = generationContext.operationNode.outputs.find(
@@ -336,73 +346,34 @@ export function generateText(args: {
 						generateMessages: generateMessages,
 						providerMetadata: await streamTextResult.providerMetadata,
 					});
-					args.context.logger.info(
+					context.logger.info(
 						`Generation completion processing finished in ${Date.now() - generationCompletionStartTime}ms`,
 					);
 				},
 			});
+
+			const writer = batchWriter<StreamItem<typeof uiMessageStream>>({
+				process: (batch) =>
+					context.experimental_storage.setBlob(
+						generationUiMessageChunksPath(generation.id),
+						new TextEncoder().encode(
+							batch.map((chunk) => JSON.stringify(chunk)).join("\n"),
+						),
+					),
+				preserveItems: true,
+			});
+
+			for await (const chunk of uiMessageStream) {
+				writer.add(chunk);
+			}
+			await writer.close();
 		},
 	});
-}
-
-function generationModel(
-	languageModel: TextGenerationLanguageModelData,
-	useAiGateway: boolean,
-	gatewayOptions?: { httpReferer: string; xTitle: string },
-) {
-	const llmProvider = languageModel.provider;
-	if (useAiGateway) {
-		const gateway = createGateway(
-			gatewayOptions === undefined
-				? undefined
-				: {
-						headers: {
-							"http-referer": gatewayOptions.httpReferer,
-							"x-title": gatewayOptions.xTitle,
-						},
-					},
-		);
-		// Use AI Gateway model specifier: "<provider>/<modelId>"
-		// e.g. "openai/gpt-4o" or "anthropic/claude-3-5-sonnet-20240620"
-		switch (llmProvider) {
-			case "anthropic":
-			case "openai":
-			case "google":
-			case "perplexity": {
-				return gateway(`${llmProvider}/${languageModel.id}`);
-			}
-			default: {
-				const _exhaustiveCheck: never = llmProvider;
-				throw new Error(`Unknown LLM provider: ${_exhaustiveCheck}`);
-			}
-		}
-	}
-
-	// Default: use direct provider SDKs
-	switch (llmProvider) {
-		case "anthropic": {
-			return anthropic(languageModel.id);
-		}
-		case "openai": {
-			return openai.responses(languageModel.id);
-		}
-		case "google": {
-			return vertex(languageModel.id) as LanguageModel;
-		}
-		case "perplexity": {
-			return perplexity(languageModel.id);
-		}
-		default: {
-			const _exhaustiveCheck: never = llmProvider;
-			throw new Error(`Unknown LLM provider: ${_exhaustiveCheck}`);
-		}
-	}
 }
 
 function getProviderOptions(languageModelData: TextGenerationLanguageModelData):
 	| {
 			anthropic?: AnthropicProviderOptions;
-			perplexity?: PerplexityProviderOptions;
 			openai?: OpenAIResponsesProviderOptions;
 	  }
 	| undefined {
@@ -425,19 +396,6 @@ function getProviderOptions(languageModelData: TextGenerationLanguageModelData):
 			},
 		};
 	}
-	if (
-		languageModel &&
-		languageModelData.provider === "perplexity" &&
-		languageModelData.configurations.searchDomainFilter
-	) {
-		const { searchDomainFilter } = languageModelData.configurations;
-		return {
-			perplexity: {
-				// https://docs.perplexity.ai/guides/search-domain-filters
-				search_domain_filter: searchDomainFilter,
-			},
-		};
-	}
 	if (languageModel && languageModelData.provider === "openai") {
 		const openaiOptions: OpenAIResponsesProviderOptions = {};
 		if (hasCapability(languageModel, Capability.Reasoning)) {
@@ -451,4 +409,35 @@ function getProviderOptions(languageModelData: TextGenerationLanguageModelData):
 		return { openai: openaiOptions };
 	}
 	return undefined;
+}
+
+function generationModel(
+	languageModel: TextGenerationLanguageModelData,
+	gatewayOptions?: { httpReferer: string; xTitle: string },
+) {
+	const llmProvider = languageModel.provider;
+	const gateway = createGateway(
+		gatewayOptions === undefined
+			? undefined
+			: {
+					headers: {
+						"http-referer": gatewayOptions.httpReferer,
+						"x-title": gatewayOptions.xTitle,
+					},
+				},
+	);
+	// Use AI Gateway model specifier: "<provider>/<modelId>"
+	// e.g. "openai/gpt-4o" or "anthropic/claude-3-5-sonnet-20240620"
+	switch (llmProvider) {
+		case "anthropic":
+		case "openai":
+		case "google":
+		case "perplexity": {
+			return gateway(`${llmProvider}/${languageModel.id}`);
+		}
+		default: {
+			const _exhaustiveCheck: never = llmProvider;
+			throw new Error(`Unknown LLM provider: ${_exhaustiveCheck}`);
+		}
+	}
 }

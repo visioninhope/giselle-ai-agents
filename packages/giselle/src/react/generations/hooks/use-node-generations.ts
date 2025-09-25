@@ -88,9 +88,10 @@ export function useNodeGenerations({
 	);
 
 	const stopGenerationRunner = useCallback(() => {
-		if (currentGeneration !== undefined) {
-			stopGenerationSystem(currentGeneration.id);
+		if (currentGeneration === undefined) {
+			return;
 		}
+		stopGenerationSystem(currentGeneration.id);
 	}, [currentGeneration, stopGenerationSystem]);
 
 	return {
