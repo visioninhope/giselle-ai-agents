@@ -89,15 +89,19 @@ async function rollbackUploads(
 
 			if (storageError) {
 				console.error(
-					"Failed to roll back uploaded PDF files from storage:",
+					"Failed to roll back uploaded PDF files from storage. Aborting rollback.",
 					storageError,
 				);
+				throw new Error("Storage cleanup failed during rollback.");
 			}
 		} catch (cleanupError) {
 			console.error(
-				"Failed to roll back uploaded PDF files from storage:",
+				"Failed to roll back uploaded PDF files from storage. Aborting rollback.",
 				cleanupError,
 			);
+			throw cleanupError instanceof Error
+				? cleanupError
+				: new Error("Storage cleanup failed during rollback.");
 		}
 	}
 
@@ -111,6 +115,9 @@ async function rollbackUploads(
 				"Failed to roll back document vector store source records:",
 				cleanupError,
 			);
+			throw cleanupError instanceof Error
+				? cleanupError
+				: new Error("Database cleanup failed during rollback.");
 		}
 	}
 }
@@ -260,7 +267,17 @@ export async function POST(
 				"Failed to persist document vector store source metadata:",
 				dbError,
 			);
-			await rollbackUploads([storageKey], []);
+			try {
+				await rollbackUploads([storageKey], []);
+			} catch (rollbackError) {
+				console.error(
+					"Rollback failed after metadata persistence error:",
+					rollbackError,
+				);
+				throw rollbackError instanceof Error
+					? rollbackError
+					: new Error("Rollback failed after metadata persistence error.");
+			}
 			failures.push({
 				fileName: originalFileName,
 				error: "Failed to save metadata",
