@@ -188,7 +188,8 @@ export async function POST(
 			| "oversize"
 			| "read-error"
 			| "upload-error"
-			| "metadata-error";
+			| "metadata-error"
+			| "rollback-error";
 	}> = [];
 
 	for (const file of files) {
@@ -282,21 +283,22 @@ export async function POST(
 				`Failed to persist metadata for ${originalFileName}. Rolling back this file.`,
 				dbError,
 			);
+			let rollbackFailed = false;
 			try {
 				await rollbackUploads([storageKey], []);
 			} catch (rollbackError) {
+				rollbackFailed = true;
 				console.error(
 					"Rollback failed after metadata persistence error:",
 					rollbackError,
 				);
-				throw rollbackError instanceof Error
-					? rollbackError
-					: new Error("Rollback failed after metadata persistence error.");
 			}
 			failures.push({
 				fileName: originalFileName,
-				error: "Failed to save metadata",
-				code: "metadata-error",
+				error: rollbackFailed
+					? "Failed to save metadata and roll back storage"
+					: "Failed to save metadata",
+				code: rollbackFailed ? "rollback-error" : "metadata-error",
 			});
 		}
 	}
