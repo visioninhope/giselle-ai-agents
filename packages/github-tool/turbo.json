@@ -10,6 +10,7 @@
 				"GITHUB_*",
 				"LANGFUSE_*",
 				"POSTGRES_*",
+				"REDIS_URL",
 				"SIGNOZ_*",
 				"STRIPE_*",
 				"SMTP_*",
@@ -22,6 +23,9 @@
 				"INNGEST_*",
 				"OTEL_*",
 				"GOOGLE_OAUTH_CLIENT_*",
+				"GOOGLE_VERTEX_*",
+				"GOOGLE_CLIENT_EMAIL",
+				"GOOGLE_PRIVATE_*",
 				"WAITUNTIL_OFFSET_MILLIS",
 				"EDGE_CONFIG"
 			]
