@@ -83,7 +83,16 @@ async function rollbackUploads(
 ) {
 	if (uploadedKeys.length > 0) {
 		try {
-			await supabase.storage.from(STORAGE_BUCKET).remove(uploadedKeys);
+			const { error: storageError } = await supabase.storage
+				.from(STORAGE_BUCKET)
+				.remove(uploadedKeys);
+
+			if (storageError) {
+				console.error(
+					"Failed to roll back uploaded PDF files from storage:",
+					storageError,
+				);
+			}
 		} catch (cleanupError) {
 			console.error(
 				"Failed to roll back uploaded PDF files from storage:",
