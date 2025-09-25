@@ -167,63 +167,77 @@ export async function POST(
 		);
 	}
 
-	for (const file of files) {
-		if (!isPdfFile(file)) {
-			return NextResponse.json(
-				{ error: `${file.name} is not a PDF file` },
-				{ status: 400 },
-			);
-		}
-
-		if (file.size === 0) {
-			return NextResponse.json(
-				{ error: `${file.name} is empty and cannot be uploaded` },
-				{ status: 400 },
-			);
-		}
-
-		if (file.size > DOCUMENT_VECTOR_STORE_MAX_FILE_SIZE_BYTES) {
-			return NextResponse.json(
-				{
-					error: `${file.name} exceeds the ${DOCUMENT_VECTOR_STORE_MAX_FILE_SIZE_MB.toFixed(1)}MB limit`,
-				},
-				{ status: 413 },
-			);
-		}
-	}
-
-	const uploadedKeys: string[] = [];
-	const createdSourceIds: DocumentVectorStoreSourceId[] = [];
+	const successes: Array<{
+		fileName: string;
+		sourceId: DocumentVectorStoreSourceId;
+		storageKey: string;
+	}> = [];
+	const failures: Array<{ fileName: string; error: string }> = [];
 
 	for (const file of files) {
 		const sanitizedFileName = sanitizePdfFileName(file.name);
+		const originalFileName = file.name.trim() || sanitizedFileName;
+
+		if (!isPdfFile(file)) {
+			failures.push({
+				fileName: originalFileName,
+				error: "File is not a PDF",
+			});
+			continue;
+		}
+
+		if (file.size === 0) {
+			failures.push({
+				fileName: originalFileName,
+				error: "File is empty and cannot be uploaded",
+			});
+			continue;
+		}
+
+		if (file.size > DOCUMENT_VECTOR_STORE_MAX_FILE_SIZE_BYTES) {
+			failures.push({
+				fileName: originalFileName,
+				error: `File exceeds the ${DOCUMENT_VECTOR_STORE_MAX_FILE_SIZE_MB.toFixed(1)}MB limit`,
+			});
+			continue;
+		}
+
 		const storageKey = buildStorageKey(
 			documentVectorStoreId,
 			sanitizedFileName,
 		);
-		const arrayBuffer = await file.arrayBuffer();
-		const buffer = Buffer.from(arrayBuffer);
-		const checksum = createHash("sha256").update(buffer).digest("hex");
 
-		const { error } = await supabase.storage
+		let buffer: Buffer;
+		try {
+			const arrayBuffer = await file.arrayBuffer();
+			buffer = Buffer.from(arrayBuffer);
+		} catch (bufferError) {
+			console.error("Failed to read file contents for upload:", bufferError);
+			failures.push({
+				fileName: originalFileName,
+				error: "Failed to read file contents",
+			});
+			continue;
+		}
+
+		const checksum = createHash("sha256").update(buffer).digest("hex");
+		const { error: uploadError } = await supabase.storage
 			.from(STORAGE_BUCKET)
 			.upload(storageKey, buffer, {
 				contentType: "application/pdf",
 				upsert: true,
 			});
 
-		if (error) {
-			await rollbackUploads(uploadedKeys, createdSourceIds);
-			return NextResponse.json(
-				{ error: `Failed to upload ${file.name}` },
-				{ status: 500 },
-			);
+		if (uploadError) {
+			console.error("Failed to upload PDF file to storage:", uploadError);
+			failures.push({
+				fileName: originalFileName,
+				error: "Failed to upload file",
+			});
+			continue;
 		}
 
-		uploadedKeys.push(storageKey);
-
 		const sourceId = `dvss_${createId()}` as DocumentVectorStoreSourceId;
-		const originalFileName = file.name.trim() || sanitizedFileName;
 
 		try {
 			await db.insert(documentVectorStoreSources).values({
@@ -236,21 +250,33 @@ export async function POST(
 				fileChecksum: checksum,
 				uploadStatus: "uploaded",
 			});
-			createdSourceIds.push(sourceId);
+			successes.push({
+				fileName: originalFileName,
+				sourceId,
+				storageKey,
+			});
 		} catch (dbError) {
 			console.error(
 				"Failed to persist document vector store source metadata:",
 				dbError,
 			);
-			await rollbackUploads(uploadedKeys, createdSourceIds);
-			return NextResponse.json(
-				{
-					error: `Failed to save metadata for ${file.name}`,
-				},
-				{ status: 500 },
-			);
+			await rollbackUploads([storageKey], []);
+			failures.push({
+				fileName: originalFileName,
+				error: "Failed to save metadata",
+			});
 		}
 	}
 
-	return NextResponse.json({ success: true });
+	const hasSuccesses = successes.length > 0;
+	const hasFailures = failures.length > 0;
+	const status = hasSuccesses && hasFailures ? 207 : hasSuccesses ? 200 : 500;
+
+	return NextResponse.json(
+		{
+			successes,
+			failures,
+		},
+		{ status },
+	);
 }

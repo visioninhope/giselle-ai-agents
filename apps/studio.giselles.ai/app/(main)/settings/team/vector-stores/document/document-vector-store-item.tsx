@@ -191,6 +191,18 @@ type DocumentVectorStoreConfigureDialogProps = {
 	showErrorToast: (message: string) => void;
 };
 
+type DocumentUploadResponse = {
+	successes: Array<{
+		fileName: string;
+		sourceId: string;
+		storageKey: string;
+	}>;
+	failures: Array<{
+		fileName: string;
+		error: string;
+	}>;
+};
+
 function DocumentVectorStoreConfigureDialog({
 	open,
 	onOpenChange,
@@ -292,9 +304,41 @@ function DocumentVectorStoreConfigureDialog({
 					},
 				);
 				const payload = (await response.json().catch(() => null)) as
+					| DocumentUploadResponse
 					| { error?: string }
-					| { success: true }
 					| null;
+				if (payload && "successes" in payload && "failures" in payload) {
+					const { successes, failures } = payload;
+					const hasSuccesses = successes.length > 0;
+					const hasFailures = failures.length > 0;
+
+					if (hasSuccesses) {
+						setUploadMessage(
+							successes.length === 1
+								? `${successes[0].fileName} uploaded successfully.`
+								: `${successes.length} files uploaded successfully.`,
+						);
+					} else {
+						setUploadMessage("");
+					}
+
+					if (hasFailures) {
+						const [firstFailure, ...remainingFailures] = failures;
+						const additionalFailures = remainingFailures.length;
+						const baseMessage = `Failed to upload ${firstFailure.fileName}: ${firstFailure.error}.`;
+						const failureMessage =
+							additionalFailures > 0
+								? `${baseMessage} ${additionalFailures} more file(s) failed.`
+								: baseMessage;
+						showErrorToast(failureMessage);
+					}
+
+					if (!response.ok) {
+						setUploadMessage("");
+					}
+					return;
+				}
+
 				if (!response.ok || (payload && "error" in payload && payload.error)) {
 					const message =
 						payload && "error" in payload && payload.error
@@ -302,6 +346,7 @@ function DocumentVectorStoreConfigureDialog({
 							: "Failed to upload files";
 					throw new Error(message);
 				}
+
 				const uploadedCount = validFiles.length;
 				setUploadMessage(
 					uploadedCount === 1
