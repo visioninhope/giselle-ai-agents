@@ -20,6 +20,25 @@ export function createAiSdkEmbedder(
 
 	const { model, provider, dimensions } = config.profile;
 	const maxRetries = config.maxRetries ?? 3;
+	const normalizeUsage = (
+		rawUsage: unknown,
+	): { tokens: number; imageTokens?: number } | undefined => {
+		if (!rawUsage || typeof rawUsage !== "object") {
+			return undefined;
+		}
+		const usageWithTokens = rawUsage as { tokens?: unknown };
+		if (typeof usageWithTokens.tokens !== "number") {
+			return undefined;
+		}
+		const normalized: { tokens: number; imageTokens?: number } = {
+			tokens: usageWithTokens.tokens,
+		};
+		const usageWithImages = rawUsage as { imageTokens?: unknown };
+		if (typeof usageWithImages.imageTokens === "number") {
+			normalized.imageTokens = usageWithImages.imageTokens;
+		}
+		return normalized;
+	};
 
 	return {
 		async embed(text: string): Promise<number[]> {
@@ -33,13 +52,14 @@ export function createAiSdkEmbedder(
 
 				if (config.embeddingComplete) {
 					try {
+						const usage = normalizeUsage(result.usage);
 						await config.embeddingComplete({
 							texts: [text],
 							embeddings: [result.embedding],
 							model,
 							provider,
 							dimensions,
-							usage: result.usage ? { tokens: result.usage.tokens } : undefined,
+							usage,
 							operation: "embed",
 							startTime,
 							endTime: new Date(),
@@ -69,13 +89,14 @@ export function createAiSdkEmbedder(
 
 				if (config.embeddingComplete) {
 					try {
+						const usage = normalizeUsage(result.usage);
 						await config.embeddingComplete({
 							texts,
 							embeddings: result.embeddings,
 							model,
 							provider,
 							dimensions,
-							usage: result.usage ? { tokens: result.usage.tokens } : undefined,
+							usage,
 							operation: "embedMany",
 							startTime,
 							endTime: new Date(),
