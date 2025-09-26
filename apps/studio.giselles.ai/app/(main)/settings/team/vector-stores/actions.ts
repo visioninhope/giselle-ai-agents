@@ -51,6 +51,7 @@ if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) {
 }
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
+const DOCUMENT_VECTOR_STORE_STORAGE_PREFIX = "vector-stores";
 
 type IngestabilityCheck = {
 	canIngest: boolean;
@@ -792,21 +793,28 @@ export async function deleteDocumentVectorStore(
 		if (storageSources.length > 0) {
 			// Perform potentially slow storage cleanup after the database transaction commits.
 			after(async () => {
-				const storageRemovals = new Map<string, string[]>();
+				const storeFolder = `${DOCUMENT_VECTOR_STORE_STORAGE_PREFIX}/${documentVectorStoreId}`;
+				const cleanupTargetsByBucket = new Map<string, Set<string>>();
 				for (const record of storageSources) {
-					const keys = storageRemovals.get(record.storageBucket) ?? [];
-					keys.push(record.storageKey);
-					storageRemovals.set(record.storageBucket, keys);
+					const targets = cleanupTargetsByBucket.get(record.storageBucket);
+					if (targets) {
+						targets.add(record.storageKey);
+					} else {
+						cleanupTargetsByBucket.set(
+							record.storageBucket,
+							new Set([storeFolder, `${storeFolder}/`, record.storageKey]),
+						);
+					}
 				}
 
-				for (const [bucket, keys] of storageRemovals) {
-					if (keys.length === 0) {
+				for (const [bucket, targets] of cleanupTargetsByBucket) {
+					if (targets.size === 0) {
 						continue;
 					}
 					try {
 						const { error: storageError } = await supabase.storage
 							.from(bucket)
-							.remove(keys);
+							.remove(Array.from(targets));
 						if (storageError) {
 							console.error(
 								`Failed to delete PDF files from storage bucket ${bucket}:`,
