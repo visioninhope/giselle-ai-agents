@@ -191,6 +191,61 @@ type DocumentVectorStoreConfigureDialogProps = {
 	showErrorToast: (message: string) => void;
 };
 
+type DocumentUploadResponse = {
+	successes: Array<{
+		fileName: string;
+		sourceId: string;
+		storageKey: string;
+	}>;
+	failures: Array<{
+		fileName: string;
+		error: string;
+		code?: string;
+	}>;
+};
+
+type DocumentSourceItem = {
+	id: string;
+	fileName: string;
+};
+
+function buildDocumentSourceItems(
+	sources: DocumentVectorStoreWithProfiles["sources"],
+): DocumentSourceItem[] {
+	return sources.map((source) => ({
+		id: source.id,
+		fileName: source.fileName,
+	}));
+}
+
+function buildUploadedSourceItems(
+	successes: DocumentUploadResponse["successes"],
+): DocumentSourceItem[] {
+	if (successes.length === 0) {
+		return [];
+	}
+
+	return successes.map((success) => ({
+		id: success.sourceId,
+		fileName: success.fileName,
+	}));
+}
+
+function mergeDocumentSourceItems(
+	previous: DocumentSourceItem[],
+	newItems: DocumentSourceItem[],
+): DocumentSourceItem[] {
+	if (newItems.length === 0) {
+		return previous;
+	}
+	const existingIds = new Set(previous.map((item) => item.id));
+	const filteredNewItems = newItems.filter((item) => !existingIds.has(item.id));
+	if (filteredNewItems.length === 0) {
+		return previous;
+	}
+	return [...filteredNewItems, ...previous];
+}
+
 function DocumentVectorStoreConfigureDialog({
 	open,
 	onOpenChange,
@@ -220,7 +275,11 @@ function DocumentVectorStoreConfigureDialog({
 	const [isUploadingDocuments, setIsUploadingDocuments] = useState(false);
 	const [isDragActive, setIsDragActive] = useState(false);
 	const [uploadMessage, setUploadMessage] = useState("");
+	const [documentSources, setDocumentSources] = useState<DocumentSourceItem[]>(
+		() => buildDocumentSourceItems(store.sources),
+	);
 	const fileInputRef = useRef<HTMLInputElement>(null);
+	const router = useRouter();
 
 	useEffect(() => {
 		onPendingChange(isPending);
@@ -238,6 +297,7 @@ function DocumentVectorStoreConfigureDialog({
 				: defaultProfiles,
 		);
 		setUploadMessage("");
+		setDocumentSources(buildDocumentSourceItems(store.sources));
 	}, [open, store, defaultProfiles]);
 
 	const handleFilesUpload = useCallback(
@@ -292,9 +352,46 @@ function DocumentVectorStoreConfigureDialog({
 					},
 				);
 				const payload = (await response.json().catch(() => null)) as
+					| DocumentUploadResponse
 					| { error?: string }
-					| { success: true }
 					| null;
+				if (payload && "successes" in payload && "failures" in payload) {
+					const { successes, failures } = payload;
+					const hasSuccesses = successes.length > 0;
+					const hasFailures = failures.length > 0;
+
+					if (hasSuccesses) {
+						const newItems = buildUploadedSourceItems(successes);
+						setDocumentSources((prev) =>
+							mergeDocumentSourceItems(prev, newItems),
+						);
+						setUploadMessage(
+							successes.length === 1
+								? `${successes[0].fileName} uploaded successfully.`
+								: `${successes.length} files uploaded successfully.`,
+						);
+						router.refresh();
+					} else {
+						setUploadMessage("");
+					}
+
+					if (hasFailures) {
+						const [firstFailure, ...remainingFailures] = failures;
+						const additionalFailures = remainingFailures.length;
+						const baseMessage = `Failed to upload ${firstFailure.fileName}: ${firstFailure.error}.`;
+						const failureMessage =
+							additionalFailures > 0
+								? `${baseMessage} ${additionalFailures} more file(s) failed.`
+								: baseMessage;
+						showErrorToast(failureMessage);
+					}
+
+					if (!response.ok && response.status !== 207) {
+						setUploadMessage("");
+					}
+					return;
+				}
+
 				if (!response.ok || (payload && "error" in payload && payload.error)) {
 					const message =
 						payload && "error" in payload && payload.error
@@ -302,6 +399,7 @@ function DocumentVectorStoreConfigureDialog({
 							: "Failed to upload files";
 					throw new Error(message);
 				}
+
 				const uploadedCount = validFiles.length;
 				setUploadMessage(
 					uploadedCount === 1
@@ -319,7 +417,7 @@ function DocumentVectorStoreConfigureDialog({
 				setIsUploadingDocuments(false);
 			}
 		},
-		[showErrorToast, store.id],
+		[showErrorToast, store.id, router],
 	);
 
 	const handleFileInputChange = useCallback(
@@ -517,6 +615,29 @@ function DocumentVectorStoreConfigureDialog({
 							{uploadMessage ? (
 								<p className="text-xs text-black-300">{uploadMessage}</p>
 							) : null}
+							{documentSources.length > 0 ? (
+								<div className="space-y-2">
+									<div className="text-white-400 text-sm font-medium">
+										Uploaded Files
+									</div>
+									<ul className="max-h-48 space-y-2 overflow-y-auto pr-1">
+										{documentSources.map((source) => (
+											<li
+												key={source.id}
+												className="flex items-start justify-between gap-3 rounded-lg border border-white/10 bg-black-950/30 px-3 py-2"
+											>
+												<span className="text-white-400 text-sm font-medium break-all">
+													{source.fileName}
+												</span>
+											</li>
+										))}
+									</ul>
+								</div>
+							) : (
+								<p className="text-xs text-black-300">
+									No PDF files uploaded yet.
+								</p>
+							)}
 						</div>
 
 						{error ? <p className="text-error-900 text-sm">{error}</p> : null}

@@ -1,19 +1,27 @@
 import { Buffer } from "node:buffer";
+import { createHash } from "node:crypto";
 
 import { createId } from "@paralleldrive/cuid2";
 import { createClient } from "@supabase/supabase-js";
-import { and, eq } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
-import { db, documentVectorStores } from "@/drizzle";
+import {
+	db,
+	documentVectorStoreSources,
+	documentVectorStores,
+} from "@/drizzle";
 import { docVectorStoreFlag } from "@/flags";
 import {
 	DOCUMENT_VECTOR_STORE_MAX_FILE_SIZE_BYTES,
 	DOCUMENT_VECTOR_STORE_MAX_FILE_SIZE_MB,
 } from "@/lib/vector-stores/document/constants";
 import { isPdfFile } from "@/lib/vector-stores/document/utils";
-import type { DocumentVectorStoreId } from "@/packages/types";
+import type {
+	DocumentVectorStoreId,
+	DocumentVectorStoreSourceId,
+} from "@/packages/types";
 import { fetchCurrentTeam } from "@/services/teams";
 
 export const runtime = "nodejs";
@@ -48,12 +56,15 @@ async function fetchTeam() {
 	}
 }
 
-async function verifyStoreAccess(
+async function findAccessibleStore(
 	documentVectorStoreId: DocumentVectorStoreId,
 	teamDbId: number,
 ) {
 	const [store] = await db
-		.select({ id: documentVectorStores.id })
+		.select({
+			dbId: documentVectorStores.dbId,
+			id: documentVectorStores.id,
+		})
 		.from(documentVectorStores)
 		.where(
 			and(
@@ -63,7 +74,52 @@ async function verifyStoreAccess(
 		)
 		.limit(1);
 
-	return Boolean(store);
+	return store ?? null;
+}
+
+async function rollbackUploads(
+	uploadedKeys: string[],
+	createdSourceIds: DocumentVectorStoreSourceId[],
+) {
+	if (uploadedKeys.length > 0) {
+		try {
+			const { error: storageError } = await supabase.storage
+				.from(STORAGE_BUCKET)
+				.remove(uploadedKeys);
+
+			if (storageError) {
+				console.error(
+					"Failed to roll back uploaded PDF files from storage. Aborting rollback.",
+					storageError,
+				);
+				throw new Error("Storage cleanup failed during rollback.");
+			}
+		} catch (cleanupError) {
+			console.error(
+				"Failed to roll back uploaded PDF files from storage. Aborting rollback.",
+				cleanupError,
+			);
+			throw cleanupError instanceof Error
+				? cleanupError
+				: new Error("Storage cleanup failed during rollback.");
+		}
+	}
+
+	if (createdSourceIds.length > 0) {
+		try {
+			await db
+				.delete(documentVectorStoreSources)
+				.where(inArray(documentVectorStoreSources.id, createdSourceIds));
+		} catch (cleanupError) {
+			console.error(
+				"Failed to roll back document vector store source records:",
+				cleanupError,
+			);
+			throw cleanupError instanceof Error
+				? cleanupError
+				: new Error("Database cleanup failed during rollback.");
+		}
+	}
 }
 
 function sanitizePdfFileName(fileName: string): string {
@@ -110,69 +166,170 @@ export async function POST(
 	const { documentVectorStoreId: documentVectorStoreIdParam } = await params;
 	const documentVectorStoreId =
 		documentVectorStoreIdParam as DocumentVectorStoreId;
-	const hasAccess = await verifyStoreAccess(documentVectorStoreId, team.dbId);
-	if (!hasAccess) {
+	const store = await findAccessibleStore(documentVectorStoreId, team.dbId);
+	if (!store) {
 		return NextResponse.json(
 			{ error: "Vector store not found" },
 			{ status: 404 },
 		);
 	}
 
-	for (const file of files) {
-		if (!isPdfFile(file)) {
-			return NextResponse.json(
-				{ error: `${file.name} is not a PDF file` },
-				{ status: 400 },
-			);
-		}
-
-		if (file.size === 0) {
-			return NextResponse.json(
-				{ error: `${file.name} is empty and cannot be uploaded` },
-				{ status: 400 },
-			);
-		}
-
-		if (file.size > DOCUMENT_VECTOR_STORE_MAX_FILE_SIZE_BYTES) {
-			return NextResponse.json(
-				{
-					error: `${file.name} exceeds the ${DOCUMENT_VECTOR_STORE_MAX_FILE_SIZE_MB.toFixed(1)}MB limit`,
-				},
-				{ status: 413 },
-			);
-		}
-	}
-
-	const uploadedKeys: string[] = [];
+	const successes: Array<{
+		fileName: string;
+		sourceId: DocumentVectorStoreSourceId;
+		storageKey: string;
+	}> = [];
+	const failures: Array<{
+		fileName: string;
+		error: string;
+		code:
+			| "not-pdf"
+			| "empty"
+			| "oversize"
+			| "read-error"
+			| "upload-error"
+			| "metadata-error"
+			| "rollback-error";
+	}> = [];
 
 	for (const file of files) {
 		const sanitizedFileName = sanitizePdfFileName(file.name);
+		const originalFileName = file.name.trim() || sanitizedFileName;
+
+		if (!isPdfFile(file)) {
+			failures.push({
+				fileName: originalFileName,
+				error: "File is not a PDF",
+				code: "not-pdf",
+			});
+			continue;
+		}
+
+		if (file.size === 0) {
+			failures.push({
+				fileName: originalFileName,
+				error: "File is empty and cannot be uploaded",
+				code: "empty",
+			});
+			continue;
+		}
+
+		if (file.size > DOCUMENT_VECTOR_STORE_MAX_FILE_SIZE_BYTES) {
+			failures.push({
+				fileName: originalFileName,
+				error: `File exceeds the ${DOCUMENT_VECTOR_STORE_MAX_FILE_SIZE_MB.toFixed(1)}MB limit`,
+				code: "oversize",
+			});
+			continue;
+		}
+
 		const storageKey = buildStorageKey(
 			documentVectorStoreId,
 			sanitizedFileName,
 		);
-		const arrayBuffer = await file.arrayBuffer();
-		const buffer = Buffer.from(arrayBuffer);
 
-		const { error } = await supabase.storage
+		let buffer: Buffer;
+		try {
+			const arrayBuffer = await file.arrayBuffer();
+			buffer = Buffer.from(arrayBuffer);
+		} catch (bufferError) {
+			console.error("Failed to read file contents for upload:", bufferError);
+			failures.push({
+				fileName: originalFileName,
+				error: "Failed to read file contents",
+				code: "read-error",
+			});
+			continue;
+		}
+
+		const checksum = createHash("sha256").update(buffer).digest("hex");
+		const { error: uploadError } = await supabase.storage
 			.from(STORAGE_BUCKET)
 			.upload(storageKey, buffer, {
 				contentType: "application/pdf",
 				upsert: true,
 			});
 
-		if (error) {
-			if (uploadedKeys.length > 0) {
-				await supabase.storage.from(STORAGE_BUCKET).remove(uploadedKeys);
-			}
-			return NextResponse.json(
-				{ error: `Failed to upload ${file.name}` },
-				{ status: 500 },
-			);
+		if (uploadError) {
+			console.error("Failed to upload PDF file to storage:", uploadError);
+			failures.push({
+				fileName: originalFileName,
+				error: "Failed to upload file",
+				code: "upload-error",
+			});
+			continue;
 		}
 
-		uploadedKeys.push(storageKey);
+		const sourceId = `dvss_${createId()}` as DocumentVectorStoreSourceId;
+
+		try {
+			await db.insert(documentVectorStoreSources).values({
+				id: sourceId,
+				documentVectorStoreDbId: store.dbId,
+				storageBucket: STORAGE_BUCKET,
+				storageKey,
+				fileName: originalFileName,
+				fileSizeBytes: file.size,
+				fileChecksum: checksum,
+				uploadStatus: "uploaded",
+			});
+			successes.push({
+				fileName: originalFileName,
+				sourceId,
+				storageKey,
+			});
+		} catch (dbError) {
+			console.error(
+				`Failed to persist metadata for ${originalFileName}. Rolling back this file.`,
+				dbError,
+			);
+			let rollbackFailed = false;
+			try {
+				await rollbackUploads([storageKey], []);
+			} catch (rollbackError) {
+				rollbackFailed = true;
+				console.error(
+					"Rollback failed after metadata persistence error:",
+					rollbackError,
+				);
+			}
+			failures.push({
+				fileName: originalFileName,
+				error: rollbackFailed
+					? "Failed to save metadata and roll back storage"
+					: "Failed to save metadata",
+				code: rollbackFailed ? "rollback-error" : "metadata-error",
+			});
+		}
 	}
 
-	return NextResponse.json({ success: true });
+	const hasSuccesses = successes.length > 0;
+	const hasFailures = failures.length > 0;
+	const validationFailureCodes = new Set(["not-pdf", "empty", "oversize"]);
+	const allValidationFailures =
+		hasFailures &&
+		failures.every((failure) => validationFailureCodes.has(failure.code));
+	const hasOversizeFailure = failures.some(
+		(failure) => failure.code === "oversize",
+	);
+	let status: number;
+	if (hasSuccesses && hasFailures) {
+		status = 207;
+	} else if (hasSuccesses) {
+		status = 200;
+	} else if (allValidationFailures) {
+		status = hasOversizeFailure ? 413 : 400;
+	} else if (hasFailures) {
+		status = 500;
+	} else {
+		status = 200;
+	}
+
+	return NextResponse.json(
+		{
+			successes,
+			failures,
+		},
+		{ status },
+	);
 }

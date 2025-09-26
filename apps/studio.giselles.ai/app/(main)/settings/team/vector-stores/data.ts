@@ -1,8 +1,9 @@
 import type { components } from "@octokit/openapi-types";
-import { desc, eq } from "drizzle-orm";
+import { desc, eq, inArray } from "drizzle-orm";
 import {
 	db,
 	documentEmbeddingProfiles,
+	documentVectorStoreSources,
 	documentVectorStores,
 	githubRepositoryContentStatus,
 	githubRepositoryIndex,
@@ -13,8 +14,12 @@ import { fetchCurrentTeam } from "@/services/teams";
 import type { InstallationWithRepos } from "./types";
 
 type DocumentVectorStoreRow = typeof documentVectorStores.$inferSelect;
+type DocumentVectorStoreSourceRow =
+	typeof documentVectorStoreSources.$inferSelect;
+
 export type DocumentVectorStoreWithProfiles = DocumentVectorStoreRow & {
 	embeddingProfileIds: number[];
+	sources: DocumentVectorStoreSourceRow[];
 };
 
 export async function getGitHubRepositoryIndexes(): Promise<
@@ -95,11 +100,35 @@ export async function getDocumentVectorStores(): Promise<
 					embeddingProfileId !== null && embeddingProfileId !== undefined
 						? [embeddingProfileId]
 						: [],
+				sources: [],
 			});
 			continue;
 		}
 		if (embeddingProfileId !== null && embeddingProfileId !== undefined) {
 			existing.embeddingProfileIds.push(embeddingProfileId);
+		}
+	}
+
+	const storeDbIds = Array.from(storeMap.keys());
+	if (storeDbIds.length === 0) {
+		return [];
+	}
+
+	const sourceRecords = await db
+		.select({
+			storeDbId: documentVectorStoreSources.documentVectorStoreDbId,
+			source: documentVectorStoreSources,
+		})
+		.from(documentVectorStoreSources)
+		.where(
+			inArray(documentVectorStoreSources.documentVectorStoreDbId, storeDbIds),
+		)
+		.orderBy(desc(documentVectorStoreSources.createdAt));
+
+	for (const record of sourceRecords) {
+		const store = storeMap.get(record.storeDbId);
+		if (store) {
+			store.sources.push(record.source);
 		}
 	}
 
