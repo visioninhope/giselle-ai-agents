@@ -28,12 +28,16 @@ const defaultConfigurations: OpenAILanguageModelConfigurations = {
 };
 
 export const OpenAILanguageModelId = z
-	.enum(["gpt-5", "gpt-5-mini", "gpt-5-nano"])
+	.enum(["gpt-5", "gpt-5-codex", "gpt-5-mini", "gpt-5-nano"])
 	.catch((ctx) => {
 		if (typeof ctx.value !== "string") {
 			return "gpt-5-nano";
 		}
 		const v = ctx.value;
+
+		if (/^gpt-5-codex(?:-.+)?$/.test(v)) {
+			return "gpt-5-codex";
+		}
 
 		// Fallback to gpt-5
 		if (
@@ -86,6 +90,18 @@ const gpt5: OpenAILanguageModel = {
 	configurations: defaultConfigurations,
 };
 
+const gpt5codex: OpenAILanguageModel = {
+	provider: "openai",
+	id: "gpt-5-codex",
+	capabilities:
+		Capability.ImageFileInput |
+		Capability.TextGeneration |
+		Capability.OptionalSearchGrounding |
+		Capability.Reasoning,
+	tier: Tier.enum.pro,
+	configurations: defaultConfigurations,
+};
+
 const gpt5mini: OpenAILanguageModel = {
 	provider: "openai",
 	id: "gpt-5-mini",
@@ -109,7 +125,7 @@ const gpt5nano: OpenAILanguageModel = {
 	configurations: defaultConfigurations,
 };
 
-export const models = [gpt5, gpt5mini, gpt5nano];
+export const models = [gpt5, gpt5codex, gpt5mini, gpt5nano];
 
 export const LanguageModel = OpenAILanguageModel;
 export type LanguageModel = OpenAILanguageModel;
