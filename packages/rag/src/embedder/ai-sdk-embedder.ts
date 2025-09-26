@@ -26,16 +26,19 @@ export function createAiSdkEmbedder(
 		if (!rawUsage || typeof rawUsage !== "object") {
 			return undefined;
 		}
-		const usageWithTokens = rawUsage as { tokens?: unknown };
-		if (typeof usageWithTokens.tokens !== "number") {
-			return undefined;
-		}
-		const normalized: { tokens: number; imageTokens?: number } = {
-			tokens: usageWithTokens.tokens,
+		const usageWithNumbers = rawUsage as {
+			tokens?: unknown;
+			imageTokens?: unknown;
 		};
-		const usageWithImages = rawUsage as { imageTokens?: unknown };
-		if (typeof usageWithImages.imageTokens === "number") {
-			normalized.imageTokens = usageWithImages.imageTokens;
+		const hasTokens = typeof usageWithNumbers.tokens === "number";
+		const tokens = hasTokens ? (usageWithNumbers.tokens as number) : 0;
+		const normalized: { tokens: number; imageTokens?: number } = { tokens };
+		const hasImageTokens = typeof usageWithNumbers.imageTokens === "number";
+		if (hasImageTokens) {
+			normalized.imageTokens = usageWithNumbers.imageTokens as number;
+		}
+		if (!hasTokens && !hasImageTokens) {
+			return undefined;
 		}
 		return normalized;
 	};
