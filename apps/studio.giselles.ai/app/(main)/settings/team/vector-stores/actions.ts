@@ -731,7 +731,7 @@ export async function deleteDocumentVectorStore(
 
 	try {
 		const team = await fetchCurrentTeam();
-		const deleted = await db.transaction(async (tx) => {
+		const deletionResult = await db.transaction(async (tx) => {
 			const [store] = await tx
 				.select({ dbId: documentVectorStores.dbId })
 				.from(documentVectorStores)
@@ -745,12 +745,14 @@ export async function deleteDocumentVectorStore(
 				.limit(1);
 
 			if (!store) {
-				return false;
+				return {
+					success: false as const,
+					storageSources: [],
+				};
 			}
 
 			const sourceRecords = await tx
 				.select({
-					id: documentVectorStoreSources.id,
 					storageBucket: documentVectorStoreSources.storageBucket,
 					storageKey: documentVectorStoreSources.storageKey,
 				})
@@ -758,29 +760,6 @@ export async function deleteDocumentVectorStore(
 				.where(
 					eq(documentVectorStoreSources.documentVectorStoreDbId, store.dbId),
 				);
-
-			const storageRemovals = new Map<string, string[]>();
-			for (const record of sourceRecords) {
-				const keys = storageRemovals.get(record.storageBucket) ?? [];
-				keys.push(record.storageKey);
-				storageRemovals.set(record.storageBucket, keys);
-			}
-
-			for (const [bucket, keys] of storageRemovals) {
-				if (keys.length === 0) {
-					continue;
-				}
-				const { error: storageError } = await supabase.storage
-					.from(bucket)
-					.remove(keys);
-				if (storageError) {
-					console.error(
-						`Failed to delete PDF files from storage bucket ${bucket}:`,
-						storageError,
-					);
-					throw new Error("Failed to delete files from storage");
-				}
-			}
 
 			if (sourceRecords.length > 0) {
 				await tx
@@ -798,11 +777,50 @@ export async function deleteDocumentVectorStore(
 			await tx
 				.delete(documentVectorStores)
 				.where(eq(documentVectorStores.dbId, store.dbId));
-			return true;
+
+			return {
+				success: true as const,
+				storageSources: sourceRecords,
+			};
 		});
 
-		if (!deleted) {
+		if (!deletionResult.success) {
 			return { success: false, error: "Vector store not found" };
+		}
+
+		const storageSources = deletionResult.storageSources;
+		if (storageSources.length > 0) {
+			// Perform potentially slow storage cleanup after the database transaction commits.
+			after(async () => {
+				const storageRemovals = new Map<string, string[]>();
+				for (const record of storageSources) {
+					const keys = storageRemovals.get(record.storageBucket) ?? [];
+					keys.push(record.storageKey);
+					storageRemovals.set(record.storageBucket, keys);
+				}
+
+				for (const [bucket, keys] of storageRemovals) {
+					if (keys.length === 0) {
+						continue;
+					}
+					try {
+						const { error: storageError } = await supabase.storage
+							.from(bucket)
+							.remove(keys);
+						if (storageError) {
+							console.error(
+								`Failed to delete PDF files from storage bucket ${bucket}:`,
+								storageError,
+							);
+						}
+					} catch (storageError) {
+						console.error(
+							`Failed to delete PDF files from storage bucket ${bucket}:`,
+							storageError,
+						);
+					}
+				}
+			});
 		}
 
 		revalidatePath("/settings/team/vector-stores/document");
