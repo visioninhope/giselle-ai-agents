@@ -7,12 +7,14 @@ import {
 	isEmbeddingProfileId,
 } from "@giselle-sdk/data-type";
 import { createId } from "@paralleldrive/cuid2";
+import { createClient } from "@supabase/supabase-js";
 import { and, eq, inArray, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { after } from "next/server";
 import {
 	db,
 	documentEmbeddingProfiles,
+	documentVectorStoreSources,
 	documentVectorStores,
 	type GitHubRepositoryContentType,
 	githubRepositoryContentStatus,
@@ -38,6 +40,17 @@ import type {
 	DiagnosticResult,
 	DocumentVectorStoreUpdateInput,
 } from "./types";
+
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY;
+
+if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) {
+	throw new Error(
+		"Missing Supabase configuration. Please set SUPABASE_URL and SUPABASE_SERVICE_KEY.",
+	);
+}
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
 
 type IngestabilityCheck = {
 	canIngest: boolean;
@@ -731,7 +744,51 @@ export async function deleteDocumentVectorStore(
 				.for("update")
 				.limit(1);
 
-			if (!store) return false;
+			if (!store) {
+				return false;
+			}
+
+			const sourceRecords = await tx
+				.select({
+					id: documentVectorStoreSources.id,
+					storageBucket: documentVectorStoreSources.storageBucket,
+					storageKey: documentVectorStoreSources.storageKey,
+				})
+				.from(documentVectorStoreSources)
+				.where(
+					eq(documentVectorStoreSources.documentVectorStoreDbId, store.dbId),
+				);
+
+			const storageRemovals = new Map<string, string[]>();
+			for (const record of sourceRecords) {
+				const keys = storageRemovals.get(record.storageBucket) ?? [];
+				keys.push(record.storageKey);
+				storageRemovals.set(record.storageBucket, keys);
+			}
+
+			for (const [bucket, keys] of storageRemovals) {
+				if (keys.length === 0) {
+					continue;
+				}
+				const { error: storageError } = await supabase.storage
+					.from(bucket)
+					.remove(keys);
+				if (storageError) {
+					console.error(
+						`Failed to delete PDF files from storage bucket ${bucket}:`,
+						storageError,
+					);
+					throw new Error("Failed to delete files from storage");
+				}
+			}
+
+			if (sourceRecords.length > 0) {
+				await tx
+					.delete(documentVectorStoreSources)
+					.where(
+						eq(documentVectorStoreSources.documentVectorStoreDbId, store.dbId),
+					);
+			}
 
 			await tx
 				.delete(documentEmbeddingProfiles)
