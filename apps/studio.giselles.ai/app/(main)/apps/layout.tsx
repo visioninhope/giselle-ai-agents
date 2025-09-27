@@ -1,5 +1,6 @@
 import { createId } from "@paralleldrive/cuid2";
 import { ExternalLink, Plus } from "lucide-react";
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
 import { GlassButton } from "@/components/ui/glass-button";
@@ -26,6 +27,7 @@ export default function Layout({ children }: { children: ReactNode }) {
 			creatorDbId: user.dbId,
 			workspaceId: workspace.id,
 		});
+		revalidatePath(`/workspaces/${workspace.id}`);
 		redirect(`/workspaces/${workspace.id}`);
 	}
 
