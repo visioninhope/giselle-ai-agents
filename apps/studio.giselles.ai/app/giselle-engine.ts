@@ -1,10 +1,18 @@
 import { WorkspaceId } from "@giselle-sdk/data-type";
-import type { QueryContext, RunningGeneration } from "@giselle-sdk/giselle";
+import type {
+	CompletedGeneration,
+	FailedGeneration,
+	GenerationCompleteCallbackFunctionArgs,
+	GenerationFailedCallbackFunctionArgs,
+	OutputFileBlob,
+	QueryContext,
+	RunningGeneration,
+} from "@giselle-sdk/giselle";
 import {
 	getRequestId,
 	NextGiselleEngine,
 } from "@giselle-sdk/giselle/next-internal";
-import { traceEmbedding } from "@giselle-sdk/langfuse";
+import { traceEmbedding, traceGeneration } from "@giselle-sdk/langfuse";
 import type { EmbeddingMetrics } from "@giselle-sdk/rag";
 import {
 	supabaseStorageDriver as experimental_supabaseStorageDriver,
@@ -12,6 +20,7 @@ import {
 } from "@giselle-sdk/supabase-driver";
 import { openaiVectorStore } from "@giselle-sdk/vector-store-adapters";
 import { tasks } from "@trigger.dev/sdk";
+import type { ModelMessage, ProviderMetadata } from "ai";
 import { after } from "next/server";
 import { createStorage } from "unstorage";
 import { waitForLangfuseFlush } from "@/instrumentation.node";
@@ -96,6 +105,39 @@ if (
 
 type TeamForPlan = Pick<CurrentTeam, "id" | "activeSubscriptionId" | "type">;
 
+async function traceGenerationForTeam(args: {
+	generation: CompletedGeneration | FailedGeneration;
+	inputMessages: ModelMessage[];
+	outputFileBlobs?: OutputFileBlob[];
+	sessionId?: string;
+	userId: string;
+	team: TeamForPlan;
+	providerMetadata?: ProviderMetadata;
+	requestId?: string;
+}) {
+	const isPro = isProPlan(args.team);
+	const planTag = isPro ? "plan:pro" : "plan:free";
+	const teamTypeTag = `teamType:${args.team.type}`;
+
+	await traceGeneration({
+		generation: args.generation,
+		outputFileBlobs: args.outputFileBlobs,
+		inputMessages: args.inputMessages,
+		userId: args.userId,
+		tags: [planTag, teamTypeTag],
+		metadata: {
+			generationId: args.generation.id,
+			isProPlan: isPro,
+			teamType: args.team.type,
+			userId: args.userId,
+			subscriptionId: args.team.activeSubscriptionId ?? "",
+			providerMetadata: args.providerMetadata,
+			requestId: args.requestId,
+		},
+		sessionId: args.sessionId,
+	});
+}
+
 async function traceEmbeddingForTeam(args: {
 	metrics: EmbeddingMetrics;
 	generation: RunningGeneration;
@@ -131,6 +173,82 @@ async function traceEmbeddingForTeam(args: {
 		},
 	});
 }
+
+type GenerationTraceArgs = {
+	generation: CompletedGeneration | FailedGeneration;
+	inputMessages: ModelMessage[];
+	outputFileBlobs?: OutputFileBlob[];
+	providerMetadata?: ProviderMetadata;
+	requestId?: string;
+};
+
+function handleGenerationTrace(args: GenerationTraceArgs) {
+	after(async () => {
+		try {
+			switch (args.generation.context.origin.type) {
+				case "github-app": {
+					const team = await getWorkspaceTeam(
+						args.generation.context.origin.workspaceId,
+					);
+					await traceGenerationForTeam({
+						generation: args.generation,
+						inputMessages: args.inputMessages,
+						outputFileBlobs: args.outputFileBlobs,
+						sessionId: args.generation.context.origin.actId,
+						userId: "github-app",
+						team,
+						providerMetadata: args.providerMetadata,
+						requestId: args.requestId,
+					});
+					break;
+				}
+				case "stage":
+				case "studio": {
+					const [currentUser, currentTeam] = await Promise.all([
+						fetchCurrentUser(),
+						fetchCurrentTeam(),
+					]);
+					await traceGenerationForTeam({
+						generation: args.generation,
+						inputMessages: args.inputMessages,
+						outputFileBlobs: args.outputFileBlobs,
+						sessionId: args.generation.context.origin.actId,
+						userId: currentUser.id,
+						team: currentTeam,
+						providerMetadata: args.providerMetadata,
+						requestId: args.requestId,
+					});
+					break;
+				}
+				default: {
+					const _exhaustiveCheck: never = args.generation.context.origin;
+					throw new Error(`Unhandled origin type: ${_exhaustiveCheck}`);
+				}
+			}
+		} catch (error) {
+			console.error("Trace generation failed:", error);
+		}
+	});
+}
+
+const generateContentProcessor =
+	process.env.VERCEL === "1" && process.env.NODE_ENV !== "development"
+		? "trigger.dev"
+		: "self";
+
+const generationTracingCallbacks =
+	generateContentProcessor === "self"
+		? {
+				generationComplete: (args: GenerationCompleteCallbackFunctionArgs) => {
+					const requestId = getRequestId();
+					handleGenerationTrace({ ...args, requestId });
+				},
+				generationFailed: (args: GenerationFailedCallbackFunctionArgs) => {
+					const requestId = getRequestId();
+					handleGenerationTrace({ ...args, requestId });
+				},
+			}
+		: undefined;
 
 export const giselleEngine = NextGiselleEngine({
 	basePath: "/api/giselle",
@@ -170,6 +288,7 @@ export const giselleEngine = NextGiselleEngine({
 		githubPullRequest: gitHubPullRequestQueryService,
 	},
 	callbacks: {
+		...generationTracingCallbacks,
 		embeddingComplete: (args) => {
 			after(async () => {
 				try {
@@ -230,7 +349,7 @@ export const giselleEngine = NextGiselleEngine({
 
 // In Vercel environment, execute generateContent with trigger
 // In local environment, use Next.js (default behavior).
-if (process.env.VERCEL === "1" && process.env.NODE_ENV !== "development") {
+if (generateContentProcessor === "trigger.dev") {
 	giselleEngine.setGenerateContentProcess(async ({ generation }) => {
 		const requestId = getRequestId();
 		if (requestId === undefined) {
