@@ -34,6 +34,21 @@ export function resolveSupportedDocumentFile(file: {
 	type?: string;
 	name: string;
 }): { extension: string; contentType: string } | null {
+	const matchedByExtension = findSupportedFileTypeByExtension(file.name);
+	if (matchedByExtension) {
+		const normalizedMime = file.type?.toLowerCase();
+		const matchedMime =
+			normalizedMime &&
+			matchedByExtension.mimeTypes.find(
+				(mime) => mime.toLowerCase() === normalizedMime,
+			);
+
+		return {
+			extension: matchedByExtension.extension,
+			contentType: matchedMime ?? matchedByExtension.mimeTypes[0],
+		};
+	}
+
 	const matchedByMimeType = findSupportedFileTypeByMimeType(file.type);
 	if (matchedByMimeType) {
 		return {
@@ -45,15 +60,7 @@ export function resolveSupportedDocumentFile(file: {
 		};
 	}
 
-	const matchedByExtension = findSupportedFileTypeByExtension(file.name);
-	if (!matchedByExtension) {
-		return null;
-	}
-
-	return {
-		extension: matchedByExtension.extension,
-		contentType: matchedByExtension.mimeTypes[0],
-	};
+	return null;
 }
 
 export function isSupportedDocumentFile(file: {
