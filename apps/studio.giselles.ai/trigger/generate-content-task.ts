@@ -22,7 +22,7 @@ async function traceGenerationForTeam(args: {
 	userId: string;
 	team: TeamForPlan;
 	providerMetadata?: ProviderMetadata;
-	requestId?: string;
+	requestId?: string | undefined;
 }) {
 	const isPro = isProPlan(args.team);
 	const planTag = isPro ? "plan:pro" : "plan:free";
@@ -51,7 +51,7 @@ export const generateContentTask = schemaTask({
 	id: "generate-content",
 	schema: z.object({
 		generationId: GenerationId.schema,
-		requestId: z.string(),
+		requestId: z.string().optional(),
 		userId: z.string(),
 		team: z.object({
 			id: z.string<`tm_${string}`>(),
@@ -74,7 +74,6 @@ export const generateContentTask = schemaTask({
 			await traceGenerationForTeam({
 				generation: result.failedGeneration,
 				inputMessages: result.inputMessages,
-				outputFileBlobs: result.outputFileBlobs,
 				sessionId: generation.context.origin.actId,
 				userId: payload.userId,
 				team: {
@@ -82,13 +81,12 @@ export const generateContentTask = schemaTask({
 					activeSubscriptionId: payload.team.subscriptionId,
 					type: payload.team.type,
 				},
-				providerMetadata: result.providerMetadata,
 				requestId: payload.requestId,
 			});
 			return;
 		}
 		await traceGenerationForTeam({
-			generation: result.completeGeneration,
+			generation: result.completedGeneration,
 			inputMessages: result.inputMessages,
 			outputFileBlobs: result.outputFileBlobs,
 			sessionId: generation.context.origin.actId,

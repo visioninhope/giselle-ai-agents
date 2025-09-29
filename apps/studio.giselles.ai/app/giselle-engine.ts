@@ -352,9 +352,6 @@ export const giselleEngine = NextGiselleEngine({
 if (generateContentProcessor === "trigger.dev") {
 	giselleEngine.setGenerateContentProcess(async ({ generation }) => {
 		const requestId = getRequestId();
-		if (requestId === undefined) {
-			throw new Error("Request ID is undefined");
-		}
 		switch (generation.context.origin.type) {
 			case "github-app": {
 				const team = await getWorkspaceTeam(
