@@ -59,8 +59,6 @@ export const generateContentTask = schemaTask({
 			subscriptionId: z.string().nullable(),
 		}),
 	}),
-	// Set an optional maxDuration to prevent tasks from running indefinitely
-	maxDuration: 300, // Stop executing after 300 secs (5 mins) of compute
 	run: async (payload) => {
 		const generation = await giselleEngine.getGeneration(
 			payload.generationId,
