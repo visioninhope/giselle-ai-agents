@@ -817,13 +817,13 @@ export async function deleteDocumentVectorStore(
 							.remove(Array.from(targets));
 						if (storageError) {
 							console.error(
-								`Failed to delete PDF files from storage bucket ${bucket}:`,
+								`Failed to delete document files from storage bucket ${bucket}:`,
 								storageError,
 							);
 						}
 					} catch (storageError) {
 						console.error(
-							`Failed to delete PDF files from storage bucket ${bucket}:`,
+							`Failed to delete document files from storage bucket ${bucket}:`,
 							storageError,
 						);
 					}
