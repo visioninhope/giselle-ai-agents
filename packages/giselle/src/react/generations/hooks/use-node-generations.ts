@@ -1,5 +1,5 @@
 import type { NodeId } from "@giselle-sdk/data-type";
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import useSWR from "swr";
 import { useShallow } from "zustand/shallow";
 import type {
@@ -30,12 +30,13 @@ export function useNodeGenerations({
 		startGenerationRunner,
 		createAndStartGenerationRunner,
 		stopGenerationRunner: stopGenerationSystem,
+		addGenerationRunner,
 	} = useGenerationRunnerSystem();
 	const client = useGiselleEngine();
 	const { experimental_storage } = useFeatureFlag();
 
 	/** @todo fetch on server */
-	const { data } = useSWR(
+	const { data, isLoading } = useSWR(
 		{
 			api: "node-generations",
 			origin,
@@ -49,35 +50,34 @@ export function useNodeGenerations({
 			revalidateOnReconnect: false,
 		},
 	);
+
+	useEffect(() => {
+		if (isLoading || data === undefined) {
+			return;
+		}
+		console.log(data);
+		addGenerationRunner(data);
+	}, [isLoading, data, addGenerationRunner]);
+
 	const currentGeneration = useMemo<Generation>(() => {
-		const fetchGenerations = data ?? [];
-		const createdGenerations = generations.filter(
-			(generation) =>
-				generation.context.operationNode.id === nodeId &&
-				generation.context.origin.type === origin.type &&
-				(origin.type === "studio"
-					? generation.context.origin.type === "studio" &&
-						generation.context.origin.workspaceId === origin.workspaceId
-					: generation.context.origin.type !== "studio" &&
-						generation.context.origin.actId === origin.actId),
-		);
-		// Deduplicate generations by filtering out fetched generations from created ones
-		const deduplicatedCreatedGenerations = createdGenerations.filter(
-			(created) =>
-				!fetchGenerations.some((fetched) => fetched.id === created.id),
-		);
-		// Filter out cancelled generations from both sources after deduplication
-		const allGenerations = [
-			...fetchGenerations,
-			...deduplicatedCreatedGenerations,
-		]
-			.filter((generation) => generation.status !== "cancelled")
+		const filteredGenerations = generations
+			.filter(
+				(generation) =>
+					generation.status !== "cancelled" &&
+					generation.context.operationNode.id === nodeId &&
+					generation.context.origin.type === origin.type &&
+					(origin.type === "studio"
+						? generation.context.origin.type === "studio" &&
+							generation.context.origin.workspaceId === origin.workspaceId
+						: generation.context.origin.type !== "studio" &&
+							generation.context.origin.actId === origin.actId),
+			)
 			.sort(
 				(a, b) =>
 					new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
 			);
-		return allGenerations[0];
-	}, [generations, data, nodeId, origin]);
+		return filteredGenerations[0];
+	}, [generations, nodeId, origin]);
 
 	const isGenerating = useMemo(
 		() =>
