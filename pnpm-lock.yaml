@@ -253,6 +253,7 @@ catalogs:
 overrides:
   vite: 7.1.3
   cookie: 1.0.2
+  '@electric-sql/client': 1.0.10
 
 importers:
 
@@ -1744,8 +1745,8 @@ packages:
     resolution: {integrity: sha512-Sd8LcWpZk/SWEeKGE8LT6gMm5MGfX/wm+GPnh1eBEtCpya3vYqn37wYknwAHw92ONoyyREl1hJwxV/Qx2DWNOg==}
     engines: {node: '>=16'}
 
-  '@electric-sql/client@1.0.0-beta.1':
-    resolution: {integrity: sha512-Ei9jN3pDoGzc+a/bGqnB5ajb52IvSv7/n2btuyzUlcOHIR2kM9fqtYTJXPwZYKLkGZlHWlpHgWyRtrinkP2nHg==}
+  '@electric-sql/client@1.0.10':
+    resolution: {integrity: sha512-KcP6R2OGiruxbhAa0wMGiRIfpXDQQ8vznBmn34kG/UJ11sqA4NQBhoPhSsKkCPs5EKc2DoS6bcnqLkIHFdxmvg==}
 
   '@embedpdf/pdfium@1.2.1':
     resolution: {integrity: sha512-QWf1jg7EqUlku2q6KYhlXCNfk5IAykFerPuzKJepHTeAEaRcAfu84fJgEsoUTCK4D6dfzVNp2Iuxw6Kv7MpSeg==}
@@ -2439,6 +2440,9 @@ packages:
 
   '@manypkg/get-packages@1.1.3':
     resolution: {integrity: sha512-fo+QhuU3qE/2TQMQmbVMqaQ6EWbMhi4ABWP+O4AM1NqPBuy0OrApV5LO6BrrgnhtAHS2NH6RrVk9OL181tTi8A==}
+
+  '@microsoft/fetch-event-source@2.0.1':
+    resolution: {integrity: sha512-W6CLUJ2eBMw3Rec70qrsEW0jOm/3twwJv21mrmj2yORiaVmVYGS4sSS5yUwvQc1ZlDLYGPnClVWmUUMagKNsfA==}
 
   '@mixmark-io/domino@2.2.0':
     resolution: {integrity: sha512-Y28PR25bHXUg88kCV7nivXrP2Nj2RueZ3/l/jdx6J9f8J4nsEGcgX0Qe6lt7Pa+J79+kPiJU3LguR6O/6zrLOw==}
@@ -9861,7 +9865,9 @@ snapshots:
 
   '@edge-runtime/cookies@5.0.2': {}
 
-  '@electric-sql/client@1.0.0-beta.1':
+  '@electric-sql/client@1.0.10':
+    dependencies:
+      '@microsoft/fetch-event-source': 2.0.1
     optionalDependencies:
       '@rollup/rollup-darwin-arm64': 4.49.0
 
@@ -10306,6 +10312,8 @@ snapshots:
       fs-extra: 8.1.0
       globby: 11.1.0
       read-yaml-file: 1.1.0
+
+  '@microsoft/fetch-event-source@2.0.1': {}
 
   '@mixmark-io/domino@2.2.0': {}
 
@@ -13495,7 +13503,7 @@ snapshots:
   '@trigger.dev/core@4.0.4(bufferutil@4.0.9)(utf-8-validate@6.0.5)':
     dependencies:
       '@bugsnag/cuid': 3.2.1
-      '@electric-sql/client': 1.0.0-beta.1
+      '@electric-sql/client': 1.0.10
       '@google-cloud/precise-date': 4.0.0
       '@jsonhero/path': 1.0.21
       '@opentelemetry/api': 1.9.0
