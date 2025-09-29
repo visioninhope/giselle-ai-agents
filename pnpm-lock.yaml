@@ -470,6 +470,9 @@ importers:
       '@supabase/supabase-js':
         specifier: 'catalog:'
         version: 2.50.5(bufferutil@4.0.9)(utf-8-validate@6.0.5)
+      '@trigger.dev/sdk':
+        specifier: 'catalog:'
+        version: 4.0.4(ai@5.0.44(zod@3.25.76))(bufferutil@4.0.9)(utf-8-validate@6.0.5)(zod@3.25.76)
       '@vercel/blob':
         specifier: 0.27.3
         version: 0.27.3
@@ -612,9 +615,6 @@ importers:
       '@tailwindcss/typography':
         specifier: 0.5.15
         version: 0.5.15(tailwindcss@4.1.10)
-      '@trigger.dev/sdk':
-        specifier: 'catalog:'
-        version: 4.0.4(ai@5.0.44(zod@3.25.76))(bufferutil@4.0.9)(utf-8-validate@6.0.5)(zod@3.25.76)
       '@types/node':
         specifier: 'catalog:'
         version: 22.14.0
