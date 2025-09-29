@@ -232,7 +232,8 @@ function handleGenerationTrace(args: GenerationTraceArgs) {
 }
 
 const generateContentProcessor =
-	process.env.VERCEL === "1" && process.env.NODE_ENV !== "development"
+	process.env.TRIGGERDOTDEV === "1" ||
+	(process.env.VERCEL === "1" && process.env.NODE_ENV !== "development")
 		? "trigger.dev"
 		: "self";
 
