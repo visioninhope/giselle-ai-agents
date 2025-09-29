@@ -132,7 +132,6 @@ export function GoogleModelPanel({
 						});
 						setUrlError(null);
 					}}
-					note="Gemini can crawl the URLs you provide when this is enabled."
 				/>
 				<textarea
 					className="w-full min-h-[96px] rounded-[8px] border border-white-900 bg-black-100 p-[12px] text-white-800 outline-none"
@@ -159,7 +158,7 @@ export function GoogleModelPanel({
 					spellCheck={false}
 				/>
 				{urlError !== null ? (
-					<p className="text-[12px] text-warning-900">{urlError}</p>
+					<p className="text-[12px] text-red-900">{urlError}</p>
 				) : (
 					<p className="text-[12px] text-white-700">
 						Add up to 20 URLs, one per line.
