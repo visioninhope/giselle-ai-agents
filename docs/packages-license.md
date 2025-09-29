@@ -2,14 +2,14 @@
 
 
 ## Summary
-* 861 MIT
-* 220 Apache 2.0
-* 50 ISC
+* 854 MIT
+* 187 Apache 2.0
+* 46 ISC
 * 27 New BSD
 * 13 Simplified BSD
 * 5 BlueOak-1.0.0
-* 3 MIT-0
 * 2 MIT OR Apache-2.0
+* 2 MIT-0
 * 2 Mozilla Public License 2.0
 * 1 BSD
 * 1 (MIT OR CC0-1.0)
@@ -21,7 +21,6 @@
 * 1 CC-BY-4.0
 * 1 Python-2.0
 * 1 LGPL-3.0-or-later
-* 1 (Apache-2.0 AND BSD-3-Clause)
 
 
 
@@ -798,17 +797,6 @@ MIT OR Apache-2.0 permitted
 
 
 
-<a name="@bufbuild/protobuf"></a>
-### @bufbuild/protobuf v2.9.0
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-(Apache-2.0 AND BSD-3-Clause) permitted
-
-
-
 <a name="@bugsnag/cuid"></a>
 ### @bugsnag/cuid v3.2.1
 #### 
@@ -1293,17 +1281,6 @@ LGPL-3.0-or-later permitted
 
 
 
-<a name="@inngest/ai"></a>
-### @inngest/ai v0.1.6
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
-
-
-
 <a name="@isaacs/cliui"></a>
 ### @isaacs/cliui v8.0.2
 #### 
@@ -1323,17 +1300,6 @@ LGPL-3.0-or-later permitted
 * /home/runner/work/giselle/giselle
 
 <a href="http://en.wikipedia.org/wiki/ISC_license">ISC</a> permitted
-
-
-
-<a name="@jpwilliams/waitgroup"></a>
-### @jpwilliams/waitgroup v2.1.1
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
 
 
 
@@ -1766,17 +1732,6 @@ LGPL-3.0-or-later permitted
 
 
 
-<a name="@opentelemetry/auto-instrumentations-node"></a>
-### @opentelemetry/auto-instrumentations-node v0.56.1
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
-
-
-
 <a name="@opentelemetry/context-async-hooks"></a>
 ### @opentelemetry/context-async-hooks v1.24.1
 #### 
@@ -1799,74 +1754,8 @@ LGPL-3.0-or-later permitted
 
 
 
-<a name="@opentelemetry/exporter-logs-otlp-grpc"></a>
-### @opentelemetry/exporter-logs-otlp-grpc v0.57.2
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
-
-
-
 <a name="@opentelemetry/exporter-logs-otlp-http"></a>
-### @opentelemetry/exporter-logs-otlp-http v0.57.2
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
-
-
-
-<a name="@opentelemetry/exporter-logs-otlp-proto"></a>
-### @opentelemetry/exporter-logs-otlp-proto v0.57.2
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
-
-
-
-<a name="@opentelemetry/exporter-metrics-otlp-grpc"></a>
-### @opentelemetry/exporter-metrics-otlp-grpc v0.57.2
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
-
-
-
-<a name="@opentelemetry/exporter-metrics-otlp-http"></a>
-### @opentelemetry/exporter-metrics-otlp-http v0.57.2
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
-
-
-
-<a name="@opentelemetry/exporter-metrics-otlp-proto"></a>
-### @opentelemetry/exporter-metrics-otlp-proto v0.57.2
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
-
-
-
-<a name="@opentelemetry/exporter-prometheus"></a>
-### @opentelemetry/exporter-prometheus v0.57.2
+### @opentelemetry/exporter-logs-otlp-http v0.203.0
 #### 
 
 ##### Paths
@@ -1942,63 +1831,8 @@ LGPL-3.0-or-later permitted
 
 
 
-<a name="@opentelemetry/instrumentation-aws-lambda"></a>
-### @opentelemetry/instrumentation-aws-lambda v0.50.3
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
-
-
-
-<a name="@opentelemetry/instrumentation-aws-sdk"></a>
-### @opentelemetry/instrumentation-aws-sdk v0.49.1
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
-
-
-
-<a name="@opentelemetry/instrumentation-bunyan"></a>
-### @opentelemetry/instrumentation-bunyan v0.45.1
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
-
-
-
-<a name="@opentelemetry/instrumentation-cassandra-driver"></a>
-### @opentelemetry/instrumentation-cassandra-driver v0.45.1
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
-
-
-
 <a name="@opentelemetry/instrumentation-connect"></a>
 ### @opentelemetry/instrumentation-connect v0.43.1
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
-
-
-
-<a name="@opentelemetry/instrumentation-cucumber"></a>
-### @opentelemetry/instrumentation-cucumber v0.14.1
 #### 
 
 ##### Paths
@@ -2019,30 +1853,8 @@ LGPL-3.0-or-later permitted
 
 
 
-<a name="@opentelemetry/instrumentation-dns"></a>
-### @opentelemetry/instrumentation-dns v0.43.1
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
-
-
-
 <a name="@opentelemetry/instrumentation-express"></a>
 ### @opentelemetry/instrumentation-express v0.47.1
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
-
-
-
-<a name="@opentelemetry/instrumentation-fastify"></a>
-### @opentelemetry/instrumentation-fastify v0.44.2
 #### 
 
 ##### Paths
@@ -2076,17 +1888,6 @@ LGPL-3.0-or-later permitted
 
 <a name="@opentelemetry/instrumentation-graphql"></a>
 ### @opentelemetry/instrumentation-graphql v0.47.1
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
-
-
-
-<a name="@opentelemetry/instrumentation-grpc"></a>
-### @opentelemetry/instrumentation-grpc v0.57.2
 #### 
 
 ##### Paths
@@ -2173,17 +1974,6 @@ LGPL-3.0-or-later permitted
 
 
 
-<a name="@opentelemetry/instrumentation-memcached"></a>
-### @opentelemetry/instrumentation-memcached v0.43.1
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
-
-
-
 <a name="@opentelemetry/instrumentation-mongodb"></a>
 ### @opentelemetry/instrumentation-mongodb v0.52.0
 #### 
@@ -2228,28 +2018,6 @@ LGPL-3.0-or-later permitted
 
 
 
-<a name="@opentelemetry/instrumentation-nestjs-core"></a>
-### @opentelemetry/instrumentation-nestjs-core v0.44.1
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
-
-
-
-<a name="@opentelemetry/instrumentation-net"></a>
-### @opentelemetry/instrumentation-net v0.43.1
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
-
-
-
 <a name="@opentelemetry/instrumentation-pg"></a>
 ### @opentelemetry/instrumentation-pg v0.51.1
 #### 
@@ -2261,63 +2029,8 @@ LGPL-3.0-or-later permitted
 
 
 
-<a name="@opentelemetry/instrumentation-pino"></a>
-### @opentelemetry/instrumentation-pino v0.46.1
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
-
-
-
-<a name="@opentelemetry/instrumentation-redis"></a>
-### @opentelemetry/instrumentation-redis v0.46.1
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
-
-
-
 <a name="@opentelemetry/instrumentation-redis-4"></a>
 ### @opentelemetry/instrumentation-redis-4 v0.46.1
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
-
-
-
-<a name="@opentelemetry/instrumentation-restify"></a>
-### @opentelemetry/instrumentation-restify v0.45.1
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
-
-
-
-<a name="@opentelemetry/instrumentation-router"></a>
-### @opentelemetry/instrumentation-router v0.44.1
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
-
-
-
-<a name="@opentelemetry/instrumentation-socket.io"></a>
-### @opentelemetry/instrumentation-socket.io v0.46.1
 #### 
 
 ##### Paths
@@ -2340,17 +2053,6 @@ LGPL-3.0-or-later permitted
 
 <a name="@opentelemetry/instrumentation-undici"></a>
 ### @opentelemetry/instrumentation-undici v0.10.1
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
-
-
-
-<a name="@opentelemetry/instrumentation-winston"></a>
-### @opentelemetry/instrumentation-winston v0.44.1
 #### 
 
 ##### Paths
@@ -2404,17 +2106,6 @@ LGPL-3.0-or-later permitted
 
 
 
-<a name="@opentelemetry/propagation-utils"></a>
-### @opentelemetry/propagation-utils v0.30.16
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
-
-
-
 <a name="@opentelemetry/propagator-b3"></a>
 ### @opentelemetry/propagator-b3 v1.24.1
 #### 
@@ -2439,61 +2130,6 @@ LGPL-3.0-or-later permitted
 
 <a name="@opentelemetry/redis-common"></a>
 ### @opentelemetry/redis-common v0.36.2
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
-
-
-
-<a name="@opentelemetry/resource-detector-alibaba-cloud"></a>
-### @opentelemetry/resource-detector-alibaba-cloud v0.30.1
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
-
-
-
-<a name="@opentelemetry/resource-detector-aws"></a>
-### @opentelemetry/resource-detector-aws v1.12.0
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
-
-
-
-<a name="@opentelemetry/resource-detector-azure"></a>
-### @opentelemetry/resource-detector-azure v0.6.1
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
-
-
-
-<a name="@opentelemetry/resource-detector-container"></a>
-### @opentelemetry/resource-detector-container v0.6.1
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
-
-
-
-<a name="@opentelemetry/resource-detector-gcp"></a>
-### @opentelemetry/resource-detector-gcp v0.33.1
 #### 
 
 ##### Paths
@@ -4681,28 +4317,6 @@ LGPL-3.0-or-later permitted
 
 
 
-<a name="@types/aws-lambda"></a>
-### @types/aws-lambda v8.10.147
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-
-
-<a name="@types/bunyan"></a>
-### @types/bunyan v1.8.11
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-
-
 <a name="@types/chai"></a>
 ### @types/chai v5.2.2
 #### 
@@ -4947,17 +4561,6 @@ LGPL-3.0-or-later permitted
 
 <a name="@types/mdurl"></a>
 ### @types/mdurl v2.0.0
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-
-
-<a name="@types/memcached"></a>
-### @types/memcached v2.2.10
 #### 
 
 ##### Paths
@@ -5694,7 +5297,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="ansi-regex"></a>
-### ansi-regex v4.1.1
+### ansi-regex v5.0.1
 #### 
 
 ##### Paths
@@ -6068,17 +5671,6 @@ Python-2.0 manually approved
 * /home/runner/work/giselle/giselle
 
 CC-BY-4.0 permitted
-
-
-
-<a name="canonicalize"></a>
-### canonicalize v1.0.8
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
 
 
 
@@ -6469,17 +6061,6 @@ BlueOak-1.0.0 permitted
 
 <a name="cronstrue"></a>
 ### cronstrue v2.59.0
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-
-
-<a name="cross-fetch"></a>
-### cross-fetch v4.1.0
 #### 
 
 ##### Paths
@@ -7842,17 +7423,6 @@ BlueOak-1.0.0 permitted
 
 
 
-<a name="hash.js"></a>
-### hash.js v1.1.7
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-
-
 <a name="hasown"></a>
 ### hasown v2.0.2
 #### 
@@ -8106,17 +7676,6 @@ BlueOak-1.0.0 permitted
 
 
 
-<a name="inherits"></a>
-### inherits v2.0.4
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://en.wikipedia.org/wiki/ISC_license">ISC</a> permitted
-
-
-
 <a name="inline-style-parser"></a>
 ### inline-style-parser v0.2.4
 #### 
@@ -8125,17 +7684,6 @@ BlueOak-1.0.0 permitted
 * /home/runner/work/giselle/giselle
 
 <a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-
-
-<a name="inngest"></a>
-### inngest v3.40.3
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
 
 
 
@@ -8554,17 +8102,6 @@ BlueOak-1.0.0 permitted
 * /home/runner/work/giselle/giselle
 
 <a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-
-
-<a name="json-stringify-safe"></a>
-### json-stringify-safe v5.0.1
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://en.wikipedia.org/wiki/ISC_license">ISC</a> permitted
 
 
 
@@ -9500,17 +9037,6 @@ BlueOak-1.0.0 permitted
 * /home/runner/work/giselle/giselle
 
 <a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-
-
-<a name="minimalistic-assert"></a>
-### minimalistic-assert v1.0.1
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://en.wikipedia.org/wiki/ISC_license">ISC</a> permitted
 
 
 
@@ -11318,17 +10844,6 @@ BlueOak-1.0.0 permitted
 
 
 
-<a name="serialize-error-cjs"></a>
-### serialize-error-cjs v0.1.4
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-MIT-0 permitted
-
-
-
 <a name="serialize-javascript"></a>
 ### serialize-javascript v6.0.2
 #### 
@@ -11697,7 +11212,7 @@ Unknown manually approved
 
 
 <a name="strip-ansi"></a>
-### strip-ansi v5.2.0
+### strip-ansi v6.0.1
 #### 
 
 ##### Paths
@@ -11935,28 +11450,6 @@ Unknown manually approved
 * /home/runner/work/giselle/giselle
 
 <a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-
-
-<a name="temporal-polyfill"></a>
-### temporal-polyfill v0.2.5
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-
-
-<a name="temporal-spec"></a>
-### temporal-spec v0.2.4
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://en.wikipedia.org/wiki/ISC_license">ISC</a> permitted
 
 
 
@@ -13120,7 +12613,7 @@ BlueOak-1.0.0 permitted
 
 
 <a name="zod"></a>
-### zod v3.22.5
+### zod v3.25.28
 #### 
 
 ##### Paths
