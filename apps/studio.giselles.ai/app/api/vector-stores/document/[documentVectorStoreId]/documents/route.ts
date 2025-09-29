@@ -16,8 +16,12 @@ import { docVectorStoreFlag } from "@/flags";
 import {
 	DOCUMENT_VECTOR_STORE_MAX_FILE_SIZE_BYTES,
 	DOCUMENT_VECTOR_STORE_MAX_FILE_SIZE_MB,
+	DOCUMENT_VECTOR_STORE_SUPPORTED_FILE_TYPE_LABEL,
 } from "@/lib/vector-stores/document/constants";
-import { isPdfFile } from "@/lib/vector-stores/document/utils";
+import {
+	resolveSupportedDocumentFile,
+	sanitizeDocumentFileName,
+} from "@/lib/vector-stores/document/utils";
 import type {
 	DocumentVectorStoreId,
 	DocumentVectorStoreSourceId,
@@ -89,14 +93,14 @@ async function rollbackUploads(
 
 			if (storageError) {
 				console.error(
-					"Failed to roll back uploaded PDF files from storage. Aborting rollback.",
+					"Failed to roll back uploaded document files from storage. Aborting rollback.",
 					storageError,
 				);
 				throw new Error("Storage cleanup failed during rollback.");
 			}
 		} catch (cleanupError) {
 			console.error(
-				"Failed to roll back uploaded PDF files from storage. Aborting rollback.",
+				"Failed to roll back uploaded document files from storage. Aborting rollback.",
 				cleanupError,
 			);
 			throw cleanupError instanceof Error
@@ -120,17 +124,6 @@ async function rollbackUploads(
 				: new Error("Database cleanup failed during rollback.");
 		}
 	}
-}
-
-function sanitizePdfFileName(fileName: string): string {
-	const trimmed = fileName.trim();
-	const lower = trimmed.toLowerCase();
-	const base = lower.endsWith(".pdf") ? trimmed.slice(0, -4) : trimmed;
-	const sanitizedBase = base
-		.replace(/[^a-z0-9-_]+/gi, "_")
-		.replace(/_{2,}/g, "_");
-	const finalBase = sanitizedBase.length > 0 ? sanitizedBase : "document";
-	return `${finalBase}.pdf`;
 }
 
 function buildStorageKey(
@@ -183,7 +176,7 @@ export async function POST(
 		fileName: string;
 		error: string;
 		code:
-			| "not-pdf"
+			| "unsupported-type"
 			| "empty"
 			| "oversize"
 			| "read-error"
@@ -193,17 +186,24 @@ export async function POST(
 	}> = [];
 
 	for (const file of files) {
-		const sanitizedFileName = sanitizePdfFileName(file.name);
-		const originalFileName = file.name.trim() || sanitizedFileName;
+		const trimmedFileName = file.name.trim();
+		const resolvedFile = resolveSupportedDocumentFile(file);
+		const fallbackFileName = trimmedFileName || file.name || "document";
 
-		if (!isPdfFile(file)) {
+		if (!resolvedFile) {
 			failures.push({
-				fileName: originalFileName,
-				error: "File is not a PDF",
-				code: "not-pdf",
+				fileName: fallbackFileName,
+				error: `Unsupported file type. Supported types: ${DOCUMENT_VECTOR_STORE_SUPPORTED_FILE_TYPE_LABEL}`,
+				code: "unsupported-type",
 			});
 			continue;
 		}
+
+		const sanitizedFileName = sanitizeDocumentFileName(
+			fallbackFileName,
+			resolvedFile.extension,
+		);
+		const originalFileName = trimmedFileName || sanitizedFileName;
 
 		if (file.size === 0) {
 			failures.push({
@@ -246,12 +246,12 @@ export async function POST(
 		const { error: uploadError } = await supabase.storage
 			.from(STORAGE_BUCKET)
 			.upload(storageKey, buffer, {
-				contentType: "application/pdf",
+				contentType: resolvedFile.contentType,
 				upsert: true,
 			});
 
 		if (uploadError) {
-			console.error("Failed to upload PDF file to storage:", uploadError);
+			console.error("Failed to upload document file to storage:", uploadError);
 			failures.push({
 				fileName: originalFileName,
 				error: "Failed to upload file",
@@ -305,7 +305,11 @@ export async function POST(
 
 	const hasSuccesses = successes.length > 0;
 	const hasFailures = failures.length > 0;
-	const validationFailureCodes = new Set(["not-pdf", "empty", "oversize"]);
+	const validationFailureCodes = new Set([
+		"unsupported-type",
+		"empty",
+		"oversize",
+	]);
 	const allValidationFailures =
 		hasFailures &&
 		failures.every((failure) => validationFailureCodes.has(failure.code));
@@ -408,7 +412,7 @@ export async function DELETE(
 			.remove([source.storageKey]);
 		if (storageError) {
 			console.error(
-				`Failed to delete PDF file ${source.storageKey} from storage:`,
+				`Failed to delete document file ${source.storageKey} from storage:`,
 				storageError,
 			);
 			return NextResponse.json(
