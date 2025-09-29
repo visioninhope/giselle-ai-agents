@@ -2,7 +2,6 @@
 
 import {
 	DEFAULT_EMBEDDING_PROFILE_ID,
-	EMBEDDING_PROFILES,
 	type EmbeddingProfileId,
 	isEmbeddingProfileId,
 } from "@giselle-sdk/data-type";
@@ -566,13 +565,6 @@ function validateDocumentEmbeddingProfileIds(
 	for (const id of embeddingProfileIds) {
 		if (!isEmbeddingProfileId(id)) {
 			return { success: false, error: `Invalid embedding profile id: ${id}` };
-		}
-		const profile = EMBEDDING_PROFILES[id];
-		if (profile.provider !== "cohere") {
-			return {
-				success: false,
-				error: "Only Cohere profiles are supported for Document Vector Stores",
-			};
 		}
 		uniqueIds.add(id);
 	}

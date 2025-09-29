@@ -1,5 +1,6 @@
 "use client";
 
+import { DEFAULT_EMBEDDING_PROFILE_ID } from "@giselle-sdk/data-type";
 import * as Dialog from "@radix-ui/react-dialog";
 import {
 	ArrowUpFromLine,
@@ -270,10 +271,22 @@ function DocumentVectorStoreConfigureDialog({
 		() => Object.entries(DOCUMENT_EMBEDDING_PROFILES),
 		[],
 	);
-	const defaultProfiles = useMemo(
-		() => availableProfiles.map(([id]) => Number(id)),
+	const selectableProfiles = useMemo(
+		() =>
+			availableProfiles.filter(([, profile]) => profile.provider !== "cohere"),
 		[availableProfiles],
 	);
+	const defaultProfiles = useMemo(() => {
+		const primaryIds = selectableProfiles.map(([id]) => Number(id));
+		const fallbackIds =
+			primaryIds.length > 0
+				? primaryIds
+				: availableProfiles.map(([id]) => Number(id));
+		if (fallbackIds.includes(DEFAULT_EMBEDDING_PROFILE_ID)) {
+			return [DEFAULT_EMBEDDING_PROFILE_ID];
+		}
+		return fallbackIds.length > 0 ? [fallbackIds[0]] : [];
+	}, [selectableProfiles, availableProfiles]);
 	const nameInputId = useId();
 	const [name, setName] = useState(store.name);
 	const [selectedProfiles, setSelectedProfiles] = useState<number[]>(
@@ -604,7 +617,7 @@ function DocumentVectorStoreConfigureDialog({
 								Select at least one embedding model for ingestion.
 							</div>
 							<div className="space-y-2">
-								{availableProfiles.map(([profileIdString, profile]) => {
+								{selectableProfiles.map(([profileIdString, profile]) => {
 									const profileId = Number(profileIdString);
 									const isSelected = selectedProfiles.includes(profileId);
 									const isLastSelected =
