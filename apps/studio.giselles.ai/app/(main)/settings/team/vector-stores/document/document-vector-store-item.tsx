@@ -271,13 +271,22 @@ function DocumentVectorStoreConfigureDialog({
 		() => Object.entries(DOCUMENT_EMBEDDING_PROFILES),
 		[],
 	);
+	const selectableProfiles = useMemo(
+		() =>
+			availableProfiles.filter(([, profile]) => profile.provider !== "cohere"),
+		[availableProfiles],
+	);
 	const defaultProfiles = useMemo(() => {
-		const profileIds = availableProfiles.map(([id]) => Number(id));
-		if (profileIds.includes(DEFAULT_EMBEDDING_PROFILE_ID)) {
+		const primaryIds = selectableProfiles.map(([id]) => Number(id));
+		const fallbackIds =
+			primaryIds.length > 0
+				? primaryIds
+				: availableProfiles.map(([id]) => Number(id));
+		if (fallbackIds.includes(DEFAULT_EMBEDDING_PROFILE_ID)) {
 			return [DEFAULT_EMBEDDING_PROFILE_ID];
 		}
-		return profileIds.length > 0 ? [profileIds[0]] : [];
-	}, [availableProfiles]);
+		return fallbackIds.length > 0 ? [fallbackIds[0]] : [];
+	}, [selectableProfiles, availableProfiles]);
 	const nameInputId = useId();
 	const [name, setName] = useState(store.name);
 	const [selectedProfiles, setSelectedProfiles] = useState<number[]>(
@@ -608,7 +617,7 @@ function DocumentVectorStoreConfigureDialog({
 								Select at least one embedding model for ingestion.
 							</div>
 							<div className="space-y-2">
-								{availableProfiles.map(([profileIdString, profile]) => {
+								{selectableProfiles.map(([profileIdString, profile]) => {
 									const profileId = Number(profileIdString);
 									const isSelected = selectedProfiles.includes(profileId);
 									const isLastSelected =
