@@ -1,5 +1,6 @@
 "use client";
 
+import { DEFAULT_EMBEDDING_PROFILE_ID } from "@giselle-sdk/data-type";
 import * as Dialog from "@radix-ui/react-dialog";
 import {
 	ArrowUpFromLine,
@@ -270,10 +271,13 @@ function DocumentVectorStoreConfigureDialog({
 		() => Object.entries(DOCUMENT_EMBEDDING_PROFILES),
 		[],
 	);
-	const defaultProfiles = useMemo(
-		() => availableProfiles.map(([id]) => Number(id)),
-		[availableProfiles],
-	);
+	const defaultProfiles = useMemo(() => {
+		const profileIds = availableProfiles.map(([id]) => Number(id));
+		if (profileIds.includes(DEFAULT_EMBEDDING_PROFILE_ID)) {
+			return [DEFAULT_EMBEDDING_PROFILE_ID];
+		}
+		return profileIds.length > 0 ? [profileIds[0]] : [];
+	}, [availableProfiles]);
 	const nameInputId = useId();
 	const [name, setName] = useState(store.name);
 	const [selectedProfiles, setSelectedProfiles] = useState<number[]>(

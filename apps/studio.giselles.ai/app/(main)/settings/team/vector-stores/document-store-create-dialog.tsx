@@ -1,8 +1,15 @@
 "use client";
 
+import { DEFAULT_EMBEDDING_PROFILE_ID } from "@giselle-sdk/data-type";
 import * as Dialog from "@radix-ui/react-dialog";
 import { Plus } from "lucide-react";
-import { useCallback, useMemo, useState, useTransition } from "react";
+import {
+	useCallback,
+	useEffect,
+	useMemo,
+	useState,
+	useTransition,
+} from "react";
 import { GlassButton } from "@/components/ui/glass-button";
 import {
 	GlassDialogBody,
@@ -29,25 +36,56 @@ export function DocumentVectorStoreCreateDialog({
 		() => Object.entries(DOCUMENT_EMBEDDING_PROFILES),
 		[],
 	);
-	const selectedProfiles = useMemo(
-		() => availableProfiles.map(([id]) => Number(id)),
-		[availableProfiles],
-	);
+	const defaultProfileIds = useMemo(() => {
+		const profileIds = availableProfiles.map(([id]) => Number(id));
+		if (profileIds.includes(DEFAULT_EMBEDDING_PROFILE_ID)) {
+			return [DEFAULT_EMBEDDING_PROFILE_ID];
+		}
+		return profileIds.length > 0 ? [profileIds[0]] : [];
+	}, [availableProfiles]);
+	const [selectedProfiles, setSelectedProfiles] = useState<number[]>(() => [
+		...defaultProfileIds,
+	]);
 	const [isPending, startTransition] = useTransition();
 	const [error, setError] = useState<string | null>(null);
 
+	useEffect(() => {
+		if (open) {
+			setSelectedProfiles([...defaultProfileIds]);
+			setError(null);
+		}
+	}, [open, defaultProfileIds]);
+
+	const toggleProfile = useCallback((profileId: number) => {
+		setSelectedProfiles((prev) => {
+			const isSelected = prev.includes(profileId);
+			if (isSelected) {
+				if (prev.length === 1) {
+					return prev;
+				}
+				return prev.filter((id) => id !== profileId);
+			}
+			return [...prev, profileId];
+		});
+	}, []);
+
 	const onSubmit = useCallback(() => {
+		if (selectedProfiles.length === 0) {
+			setError("Select at least one embedding profile");
+			return;
+		}
 		setError(null);
 		startTransition(async () => {
 			const result = await createAction(name.trim(), selectedProfiles);
 			if (result.success) {
 				setOpen(false);
 				setName("");
+				setSelectedProfiles([...defaultProfileIds]);
 			} else {
 				setError(result.error);
 			}
 		});
-	}, [createAction, name, selectedProfiles]);
+	}, [createAction, name, selectedProfiles, defaultProfileIds]);
 
 	return (
 		<Dialog.Root open={open} onOpenChange={setOpen}>
@@ -78,7 +116,7 @@ export function DocumentVectorStoreCreateDialog({
 								onChange={(e) => setName(e.target.value)}
 							/>
 						</label>
-						{/* Embedding Models (Cohere-only), styled like Register Repository */}
+						{/* Embedding Models, styled like Register Repository */}
 						<div className="mt-4">
 							<div className="text-white-400 text-[14px] leading-[16.8px] font-sans mb-2">
 								Embedding Models
@@ -90,6 +128,8 @@ export function DocumentVectorStoreCreateDialog({
 								{availableProfiles.map(([id, p]) => {
 									const profileId = Number(id);
 									const isSelected = selectedProfiles.includes(profileId);
+									const isLastSelected =
+										selectedProfiles.length === 1 && isSelected;
 									return (
 										<label
 											key={profileId}
@@ -98,7 +138,8 @@ export function DocumentVectorStoreCreateDialog({
 											<input
 												type="checkbox"
 												checked={isSelected}
-												disabled
+												disabled={isPending || isLastSelected}
+												onChange={() => toggleProfile(profileId)}
 												className="mt-1 w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 rounded focus:ring-primary-500"
 											/>
 											<div className="flex-1">
