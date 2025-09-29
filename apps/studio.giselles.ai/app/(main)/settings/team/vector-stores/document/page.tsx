@@ -4,6 +4,7 @@ import { docVectorStoreFlag } from "@/flags";
 import {
 	createDocumentVectorStore,
 	deleteDocumentVectorStore,
+	updateDocumentVectorStore,
 } from "../actions";
 import { getDocumentVectorStores } from "../data";
 import { DocumentVectorStoreCreateDialog } from "../document-store-create-dialog";
@@ -48,6 +49,7 @@ export default async function DocumentVectorStorePage() {
 				<DocumentVectorStoreList
 					stores={vectorStores}
 					deleteAction={deleteDocumentVectorStore}
+					updateAction={updateDocumentVectorStore}
 				/>
 			</VectorStoresNavigationLayout>
 		</div>

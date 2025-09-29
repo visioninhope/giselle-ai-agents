@@ -3,9 +3,7 @@ import {
 	isImageGenerationNode,
 	isQueryNode,
 	isTextGenerationNode,
-	isTriggerNode,
 	isVectorStoreNode,
-	isWebPageNode,
 	type NodeLike,
 } from "@giselle-sdk/data-type";
 import {
@@ -40,24 +38,6 @@ export function isSupportedConnection(
 
 	// prevent unsupported inputs for image generation node
 	if (isImageGenerationNode(inputNode)) {
-		if (isWebPageNode(outputNode)) {
-			return {
-				canConnect: false,
-				message: "Web page node is not supported as an input for this node",
-			};
-		}
-		if (isTriggerNode(outputNode)) {
-			return {
-				canConnect: false,
-				message: "Trigger node is not supported as an input for this node",
-			};
-		}
-		if (outputNode.content.type === "action") {
-			return {
-				canConnect: false,
-				message: "Action node is not supported as an input for this node",
-			};
-		}
 		if (outputNode.content.type === "github") {
 			return {
 				canConnect: false,

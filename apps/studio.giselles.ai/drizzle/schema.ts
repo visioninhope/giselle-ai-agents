@@ -7,6 +7,7 @@ import type {
 import type { ActId } from "@giselle-sdk/giselle";
 import type {
 	DocumentVectorStoreId,
+	DocumentVectorStoreSourceId,
 	GitHubRepositoryIndexId,
 } from "@giselles-ai/types";
 import { relations, sql } from "drizzle-orm";
@@ -350,6 +351,69 @@ export const documentVectorStores = pgTable(
 		index("doc_vs_team_db_id_idx").on(table.teamDbId),
 		unique("doc_vs_id_unique").on(table.id),
 	],
+);
+
+export type DocumentVectorStoreSourceUploadStatus =
+	| "uploading"
+	| "uploaded"
+	| "failed";
+
+export type DocumentVectorStoreSourceIngestStatus =
+	| "idle"
+	| "running"
+	| "completed"
+	| "failed";
+
+export const documentVectorStoreSources = pgTable(
+	"document_vector_store_sources",
+	{
+		id: text("id").$type<DocumentVectorStoreSourceId>().notNull(),
+		dbId: serial("db_id").primaryKey(),
+		documentVectorStoreDbId: integer("document_vector_store_db_id")
+			.notNull()
+			.references(() => documentVectorStores.dbId, { onDelete: "cascade" }),
+		storageBucket: text("storage_bucket").notNull(),
+		storageKey: text("storage_key").notNull(),
+		fileName: text("file_name").notNull(),
+		fileSizeBytes: integer("file_size_bytes").notNull(),
+		fileChecksum: text("file_checksum"),
+		uploadStatus: text("upload_status")
+			.notNull()
+			.$type<DocumentVectorStoreSourceUploadStatus>()
+			.default("uploading"),
+		uploadErrorCode: text("upload_error_code"),
+		ingestStatus: text("ingest_status")
+			.notNull()
+			.$type<DocumentVectorStoreSourceIngestStatus>()
+			.default("idle"),
+		ingestErrorCode: text("ingest_error_code"),
+		metadata: jsonb("metadata"),
+		createdAt: timestamp("created_at").defaultNow().notNull(),
+		updatedAt: timestamp("updated_at")
+			.defaultNow()
+			.notNull()
+			.$onUpdate(() => new Date()),
+		ingestedAt: timestamp("ingested_at"),
+	},
+	(table) => [
+		unique("doc_vs_src_id_unique").on(table.id),
+		unique("doc_vs_src_storage_unique").on(
+			table.documentVectorStoreDbId,
+			table.storageKey,
+		),
+		index("doc_vs_src_upload_status_idx").on(table.uploadStatus),
+		index("doc_vs_src_ingest_status_idx").on(table.ingestStatus),
+	],
+);
+
+export const documentVectorStoreSourcesRelations = relations(
+	documentVectorStoreSources,
+	({ one }) => ({
+		documentVectorStore: one(documentVectorStores, {
+			fields: [documentVectorStoreSources.documentVectorStoreDbId],
+			references: [documentVectorStores.dbId],
+		}),
+	}),
 );
 
 export const documentEmbeddingProfiles = pgTable(

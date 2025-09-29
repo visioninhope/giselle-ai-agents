@@ -505,7 +505,7 @@ async function buildGenerationMessageForImageGeneration(
 	if (prompt === undefined) {
 		throw new Error("Prompt cannot be empty");
 	}
-
+	const llmProvider = node.content.llm.provider;
 	let userMessage = prompt;
 
 	if (isJsonContent(prompt)) {
@@ -574,16 +574,49 @@ async function buildGenerationMessageForImageGeneration(
 					contextNode.content,
 					fileResolver,
 				);
+				switch (llmProvider) {
+					case "fal":
+					case "openai":
+						userMessage = userMessage.replace(
+							replaceKeyword,
+							fileContents
+								.map((fileContent) => {
+									if (fileContent.type !== "file") {
+										return null;
+									}
+									if (
+										!(
+											fileContent.data instanceof Uint8Array ||
+											fileContent.data instanceof ArrayBuffer
+										)
+									) {
+										return null;
+									}
+									const text = new TextDecoder().decode(fileContent.data);
+									return `<WebPage name=${fileContent.filename}>${text}</WebPage>`;
+								})
+								.filter((data): data is string => data !== null)
+								.join(),
+						);
+						break;
+					case "google":
+						userMessage = userMessage.replace(
+							replaceKeyword,
+							getFilesDescription(attachedFiles.length, fileContents.length),
+						);
 
-				userMessage = userMessage.replace(
-					replaceKeyword,
-					getFilesDescription(attachedFiles.length, fileContents.length),
-				);
-
-				attachedFiles.push(...fileContents);
+						attachedFiles.push(...fileContents);
+						break;
+					default: {
+						const _exhaustiveCheck: never = llmProvider;
+						throw new Error(`Unhandled type: ${_exhaustiveCheck}`);
+					}
+				}
 				break;
 			}
 
+			case "action":
+			case "trigger":
 			case "query": {
 				const result = await textGenerationResolver(
 					contextNode.id,
@@ -613,8 +646,6 @@ async function buildGenerationMessageForImageGeneration(
 			}
 
 			case "github":
-			case "trigger":
-			case "action":
 			case "vectorStore":
 				throw new Error("Not implemented");
 

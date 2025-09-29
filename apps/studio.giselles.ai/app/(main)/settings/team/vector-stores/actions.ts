@@ -7,12 +7,14 @@ import {
 	isEmbeddingProfileId,
 } from "@giselle-sdk/data-type";
 import { createId } from "@paralleldrive/cuid2";
+import { createClient } from "@supabase/supabase-js";
 import { and, eq, inArray, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { after } from "next/server";
 import {
 	db,
 	documentEmbeddingProfiles,
+	documentVectorStoreSources,
 	documentVectorStores,
 	type GitHubRepositoryContentType,
 	githubRepositoryContentStatus,
@@ -33,7 +35,23 @@ import type {
 import { fetchCurrentUser, getGitHubIdentityState } from "@/services/accounts";
 import { buildAppInstallationClient } from "@/services/external/github";
 import { fetchCurrentTeam } from "@/services/teams";
-import type { ActionResult, DiagnosticResult } from "./types";
+import type {
+	ActionResult,
+	DiagnosticResult,
+	DocumentVectorStoreUpdateInput,
+} from "./types";
+
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY;
+
+if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) {
+	throw new Error(
+		"Missing Supabase configuration. Please set SUPABASE_URL and SUPABASE_SERVICE_KEY.",
+	);
+}
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
+const DOCUMENT_VECTOR_STORE_STORAGE_PREFIX = "vector-stores";
 
 type IngestabilityCheck = {
 	canIngest: boolean;
@@ -534,6 +552,34 @@ export async function triggerManualIngest(
 	}
 }
 
+function validateDocumentEmbeddingProfileIds(
+	embeddingProfileIds: number[],
+):
+	| { success: true; profileIds: EmbeddingProfileId[] }
+	| { success: false; error: string } {
+	if (!Array.isArray(embeddingProfileIds) || embeddingProfileIds.length === 0) {
+		return { success: false, error: "Select at least one embedding profile" };
+	}
+
+	const uniqueIds = new Set<EmbeddingProfileId>();
+
+	for (const id of embeddingProfileIds) {
+		if (!isEmbeddingProfileId(id)) {
+			return { success: false, error: `Invalid embedding profile id: ${id}` };
+		}
+		const profile = EMBEDDING_PROFILES[id];
+		if (profile.provider !== "cohere") {
+			return {
+				success: false,
+				error: "Only Cohere profiles are supported for Document Vector Stores",
+			};
+		}
+		uniqueIds.add(id);
+	}
+
+	return { success: true, profileIds: Array.from(uniqueIds) };
+}
+
 export async function createDocumentVectorStore(
 	name: string,
 	embeddingProfileIds: number[],
@@ -546,25 +592,12 @@ export async function createDocumentVectorStore(
 	if (trimmedName.length === 0) {
 		return { success: false, error: "Name is required" };
 	}
-	// Validate provided embedding profiles: non-empty and Cohere-only
-	if (!Array.isArray(embeddingProfileIds) || embeddingProfileIds.length === 0) {
-		return { success: false, error: "Select at least one embedding profile" };
+	const validationResult =
+		validateDocumentEmbeddingProfileIds(embeddingProfileIds);
+	if (!validationResult.success) {
+		return { success: false, error: validationResult.error };
 	}
-	for (const id of embeddingProfileIds) {
-		if (!isEmbeddingProfileId(id)) {
-			return { success: false, error: `Invalid embedding profile id: ${id}` };
-		}
-		const p = EMBEDDING_PROFILES[id];
-		if (p.provider !== "cohere") {
-			return {
-				success: false,
-				error: "Only Cohere profiles are supported for Document Vector Stores",
-			};
-		}
-	}
-	const profileIds = Array.from(
-		new Set(embeddingProfileIds),
-	) as EmbeddingProfileId[];
+	const { profileIds } = validationResult;
 	try {
 		const team = await fetchCurrentTeam();
 		const documentVectorStoreId = `dvs_${createId()}` as DocumentVectorStoreId;
@@ -608,17 +641,31 @@ export async function createDocumentVectorStore(
 	}
 }
 
-export async function deleteDocumentVectorStore(
+export async function updateDocumentVectorStore(
 	documentVectorStoreId: DocumentVectorStoreId,
+	input: DocumentVectorStoreUpdateInput,
 ): Promise<ActionResult> {
 	const enabled = await docVectorStoreFlag();
 	if (!enabled) {
 		return { success: false, error: "Feature disabled" };
 	}
 
+	const trimmedName = input.name.trim();
+	if (trimmedName.length === 0) {
+		return { success: false, error: "Name is required" };
+	}
+
+	const validationResult = validateDocumentEmbeddingProfileIds(
+		input.embeddingProfileIds,
+	);
+	if (!validationResult.success) {
+		return { success: false, error: validationResult.error };
+	}
+	const { profileIds } = validationResult;
+
 	try {
 		const team = await fetchCurrentTeam();
-		const deleted = await db.transaction(async (tx) => {
+		const updated = await db.transaction(async (tx) => {
 			const [store] = await tx
 				.select({ dbId: documentVectorStores.dbId })
 				.from(documentVectorStores)
@@ -631,7 +678,97 @@ export async function deleteDocumentVectorStore(
 				.for("update")
 				.limit(1);
 
-			if (!store) return false;
+			if (!store) {
+				return false;
+			}
+
+			await tx
+				.update(documentVectorStores)
+				.set({ name: trimmedName })
+				.where(eq(documentVectorStores.dbId, store.dbId));
+
+			await tx
+				.delete(documentEmbeddingProfiles)
+				.where(
+					eq(documentEmbeddingProfiles.documentVectorStoreDbId, store.dbId),
+				);
+
+			if (profileIds.length > 0) {
+				const now = new Date();
+				await tx.insert(documentEmbeddingProfiles).values(
+					profileIds.map((profileId) => ({
+						documentVectorStoreDbId: store.dbId,
+						embeddingProfileId: profileId,
+						createdAt: now,
+					})),
+				);
+			}
+
+			return true;
+		});
+
+		if (!updated) {
+			return { success: false, error: "Vector store not found" };
+		}
+
+		revalidatePath("/settings/team/vector-stores/document");
+		return { success: true };
+	} catch (error) {
+		console.error("Failed to update document vector store:", error);
+		return {
+			success: false,
+			error: "Failed to update vector store. Please try again.",
+		};
+	}
+}
+
+export async function deleteDocumentVectorStore(
+	documentVectorStoreId: DocumentVectorStoreId,
+): Promise<ActionResult> {
+	const enabled = await docVectorStoreFlag();
+	if (!enabled) {
+		return { success: false, error: "Feature disabled" };
+	}
+
+	try {
+		const team = await fetchCurrentTeam();
+		const deletionResult = await db.transaction(async (tx) => {
+			const [store] = await tx
+				.select({ dbId: documentVectorStores.dbId })
+				.from(documentVectorStores)
+				.where(
+					and(
+						eq(documentVectorStores.id, documentVectorStoreId),
+						eq(documentVectorStores.teamDbId, team.dbId),
+					),
+				)
+				.for("update")
+				.limit(1);
+
+			if (!store) {
+				return {
+					success: false as const,
+					storageSources: [],
+				};
+			}
+
+			const sourceRecords = await tx
+				.select({
+					storageBucket: documentVectorStoreSources.storageBucket,
+					storageKey: documentVectorStoreSources.storageKey,
+				})
+				.from(documentVectorStoreSources)
+				.where(
+					eq(documentVectorStoreSources.documentVectorStoreDbId, store.dbId),
+				);
+
+			if (sourceRecords.length > 0) {
+				await tx
+					.delete(documentVectorStoreSources)
+					.where(
+						eq(documentVectorStoreSources.documentVectorStoreDbId, store.dbId),
+					);
+			}
 
 			await tx
 				.delete(documentEmbeddingProfiles)
@@ -641,11 +778,57 @@ export async function deleteDocumentVectorStore(
 			await tx
 				.delete(documentVectorStores)
 				.where(eq(documentVectorStores.dbId, store.dbId));
-			return true;
+
+			return {
+				success: true as const,
+				storageSources: sourceRecords,
+			};
 		});
 
-		if (!deleted) {
+		if (!deletionResult.success) {
 			return { success: false, error: "Vector store not found" };
+		}
+
+		const storageSources = deletionResult.storageSources;
+		if (storageSources.length > 0) {
+			// Perform potentially slow storage cleanup after the database transaction commits.
+			after(async () => {
+				const storeFolder = `${DOCUMENT_VECTOR_STORE_STORAGE_PREFIX}/${documentVectorStoreId}`;
+				const cleanupTargetsByBucket = new Map<string, Set<string>>();
+				for (const record of storageSources) {
+					const targets = cleanupTargetsByBucket.get(record.storageBucket);
+					if (targets) {
+						targets.add(record.storageKey);
+					} else {
+						cleanupTargetsByBucket.set(
+							record.storageBucket,
+							new Set([storeFolder, `${storeFolder}/`, record.storageKey]),
+						);
+					}
+				}
+
+				for (const [bucket, targets] of cleanupTargetsByBucket) {
+					if (targets.size === 0) {
+						continue;
+					}
+					try {
+						const { error: storageError } = await supabase.storage
+							.from(bucket)
+							.remove(Array.from(targets));
+						if (storageError) {
+							console.error(
+								`Failed to delete PDF files from storage bucket ${bucket}:`,
+								storageError,
+							);
+						}
+					} catch (storageError) {
+						console.error(
+							`Failed to delete PDF files from storage bucket ${bucket}:`,
+							storageError,
+						);
+					}
+				}
+			});
 		}
 
 		revalidatePath("/settings/team/vector-stores/document");
