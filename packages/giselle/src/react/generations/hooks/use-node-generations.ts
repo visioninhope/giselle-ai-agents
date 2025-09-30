@@ -55,7 +55,6 @@ export function useNodeGenerations({
 		if (isLoading || data === undefined) {
 			return;
 		}
-		console.log(data);
 		addGenerationRunner(data);
 	}, [isLoading, data, addGenerationRunner]);
 
