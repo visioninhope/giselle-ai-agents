@@ -5,7 +5,7 @@ import { createId } from "@paralleldrive/cuid2";
 import { createClient } from "@supabase/supabase-js";
 import { and, eq, inArray } from "drizzle-orm";
 import type { NextRequest } from "next/server";
-import { NextResponse } from "next/server";
+import { after, NextResponse } from "next/server";
 
 import {
 	db,
@@ -280,9 +280,11 @@ export async function POST(
 				storageKey,
 			});
 
-			// Trigger ingestion asynchronously (fire and forget)
-			ingestDocument(sourceId).catch((error) => {
-				console.error(`Failed to ingest document ${sourceId}:`, error);
+			// Trigger ingestion after response is sent (survives serverless freeze)
+			after(() => {
+				ingestDocument(sourceId).catch((error) => {
+					console.error(`Failed to ingest document ${sourceId}:`, error);
+				});
 			});
 		} catch (dbError) {
 			console.error(
