@@ -139,11 +139,15 @@ export async function ingestDocument(
 	} catch (error) {
 		// Handle abort
 		if (signal?.aborted) {
-			await updateDocumentVectorStoreSourceStatus({
-				sourceId,
-				ingestStatus: "idle",
-				ingestErrorCode: null,
-			});
+			try {
+				await updateDocumentVectorStoreSourceStatus({
+					sourceId,
+					ingestStatus: "idle",
+					ingestErrorCode: null,
+				});
+			} catch (updateError) {
+				console.error("Failed to update status on abort:", updateError);
+			}
 			throw error;
 		}
 
@@ -153,11 +157,15 @@ export async function ingestDocument(
 				? (error.code as IngestErrorCode)
 				: ("extraction-failed" as IngestErrorCode);
 
-		await updateDocumentVectorStoreSourceStatus({
-			sourceId,
-			ingestStatus: "failed",
-			ingestErrorCode: errorCode,
-		});
+		try {
+			await updateDocumentVectorStoreSourceStatus({
+				sourceId,
+				ingestStatus: "failed",
+				ingestErrorCode: errorCode,
+			});
+		} catch (updateError) {
+			console.error("Failed to update status on error:", updateError);
+		}
 
 		throw error;
 	}
