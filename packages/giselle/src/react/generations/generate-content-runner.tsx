@@ -66,10 +66,13 @@ export function GenerateContentRunner({
 	const reachedStreamEnd = useRef(false);
 	const messageUpdateQueue = useRef<Map<UIMessage["id"], UIMessage>>(new Map());
 	const pendingUpdate = useRef<number | null>(null);
+	const prevGenerationId = useRef(generation.id);
 
 	// Reset lifecycle refs when generation changes
-	// biome-ignore lint/correctness/useExhaustiveDependencies: intentionally depend on generation.id only
 	useEffect(() => {
+		if (prevGenerationId.current === generation.id) {
+			return;
+		}
 		didPerformingContentGeneration.current = false;
 		didListeningContentGeneration.current = false;
 		reachedStreamEnd.current = false;
