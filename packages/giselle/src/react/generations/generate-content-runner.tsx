@@ -85,6 +85,8 @@ export function GenerateContentRunner({
 			cancelAnimationFrame(pendingUpdate.current);
 			pendingUpdate.current = null;
 		}
+
+		prevGenerationId.current = generation.id;
 	}, [generation.id]);
 
 	const flushMessageUpdates = useCallback(() => {
