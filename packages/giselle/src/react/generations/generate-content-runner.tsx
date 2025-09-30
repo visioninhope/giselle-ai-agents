@@ -67,6 +67,14 @@ export function GenerateContentRunner({
 	const messageUpdateQueue = useRef<Map<UIMessage["id"], UIMessage>>(new Map());
 	const pendingUpdate = useRef<number | null>(null);
 
+	// Reset lifecycle refs when generation changes
+	// biome-ignore lint/correctness/useExhaustiveDependencies: intentionally depend on generation.id only
+	useEffect(() => {
+		didPerformingContentGeneration.current = false;
+		didListeningContentGeneration.current = false;
+		reachedStreamEnd.current = false;
+	}, [generation.id]);
+
 	const flushMessageUpdates = useCallback(() => {
 		if (messageUpdateQueue.current.size === 0) return;
 
