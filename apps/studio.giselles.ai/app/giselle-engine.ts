@@ -237,19 +237,32 @@ const generateContentProcessor =
 		? "trigger.dev"
 		: "self";
 
-const generationTracingCallbacks =
-	generateContentProcessor === "self"
-		? {
-				generationComplete: (args: GenerationCompleteCallbackFunctionArgs) => {
-					const requestId = getRequestId();
-					handleGenerationTrace({ ...args, requestId });
-				},
-				generationFailed: (args: GenerationFailedCallbackFunctionArgs) => {
-					const requestId = getRequestId();
-					handleGenerationTrace({ ...args, requestId });
-				},
-			}
-		: undefined;
+const generationTracingCallbacks = {
+	generationComplete: (args: GenerationCompleteCallbackFunctionArgs) => {
+		// Hotfix: Implemented delegation of text generation to trigger.dev, but delegation is not working for Act cases.
+		// Also, tracing is not performed, so for Act cases, execute on Vercel Functions and perform tracing as well.
+		if (
+			generateContentProcessor === "trigger.dev" &&
+			args.generation.context.origin.actId === undefined
+		) {
+			return;
+		}
+		const requestId = getRequestId();
+		handleGenerationTrace({ ...args, requestId });
+	},
+	generationFailed: (args: GenerationFailedCallbackFunctionArgs) => {
+		// Hotfix: Implemented delegation of text generation to trigger.dev, but delegation is not working for Act cases.
+		// Also, tracing is not performed, so for Act cases, execute on Vercel Functions and perform tracing as well.
+		if (
+			generateContentProcessor === "trigger.dev" &&
+			args.generation.context.origin.actId === undefined
+		) {
+			return;
+		}
+		const requestId = getRequestId();
+		handleGenerationTrace({ ...args, requestId });
+	},
+};
 
 export const giselleEngine = NextGiselleEngine({
 	basePath: "/api/giselle",
