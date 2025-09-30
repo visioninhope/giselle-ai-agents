@@ -167,10 +167,16 @@ export function generateText(args: {
 					},
 				};
 			}
+			const urlContextUrls =
+				operationNode.content.tools?.googleUrlContext?.urls;
+			const hasUrlContextConfigured =
+				Array.isArray(urlContextUrls) && urlContextUrls.length > 0;
+
 			if (
 				operationNode.content.llm.provider === "google" &&
 				operationNode.content.llm.configurations.searchGrounding &&
-				hasCapability(languageModel, Capability.OptionalSearchGrounding)
+				hasCapability(languageModel, Capability.OptionalSearchGrounding) &&
+				!hasUrlContextConfigured
 			) {
 				preparedToolSet = {
 					...preparedToolSet,
@@ -186,7 +192,7 @@ export function generateText(args: {
 			) {
 				preparedToolSet = addUrlContextTool({
 					preparedToolSet,
-					urls: operationNode.content.tools?.googleUrlContext?.urls,
+					urls: urlContextUrls,
 					tool: vertex.tools.urlContext({}),
 				});
 			}
