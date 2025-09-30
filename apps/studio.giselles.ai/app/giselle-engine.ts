@@ -2,6 +2,8 @@ import { WorkspaceId } from "@giselle-sdk/data-type";
 import type {
 	CompletedGeneration,
 	FailedGeneration,
+	GenerationCompleteCallbackFunctionArgs,
+	GenerationFailedCallbackFunctionArgs,
 	OutputFileBlob,
 	QueryContext,
 	RunningGeneration,
@@ -17,6 +19,7 @@ import {
 	supabaseVaultDriver,
 } from "@giselle-sdk/supabase-driver";
 import { openaiVectorStore } from "@giselle-sdk/vector-store-adapters";
+import { tasks } from "@trigger.dev/sdk";
 import type { ModelMessage, ProviderMetadata } from "ai";
 import { after } from "next/server";
 import { createStorage } from "unstorage";
@@ -36,6 +39,7 @@ import {
 	gitHubPullRequestQueryService,
 	gitHubQueryService,
 } from "../lib/vector-stores/github";
+import type { generateContentTask } from "../trigger/generate-content-task";
 
 export const publicStorage = createStorage({
 	driver: supabaseStorageDriver({
@@ -227,6 +231,26 @@ function handleGenerationTrace(args: GenerationTraceArgs) {
 	});
 }
 
+const generateContentProcessor =
+	process.env.TRIGGERDOTDEV === "1" ||
+	(process.env.VERCEL === "1" && process.env.NODE_ENV !== "development")
+		? "trigger.dev"
+		: "self";
+
+const generationTracingCallbacks =
+	generateContentProcessor === "self"
+		? {
+				generationComplete: (args: GenerationCompleteCallbackFunctionArgs) => {
+					const requestId = getRequestId();
+					handleGenerationTrace({ ...args, requestId });
+				},
+				generationFailed: (args: GenerationFailedCallbackFunctionArgs) => {
+					const requestId = getRequestId();
+					handleGenerationTrace({ ...args, requestId });
+				},
+			}
+		: undefined;
+
 export const giselleEngine = NextGiselleEngine({
 	basePath: "/api/giselle",
 	storage,
@@ -265,14 +289,7 @@ export const giselleEngine = NextGiselleEngine({
 		githubPullRequest: gitHubPullRequestQueryService,
 	},
 	callbacks: {
-		generationComplete: (args) => {
-			const requestId = getRequestId();
-			handleGenerationTrace({ ...args, requestId });
-		},
-		generationFailed: (args) => {
-			const requestId = getRequestId();
-			handleGenerationTrace({ ...args, requestId });
-		},
+		...generationTracingCallbacks,
 		embeddingComplete: (args) => {
 			after(async () => {
 				try {
@@ -330,3 +347,51 @@ export const giselleEngine = NextGiselleEngine({
 	logger,
 	waitUntil: after,
 });
+
+// In Vercel environment, execute generateContent with trigger
+// In local environment, use Next.js (default behavior).
+if (generateContentProcessor === "trigger.dev") {
+	giselleEngine.setGenerateContentProcess(async ({ generation }) => {
+		const requestId = getRequestId();
+		switch (generation.context.origin.type) {
+			case "github-app": {
+				const team = await getWorkspaceTeam(
+					generation.context.origin.workspaceId,
+				);
+				await tasks.trigger<typeof generateContentTask>("generate-content", {
+					generationId: generation.id,
+					requestId,
+					userId: "github-app",
+					team: {
+						id: team.id,
+						type: team.type,
+						subscriptionId: team.activeSubscriptionId,
+					},
+				});
+				break;
+			}
+			case "stage":
+			case "studio": {
+				const [currentUser, currentTeam] = await Promise.all([
+					fetchCurrentUser(),
+					fetchCurrentTeam(),
+				]);
+				await tasks.trigger<typeof generateContentTask>("generate-content", {
+					generationId: generation.id,
+					requestId,
+					userId: currentUser.id,
+					team: {
+						id: currentTeam.id,
+						type: currentTeam.type,
+						subscriptionId: currentTeam.activeSubscriptionId,
+					},
+				});
+				break;
+			}
+			default: {
+				const _exhaustiveCheck: never = generation.context.origin;
+				throw new Error(`Unhandled origin type: ${_exhaustiveCheck}`);
+			}
+		}
+	});
+}
