@@ -243,7 +243,7 @@ const generationTracingCallbacks = {
 		// Also, tracing is not performed, so for Act cases, execute on Vercel Functions and perform tracing as well.
 		if (
 			generateContentProcessor === "trigger.dev" &&
-			args.generation.context.origin.actId === undefined
+			args.generation.context.origin.type === "studio"
 		) {
 			return;
 		}
@@ -255,7 +255,7 @@ const generationTracingCallbacks = {
 		// Also, tracing is not performed, so for Act cases, execute on Vercel Functions and perform tracing as well.
 		if (
 			generateContentProcessor === "trigger.dev" &&
-			args.generation.context.origin.actId === undefined
+			args.generation.context.origin.type === "studio"
 		) {
 			return;
 		}
