@@ -64,19 +64,19 @@ export async function ingestDocument(
 			});
 		}
 
-		// Mark as running
-		await updateDocumentVectorStoreSourceStatus({
-			sourceId,
-			ingestStatus: "running",
-			ingestErrorCode: null,
-		});
-
-		// Validate source state
+		// Validate source state before marking as running
 		if (source.uploadStatus !== "uploaded") {
 			throw Object.assign(new Error("Source upload is not completed"), {
 				code: "invalid-state" as IngestErrorCode,
 			});
 		}
+
+		// Mark as running (after validation)
+		await updateDocumentVectorStoreSourceStatus({
+			sourceId,
+			ingestStatus: "running",
+			ingestErrorCode: null,
+		});
 
 		signal?.throwIfAborted();
 
