@@ -10,6 +10,8 @@ interface ExtractTextResult {
 	fileType: "txt" | "md";
 }
 
+const SUPPORTED_TEXT_EXTENSIONS = [".txt", ".md"] as const;
+
 /**
  * Extract text content from TXT or Markdown files
  * @param buffer - File content buffer
@@ -29,12 +31,15 @@ export function extractTextFromDocument(
 
 	const fileTypeInfo = resolveSupportedDocumentFile({ name: fileName });
 
-	if (!fileTypeInfo) {
-		throw new Error(`Unsupported file type: ${fileName}`);
-	}
-
-	if (fileTypeInfo.extension === ".pdf") {
-		throw new Error("PDF extraction is not supported in this function");
+	if (
+		!fileTypeInfo ||
+		!SUPPORTED_TEXT_EXTENSIONS.includes(
+			fileTypeInfo.extension as (typeof SUPPORTED_TEXT_EXTENSIONS)[number],
+		)
+	) {
+		throw new Error(
+			`Unsupported file type for text extraction: ${fileName}. Only TXT and Markdown files are supported.`,
+		);
 	}
 
 	const { text } = extractText(buffer);
