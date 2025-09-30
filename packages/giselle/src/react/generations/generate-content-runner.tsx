@@ -73,6 +73,15 @@ export function GenerateContentRunner({
 		didPerformingContentGeneration.current = false;
 		didListeningContentGeneration.current = false;
 		reachedStreamEnd.current = false;
+
+		// Clear message queue to prevent stale messages from previous generation
+		messageUpdateQueue.current.clear();
+
+		// Cancel pending animation frame to prevent applying stale updates
+		if (pendingUpdate.current !== null) {
+			cancelAnimationFrame(pendingUpdate.current);
+			pendingUpdate.current = null;
+		}
 	}, [generation.id]);
 
 	const flushMessageUpdates = useCallback(() => {
