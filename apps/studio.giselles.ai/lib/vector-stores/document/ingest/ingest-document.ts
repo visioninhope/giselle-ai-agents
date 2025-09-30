@@ -55,13 +55,6 @@ export async function ingestDocument(
 	try {
 		signal?.throwIfAborted();
 
-		// Mark as running
-		await updateDocumentVectorStoreSourceStatus({
-			sourceId,
-			ingestStatus: "running",
-			ingestErrorCode: null,
-		});
-
 		// Get source from database
 		const source = await getDocumentVectorStoreSource(sourceId);
 
@@ -70,6 +63,13 @@ export async function ingestDocument(
 				code: "source-not-found" as IngestErrorCode,
 			});
 		}
+
+		// Mark as running
+		await updateDocumentVectorStoreSourceStatus({
+			sourceId,
+			ingestStatus: "running",
+			ingestErrorCode: null,
+		});
 
 		// Validate source state
 		if (source.uploadStatus !== "uploaded") {
