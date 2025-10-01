@@ -306,13 +306,13 @@ export async function POST(
 
 			// Trigger ingestion immediately after response is sent
 			// If this fails or times out, cron job will retry (/api/vector-stores/document/ingest)
-			after(() => {
+			after(() =>
 				ingestDocument(sourceId, {
 					embeddingProfileIds: store.embeddingProfileIds,
 				}).catch((error) => {
 					console.error(`Failed to ingest document ${sourceId}:`, error);
-				});
-			});
+				}),
+			);
 		} catch (dbError) {
 			console.error(
 				`Failed to persist metadata for ${originalFileName}. Rolling back this file.`,
