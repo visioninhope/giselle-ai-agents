@@ -43,9 +43,15 @@ function getDataSourceDisplayInfo(input: ConnectedSource): {
 					icon,
 				};
 			}
-			default: {
-				const _exhaustiveCheck: never = node.content.source.provider;
-				throw new Error(`Unhandled provider: ${_exhaustiveCheck}`);
+			case "document": {
+				return {
+					name,
+					description: {
+						line1: "Document",
+						line2: node.content.source.state.status,
+					},
+					icon,
+				};
 			}
 		}
 	}
