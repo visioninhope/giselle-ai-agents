@@ -1,6 +1,7 @@
 import { Select } from "@giselle-internal/ui/select";
 import type {
 	EmbeddingProfileId,
+	GitHubVectorStoreSource,
 	VectorStoreNode,
 } from "@giselle-sdk/data-type";
 import {
@@ -32,11 +33,12 @@ export function GitHubVectorStoreNodePropertiesPanel({
 	// Get repository indexes
 	const githubRepositoryIndexes = vectorStore?.githubRepositoryIndexes ?? [];
 
+	// This component is GitHub-specific
+	const source = node.content.source as GitHubVectorStoreSource;
+
 	// Current content type from node (if configured)
 	const currentContentType =
-		node.content.source.state.status === "configured"
-			? node.content.source.state.contentType
-			: undefined;
+		source.state.status === "configured" ? source.state.contentType : undefined;
 
 	const { isOrphaned, repositoryId, isEmbeddingProfileOrphaned } =
 		useGitHubVectorStoreStatus(node);
@@ -46,8 +48,8 @@ export function GitHubVectorStoreNodePropertiesPanel({
 	const [selectedEmbeddingProfileId, setSelectedEmbeddingProfileId] = useState<
 		EmbeddingProfileId | undefined
 	>(
-		node.content.source.state.status === "configured"
-			? node.content.source.state.embeddingProfileId
+		source.state.status === "configured"
+			? source.state.embeddingProfileId
 			: undefined,
 	);
 
@@ -92,7 +94,7 @@ export function GitHubVectorStoreNodePropertiesPanel({
 				content: {
 					...node.content,
 					source: {
-						...node.content.source,
+						provider: "github",
 						state: {
 							status: "unconfigured",
 						},
@@ -214,7 +216,7 @@ export function GitHubVectorStoreNodePropertiesPanel({
 				content: {
 					...node.content,
 					source: {
-						...node.content.source,
+						provider: "github",
 						state: {
 							status: "configured",
 							owner: selectedRepo.owner,
@@ -234,14 +236,14 @@ export function GitHubVectorStoreNodePropertiesPanel({
 				<p className="text-[14px] py-[1.5px] text-white-400">
 					GitHub Repository
 				</p>
-				{isOrphaned && node.content.source.state.status === "configured" && (
+				{isOrphaned && source.state.status === "configured" && (
 					<div className="flex items-center gap-[6px] text-error-900 text-[13px] mb-[8px]">
 						<TriangleAlert className="size-[16px]" />
 						<span>
 							The repository{" "}
 							<span className="font-mono font-semibold">
-								{node.content.source.state.owner}/
-								{node.content.source.state.repo}
+								{source.state.owner}/
+								{source.state.repo}
 							</span>{" "}
 							is no longer available in your Vector Stores. Please select a
 							different repository or set up this repository again.
@@ -344,7 +346,7 @@ export function GitHubVectorStoreNodePropertiesPanel({
 								Embedding Model
 							</p>
 							{isEmbeddingProfileOrphaned &&
-								node.content.source.state.status === "configured" && (
+								source.state.status === "configured" && (
 									<div className="flex items-center gap-[6px] text-error-900 text-[13px] mb-[8px]">
 										<TriangleAlert className="size-[16px]" />
 										<span>
@@ -363,14 +365,14 @@ export function GitHubVectorStoreNodePropertiesPanel({
 									setSelectedEmbeddingProfileId(maybeId);
 
 									// Update node data with selected profile
-									if (node.content.source.state.status === "configured") {
+									if (source.state.status === "configured") {
 										updateNodeData(node, {
 											content: {
 												...node.content,
 												source: {
-													...node.content.source,
+													provider: "github",
 													state: {
-														...node.content.source.state,
+														...source.state,
 														embeddingProfileId: maybeId,
 													},
 												},
