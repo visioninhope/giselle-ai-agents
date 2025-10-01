@@ -153,6 +153,14 @@ export async function ingestDocument(
 
 		signal?.throwIfAborted();
 
+		// Validate embedding profiles exist
+		if (embeddingProfileIds.length === 0) {
+			throw Object.assign(
+				new Error("No embedding profiles configured for this vector store"),
+				{ code: "embedding-failed" as IngestErrorCode },
+			);
+		}
+
 		// Generate embeddings for each embedding profile and store in database
 		let totalEmbeddingCount = 0;
 		const insertedProfileIds: EmbeddingProfileId[] = [];
