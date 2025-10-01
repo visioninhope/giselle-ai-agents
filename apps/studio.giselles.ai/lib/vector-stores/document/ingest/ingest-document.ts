@@ -33,6 +33,7 @@ type IngestErrorCode =
 	| "source-not-found"
 	| "file-not-found"
 	| "extraction-failed"
+	| "chunking-failed"
 	| "unsupported-type"
 	| "invalid-state";
 
@@ -127,7 +128,15 @@ export async function ingestDocument(
 		signal?.throwIfAborted();
 
 		// Chunk the text into smaller pieces
-		const chunkResult = chunkText(text, { signal });
+		let chunkResult: ReturnType<typeof chunkText>;
+		try {
+			chunkResult = chunkText(text, { signal });
+		} catch (error) {
+			throw Object.assign(new Error("Text chunking failed"), {
+				code: "chunking-failed" as IngestErrorCode,
+				cause: error,
+			});
+		}
 
 		signal?.throwIfAborted();
 
