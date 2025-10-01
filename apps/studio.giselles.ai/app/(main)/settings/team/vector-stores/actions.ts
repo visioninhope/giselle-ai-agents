@@ -2,7 +2,6 @@
 
 import {
 	DEFAULT_EMBEDDING_PROFILE_ID,
-	EMBEDDING_PROFILES,
 	type EmbeddingProfileId,
 	isEmbeddingProfileId,
 } from "@giselle-sdk/data-type";
@@ -567,13 +566,6 @@ function validateDocumentEmbeddingProfileIds(
 		if (!isEmbeddingProfileId(id)) {
 			return { success: false, error: `Invalid embedding profile id: ${id}` };
 		}
-		const profile = EMBEDDING_PROFILES[id];
-		if (profile.provider !== "cohere") {
-			return {
-				success: false,
-				error: "Only Cohere profiles are supported for Document Vector Stores",
-			};
-		}
 		uniqueIds.add(id);
 	}
 
@@ -817,13 +809,13 @@ export async function deleteDocumentVectorStore(
 							.remove(Array.from(targets));
 						if (storageError) {
 							console.error(
-								`Failed to delete PDF files from storage bucket ${bucket}:`,
+								`Failed to delete document files from storage bucket ${bucket}:`,
 								storageError,
 							);
 						}
 					} catch (storageError) {
 						console.error(
-							`Failed to delete PDF files from storage bucket ${bucket}:`,
+							`Failed to delete document files from storage bucket ${bucket}:`,
 							storageError,
 						);
 					}

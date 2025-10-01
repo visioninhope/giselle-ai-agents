@@ -61,10 +61,33 @@ export function GenerateContentRunner({
 	const upsertMessage = useGenerationStore((s) => s.upsertMessage);
 	const updateGeneration = useGenerationStore((s) => s.updateGeneration);
 	const { updateGenerationStatusToComplete } = useGenerationRunnerSystem();
-	const didRun = useRef(false);
+	const didPerformingContentGeneration = useRef(false);
+	const didListeningContentGeneration = useRef(false);
 	const reachedStreamEnd = useRef(false);
 	const messageUpdateQueue = useRef<Map<UIMessage["id"], UIMessage>>(new Map());
 	const pendingUpdate = useRef<number | null>(null);
+	const prevGenerationId = useRef(generation.id);
+
+	// Reset lifecycle refs when generation changes
+	useEffect(() => {
+		if (prevGenerationId.current === generation.id) {
+			return;
+		}
+		didPerformingContentGeneration.current = false;
+		didListeningContentGeneration.current = false;
+		reachedStreamEnd.current = false;
+
+		// Clear message queue to prevent stale messages from previous generation
+		messageUpdateQueue.current.clear();
+
+		// Cancel pending animation frame to prevent applying stale updates
+		if (pendingUpdate.current !== null) {
+			cancelAnimationFrame(pendingUpdate.current);
+			pendingUpdate.current = null;
+		}
+
+		prevGenerationId.current = generation.id;
+	}, [generation.id]);
 
 	const flushMessageUpdates = useCallback(() => {
 		if (messageUpdateQueue.current.size === 0) return;
@@ -160,20 +183,32 @@ export function GenerateContentRunner({
 	]);
 
 	useEffect(() => {
-		if (didRun.current) {
+		if (didPerformingContentGeneration.current) {
 			return;
 		}
 		if (generation.status !== "queued") {
 			return;
 		}
-		didRun.current = true;
+		didPerformingContentGeneration.current = true;
 		client
 			.startContentGeneration({ generation })
 			.then(({ generation: runningGeneration }) => {
 				onStart?.(runningGeneration);
 				updateGeneration(runningGeneration);
-				processStream();
 			});
-	}, [generation, client, processStream, updateGeneration, onStart]);
+	}, [generation, client, updateGeneration, onStart]);
+
+	useEffect(() => {
+		if (didListeningContentGeneration.current) {
+			return;
+		}
+		if (generation.status !== "running") {
+			return;
+		}
+		didListeningContentGeneration.current = true;
+
+		processStream();
+	}, [generation, processStream]);
+
 	return null;
 }

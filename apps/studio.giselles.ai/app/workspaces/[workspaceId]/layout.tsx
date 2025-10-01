@@ -80,6 +80,8 @@ export default async function Layout({
 	// return children
 	return (
 		<WorkspaceProvider
+			// TODO: Make it reference the same timeout setting as in trigger.config.ts
+			generationTimeout={3600 * 1000}
 			integration={{
 				value: {
 					github: gitHubIntegrationState,

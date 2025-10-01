@@ -1,5 +1,6 @@
 "use client";
 
+import { DEFAULT_EMBEDDING_PROFILE_ID } from "@giselle-sdk/data-type";
 import * as Dialog from "@radix-ui/react-dialog";
 import {
 	ArrowUpFromLine,
@@ -28,8 +29,11 @@ import {
 import {
 	DOCUMENT_VECTOR_STORE_MAX_FILE_SIZE_BYTES,
 	DOCUMENT_VECTOR_STORE_MAX_FILE_SIZE_LABEL,
+	DOCUMENT_VECTOR_STORE_SUPPORTED_FILE_EXTENSIONS,
+	DOCUMENT_VECTOR_STORE_SUPPORTED_FILE_TYPE_LABEL,
+	DOCUMENT_VECTOR_STORE_SUPPORTED_MIME_TYPES,
 } from "@/lib/vector-stores/document/constants";
-import { isPdfFile } from "@/lib/vector-stores/document/utils";
+import { isSupportedDocumentFile } from "@/lib/vector-stores/document/utils";
 import { useToast } from "@/packages/contexts/toast";
 import type { DocumentVectorStoreId } from "@/packages/types";
 import {
@@ -41,6 +45,14 @@ import {
 import type { DocumentVectorStoreWithProfiles } from "../data";
 import { DOCUMENT_EMBEDDING_PROFILES } from "../document-embedding-profiles";
 import type { ActionResult, DocumentVectorStoreUpdateInput } from "../types";
+
+const DOCUMENT_UPLOAD_ACCEPT = [
+	...DOCUMENT_VECTOR_STORE_SUPPORTED_MIME_TYPES,
+	...DOCUMENT_VECTOR_STORE_SUPPORTED_FILE_EXTENSIONS,
+].join(",");
+
+const SUPPORTED_FILE_TYPES_LABEL =
+	DOCUMENT_VECTOR_STORE_SUPPORTED_FILE_TYPE_LABEL;
 
 type DocumentVectorStoreItemProps = {
 	store: DocumentVectorStoreWithProfiles;
@@ -259,10 +271,22 @@ function DocumentVectorStoreConfigureDialog({
 		() => Object.entries(DOCUMENT_EMBEDDING_PROFILES),
 		[],
 	);
-	const defaultProfiles = useMemo(
-		() => availableProfiles.map(([id]) => Number(id)),
+	const selectableProfiles = useMemo(
+		() =>
+			availableProfiles.filter(([, profile]) => profile.provider !== "cohere"),
 		[availableProfiles],
 	);
+	const defaultProfiles = useMemo(() => {
+		const primaryIds = selectableProfiles.map(([id]) => Number(id));
+		const fallbackIds =
+			primaryIds.length > 0
+				? primaryIds
+				: availableProfiles.map(([id]) => Number(id));
+		if (fallbackIds.includes(DEFAULT_EMBEDDING_PROFILE_ID)) {
+			return [DEFAULT_EMBEDDING_PROFILE_ID];
+		}
+		return fallbackIds.length > 0 ? [fallbackIds[0]] : [];
+	}, [selectableProfiles, availableProfiles]);
 	const nameInputId = useId();
 	const [name, setName] = useState(store.name);
 	const [selectedProfiles, setSelectedProfiles] = useState<number[]>(
@@ -314,8 +338,10 @@ function DocumentVectorStoreConfigureDialog({
 			const errors: string[] = [];
 
 			for (const file of filesArray) {
-				if (!isPdfFile(file)) {
-					errors.push(`${file.name} is not a PDF file.`);
+				if (!isSupportedDocumentFile(file)) {
+					errors.push(
+						`${file.name} is not a supported file type. Supported types: ${SUPPORTED_FILE_TYPES_LABEL}.`,
+					);
 					continue;
 				}
 				if (file.size === 0) {
@@ -591,7 +617,7 @@ function DocumentVectorStoreConfigureDialog({
 								Select at least one embedding model for ingestion.
 							</div>
 							<div className="space-y-2">
-								{availableProfiles.map(([profileIdString, profile]) => {
+								{selectableProfiles.map(([profileIdString, profile]) => {
 									const profileId = Number(profileIdString);
 									const isSelected = selectedProfiles.includes(profileId);
 									const isLastSelected =
@@ -628,13 +654,13 @@ function DocumentVectorStoreConfigureDialog({
 								Source Files
 							</div>
 							<div className="text-white-400/60 text-[12px]">
-								Upload PDF files (maximum{" "}
+								Upload {SUPPORTED_FILE_TYPES_LABEL} files (maximum{" "}
 								{DOCUMENT_VECTOR_STORE_MAX_FILE_SIZE_LABEL} each) to include in
 								this vector store.
 							</div>
 							<button
 								type="button"
-								aria-label="Upload PDF files"
+								aria-label={`Upload ${SUPPORTED_FILE_TYPES_LABEL} files`}
 								onClick={handleSelectFiles}
 								onDragOver={handleDragOver}
 								onDragLeave={handleDragLeave}
@@ -644,7 +670,7 @@ function DocumentVectorStoreConfigureDialog({
 							>
 								<ArrowUpFromLine className="h-8 w-8 text-black-300" />
 								<p className="text-white-400 text-sm">
-									Drop PDF files here to upload.
+									Drop {SUPPORTED_FILE_TYPES_LABEL} files here to upload.
 								</p>
 								<p className="text-xs text-black-300">
 									Maximum {DOCUMENT_VECTOR_STORE_MAX_FILE_SIZE_LABEL} per file.
@@ -662,7 +688,7 @@ function DocumentVectorStoreConfigureDialog({
 							<input
 								ref={fileInputRef}
 								type="file"
-								accept="application/pdf,.pdf"
+								accept={DOCUMENT_UPLOAD_ACCEPT}
 								multiple
 								className="hidden"
 								onChange={handleFileInputChange}
@@ -712,9 +738,7 @@ function DocumentVectorStoreConfigureDialog({
 									</ul>
 								</div>
 							) : (
-								<p className="text-xs text-black-300">
-									No PDF files uploaded yet.
-								</p>
+								<p className="text-xs text-black-300">No files uploaded yet.</p>
 							)}
 						</div>
 

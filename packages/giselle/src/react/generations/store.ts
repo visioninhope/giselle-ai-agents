@@ -24,8 +24,12 @@ export const useGenerationStore = create<GenerationStore>((set) => ({
 	addGenerationRunner: (generations) =>
 		set((state) => {
 			const arr = Array.isArray(generations) ? generations : [generations];
+			const incomingIds = new Set(arr.map((g) => g.id));
+			const filteredExisting = state.generations.filter(
+				(g) => !incomingIds.has(g.id),
+			);
 			return {
-				generations: [...state.generations, ...arr],
+				generations: [...filteredExisting, ...arr],
 			};
 		}),
 	updateGeneration: (generation) =>
