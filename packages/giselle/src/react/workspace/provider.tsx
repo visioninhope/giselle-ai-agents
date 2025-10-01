@@ -30,6 +30,7 @@ export function WorkspaceProvider({
 	featureFlag,
 	vectorStore,
 	flowTrigger,
+	generationTimeout,
 }: {
 	children: ReactNode;
 	integration?: IntegrationProviderProps;
@@ -38,6 +39,7 @@ export function WorkspaceProvider({
 	featureFlag?: FeatureFlagContextValue;
 	vectorStore?: VectorStoreContextValue;
 	flowTrigger?: FlowTriggerContextValue;
+	generationTimeout?: number;
 }) {
 	return (
 		<FeatureFlagContext
@@ -56,7 +58,7 @@ export function WorkspaceProvider({
 					<UsageLimitsProvider limits={usageLimits}>
 						<IntegrationProvider {...integration}>
 							<VectorStoreProvider value={vectorStore}>
-								<ZustandBridgeGenerationProvider>
+								<ZustandBridgeGenerationProvider timeout={generationTimeout}>
 									{children}
 								</ZustandBridgeGenerationProvider>
 							</VectorStoreProvider>

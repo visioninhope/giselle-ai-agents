@@ -38,9 +38,11 @@ import { useGenerationStore } from "./store";
 export function ZustandBridgeGenerationProvider({
 	children,
 	generateTextApi = "/api/giselle/generateText",
+	timeout = 1000 * 800,
 }: {
 	children: React.ReactNode;
 	generateTextApi?: string;
+	timeout?: number;
 }) {
 	const client = useGiselleEngine();
 	const { experimental_storage } = useFeatureFlag();
@@ -64,7 +66,6 @@ export function ZustandBridgeGenerationProvider({
 		async (
 			generationId: GenerationId,
 			options?: {
-				timeout?: number;
 				onStart?: (generation: RunningGeneration) => void;
 				onComplete?: (generation: CompletedGeneration) => void;
 				onError?: (generation: FailedGeneration) => void;
@@ -76,11 +77,10 @@ export function ZustandBridgeGenerationProvider({
 			let status = generation.status;
 			let messages =
 				"messages" in generation ? (generation.messages ?? []) : [];
-			const timeoutDuration = options?.timeout || 1000 * 800;
 			const startTime = Date.now();
 
 			while (true) {
-				if (Date.now() - startTime > timeoutDuration) {
+				if (Date.now() - startTime > timeout) {
 					generation = generationListener.current[generationId];
 					const failedGeneration: FailedGeneration = {
 						id: generation.id,
@@ -139,7 +139,7 @@ export function ZustandBridgeGenerationProvider({
 				await new Promise((resolve) => setTimeout(resolve, 500));
 			}
 		},
-		[updateGeneration],
+		[updateGeneration, timeout],
 	);
 
 	const createGenerationRunner: CreateGenerationRunner = useCallback(
