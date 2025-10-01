@@ -3,7 +3,7 @@ import type {
 	EmbeddingProfileId,
 } from "@giselle-sdk/data-type";
 import type { DocumentVectorStoreSourceId } from "@giselles-ai/types";
-import { eq } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import { db } from "@/drizzle/db";
 import type {
 	DocumentVectorStoreSourceIngestStatus,
@@ -108,4 +108,24 @@ export async function insertDocumentEmbeddings(
 	}));
 
 	await db.insert(documentEmbeddings).values(values);
+}
+
+export async function deleteDocumentEmbeddingsByProfiles(params: {
+	sourceDbId: number;
+	embeddingProfileIds: EmbeddingProfileId[];
+}): Promise<void> {
+	const { sourceDbId, embeddingProfileIds } = params;
+
+	if (embeddingProfileIds.length === 0) {
+		return;
+	}
+
+	await db
+		.delete(documentEmbeddings)
+		.where(
+			and(
+				eq(documentEmbeddings.documentVectorStoreSourceDbId, sourceDbId),
+				inArray(documentEmbeddings.embeddingProfileId, embeddingProfileIds),
+			),
+		);
 }

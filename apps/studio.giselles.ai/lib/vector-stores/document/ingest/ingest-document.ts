@@ -5,6 +5,7 @@ import type {
 import type { DocumentVectorStoreSourceId } from "@giselles-ai/types";
 import { createClient } from "@supabase/supabase-js";
 import {
+	deleteDocumentEmbeddingsByProfiles,
 	getDocumentVectorStoreSource,
 	insertDocumentEmbeddings,
 	updateDocumentVectorStoreSourceStatus,
@@ -154,11 +155,12 @@ export async function ingestDocument(
 
 		// Generate embeddings for each embedding profile and store in database
 		let totalEmbeddingCount = 0;
+		const insertedProfileIds: EmbeddingProfileId[] = [];
 
-		for (const embeddingProfileId of embeddingProfileIds) {
-			signal?.throwIfAborted();
+		try {
+			for (const embeddingProfileId of embeddingProfileIds) {
+				signal?.throwIfAborted();
 
-			try {
 				const embeddingResult = await generateEmbeddings({
 					chunks: chunkResult.chunks,
 					embeddingProfileId,
@@ -176,16 +178,29 @@ export async function ingestDocument(
 					embeddings: embeddingResult.embeddings,
 				});
 
+				insertedProfileIds.push(embeddingProfileId);
 				totalEmbeddingCount += embeddingResult.embeddingCount;
-			} catch (error) {
-				throw Object.assign(
-					new Error("Failed to generate or store embeddings"),
-					{
-						code: "embedding-failed" as IngestErrorCode,
-						cause: error,
-					},
-				);
 			}
+		} catch (error) {
+			// Rollback: delete partially inserted embeddings
+			if (insertedProfileIds.length > 0) {
+				try {
+					await deleteDocumentEmbeddingsByProfiles({
+						sourceDbId: source.dbId,
+						embeddingProfileIds: insertedProfileIds,
+					});
+				} catch (rollbackError) {
+					console.error(
+						"Failed to rollback embeddings after ingestion error:",
+						rollbackError,
+					);
+				}
+			}
+
+			throw Object.assign(new Error("Failed to generate or store embeddings"), {
+				code: "embedding-failed" as IngestErrorCode,
+				cause: error,
+			});
 		}
 
 		signal?.throwIfAborted();
