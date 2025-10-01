@@ -32,6 +32,7 @@ import type {
 import { fetchCurrentTeam } from "@/services/teams";
 
 export const runtime = "nodejs";
+export const maxDuration = 800;
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY;
@@ -303,14 +304,15 @@ export async function POST(
 				storageKey,
 			});
 
-			// Trigger ingestion after response is sent (survives serverless freeze)
-			after(() => {
+			// Trigger ingestion immediately after response is sent
+			// If this fails or times out, cron job will retry (/api/vector-stores/document/ingest)
+			after(() =>
 				ingestDocument(sourceId, {
 					embeddingProfileIds: store.embeddingProfileIds,
 				}).catch((error) => {
 					console.error(`Failed to ingest document ${sourceId}:`, error);
-				});
-			});
+				}),
+			);
 		} catch (dbError) {
 			console.error(
 				`Failed to persist metadata for ${originalFileName}. Rolling back this file.`,

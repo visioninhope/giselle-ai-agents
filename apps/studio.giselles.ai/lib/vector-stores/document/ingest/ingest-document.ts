@@ -4,6 +4,8 @@ import type {
 } from "@giselle-sdk/data-type";
 import type { DocumentVectorStoreSourceId } from "@giselles-ai/types";
 import { createClient } from "@supabase/supabase-js";
+import { and, eq, lt, or } from "drizzle-orm";
+import { db, documentVectorStoreSources } from "@/drizzle";
 import {
 	deleteDocumentEmbeddingsByProfiles,
 	getDocumentVectorStoreSource,
@@ -30,13 +32,15 @@ interface IngestDocumentOptions {
 
 interface IngestDocumentResult {
 	sourceId: DocumentVectorStoreSourceId;
-	text: string;
-	fileType: "txt" | "md";
-	chunks: string[];
-	chunkCount: number;
-	embeddingProfileIds: EmbeddingProfileId[];
-	embeddingCount: number;
+	text?: string;
+	fileType?: "txt" | "md";
+	chunks?: string[];
+	chunkCount?: number;
+	embeddingProfileIds?: EmbeddingProfileId[];
+	embeddingCount?: number;
 	success: boolean;
+	skipped?: boolean;
+	reason?: string;
 }
 
 type IngestErrorCode =
@@ -73,6 +77,48 @@ export async function ingestDocument(
 	try {
 		signal?.throwIfAborted();
 
+		// Atomically claim this document for processing
+		// This prevents race conditions between after() hook, cron job, and multiple cron instances
+		const STALE_THRESHOLD_MINUTES = 15;
+		const staleThreshold = new Date(
+			Date.now() - STALE_THRESHOLD_MINUTES * 60 * 1000,
+		);
+
+		const claimResult = await db
+			.update(documentVectorStoreSources)
+			.set({
+				ingestStatus: "running",
+				ingestErrorCode: null, // Clear any previous error
+				updatedAt: new Date(), // Reset stale detection timer
+			})
+			.where(
+				and(
+					eq(documentVectorStoreSources.id, sourceId),
+					eq(documentVectorStoreSources.uploadStatus, "uploaded"), // Only claim uploaded documents
+					or(
+						// Claim idle documents
+						eq(documentVectorStoreSources.ingestStatus, "idle"),
+						// Claim stale running documents
+						and(
+							eq(documentVectorStoreSources.ingestStatus, "running"),
+							lt(documentVectorStoreSources.updatedAt, staleThreshold),
+						),
+					),
+				),
+			);
+
+		// Check if we successfully claimed the document
+		if (claimResult.rowCount === 0) {
+			// Document is already being processed by another worker
+			console.log(`Document ${sourceId} is already being processed, skipping`);
+			return {
+				sourceId,
+				success: false,
+				skipped: true,
+				reason: "already-processing",
+			};
+		}
+
 		// Get source from database
 		const source = await getDocumentVectorStoreSource(sourceId);
 
@@ -81,20 +127,6 @@ export async function ingestDocument(
 				code: "source-not-found" as IngestErrorCode,
 			});
 		}
-
-		// Validate source state before marking as running
-		if (source.uploadStatus !== "uploaded") {
-			throw Object.assign(new Error("Source upload is not completed"), {
-				code: "invalid-state" as IngestErrorCode,
-			});
-		}
-
-		// Mark as running (after validation)
-		await updateDocumentVectorStoreSourceStatus({
-			sourceId,
-			ingestStatus: "running",
-			ingestErrorCode: null,
-		});
 
 		signal?.throwIfAborted();
 
@@ -247,6 +279,8 @@ export async function ingestDocument(
 		}
 
 		// Handle other errors
+		// Mark as 'failed' for permanent errors that should not be retried by cron job
+		// (e.g., unsupported file type, missing API keys, invalid embedding profiles)
 		const errorCode =
 			error && typeof error === "object" && "code" in error
 				? (error.code as IngestErrorCode)
