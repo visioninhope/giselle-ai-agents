@@ -366,10 +366,6 @@ export function Toolbar() {
 													<TextFileIcon className="w-[20px] h-[20px]" />
 													<p className="text-[14px]">Text Upload</p>
 												</ToggleGroup.Item>
-												<ToggleGroup.Item value="githubVectorStore" data-tool>
-													<GitHubIcon className="w-[20px] h-[20px]" />
-													<p className="text-[14px]">GitHub Vector Store</p>
-												</ToggleGroup.Item>
 												{documentVectorStore && (
 													<ToggleGroup.Item
 														value="documentVectorStore"
@@ -379,6 +375,10 @@ export function Toolbar() {
 														<p className="text-[14px]">Document Vector Store</p>
 													</ToggleGroup.Item>
 												)}
+												<ToggleGroup.Item value="githubVectorStore" data-tool>
+													<GitHubIcon className="w-[20px] h-[20px]" />
+													<p className="text-[14px]">GitHub Vector Store</p>
+												</ToggleGroup.Item>
 											</ToggleGroup.Root>
 										</div>
 									</Popover.Content>
