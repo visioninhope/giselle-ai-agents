@@ -56,12 +56,20 @@ export async function GET(request: NextRequest) {
 	// Process documents sequentially to avoid overwhelming the embedding API
 	let successCount = 0;
 	let failureCount = 0;
+	let skippedCount = 0;
 
 	for (const target of targets) {
 		try {
-			await ingestDocument(target.sourceId, {
+			const result = await ingestDocument(target.sourceId, {
 				embeddingProfileIds: target.embeddingProfileIds,
 			});
+
+			if (result.skipped) {
+				// Already being processed by another cron instance
+				skippedCount++;
+				continue;
+			}
+
 			successCount++;
 		} catch (error) {
 			console.error(
@@ -77,6 +85,7 @@ export async function GET(request: NextRequest) {
 			processed: targets.length,
 			success: successCount,
 			failure: failureCount,
+			skipped: skippedCount,
 		},
 		{ status: 200 },
 	);
