@@ -1,11 +1,17 @@
+import type {
+	EmbeddingDimensions,
+	EmbeddingProfileId,
+} from "@giselle-sdk/data-type";
 import type { DocumentVectorStoreSourceId } from "@giselles-ai/types";
 import { createClient } from "@supabase/supabase-js";
 import {
 	getDocumentVectorStoreSource,
+	insertDocumentEmbeddings,
 	updateDocumentVectorStoreSourceStatus,
 } from "../database";
 import { chunkText } from "./chunk-text";
 import { extractTextFromDocument } from "./extract-text";
+import { generateEmbeddings } from "./generate-embeddings";
 
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY;
@@ -17,6 +23,7 @@ if (!supabaseUrl || !supabaseServiceKey) {
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 interface IngestDocumentOptions {
+	embeddingProfileIds: EmbeddingProfileId[];
 	signal?: AbortSignal;
 }
 
@@ -26,6 +33,8 @@ interface IngestDocumentResult {
 	fileType: "txt" | "md";
 	chunks: string[];
 	chunkCount: number;
+	embeddingProfileIds: EmbeddingProfileId[];
+	embeddingCount: number;
 	success: boolean;
 }
 
@@ -34,28 +43,31 @@ type IngestErrorCode =
 	| "file-not-found"
 	| "extraction-failed"
 	| "chunking-failed"
+	| "embedding-failed"
 	| "unsupported-type"
 	| "invalid-state";
 
 /**
- * Ingest a document source by extracting and chunking text content
+ * Ingest a document source by extracting, chunking, and embedding text content
  * This function:
  * 1. Validates the source exists and is in the correct state
  * 2. Downloads the file from Supabase storage
  * 3. Extracts text content (for TXT/MD files)
  * 4. Chunks the text into smaller pieces for embedding
- * 5. Updates the source status
+ * 5. Generates embeddings for each chunk using specified embedding profiles
+ * 6. Stores embeddings in the database
+ * 7. Updates the source status
  *
  * @param sourceId - Document vector store source ID
- * @param options - Optional ingestion settings
- * @returns Ingestion result with extracted text and chunks
+ * @param options - Ingestion settings including embedding profiles
+ * @returns Ingestion result with extracted text, chunks, and embeddings
  * @throws Error with code if ingestion fails
  */
 export async function ingestDocument(
 	sourceId: DocumentVectorStoreSourceId,
-	options?: IngestDocumentOptions,
+	options: IngestDocumentOptions,
 ): Promise<IngestDocumentResult> {
-	const { signal } = options ?? {};
+	const { embeddingProfileIds, signal } = options;
 
 	try {
 		signal?.throwIfAborted();
@@ -140,6 +152,44 @@ export async function ingestDocument(
 
 		signal?.throwIfAborted();
 
+		// Generate embeddings for each embedding profile and store in database
+		let totalEmbeddingCount = 0;
+
+		for (const embeddingProfileId of embeddingProfileIds) {
+			signal?.throwIfAborted();
+
+			try {
+				const embeddingResult = await generateEmbeddings({
+					chunks: chunkResult.chunks,
+					embeddingProfileId,
+					signal,
+				});
+
+				signal?.throwIfAborted();
+
+				// Insert embeddings into database
+				await insertDocumentEmbeddings({
+					sourceDbId: source.dbId,
+					embeddingProfileId,
+					dimensions: embeddingResult.dimensions as EmbeddingDimensions,
+					documentKey: source.fileName,
+					embeddings: embeddingResult.embeddings,
+				});
+
+				totalEmbeddingCount += embeddingResult.embeddingCount;
+			} catch (error) {
+				throw Object.assign(
+					new Error("Failed to generate or store embeddings"),
+					{
+						code: "embedding-failed" as IngestErrorCode,
+						cause: error,
+					},
+				);
+			}
+		}
+
+		signal?.throwIfAborted();
+
 		// Mark as completed
 		await updateDocumentVectorStoreSourceStatus({
 			sourceId,
@@ -154,6 +204,8 @@ export async function ingestDocument(
 			fileType,
 			chunks: chunkResult.chunks,
 			chunkCount: chunkResult.chunkCount,
+			embeddingProfileIds,
+			embeddingCount: totalEmbeddingCount,
 			success: true,
 		};
 	} catch (error) {
