@@ -55,6 +55,9 @@ export function useNodeGenerations({
 		if (isLoading || data === undefined) {
 			return;
 		}
+		if (data.length === 0) {
+			return;
+		}
 		addGenerationRunner(
 			data.sort(
 				(a, b) =>
