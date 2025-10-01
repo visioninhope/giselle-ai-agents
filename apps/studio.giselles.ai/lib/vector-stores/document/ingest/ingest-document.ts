@@ -4,6 +4,7 @@ import {
 	getDocumentVectorStoreSource,
 	updateDocumentVectorStoreSourceStatus,
 } from "../database";
+import { chunkText } from "./chunk-text";
 import { extractTextFromDocument } from "./extract-text";
 
 const supabaseUrl = process.env.SUPABASE_URL;
@@ -23,6 +24,8 @@ interface IngestDocumentResult {
 	sourceId: DocumentVectorStoreSourceId;
 	text: string;
 	fileType: "txt" | "md";
+	chunks: string[];
+	chunkCount: number;
 	success: boolean;
 }
 
@@ -30,20 +33,22 @@ type IngestErrorCode =
 	| "source-not-found"
 	| "file-not-found"
 	| "extraction-failed"
+	| "chunking-failed"
 	| "unsupported-type"
 	| "invalid-state";
 
 /**
- * Ingest a document source by extracting text content
+ * Ingest a document source by extracting and chunking text content
  * This function:
  * 1. Validates the source exists and is in the correct state
  * 2. Downloads the file from Supabase storage
  * 3. Extracts text content (for TXT/MD files)
- * 4. Updates the source status
+ * 4. Chunks the text into smaller pieces for embedding
+ * 5. Updates the source status
  *
  * @param sourceId - Document vector store source ID
  * @param options - Optional ingestion settings
- * @returns Ingestion result with extracted text
+ * @returns Ingestion result with extracted text and chunks
  * @throws Error with code if ingestion fails
  */
 export async function ingestDocument(
@@ -122,6 +127,19 @@ export async function ingestDocument(
 
 		signal?.throwIfAborted();
 
+		// Chunk the text into smaller pieces
+		let chunkResult: ReturnType<typeof chunkText>;
+		try {
+			chunkResult = chunkText(text, { signal });
+		} catch (error) {
+			throw Object.assign(new Error("Text chunking failed"), {
+				code: "chunking-failed" as IngestErrorCode,
+				cause: error,
+			});
+		}
+
+		signal?.throwIfAborted();
+
 		// Mark as completed
 		await updateDocumentVectorStoreSourceStatus({
 			sourceId,
@@ -134,6 +152,8 @@ export async function ingestDocument(
 			sourceId,
 			text,
 			fileType,
+			chunks: chunkResult.chunks,
+			chunkCount: chunkResult.chunkCount,
 			success: true,
 		};
 	} catch (error) {
