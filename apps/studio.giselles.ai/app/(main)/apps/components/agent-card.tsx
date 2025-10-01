@@ -3,7 +3,6 @@
 import { formatTimestamp } from "@giselles-ai/lib/utils";
 import clsx from "clsx/lite";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import type { agents as dbAgents } from "@/drizzle";
 import { DeleteAgentButton } from "./delete-agent-button";
@@ -29,17 +28,6 @@ export function AgentCard({ agent }: { agent: typeof dbAgents.$inferSelect }) {
 		const id = setInterval(update, 60_000);
 		return () => clearInterval(id);
 	}, [agent.updatedAt]);
-
-	const router = useRouter();
-	const handleClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
-		event.preventDefault();
-		router.refresh();
-		router.push(`/workspaces/${agent.workspaceId}`);
-	};
-
-	if (!agent.workspaceId) {
-		return null;
-	}
 
 	return (
 		<section
@@ -85,7 +73,6 @@ export function AgentCard({ agent }: { agent: typeof dbAgents.$inferSelect }) {
 				<Link
 					href={`/workspaces/${agent.workspaceId}`}
 					className="flex h-full flex-col pt-2"
-					onClick={handleClick}
 				>
 					<div className="aspect-video w-full rounded-lg bg-white/5 flex items-center justify-center">
 						<svg
