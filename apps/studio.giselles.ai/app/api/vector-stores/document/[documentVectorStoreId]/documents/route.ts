@@ -5,7 +5,7 @@ import { createId } from "@paralleldrive/cuid2";
 import { createClient } from "@supabase/supabase-js";
 import { and, eq, inArray } from "drizzle-orm";
 import type { NextRequest } from "next/server";
-import { NextResponse } from "next/server";
+import { after, NextResponse } from "next/server";
 
 import {
 	db,
@@ -18,6 +18,7 @@ import {
 	DOCUMENT_VECTOR_STORE_MAX_FILE_SIZE_MB,
 	DOCUMENT_VECTOR_STORE_SUPPORTED_FILE_TYPE_LABEL,
 } from "@/lib/vector-stores/document/constants";
+import { ingestDocument } from "@/lib/vector-stores/document/ingest";
 import {
 	resolveSupportedDocumentFile,
 	sanitizeDocumentFileName,
@@ -277,6 +278,13 @@ export async function POST(
 				fileName: originalFileName,
 				sourceId,
 				storageKey,
+			});
+
+			// Trigger ingestion after response is sent (survives serverless freeze)
+			after(() => {
+				ingestDocument(sourceId).catch((error) => {
+					console.error(`Failed to ingest document ${sourceId}:`, error);
+				});
 			});
 		} catch (dbError) {
 			console.error(
