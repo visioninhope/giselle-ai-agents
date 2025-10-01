@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { WorkspaceId } from "@giselle-sdk/data-type";
 import {
 	WorkspaceProvider,
