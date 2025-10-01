@@ -2,8 +2,12 @@
 
 import { DEFAULT_EMBEDDING_PROFILE_ID } from "@giselle-sdk/data-type";
 import * as Dialog from "@radix-ui/react-dialog";
+import * as Tooltip from "@radix-ui/react-tooltip";
 import {
+	AlertCircle,
 	ArrowUpFromLine,
+	CheckCircle2,
+	Clock,
 	Loader2,
 	MoreVertical,
 	Settings,
@@ -53,6 +57,74 @@ const DOCUMENT_UPLOAD_ACCEPT = [
 
 const SUPPORTED_FILE_TYPES_LABEL =
 	DOCUMENT_VECTOR_STORE_SUPPORTED_FILE_TYPE_LABEL;
+
+type IngestStatus = "idle" | "running" | "completed" | "failed";
+
+function IngestStatusBadge({
+	status,
+	errorCode,
+}: {
+	status: IngestStatus;
+	errorCode?: string | null;
+}) {
+	const config = {
+		idle: {
+			icon: Clock,
+			label: "Pending",
+			className: "bg-yellow-500/10 text-yellow-500 border-yellow-500/20",
+		},
+		running: {
+			icon: Loader2,
+			label: "Processing",
+			className: "bg-blue-500/10 text-blue-500 border-blue-500/20",
+			animate: true,
+		},
+		completed: {
+			icon: CheckCircle2,
+			label: "Ready",
+			className: "bg-green-500/10 text-green-500 border-green-500/20",
+		},
+		failed: {
+			icon: AlertCircle,
+			label: "Failed",
+			className: "bg-error-500/10 text-error-500 border-error-500/20",
+		},
+	}[status];
+
+	const Icon = config.icon;
+	const badge = (
+		<span
+			className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-medium ${config.className}`}
+		>
+			<Icon
+				className={`h-3 w-3 ${config.animate ? "animate-spin" : ""}`}
+				aria-hidden="true"
+			/>
+			{config.label}
+		</span>
+	);
+
+	if (status === "failed" && errorCode) {
+		return (
+			<Tooltip.Provider delayDuration={200}>
+				<Tooltip.Root>
+					<Tooltip.Trigger asChild>{badge}</Tooltip.Trigger>
+					<Tooltip.Portal>
+						<Tooltip.Content
+							side="top"
+							className="z-50 max-w-xs rounded-md border border-white/10 bg-black-900 px-3 py-2 text-xs text-white-400 shadow-lg"
+						>
+							<p className="font-medium">Error: {errorCode}</p>
+							<Tooltip.Arrow className="fill-black-900" />
+						</Tooltip.Content>
+					</Tooltip.Portal>
+				</Tooltip.Root>
+			</Tooltip.Provider>
+		);
+	}
+
+	return badge;
+}
 
 type DocumentVectorStoreItemProps = {
 	store: DocumentVectorStoreWithProfiles;
@@ -219,6 +291,8 @@ type DocumentUploadResponse = {
 type DocumentSourceItem = {
 	id: string;
 	fileName: string;
+	ingestStatus: IngestStatus;
+	ingestErrorCode: string | null;
 };
 
 function buildDocumentSourceItems(
@@ -227,6 +301,8 @@ function buildDocumentSourceItems(
 	return sources.map((source) => ({
 		id: source.id,
 		fileName: source.fileName,
+		ingestStatus: source.ingestStatus as IngestStatus,
+		ingestErrorCode: source.ingestErrorCode,
 	}));
 }
 
@@ -240,6 +316,8 @@ function buildUploadedSourceItems(
 	return successes.map((success) => ({
 		id: success.sourceId,
 		fileName: success.fileName,
+		ingestStatus: "idle" as IngestStatus,
+		ingestErrorCode: null,
 	}));
 }
 
@@ -709,9 +787,15 @@ function DocumentVectorStoreConfigureDialog({
 													key={source.id}
 													className="flex items-center justify-between gap-3 rounded-lg border border-white/10 bg-black-950/30 px-3 py-2"
 												>
-													<span className="text-white-400 text-sm font-medium break-all">
-														{source.fileName}
-													</span>
+													<div className="flex flex-col gap-1.5 min-w-0 flex-1">
+														<span className="text-white-400 text-sm font-medium break-all">
+															{source.fileName}
+														</span>
+														<IngestStatusBadge
+															status={source.ingestStatus}
+															errorCode={source.ingestErrorCode}
+														/>
+													</div>
 													<button
 														type="button"
 														onClick={() =>
@@ -721,7 +805,7 @@ function DocumentVectorStoreConfigureDialog({
 															)
 														}
 														disabled={isDeleting}
-														className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-white/10 text-black-300 transition-colors hover:text-error-500 focus:outline-none focus:ring-2 focus:ring-white/30 disabled:cursor-not-allowed disabled:opacity-50"
+														className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-white/10 text-black-300 transition-colors hover:text-error-500 focus:outline-none focus:ring-2 focus:ring-white/30 disabled:cursor-not-allowed disabled:opacity-50 flex-shrink-0"
 													>
 														<span className="sr-only">
 															Delete {source.fileName}
