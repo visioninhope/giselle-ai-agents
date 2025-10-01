@@ -91,7 +91,7 @@ export function Toolbar() {
 	const [searchQuery, setSearchQuery] = useState<string>("");
 	const [selectedCategory, setSelectedCategory] = useState<string>("All");
 	const { llmProviders } = useWorkflowDesigner();
-	const { webSearchAction } = useFeatureFlag();
+	const { webSearchAction, documentVectorStore } = useFeatureFlag();
 
 	const modelsFilteredBySearchOnly = languageModels
 		.filter((model) => llmProviders.includes(model.provider))
@@ -370,10 +370,15 @@ export function Toolbar() {
 													<GitHubIcon className="w-[20px] h-[20px]" />
 													<p className="text-[14px]">GitHub Vector Store</p>
 												</ToggleGroup.Item>
-												<ToggleGroup.Item value="documentVectorStore" data-tool>
-													<DocumentIcon className="w-[20px] h-[20px]" />
-													<p className="text-[14px]">Document Vector Store</p>
-												</ToggleGroup.Item>
+												{documentVectorStore && (
+													<ToggleGroup.Item
+														value="documentVectorStore"
+														data-tool
+													>
+														<DocumentIcon className="w-[20px] h-[20px]" />
+														<p className="text-[14px]">Document Vector Store</p>
+													</ToggleGroup.Item>
+												)}
 											</ToggleGroup.Root>
 										</div>
 									</Popover.Content>
