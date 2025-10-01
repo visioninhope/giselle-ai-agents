@@ -11,7 +11,10 @@ export async function updateWorkspaceName(
 	name: string,
 ) {
 	const experimental_storage = await experimental_storageFlag();
-	const workspace = await giselleEngine.getWorkspace(workspaceId, experimental_storage);
+	const workspace = await giselleEngine.getWorkspace(
+		workspaceId,
+		experimental_storage,
+	);
 
 	const previousWorkspace = structuredClone(workspace);
 	const updatedWorkspace = { ...workspace, name };
@@ -25,7 +28,10 @@ export async function updateWorkspaceName(
 			.where(eq(agents.workspaceId, workspaceId));
 	} catch (error) {
 		try {
-			await giselleEngine.updateWorkspace(previousWorkspace, experimental_storage);
+			await giselleEngine.updateWorkspace(
+				previousWorkspace,
+				experimental_storage,
+			);
 		} catch (rollbackError) {
 			console.error(
 				"Failed to rollback workspace name after agents update failure",
