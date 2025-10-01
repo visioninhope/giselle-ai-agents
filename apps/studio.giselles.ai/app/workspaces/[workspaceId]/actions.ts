@@ -11,7 +11,7 @@ export async function updateWorkspaceName(
 ) {
 	const workspace = await giselleEngine.getWorkspace(workspaceId, true);
 
-	const previousWorkspace = workspace;
+	const previousWorkspace = structuredClone(workspace);
 	const updatedWorkspace = { ...workspace, name };
 
 	await giselleEngine.updateWorkspace(updatedWorkspace, true);
