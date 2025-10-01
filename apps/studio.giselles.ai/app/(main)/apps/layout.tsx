@@ -1,5 +1,6 @@
 import { createId } from "@paralleldrive/cuid2";
 import { ExternalLink, Plus } from "lucide-react";
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
 import { GlassButton } from "@/components/ui/glass-button";
@@ -8,7 +9,6 @@ import { experimental_storageFlag } from "@/flags";
 import { fetchCurrentUser } from "@/services/accounts";
 import { fetchCurrentTeam } from "@/services/teams";
 import { giselleEngine } from "../../giselle-engine";
-import { revalidatePath } from "next/cache";
 
 export default function Layout({ children }: { children: ReactNode }) {
 	async function createAgent() {
