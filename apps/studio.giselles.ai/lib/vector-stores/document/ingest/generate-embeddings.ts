@@ -131,11 +131,25 @@ export async function generateEmbeddings(
 	}
 
 	// Validate dimensions
-	const dimensions = embeddings[0]?.embedding.length ?? profile.dimensions;
+	if (embeddings.length === 0) {
+		throw Object.assign(new Error("No embeddings were generated"), {
+			code: "embedding-failed" as GenerateEmbeddingsErrorCode,
+		});
+	}
+
+	const actualDimensions = embeddings[0].embedding.length;
+	if (actualDimensions !== profile.dimensions) {
+		throw Object.assign(
+			new Error(
+				`Embedding dimension mismatch: expected ${profile.dimensions}, got ${actualDimensions}`,
+			),
+			{ code: "embedding-failed" as GenerateEmbeddingsErrorCode },
+		);
+	}
 
 	return {
 		embeddings,
 		embeddingCount: embeddings.length,
-		dimensions,
+		dimensions: actualDimensions,
 	};
 }
