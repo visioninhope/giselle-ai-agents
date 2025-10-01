@@ -8,6 +8,7 @@ import { experimental_storageFlag } from "@/flags";
 import { fetchCurrentUser } from "@/services/accounts";
 import { fetchCurrentTeam } from "@/services/teams";
 import { giselleEngine } from "../../giselle-engine";
+import { revalidatePath } from "next/cache";
 
 export default function Layout({ children }: { children: ReactNode }) {
 	async function createAgent() {
@@ -26,6 +27,7 @@ export default function Layout({ children }: { children: ReactNode }) {
 			creatorDbId: user.dbId,
 			workspaceId: workspace.id,
 		});
+		revalidatePath(`/workspaces/${workspace.id}`);
 		redirect(`/workspaces/${workspace.id}`);
 	}
 
