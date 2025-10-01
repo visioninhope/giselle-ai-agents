@@ -27,7 +27,7 @@ export default function Layout({ children }: { children: ReactNode }) {
 			creatorDbId: user.dbId,
 			workspaceId: workspace.id,
 		});
-		revalidatePath(`/workspaces/${workspace.id}`, "layout");
+
 		redirect(`/workspaces/${workspace.id}`);
 	}
 
