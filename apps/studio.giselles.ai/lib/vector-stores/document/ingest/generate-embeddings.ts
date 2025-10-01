@@ -50,6 +50,15 @@ export async function generateEmbeddings(
 		signal,
 	} = options;
 
+	if (!Number.isInteger(maxBatchSize) || maxBatchSize <= 0) {
+		throw Object.assign(
+			new Error(
+				`maxBatchSize must be a positive integer (received ${maxBatchSize}).`,
+			),
+			{ code: "embedding-failed" as GenerateEmbeddingsErrorCode },
+		);
+	}
+
 	signal?.throwIfAborted();
 
 	// Validate embedding profile
