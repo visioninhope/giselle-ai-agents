@@ -242,8 +242,7 @@ export function GitHubVectorStoreNodePropertiesPanel({
 						<span>
 							The repository{" "}
 							<span className="font-mono font-semibold">
-								{source.state.owner}/
-								{source.state.repo}
+								{source.state.owner}/{source.state.repo}
 							</span>{" "}
 							is no longer available in your Vector Stores. Please select a
 							different repository or set up this repository again.
