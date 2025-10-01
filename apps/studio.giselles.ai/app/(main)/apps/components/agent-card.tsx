@@ -29,6 +29,10 @@ export function AgentCard({ agent }: { agent: typeof dbAgents.$inferSelect }) {
 		return () => clearInterval(id);
 	}, [agent.updatedAt]);
 
+	if (!agent.workspaceId) {
+		return null;
+	}
+
 	return (
 		<section
 			onMouseMove={handleMouseMove}

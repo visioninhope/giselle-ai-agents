@@ -1,6 +1,5 @@
 import { createId } from "@paralleldrive/cuid2";
 import { ExternalLink, Plus } from "lucide-react";
-import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
 import { GlassButton } from "@/components/ui/glass-button";
