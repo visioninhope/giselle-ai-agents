@@ -1,3 +1,15 @@
+/**
+ * Cron job endpoint for document embedding ingestion
+ *
+ * This endpoint processes documents that were not successfully ingested during upload:
+ * - Documents in 'idle' status: Initial ingestion not yet attempted or failed to start
+ * - Documents in 'running' status for >15 minutes: Likely interrupted by timeout
+ *
+ * Documents with 'failed' status are NOT retried by this cron job.
+ * Failed status indicates permanent errors (e.g., unsupported file type, missing API keys,
+ * invalid embedding profiles) that would fail repeatedly. Users should re-upload or
+ * fix configuration issues for these documents.
+ */
 import { createHash, timingSafeEqual } from "node:crypto";
 import type { NextRequest } from "next/server";
 import { ingestDocument } from "@/lib/vector-stores/document/ingest";

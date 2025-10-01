@@ -20,8 +20,12 @@ interface DocumentIngestTarget {
  * Fetch document sources that need to be ingested
  *
  * Target documents are:
- * - idle
- * - running and updated more than 15 minutes ago (stale)
+ * - idle: Newly uploaded documents waiting for initial ingestion
+ * - running and updated more than 15 minutes ago (stale): Likely interrupted by timeout
+ *
+ * NOTE: Documents with 'failed' status are intentionally excluded.
+ * Failed ingestions indicate permanent errors (invalid file, missing API keys, etc.)
+ * that would repeatedly fail. These require manual intervention or re-upload.
  *
  * @returns Document sources to ingest
  */

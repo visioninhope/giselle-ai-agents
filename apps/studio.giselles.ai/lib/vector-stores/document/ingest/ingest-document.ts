@@ -247,6 +247,8 @@ export async function ingestDocument(
 		}
 
 		// Handle other errors
+		// Mark as 'failed' for permanent errors that should not be retried by cron job
+		// (e.g., unsupported file type, missing API keys, invalid embedding profiles)
 		const errorCode =
 			error && typeof error === "object" && "code" in error
 				? (error.code as IngestErrorCode)
