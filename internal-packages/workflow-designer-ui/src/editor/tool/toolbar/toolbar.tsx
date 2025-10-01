@@ -10,11 +10,12 @@ import {
 import {
 	actionNodeDefaultName,
 	createActionNode,
+	createDocumentVectorStoreNode,
 	createFileNode,
+	createGitHubVectorStoreNode,
 	createQueryNode,
 	createTextNode,
 	createTriggerNode,
-	createVectorStoreNode,
 	createWebPageNode,
 	triggerNodeDefaultName,
 	useFeatureFlag,
@@ -322,7 +323,11 @@ export function Toolbar() {
 														setSelectedTool(addNodeTool(createTextNode()));
 													} else if (sourceType === "githubVectorStore") {
 														setSelectedTool(
-															addNodeTool(createVectorStoreNode("github")),
+															addNodeTool(createGitHubVectorStoreNode()),
+														);
+													} else if (sourceType === "documentVectorStore") {
+														setSelectedTool(
+															addNodeTool(createDocumentVectorStoreNode()),
 														);
 													} else if (sourceType === "pdf") {
 														setSelectedTool(
@@ -364,6 +369,10 @@ export function Toolbar() {
 												<ToggleGroup.Item value="githubVectorStore" data-tool>
 													<GitHubIcon className="w-[20px] h-[20px]" />
 													<p className="text-[14px]">GitHub Vector Store</p>
+												</ToggleGroup.Item>
+												<ToggleGroup.Item value="documentVectorStore" data-tool>
+													<DocumentIcon className="w-[20px] h-[20px]" />
+													<p className="text-[14px]">Document Vector Store</p>
 												</ToggleGroup.Item>
 											</ToggleGroup.Root>
 										</div>
