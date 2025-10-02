@@ -2,7 +2,11 @@ import { createHash } from "node:crypto";
 import { type Dirent, promises as fs } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, normalize } from "node:path";
-import type { Document, DocumentLoader } from "@giselle-sdk/rag";
+import {
+	type Document,
+	type DocumentLoader,
+	replaceNullCharacters,
+} from "@giselle-sdk/rag";
 import type { Octokit } from "@octokit/core";
 import { extract } from "tar";
 import { executeRestRequest } from "../utils";
@@ -150,7 +154,10 @@ export function createGitHubArchiveLoader(
 		const textDecoder = new TextDecoder("utf-8", { fatal: true });
 		try {
 			const decodedContent = textDecoder.decode(contentBytes);
-			return { content: decodedContent, metadata };
+			return {
+				content: replaceNullCharacters(decodedContent),
+				metadata,
+			};
 		} catch {
 			return null;
 		}
