@@ -14,10 +14,10 @@ export type DocumentVectorStoreWithProfiles =
 		sources: (typeof documentVectorStoreSources.$inferSelect)[];
 	};
 
-export async function getDocumentVectorStores(): Promise<
-	DocumentVectorStoreWithProfiles[]
-> {
-	const team = await fetchCurrentTeam();
+export async function getDocumentVectorStores(
+	teamDbId?: number,
+): Promise<DocumentVectorStoreWithProfiles[]> {
+	const targetTeamDbId = teamDbId ?? (await fetchCurrentTeam()).dbId;
 
 	const records = await db
 		.select({
@@ -32,7 +32,7 @@ export async function getDocumentVectorStores(): Promise<
 				documentVectorStores.dbId,
 			),
 		)
-		.where(eq(documentVectorStores.teamDbId, team.dbId))
+		.where(eq(documentVectorStores.teamDbId, targetTeamDbId))
 		.orderBy(desc(documentVectorStores.createdAt));
 
 	const storeMap = new Map<number, DocumentVectorStoreWithProfiles>();

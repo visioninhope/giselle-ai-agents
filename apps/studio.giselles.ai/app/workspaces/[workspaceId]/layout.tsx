@@ -79,7 +79,7 @@ export default async function Layout({
 	const resumableGeneration = await resumableGenerationFlag();
 	const documentVectorStore = await docVectorStoreFlag();
 	const documentVectorStores = documentVectorStore
-		? await getDocumentVectorStores()
+		? await getDocumentVectorStores(workspaceTeam.dbId)
 		: [];
 	const data = await giselleEngine.getWorkspace(workspaceId, true);
 
