@@ -10,11 +10,12 @@ import {
 import {
 	actionNodeDefaultName,
 	createActionNode,
+	createDocumentVectorStoreNode,
 	createFileNode,
+	createGitHubVectorStoreNode,
 	createQueryNode,
 	createTextNode,
 	createTriggerNode,
-	createVectorStoreNode,
 	createWebPageNode,
 	triggerNodeDefaultName,
 	useFeatureFlag,
@@ -90,7 +91,7 @@ export function Toolbar() {
 	const [searchQuery, setSearchQuery] = useState<string>("");
 	const [selectedCategory, setSelectedCategory] = useState<string>("All");
 	const { llmProviders } = useWorkflowDesigner();
-	const { webSearchAction } = useFeatureFlag();
+	const { webSearchAction, documentVectorStore } = useFeatureFlag();
 
 	const modelsFilteredBySearchOnly = languageModels
 		.filter((model) => llmProviders.includes(model.provider))
@@ -322,7 +323,11 @@ export function Toolbar() {
 														setSelectedTool(addNodeTool(createTextNode()));
 													} else if (sourceType === "githubVectorStore") {
 														setSelectedTool(
-															addNodeTool(createVectorStoreNode("github")),
+															addNodeTool(createGitHubVectorStoreNode()),
+														);
+													} else if (sourceType === "documentVectorStore") {
+														setSelectedTool(
+															addNodeTool(createDocumentVectorStoreNode()),
 														);
 													} else if (sourceType === "pdf") {
 														setSelectedTool(
@@ -361,6 +366,15 @@ export function Toolbar() {
 													<TextFileIcon className="w-[20px] h-[20px]" />
 													<p className="text-[14px]">Text Upload</p>
 												</ToggleGroup.Item>
+												{documentVectorStore && (
+													<ToggleGroup.Item
+														value="documentVectorStore"
+														data-tool
+													>
+														<DocumentIcon className="w-[20px] h-[20px]" />
+														<p className="text-[14px]">Document Vector Store</p>
+													</ToggleGroup.Item>
+												)}
 												<ToggleGroup.Item value="githubVectorStore" data-tool>
 													<GitHubIcon className="w-[20px] h-[20px]" />
 													<p className="text-[14px]">GitHub Vector Store</p>

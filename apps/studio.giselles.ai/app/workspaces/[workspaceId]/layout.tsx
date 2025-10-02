@@ -9,6 +9,7 @@ import { giselleEngine } from "@/app/giselle-engine";
 import { db, flowTriggers } from "@/drizzle";
 import {
 	aiGatewayFlag,
+	docVectorStoreFlag,
 	experimental_storageFlag,
 	layoutV3Flag,
 	resumableGenerationFlag,
@@ -75,6 +76,7 @@ export default async function Layout({
 	const stage = await stageFlag();
 	const aiGateway = await aiGatewayFlag();
 	const resumableGeneration = await resumableGenerationFlag();
+	const documentVectorStore = await docVectorStoreFlag();
 	const data = await giselleEngine.getWorkspace(workspaceId, true);
 
 	// return children
@@ -112,6 +114,7 @@ export default async function Layout({
 				stage,
 				aiGateway,
 				resumableGeneration,
+				documentVectorStore,
 			}}
 			flowTrigger={{
 				callbacks: {
