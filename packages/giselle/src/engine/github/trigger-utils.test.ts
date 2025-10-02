@@ -280,7 +280,7 @@ describe("resolveTrigger", () => {
 			["pullRequestBody", "PR body"],
 			["pullRequestNumber", "4"],
 			["pullRequestTitle", "PR title"],
-			["diff", "diff"]
+			["diff", "diff"],
 		])("resolve %s", async (accessor, expected) => {
 			const trigger = createTrigger("github.pull_request_comment.created");
 			const output = createOutput(accessor);
@@ -302,7 +302,7 @@ describe("resolveTrigger", () => {
 			["issueBody", "PR body"],
 			["issueNumber", "4"],
 			["issueTitle", "PR title"],
-			["diff", "diff"]
+			["diff", "diff"],
 		] as const)("resolve legacy accessor %s", async (accessor, expected) => {
 			const trigger = createTrigger("github.pull_request_comment.created");
 			const output = createOutput(accessor);
