@@ -3,6 +3,7 @@ import { escapeIdentifier } from "pg";
 import * as pgvector from "pgvector/pg";
 import { EMBEDDING_COLUMNS } from "../../database/constants";
 import { ConfigurationError } from "../../errors";
+import { replaceNullCharacters } from "../../utils";
 import type { ColumnMapping } from "../column-mapping";
 import { REQUIRED_COLUMN_KEYS } from "../column-mapping";
 import type { ChunkWithEmbedding } from "../types";
@@ -123,7 +124,7 @@ export function prepareChunkRecords<TMetadata extends Record<string, unknown>>(
 	return chunks.map((chunk) => ({
 		record: {
 			[columnMapping.documentKey]: documentKey,
-			[columnMapping.chunkContent]: chunk.content,
+			[columnMapping.chunkContent]: replaceNullCharacters(chunk.content),
 			[columnMapping.chunkIndex]: chunk.index,
 			...metadataColumns,
 			...scope,
