@@ -108,35 +108,29 @@ export const AnthropicWebSearchTool = z.object({
 });
 export type AnthropicWebSearchTool = z.infer<typeof AnthropicWebSearchTool>;
 
-const googleUrlSchema = z
-	.string()
-	.url()
-	.refine((value) => value.length <= 2048, {
-		message: "URL must be 2048 characters or fewer",
-	});
-
-export const GoogleUrlContextTool = z.object({
-	urls: z
-		.array(googleUrlSchema)
-		.min(1, "At least one URL is required")
-		.max(20, "A maximum of 20 URLs is supported"),
-});
-export type GoogleUrlContextTool = z.infer<typeof GoogleUrlContextTool>;
-
 export const ToolSet = z.object({
 	github: z.optional(GitHubTool),
 	postgres: z.optional(PostgresTool),
 	openaiWebSearch: z.optional(OpenAIWebSearchTool),
 	anthropicWebSearch: z.optional(AnthropicWebSearchTool),
-	googleUrlContext: z.optional(GoogleUrlContextTool),
 });
 export type ToolSet = z.infer<typeof ToolSet>;
+
+export const TEXT_GENERATION_CONTEXT_SOURCE_VALUES = [
+	"none",
+	"google_search",
+	"url_context",
+] as const;
+
+export type TextGenerationContextSource =
+	(typeof TEXT_GENERATION_CONTEXT_SOURCE_VALUES)[number];
 
 export const TextGenerationContent = z.object({
 	type: z.literal("textGeneration"),
 	llm: TextGenerationLanguageModelData,
 	prompt: z.string().optional(),
 	tools: z.optional(ToolSet),
+	contextSource: z.enum(TEXT_GENERATION_CONTEXT_SOURCE_VALUES).optional(),
 });
 export type TextGenerationContent = z.infer<typeof TextGenerationContent>;
 

@@ -17,13 +17,7 @@ import {
 	isJsonContent,
 	jsonContentToText,
 } from "@giselle-sdk/text-editor-utils";
-import type {
-	DataContent,
-	FilePart,
-	ImagePart,
-	ModelMessage,
-	ToolSet,
-} from "ai";
+import type { DataContent, FilePart, ImagePart, ModelMessage } from "ai";
 import type { Storage } from "unstorage";
 import {
 	type CompletedGeneration,
@@ -38,6 +32,8 @@ import type { GiselleStorage } from "../experimental_storage";
 import type { GiselleEngineContext } from "../types";
 import type { PreparedToolSet } from "./types";
 
+const URL_CONTEXT_LIMIT = 20;
+
 export function addUrlContextTool({
 	preparedToolSet,
 	urls,
@@ -45,7 +41,7 @@ export function addUrlContextTool({
 }: {
 	preparedToolSet: PreparedToolSet;
 	urls: string[] | undefined;
-	tool: NonNullable<ToolSet["url_context"]>;
+	tool: PreparedToolSet["toolSet"][string];
 }): PreparedToolSet {
 	if (urls === undefined || urls.length === 0) {
 		return preparedToolSet;
@@ -57,6 +53,66 @@ export function addUrlContextTool({
 			...preparedToolSet.toolSet,
 			url_context: tool,
 		},
+	};
+}
+
+type BuildMessageObjectResult = {
+	messages: ModelMessage[];
+	urlContextUrls: string[];
+};
+
+function extractHttpsUrls(text: string): string[] {
+	const matches =
+		text.match(/https?:\/\/[\w\-._~:/?#[\]@!$&'()*+,;=%]+/g) ?? [];
+	const unique = new Set<string>();
+	for (const candidate of matches) {
+		try {
+			const parsed = new URL(candidate);
+			if (parsed.protocol !== "https:") {
+				continue;
+			}
+			const normalized = parsed.toString();
+			unique.add(normalized);
+		} catch {}
+	}
+	return Array.from(unique);
+}
+
+function applyUrlContextPrompt({
+	node,
+	message,
+}: {
+	node: TextGenerationNode;
+	message: string;
+}): { message: string; urls: string[] } {
+	const shouldUseUrlContext =
+		node.content.llm.provider === "google" &&
+		node.content.contextSource === "url_context";
+	if (!shouldUseUrlContext) {
+		return { message, urls: [] };
+	}
+
+	const urls = extractHttpsUrls(message);
+	if (urls.length === 0) {
+		return { message, urls: [] };
+	}
+	if (urls.length > URL_CONTEXT_LIMIT) {
+		throw new Error(
+			`URL Context supports up to ${URL_CONTEXT_LIMIT.toString()} URLs in the prompt.`,
+		);
+	}
+
+	const formattedList = urls.map((url) => `- ${url}`).join("\n");
+	const instructionLines = [
+		"# URL Context",
+		"Use the url_context tool to retrieve information from the following URLs before answering:",
+		formattedList,
+		"Cite any information that comes from these URLs in your response.",
+	];
+
+	return {
+		message: `${instructionLines.join("\n")}\n\n${message}`,
+		urls,
 	};
 }
 
@@ -77,7 +133,7 @@ export async function buildMessageObject(
 		nodeId: NodeId,
 		outputId: OutputId,
 	) => Promise<ImagePart[] | undefined>,
-): Promise<ModelMessage[]> {
+): Promise<BuildMessageObjectResult> {
 	switch (node.content.type) {
 		case "textGeneration": {
 			return await buildGenerationMessageForTextGeneration(
@@ -88,18 +144,21 @@ export async function buildMessageObject(
 			);
 		}
 		case "imageGeneration": {
-			return await buildGenerationMessageForImageGeneration(
-				node as ImageGenerationNode,
-				contextNodes,
-				fileResolver,
-				textGenerationResolver,
-				imageGenerationResolver,
-			);
+			return {
+				messages: await buildGenerationMessageForImageGeneration(
+					node as ImageGenerationNode,
+					contextNodes,
+					fileResolver,
+					textGenerationResolver,
+					imageGenerationResolver,
+				),
+				urlContextUrls: [],
+			};
 		}
 		case "action":
 		case "trigger":
 		case "query": {
-			return [];
+			return { messages: [], urlContextUrls: [] };
 		}
 		default: {
 			const _exhaustiveCheck: never = node.content;
@@ -116,7 +175,7 @@ async function buildGenerationMessageForTextGeneration(
 		nodeId: NodeId,
 		outputId: OutputId,
 	) => Promise<string | undefined>,
-): Promise<ModelMessage[]> {
+): Promise<BuildMessageObjectResult> {
 	const llmProvider = node.content.llm.provider;
 	const prompt = node.content.prompt;
 	if (prompt === undefined) {
@@ -290,35 +349,23 @@ async function buildGenerationMessageForTextGeneration(
 			}
 		}
 	}
-	let finalUserMessage = userMessage;
-	if (
-		node.content.llm.provider === "google" &&
-		node.content.tools?.googleUrlContext?.urls !== undefined
-	) {
-		const urls = node.content.tools.googleUrlContext.urls;
-		if (urls.length > 0) {
-			const formattedList = urls.map((url: string) => `- ${url}`).join("\n");
-			const instructionLines = [
-				"# URL Context",
-				"Use the url_context tool to retrieve information from the following URLs before answering:",
-				formattedList,
-				"Cite any information that comes from these URLs in your response.",
-			];
-			finalUserMessage = `${instructionLines.join("\n")}\n\n${userMessage}`;
-		}
-	}
-	return [
-		{
-			role: "user",
-			content: [
-				...attachedFiles,
-				{
-					type: "text",
-					text: finalUserMessage,
-				},
-			],
-		},
-	];
+	const { message: finalUserMessage, urls: urlContextUrls } =
+		applyUrlContextPrompt({ node, message: userMessage });
+	return {
+		messages: [
+			{
+				role: "user",
+				content: [
+					...attachedFiles,
+					{
+						type: "text",
+						text: finalUserMessage,
+					},
+				],
+			},
+		],
+		urlContextUrls,
+	};
 }
 
 function getOrdinal(n: number): string {

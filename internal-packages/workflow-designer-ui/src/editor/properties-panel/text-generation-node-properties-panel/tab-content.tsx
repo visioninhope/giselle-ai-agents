@@ -5,6 +5,7 @@ import {
 	isTextGenerationNode,
 	type Output,
 	OutputId,
+	type TextGenerationContextSource,
 	type TextGenerationNode,
 	type ToolSet,
 } from "@giselle-sdk/data-type";
@@ -194,111 +195,57 @@ export function TextGenerationTabContent({
 		};
 	}, [data.connections, data.nodes, deleteConnection, node, updateNodeData]);
 
-	const handleGoogleToolChange = useCallback(
-		(changedToolSet: ToolSet) => {
-			updateNodeDataContent(node, {
-				...node.content,
-				tools: changedToolSet,
-			});
+	const ensureSourceOutput = useCallback(() => {
+		if (node.outputs.some((output) => output.accessor === "source")) {
+			return;
+		}
+		updateNodeData(node, {
+			outputs: [
+				...node.outputs,
+				{
+					id: OutputId.generate(),
+					label: "Source",
+					accessor: "source",
+				},
+			],
+		});
+	}, [node, updateNodeData]);
 
+	const handleGoogleContextSourceChange = useCallback(
+		(mode: TextGenerationContextSource) => {
 			if (node.content.llm.provider !== "google") {
 				return;
 			}
 
-			const { searchGrounding } = node.content.llm.configurations;
-			const shouldEnsureSourceOutput =
-				changedToolSet.googleUrlContext !== undefined || searchGrounding;
-
-			if (!shouldEnsureSourceOutput) {
+			if (mode === "google_search" || mode === "url_context") {
+				ensureSourceOutput();
+			} else {
 				const { outputs: filteredOutputs, removed } =
 					detachSourceOutputConnections();
 				if (removed) {
-					updateNodeData(node, {
-						outputs: filteredOutputs,
-					});
+					updateNodeData(node, { outputs: filteredOutputs });
 				}
-				return;
 			}
 
-			if (!node.outputs.some((output) => output.accessor === "source")) {
-				updateNodeData(node, {
-					outputs: [
-						...node.outputs,
-						{
-							id: OutputId.generate(),
-							label: "Source",
-							accessor: "source",
-						},
-					],
-				});
-			}
+			updateNodeDataContent(node, {
+				...node.content,
+				contextSource: mode,
+				llm: {
+					...node.content.llm,
+					configurations: {
+						...node.content.llm.configurations,
+						searchGrounding: mode === "google_search",
+					},
+				},
+			});
 		},
 		[
 			detachSourceOutputConnections,
+			ensureSourceOutput,
 			node,
 			updateNodeData,
 			updateNodeDataContent,
 		],
-	);
-
-	const handleGoogleSearchGroundingChange = useCallback(
-		(enable: boolean) => {
-			if (node.content.llm.provider !== "google") {
-				return;
-			}
-
-			if (enable) {
-				const hasSourceOutput = node.outputs.some(
-					(output) => output.accessor === "source",
-				);
-				updateNodeData(node, {
-					content: {
-						...node.content,
-						llm: {
-							...node.content.llm,
-							configurations: {
-								...node.content.llm.configurations,
-								searchGrounding: true,
-							},
-						},
-					},
-					outputs: hasSourceOutput
-						? node.outputs
-						: [
-								...node.outputs,
-								{
-									id: OutputId.generate(),
-									label: "Source",
-									accessor: "source",
-								},
-							],
-				});
-				return;
-			}
-
-			const shouldRemoveSourceOutput =
-				node.content.tools?.googleUrlContext === undefined;
-			let nextOutputs = node.outputs;
-			if (shouldRemoveSourceOutput) {
-				const { outputs: filteredOutputs } = detachSourceOutputConnections();
-				nextOutputs = filteredOutputs;
-			}
-
-			updateNodeData(node, {
-				content: {
-					...node.content,
-					llm: {
-						...node.content.llm,
-						configurations: {
-							...node.content.llm.configurations,
-							searchGrounding: false,
-						},
-					},
-				},
-				outputs: nextOutputs,
-			});
-		},
-		[detachSourceOutputConnections, node, updateNodeData],
 	);
 
 	return (
@@ -500,11 +447,8 @@ export function TextGenerationTabContent({
 				{node.content.llm.provider === "google" && (
 					<GoogleModelPanel
 						googleLanguageModel={node.content.llm}
-						tools={node.content.tools}
-						onToolChange={handleGoogleToolChange}
-						onSearchGroundingConfigurationChange={
-							handleGoogleSearchGroundingChange
-						}
+						contextSource={node.content.contextSource ?? "none"}
+						onContextSourceChange={handleGoogleContextSourceChange}
 						onModelChange={(value) =>
 							updateNodeDataContent(node, {
 								...node.content,

@@ -66,7 +66,7 @@ export function generateText(args: {
 				throw new Error("Invalid language model");
 			}
 
-			const messages = await buildMessageObject(
+			const { messages, urlContextUrls } = await buildMessageObject(
 				operationNode,
 				generationContext.sourceNodes,
 				fileResolver,
@@ -167,16 +167,11 @@ export function generateText(args: {
 					},
 				};
 			}
-			const urlContextUrls =
-				operationNode.content.tools?.googleUrlContext?.urls;
-			const hasUrlContextConfigured =
-				Array.isArray(urlContextUrls) && urlContextUrls.length > 0;
-
 			if (
 				operationNode.content.llm.provider === "google" &&
 				operationNode.content.llm.configurations.searchGrounding &&
 				hasCapability(languageModel, Capability.OptionalSearchGrounding) &&
-				!hasUrlContextConfigured
+				operationNode.content.contextSource === "google_search"
 			) {
 				preparedToolSet = {
 					...preparedToolSet,
@@ -188,7 +183,8 @@ export function generateText(args: {
 			}
 			if (
 				operationNode.content.llm.provider === "google" &&
-				hasCapability(languageModel, Capability.UrlContext)
+				hasCapability(languageModel, Capability.UrlContext) &&
+				operationNode.content.contextSource === "url_context"
 			) {
 				preparedToolSet = addUrlContextTool({
 					preparedToolSet,
