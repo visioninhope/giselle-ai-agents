@@ -83,7 +83,7 @@
 
 
 <a name="@ai-sdk/google"></a>
-### @ai-sdk/google v2.0.16
+### @ai-sdk/google v2.0.14
 #### 
 
 ##### Paths
@@ -94,7 +94,7 @@
 
 
 <a name="@ai-sdk/google-vertex"></a>
-### @ai-sdk/google-vertex v3.0.29
+### @ai-sdk/google-vertex v3.0.27
 #### 
 
 ##### Paths
