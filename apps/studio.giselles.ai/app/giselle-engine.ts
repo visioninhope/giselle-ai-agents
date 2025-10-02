@@ -19,7 +19,7 @@ import {
 	supabaseVaultDriver,
 } from "@giselle-sdk/supabase-driver";
 import { openaiVectorStore } from "@giselle-sdk/vector-store-adapters";
-import { tasks } from "@trigger.dev/sdk";
+import { tasks as jobs } from "@trigger.dev/sdk";
 import type { ModelMessage, ProviderMetadata } from "ai";
 import { after } from "next/server";
 import { createStorage } from "unstorage";
@@ -39,7 +39,7 @@ import {
 	gitHubPullRequestQueryService,
 	gitHubQueryService,
 } from "../lib/vector-stores/github";
-import type { generateContentTask } from "../trigger/generate-content-task";
+import type { generateContentJob } from "../trigger/generate-content-job";
 
 export const publicStorage = createStorage({
 	driver: supabaseStorageDriver({
@@ -371,7 +371,7 @@ if (generateContentProcessor === "trigger.dev") {
 				const team = await getWorkspaceTeam(
 					generation.context.origin.workspaceId,
 				);
-				await tasks.trigger<typeof generateContentTask>("generate-content", {
+				await jobs.trigger<typeof generateContentJob>("generate-content", {
 					generationId: generation.id,
 					requestId,
 					userId: "github-app",
@@ -389,7 +389,7 @@ if (generateContentProcessor === "trigger.dev") {
 					fetchCurrentUser(),
 					fetchCurrentTeam(),
 				]);
-				await tasks.trigger<typeof generateContentTask>("generate-content", {
+				await jobs.trigger<typeof generateContentJob>("generate-content", {
 					generationId: generation.id,
 					requestId,
 					userId: currentUser.id,
