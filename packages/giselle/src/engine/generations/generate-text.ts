@@ -16,7 +16,7 @@ import {
 	languageModels,
 } from "@giselle-sdk/language-model";
 import type { LanguageModel } from "ai";
-import { AISDKError, streamText } from "ai";
+import { AISDKError, stepCountIs, streamText } from "ai";
 import type {
 	FailedGeneration,
 	GenerationOutput,
@@ -47,12 +47,13 @@ export function generateText(args: {
 		useExperimentalStorage: args.useExperimentalStorage,
 		useResumableGeneration: args.useResumableGeneration,
 		execute: async ({
-			completeGeneration,
+			finishGeneration,
 			runningGeneration,
 			generationContext,
 			setGeneration,
 			fileResolver,
 			generationContentResolver,
+			imageGenerationResolver,
 		}) => {
 			const operationNode = generationContext.operationNode;
 			if (!isTextGenerationNode(operationNode)) {
@@ -71,6 +72,7 @@ export function generateText(args: {
 				generationContext.sourceNodes,
 				fileResolver,
 				generationContentResolver,
+				imageGenerationResolver,
 			);
 
 			let preparedToolSet: PreparedToolSet = {
@@ -204,11 +206,22 @@ export function generateText(args: {
 			);
 			let generationError: unknown | undefined;
 			const textGenerationStartTime = Date.now();
+			const shouldDisableToolStepLimit =
+				operationNode.content.llm.provider === "openai" &&
+				["gpt-5", "gpt-5-mini", "gpt-5-nano"].includes(
+					operationNode.content.llm.id,
+				);
+			const preparedToolCount = Object.keys(preparedToolSet.toolSet).length;
 			const streamTextResult = streamText({
 				model,
 				providerOptions,
 				messages,
 				tools: preparedToolSet.toolSet,
+				...(shouldDisableToolStepLimit
+					? {}
+					: {
+							stopWhen: stepCountIs(preparedToolCount + 1),
+						}),
 				onError: ({ error }) => {
 					generationError = error;
 				},
@@ -316,7 +329,7 @@ export function generateText(args: {
 						});
 					}
 					const generationCompletionStartTime = Date.now();
-					await completeGeneration({
+					await finishGeneration({
 						inputMessages: messages,
 						outputs: generationOutputs,
 						usage: await streamTextResult.usage,

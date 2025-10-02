@@ -5,7 +5,11 @@ import type {
 	WorkspaceId,
 } from "@giselle-sdk/data-type";
 import type { ActId } from "@giselle-sdk/giselle";
-import type { GitHubRepositoryIndexId } from "@giselles-ai/types";
+import type {
+	DocumentVectorStoreId,
+	DocumentVectorStoreSourceId,
+	GitHubRepositoryIndexId,
+} from "@giselles-ai/types";
 import { relations, sql } from "drizzle-orm";
 import {
 	boolean,
@@ -326,6 +330,166 @@ export const githubRepositoryEmbeddingProfiles = pgTable(
 			name: "gh_repo_emb_profiles_repo_idx_fk",
 		}).onDelete("cascade"),
 	],
+);
+
+export const documentVectorStores = pgTable(
+	"document_vector_stores",
+	{
+		id: text("id").$type<DocumentVectorStoreId>().notNull(),
+		dbId: serial("db_id").primaryKey(),
+		teamDbId: integer("team_db_id")
+			.notNull()
+			.references(() => teams.dbId, { onDelete: "cascade" }),
+		name: text("name").notNull(),
+		createdAt: timestamp("created_at").defaultNow().notNull(),
+		updatedAt: timestamp("updated_at")
+			.defaultNow()
+			.notNull()
+			.$onUpdate(() => new Date()),
+	},
+	(table) => [
+		index("doc_vs_team_db_id_idx").on(table.teamDbId),
+		unique("doc_vs_id_unique").on(table.id),
+	],
+);
+
+export type DocumentVectorStoreSourceUploadStatus =
+	| "uploading"
+	| "uploaded"
+	| "failed";
+
+export type DocumentVectorStoreSourceIngestStatus =
+	| "idle"
+	| "running"
+	| "completed"
+	| "failed";
+
+export const documentVectorStoreSources = pgTable(
+	"document_vector_store_sources",
+	{
+		id: text("id").$type<DocumentVectorStoreSourceId>().notNull(),
+		dbId: serial("db_id").primaryKey(),
+		documentVectorStoreDbId: integer("document_vector_store_db_id")
+			.notNull()
+			.references(() => documentVectorStores.dbId, { onDelete: "cascade" }),
+		storageBucket: text("storage_bucket").notNull(),
+		storageKey: text("storage_key").notNull(),
+		fileName: text("file_name").notNull(),
+		fileSizeBytes: integer("file_size_bytes").notNull(),
+		fileChecksum: text("file_checksum"),
+		uploadStatus: text("upload_status")
+			.notNull()
+			.$type<DocumentVectorStoreSourceUploadStatus>()
+			.default("uploading"),
+		uploadErrorCode: text("upload_error_code"),
+		ingestStatus: text("ingest_status")
+			.notNull()
+			.$type<DocumentVectorStoreSourceIngestStatus>()
+			.default("idle"),
+		ingestErrorCode: text("ingest_error_code"),
+		metadata: jsonb("metadata"),
+		createdAt: timestamp("created_at").defaultNow().notNull(),
+		updatedAt: timestamp("updated_at")
+			.defaultNow()
+			.notNull()
+			.$onUpdate(() => new Date()),
+		ingestedAt: timestamp("ingested_at"),
+	},
+	(table) => [
+		unique("doc_vs_src_id_unique").on(table.id),
+		unique("doc_vs_src_storage_unique").on(
+			table.documentVectorStoreDbId,
+			table.storageKey,
+		),
+		index("doc_vs_src_upload_status_idx").on(table.uploadStatus),
+		index("doc_vs_src_ingest_status_idx").on(table.ingestStatus),
+	],
+);
+
+export const documentVectorStoreSourcesRelations = relations(
+	documentVectorStoreSources,
+	({ one }) => ({
+		documentVectorStore: one(documentVectorStores, {
+			fields: [documentVectorStoreSources.documentVectorStoreDbId],
+			references: [documentVectorStores.dbId],
+		}),
+	}),
+);
+
+export const documentEmbeddingProfiles = pgTable(
+	"document_embedding_profiles",
+	{
+		documentVectorStoreDbId: integer("document_vector_store_db_id").notNull(),
+		embeddingProfileId: integer("embedding_profile_id")
+			.$type<EmbeddingProfileId>()
+			.notNull(),
+		createdAt: timestamp("created_at").defaultNow().notNull(),
+	},
+	(table) => [
+		primaryKey({
+			columns: [table.documentVectorStoreDbId, table.embeddingProfileId],
+			name: "doc_vs_emb_profiles_pk",
+		}),
+		foreignKey({
+			columns: [table.documentVectorStoreDbId],
+			foreignColumns: [documentVectorStores.dbId],
+			name: "doc_vs_emb_profiles_store_fk",
+		}).onDelete("cascade"),
+	],
+);
+
+export const documentEmbeddings = pgTable(
+	"document_embeddings",
+	{
+		dbId: serial("db_id").primaryKey(),
+		documentVectorStoreSourceDbId: integer("document_vector_store_source_db_id")
+			.notNull()
+			.references(() => documentVectorStoreSources.dbId, {
+				onDelete: "cascade",
+			}),
+		embeddingProfileId: integer("embedding_profile_id")
+			.$type<EmbeddingProfileId>()
+			.notNull(),
+		embeddingDimensions: integer("embedding_dimensions")
+			.$type<EmbeddingDimensions>()
+			.notNull(),
+		documentKey: text("document_key").notNull(),
+		chunkIndex: integer("chunk_index").notNull(),
+		chunkContent: text("chunk_content").notNull(),
+		embedding: vectorWithoutDimensions("embedding").notNull(),
+		createdAt: timestamp("created_at").defaultNow().notNull(),
+		updatedAt: timestamp("updated_at")
+			.defaultNow()
+			.notNull()
+			.$onUpdate(() => new Date()),
+	},
+	(table) => [
+		unique("doc_embs_src_prof_doc_chunk_unique").on(
+			table.documentVectorStoreSourceDbId,
+			table.embeddingProfileId,
+			table.documentKey,
+			table.chunkIndex,
+		),
+		index("doc_embs_embedding_1536_idx")
+			.using("hnsw", sql`(${table.embedding}::vector(1536)) vector_cosine_ops`)
+			.where(sql`${table.embeddingDimensions} = 1536`),
+		index("doc_embs_embedding_3072_idx")
+			.using(
+				"hnsw",
+				sql`(${table.embedding}::halfvec(3072)) halfvec_cosine_ops`,
+			)
+			.where(sql`${table.embeddingDimensions} = 3072`),
+	],
+);
+
+export const documentEmbeddingsRelations = relations(
+	documentEmbeddings,
+	({ one }) => ({
+		documentVectorStoreSource: one(documentVectorStoreSources, {
+			fields: [documentEmbeddings.documentVectorStoreSourceDbId],
+			references: [documentVectorStoreSources.dbId],
+		}),
+	}),
 );
 
 export type GitHubRepositoryContentType = "blob" | "pull_request";

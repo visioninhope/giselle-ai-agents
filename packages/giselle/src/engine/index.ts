@@ -39,12 +39,15 @@ import {
 	cancelGeneration,
 	type Generation,
 	type GenerationOrigin,
+	generateContent,
 	generateImage,
 	generateText,
 	getGeneratedImage,
 	getGeneration,
+	getGenerationMessageChunkss,
 	getNodeGenerations,
 	type QueuedGeneration,
+	type RunningGeneration,
 	setGeneration,
 } from "./generations";
 import { flushGenerationIndexQueue } from "./generations/internal/act-generation-index-queue";
@@ -57,7 +60,11 @@ import { executeAction } from "./operations";
 import { executeQuery } from "./operations/execute-query";
 import { addSecret, deleteSecret, getWorkspaceSecrets } from "./secrets";
 import { addWebPage } from "./sources";
-import type { GiselleEngineConfig, GiselleEngineContext } from "./types";
+import type {
+	GiselleEngineConfig,
+	GiselleEngineContext,
+	WaitUntil,
+} from "./types";
 import {
 	copyWorkspace,
 	createSampleWorkspaces,
@@ -80,6 +87,10 @@ export * from "./usage-limits";
 export * from "./vault";
 export * from "./vector-store";
 
+const defaultWaitUntil: WaitUntil = (promise) => {
+	return promise;
+};
+
 export function GiselleEngine(config: GiselleEngineConfig) {
 	const context: GiselleEngineContext = {
 		...config,
@@ -87,6 +98,8 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 		integrationConfigs: config.integrationConfigs ?? {},
 		callbacks: config.callbacks,
 		logger: config.logger ?? noopLogger,
+		waitUntil: config.waitUntil ?? defaultWaitUntil,
+		generateContentProcess: { type: "self" },
 	};
 	return {
 		copyWorkspace: async (workspaceId: WorkspaceId, name?: string) => {
@@ -364,6 +377,30 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 		async flushGenerationIndexQueue() {
 			return await flushGenerationIndexQueue(context.experimental_storage);
 		},
+		generateContent(args: {
+			generation: RunningGeneration;
+			logger?: GiselleLogger;
+		}) {
+			return generateContent({ ...args, context });
+		},
+		getGenerationMessageChunks(args: {
+			generationId: GenerationId;
+			startByte?: number;
+			abortSignal?: AbortSignal;
+		}) {
+			return getGenerationMessageChunkss({ ...args, context });
+		},
+		startContentGeneration(args: { generation: Generation }) {
+			return startContentGeneration({ ...args, context });
+		},
+		setGenerateContentProcess(
+			process: (args: {
+				context: GiselleEngineContext;
+				generation: RunningGeneration;
+			}) => Promise<void>,
+		) {
+			context.generateContentProcess = { type: "external", process };
+		},
 	};
 }
 
@@ -371,6 +408,8 @@ export type GiselleEngine = ReturnType<typeof GiselleEngine>;
 
 // Re-export value constructors explicitly
 import { ActId, GenerationId } from "../concepts/identifiers";
+import type { GiselleLogger } from "../logger/types";
+import { startContentGeneration } from "./generations/start-content-generation";
 export { ActId, GenerationId };
 
 export * from "./error";

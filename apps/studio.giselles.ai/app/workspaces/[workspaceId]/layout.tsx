@@ -33,7 +33,12 @@ export default async function Layout({
 	params: Promise<{ workspaceId: string }>;
 	children: ReactNode;
 }) {
-	const workspaceId = WorkspaceId.parse((await params).workspaceId);
+	const { data: workspaceId, success } = WorkspaceId.safeParse(
+		(await params).workspaceId,
+	);
+	if (!success) {
+		return notFound();
+	}
 
 	const agent = await db.query.agents.findFirst({
 		where: (agents, { eq }) => eq(agents.workspaceId, workspaceId),
@@ -75,6 +80,8 @@ export default async function Layout({
 	// return children
 	return (
 		<WorkspaceProvider
+			// TODO: Make it reference the same timeout setting as in trigger.config.ts
+			generationTimeout={3600 * 1000}
 			integration={{
 				value: {
 					github: gitHubIntegrationState,

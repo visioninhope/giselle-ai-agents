@@ -1,10 +1,13 @@
 import type {
+	ActionNode,
 	FileNode,
 	ImageGenerationNode,
 	QueryNode,
 	TextGenerationNode,
 	TextNode,
+	TriggerNode,
 	VariableNode,
+	WebPageNode,
 } from "@giselle-sdk/data-type";
 import { useWorkflowDesigner } from "@giselle-sdk/giselle/react";
 import { useMemo } from "react";
@@ -16,9 +19,14 @@ export function useConnectedSources(node: ImageGenerationNode) {
 		const connectionsToThisNode = data.connections.filter(
 			(connection) => connection.inputNode.id === node.id,
 		);
-		const connectedGeneratedSources: ConnectedSource<TextGenerationNode>[] = [];
+		const connectedGeneratedTextSources: ConnectedSource<TextGenerationNode>[] =
+			[];
+		const connectedGeneratedImageSources: ConnectedSource<ImageGenerationNode>[] =
+			[];
 		const connectedVariableSources: ConnectedSource<VariableNode>[] = [];
 		const connectedQuerySources: ConnectedSource<QueryNode>[] = [];
+		const connectedTriggerSources: ConnectedSource<TriggerNode>[] = [];
+		const connectedActionSources: ConnectedSource<ActionNode>[] = [];
 		for (const connection of connectionsToThisNode) {
 			const node = data.nodes.find(
 				(node) => node.id === connection.outputNode.id,
@@ -37,7 +45,7 @@ export function useConnectedSources(node: ImageGenerationNode) {
 				case "operation":
 					switch (node.content.type) {
 						case "textGeneration":
-							connectedGeneratedSources.push({
+							connectedGeneratedTextSources.push({
 								output,
 								node: node as TextGenerationNode,
 								connection,
@@ -50,10 +58,27 @@ export function useConnectedSources(node: ImageGenerationNode) {
 								connection,
 							});
 							break;
-						case "imageGeneration":
-						case "action":
 						case "trigger":
-							throw new Error("not implemented");
+							connectedTriggerSources.push({
+								output,
+								node: node as TriggerNode,
+								connection,
+							});
+							break;
+						case "imageGeneration":
+							connectedGeneratedImageSources.push({
+								output,
+								node: node as ImageGenerationNode,
+								connection,
+							});
+							break;
+						case "action":
+							connectedActionSources.push({
+								output,
+								node: node as ActionNode,
+								connection,
+							});
+							break;
 						default: {
 							const _exhaustiveCheck: never = node.content.type;
 							throw new Error(`Unhandled node type: ${_exhaustiveCheck}`);
@@ -76,9 +101,14 @@ export function useConnectedSources(node: ImageGenerationNode) {
 								connection,
 							});
 							break;
-
-						case "vectorStore":
 						case "webPage":
+							connectedVariableSources.push({
+								output,
+								node: node as WebPageNode,
+								connection,
+							});
+							break;
+						case "vectorStore":
 						case "github":
 							throw new Error("vectore store can not be connected");
 						default: {
@@ -96,13 +126,19 @@ export function useConnectedSources(node: ImageGenerationNode) {
 
 		return {
 			all: [
-				...connectedGeneratedSources,
+				...connectedGeneratedTextSources,
 				...connectedVariableSources,
 				...connectedQuerySources,
+				...connectedGeneratedImageSources,
+				...connectedTriggerSources,
+				...connectedActionSources,
 			],
-			generation: connectedGeneratedSources,
+			generationText: connectedGeneratedTextSources,
+			generationImage: connectedGeneratedImageSources,
 			variable: connectedVariableSources,
 			query: connectedQuerySources,
+			trigger: connectedTriggerSources,
+			action: connectedActionSources,
 		};
 	}, [node.id, data.connections, data.nodes]);
 }

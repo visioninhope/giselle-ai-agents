@@ -3,9 +3,7 @@ import {
 	isImageGenerationNode,
 	isQueryNode,
 	isTextGenerationNode,
-	isTriggerNode,
 	isVectorStoreNode,
-	isWebPageNode,
 	type NodeLike,
 } from "@giselle-sdk/data-type";
 import {
@@ -40,24 +38,6 @@ export function isSupportedConnection(
 
 	// prevent unsupported inputs for image generation node
 	if (isImageGenerationNode(inputNode)) {
-		if (isWebPageNode(outputNode)) {
-			return {
-				canConnect: false,
-				message: "Web page node is not supported as an input for this node",
-			};
-		}
-		if (isTriggerNode(outputNode)) {
-			return {
-				canConnect: false,
-				message: "Trigger node is not supported as an input for this node",
-			};
-		}
-		if (outputNode.content.type === "action") {
-			return {
-				canConnect: false,
-				message: "Action node is not supported as an input for this node",
-			};
-		}
 		if (outputNode.content.type === "github") {
 			return {
 				canConnect: false,
@@ -76,11 +56,39 @@ export function isSupportedConnection(
 		};
 	}
 
-	// image generation, github is not supported as an output
-	if (outputNode.content.type === "imageGeneration") {
+	// image generation can be connected to generation node if the model have a capability to handle generated image input
+	if (isImageGenerationNode(outputNode)) {
+		if (!isTextGenerationNode(inputNode) && !isImageGenerationNode(inputNode)) {
+			return {
+				canConnect: false,
+				message:
+					"Image generation node can only be connected to text generation or image generation",
+			};
+		}
+
+		const inputNodeLLMId = inputNode.content.llm.id;
+		const inputNodeLanguageModel = languageModels.find(
+			(languageModel) => languageModel.id === inputNodeLLMId,
+		);
+
+		if (inputNodeLanguageModel === undefined) {
+			return {
+				canConnect: false,
+				message: "This node is not supported as an input for Image generation",
+			};
+		}
+		if (
+			hasCapability(inputNodeLanguageModel, Capability.ImageGenerationInput)
+		) {
+			return {
+				canConnect: true,
+			};
+		}
+
 		return {
 			canConnect: false,
-			message: "Image generation node is not supported as an output",
+			message:
+				"Image generation node is not supported as an input for this node",
 		};
 	}
 	if (outputNode.content.type === "github") {

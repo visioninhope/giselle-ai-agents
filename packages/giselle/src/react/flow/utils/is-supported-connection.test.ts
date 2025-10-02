@@ -11,10 +11,11 @@ import type {
 	VariableNode,
 	VectorStoreNode,
 } from "@giselle-sdk/data-type";
-import { NodeId, OutputId } from "@giselle-sdk/data-type";
+import { NodeId } from "@giselle-sdk/data-type";
 import {
 	anthropicLanguageModels,
 	falLanguageModels,
+	googleImageLanguageModels,
 	openaiLanguageModels,
 	perplexityLanguageModels,
 } from "@giselle-sdk/language-model";
@@ -114,23 +115,6 @@ describe("isSupportedConnection", () => {
 		},
 	});
 
-	const createWebPageNode = (id: NodeId): VariableNode => ({
-		id,
-		type: "variable",
-		inputs: [],
-		outputs: [
-			{
-				id: OutputId.generate(),
-				label: "Output",
-				accessor: "web-page",
-			},
-		],
-		content: {
-			type: "webPage",
-			webpages: [],
-		},
-	});
-
 	const createTriggerNode = (id: NodeId): TriggerNode => ({
 		id,
 		type: "operation",
@@ -181,19 +165,6 @@ describe("isSupportedConnection", () => {
 	});
 
 	describe("Output node restrictions", () => {
-		test("should reject image generation node as output", () => {
-			const outputNode = createImageGenerationNode("nd-test4");
-			const inputNode = createTextGenerationNode(NodeId.generate());
-
-			const result = isSupportedConnection(outputNode, inputNode);
-
-			expect(result.canConnect).toBe(false);
-			expect(result).toHaveProperty(
-				"message",
-				"Image generation node is not supported as an output",
-			);
-		});
-
 		test("should reject GitHub node as output", () => {
 			const outputNode = createGitHubNode("nd-test6");
 			const inputNode = createTextGenerationNode(NodeId.generate());
@@ -309,47 +280,19 @@ describe("isSupportedConnection", () => {
 		});
 	});
 
-	describe("Image generation node input restrictions", () => {
-		test("should reject WebPageNode as input", () => {
-			const outputNode = createWebPageNode(NodeId.generate());
-			const inputNode = createImageGenerationNode(NodeId.generate());
+	describe("Image generation node restrictions", () => {
+		test("should allow Image Generation Node as input for Google(Nano banana)", () => {
+			const outputNode = createImageGenerationNode(NodeId.generate());
+			const nanoBanana = googleImageLanguageModels.find(
+				(m) => m.id === "gemini-2.5-flash-image-preview",
+			);
+			const inputNode = createImageGenerationNode(
+				NodeId.generate(),
+				nanoBanana,
+			);
 
 			const result = isSupportedConnection(outputNode, inputNode);
-
-			expect(result.canConnect).toBe(false);
-			if (!result.canConnect) {
-				expect(result.message).toBe(
-					"Web page node is not supported as an input for this node",
-				);
-			}
-		});
-
-		test("should reject TriggerNode as input", () => {
-			const outputNode = createTriggerNode(NodeId.generate());
-			const inputNode = createImageGenerationNode(NodeId.generate());
-
-			const result = isSupportedConnection(outputNode, inputNode);
-
-			expect(result.canConnect).toBe(false);
-			if (!result.canConnect) {
-				expect(result.message).toBe(
-					"Trigger node is not supported as an input for this node",
-				);
-			}
-		});
-
-		test("should reject ActionNode as input", () => {
-			const outputNode = createActionNode(NodeId.generate());
-			const inputNode = createImageGenerationNode(NodeId.generate());
-
-			const result = isSupportedConnection(outputNode, inputNode);
-
-			expect(result.canConnect).toBe(false);
-			if (!result.canConnect) {
-				expect(result.message).toBe(
-					"Action node is not supported as an input for this node",
-				);
-			}
+			expect(result.canConnect).toBe(true);
 		});
 
 		test("should reject GitHubNode as input", () => {

@@ -5,11 +5,16 @@ describe("openai llm", () => {
 	describe("OpenAILanguageModelId", () => {
 		it("should map GPT-5 models correctly", () => {
 			expect(OpenAILanguageModelId.parse("gpt-5")).toBe("gpt-5");
+			expect(OpenAILanguageModelId.parse("gpt-5-codex")).toBe("gpt-5-codex");
 			expect(OpenAILanguageModelId.parse("gpt-5-mini")).toBe("gpt-5-mini");
 			expect(OpenAILanguageModelId.parse("gpt-5-nano")).toBe("gpt-5-nano");
 		});
 
 		it("should fallback deprecated models to GPT-5 series", () => {
+			expect(OpenAILanguageModelId.parse("gpt-5-codex-20250915")).toBe(
+				"gpt-5-codex",
+			);
+
 			// Fallback to gpt-5
 			expect(OpenAILanguageModelId.parse("gpt-4o")).toBe("gpt-5");
 			expect(OpenAILanguageModelId.parse("o3")).toBe("gpt-5");

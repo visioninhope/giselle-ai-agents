@@ -218,7 +218,7 @@ function formatDate(date: Date) {
 }
 
 // Over-engineered: Explicit types for self-evident returns
-export function createUser(data: UserData) {
+export function createUser(data: UserData): User {
   return new User(data);  // The annotation adds no value
 }
 ```

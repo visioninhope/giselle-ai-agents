@@ -1,15 +1,15 @@
-import { useChat } from "@ai-sdk/react";
 import { isTextGenerationNode } from "@giselle-sdk/data-type";
-import { DefaultChatTransport } from "ai";
 import { useCallback, useEffect, useRef } from "react";
 import {
 	type Generation,
 	GenerationContext,
 	isQueuedGeneration,
+	type RunningGeneration,
 } from "../../concepts/generation";
 import { useFeatureFlag } from "../feature-flags";
 import { useGiselleEngine } from "../use-giselle-engine";
 import { useGenerationRunnerSystem } from "./contexts/generation-runner-system";
+import { GenerateContentRunner } from "./generate-content-runner";
 
 function useOnce(fn: () => void) {
 	const once = useRef(false);
@@ -45,6 +45,14 @@ export function GenerationRunner({ generation }: { generation: Generation }) {
 }
 
 function TextGenerationRunner({ generation }: { generation: Generation }) {
+	const { updateGenerationListener } = useGenerationRunnerSystem();
+	const handleStart = useCallback(
+		(generation: RunningGeneration) => {
+			updateGenerationListener(generation);
+		},
+		[updateGenerationListener],
+	);
+
 	if (generation.status === "created") {
 		return null;
 	}
@@ -52,68 +60,9 @@ function TextGenerationRunner({ generation }: { generation: Generation }) {
 	if (!isTextGenerationNode(generationContext.operationNode)) {
 		throw new Error("Invalid generation type");
 	}
-	const content = generationContext.operationNode.content;
-	switch (content.llm.provider) {
-		case "openai":
-		case "anthropic":
-		case "google":
-		case "perplexity":
-			return <CompletionRunner generation={generation} />;
-		default: {
-			const _exhaustiveCheck: never = content.llm;
-			return _exhaustiveCheck;
-		}
-	}
-}
-
-function CompletionRunner({ generation }: { generation: Generation }) {
-	const { experimental_storage, aiGateway, resumableGeneration } =
-		useFeatureFlag();
-	const {
-		generateTextApi,
-		updateGenerationStatusToRunning,
-		updateGenerationStatusToComplete,
-		updateGenerationStatusToFailure,
-		updateMessages,
-		addStopHandler,
-	} = useGenerationRunnerSystem();
-	const { messages, sendMessage, stop, status } = useChat({
-		transport: new DefaultChatTransport({
-			api: generateTextApi,
-			body: {
-				generation,
-				useExperimentalStorage: experimental_storage,
-				useAiGateway: aiGateway,
-				useResumableGeneration: resumableGeneration,
-			},
-		}),
-		onFinish: async () => {
-			await updateGenerationStatusToComplete(generation.id);
-		},
-		onError: async () => {
-			await updateGenerationStatusToFailure(generation.id);
-		},
-	});
-	useEffect(() => {
-		if (status !== "streaming") {
-			return;
-		}
-		updateGenerationStatusToRunning(generation.id);
-	}, [status, updateGenerationStatusToRunning, generation.id]);
-	useEffect(() => {
-		if (generation.status !== "running") {
-			return;
-		}
-		updateMessages(generation.id, messages);
-	}, [messages, generation.status, updateMessages, generation.id]);
-	useOnce(() => {
-		if (generation.status !== "queued") {
-			return;
-		}
-		addStopHandler(generation.id, stop);
-		sendMessage({ role: "user", parts: [] });
-	});
-	return null;
+	return (
+		<GenerateContentRunner generation={generation} onStart={handleStart} />
+	);
 }
 
 function ImageGenerationRunner({ generation }: { generation: Generation }) {

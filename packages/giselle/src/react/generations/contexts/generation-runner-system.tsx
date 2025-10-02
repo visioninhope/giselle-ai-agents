@@ -70,6 +70,7 @@ interface GenerationRunnerSystemContextValue {
 	addStopHandler: (generationId: GenerationId, handler: () => void) => void;
 	stopGenerationRunner: (generationId: GenerationId) => Promise<void>;
 	addGenerationRunner: (generations: Generation | Generation[]) => void;
+	updateGenerationListener: (generation: Generation) => void;
 }
 
 export const GenerationRunnerSystemContext =

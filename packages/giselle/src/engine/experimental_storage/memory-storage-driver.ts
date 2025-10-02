@@ -83,5 +83,20 @@ export function memoryStorageDriver(
 		exists(path: string): Promise<boolean> {
 			return Promise.resolve(jsonStore.has(path) || blobStore.has(path));
 		},
+
+		contentLength(path: string): Promise<number> {
+			const jsonData = jsonStore.get(path);
+			if (jsonData !== undefined) {
+				const jsonString = JSON.stringify(jsonData);
+				return Promise.resolve(new TextEncoder().encode(jsonString).length);
+			}
+
+			const blobData = blobStore.get(path);
+			if (blobData !== undefined) {
+				return Promise.resolve(blobData.length);
+			}
+
+			return Promise.reject(new Error(`No data stored at ${path}`));
+		},
 	};
 }
