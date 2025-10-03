@@ -43,6 +43,10 @@ export const SuggestionList = forwardRef<
 
 	useImperativeHandle(ref, () => ({
 		onKeyDown: ({ event }) => {
+			if (props.items.length === 0) {
+				return false;
+			}
+
 			if (event.key === "ArrowUp") {
 				setSelectedIndex(
 					(prev) => (prev + filteredItems.length - 1) % filteredItems.length,
