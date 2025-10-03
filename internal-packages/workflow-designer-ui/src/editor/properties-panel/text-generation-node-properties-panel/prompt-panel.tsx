@@ -26,6 +26,16 @@ export function PromptPanel({ node }: { node: TextGenerationNode }) {
 				updateNodeDataContent(node, { prompt: value });
 			}}
 			nodes={connectedSources.map((source) => source.node)}
+			connectedSources={connectedSources.map(
+				({ node, id, label, accessor }) => ({
+					node,
+					output: {
+						id,
+						label,
+						accessor,
+					},
+				}),
+			)}
 			tools={(editor) => (
 				<DropdownMenu
 					trigger={<AtSignIcon className="w-[18px]" />}

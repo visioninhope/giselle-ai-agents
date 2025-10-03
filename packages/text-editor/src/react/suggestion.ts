@@ -1,8 +1,8 @@
-import type { Node as GiselleNode } from "@giselle-sdk/data-type";
 import { defaultName } from "@giselle-sdk/giselle/react";
 import { createSourceExtensionJSONContent } from "@giselle-sdk/text-editor-utils";
 import { ReactRenderer } from "@tiptap/react";
 import type { SuggestionOptions } from "@tiptap/suggestion";
+import type { ConnectedSource } from "./component";
 import {
 	type SuggestionItem,
 	SuggestionList,
@@ -10,26 +10,23 @@ import {
 } from "./suggestion-list";
 
 export function createSuggestion(
-	nodes: GiselleNode[] | undefined,
+	connectedSources: ConnectedSource[] | undefined,
 ): Omit<SuggestionOptions<SuggestionItem>, "editor"> {
 	return {
 		char: "@",
 		items: ({ query }) => {
-			if (nodes === undefined) {
+			if (connectedSources === undefined) {
 				return [];
 			}
 
-			const items: SuggestionItem[] = [];
-			for (const node of nodes) {
-				for (const output of node.outputs) {
-					items.push({
-						id: `${node.id}-${output.id}`,
-						node,
-						output,
-						label: `${node.name ?? defaultName(node)} / ${output.label}`,
-					} satisfies SuggestionItem);
-				}
-			}
+			const items: SuggestionItem[] = connectedSources.map(
+				({ node, output }) => ({
+					id: `${node.id}-${output.id}`,
+					node,
+					output,
+					label: `${node.name ?? defaultName(node)} / ${output.label}`,
+				}),
+			);
 
 			if (query === "") {
 				return items;
