@@ -2,7 +2,7 @@
 
 
 ## Summary
-* 858 MIT
+* 860 MIT
 * 188 Apache 2.0
 * 46 ISC
 * 27 New BSD
@@ -4262,6 +4262,17 @@ LGPL-3.0-or-later permitted
 
 
 
+<a name="@tiptap/extension-mention"></a>
+### @tiptap/extension-mention v2.11.5
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
 <a name="@tiptap/extension-ordered-list"></a>
 ### @tiptap/extension-ordered-list v2.11.5
 #### 
@@ -4363,6 +4374,17 @@ LGPL-3.0-or-later permitted
 
 <a name="@tiptap/starter-kit"></a>
 ### @tiptap/starter-kit v2.11.5
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
+<a name="@tiptap/suggestion"></a>
+### @tiptap/suggestion v2.11.5
 #### 
 
 ##### Paths
