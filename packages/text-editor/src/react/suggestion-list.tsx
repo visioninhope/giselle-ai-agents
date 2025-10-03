@@ -2,7 +2,13 @@ import type { Node as GiselleNode, Output } from "@giselle-sdk/data-type";
 import { defaultName } from "@giselle-sdk/giselle/react";
 import type { SuggestionProps } from "@tiptap/suggestion";
 import clsx from "clsx/lite";
-import { forwardRef, useCallback, useImperativeHandle, useState } from "react";
+import {
+	forwardRef,
+	useCallback,
+	useEffect,
+	useImperativeHandle,
+	useState,
+} from "react";
 
 export interface SuggestionItem {
 	id: string;
@@ -18,7 +24,7 @@ export interface SuggestionListRef {
 export const SuggestionList = forwardRef<
 	SuggestionListRef,
 	SuggestionListProps
->((props, ref) => {
+>(({ items, command }, ref) => {
 	const [selectedIndex, setSelectedIndex] = useState(0);
 	useEffect(() => {
 		if (items.length >= 0) {
@@ -27,28 +33,26 @@ export const SuggestionList = forwardRef<
 	}, [items.length]);
 	const selectItem = useCallback(
 		(index: number) => {
-			const item = props.items[index];
+			const item = items[index];
 			if (item) {
-				props.command(item);
+				command(item);
 			}
 		},
-		[props.items, props.command],
+		[items, command],
 	);
 
 	useImperativeHandle(ref, () => ({
 		onKeyDown: ({ event }) => {
-			if (props.items.length === 0) {
+			if (items.length === 0) {
 				return false;
 			}
 
 			if (event.key === "ArrowUp") {
-				setSelectedIndex(
-					(prev) => (prev + props.items.length - 1) % props.items.length,
-				);
+				setSelectedIndex((prev) => (prev + items.length - 1) % items.length);
 				return true;
 			}
 			if (event.key === "ArrowDown") {
-				setSelectedIndex((prev) => (prev + 1) % props.items.length);
+				setSelectedIndex((prev) => (prev + 1) % items.length);
 				return true;
 			}
 
@@ -61,7 +65,7 @@ export const SuggestionList = forwardRef<
 		},
 	}));
 
-	if (props.items.length === 0) {
+	if (items.length === 0) {
 		return null;
 	}
 
@@ -74,10 +78,10 @@ export const SuggestionList = forwardRef<
 				"w-fit",
 			)}
 		>
-			{props.items.map((item, index) => (
+			{items.map(({ id, node, output: { label } }, index) => (
 				<button
 					type="button"
-					key={item.id}
+					key={id}
 					onClick={() => selectItem(index)}
 					className={clsx(
 						"block w-full text-left px-[8px] py-[6px]",
@@ -90,7 +94,7 @@ export const SuggestionList = forwardRef<
 							: "hover:bg-ghost-element-hover/25",
 					)}
 				>
-					{item.node.name ?? defaultName(item.node)} / {item.output.label}
+					{node.name ?? defaultName(node)} / {label}
 				</button>
 			))}
 		</div>
