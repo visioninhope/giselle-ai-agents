@@ -24,6 +24,9 @@ function getDocumentStoreStatus(
 	fallbackStatus?: string,
 ): string {
 	if (!store) {
+		if (fallbackStatus === "configured") {
+			return "Requires setup";
+		}
 		return fallbackStatus ?? "Store unavailable";
 	}
 	const total = store.sources.length;
