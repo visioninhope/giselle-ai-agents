@@ -26,19 +26,14 @@ export const SuggestionList = forwardRef<
 	SuggestionListProps
 >((props, ref) => {
 	const [selectedIndex, setSelectedIndex] = useState(0);
-
-	const filteredItems = useMemo(() => {
-		return props.items;
-	}, [props.items]);
-
 	const selectItem = useCallback(
 		(index: number) => {
-			const item = filteredItems[index];
+			const item = props.items[index];
 			if (item) {
 				props.command(item);
 			}
 		},
-		[filteredItems, props.command],
+		[props.items, props.command],
 	);
 
 	useImperativeHandle(ref, () => ({
@@ -49,12 +44,12 @@ export const SuggestionList = forwardRef<
 
 			if (event.key === "ArrowUp") {
 				setSelectedIndex(
-					(prev) => (prev + filteredItems.length - 1) % filteredItems.length,
+					(prev) => (prev + props.items.length - 1) % props.items.length,
 				);
 				return true;
 			}
 			if (event.key === "ArrowDown") {
-				setSelectedIndex((prev) => (prev + 1) % filteredItems.length);
+				setSelectedIndex((prev) => (prev + 1) % props.items.length);
 				return true;
 			}
 
@@ -67,7 +62,7 @@ export const SuggestionList = forwardRef<
 		},
 	}));
 
-	if (filteredItems.length === 0) {
+	if (props.items.length === 0) {
 		return null;
 	}
 
@@ -80,7 +75,7 @@ export const SuggestionList = forwardRef<
 				"w-fit",
 			)}
 		>
-			{filteredItems.map((item, index) => (
+			{props.items.map((item, index) => (
 				<button
 					type="button"
 					key={item.id}
