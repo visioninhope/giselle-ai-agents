@@ -99,7 +99,6 @@ export default async function Layout({
 			}}
 			vectorStore={{
 				githubRepositoryIndexes: gitHubRepositoryIndexes,
-				settingPath: "/settings/team/vector-stores",
 				documentSettingPath: "/settings/team/vector-stores/document",
 				githubSettingPath: "/settings/team/vector-stores",
 				documentStores: documentVectorStores.map((store) => ({
