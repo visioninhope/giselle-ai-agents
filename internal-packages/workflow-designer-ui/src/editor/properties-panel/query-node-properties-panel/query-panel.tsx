@@ -99,6 +99,12 @@ export function QueryPanel({ node }: { node: QueryNode }) {
 						updateNodeDataContent(node, { query: value });
 					}}
 					nodes={connectedInputsWithoutDatasource.map((input) => input.node)}
+					connectedSources={connectedInputsWithoutDatasource.map(
+						({ node, output }) => ({
+							node,
+							output,
+						}),
+					)}
 					header={
 						connectedDatasourceInputs.length > 0 ? (
 							<div className="flex items-center gap-[6px] flex-wrap">
