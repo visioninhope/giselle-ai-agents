@@ -20,6 +20,11 @@ export const SuggestionList = forwardRef<
 	SuggestionListProps
 >((props, ref) => {
 	const [selectedIndex, setSelectedIndex] = useState(0);
+	useEffect(() => {
+		if (items.length >= 0) {
+			setSelectedIndex(0);
+		}
+	}, [items.length]);
 	const selectItem = useCallback(
 		(index: number) => {
 			const item = props.items[index];
