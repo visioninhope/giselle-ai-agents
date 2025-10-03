@@ -42,6 +42,7 @@ export function createSuggestion(
 			let component: ReactRenderer<SuggestionListRef> | undefined;
 			let popup: HTMLElement | undefined;
 			let escapeHandler: ((event: KeyboardEvent) => void) | undefined;
+			let pointerDownHandler: ((event: PointerEvent) => void) | undefined;
 
 			return {
 				onStart: (props) => {
@@ -68,11 +69,26 @@ export function createSuggestion(
 
 					// Add global Escape key handler
 					escapeHandler = (event: KeyboardEvent) => {
-						if (event.key === "Escape" && popup) {
+						if (popup === undefined) {
+							return;
+						}
+						if (event.key === "Escape") {
 							popup.style.display = "none";
 						}
 					};
 					document.addEventListener("keydown", escapeHandler);
+
+					pointerDownHandler = (event: PointerEvent) => {
+						if (popup === undefined) {
+							return;
+						}
+						const target = event.target;
+						if (target instanceof Node && popup.contains(target)) {
+							return;
+						}
+						popup.style.display = "none";
+					};
+					document.addEventListener("pointerdown", pointerDownHandler);
 				},
 
 				onUpdate(props) {
@@ -94,6 +110,9 @@ export function createSuggestion(
 				onExit() {
 					if (escapeHandler) {
 						document.removeEventListener("keydown", escapeHandler);
+					}
+					if (pointerDownHandler) {
+						document.removeEventListener("pointerdown", pointerDownHandler);
 					}
 					popup?.remove();
 					component?.destroy();
