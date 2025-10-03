@@ -16,7 +16,7 @@ export interface SuggestionItem {
 	output: Output;
 	label: string;
 }
-export interface SuggestionListProps extends SuggestionProps<SuggestionItem> {}
+interface SuggestionListProps extends SuggestionProps<SuggestionItem> {}
 export interface SuggestionListRef {
 	onKeyDown: (props: { event: KeyboardEvent }) => boolean;
 }
