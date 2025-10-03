@@ -104,7 +104,7 @@ function getDataSourceDisplayInfo(
 					return {
 						name,
 						description: {
-							line1: name,
+							line1: "Document vector store",
 							line2: "Requires setup",
 						},
 						icon,
