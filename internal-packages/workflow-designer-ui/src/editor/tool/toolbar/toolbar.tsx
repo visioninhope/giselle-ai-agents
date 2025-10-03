@@ -40,6 +40,7 @@ import {
 } from "lucide-react";
 import { Popover, ToggleGroup } from "radix-ui";
 import { useEffect, useState } from "react";
+import { DocumentVectorStoreIcon } from "../../../icons/node/document-vector-store-icon";
 import { Tooltip } from "../../../ui/tooltip";
 import { isToolAction } from "../types";
 import {
@@ -371,7 +372,7 @@ export function Toolbar() {
 														value="documentVectorStore"
 														data-tool
 													>
-														<DocumentIcon className="w-[20px] h-[20px]" />
+														<DocumentVectorStoreIcon className="w-[20px] h-[20px]" />
 														<p className="text-[14px]">Document Vector Store</p>
 													</ToggleGroup.Item>
 												)}
