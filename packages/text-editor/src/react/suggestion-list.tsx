@@ -2,13 +2,7 @@ import type { Node as GiselleNode, Output } from "@giselle-sdk/data-type";
 import { defaultName } from "@giselle-sdk/giselle/react";
 import type { SuggestionProps } from "@tiptap/suggestion";
 import clsx from "clsx/lite";
-import {
-	forwardRef,
-	useCallback,
-	useImperativeHandle,
-	useMemo,
-	useState,
-} from "react";
+import { forwardRef, useCallback, useImperativeHandle, useState } from "react";
 
 export interface SuggestionItem {
 	id: string;
