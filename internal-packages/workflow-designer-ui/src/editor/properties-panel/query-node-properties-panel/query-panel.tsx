@@ -19,9 +19,12 @@ type DocumentVectorStoreSummary = NonNullable<
 	NonNullable<VectorStoreContextValue["documentStores"]>[number]
 >;
 
-function getDocumentStoreStatus(store?: DocumentVectorStoreSummary): string {
+function getDocumentStoreStatus(
+	store: DocumentVectorStoreSummary | undefined,
+	fallbackStatus?: string,
+): string {
 	if (!store) {
-		return "Store unavailable";
+		return fallbackStatus ?? "Store unavailable";
 	}
 	const total = store.sources.length;
 	if (total === 0) {
@@ -107,11 +110,21 @@ function getDataSourceDisplayInfo(
 				const store = documentStoreMap.get(
 					node.content.source.state.documentVectorStoreId,
 				);
+				const storeStatus = getDocumentStoreStatus(
+					store,
+					node.content.source.state.status,
+				);
+				const nodeLabel = name;
+				const storeName = store?.name?.trim() ?? "";
+				const descriptionLine1 =
+					storeName.length > 0 && storeName !== nodeLabel
+						? storeName
+						: "Document vector store";
 				return {
-					name: store?.name ?? name,
+					name: nodeLabel,
 					description: {
-						line1: store?.name ?? name,
-						line2: getDocumentStoreStatus(store),
+						line1: descriptionLine1,
+						line2: storeStatus,
 					},
 					icon,
 				};
