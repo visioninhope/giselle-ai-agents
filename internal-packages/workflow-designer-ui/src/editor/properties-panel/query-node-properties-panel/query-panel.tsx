@@ -16,8 +16,8 @@ import { DocumentVectorStoreIcon } from "../../../icons/node/document-vector-sto
 import { type ConnectedSource, useConnectedSources } from "./sources";
 
 type DocumentVectorStoreSummary = NonNullable<
-	NonNullable<VectorStoreContextValue["documentStores"]>[number]
->;
+	VectorStoreContextValue["documentStores"]
+>[number];
 
 function getDocumentStoreStatus(
 	store: DocumentVectorStoreSummary | undefined,
