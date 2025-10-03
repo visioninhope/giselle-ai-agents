@@ -22,7 +22,6 @@ export interface VectorStoreContextValue {
 			ingestErrorCode: string | null;
 		}>;
 	}[];
-	settingPath?: string;
 	documentSettingPath?: string;
 	githubSettingPath?: string;
 }
