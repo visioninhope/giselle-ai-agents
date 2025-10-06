@@ -35,6 +35,7 @@ import {
 	isProPlan,
 } from "@/services/teams";
 import supabaseStorageDriver from "@/supabase-storage-driver";
+import { getDocumentVectorStoreQueryService } from "../lib/vector-stores/document/query/service";
 import {
 	gitHubPullRequestQueryService,
 	gitHubQueryService,
@@ -150,28 +151,54 @@ async function traceEmbeddingForTeam(args: {
 	const planTag = isPro ? "plan:pro" : "plan:free";
 	const teamTypeTag = `teamType:${args.team.type}`;
 
-	if (args.queryContext.provider !== "github") {
-		throw new Error(`Unsupported provider: ${args.queryContext.provider}`);
-	}
+	const { queryContext } = args;
+	const baseMetadata = {
+		generationId: args.generation.id,
+		teamId: args.team.id,
+		isProPlan: isPro,
+		teamType: args.team.type,
+		userId: args.userId,
+		subscriptionId: args.team.activeSubscriptionId ?? "",
+		resourceProvider: queryContext.provider,
+		workspaceId: queryContext.workspaceId,
+		embeddingProfileId: queryContext.embeddingProfileId,
+	};
 
-	await traceEmbedding({
+	const traceArgs = {
 		metrics: args.metrics,
 		userId: args.userId,
 		sessionId: args.sessionId,
 		tags: [planTag, teamTypeTag, "embedding-purpose:query"],
-		metadata: {
-			generationId: args.generation.id,
-			teamId: args.team.id,
-			isProPlan: isPro,
-			teamType: args.team.type,
-			userId: args.userId,
-			subscriptionId: args.team.activeSubscriptionId ?? "",
-			resourceProvider: args.queryContext.provider,
-			resourceContentType: args.queryContext.contentType,
-			resourceOwner: args.queryContext.owner,
-			resourceRepo: args.queryContext.repo,
-		},
-	});
+	};
+
+	switch (queryContext.provider) {
+		case "github": {
+			await traceEmbedding({
+				...traceArgs,
+				metadata: {
+					...baseMetadata,
+					resourceContentType: queryContext.contentType,
+					resourceOwner: queryContext.owner,
+					resourceRepo: queryContext.repo,
+				},
+			});
+			break;
+		}
+		case "document": {
+			await traceEmbedding({
+				...traceArgs,
+				metadata: {
+					...baseMetadata,
+					documentVectorStoreId: queryContext.documentVectorStoreId,
+				},
+			});
+			break;
+		}
+		default: {
+			const _exhaustiveCheck: never = queryContext;
+			throw new Error(`Unsupported provider: ${_exhaustiveCheck}`);
+		}
+	}
 }
 
 type GenerationTraceArgs = {
@@ -300,6 +327,7 @@ export const giselleEngine = NextGiselleEngine({
 	vectorStoreQueryServices: {
 		github: gitHubQueryService,
 		githubPullRequest: gitHubPullRequestQueryService,
+		document: getDocumentVectorStoreQueryService(),
 	},
 	callbacks: {
 		...generationTracingCallbacks,
