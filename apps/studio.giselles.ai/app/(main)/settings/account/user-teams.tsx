@@ -65,7 +65,7 @@ export default function UserTeams({
 						type="text"
 						value={teamName}
 						placeholder="Search for a team..."
-						className="w-full text-white-900 font-medium text-[14px] leading-[23.8px] font-geist placeholder:text-black-400 bg-transparent outline-none"
+						className="w-full text-inverse font-medium text-[14px] leading-[23.8px] font-geist placeholder:text-black-400 bg-transparent outline-none"
 					/>
 				</div>
 				<div>

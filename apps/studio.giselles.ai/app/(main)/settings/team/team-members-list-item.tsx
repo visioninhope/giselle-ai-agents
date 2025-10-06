@@ -118,7 +118,7 @@ export function TeamMemberListItem({
 						/>
 					</div>
 					<div className="flex flex-col gap-y-1 font-medium">
-						<div className="text-white-900 text-[14px] leading-[20.4px]">
+						<div className="text-inverse text-[14px] leading-[20.4px]">
 							{displayName || "No display name"}
 						</div>
 						<div className="text-white-400 text-[12px] leading-[16px]">
