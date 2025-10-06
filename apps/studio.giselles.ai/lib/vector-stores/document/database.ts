@@ -100,8 +100,8 @@ export async function insertDocumentEmbeddings(
 
 	// Convert embeddings to the format expected by the database
 	const values = embeddings.map((emb) => ({
-		documentVectorStoreSourceDbId: sourceDbId,
 		documentVectorStoreDbId: storeDbId,
+		documentVectorStoreSourceDbId: sourceDbId,
 		embeddingProfileId,
 		embeddingDimensions: dimensions,
 		documentKey,
