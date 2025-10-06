@@ -4,6 +4,16 @@ function isFiniteNumber(value: unknown): value is number {
 	return typeof value === "number" && Number.isFinite(value);
 }
 
+/**
+ * Normalizes usage metrics so they can be safely persisted.
+ *
+ * The AI SDK surfaces token usage fields as `number | undefined` and internally
+ * uses `NaN` only as a temporary fallback when the provider omits usage
+ * information. JSON (and therefore our storage layer) cannot serialize `NaN`,
+ * and relational aggregates expect finite numbers. Converting any non-finite
+ * value to `undefined` preserves the SDK contract while keeping our
+ * persistence and analytics layers consistent.
+ */
 export function sanitizeGenerationUsage(
 	usage?: GenerationUsage,
 ): GenerationUsage | undefined {
