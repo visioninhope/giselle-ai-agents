@@ -30,24 +30,6 @@ import type { GenerationId } from "../../concepts/identifiers";
 import { parseAndMod } from "../../data-mod";
 import type { GiselleStorage } from "../experimental_storage";
 import type { GiselleEngineContext } from "../types";
-import type { PreparedToolSet } from "./types";
-
-export function addUrlContextTool({
-	preparedToolSet,
-	tool,
-}: {
-	preparedToolSet: PreparedToolSet;
-	tool: PreparedToolSet["toolSet"][string];
-}): PreparedToolSet {
-	return {
-		...preparedToolSet,
-		toolSet: {
-			...preparedToolSet.toolSet,
-			url_context: tool,
-		},
-	};
-}
-
 interface GeneratedImageData {
 	uint8Array: Uint8Array;
 	base64: string;

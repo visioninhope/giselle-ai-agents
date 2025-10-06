@@ -37,7 +37,7 @@ import type { GiselleEngineContext } from "../types";
 import { useGenerationExecutor } from "./internal/use-generation-executor";
 import { createPostgresTools } from "./tools/postgres";
 import type { PreparedToolSet } from "./types";
-import { addUrlContextTool, buildMessageObject, getGeneration } from "./utils";
+import { buildMessageObject, getGeneration } from "./utils";
 
 type StreamItem<T> = T extends AsyncIterableStream<infer Inner> ? Inner : never;
 
@@ -213,10 +213,13 @@ export function generateContent({
 				hasCapability(languageModel, Capability.UrlContext) &&
 				operationNode.content.contextSource === "url_context"
 			) {
-				preparedToolSet = addUrlContextTool({
-					preparedToolSet,
-					tool: google.tools.urlContext({}),
-				});
+				preparedToolSet = {
+					...preparedToolSet,
+					toolSet: {
+						...preparedToolSet.toolSet,
+						url_context: google.tools.urlContext({}),
+					},
+				};
 			}
 
 			if (

@@ -26,7 +26,7 @@ import type { GiselleEngineContext } from "../types";
 import { useGenerationExecutor } from "./internal/use-generation-executor";
 import { createPostgresTools } from "./tools/postgres";
 import type { PreparedToolSet } from "./types";
-import { addUrlContextTool, buildMessageObject } from "./utils";
+import { buildMessageObject } from "./utils";
 
 // PerplexityProviderOptions is not exported from @ai-sdk/perplexity, so we define it here based on the model configuration
 type PerplexityProviderOptions = {
@@ -186,10 +186,13 @@ export function generateText(args: {
 				hasCapability(languageModel, Capability.UrlContext) &&
 				operationNode.content.contextSource === "url_context"
 			) {
-				preparedToolSet = addUrlContextTool({
-					preparedToolSet,
-					tool: vertex.tools.urlContext({}),
-				});
+				preparedToolSet = {
+					...preparedToolSet,
+					toolSet: {
+						...preparedToolSet.toolSet,
+						url_context: vertex.tools.urlContext({}),
+					},
+				};
 			}
 
 			if (
