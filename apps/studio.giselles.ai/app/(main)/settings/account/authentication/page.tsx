@@ -23,14 +23,14 @@ export default function AccountAuthenticationPage() {
 			<div className="flex flex-col gap-y-4">
 				<Suspense
 					fallback={
-						<Skeleton className="rounded-md border border-black-70 w-full h-16" />
+						<Skeleton className="rounded-md border border-border w-full h-16" />
 					}
 				>
 					<GoogleAuthentication />
 				</Suspense>
 				<Suspense
 					fallback={
-						<Skeleton className="rounded-md border border-black-70 w-full h-16" />
+						<Skeleton className="rounded-md border border-border w-full h-16" />
 					}
 				>
 					<GitHubAuthentication />
