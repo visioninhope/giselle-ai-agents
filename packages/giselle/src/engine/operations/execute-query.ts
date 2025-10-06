@@ -462,7 +462,7 @@ async function queryVectorStore(
 						const embeddingProfileId =
 							state.embeddingProfileId ?? DEFAULT_EMBEDDING_PROFILE_ID;
 						const queryContext: DocumentVectorStoreQueryContext = {
-							provider: "document" as const,
+							provider: "document",
 							workspaceId,
 							documentVectorStoreId: state.documentVectorStoreId,
 							embeddingProfileId,
