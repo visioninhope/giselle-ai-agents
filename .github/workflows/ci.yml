@@ -27,5 +27,16 @@ jobs:
       - run: pnpm knip
       - name: Build SDK
         run: pnpm build-sdk
+      - name: Report Colors (non-blocking)
+        run: pnpm report:colors || true
+      - name: Save Report Colors JSON
+        if: always()
+        run: pnpm report:colors:out || true
+      - name: Upload Report Artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: report-colors
+          path: .reports/report-colors.json
       - name: Test
         run: pnpm test
