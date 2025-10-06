@@ -170,8 +170,7 @@ export function generateText(args: {
 			if (
 				operationNode.content.llm.provider === "google" &&
 				operationNode.content.llm.configurations.searchGrounding &&
-				hasCapability(languageModel, Capability.OptionalSearchGrounding) &&
-				operationNode.content.contextSource === "google_search"
+				hasCapability(languageModel, Capability.OptionalSearchGrounding)
 			) {
 				preparedToolSet = {
 					...preparedToolSet,
@@ -184,7 +183,7 @@ export function generateText(args: {
 			if (
 				operationNode.content.llm.provider === "google" &&
 				hasCapability(languageModel, Capability.UrlContext) &&
-				operationNode.content.contextSource === "url_context"
+				(operationNode.content.llm.configurations.urlContext ?? false)
 			) {
 				preparedToolSet = {
 					...preparedToolSet,

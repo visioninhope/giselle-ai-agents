@@ -5,7 +5,6 @@ import {
 	isTextGenerationNode,
 	type Output,
 	OutputId,
-	type TextGenerationContextSource,
 	type TextGenerationNode,
 	type ToolSet,
 } from "@giselle-sdk/data-type";
@@ -195,57 +194,128 @@ export function TextGenerationTabContent({
 		};
 	}, [data.connections, data.nodes, deleteConnection, node, updateNodeData]);
 
-	const ensureSourceOutput = useCallback(() => {
-		if (node.outputs.some((output) => output.accessor === "source")) {
-			return;
-		}
-		updateNodeData(node, {
-			outputs: [
-				...node.outputs,
-				{
-					id: OutputId.generate(),
-					label: "Source",
-					accessor: "source",
-				},
-			],
-		});
-	}, [node, updateNodeData]);
-
-	const handleGoogleContextSourceChange = useCallback(
-		(mode: TextGenerationContextSource) => {
+	const handleGoogleSearchGroundingChange = useCallback(
+		(enable: boolean) => {
 			if (node.content.llm.provider !== "google") {
 				return;
 			}
 
-			if (mode === "google_search" || mode === "url_context") {
-				ensureSourceOutput();
-			} else {
-				const { outputs: filteredOutputs, removed } =
-					detachSourceOutputConnections();
-				if (removed) {
-					updateNodeData(node, { outputs: filteredOutputs });
-				}
+			const isUrlContextEnabled =
+				node.content.llm.configurations.urlContext ?? false;
+
+			if (enable || isUrlContextEnabled) {
+				const hasSourceOutput = node.outputs.some(
+					(output) => output.accessor === "source",
+				);
+				const outputs = hasSourceOutput
+					? node.outputs
+					: [
+							...node.outputs,
+							{
+								id: OutputId.generate(),
+								label: "Source",
+								accessor: "source",
+							},
+						];
+
+				updateNodeData(node, {
+					...node,
+					content: {
+						...node.content,
+						llm: {
+							...node.content.llm,
+							configurations: {
+								...node.content.llm.configurations,
+								searchGrounding: enable,
+							},
+						},
+					},
+					outputs,
+				});
+				return;
 			}
 
-			updateNodeDataContent(node, {
-				...node.content,
-				contextSource: mode,
-				llm: {
-					...node.content.llm,
-					configurations: {
-						...node.content.llm.configurations,
-						searchGrounding: mode === "google_search",
+			const { outputs: filteredOutputs, removed } =
+				detachSourceOutputConnections();
+
+			updateNodeData(node, {
+				...node,
+				content: {
+					...node.content,
+					llm: {
+						...node.content.llm,
+						configurations: {
+							...node.content.llm.configurations,
+							searchGrounding: enable,
+						},
 					},
 				},
+				outputs: removed ? filteredOutputs : node.outputs,
 			});
 		},
-		[
-			detachSourceOutputConnections,
-			ensureSourceOutput,
-			node,
-			updateNodeData,
-			updateNodeDataContent,
-		],
+		[detachSourceOutputConnections, node, updateNodeData],
+	);
+
+	const handleGoogleUrlContextChange = useCallback(
+		(enable: boolean) => {
+			if (node.content.llm.provider !== "google") {
+				return;
+			}
+
+			const isSearchGroundingEnabled =
+				node.content.llm.configurations.searchGrounding;
+
+			if (enable || isSearchGroundingEnabled) {
+				const hasSourceOutput = node.outputs.some(
+					(output) => output.accessor === "source",
+				);
+				const outputs = hasSourceOutput
+					? node.outputs
+					: [
+							...node.outputs,
+							{
+								id: OutputId.generate(),
+								label: "Source",
+								accessor: "source",
+							},
+						];
+
+				updateNodeData(node, {
+					...node,
+					content: {
+						...node.content,
+						llm: {
+							...node.content.llm,
+							configurations: {
+								...node.content.llm.configurations,
+								urlContext: enable,
+							},
+						},
+					},
+					outputs,
+				});
+				return;
+			}
+
+			const { outputs: filteredOutputs, removed } =
+				detachSourceOutputConnections();
+
+			updateNodeData(node, {
+				...node,
+				content: {
+					...node.content,
+					llm: {
+						...node.content.llm,
+						configurations: {
+							...node.content.llm.configurations,
+							urlContext: enable,
+						},
+					},
+				},
+				outputs: removed ? filteredOutputs : node.outputs,
+			});
+		},
+		[detachSourceOutputConnections, node, updateNodeData],
 	);
 
 	return (
@@ -447,8 +517,10 @@ export function TextGenerationTabContent({
 				{node.content.llm.provider === "google" && (
 					<GoogleModelPanel
 						googleLanguageModel={node.content.llm}
-						contextSource={node.content.contextSource ?? "none"}
-						onContextSourceChange={handleGoogleContextSourceChange}
+						onSearchGroundingConfigurationChange={
+							handleGoogleSearchGroundingChange
+						}
+						onUrlContextConfigurationChange={handleGoogleUrlContextChange}
 						onModelChange={(value) =>
 							updateNodeDataContent(node, {
 								...node.content,

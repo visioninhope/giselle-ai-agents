@@ -7,6 +7,7 @@ const GoogleLanguageModelConfigurations = z.object({
 	temperature: z.number(),
 	topP: z.number(),
 	searchGrounding: z.boolean(),
+	urlContext: z.boolean().optional().default(false),
 });
 type GoogleLanguageModelConfigurations = z.infer<
 	typeof GoogleLanguageModelConfigurations
@@ -16,6 +17,7 @@ const defaultConfigurations: GoogleLanguageModelConfigurations = {
 	temperature: 0.7,
 	topP: 1.0,
 	searchGrounding: false,
+	urlContext: false,
 };
 
 export const GoogleLanguageModelId = z
