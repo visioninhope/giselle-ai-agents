@@ -112,7 +112,7 @@ function IngestStatusBadge({
 					<Tooltip.Portal>
 						<Tooltip.Content
 							side="top"
-							className="z-50 max-w-xs rounded-md border border-white/10 bg-black-900 px-3 py-2 text-xs text-white-400 shadow-lg"
+							className="z-50 max-w-xs rounded-md border border-border-muted bg-surface px-3 py-2 text-xs text-white-400 shadow-lg"
 						>
 							<p className="font-medium">Error: {errorCode}</p>
 							<Tooltip.Arrow className="fill-black-900" />
@@ -192,7 +192,7 @@ export function DocumentVectorStoreItem({
 						</DropdownMenuTrigger>
 						<DropdownMenuContent
 							align="end"
-							className="w-[180px] bg-black-850 border-[0.5px] border-black-400 rounded-[8px]"
+							className="w-[180px] bg-surface border-[0.5px] border-border rounded-[8px]"
 						>
 							<DropdownMenuItem
 								onSelect={() => {
@@ -679,7 +679,7 @@ function DocumentVectorStoreConfigureDialog({
 							</label>
 							<input
 								id={nameInputId}
-								className="w-full rounded-md bg-black-950/40 border border-white/10 px-3 py-2 text-white-400 focus:outline-none focus:ring-1 focus:ring-white/20"
+								className="w-full rounded-md bg-surface border border-border-muted px-3 py-2 text-white-400 focus:outline-none focus:ring-1 focus:ring-white/20"
 								placeholder="Vector store name"
 								value={name}
 								onChange={(event) => setName(event.target.value)}
@@ -702,8 +702,8 @@ function DocumentVectorStoreConfigureDialog({
 										selectedProfiles.length === 1 && isSelected;
 									return (
 										<label
-											key={profileId}
-											className="flex items-start gap-3 p-3 rounded-lg bg-black-300/10 hover:bg-black-300/20 transition-colors"
+											key={profileIdString}
+											className="flex items-start gap-3 p-3 rounded-lg bg-surface hover:bg-white/5 transition-colors"
 										>
 											<input
 												type="checkbox"
@@ -744,7 +744,7 @@ function DocumentVectorStoreConfigureDialog({
 								onDragLeave={handleDragLeave}
 								onDrop={handleDrop}
 								disabled={isUploadingDocuments}
-								className={`flex flex-col items-center gap-3 rounded-xl border border-dashed border-white/10 bg-black-950/20 px-6 py-8 text-center transition-colors focus:outline-none focus:ring-2 focus:ring-white/30 ${isDragActive ? "border-white/30 bg-white/5" : ""} ${isUploadingDocuments ? "opacity-60" : ""}`}
+								className={`flex flex-col items-center gap-3 rounded-xl border border-dashed border-border-muted bg-surface px-6 py-8 text-center transition-colors focus:outline-none focus:ring-2 focus:ring-white/30 ${isDragActive ? "border-white/30 bg-white/5" : ""} ${isUploadingDocuments ? "opacity-60" : ""}`}
 							>
 								<ArrowUpFromLine className="h-8 w-8 text-black-300" />
 								<p className="text-white-400 text-sm">
@@ -785,7 +785,7 @@ function DocumentVectorStoreConfigureDialog({
 											return (
 												<li
 													key={source.id}
-													className="flex items-center justify-between gap-3 rounded-lg border border-white/10 bg-black-950/30 px-3 py-2"
+													className="flex items-center justify-between gap-3 rounded-lg border border-border-muted bg-surface px-3 py-2"
 												>
 													<div className="flex flex-col gap-1.5 min-w-0 flex-1">
 														<span className="text-white-400 text-sm font-medium break-all">
@@ -805,7 +805,7 @@ function DocumentVectorStoreConfigureDialog({
 															)
 														}
 														disabled={isDeleting}
-														className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-white/10 text-black-300 transition-colors hover:text-error-500 focus:outline-none focus:ring-2 focus:ring-white/30 disabled:cursor-not-allowed disabled:opacity-50 flex-shrink-0"
+														className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-border-muted text-black-300 transition-colors hover:text-error-500 focus:outline-none focus:ring-2 focus:ring-white/30 disabled:cursor-not-allowed disabled:opacity-50 flex-shrink-0"
 													>
 														<span className="sr-only">
 															Delete {source.fileName}

@@ -22,7 +22,7 @@ export const GlassDialogContent = React.forwardRef<
 			: "linear-gradient(135deg, rgba(150, 150, 150, 0.03) 0%, rgba(60, 90, 160, 0.12) 100%)";
 
 	const borderClass =
-		variant === "destructive" ? "border-error-900/10" : "border-white/10";
+		variant === "destructive" ? "border-error-900/10" : "border-border-muted";
 
 	return (
 		<Dialog.Portal>

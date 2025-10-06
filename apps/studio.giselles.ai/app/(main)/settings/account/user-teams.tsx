@@ -162,7 +162,7 @@ function UserTeamsItem({
 				</DropdownMenuTrigger>
 				<DropdownMenuContent
 					align="end"
-					className="p-1 border-[0.25px] border-white/10 rounded-[8px] min-w-[165px] bg-black-900 shadow-none"
+					className="p-1 border-[0.25px] border-border-muted rounded-[8px] min-w-[165px] bg-surface shadow-none"
 				>
 					<DropdownMenuItem className="p-0">
 						<ChangeTeamAndAction
