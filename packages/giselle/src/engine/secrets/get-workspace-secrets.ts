@@ -9,7 +9,7 @@ export async function getWorkspaceSecrets(args: {
 	tags?: string[];
 }) {
 	const secrets = await getWorkspaceIndex({
-		storage: args.context.storage,
+		context: args.context,
 		indexPath: workspaceSecretIndexPath(args.workspaceId),
 		itemSchema: SecretIndex,
 	});
