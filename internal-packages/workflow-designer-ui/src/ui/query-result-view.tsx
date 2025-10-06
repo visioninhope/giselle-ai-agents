@@ -249,8 +249,14 @@ function getDataSourceDisplayInfo(
 		if (state.status === "configured") {
 			const storeId = state.documentVectorStoreId;
 			const store = documentStoreMap.get(storeId);
+			if (!store) {
+				return {
+					line1: storeId,
+					line2: "Requires setup",
+				};
+			}
 			return {
-				line1: store?.name ?? storeId,
+				line1: store.name,
 				line2: summarizeDocumentStoreStatus(store),
 			};
 		}
