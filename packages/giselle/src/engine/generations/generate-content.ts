@@ -95,7 +95,7 @@ export function generateContent({
 				throw new Error("Invalid language model");
 			}
 
-			const { messages, urlContextUrls } = await buildMessageObject(
+			const messages = await buildMessageObject(
 				operationNode,
 				generationContext.sourceNodes,
 				fileResolver,
@@ -215,7 +215,6 @@ export function generateContent({
 			) {
 				preparedToolSet = addUrlContextTool({
 					preparedToolSet,
-					urls: urlContextUrls,
 					tool: google.tools.urlContext({}),
 				});
 			}

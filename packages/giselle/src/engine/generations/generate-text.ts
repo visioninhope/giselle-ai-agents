@@ -66,7 +66,7 @@ export function generateText(args: {
 				throw new Error("Invalid language model");
 			}
 
-			const { messages, urlContextUrls } = await buildMessageObject(
+			const messages = await buildMessageObject(
 				operationNode,
 				generationContext.sourceNodes,
 				fileResolver,
@@ -188,7 +188,6 @@ export function generateText(args: {
 			) {
 				preparedToolSet = addUrlContextTool({
 					preparedToolSet,
-					urls: urlContextUrls,
 					tool: vertex.tools.urlContext({}),
 				});
 			}

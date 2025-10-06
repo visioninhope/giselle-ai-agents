@@ -32,87 +32,19 @@ import type { GiselleStorage } from "../experimental_storage";
 import type { GiselleEngineContext } from "../types";
 import type { PreparedToolSet } from "./types";
 
-const URL_CONTEXT_LIMIT = 20;
-
 export function addUrlContextTool({
 	preparedToolSet,
-	urls,
 	tool,
 }: {
 	preparedToolSet: PreparedToolSet;
-	urls: string[] | undefined;
 	tool: PreparedToolSet["toolSet"][string];
 }): PreparedToolSet {
-	if (urls === undefined || urls.length === 0) {
-		return preparedToolSet;
-	}
-
 	return {
 		...preparedToolSet,
 		toolSet: {
 			...preparedToolSet.toolSet,
 			url_context: tool,
 		},
-	};
-}
-
-type BuildMessageObjectResult = {
-	messages: ModelMessage[];
-	urlContextUrls: string[];
-};
-
-function extractHttpsUrls(text: string): string[] {
-	const matches =
-		text.match(/https?:\/\/[\w\-._~:/?#[\]@!$&'()*+,;=%]+/g) ?? [];
-	const unique = new Set<string>();
-	for (const candidate of matches) {
-		try {
-			const parsed = new URL(candidate);
-			if (parsed.protocol !== "https:") {
-				continue;
-			}
-			const normalized = parsed.toString();
-			unique.add(normalized);
-		} catch {}
-	}
-	return Array.from(unique);
-}
-
-function applyUrlContextPrompt({
-	node,
-	message,
-}: {
-	node: TextGenerationNode;
-	message: string;
-}): { message: string; urls: string[] } {
-	const shouldUseUrlContext =
-		node.content.llm.provider === "google" &&
-		node.content.contextSource === "url_context";
-	if (!shouldUseUrlContext) {
-		return { message, urls: [] };
-	}
-
-	const urls = extractHttpsUrls(message);
-	if (urls.length === 0) {
-		return { message, urls: [] };
-	}
-	if (urls.length > URL_CONTEXT_LIMIT) {
-		throw new Error(
-			`URL Context supports up to ${URL_CONTEXT_LIMIT.toString()} URLs in the prompt.`,
-		);
-	}
-
-	const formattedList = urls.map((url) => `- ${url}`).join("\n");
-	const instructionLines = [
-		"# URL Context",
-		"Use the url_context tool to retrieve information from the following URLs before answering:",
-		formattedList,
-		"Cite any information that comes from these URLs in your response.",
-	];
-
-	return {
-		message: `${instructionLines.join("\n")}\n\n${message}`,
-		urls,
 	};
 }
 
@@ -133,7 +65,7 @@ export async function buildMessageObject(
 		nodeId: NodeId,
 		outputId: OutputId,
 	) => Promise<ImagePart[] | undefined>,
-): Promise<BuildMessageObjectResult> {
+): Promise<ModelMessage[]> {
 	switch (node.content.type) {
 		case "textGeneration": {
 			return await buildGenerationMessageForTextGeneration(
@@ -144,21 +76,18 @@ export async function buildMessageObject(
 			);
 		}
 		case "imageGeneration": {
-			return {
-				messages: await buildGenerationMessageForImageGeneration(
-					node as ImageGenerationNode,
-					contextNodes,
-					fileResolver,
-					textGenerationResolver,
-					imageGenerationResolver,
-				),
-				urlContextUrls: [],
-			};
+			return await buildGenerationMessageForImageGeneration(
+				node as ImageGenerationNode,
+				contextNodes,
+				fileResolver,
+				textGenerationResolver,
+				imageGenerationResolver,
+			);
 		}
 		case "action":
 		case "trigger":
 		case "query": {
-			return { messages: [], urlContextUrls: [] };
+			return [];
 		}
 		default: {
 			const _exhaustiveCheck: never = node.content;
@@ -175,7 +104,7 @@ async function buildGenerationMessageForTextGeneration(
 		nodeId: NodeId,
 		outputId: OutputId,
 	) => Promise<string | undefined>,
-): Promise<BuildMessageObjectResult> {
+): Promise<ModelMessage[]> {
 	const llmProvider = node.content.llm.provider;
 	const prompt = node.content.prompt;
 	if (prompt === undefined) {
@@ -349,23 +278,18 @@ async function buildGenerationMessageForTextGeneration(
 			}
 		}
 	}
-	const { message: finalUserMessage, urls: urlContextUrls } =
-		applyUrlContextPrompt({ node, message: userMessage });
-	return {
-		messages: [
-			{
-				role: "user",
-				content: [
-					...attachedFiles,
-					{
-						type: "text",
-						text: finalUserMessage,
-					},
-				],
-			},
-		],
-		urlContextUrls,
-	};
+	return [
+		{
+			role: "user",
+			content: [
+				...attachedFiles,
+				{
+					type: "text",
+					text: userMessage,
+				},
+			],
+		},
+	];
 }
 
 function getOrdinal(n: number): string {
