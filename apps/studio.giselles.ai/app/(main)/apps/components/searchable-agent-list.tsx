@@ -110,7 +110,7 @@ export function SearchableAgentList({
 
 									{/* Content */}
 									<div className="flex flex-col gap-y-1">
-										<p className="text-[14px] font-sans text-white-900">
+										<p className="text-[14px] font-sans text-inverse">
 											{agent.name || "Untitled"}
 										</p>
 										<p className="text-[12px] font-geist text-white-400">

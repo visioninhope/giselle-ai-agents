@@ -70,6 +70,7 @@ export async function updateDocumentVectorStoreSourceStatus(
 }
 
 interface InsertEmbeddingsParams {
+	storeDbId: number;
 	sourceDbId: number;
 	embeddingProfileId: EmbeddingProfileId;
 	dimensions: EmbeddingDimensions;
@@ -85,6 +86,7 @@ export async function insertDocumentEmbeddings(
 	params: InsertEmbeddingsParams,
 ): Promise<void> {
 	const {
+		storeDbId,
 		sourceDbId,
 		embeddingProfileId,
 		dimensions,
@@ -98,6 +100,7 @@ export async function insertDocumentEmbeddings(
 
 	// Convert embeddings to the format expected by the database
 	const values = embeddings.map((emb) => ({
+		documentVectorStoreDbId: storeDbId,
 		documentVectorStoreSourceDbId: sourceDbId,
 		embeddingProfileId,
 		embeddingDimensions: dimensions,
