@@ -283,7 +283,7 @@ export function TeamProfileEditModal({
 							}}
 						/>
 						<div className="absolute top-0 left-4 right-4 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
-						<div className="absolute inset-0 rounded-[12px] border border-white/10" />
+						<div className="absolute inset-0 rounded-[12px] border border-border-muted" />
 
 						<div className="relative z-10">
 							<div className="flex justify-between items-center">
