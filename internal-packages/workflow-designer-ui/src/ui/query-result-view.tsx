@@ -380,20 +380,13 @@ function QueryResultCard({
 							<span className="text-[12px] font-semibold text-white-700">
 								Chunk #{record.chunkIndex}
 							</span>
-							{isDocumentResult && (
+							{isDocumentResult && record.metadata.documentKey ? (
 								<div className="flex flex-col text-[11px] text-white-500">
-									{record.metadata.documentKey ? (
-										<span className="break-all">
-											File: {record.metadata.documentKey}
-										</span>
-									) : null}
-									{record.metadata.documentVectorStoreSourceDbId ? (
-										<span className="break-all">
-											Source ID: {record.metadata.documentVectorStoreSourceDbId}
-										</span>
-									) : null}
+									<span className="break-all">
+										File: {record.metadata.documentKey}
+									</span>
 								</div>
-							)}
+							) : null}
 						</div>
 						<ScoreIndicator score={record.score} />
 					</div>
