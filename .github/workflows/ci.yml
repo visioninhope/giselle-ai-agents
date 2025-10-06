@@ -27,5 +27,7 @@ jobs:
       - run: pnpm knip
       - name: Build SDK
         run: pnpm build-sdk
+      - name: Report Colors (non-blocking)
+        run: pnpm report:colors || true
       - name: Test
         run: pnpm test
