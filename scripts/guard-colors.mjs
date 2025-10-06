@@ -33,7 +33,7 @@ function main() {
 	let report;
 	try {
 		report = JSON.parse(res.stdout || "{}");
-	} catch (e) {
+	} catch (_e) {
 		console.error("[guard-colors] failed to parse report JSON");
 		process.exit(0);
 	}

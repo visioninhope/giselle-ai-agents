@@ -74,7 +74,7 @@ async function MyAgentList() {
 							<div className="h-[20px] mb-1.5" />
 
 							{/* Thumbnail */}
-							<div className="h-[150px] bg-black-80 rounded-[8px] mb-4" />
+							<div className="h-[150px] bg-white/5 rounded-[8px] mb-4" />
 
 							<div className="flex-grow">
 								<h3 className="font-sans text-white-400 text-[16px] font-semibold mb-1 line-clamp-2">
@@ -83,7 +83,7 @@ async function MyAgentList() {
 							</div>
 
 							<div className="mt-auto">
-								<div className="border-t-[0.5px] border-black-400 my-4" />
+								<div className="border-t-[0.5px] border-border my-4" />
 								<div className="flex justify-between items-center">
 									<span className="text-white-400 text-xs font-geist truncate max-w-[200px]">
 										Edited by you -{" "}
