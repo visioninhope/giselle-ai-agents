@@ -414,12 +414,17 @@ function QueryResultCard({
 								Metadata
 							</summary>
 							<div className="mt-[4px] pl-[12px] space-y-[2px]">
-								{Object.entries(record.metadata).map(([key, value]) => (
-									<div key={key} className="flex gap-[8px]">
-										<span className="font-medium">{key}:</span>
-										<span className="break-all">{String(value)}</span>
-									</div>
-								))}
+								{Object.entries(record.metadata).map(([key, value]) => {
+									if (key === "documentVectorStoreSourceDbId") {
+										return null;
+									}
+									return (
+										<div key={key} className="flex gap-[8px]">
+											<span className="font-medium">{key}:</span>
+											<span className="break-all">{String(value)}</span>
+										</div>
+									);
+								})}
 							</div>
 						</details>
 					)}
