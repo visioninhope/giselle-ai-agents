@@ -49,7 +49,7 @@ export const Act = z.object({
 	id: ActId.schema,
 	workspaceId: WorkspaceId.schema,
 	name: z.string(),
-	status: z.enum(["inProgress", "completed", "failed", "cancelled"]),
+	status: z.enum(["created", "inProgress", "completed", "failed", "cancelled"]),
 	steps: z.object({
 		queued: z.number(),
 		inProgress: z.number(),

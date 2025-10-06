@@ -1,6 +1,7 @@
 import type { NodeId } from "@giselle-sdk/data-type";
 import type { Storage } from "unstorage";
 import { Generation, NodeGenerationIndex } from "../../../concepts/generation";
+import type { GiselleLogger } from "../../../logger/types";
 import type { GiselleStorage } from "../../experimental_storage";
 import {
 	generationPath,
@@ -24,6 +25,7 @@ export async function internalSetGeneration(params: {
 	experimental_storage: GiselleStorage;
 	useExperimentalStorage?: boolean;
 	generation: Generation;
+	logger?: GiselleLogger;
 }) {
 	if (params.useExperimentalStorage) {
 		await params.experimental_storage.setJson({
@@ -38,6 +40,7 @@ export async function internalSetGeneration(params: {
 		);
 	}
 
+	params.logger?.debug("insert");
 	const newIndex = toNodeGenerationIndex(params.generation);
 	const nodeId = params.generation.context.operationNode.id;
 
@@ -59,6 +62,8 @@ export async function internalSetGeneration(params: {
 
 	// Update actId-based index when present
 	const actId = params.generation.context.origin.actId;
+	params.logger?.debug(`internalSetGeneration ---- ${actId}`);
+	params.logger?.debug(JSON.stringify(newIndex, null, 2));
 	if (actId !== undefined) {
 		updateActGenerationIndexes(params.experimental_storage, actId, newIndex);
 	}

@@ -35,6 +35,7 @@ import {
 	isProPlan,
 } from "@/services/teams";
 import supabaseStorageDriver from "@/supabase-storage-driver";
+import type { runActJob } from "@/trigger/run-act-job";
 import { getDocumentVectorStoreQueryService } from "../lib/vector-stores/document/query/service";
 import {
 	gitHubPullRequestQueryService,
@@ -434,5 +435,11 @@ if (generateContentProcessor === "trigger.dev") {
 				throw new Error(`Unhandled origin type: ${_exhaustiveCheck}`);
 			}
 		}
+	});
+
+	giselleEngine.setRunActProcess(async (args) => {
+		await jobs.trigger<typeof runActJob>("run-act-job", {
+			actId: args.actId,
+		});
 	});
 }

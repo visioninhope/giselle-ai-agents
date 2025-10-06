@@ -12,5 +12,6 @@ export async function setGeneration(args: {
 		experimental_storage: args.context.experimental_storage,
 		useExperimentalStorage: args.useExperimentalStorage,
 		generation: args.generation,
+		logger: args.context.logger,
 	});
 }

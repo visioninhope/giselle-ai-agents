@@ -11,6 +11,7 @@ import type { LanguageModelProvider } from "@giselle-sdk/language-model";
 import type { EmbeddingMetrics, QueryService } from "@giselle-sdk/rag";
 import type { ModelMessage, ProviderMetadata } from "ai";
 import type { Storage } from "unstorage";
+import type { ActId } from "../concepts/act";
 import type { GiselleLogger } from "../logger/types";
 import type { GiselleStorage } from "./experimental_storage";
 import type { VectorStore } from "./experimental_vector-store/types/interface";
@@ -36,6 +37,19 @@ type GenerateContentArgs = {
 type GenerateContentProcess =
 	| { type: "self" }
 	| { type: "external"; process: (args: GenerateContentArgs) => Promise<void> };
+
+export type SetRunActProcessArgs = {
+	context: GiselleEngineContext;
+	actId: ActId;
+};
+type RunActProcess =
+	| { type: "self" }
+	| {
+			type: "external";
+			process: (args: SetRunActProcessArgs) => Promise<void>;
+	  };
+
+export type RunAct = (args: SetRunActProcessArgs) => Promise<void>;
 
 export interface GenerationCompleteCallbackFunctionArgs {
 	generation: CompletedGeneration;
@@ -99,6 +113,7 @@ export interface GiselleEngineContext {
 	logger: GiselleLogger;
 	waitUntil: WaitUntil;
 	generateContentProcess: GenerateContentProcess;
+	runActProcess: RunActProcess;
 }
 
 interface GitHubInstalltionAppAuthResolver {

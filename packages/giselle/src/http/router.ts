@@ -330,7 +330,7 @@ export const createJsonRouters = {
 		}),
 	startAct: (giselleEngine: GiselleEngine) =>
 		createHandler({
-			input: StartActInputs.omit({ callbacks: true }),
+			input: StartActInputs,
 			handler: async ({ input }) => {
 				await giselleEngine.startAct(input);
 				return new Response(null, { status: 204 });
@@ -506,6 +506,30 @@ export const createJsonRouters = {
 					...input,
 				});
 				return JsonResponse.json({ generation: runningGeneration });
+			},
+		}),
+	getWorkspaceInprogressAct: (giselleEngine: GiselleEngine) =>
+		createHandler({
+			input: z.object({
+				workspaceId: WorkspaceId.schema,
+			}),
+			handler: async ({ input }) => {
+				const act = await giselleEngine.getWorkspaceInprogressAct({
+					workspaceId: input.workspaceId,
+				});
+				return JsonResponse.json({ act });
+			},
+		}),
+	getActGenerationIndexes: (giselleEngine: GiselleEngine) =>
+		createHandler({
+			input: z.object({
+				actId: ActId.schema,
+			}),
+			handler: async ({ input }) => {
+				const result = await giselleEngine.getActGenerationIndexes({
+					actId: input.actId,
+				});
+				return JsonResponse.json(result);
 			},
 		}),
 } as const;

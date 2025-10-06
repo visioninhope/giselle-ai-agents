@@ -9,6 +9,7 @@ import type { Patch } from "../object/patch-object";
 
 // Valid status transitions for acts
 const VALID_ACT_TRANSITIONS: Record<Act["status"], Act["status"][]> = {
+	created: ["inProgress"],
 	inProgress: ["completed", "failed", "cancelled"],
 	completed: [],
 	failed: [],

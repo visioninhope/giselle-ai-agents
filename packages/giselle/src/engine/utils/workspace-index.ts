@@ -1,25 +1,55 @@
-import type { Storage } from "unstorage";
 import { z } from "zod/v4";
+import type { GiselleEngineContext } from "../types";
 
-export async function addWorkspaceIndexItem<I>(args: {
-	storage: Storage;
+export async function addWorkspaceIndexItem<I>({
+	context,
+	indexPath,
+	item,
+	itemSchema,
+	useExperimentalStorage = false,
+}: {
+	context: GiselleEngineContext;
 	indexPath: string;
 	item: I;
 	itemSchema: z.ZodType<I>;
+	useExperimentalStorage?: boolean;
 }) {
-	const indexLike = await args.storage.getItem(args.indexPath);
-	const parse = z.array(args.itemSchema).safeParse(indexLike);
+	if (useExperimentalStorage) {
+		const indexItem = await context.experimental_storage.getJson({
+			path: indexPath,
+			schema: z.array(itemSchema),
+		});
+		await context.experimental_storage.setJson({
+			path: indexPath,
+			data: [...indexItem, item],
+		});
+		return;
+	}
+	const indexLike = await context.storage.getItem(indexPath);
+	const parse = z.array(itemSchema).safeParse(indexLike);
 	const current = parse.success ? parse.data : [];
-	const item = args.itemSchema.parse(args.item);
-	await args.storage.setItem(args.indexPath, [...current, item]);
+	const parsedItem = itemSchema.parse(item);
+	await context.storage.setItem(indexPath, [...current, parsedItem]);
 }
 
-export async function getWorkspaceIndex<I extends z.ZodObject>(args: {
-	storage: Storage;
+export async function getWorkspaceIndex<I extends z.ZodObject>({
+	context,
+	indexPath,
+	itemSchema,
+	useExperimentalStorage = false,
+}: {
+	context: GiselleEngineContext;
 	indexPath: string;
 	itemSchema: I;
+	useExperimentalStorage?: boolean;
 }): Promise<z.infer<I>[]> {
-	const indexLike = await args.storage.getItem(args.indexPath);
-	const parse = z.array(args.itemSchema).safeParse(indexLike);
+	if (useExperimentalStorage) {
+		return context.experimental_storage.getJson({
+			path: indexPath,
+			schema: z.array(itemSchema),
+		});
+	}
+	const indexLike = await context.storage.getItem(indexPath);
+	const parse = z.array(itemSchema).safeParse(indexLike);
 	return parse.success ? parse.data : [];
 }

@@ -8,7 +8,9 @@ import type {
 	Workspace,
 	WorkspaceId,
 } from "@giselle-sdk/data-type";
+import { ActId, GenerationId } from "../concepts/identifiers";
 import { noopLogger } from "../logger/noop-logger";
+import type { GiselleLogger } from "../logger/types";
 import {
 	type CreateActInputs,
 	type CreateAndStartActInputs,
@@ -16,8 +18,11 @@ import {
 	createAndStartAct,
 	getAct,
 	getWorkspaceActs,
+	getWorkspaceInprogressAct,
 	type Patch,
 	patchAct,
+	type RunActInputs,
+	runAct,
 	type StartActInputs,
 	startAct,
 	streamAct,
@@ -50,7 +55,9 @@ import {
 	type RunningGeneration,
 	setGeneration,
 } from "./generations";
+import { getActGenerationIndexes } from "./generations/get-act-generation-indexes";
 import { flushGenerationIndexQueue } from "./generations/internal/act-generation-index-queue";
+import { startContentGeneration } from "./generations/start-content-generation";
 import {
 	getGitHubRepositories,
 	getGitHubRepositoryFullname,
@@ -63,6 +70,7 @@ import { addWebPage } from "./sources";
 import type {
 	GiselleEngineConfig,
 	GiselleEngineContext,
+	SetRunActProcessArgs,
 	WaitUntil,
 } from "./types";
 import {
@@ -100,6 +108,7 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 		logger: config.logger ?? noopLogger,
 		waitUntil: config.waitUntil ?? defaultWaitUntil,
 		generateContentProcess: { type: "self" },
+		runActProcess: { type: "self" },
 	};
 	return {
 		copyWorkspace: async (workspaceId: WorkspaceId, name?: string) => {
@@ -375,7 +384,7 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 			return deleteSecret({ ...args, context });
 		},
 		async flushGenerationIndexQueue() {
-			return await flushGenerationIndexQueue(context.experimental_storage);
+			return await flushGenerationIndexQueue({ context });
 		},
 		generateContent(args: {
 			generation: RunningGeneration;
@@ -401,15 +410,23 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 		) {
 			context.generateContentProcess = { type: "external", process };
 		},
+		getWorkspaceInprogressAct(args: { workspaceId: WorkspaceId }) {
+			return getWorkspaceInprogressAct({ ...args, context });
+		},
+		getActGenerationIndexes(args: { actId: ActId }) {
+			return getActGenerationIndexes({ ...args, context });
+		},
+		setRunActProcess(process: (args: SetRunActProcessArgs) => Promise<void>) {
+			context.runActProcess = { type: "external", process };
+		},
+		runAct(args: RunActInputs) {
+			return runAct({ ...args, context });
+		},
 	};
 }
 
 export type GiselleEngine = ReturnType<typeof GiselleEngine>;
 
 // Re-export value constructors explicitly
-import { ActId, GenerationId } from "../concepts/identifiers";
-import type { GiselleLogger } from "../logger/types";
-import { startContentGeneration } from "./generations/start-content-generation";
 export { ActId, GenerationId };
-
 export * from "./error";

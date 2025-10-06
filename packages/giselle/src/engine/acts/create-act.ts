@@ -181,9 +181,9 @@ export async function createAct(
 	const triggerNode = nodes.find((node) => isTriggerNode(node));
 
 	const act: Act = {
-		id: ActId.generate(),
+		id: actId,
 		workspaceId: workspace.id,
-		status: "inProgress",
+		status: "created",
 		name: triggerNode
 			? (triggerNode.name ?? defaultName(triggerNode))
 			: "Untitled Act",
@@ -210,10 +210,11 @@ export async function createAct(
 		annotations: [],
 		sequences,
 	};
+	args.context.logger.debug(`created act:${act.id}`);
 	await Promise.all([
 		args.context.storage.setItem(actPath(act.id), act),
 		addWorkspaceIndexItem({
-			storage: args.context.storage,
+			context: args.context,
 			indexPath: workspaceActPath(workspace.id),
 			item: act,
 			itemSchema: ActIndexObject,
