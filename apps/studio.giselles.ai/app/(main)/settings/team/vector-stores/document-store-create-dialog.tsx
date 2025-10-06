@@ -119,7 +119,7 @@ export function DocumentVectorStoreCreateDialog({
 						<label className="flex flex-col gap-2">
 							<span className="text-sm text-black-300 font-geist">Name</span>
 							<input
-								className="w-full rounded-md bg-black-950/40 border border-white/10 px-3 py-2 text-white-400 focus:outline-none focus:ring-1 focus:ring-white/20"
+								className="w-full rounded-md bg-black-950/40 border border-border px-3 py-2 text-white-400 focus:outline-none focus:ring-1 focus:ring-white/20"
 								placeholder="e.g. Product Docs"
 								value={name}
 								onChange={(e) => setName(e.target.value)}
