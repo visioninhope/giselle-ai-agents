@@ -1,0 +1,13 @@
+/* semantic.css (Phase 1.5 scaffold) - not applied globally yet */
+
+@layer utilities {
+	:root {
+		/* map semantic vars to primitives (light defaults) */
+		--color-text: var(--color-gray-50);
+		--color-text-inverse: var(--color-white);
+		--color-surface: var(--color-gray-950);
+		--color-border: var(--color-gray-700);
+		--color-border-muted: var(--color-gray-800);
+		--color-focused: var(--color-info-500);
+	}
+}
