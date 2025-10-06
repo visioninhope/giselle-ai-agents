@@ -1,5 +1,9 @@
-import type { Document, DocumentLoader } from "@giselle-sdk/rag";
-import { DocumentLoaderError } from "@giselle-sdk/rag";
+import {
+	type Document,
+	type DocumentLoader,
+	DocumentLoaderError,
+	replaceNullCharacters,
+} from "@giselle-sdk/rag";
 import type { Octokit } from "@octokit/core";
 import { executeRestRequest } from "../utils";
 
@@ -114,7 +118,7 @@ async function loadBlob(
 	try {
 		const decodedContent = textDecoder.decode(contentInBytes);
 		return {
-			content: decodedContent,
+			content: replaceNullCharacters(decodedContent),
 			metadata: {
 				owner,
 				repo,

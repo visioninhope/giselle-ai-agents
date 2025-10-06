@@ -673,6 +673,14 @@ export function createVectorStoreNode(
 	return vectorStoreFactoryImpl.create(provider);
 }
 
+export function createGitHubVectorStoreNode(): VectorStoreNode {
+	return vectorStoreFactoryImpl.create("github");
+}
+
+export function createDocumentVectorStoreNode(): VectorStoreNode {
+	return vectorStoreFactoryImpl.create("document");
+}
+
 export function createWebPageNode(): WebPageNode {
 	return webPageFactoryImpl.create();
 }

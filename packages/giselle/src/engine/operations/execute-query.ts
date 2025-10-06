@@ -439,6 +439,12 @@ async function queryVectorStore(
 						}
 					}
 
+					case "document": {
+						throw new Error(
+							"Document vector store query is not yet implemented",
+						);
+					}
+
 					default: {
 						const _exhaustiveCheck: never = provider;
 						throw new Error(

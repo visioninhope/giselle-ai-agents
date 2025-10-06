@@ -114,7 +114,7 @@ export function InvitationListItem({
 						</div>
 					</div>
 					<div className="flex flex-col gap-y-1 font-medium">
-						<div className="text-white-900/50 text-[14px] leading-[20.4px] flex items-center">
+						<div className="text-inverse/50 text-[14px] leading-[20.4px] flex items-center">
 							{email}
 							<span className="ml-2 text-black-400 text-[12px] leading-[16px]">
 								(Invitation pending)

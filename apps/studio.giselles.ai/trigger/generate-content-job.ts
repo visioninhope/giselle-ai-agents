@@ -6,7 +6,7 @@ import {
 	type OutputFileBlob,
 } from "@giselle-sdk/giselle";
 import { traceGeneration } from "@giselle-sdk/langfuse";
-import { logger, schemaTask } from "@trigger.dev/sdk";
+import { logger, schemaTask as schemaJob } from "@trigger.dev/sdk";
 import type { ModelMessage, ProviderMetadata } from "ai";
 import { z } from "zod/v4";
 import { giselleEngine } from "@/app/giselle-engine";
@@ -47,7 +47,7 @@ async function traceGenerationForTeam(args: {
 	});
 }
 
-export const generateContentTask = schemaTask({
+export const generateContentJob = schemaJob({
 	id: "generate-content",
 	schema: z.object({
 		generationId: GenerationId.schema,

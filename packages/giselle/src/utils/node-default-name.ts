@@ -33,6 +33,7 @@ export const vectorStoreProviderLabel: Record<
 	string
 > = {
 	github: "GitHub Vector Store",
+	document: "Document Vector Store",
 };
 export function vectorStoreNodeDefaultName(
 	vectorStoreProvider: VectorStoreSourceProvider,

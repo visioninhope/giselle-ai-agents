@@ -22,8 +22,25 @@ export const GitHubVectorStoreSource = z.object({
 });
 export type GitHubVectorStoreSource = z.infer<typeof GitHubVectorStoreSource>;
 
+export const DocumentVectorStoreSource = z.object({
+	provider: z.literal("document"),
+	state: z.discriminatedUnion("status", [
+		z.object({
+			status: z.literal("configured"),
+			documentVectorStoreId: z.string(),
+			embeddingProfileId: EmbeddingProfileIdSchema.optional(),
+		}),
+		z.object({
+			status: z.literal("unconfigured"),
+		}),
+	]),
+});
+export type DocumentVectorStoreSource = z.infer<
+	typeof DocumentVectorStoreSource
+>;
+
 export const VectorStoreContent = VectorStoreContentBase.extend({
-	source: GitHubVectorStoreSource,
+	source: z.union([GitHubVectorStoreSource, DocumentVectorStoreSource]),
 });
 export type VectorStoreContent = z.infer<typeof VectorStoreContent>;
 

@@ -1,6 +1,7 @@
 import { Buffer } from "node:buffer";
 import { createHash } from "node:crypto";
 
+import type { EmbeddingProfileId } from "@giselle-sdk/data-type";
 import { createId } from "@paralleldrive/cuid2";
 import { createClient } from "@supabase/supabase-js";
 import { and, eq, inArray } from "drizzle-orm";
@@ -9,6 +10,7 @@ import { after, NextResponse } from "next/server";
 
 import {
 	db,
+	documentEmbeddingProfiles,
 	documentVectorStoreSources,
 	documentVectorStores,
 } from "@/drizzle";
@@ -30,6 +32,7 @@ import type {
 import { fetchCurrentTeam } from "@/services/teams";
 
 export const runtime = "nodejs";
+export const maxDuration = 800;
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY;
@@ -65,21 +68,42 @@ async function findAccessibleStore(
 	documentVectorStoreId: DocumentVectorStoreId,
 	teamDbId: number,
 ) {
-	const [store] = await db
+	const records = await db
 		.select({
 			dbId: documentVectorStores.dbId,
 			id: documentVectorStores.id,
+			embeddingProfileId: documentEmbeddingProfiles.embeddingProfileId,
 		})
 		.from(documentVectorStores)
+		.leftJoin(
+			documentEmbeddingProfiles,
+			eq(
+				documentEmbeddingProfiles.documentVectorStoreDbId,
+				documentVectorStores.dbId,
+			),
+		)
 		.where(
 			and(
 				eq(documentVectorStores.id, documentVectorStoreId),
 				eq(documentVectorStores.teamDbId, teamDbId),
 			),
-		)
-		.limit(1);
+		);
 
-	return store ?? null;
+	if (records.length === 0) {
+		return null;
+	}
+
+	const store = {
+		dbId: records[0].dbId,
+		id: records[0].id,
+		embeddingProfileIds: records
+			.map((r) => r.embeddingProfileId)
+			.filter(
+				(id): id is EmbeddingProfileId => id !== null && id !== undefined,
+			),
+	};
+
+	return store;
 }
 
 async function rollbackUploads(
@@ -280,12 +304,15 @@ export async function POST(
 				storageKey,
 			});
 
-			// Trigger ingestion after response is sent (survives serverless freeze)
-			after(() => {
-				ingestDocument(sourceId).catch((error) => {
+			// Trigger ingestion immediately after response is sent
+			// If this fails or times out, cron job will retry (/api/vector-stores/document/ingest)
+			after(() =>
+				ingestDocument(sourceId, {
+					embeddingProfileIds: store.embeddingProfileIds,
+				}).catch((error) => {
 					console.error(`Failed to ingest document ${sourceId}:`, error);
-				});
-			});
+				}),
+			);
 		} catch (dbError) {
 			console.error(
 				`Failed to persist metadata for ${originalFileName}. Rolling back this file.`,

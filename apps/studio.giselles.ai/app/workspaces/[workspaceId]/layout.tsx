@@ -9,6 +9,7 @@ import { giselleEngine } from "@/app/giselle-engine";
 import { db, flowTriggers } from "@/drizzle";
 import {
 	aiGatewayFlag,
+	docVectorStoreFlag,
 	experimental_storageFlag,
 	layoutV3Flag,
 	resumableGenerationFlag,
@@ -16,6 +17,7 @@ import {
 	stageFlag,
 	webSearchActionFlag,
 } from "@/flags";
+import { getDocumentVectorStores } from "@/lib/vector-stores/document/queries";
 import { getGitHubRepositoryIndexes } from "@/lib/vector-stores/github";
 import { getGitHubIntegrationState } from "@/packages/lib/github";
 import { getUsageLimitsForTeam } from "@/packages/lib/usage-limits";
@@ -75,6 +77,10 @@ export default async function Layout({
 	const stage = await stageFlag();
 	const aiGateway = await aiGatewayFlag();
 	const resumableGeneration = await resumableGenerationFlag();
+	const documentVectorStore = await docVectorStoreFlag();
+	const documentVectorStores = documentVectorStore
+		? await getDocumentVectorStores(workspaceTeam.dbId)
+		: [];
 	const data = await giselleEngine.getWorkspace(workspaceId, true);
 
 	// return children
@@ -93,7 +99,19 @@ export default async function Layout({
 			}}
 			vectorStore={{
 				githubRepositoryIndexes: gitHubRepositoryIndexes,
-				settingPath: "/settings/team/vector-stores",
+				documentSettingPath: "/settings/team/vector-stores/document",
+				githubSettingPath: "/settings/team/vector-stores",
+				documentStores: documentVectorStores.map((store) => ({
+					id: store.id,
+					name: store.name,
+					embeddingProfileIds: store.embeddingProfileIds,
+					sources: store.sources.map((source) => ({
+						id: source.id,
+						fileName: source.fileName,
+						ingestStatus: source.ingestStatus,
+						ingestErrorCode: source.ingestErrorCode,
+					})),
+				})),
 			}}
 			usageLimits={usageLimits}
 			telemetry={{
@@ -112,6 +130,7 @@ export default async function Layout({
 				stage,
 				aiGateway,
 				resumableGeneration,
+				documentVectorStore,
 			}}
 			flowTrigger={{
 				callbacks: {

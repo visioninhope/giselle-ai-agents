@@ -18,6 +18,7 @@ import {
 	AISDKError,
 	type AsyncIterableStream,
 	type ModelMessage,
+	smoothStream,
 	streamText,
 	type UIMessage,
 } from "ai";
@@ -276,6 +277,10 @@ export function generateContent({
 						`Text generation completed in ${Date.now() - textGenerationStartTime}ms`,
 					);
 				},
+				experimental_transform: smoothStream({
+					delayInMs: 1000,
+					chunking: "line",
+				}),
 			});
 			let uiMessageStreamResult: GenerateContentResult | undefined;
 			const uiMessageStream = streamTextResult.toUIMessageStream({

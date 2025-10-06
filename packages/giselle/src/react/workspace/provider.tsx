@@ -51,6 +51,7 @@ export function WorkspaceProvider({
 				stage: featureFlag?.stage ?? false,
 				aiGateway: featureFlag?.aiGateway ?? false,
 				resumableGeneration: featureFlag?.resumableGeneration ?? false,
+				documentVectorStore: featureFlag?.documentVectorStore ?? false,
 			}}
 		>
 			<TelemetryProvider settings={telemetry}>

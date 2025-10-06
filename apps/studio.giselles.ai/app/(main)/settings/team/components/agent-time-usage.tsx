@@ -79,7 +79,7 @@ function AgentTimeUsage(props: AgentTimeUsageProps) {
 				<div className="text-right">
 					<div
 						className={cn(
-							"text-sm font-bold text-white-900 leading-[23.8px] tracking-normal font-geist",
+							"text-sm font-bold text-inverse leading-[23.8px] tracking-normal font-geist",
 						)}
 					>
 						{isOverLimit ? (

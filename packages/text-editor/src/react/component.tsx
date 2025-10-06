@@ -1,5 +1,6 @@
-import type { Node } from "@giselle-sdk/data-type";
+import type { Node, Output } from "@giselle-sdk/data-type";
 import { extensions as baseExtensions } from "@giselle-sdk/text-editor-utils";
+import Mention from "@tiptap/extension-mention";
 import Placeholder from "@tiptap/extension-placeholder";
 import { type Editor, EditorProvider, useCurrentEditor } from "@tiptap/react";
 import clsx from "clsx/lite";
@@ -13,6 +14,7 @@ import {
 import { Toolbar as ToolbarPrimitive } from "radix-ui";
 import { type ReactNode, useMemo } from "react";
 import { SourceExtensionReact } from "./source-extension-react";
+import { createSuggestion } from "./suggestion";
 
 function Toolbar({ tools }: { tools?: (editor: Editor) => ReactNode }) {
 	const { editor } = useCurrentEditor();
@@ -119,11 +121,17 @@ function Toolbar({ tools }: { tools?: (editor: Editor) => ReactNode }) {
 	);
 }
 
+export interface ConnectedSource {
+	node: Node;
+	output: Output;
+}
+
 export function TextEditor({
 	value,
 	onValueChange,
 	tools,
 	nodes,
+	connectedSources,
 	placeholder,
 	header,
 }: {
@@ -131,20 +139,30 @@ export function TextEditor({
 	onValueChange?: (value: string) => void;
 	tools?: (editor: Editor) => ReactNode;
 	nodes?: Node[];
+	connectedSources?: ConnectedSource[];
 	placeholder?: string;
 	header?: ReactNode;
 }) {
 	const extensions = useMemo(() => {
+		const mentionExtension = Mention.configure({
+			suggestion: createSuggestion(connectedSources),
+		});
+
 		return nodes === undefined
-			? [...baseExtensions, Placeholder.configure({ placeholder })]
+			? [
+					...baseExtensions,
+					mentionExtension,
+					Placeholder.configure({ placeholder }),
+				]
 			: [
 					...baseExtensions,
 					SourceExtensionReact.configure({
 						nodes,
 					}),
+					mentionExtension,
 					Placeholder.configure({ placeholder }),
 				];
-	}, [nodes, placeholder]);
+	}, [nodes, connectedSources, placeholder]);
 	return (
 		<div className="flex flex-col h-full w-full">
 			<EditorProvider

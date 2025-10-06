@@ -27,5 +27,12 @@ jobs:
       - run: pnpm knip
       - name: Build SDK
         run: pnpm build-sdk
+      - name: Install ripgrep (rg)
+        run: sudo apt-get update && sudo apt-get install -y ripgrep
+      - name: Report Colors (non-blocking)
+        run: pnpm report:colors
+        continue-on-error: true
+      - name: Guard Colors (non-blocking warnings)
+        run: pnpm guard:colors || true
       - name: Test
         run: pnpm test
