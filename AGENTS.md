@@ -33,3 +33,8 @@ Follow these guidelines when editing this repository.
 ## Communication
 - Correct grammar in commit messages, code comments, and PR comments.
 - Git branch names must always be written in English.
+
+## Submission Guidance (Design Tokens Migration)
+- Prefer base branch: `colors-foundation-v3` when applicable to minimize diffs.
+- Keep PR size small: target ~200 lines (max 400).
+- If adding aliases, keep them minimal in `internal-packages/ui/styles/aliases.css` and submit as a separate small PR.
