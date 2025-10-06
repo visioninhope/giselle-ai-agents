@@ -304,8 +304,13 @@ function isConfiguredVectorStoreNode(
 } {
 	const { content } = vectorStoreNode;
 	const { source } = content;
-	const { state } = source;
-	return state.status === "configured";
+	const { provider, state } = source;
+
+	if (state.status !== "configured") {
+		return false;
+	}
+
+	return provider === "github" || provider === "document";
 }
 
 async function queryVectorStore(
