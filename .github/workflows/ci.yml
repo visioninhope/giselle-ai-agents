@@ -43,5 +43,7 @@ jobs:
           path: .reports/report-colors.json
       - name: Guard Colors (non-blocking warnings)
         run: pnpm guard:colors || true
+      - name: Lint CSS (non-blocking)
+        run: pnpm lint:css || true
       - name: Test
         run: pnpm test
