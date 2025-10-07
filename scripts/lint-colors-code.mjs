@@ -100,9 +100,10 @@ function print(section, results) {
 		},
 		{
 			name: "Tailwind direct black/white scales in class strings",
-			// ensure the color token itself is complete (avoid matching e.g. text-black-alpha-500)
+			// drop leading word boundary so classes embedded in hyphenated strings still match
+			// keep boundary after the color token to avoid matching text-black-alpha-500
 			result: runRg(
-				"\\b(?:text|bg|border)-(?:black|white)\\b(?:-[0-9]{1,3})?(?:\\/[0-9]{1,3})?",
+				"(?:text|bg|border)-(?:black|white)\\b(?:-[0-9]{1,3})?(?:\\/[0-9]{1,3})?",
 			),
 		},
 	];
