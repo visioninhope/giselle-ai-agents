@@ -159,7 +159,7 @@ export function ConfigureSourcesDialog({
 										return (
 											<label
 												key={profileId}
-												className="flex items-start gap-3 p-2 rounded-lg bg-surface hover:bg-white/5 transition-colors cursor-pointer"
+												className="flex items-start gap-3 p-2 rounded-lg bg-white/10 hover:bg-white/5 transition-colors cursor-pointer"
 											>
 												<input
 													type="checkbox"
@@ -231,7 +231,7 @@ function ContentTypeToggle({
 	status,
 }: ContentTypeToggleProps) {
 	return (
-		<div className="bg-surface rounded-lg p-2">
+		<div className="bg-white/10 rounded-lg p-2">
 			<div className="flex items-center justify-between mb-1">
 				<div className="flex items-center gap-2">
 					<Icon size={18} className="text-gray-400" />
