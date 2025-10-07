@@ -1,7 +1,6 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { after } from "next/server";
 import { giselleEngine } from "@/app/giselle-engine";
 import { acts as actsSchema, db } from "@/drizzle";
 import { fetchCurrentUser } from "@/services/accounts";
@@ -39,12 +38,10 @@ export async function performStageAction(
 			sdkWorkspaceId: payloads.flowTrigger.workspaceId,
 		});
 
-		after(() =>
-			giselleEngine.startAct({
-				actId: act.id,
-				generationOriginType: "stage",
-			}),
-		);
+		await giselleEngine.startAct({
+			actId: act.id,
+			generationOriginType: "stage",
+		});
 
 		revalidatePath("/stage");
 	} catch (error) {
