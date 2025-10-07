@@ -88,7 +88,7 @@ export async function runWorkspaceApp(
 
 		after(() =>
 			giselleEngine.startAct({
-				act,
+				actId: act.id,
 				generationOriginType: "stage",
 			}),
 		);

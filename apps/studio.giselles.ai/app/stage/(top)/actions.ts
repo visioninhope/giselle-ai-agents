@@ -42,6 +42,7 @@ export async function performStageAction(
 		after(() =>
 			giselleEngine.startAct({
 				actId: act.id,
+				generationOriginType: "stage",
 			}),
 		);
 
