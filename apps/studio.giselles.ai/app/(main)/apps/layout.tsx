@@ -30,7 +30,7 @@ export default function Layout({ children }: { children: ReactNode }) {
 	}
 
 	return (
-		<div className="h-full bg-black-900">
+		<div className="h-full bg-bg">
 			<div className="px-[40px] py-[24px] flex-1 max-w-[1200px] mx-auto w-full">
 				<div className="flex justify-between items-center mb-8">
 					<h1

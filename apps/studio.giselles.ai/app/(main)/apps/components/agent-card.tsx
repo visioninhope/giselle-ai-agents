@@ -61,7 +61,7 @@ export function AgentCard({ agent }: { agent: typeof dbAgents.$inferSelect }) {
 			<div className="pointer-events-none absolute top-0 left-4 right-4 z-10 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
 
 			{/* Subtle inner border */}
-			<div className="pointer-events-none absolute inset-0 z-10 rounded-[inherit] border-[0.5px] border-white/5" />
+			<div className="pointer-events-none absolute inset-0 z-10 rounded-[inherit] border-[0.5px] border-border-muted" />
 
 			<div className="relative z-10 flex h-full w-full cursor-pointer flex-col pt-2 px-2 pb-4">
 				<div className="flex w-full justify-end gap-x-2">
@@ -78,7 +78,7 @@ export function AgentCard({ agent }: { agent: typeof dbAgents.$inferSelect }) {
 					href={`/workspaces/${agent.workspaceId}`}
 					className="flex h-full flex-col pt-2"
 				>
-					<div className="aspect-video w-full rounded-lg bg-white/5 flex items-center justify-center">
+					<div className="aspect-video w-full rounded-lg bg-white/10 flex items-center justify-center">
 						<svg
 							role="img"
 							aria-label="App icon"

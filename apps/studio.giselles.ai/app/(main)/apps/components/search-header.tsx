@@ -99,7 +99,7 @@ export function SearchHeader({
 					value={searchQuery}
 					onChange={(e) => onSearchChange(e.target.value)}
 					// Classes match /apps usage exactly (force radius/ring like /apps local Input)
-					className="pl-12 pr-4 h-10 w-full bg-black-700/50 text-white placeholder:text-black-400 border-black-600 rounded-[8px] shadow-none focus:border-transparent focus:ring-1 focus:ring-black--50 focus:ring-inset focus:ring-offset-0 focus-visible:border-transparent focus-visible:ring-1 focus-visible:ring-black--50 focus-visible:ring-inset focus-visible:ring-offset-0"
+					className="pl-12 pr-4 h-10 w-full bg-bg text-white placeholder:text-black-400 border-border rounded-[8px] shadow-none focus:border-transparent focus:ring-1 focus:ring-white/20 focus:ring-inset focus:ring-offset-0 focus-visible:border-transparent focus-visible:ring-1 focus-visible:ring-white/20 focus-visible:ring-inset focus-visible:ring-offset-0"
 				/>
 			</div>
 
@@ -116,7 +116,7 @@ export function SearchHeader({
 
 				{/* Optional view toggle */}
 				{canToggleView ? (
-					<div className="flex rounded-lg border border-black-600 overflow-hidden shrink-0">
+					<div className="flex rounded-lg border border-border overflow-hidden shrink-0">
 						<button
 							type="button"
 							onClick={() => onViewModeChange?.("grid")}
