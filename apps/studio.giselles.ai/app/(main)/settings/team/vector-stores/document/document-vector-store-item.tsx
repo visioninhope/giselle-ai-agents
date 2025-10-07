@@ -112,10 +112,10 @@ function IngestStatusBadge({
 					<Tooltip.Portal>
 						<Tooltip.Content
 							side="top"
-							className="z-50 max-w-xs rounded-md border border-white/10 bg-black-900 px-3 py-2 text-xs text-white-400 shadow-lg"
+							className="z-50 max-w-xs rounded-md border border-border-muted bg-surface px-3 py-2 text-xs text-white-400 shadow-lg"
 						>
 							<p className="font-medium">Error: {errorCode}</p>
-							<Tooltip.Arrow className="fill-black-900" />
+							<Tooltip.Arrow style={{ fill: "var(--color-surface)" }} />
 						</Tooltip.Content>
 					</Tooltip.Portal>
 				</Tooltip.Root>
@@ -192,7 +192,7 @@ export function DocumentVectorStoreItem({
 						</DropdownMenuTrigger>
 						<DropdownMenuContent
 							align="end"
-							className="w-[180px] bg-black-850 border-[0.5px] border-black-400 rounded-[8px]"
+							className="w-[180px] bg-surface border-[0.5px] border-border rounded-[8px]"
 						>
 							<DropdownMenuItem
 								onSelect={() => {
@@ -203,7 +203,7 @@ export function DocumentVectorStoreItem({
 								<Settings className="h-4 w-4 mr-2" />
 								Configure Sources
 							</DropdownMenuItem>
-							<DropdownMenuSeparator className="my-1 h-px bg-white/10" />
+							<DropdownMenuSeparator className="my-1 h-px bg-border-muted" />
 							<DropdownMenuItem
 								onSelect={(event) => {
 									event.preventDefault();
