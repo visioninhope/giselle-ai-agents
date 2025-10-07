@@ -260,7 +260,7 @@ export function AppDetailClient({ appDetails }: AppDetailClientProps) {
 						</div>
 
 						{/* Divider */}
-						<div className="w-full lg:w-px h-px lg:h-auto bg-white/10"></div>
+						<div className="w-full lg:w-px h-px lg:h-auto bg-border"></div>
 
 						{/* Right Column - App Details */}
 						<div className="flex-1 rounded-lg p-6">

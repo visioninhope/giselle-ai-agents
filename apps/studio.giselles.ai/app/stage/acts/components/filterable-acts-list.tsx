@@ -416,7 +416,7 @@ export function FilterableActsList({
 												{selectedStatuses.map((status) => (
 													<div
 														key={status}
-														className={`w-3 h-3 rounded-full border border-black-900 ${statusColors[status]}`}
+														className={`w-3 h-3 rounded-full border border-border ${statusColors[status]}`}
 													/>
 												))}
 											</div>

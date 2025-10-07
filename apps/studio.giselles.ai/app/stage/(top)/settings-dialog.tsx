@@ -199,7 +199,7 @@ export function SettingsDialog({
 						<Card
 							className={clsx(
 								"cursor-pointer border-[1px]",
-								!isCarouselView ? "border-blue-500" : "border-white/10",
+								!isCarouselView ? "border-blue-500" : "border-border",
 							)}
 						>
 							<label htmlFor="list">
@@ -225,7 +225,7 @@ export function SettingsDialog({
 						<Card
 							className={clsx(
 								"cursor-pointer border-[1px]",
-								isCarouselView ? "border-blue-500" : "border-white/10",
+								isCarouselView ? "border-blue-500" : "border-border",
 							)}
 						>
 							<label htmlFor="carousel">
@@ -262,7 +262,7 @@ export function SettingsDialog({
 					<select
 						id="font-select"
 						disabled
-						className="w-full p-3 bg-white/5 border border-white/10 rounded-lg text-white-100 text-sm opacity-50 cursor-not-allowed"
+						className="w-full p-3 bg-white/5 border border-border rounded-lg text-white-100 text-sm opacity-50 cursor-not-allowed"
 					>
 						<option className="bg-gray-900">Coming Soon</option>
 					</select>
