@@ -34,7 +34,6 @@ export default function Layout({ children }: { children: ReactNode }) {
 					</div>
 
 					<Nav />
-
 					{/* Border line below navigation */}
 					<div className="h-[1px] w-full bg-border" />
 				</header>

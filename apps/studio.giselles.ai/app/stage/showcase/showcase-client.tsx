@@ -224,7 +224,7 @@ export function ShowcaseClient({
 	);
 
 	return (
-		<div className="flex-1 px-[24px] bg-[var(--color-stage-background)] pt-16 md:pt-0 pb-[calc(4rem+env(safe-area-inset-bottom))] md:pb-0 h-full flex flex-col">
+		<div className="flex-1 px-[24px] bg-bg pt-16 md:pt-0 pb-[calc(4rem+env(safe-area-inset-bottom))] md:pb-0 h-full flex flex-col">
 			<div className="py-6 h-full flex flex-col">
 				<div className="flex items-center justify-between px-1 mb-6">
 					<div>
@@ -267,7 +267,7 @@ export function ShowcaseClient({
 
 				{/* Tabs */}
 				<div className="mb-8">
-					<div className="flex items-center px-0 py-0 border-t border-border">
+					<div className="flex items-center px-0 py-0 border-b border-border">
 						<div className="flex items-center space-x-[12px]">
 							{["Apps", "Playlist", "History"].map((tab) => {
 								const isActive = activeTab === tab;

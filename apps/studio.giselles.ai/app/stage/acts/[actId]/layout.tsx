@@ -26,7 +26,7 @@ export default async function ({
 	const data = getSidebarDataObject(actId);
 
 	return (
-		<div className="bg-[var(--color-stage-background)] text-foreground min-h-screen md:h-screen md:flex md:flex-row font-sans">
+		<div className="bg-bg text-foreground min-h-screen md:h-screen md:flex md:flex-row font-sans">
 			{/* Left Sidebar - Always visible */}
 			<div className="w-full md:w-auto md:h-screen md:overflow-y-auto">
 				<Suspense fallback={<NavSkelton />}>

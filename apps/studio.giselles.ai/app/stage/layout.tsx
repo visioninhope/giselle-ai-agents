@@ -6,7 +6,7 @@ import { NavigationRail } from "./ui/navigation-rail";
 export default function StageLayout({ children }: { children: ReactNode }) {
 	const data = getSidebarData();
 	return (
-		<div className="min-h-screen flex flex-col md:flex-row bg-stage-background">
+		<div className="min-h-screen flex flex-col md:flex-row bg-bg">
 			<Suspense fallback="">
 				<MobileHeader />
 				<NavigationRail user={data} />

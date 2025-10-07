@@ -63,7 +63,7 @@ export function AppDetailClient({ appDetails }: AppDetailClientProps) {
 	};
 
 	return (
-		<div className="min-h-screen bg-[var(--color-stage-background)] text-text">
+		<div className="min-h-screen bg-bg text-text">
 			<div className="flex flex-col h-full">
 				{/* Breadcrumb */}
 				<div className="p-6 pb-0">

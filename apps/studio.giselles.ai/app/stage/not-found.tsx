@@ -4,7 +4,7 @@ import { Button } from "@giselle-internal/ui/button";
 
 export default function NotFound() {
 	return (
-		<div className="flex h-screen bg-stage-background items-center justify-center">
+		<div className="flex h-screen bg-bg items-center justify-center">
 			<div className="max-w-md mx-auto text-center p-6">
 				<div className="mb-6">
 					<h2 className="text-xl font-semibold text-white-100 mb-2">

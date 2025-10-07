@@ -2,9 +2,9 @@
 
 export default function Loading() {
 	return (
-		<div className="flex h-screen bg-stage-background">
+		<div className="flex h-screen bg-bg">
 			{/* Sidebar placeholder */}
-			<div className="w-[200px] bg-stage-background border-r border-border animate-pulse">
+			<div className="w-[200px] bg-bg border-r border-border animate-pulse">
 				<div className="p-4 border-b border-border">
 					<div className="h-6 bg-surface/10 rounded mb-4"></div>
 					<div className="h-8 bg-surface/10 rounded"></div>
