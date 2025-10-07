@@ -1,5 +1,4 @@
 {
-  "defaultSeverity": "warning",
   "ignoreFiles": [
     "**/node_modules/**",
     "**/.next/**",
@@ -11,23 +10,7 @@
   ],
   "rules": {
     "color-no-hex": [true, { "severity": "warning" }],
-    "function-disallowed-list": [["rgb", "rgba", "hsl", "hsla", "oklch"], { "severity": "warning" }],
-    "at-rule-no-unknown": null,
-    "import-notation": null,
-    "selector-class-pattern": null,
-    "keyframes-name-pattern": null,
-    "rule-empty-line-before": null,
-    "custom-property-empty-line-before": null,
-    "custom-property-pattern": null,
-    "alpha-value-notation": null,
-    "color-function-notation": null,
-    "hue-degree-notation": null,
-    "color-function-alias-notation": null,
-    "length-zero-no-unit": null,
-    "declaration-block-no-redundant-longhand-properties": null,
-    "declaration-empty-line-before": null,
-    "declaration-property-value-no-unknown": null,
-    "property-no-vendor-prefix": null
+    "function-disallowed-list": [["rgb", "rgba", "hsl", "hsla", "oklch"], { "severity": "warning" }]
   }
 }
 
