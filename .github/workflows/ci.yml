@@ -32,6 +32,15 @@ jobs:
       - name: Report Colors (non-blocking)
         run: pnpm report:colors
         continue-on-error: true
+      - name: Save Report Colors JSON
+        if: always()
+        run: pnpm report:colors:out || true
+      - name: Upload Report Artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: report-colors
+          path: .reports/report-colors.json
       - name: Guard Colors (non-blocking warnings)
         run: pnpm guard:colors || true
       - name: Test

@@ -141,7 +141,7 @@ export function TeamMemberListItem({
 								</DropdownMenuTrigger>
 								<DropdownMenuContent
 									align="end"
-									className="p-1 border-[0.25px] border-white/10 rounded-[8px] min-w-[165px] bg-black-900 shadow-none"
+									className="p-1 border-[0.25px] border-border-muted rounded-[8px] min-w-[165px] bg-surface shadow-none"
 								>
 									{canEditRole && (
 										<>
@@ -179,7 +179,7 @@ export function TeamMemberListItem({
 												Remove
 											</button>
 										</AlertDialogTrigger>
-										<AlertDialogContent className="border-[0.5px] border-black-400 rounded-[8px] bg-black-850">
+										<AlertDialogContent className="border-[0.5px] border-border rounded-[8px] bg-surface">
 											<AlertDialogHeader>
 												<AlertDialogTitle className="text-white-400 text-[20px] leading-[29px] font-geist">
 													Remove Member
@@ -191,7 +191,7 @@ export function TeamMemberListItem({
 											</AlertDialogHeader>
 											<AlertDialogFooter className="mt-4">
 												<AlertDialogCancel
-													className="py-2 px-4 border-[0.5px] border-black-400 rounded-[8px] font-sans"
+													className="py-2 px-4 border-[0.5px] border-border rounded-[8px] font-sans"
 													disabled={isLoading}
 												>
 													Cancel
