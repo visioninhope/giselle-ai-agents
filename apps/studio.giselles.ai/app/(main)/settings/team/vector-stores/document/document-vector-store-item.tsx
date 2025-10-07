@@ -679,7 +679,7 @@ function DocumentVectorStoreConfigureDialog({
 							</label>
 							<input
 								id={nameInputId}
-								className="w-full rounded-md bg-black-950/40 border border-white/10 px-3 py-2 text-white-400 focus:outline-none focus:ring-1 focus:ring-white/20"
+								className="w-full rounded-md bg-white/5 border border-white/10 px-3 py-2 text-white-400 focus:outline-none focus:ring-1 focus:ring-white/20"
 								placeholder="Vector store name"
 								value={name}
 								onChange={(event) => setName(event.target.value)}
@@ -703,7 +703,7 @@ function DocumentVectorStoreConfigureDialog({
 									return (
 										<label
 											key={profileId}
-											className="flex items-start gap-3 p-3 rounded-lg bg-black-300/10 hover:bg-black-300/20 transition-colors"
+											className="flex items-start gap-3 p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
 										>
 											<input
 												type="checkbox"
@@ -744,7 +744,7 @@ function DocumentVectorStoreConfigureDialog({
 								onDragLeave={handleDragLeave}
 								onDrop={handleDrop}
 								disabled={isUploadingDocuments}
-								className={`flex flex-col items-center gap-3 rounded-xl border border-dashed border-white/10 bg-black-950/20 px-6 py-8 text-center transition-colors focus:outline-none focus:ring-2 focus:ring-white/30 ${isDragActive ? "border-white/30 bg-white/5" : ""} ${isUploadingDocuments ? "opacity-60" : ""}`}
+								className={`flex flex-col items-center gap-3 rounded-xl border border-dashed border-white/10 bg-white/5 px-6 py-8 text-center transition-colors focus:outline-none focus:ring-2 focus:ring-white/30 ${isDragActive ? "border-white/30 bg-white/10" : ""} ${isUploadingDocuments ? "opacity-60" : ""}`}
 							>
 								<ArrowUpFromLine className="h-8 w-8 text-black-300" />
 								<p className="text-white-400 text-sm">
@@ -785,7 +785,7 @@ function DocumentVectorStoreConfigureDialog({
 											return (
 												<li
 													key={source.id}
-													className="flex items-center justify-between gap-3 rounded-lg border border-white/10 bg-black-950/30 px-3 py-2"
+													className="flex items-center justify-between gap-3 rounded-lg border border-white/10 bg-white/5 px-3 py-2"
 												>
 													<div className="flex flex-col gap-1.5 min-w-0 flex-1">
 														<span className="text-white-400 text-sm font-medium break-all">
