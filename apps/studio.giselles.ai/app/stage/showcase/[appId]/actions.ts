@@ -86,12 +86,10 @@ export async function runWorkspaceApp(
 			sdkWorkspaceId: flowTrigger.workspaceId,
 		});
 
-		after(() =>
-			giselleEngine.startAct({
-				actId: act.id,
-				generationOriginType: "stage",
-			}),
-		);
+		await giselleEngine.startAct({
+			actId: act.id,
+			generationOriginType: "stage",
+		});
 
 		revalidatePath("/stage/showcase");
 		revalidatePath("/stage/acts");
