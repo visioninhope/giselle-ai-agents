@@ -390,8 +390,34 @@ export const giselleEngine = NextGiselleEngine({
 	waitUntil: after,
 });
 
-// In Vercel environment, execute generateContent with trigger
-// In local environment, use Next.js (default behavior).
+// Content generation processor: Trigger.dev implementation
+//
+// This processor delegates content generation to Trigger.dev jobs.
+// The branching logic handles two main flows:
+//
+// 1. setGenerateContentProcess:
+//    - Determines user context based on generation origin:
+//      a) "github-app": GitHub App automation (no authenticated user)
+//         → Fetch team from workspaceId, use "github-app" as userId
+//      b) "stage" / "studio": Interactive user sessions
+//         → Further branch by runtimeEnv:
+//            - "local" / "vercel" / "unknown": Outside Trigger.dev context
+//              → Fetch currentUser and currentTeam from session
+//            - "trigger.dev": Already inside a Trigger.dev job
+//              → Parse user/team from metadata to avoid circular auth calls
+//
+// 2. setRunActProcess:
+//    - Determines user context based on generationOriginType:
+//      a) "github-app": GitHub App automation
+//         → Fetch team from workspaceId, use "github-app" as userId
+//      b) "stage" / "studio": Interactive user sessions
+//         → Fetch currentUser and currentTeam from session
+//
+// Key insight:
+// - "github-app" origin has no authenticated user → derive context from workspaceId
+// - "stage"/"studio" origin needs user context → fetch from session or metadata
+// - When already inside Trigger.dev (runtimeEnv === "trigger.dev"),
+//   use metadata to avoid re-fetching auth state
 if (generateContentProcessor === "trigger.dev") {
 	giselleEngine.setGenerateContentProcess(async ({ generation, metadata }) => {
 		const requestId = getRequestId();
