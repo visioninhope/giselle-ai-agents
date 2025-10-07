@@ -37,7 +37,7 @@ export const Nav: FC = () => {
 	});
 
 	return (
-		<div className="flex items-center px-[24px] py-0 border-t border-black-900/50">
+		<div className="flex items-center px-[24px] py-0 border-t border-border">
 			<div className="flex items-center space-x-[12px]">
 				{menuItems.map((item, index) => {
 					const isActive = index === bestMatchIndex;
