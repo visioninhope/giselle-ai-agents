@@ -7,11 +7,23 @@ export const runActJob = schemaJob({
 	id: "run-act-job",
 	schema: z.object({
 		actId: ActId.schema,
+		requestId: z.string().optional(),
+		userId: z.string(),
+		team: z.object({
+			id: z.string<`tm_${string}`>(),
+			type: z.enum(["customer", "internal"]),
+			subscriptionId: z.string().nullable(),
+		}),
 	}),
 	run: async (payload) => {
 		await giselleEngine.runAct({
 			actId: payload.actId,
 			logger,
+			metadata: {
+				userId: payload.userId,
+				team: payload.team,
+				requestId: payload.actId,
+			},
 		});
 	},
 });

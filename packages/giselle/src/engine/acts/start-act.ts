@@ -1,5 +1,6 @@
 import { z } from "zod/v4";
 import { ActId } from "../../concepts/identifiers";
+import { GenerationOrigin } from "../generations";
 import type { GiselleEngineContext } from "../types";
 import { getAct } from "./get-act";
 import { patches } from "./object/patch-creators";
@@ -8,12 +9,16 @@ import { runAct } from "./run-act";
 
 export const StartActInputs = z.object({
 	actId: ActId.schema,
+	generationOriginType: z.enum(
+		GenerationOrigin.options.map((option) => option.shape.type.value),
+	),
 });
 export type StartActInputs = z.infer<typeof StartActInputs>;
 
 export async function startAct({
 	actId,
 	context,
+	generationOriginType,
 }: StartActInputs & {
 	context: GiselleEngineContext;
 }) {
@@ -36,7 +41,8 @@ export async function startAct({
 		case "external":
 			await context.runActProcess.process({
 				context,
-				actId,
+				act,
+				generationOriginType,
 			});
 			break;
 		default: {

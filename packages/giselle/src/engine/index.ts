@@ -43,6 +43,7 @@ import {
 import {
 	cancelGeneration,
 	type Generation,
+	type GenerationMetadata,
 	type GenerationOrigin,
 	generateContent,
 	generateImage,
@@ -406,6 +407,7 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 			process: (args: {
 				context: GiselleEngineContext;
 				generation: RunningGeneration;
+				metadata?: GenerationMetadata;
 			}) => Promise<void>,
 		) {
 			context.generateContentProcess = { type: "external", process };

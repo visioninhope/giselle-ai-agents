@@ -5,6 +5,7 @@ import type { GiselleLogger } from "../../logger/types";
 import { resolveTrigger } from "../flows";
 import {
 	type Generation,
+	type GenerationMetadata,
 	generateImage,
 	getGeneration,
 	isCompletedGeneration,
@@ -61,6 +62,7 @@ async function executeStep(args: {
 		onFailed?: (generation: Generation) => void | Promise<void>;
 	};
 	logger?: GiselleLogger;
+	metadata?: GenerationMetadata;
 }) {
 	try {
 		switch (args.generation.context.operationNode.content.type) {
@@ -74,6 +76,7 @@ async function executeStep(args: {
 				await startContentGeneration({
 					context: args.context,
 					generation: args.generation,
+					metadata: args.metadata,
 				});
 				const finishedGeneration = await waitUntilGenerationFinishes({
 					context: args.context,
@@ -110,6 +113,7 @@ export const RunActInputs = z.object({
 	actId: ActId.schema,
 	callbacks: z.optional(z.custom<RunActCallbacks>()),
 	logger: z.optional(z.custom<GiselleLogger>()),
+	metadata: z.optional(z.custom<GenerationMetadata>()),
 });
 export type RunActInputs = z.infer<typeof RunActInputs>;
 
@@ -147,6 +151,7 @@ export async function runAct(
 					context: args.context,
 					generation: queuedGeneration,
 					callbacks,
+					metadata: args.metadata,
 				});
 			},
 			onSequenceStart: async (sequence) => {

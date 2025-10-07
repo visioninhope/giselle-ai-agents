@@ -11,13 +11,15 @@ import type { LanguageModelProvider } from "@giselle-sdk/language-model";
 import type { EmbeddingMetrics, QueryService } from "@giselle-sdk/rag";
 import type { ModelMessage, ProviderMetadata } from "ai";
 import type { Storage } from "unstorage";
-import type { ActId } from "../concepts/act";
+import type { Act } from "../concepts/act";
 import type { GiselleLogger } from "../logger/types";
 import type { GiselleStorage } from "./experimental_storage";
 import type { VectorStore } from "./experimental_vector-store/types/interface";
 import type {
 	CompletedGeneration,
 	FailedGeneration,
+	GenerationMetadata,
+	GenerationOrigin,
 	OutputFileBlob,
 	RunningGeneration,
 } from "./generations";
@@ -33,6 +35,7 @@ export type WaitUntil<T = unknown> = (task: WaitUntilTask<T>) => void;
 type GenerateContentArgs = {
 	context: GiselleEngineContext;
 	generation: RunningGeneration;
+	metadata?: GenerationMetadata;
 };
 type GenerateContentProcess =
 	| { type: "self" }
@@ -40,7 +43,8 @@ type GenerateContentProcess =
 
 export type SetRunActProcessArgs = {
 	context: GiselleEngineContext;
-	actId: ActId;
+	act: Act;
+	generationOriginType: GenerationOrigin["type"];
 };
 type RunActProcess =
 	| { type: "self" }

@@ -23,6 +23,7 @@ import { tasks as jobs } from "@trigger.dev/sdk";
 import type { ModelMessage, ProviderMetadata } from "ai";
 import { after } from "next/server";
 import { createStorage } from "unstorage";
+import z from "zod/v4";
 import { waitForLangfuseFlush } from "@/instrumentation.node";
 import { logger } from "@/lib/logger";
 import { getWorkspaceTeam } from "@/lib/workspaces/get-workspace-team";
@@ -259,32 +260,31 @@ function handleGenerationTrace(args: GenerationTraceArgs) {
 	});
 }
 
+function getRuntimeEnv(): "trigger.dev" | "vercel" | "local" | "unknown" {
+	if (process.env.TRIGGERDOTDEV === "1") return "trigger.dev";
+	if (process.env.VERCEL === "1") return "vercel";
+	if (process.env.NODE_ENV === "development") return "local";
+	return "unknown";
+}
+
+const runtimeEnv = getRuntimeEnv();
+
 const generateContentProcessor =
-	process.env.TRIGGERDOTDEV === "1" ||
-	(process.env.VERCEL === "1" && process.env.NODE_ENV !== "development")
+	runtimeEnv === "trigger.dev" ||
+	(runtimeEnv === "vercel" && process.env.NODE_ENV !== "development")
 		? "trigger.dev"
 		: "self";
 
 const generationTracingCallbacks = {
 	generationComplete: (args: GenerationCompleteCallbackFunctionArgs) => {
-		// Hotfix: Implemented delegation of text generation to trigger.dev, but delegation is not working for Act cases.
-		// Also, tracing is not performed, so for Act cases, execute on Vercel Functions and perform tracing as well.
-		if (
-			generateContentProcessor === "trigger.dev" &&
-			args.generation.context.origin.type === "studio"
-		) {
+		if (generateContentProcessor === "trigger.dev") {
 			return;
 		}
 		const requestId = getRequestId();
 		handleGenerationTrace({ ...args, requestId });
 	},
 	generationFailed: (args: GenerationFailedCallbackFunctionArgs) => {
-		// Hotfix: Implemented delegation of text generation to trigger.dev, but delegation is not working for Act cases.
-		// Also, tracing is not performed, so for Act cases, execute on Vercel Functions and perform tracing as well.
-		if (
-			generateContentProcessor === "trigger.dev" &&
-			args.generation.context.origin.type === "studio"
-		) {
+		if (generateContentProcessor === "trigger.dev") {
 			return;
 		}
 		const requestId = getRequestId();
@@ -393,7 +393,7 @@ export const giselleEngine = NextGiselleEngine({
 // In Vercel environment, execute generateContent with trigger
 // In local environment, use Next.js (default behavior).
 if (generateContentProcessor === "trigger.dev") {
-	giselleEngine.setGenerateContentProcess(async ({ generation }) => {
+	giselleEngine.setGenerateContentProcess(async ({ generation, metadata }) => {
 		const requestId = getRequestId();
 		switch (generation.context.origin.type) {
 			case "github-app": {
@@ -414,12 +414,91 @@ if (generateContentProcessor === "trigger.dev") {
 			}
 			case "stage":
 			case "studio": {
+				switch (runtimeEnv) {
+					case "local":
+					case "vercel":
+					case "unknown": {
+						const [currentUser, currentTeam] = await Promise.all([
+							fetchCurrentUser(),
+							fetchCurrentTeam(),
+						]);
+						await jobs.trigger<typeof generateContentJob>("generate-content", {
+							generationId: generation.id,
+							requestId,
+							userId: currentUser.id,
+							team: {
+								id: currentTeam.id,
+								type: currentTeam.type,
+								subscriptionId: currentTeam.activeSubscriptionId,
+							},
+						});
+						break;
+					}
+					case "trigger.dev": {
+						const metadataSchema = z.object({
+							requestId: z.string().optional(),
+							userId: z.string(),
+							team: z.object({
+								id: z.string<`tm_${string}`>(),
+								type: z.enum(["customer", "internal"]),
+								subscriptionId: z.string().nullable(),
+							}),
+						});
+						const parsedMetadata = metadataSchema.safeParse(metadata);
+						if (parsedMetadata.error) {
+							throw new Error(
+								`Invalid metadata: ${parsedMetadata.error.message}`,
+							);
+						}
+						await jobs.trigger<typeof generateContentJob>("generate-content", {
+							generationId: generation.id,
+							requestId,
+							userId: parsedMetadata.data.userId,
+							team: parsedMetadata.data.team,
+						});
+						break;
+					}
+					default: {
+						const _exhaustiveCheck: never = runtimeEnv;
+						throw new Error(`Unhandled runtimeEnv: ${_exhaustiveCheck}`);
+					}
+				}
+				break;
+			}
+			default: {
+				const _exhaustiveCheck: never = generation.context.origin;
+				throw new Error(`Unhandled origin type: ${_exhaustiveCheck}`);
+			}
+		}
+	});
+
+	giselleEngine.setRunActProcess(async ({ act, generationOriginType }) => {
+		const requestId = getRequestId();
+		switch (generationOriginType) {
+			case "github-app": {
+				const team = await getWorkspaceTeam(act.workspaceId);
+
+				await jobs.trigger<typeof runActJob>("run-act-job", {
+					actId: act.id,
+					requestId,
+					userId: "github-app",
+					team: {
+						id: team.id,
+						type: team.type,
+						subscriptionId: team.activeSubscriptionId,
+					},
+				});
+				break;
+			}
+			case "stage":
+			case "studio": {
 				const [currentUser, currentTeam] = await Promise.all([
 					fetchCurrentUser(),
 					fetchCurrentTeam(),
 				]);
-				await jobs.trigger<typeof generateContentJob>("generate-content", {
-					generationId: generation.id,
+
+				await jobs.trigger<typeof runActJob>("run-act-job", {
+					actId: act.id,
 					requestId,
 					userId: currentUser.id,
 					team: {
@@ -431,15 +510,9 @@ if (generateContentProcessor === "trigger.dev") {
 				break;
 			}
 			default: {
-				const _exhaustiveCheck: never = generation.context.origin;
+				const _exhaustiveCheck: never = generationOriginType;
 				throw new Error(`Unhandled origin type: ${_exhaustiveCheck}`);
 			}
 		}
-	});
-
-	giselleEngine.setRunActProcess(async (args) => {
-		await jobs.trigger<typeof runActJob>("run-act-job", {
-			actId: args.actId,
-		});
 	});
 }

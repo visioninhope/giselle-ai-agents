@@ -120,6 +120,7 @@ export function useActSystem(workspaceId: WorkspaceId) {
 			addGenerationRunner(generations);
 			await client.startAct({
 				actId: act.id,
+				generationOriginType: "studio",
 			});
 			setCreating(false);
 			await pollingActGenerations(act.id);
