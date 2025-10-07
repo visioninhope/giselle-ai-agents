@@ -115,7 +115,7 @@ function IngestStatusBadge({
 							className="z-50 max-w-xs rounded-md border border-border bg-surface px-3 py-2 text-xs text-white-400 shadow-lg"
 						>
 							<p className="font-medium">Error: {errorCode}</p>
-							<Tooltip.Arrow className="fill-black-900" />
+							<Tooltip.Arrow style={{ fill: "var(--color-surface)" }} />
 						</Tooltip.Content>
 					</Tooltip.Portal>
 				</Tooltip.Root>
