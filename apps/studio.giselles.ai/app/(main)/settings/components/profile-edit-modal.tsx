@@ -291,7 +291,7 @@ export function ProfileEditModal({
 											<button
 												type="button"
 												onClick={handleSelectImageClick}
-												className="group relative w-[80px] h-[80px] rounded-full overflow-hidden cursor-pointer focus:outline-none focus:ring-0 border border-primary-100/20 hover:before:content-[''] hover:before:absolute hover:before:inset-0 hover:before:bg-black-900/40 hover:before:z-10"
+						className="group relative w-[80px] h-[80px] rounded-full overflow-hidden cursor-pointer focus:outline-none focus:ring-0 border border-primary-100/20 hover:before:content-[''] hover:before:absolute hover:before:inset-0 hover:before:bg-black-900/40 hover:before:z-10"
 											>
 												<AvatarImage
 													avatarUrl={initialAvatarUrl}
@@ -300,7 +300,7 @@ export function ProfileEditModal({
 													alt={alt}
 													className="object-cover w-full h-full"
 												/>
-												<div className="absolute inset-0 flex items-center justify-center bg-black-900/50 opacity-0 group-hover:opacity-100 transition-opacity">
+						<div className="absolute inset-0 flex items-center justify-center bg-black-900/50 opacity-0 group-hover:opacity-100 transition-opacity">
 													<div className="w-[40px] h-[40px] rounded-full flex items-center justify-center">
 														<ImageIcon className="w-7 h-7 text-white-800 transform group-hover:scale-110 transition-transform" />
 													</div>
@@ -313,7 +313,7 @@ export function ProfileEditModal({
 											<button
 												type="button"
 												onClick={handleSelectImageClick}
-												className="group relative w-[80px] h-[80px] rounded-full overflow-hidden cursor-pointer focus:outline-none focus:ring-0 border border-primary-100/30 hover:before:content-[''] hover:before:absolute hover:before:inset-0 hover:before:bg-black-900/40 hover:before:z-10"
+						className="group relative w-[80px] h-[80px] rounded-full overflow-hidden cursor-pointer focus:outline-none focus:ring-0 border border-primary-100/30 hover:before:content-[''] hover:before:absolute hover:before:inset-0 hover:before:bg-black-900/40 hover:before:z-10"
 												aria-label="Change avatar"
 											>
 												<Image
@@ -324,7 +324,7 @@ export function ProfileEditModal({
 													className="object-cover w-full h-full scale-[1.02]"
 													style={{ objectPosition: "center" }}
 												/>
-												<div className="absolute inset-0 flex items-center justify-center bg-black-900/50 opacity-0 group-hover:opacity-100 transition-opacity">
+						<div className="absolute inset-0 flex items-center justify-center bg-black-900/50 opacity-0 group-hover:opacity-100 transition-opacity">
 													<div className="w-[40px] h-[40px] rounded-full flex items-center justify-center">
 														<ImageIcon className="w-7 h-7 text-white-800 transform group-hover:scale-110 transition-transform" />
 													</div>
@@ -337,7 +337,7 @@ export function ProfileEditModal({
 											<button
 												type="button"
 												onClick={handleSelectImageClick}
-												className="group relative w-[80px] h-[80px] rounded-full overflow-hidden cursor-pointer focus:outline-none focus:ring-0 bg-transparent border border-primary-100/20 flex items-center justify-center hover:before:content-[''] hover:before:absolute hover:before:inset-0 hover:before:bg-black-900/50 hover:before:z-10"
+						className="group relative w-[80px] h-[80px] rounded-full overflow-hidden cursor-pointer focus:outline-none focus:ring-0 bg-transparent border border-primary-100/20 flex items-center justify-center hover:before:content-[''] hover:before:absolute hover:before:inset-0 hover:before:bg-black-900/50 hover:before:z-10"
 											>
 												<ImageIcon className="w-7 h-7 text-white-800 transform group-hover:scale-110 transition-transform" />
 											</button>
