@@ -68,9 +68,11 @@ function print(section, results) {
 	const cap = 20;
 	console.log(`\n[lint:colors:code] ${section}: ${items.length} findings`);
 	for (const it of items.slice(0, cap)) {
-		const text = String(it.text || "").slice(0, 200);
+		const original = String(it.text || "");
+		const preview = original.slice(0, 200);
+		const isTruncated = original.length > 200;
 		console.log(
-			` - ${it.path}:${it.line}: ${text}${it.text && it.text.length > 200 ? "..." : ""}`,
+			` - ${it.path}:${it.line}: ${preview}${isTruncated ? "..." : ""}`,
 		);
 	}
 	if (items.length > cap) {
