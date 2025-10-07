@@ -262,7 +262,7 @@ function Form({
 			</div>
 
 			{/* Separator Line */}
-			<div className="w-full h-px bg-white/10 mt-4 mb-4" />
+			<div className="w-full h-px bg-border mt-4 mb-4" />
 
 			{/* App Selection Container */}
 			<div className="mt-4 flex flex-col justify-start">
@@ -305,7 +305,7 @@ function Form({
 												"group flex items-center gap-3 p-3 rounded-lg border transition-all cursor-pointer relative z-20 w-full text-left",
 												appId === app.id
 													? "bg-blue-500/10 border-blue-500/50"
-													: "bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20",
+													: "bg-white/5 border-border hover:bg-white/10 hover:border-border",
 											)}
 										>
 											{/* Icon */}

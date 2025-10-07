@@ -194,7 +194,7 @@ export function PlaylistDetailClient({ playlist }: PlaylistDetailClientProps) {
 									</DropdownMenu.Trigger>
 									<DropdownMenu.Portal>
 										<DropdownMenu.Content
-											className="relative min-w-[180px] rounded-[12px] p-1 shadow-xl focus:outline-none backdrop-blur-md border border-white/10"
+											className="relative min-w-[180px] rounded-[12px] p-1 shadow-xl focus:outline-none backdrop-blur-md border border-border"
 											sideOffset={5}
 											style={{
 												background:
@@ -280,7 +280,7 @@ export function PlaylistDetailClient({ playlist }: PlaylistDetailClientProps) {
 									<div className="flex items-center gap-1 md:gap-2 flex-shrink-0">
 										<button
 											type="button"
-											className="p-1 md:p-1.5 rounded-full hover:bg-white/10 text-text-muted hover:text-text transition-colors border border-white/20 hover:border-white/40"
+											className="p-1 md:p-1.5 rounded-full hover:bg-white/10 text-text-muted hover:text-text transition-colors border border-border hover:border-border"
 											title="Run app"
 											onClick={() => {
 												if (app.workspaceId) {
@@ -328,7 +328,7 @@ export function PlaylistDetailClient({ playlist }: PlaylistDetailClientProps) {
 			<Dialog.Root open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
 				<Dialog.Portal>
 					<Dialog.Overlay className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50" />
-					<Dialog.Content className="fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] w-full max-w-md mx-4 rounded-[12px] p-6 shadow-xl focus:outline-none z-50 backdrop-blur-md border border-white/10 bg-gradient-to-br from-white/10 to-white/5">
+					<Dialog.Content className="fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] w-full max-w-md mx-4 rounded-[12px] p-6 shadow-xl focus:outline-none z-50 backdrop-blur-md border border-border bg-gradient-to-br from-white/10 to-white/5">
 						<div className="absolute top-0 left-4 right-4 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
 
 						<Dialog.Title className="text-text text-lg font-semibold mb-4">
@@ -350,7 +350,7 @@ export function PlaylistDetailClient({ playlist }: PlaylistDetailClientProps) {
 									onChange={(e) =>
 										setEditForm({ ...editForm, title: e.target.value })
 									}
-									className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-text placeholder-[hsl(192,25%,65%)] focus:outline-none focus:ring-2 focus:ring-blue-500"
+									className="w-full px-3 py-2 bg-white/5 border border-border rounded-lg text-text placeholder-[hsl(192,25%,65%)] focus:outline-none focus:ring-2 focus:ring-blue-500"
 									placeholder="Enter playlist title"
 								/>
 							</div>
@@ -369,7 +369,7 @@ export function PlaylistDetailClient({ playlist }: PlaylistDetailClientProps) {
 										setEditForm({ ...editForm, description: e.target.value })
 									}
 									rows={3}
-									className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-text placeholder-[hsl(192,25%,65%)] focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+									className="w-full px-3 py-2 bg-white/5 border border-border rounded-lg text-text placeholder-[hsl(192,25%,65%)] focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
 									placeholder="Enter playlist description"
 								/>
 							</div>
