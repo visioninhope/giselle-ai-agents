@@ -72,24 +72,38 @@ function print(section, results) {
 		process.exit(0);
 	}
 
-	// 1) Literal colors in code
-	const hex = runRg("#[0-9a-fA-F]{3,4}\\b|#[0-9a-fA-F]{6}|#[0-9a-fA-F]{8}");
-	const func = runRg("\\b(?:rgba?|hsla?|oklch)\\s*\\(");
+	// Aggregate checks with robust handling
+	const checks = [
+		{
+			name: "hex colors in TS/TSX",
+			// add word boundaries for all alternatives to avoid false positives
+			result: runRg(
+				"(?:#[0-9a-fA-F]{3,4}\\b|#[0-9a-fA-F]{6}\\b|#[0-9a-fA-F]{8}\\b)",
+			),
+		},
+		{
+			name: "functional colors in TS/TSX (rgb/rgba/hsl/hsla/oklch)",
+			result: runRg("\\b(?:rgba?|hsla?|oklch)\\s*\\("),
+		},
+		{
+			name: "Tailwind direct black/white scales in class strings",
+			result: runRg(
+				"\\b(?:text|bg|border)-(?:black|white)(?:-[0-9]{1,3})?(?:\\/[0-9]{1,3})?\\b",
+			),
+		},
+	];
 
-	// 2) Tailwind direct black/white scales inside class strings
-	//    e.g. "bg-black-900", "text-white-400", "border-white/10"
-	const tw = runRg(
-		"\\b(?:text|bg|border)-(?:black|white)(?:-[0-9]{1,3})?(?:\\/[0-9]{1,3})?\\b",
-	);
-
-	print("hex colors in TS/TSX", hex);
-	print("functional colors in TS/TSX (rgb/rgba/hsl/hsla/oklch)", func);
-	print("Tailwind direct black/white scales in class strings", tw);
-
-	const total =
-		(hex.items?.length || 0) +
-		(func.items?.length || 0) +
-		(tw.items?.length || 0);
+	let total = 0;
+	for (const { name, result } of checks) {
+		if (result.error) {
+			console.error(
+				`\n[lint:colors:code] Error checking for ${name}: ${result.error}`,
+			);
+			continue;
+		}
+		print(name, result);
+		total += result.items?.length || 0;
+	}
 	if (total === 0) {
 		console.log("[lint:colors:code] No issues found.");
 	} else {
