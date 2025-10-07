@@ -93,7 +93,7 @@ export function SearchableAgentList({
 							>
 								<div className="flex items-center gap-3">
 									{/* Icon */}
-									<div className="w-9 h-9 rounded-full bg-white/5 flex items-center justify-center flex-shrink-0 transition-all group-hover:bg-white/10">
+									<div className="w-9 h-9 rounded-full bg-surface/5 flex items-center justify-center flex-shrink-0 transition-all group-hover:bg-surface/10">
 										<svg
 											role="img"
 											aria-label="App icon"
