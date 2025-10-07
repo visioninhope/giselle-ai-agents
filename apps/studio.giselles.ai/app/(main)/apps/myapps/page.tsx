@@ -74,7 +74,7 @@ async function MyAgentList() {
 							<div className="h-[20px] mb-1.5" />
 
 							{/* Thumbnail */}
-							<div className="h-[150px] bg-surface/5 rounded-[8px] mb-4" />
+							<div className="h-[150px] bg-white/10 rounded-[8px] mb-4" />
 
 							<div className="flex-grow">
 								<h3 className="font-sans text-white-400 text-[16px] font-semibold mb-1 line-clamp-2">

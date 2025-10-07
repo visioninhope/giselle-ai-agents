@@ -78,7 +78,7 @@ export function AgentCard({ agent }: { agent: typeof dbAgents.$inferSelect }) {
 					href={`/workspaces/${agent.workspaceId}`}
 					className="flex h-full flex-col pt-2"
 				>
-					<div className="aspect-video w-full rounded-lg bg-surface/5 flex items-center justify-center">
+					<div className="aspect-video w-full rounded-lg bg-white/10 flex items-center justify-center">
 						<svg
 							role="img"
 							aria-label="App icon"
