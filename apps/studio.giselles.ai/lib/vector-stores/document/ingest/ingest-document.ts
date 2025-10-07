@@ -33,7 +33,7 @@ interface IngestDocumentOptions {
 interface IngestDocumentResult {
 	sourceId: DocumentVectorStoreSourceId;
 	text?: string;
-	fileType?: "txt" | "md";
+	fileType?: "txt" | "md" | "pdf";
 	chunks?: string[];
 	chunkCount?: number;
 	embeddingProfileIds?: EmbeddingProfileId[];
@@ -57,7 +57,7 @@ type IngestErrorCode =
  * This function:
  * 1. Validates the source exists and is in the correct state
  * 2. Downloads the file from Supabase storage
- * 3. Extracts text content (for TXT/MD files)
+ * 3. Extracts text content from supported document files (TXT, MD, PDF)
  * 4. Chunks the text into smaller pieces for embedding
  * 5. Generates embeddings for each chunk using specified embedding profiles
  * 6. Stores embeddings in the database
@@ -150,10 +150,10 @@ export async function ingestDocument(
 
 		// Extract text content
 		let text: string;
-		let fileType: "txt" | "md";
+		let fileType: "txt" | "md" | "pdf";
 
 		try {
-			const result = extractTextFromDocument(buffer, source.fileName, {
+			const result = await extractTextFromDocument(buffer, source.fileName, {
 				signal,
 			});
 			text = result.text;
