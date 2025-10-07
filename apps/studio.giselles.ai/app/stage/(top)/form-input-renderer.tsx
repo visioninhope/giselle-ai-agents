@@ -43,7 +43,7 @@ export function FormInputRenderer({
 									"w-full flex justify-between items-center rounded-[8px] py-[8px] px-[12px] outline-none focus:outline-none border",
 									validationErrors[input.name]
 										? "border-error"
-										: "border-white/5",
+										: "border-border",
 									"text-[14px]",
 								)}
 								disabled={isPending}
@@ -67,7 +67,7 @@ export function FormInputRenderer({
 									"border-[1px]",
 									validationErrors[input.name]
 										? "border-error"
-										: "border-white/5",
+										: "border-border",
 									"text-[14px]",
 								)}
 								rows={4}
@@ -93,7 +93,7 @@ export function FormInputRenderer({
 									"border-[1px]",
 									validationErrors[input.name]
 										? "border-error"
-										: "border-white/5",
+										: "border-border",
 									"text-[14px]",
 								)}
 								disabled={isPending}
