@@ -58,7 +58,7 @@ export type GenerationFailedCallbackFunction = (
 export interface EmbeddingCompleteCallbackFunctionArgs {
 	embeddingMetrics: EmbeddingMetrics;
 	generation: RunningGeneration;
-	queryContext: GitHubQueryContext;
+	queryContext: QueryContext;
 }
 export type EmbeddingCompleteCallbackFunction = (
 	args: EmbeddingCompleteCallbackFunctionArgs,
@@ -83,6 +83,7 @@ export interface GiselleEngineContext {
 	vectorStoreQueryServices?: {
 		github?: GitHubVectorStoreQueryService<Record<string, unknown>>;
 		githubPullRequest?: GitHubVectorStoreQueryService<Record<string, unknown>>;
+		document?: DocumentVectorStoreQueryService<Record<string, unknown>>;
 	};
 	callbacks?: {
 		generationComplete?: GenerationCompleteCallbackFunction;
@@ -147,11 +148,23 @@ export type GitHubQueryContext = {
 	contentType: "blob" | "pullRequest";
 	embeddingProfileId: EmbeddingProfileId;
 };
-export type QueryContext = GitHubQueryContext;
+
+export type DocumentVectorStoreQueryContext = {
+	provider: "document";
+	workspaceId: WorkspaceId;
+	documentVectorStoreId: string;
+	embeddingProfileId: EmbeddingProfileId;
+};
+
+export type QueryContext = GitHubQueryContext | DocumentVectorStoreQueryContext;
 
 export type GitHubVectorStoreQueryService<
 	M extends Record<string, unknown> = Record<string, never>,
 > = QueryService<GitHubQueryContext, M>;
+
+export type DocumentVectorStoreQueryService<
+	M extends Record<string, unknown> = Record<string, never>,
+> = QueryService<DocumentVectorStoreQueryContext, M>;
 
 export interface GiselleEngineConfig {
 	storage: Storage;
@@ -170,6 +183,7 @@ export interface GiselleEngineConfig {
 	vectorStoreQueryServices?: {
 		github?: GitHubVectorStoreQueryService<Record<string, unknown>>;
 		githubPullRequest?: GitHubVectorStoreQueryService<Record<string, unknown>>;
+		document?: DocumentVectorStoreQueryService<Record<string, unknown>>;
 	};
 	callbacks?: {
 		generationComplete?: GenerationCompleteCallbackFunction;

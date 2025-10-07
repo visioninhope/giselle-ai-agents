@@ -1,5 +1,9 @@
 import type { LanguageModelV2Source } from "@ai-sdk/provider";
-import { GitHubVectorStoreSource, OutputId } from "@giselle-sdk/data-type";
+import {
+	DocumentVectorStoreSource,
+	GitHubVectorStoreSource,
+	OutputId,
+} from "@giselle-sdk/data-type";
 import { createIdGenerator } from "@giselle-sdk/utils";
 import type { ProviderMetadata } from "ai";
 import { z } from "zod/v4";
@@ -58,7 +62,10 @@ export const SourceOutput = GenerationOutputBase.extend({
 	sources: z.array(z.custom<LanguageModelV2Source>()),
 });
 
-const VectorStoreSource = GitHubVectorStoreSource;
+const VectorStoreSource = z.union([
+	GitHubVectorStoreSource,
+	DocumentVectorStoreSource,
+]);
 const VectorStoreQueryResultRecord = z.object({
 	chunkContent: z.string(),
 	chunkIndex: z.number(),
