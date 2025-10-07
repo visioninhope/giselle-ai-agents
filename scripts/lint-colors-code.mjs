@@ -9,8 +9,14 @@
 import { spawnSync } from "node:child_process";
 
 function hasRg() {
-	const res = spawnSync("rg", ["--version"], { encoding: "utf8" });
-	return res.status === 0 && String(res.stdout).includes("ripgrep");
+	try {
+		const res = spawnSync("rg", ["--version"], { encoding: "utf8" });
+		if (res?.error) return false;
+		if (res?.status !== 0) return false;
+		return String(res.stdout || "").includes("ripgrep");
+	} catch {
+		return false;
+	}
 }
 
 function runRg(pattern, globs) {
@@ -29,6 +35,9 @@ function runRg(pattern, globs) {
 	for (const g of include) args.push("--glob", g);
 	args.push("-e", pattern);
 	const res = spawnSync("rg", args, { encoding: "utf8" });
+	if (res?.error) {
+		return { items: [], error: res.error.message || "rg failed to spawn" };
+	}
 	if (res.status !== 0 && res.status !== 1) {
 		return { items: [], error: res.stderr || "rg failed" };
 	}
@@ -54,15 +63,18 @@ function runRg(pattern, globs) {
 }
 
 function print(section, results) {
-	if (results.items.length === 0) return;
-	console.log(
-		`\n[lint:colors:code] ${section}: ${results.items.length} findings`,
-	);
-	for (const it of results.items.slice(0, 50)) {
-		console.log(` - ${it.path}:${it.line}: ${it.text}`);
+	const items = results.items || [];
+	if (items.length === 0) return;
+	const cap = 20;
+	console.log(`\n[lint:colors:code] ${section}: ${items.length} findings`);
+	for (const it of items.slice(0, cap)) {
+		const text = String(it.text || "").slice(0, 200);
+		console.log(
+			` - ${it.path}:${it.line}: ${text}${it.text && it.text.length > 200 ? "..." : ""}`,
+		);
 	}
-	if (results.items.length > 50) {
-		console.log(`   ... and ${results.items.length - 50} more`);
+	if (items.length > cap) {
+		console.log(`   ... and ${items.length - cap} more`);
 	}
 }
 
@@ -87,8 +99,9 @@ function print(section, results) {
 		},
 		{
 			name: "Tailwind direct black/white scales in class strings",
+			// ensure the color token itself is complete (avoid matching e.g. text-black-alpha-500)
 			result: runRg(
-				"\\b(?:text|bg|border)-(?:black|white)(?:-[0-9]{1,3})?(?:\\/[0-9]{1,3})?\\b",
+				"\\b(?:text|bg|border)-(?:black|white)\\b(?:-[0-9]{1,3})?(?:\\/[0-9]{1,3})?",
 			),
 		},
 	];
