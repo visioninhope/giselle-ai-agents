@@ -88,9 +88,10 @@ function print(section, results) {
 	const checks = [
 		{
 			name: "hex colors in TS/TSX",
-			// add word boundaries for all alternatives to avoid false positives
+			// Ensure the next char is not another hex digit to avoid partial matches
+			// Matches #RGB/#RGBA/#RRGGBB/#RRGGBBAA
 			result: runRg(
-				"(?:#[0-9a-fA-F]{3,4}\\b|#[0-9a-fA-F]{6}\\b|#[0-9a-fA-F]{8}\\b)",
+				"#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})(?![0-9a-fA-F])",
 			),
 		},
 		{
