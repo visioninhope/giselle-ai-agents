@@ -116,7 +116,7 @@ export function SearchHeader({
 
 				{/* Optional view toggle */}
 				{canToggleView ? (
-					<div className="flex rounded-lg border border-border overflow-hidden shrink-0">
+					<div className="flex rounded-lg overflow-hidden shrink-0">
 						<button
 							type="button"
 							onClick={() => onViewModeChange?.("grid")}
