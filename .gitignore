@@ -44,3 +44,5 @@ yarn-error.log*
 # prepare fonts programmatically
 app/fonts/
 .env*.local
+
+/.reports/
