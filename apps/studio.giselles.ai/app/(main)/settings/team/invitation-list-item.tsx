@@ -109,7 +109,7 @@ export function InvitationListItem({
 			<div className="flex items-center justify-between gap-2">
 				<div className="flex gap-x-2 items-center">
 					<div className="flex-shrink-0 opacity-50">
-						<div className="w-9 h-9 rounded-full border border-dashed border-white-400 flex items-center justify-center">
+						<div className="w-9 h-9 rounded-full border border-dashed border-border-muted flex items-center justify-center">
 							{/* Empty circle with dashed border */}
 						</div>
 					</div>
