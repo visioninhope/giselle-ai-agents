@@ -95,7 +95,7 @@ async function MyAgentList() {
 							</div>
 
 							<div className="absolute z-0 inset-0 border-[0.5px] rounded-[8px] mask-fill bg-gradient-to-br from-[#7182AA80] to-[#02075066] bg-origin-border bg-clip-boarder border-transparent transition-all duration-300" />
-							<div className="absolute z-1 inset-0 border-[0.5px] border-white-900 rounded-[8px] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+							<div className="absolute z-1 inset-0 border-[0.5px] border-border rounded-[8px] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 						</div>
 					</Link>
 				</div>
