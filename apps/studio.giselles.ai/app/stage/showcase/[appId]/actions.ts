@@ -7,7 +7,6 @@ import { revalidatePath } from "next/cache";
 import { after } from "next/server";
 import { giselleEngine } from "@/app/giselle-engine";
 import { acts as actsSchema, db } from "@/drizzle";
-import { aiGatewayFlag, resumableGenerationFlag } from "@/flags";
 import { fetchCurrentUser } from "@/services/accounts";
 import type { TeamId } from "@/services/teams";
 
