@@ -87,14 +87,9 @@ export async function runWorkspaceApp(
 			sdkWorkspaceId: flowTrigger.workspaceId,
 		});
 
-		const useAiGateway = await aiGatewayFlag();
-		const useResumableGeneration = await resumableGenerationFlag();
-
 		after(() =>
 			giselleEngine.startAct({
 				actId: act.id,
-				useAiGateway,
-				useResumableGeneration,
 			}),
 		);
 

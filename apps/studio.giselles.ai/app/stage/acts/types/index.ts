@@ -1,4 +1,9 @@
-export type StatusFilter = "inProgress" | "completed" | "failed" | "cancelled";
+export type StatusFilter =
+	| "created"
+	| "inProgress"
+	| "completed"
+	| "failed"
+	| "cancelled";
 
 export type ActWithNavigation = {
 	id: string;
