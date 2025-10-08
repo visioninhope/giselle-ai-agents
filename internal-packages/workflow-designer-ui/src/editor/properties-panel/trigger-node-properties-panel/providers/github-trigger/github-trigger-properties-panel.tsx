@@ -433,7 +433,10 @@ export function Installed({
 													},
 													outputs:
 														node.outputs.length > 0 ? node.outputs : outputs,
-													name: node.name ?? `On ${trigger.event.label}`,
+													name:
+														node.content.state.status === "reconfiguring"
+															? node.name
+															: `On ${trigger.event.label}`,
 												});
 											} catch (_error) {
 												// Error is handled by the UI state
