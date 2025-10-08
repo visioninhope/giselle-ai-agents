@@ -1,11 +1,18 @@
+import type {
+	EmbeddingDimensions,
+	EmbeddingProfileId,
+} from "@giselle-sdk/data-type";
 import type { DocumentVectorStoreSourceId } from "@giselles-ai/types";
-import { eq } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import { db } from "@/drizzle/db";
 import type {
 	DocumentVectorStoreSourceIngestStatus,
 	DocumentVectorStoreSourceUploadStatus,
 } from "@/drizzle/schema";
-import { documentVectorStoreSources } from "@/drizzle/schema";
+import {
+	documentEmbeddings,
+	documentVectorStoreSources,
+} from "@/drizzle/schema";
 
 export async function getDocumentVectorStoreSource(
 	sourceId: DocumentVectorStoreSourceId,
@@ -60,4 +67,68 @@ export async function updateDocumentVectorStoreSourceStatus(
 		.update(documentVectorStoreSources)
 		.set(updateData)
 		.where(eq(documentVectorStoreSources.id, sourceId));
+}
+
+interface InsertEmbeddingsParams {
+	storeDbId: number;
+	sourceDbId: number;
+	embeddingProfileId: EmbeddingProfileId;
+	dimensions: EmbeddingDimensions;
+	documentKey: string;
+	embeddings: Array<{
+		chunkIndex: number;
+		content: string;
+		embedding: number[];
+	}>;
+}
+
+export async function insertDocumentEmbeddings(
+	params: InsertEmbeddingsParams,
+): Promise<void> {
+	const {
+		storeDbId,
+		sourceDbId,
+		embeddingProfileId,
+		dimensions,
+		documentKey,
+		embeddings,
+	} = params;
+
+	if (embeddings.length === 0) {
+		return;
+	}
+
+	// Convert embeddings to the format expected by the database
+	const values = embeddings.map((emb) => ({
+		documentVectorStoreDbId: storeDbId,
+		documentVectorStoreSourceDbId: sourceDbId,
+		embeddingProfileId,
+		embeddingDimensions: dimensions,
+		documentKey,
+		chunkIndex: emb.chunkIndex,
+		chunkContent: emb.content,
+		embedding: emb.embedding,
+	}));
+
+	await db.insert(documentEmbeddings).values(values);
+}
+
+export async function deleteDocumentEmbeddingsByProfiles(params: {
+	sourceDbId: number;
+	embeddingProfileIds: EmbeddingProfileId[];
+}): Promise<void> {
+	const { sourceDbId, embeddingProfileIds } = params;
+
+	if (embeddingProfileIds.length === 0) {
+		return;
+	}
+
+	await db
+		.delete(documentEmbeddings)
+		.where(
+			and(
+				eq(documentEmbeddings.documentVectorStoreSourceDbId, sourceDbId),
+				inArray(documentEmbeddings.embeddingProfileId, embeddingProfileIds),
+			),
+		);
 }

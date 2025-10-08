@@ -388,7 +388,7 @@ export function InviteMemberDialog({
 								</DropdownMenuTrigger>
 								<DropdownMenuContent
 									align="end"
-									className="min-w-[120px] rounded-[8px] border-[0.25px] border-white/10 bg-black-850 p-1 shadow-none"
+									className="min-w-[120px] rounded-[8px] border-[0.25px] border-border-muted bg-surface p-1 shadow-none"
 								>
 									<button
 										type="button"

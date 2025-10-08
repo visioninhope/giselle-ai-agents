@@ -23,10 +23,39 @@ export async function getGenerationMessageChunkss({
 			},
 		};
 	}
-	const contentLength = await context.experimental_storage.contentLength(
-		generationUiMessageChunksPath(generationId),
-	);
-	if (startByte === contentLength) {
+	try {
+		const contentLength = await context.experimental_storage.contentLength(
+			generationUiMessageChunksPath(generationId),
+		);
+		if (startByte === contentLength) {
+			return {
+				messageChunks: [],
+				range: {
+					startByte,
+					endByte: startByte,
+				},
+			};
+		}
+		const messageChunks = await context.experimental_storage.getBlob(
+			generationUiMessageChunksPath(generationId),
+			{
+				range: {
+					start: startByte,
+				},
+			},
+		);
+		return {
+			messageChunks: new TextDecoder()
+				.decode(messageChunks)
+				.split("\n")
+				.filter((chunk) => chunk !== ""),
+			range: {
+				startByte,
+				endByte: startByte + messageChunks.byteLength,
+			},
+		};
+	} catch (error) {
+		context.logger.error(error);
 		return {
 			messageChunks: [],
 			range: {
@@ -35,22 +64,4 @@ export async function getGenerationMessageChunkss({
 			},
 		};
 	}
-	const messageChunks = await context.experimental_storage.getBlob(
-		generationUiMessageChunksPath(generationId),
-		{
-			range: {
-				start: startByte,
-			},
-		},
-	);
-	return {
-		messageChunks: new TextDecoder()
-			.decode(messageChunks)
-			.split("\n")
-			.filter((chunk) => chunk !== ""),
-		range: {
-			startByte,
-			endByte: startByte + messageChunks.byteLength,
-		},
-	};
 }

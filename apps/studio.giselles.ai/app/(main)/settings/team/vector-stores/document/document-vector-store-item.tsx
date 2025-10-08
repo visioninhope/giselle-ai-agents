@@ -2,8 +2,12 @@
 
 import { DEFAULT_EMBEDDING_PROFILE_ID } from "@giselle-sdk/data-type";
 import * as Dialog from "@radix-ui/react-dialog";
+import * as Tooltip from "@radix-ui/react-tooltip";
 import {
+	AlertCircle,
 	ArrowUpFromLine,
+	CheckCircle2,
+	Clock,
 	Loader2,
 	MoreVertical,
 	Settings,
@@ -54,6 +58,74 @@ const DOCUMENT_UPLOAD_ACCEPT = [
 const SUPPORTED_FILE_TYPES_LABEL =
 	DOCUMENT_VECTOR_STORE_SUPPORTED_FILE_TYPE_LABEL;
 
+type IngestStatus = "idle" | "running" | "completed" | "failed";
+
+function IngestStatusBadge({
+	status,
+	errorCode,
+}: {
+	status: IngestStatus;
+	errorCode?: string | null;
+}) {
+	const config = {
+		idle: {
+			icon: Clock,
+			label: "Pending",
+			className: "bg-yellow-500/10 text-yellow-500 border-yellow-500/20",
+		},
+		running: {
+			icon: Loader2,
+			label: "Processing",
+			className: "bg-blue-500/10 text-blue-500 border-blue-500/20",
+			animate: true,
+		},
+		completed: {
+			icon: CheckCircle2,
+			label: "Ready",
+			className: "bg-green-500/10 text-green-500 border-green-500/20",
+		},
+		failed: {
+			icon: AlertCircle,
+			label: "Failed",
+			className: "bg-error-500/10 text-error-500 border-error-500/20",
+		},
+	}[status];
+
+	const Icon = config.icon;
+	const badge = (
+		<span
+			className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-medium ${config.className}`}
+		>
+			<Icon
+				className={`h-3 w-3 ${config.animate ? "animate-spin" : ""}`}
+				aria-hidden="true"
+			/>
+			{config.label}
+		</span>
+	);
+
+	if (status === "failed" && errorCode) {
+		return (
+			<Tooltip.Provider delayDuration={200}>
+				<Tooltip.Root>
+					<Tooltip.Trigger asChild>{badge}</Tooltip.Trigger>
+					<Tooltip.Portal>
+						<Tooltip.Content
+							side="top"
+							className="z-50 max-w-xs rounded-md border border-border bg-surface px-3 py-2 text-xs text-white-400 shadow-lg"
+						>
+							<p className="font-medium">Error: {errorCode}</p>
+							<Tooltip.Arrow style={{ fill: "var(--color-surface)" }} />
+						</Tooltip.Content>
+					</Tooltip.Portal>
+				</Tooltip.Root>
+			</Tooltip.Provider>
+		);
+	}
+
+	return badge;
+}
+
 type DocumentVectorStoreItemProps = {
 	store: DocumentVectorStoreWithProfiles;
 	deleteAction: (
@@ -96,7 +168,7 @@ export function DocumentVectorStoreItem({
 	const disableMenu = isPending || isUpdating;
 
 	return (
-		<div className="group relative rounded-[12px] overflow-hidden w-full bg-white/[0.02] backdrop-blur-[8px] border-[0.5px] border-white/8 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),inset_0_-1px_1px_rgba(255,255,255,0.2)] before:content-[''] before:absolute before:inset-0 before:bg-white before:opacity-[0.02] before:rounded-[inherit] before:pointer-events-none hover:border-white/12 transition-colors duration-200">
+		<div className="group relative rounded-[12px] overflow-hidden w-full bg-white/[0.02] backdrop-blur-[8px] border-[0.5px] border-border shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),inset_0_-1px_1px_rgba(255,255,255,0.2)] before:content-[''] before:absolute before:inset-0 before:bg-white before:opacity-[0.02] before:rounded-[inherit] before:pointer-events-none hover:border-border transition-colors duration-200">
 			<div className="px-[24px] py-[16px]">
 				<div className="flex items-start justify-between gap-4 mb-4">
 					<div>
@@ -120,7 +192,7 @@ export function DocumentVectorStoreItem({
 						</DropdownMenuTrigger>
 						<DropdownMenuContent
 							align="end"
-							className="w-[180px] bg-black-850 border-[0.5px] border-black-400 rounded-[8px]"
+							className="w-[180px] bg-surface border-[0.5px] border-border-muted rounded-[8px]"
 						>
 							<DropdownMenuItem
 								onSelect={() => {
@@ -219,6 +291,8 @@ type DocumentUploadResponse = {
 type DocumentSourceItem = {
 	id: string;
 	fileName: string;
+	ingestStatus: IngestStatus;
+	ingestErrorCode: string | null;
 };
 
 function buildDocumentSourceItems(
@@ -227,6 +301,8 @@ function buildDocumentSourceItems(
 	return sources.map((source) => ({
 		id: source.id,
 		fileName: source.fileName,
+		ingestStatus: source.ingestStatus as IngestStatus,
+		ingestErrorCode: source.ingestErrorCode,
 	}));
 }
 
@@ -240,6 +316,8 @@ function buildUploadedSourceItems(
 	return successes.map((success) => ({
 		id: success.sourceId,
 		fileName: success.fileName,
+		ingestStatus: "idle" as IngestStatus,
+		ingestErrorCode: null,
 	}));
 }
 
@@ -601,7 +679,7 @@ function DocumentVectorStoreConfigureDialog({
 							</label>
 							<input
 								id={nameInputId}
-								className="w-full rounded-md bg-black-950/40 border border-white/10 px-3 py-2 text-white-400 focus:outline-none focus:ring-1 focus:ring-white/20"
+								className="w-full rounded-md bg-black-950/40 border border-border px-3 py-2 text-white-400 focus:outline-none focus:ring-1 focus:ring-white/20"
 								placeholder="Vector store name"
 								value={name}
 								onChange={(event) => setName(event.target.value)}
@@ -666,7 +744,7 @@ function DocumentVectorStoreConfigureDialog({
 								onDragLeave={handleDragLeave}
 								onDrop={handleDrop}
 								disabled={isUploadingDocuments}
-								className={`flex flex-col items-center gap-3 rounded-xl border border-dashed border-white/10 bg-black-950/20 px-6 py-8 text-center transition-colors focus:outline-none focus:ring-2 focus:ring-white/30 ${isDragActive ? "border-white/30 bg-white/5" : ""} ${isUploadingDocuments ? "opacity-60" : ""}`}
+								className={`flex flex-col items-center gap-3 rounded-xl border border-dashed border-border bg-black-950/20 px-6 py-8 text-center transition-colors focus:outline-none focus:ring-2 focus:ring-white/30 ${isDragActive ? "border-white/30 bg-white/5" : ""} ${isUploadingDocuments ? "opacity-60" : ""}`}
 							>
 								<ArrowUpFromLine className="h-8 w-8 text-black-300" />
 								<p className="text-white-400 text-sm">
@@ -707,11 +785,17 @@ function DocumentVectorStoreConfigureDialog({
 											return (
 												<li
 													key={source.id}
-													className="flex items-center justify-between gap-3 rounded-lg border border-white/10 bg-black-950/30 px-3 py-2"
+													className="flex items-center justify-between gap-3 rounded-lg border border-border bg-black-950/30 px-3 py-2"
 												>
-													<span className="text-white-400 text-sm font-medium break-all">
-														{source.fileName}
-													</span>
+													<div className="flex flex-col gap-1.5 min-w-0 flex-1">
+														<span className="text-white-400 text-sm font-medium break-all">
+															{source.fileName}
+														</span>
+														<IngestStatusBadge
+															status={source.ingestStatus}
+															errorCode={source.ingestErrorCode}
+														/>
+													</div>
 													<button
 														type="button"
 														onClick={() =>
@@ -721,7 +805,7 @@ function DocumentVectorStoreConfigureDialog({
 															)
 														}
 														disabled={isDeleting}
-														className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-white/10 text-black-300 transition-colors hover:text-error-500 focus:outline-none focus:ring-2 focus:ring-white/30 disabled:cursor-not-allowed disabled:opacity-50"
+														className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-border text-black-300 transition-colors hover:text-error-500 focus:outline-none focus:ring-2 focus:ring-white/30 disabled:cursor-not-allowed disabled:opacity-50 flex-shrink-0"
 													>
 														<span className="sr-only">
 															Delete {source.fileName}

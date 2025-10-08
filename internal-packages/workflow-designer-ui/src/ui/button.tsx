@@ -24,11 +24,11 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 				className={clsx(
 					"rounded-[8px] font-accent inline-flex items-center justify-center",
 					{
-						"bg-primary-900 text-white-900 hover:bg-primary-800":
+						"bg-primary-900 text-inverse hover:bg-primary-800":
 							variant === "primary",
-						"bg-transparent text-white-900 border border-white-900/20 hover:bg-white-900/5":
+						"bg-transparent text-inverse border border-white-900/20 hover:bg-white-900/5":
 							variant === "outline",
-						"bg-transparent text-white-900 hover:bg-white-900/5":
+						"bg-transparent text-inverse hover:bg-white-900/5":
 							variant === "ghost",
 					},
 					{

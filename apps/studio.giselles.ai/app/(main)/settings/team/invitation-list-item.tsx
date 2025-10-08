@@ -105,7 +105,7 @@ export function InvitationListItem({
 	};
 
 	return (
-		<div className="px-2 py-4 border-t-[0.5px] border-white/10 first:border-t-0 font-sans">
+		<div className="px-2 py-4 border-t-[0.5px] border-border-muted first:border-t-0 font-sans">
 			<div className="flex items-center justify-between gap-2">
 				<div className="flex gap-x-2 items-center">
 					<div className="flex-shrink-0 opacity-50">
@@ -114,7 +114,7 @@ export function InvitationListItem({
 						</div>
 					</div>
 					<div className="flex flex-col gap-y-1 font-medium">
-						<div className="text-white-900/50 text-[14px] leading-[20.4px] flex items-center">
+						<div className="text-inverse/50 text-[14px] leading-[20.4px] flex items-center">
 							{email}
 							<span className="ml-2 text-black-400 text-[12px] leading-[16px]">
 								(Invitation pending)
@@ -142,7 +142,7 @@ export function InvitationListItem({
 							</DropdownMenuTrigger>
 							<DropdownMenuContent
 								align="end"
-								className="p-1 border-[0.25px] border-white/10 rounded-[8px] min-w-[165px] bg-black-900 shadow-none"
+								className="p-1 border-[0.25px] border-border-muted rounded-[8px] min-w-[165px] bg-surface shadow-none"
 							>
 								<DropdownMenuItem
 									onSelect={(e) => {

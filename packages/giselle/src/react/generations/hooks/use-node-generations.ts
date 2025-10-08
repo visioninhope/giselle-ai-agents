@@ -55,7 +55,15 @@ export function useNodeGenerations({
 		if (isLoading || data === undefined) {
 			return;
 		}
-		addGenerationRunner(data);
+		if (data.length === 0) {
+			return;
+		}
+		addGenerationRunner(
+			data.sort(
+				(a, b) =>
+					new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+			)[0],
+		);
 	}, [isLoading, data, addGenerationRunner]);
 
 	const currentGeneration = useMemo<Generation>(() => {

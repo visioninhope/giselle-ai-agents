@@ -4,7 +4,6 @@ import {
 	isTriggerNode,
 	isVectorStoreNode,
 } from "@giselle-sdk/data-type";
-import { CircleAlertIcon } from "lucide-react";
 import type { ReactElement } from "react";
 import { useGitHubVectorStoreStatus } from "../../lib/use-github-vector-store-status";
 import {
@@ -12,17 +11,7 @@ import {
 	GitHubRepositoryBadgeFromRepo,
 	GitHubRepositoryBadgeFromTrigger,
 } from "./";
-
-function RequiresSetupBadge(): ReactElement {
-	return (
-		<div className="flex items-center justify-center">
-			<div className="inline-flex items-center justify-center text-slate-400 font-semibold rounded-full text-[12px] pl-[10px] pr-[12px] py-2 gap-[6px] animate-pulse [animation-duration:2s]">
-				<CircleAlertIcon className="size-[18px]" />
-				<span>REQUIRES SETUP</span>
-			</div>
-		</div>
-	);
-}
+import { RequiresSetupBadge } from "./requires-setup-badge";
 
 export function GitHubNodeInfo({
 	node,

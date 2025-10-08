@@ -89,11 +89,11 @@ export function SearchableAgentList({
 							<Link
 								key={agent.id}
 								href={`/workspaces/${agent.workspaceId}`}
-								className="group flex items-center justify-between px-2 py-3 first:border-t-0 border-t-[0.5px] border-white/10"
+								className="group flex items-center justify-between px-2 py-3 first:border-t-0 border-t-[0.5px] border-border-muted"
 							>
 								<div className="flex items-center gap-3">
 									{/* Icon */}
-									<div className="w-9 h-9 rounded-full bg-white/5 flex items-center justify-center flex-shrink-0 transition-all group-hover:bg-primary-100/20">
+									<div className="w-9 h-9 rounded-full bg-surface/5 flex items-center justify-center flex-shrink-0 transition-all group-hover:bg-surface/10">
 										<svg
 											role="img"
 											aria-label="App icon"
@@ -110,7 +110,7 @@ export function SearchableAgentList({
 
 									{/* Content */}
 									<div className="flex flex-col gap-y-1">
-										<p className="text-[14px] font-sans text-white-900">
+										<p className="text-[14px] font-sans text-inverse">
 											{agent.name || "Untitled"}
 										</p>
 										<p className="text-[12px] font-geist text-white-400">

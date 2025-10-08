@@ -139,5 +139,31 @@ describe("chunk-store/postgres/utils", () => {
 				team_id: 123,
 			});
 		});
+
+		it("replaces NUL bytes in chunk content with a safe character", () => {
+			const chunks = [
+				{ content: "hello\u0000world", index: 0, embedding: [1, 2] },
+			];
+
+			const metadata = {};
+			const columnMapping = {
+				documentKey: "doc_key",
+				chunkContent: "content",
+				chunkIndex: "idx",
+				version: "version",
+			};
+
+			const [record] = prepareChunkRecords(
+				"doc123",
+				chunks,
+				metadata,
+				columnMapping,
+				{},
+				1,
+				2,
+			);
+
+			expect(record.record.content).toBe("hello\uFFFDworld");
+		});
 	});
 });

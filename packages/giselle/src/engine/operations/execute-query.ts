@@ -2,6 +2,8 @@ import {
 	DEFAULT_EMBEDDING_PROFILE_ID,
 	DEFAULT_MAX_RESULTS,
 	DEFAULT_SIMILARITY_THRESHOLD,
+	type DocumentVectorStoreSource,
+	type GitHubVectorStoreSource,
 	isQueryNode,
 	isTextNode,
 	NodeId,
@@ -35,6 +37,7 @@ import {
 	queryResultToText,
 } from "../generations/utils";
 import type {
+	DocumentVectorStoreQueryContext,
 	EmbeddingCompleteCallbackFunction,
 	GiselleEngineContext,
 	GitHubQueryContext,
@@ -280,24 +283,34 @@ async function resolveQuery(
 	return resolvedQuery;
 }
 
+type ConfiguredGitHubVectorStoreSource = GitHubVectorStoreSource & {
+	state: Extract<GitHubVectorStoreSource["state"], { status: "configured" }>;
+};
+
+type ConfiguredDocumentVectorStoreSource = DocumentVectorStoreSource & {
+	state: Extract<DocumentVectorStoreSource["state"], { status: "configured" }>;
+};
+
+type ConfiguredVectorStoreSource =
+	| ConfiguredGitHubVectorStoreSource
+	| ConfiguredDocumentVectorStoreSource;
+
 function isConfiguredVectorStoreNode(
 	vectorStoreNode: VectorStoreNode,
 ): vectorStoreNode is VectorStoreNode & {
 	content: {
-		source: {
-			state: {
-				status: "configured";
-				owner: string;
-				repo: string;
-				contentType: "blob" | "pull_request";
-			};
-		};
+		source: ConfiguredVectorStoreSource;
 	};
 } {
 	const { content } = vectorStoreNode;
 	const { source } = content;
-	const { state } = source;
-	return state.status === "configured";
+	const { provider, state } = source;
+
+	if (state.status !== "configured") {
+		return false;
+	}
+
+	return provider === "github" || provider === "document";
 }
 
 async function queryVectorStore(
@@ -437,6 +450,52 @@ async function queryVectorStore(
 								);
 							}
 						}
+					}
+
+					case "document": {
+						if (!vectorStoreQueryServices?.document) {
+							throw new Error(
+								"No document vector store query service provided",
+							);
+						}
+
+						const embeddingProfileId =
+							state.embeddingProfileId ?? DEFAULT_EMBEDDING_PROFILE_ID;
+						const queryContext: DocumentVectorStoreQueryContext = {
+							provider: "document",
+							workspaceId,
+							documentVectorStoreId: state.documentVectorStoreId,
+							embeddingProfileId,
+						};
+						const embeddingCallback = createEngineEmbeddingCallback(
+							runningGeneration,
+							queryContext,
+							context.callbacks?.embeddingComplete,
+						);
+
+						const res = await vectorStoreQueryServices.document.search(
+							query,
+							queryContext,
+							maxResults ?? DEFAULT_MAX_RESULTS,
+							similarityThreshold ?? DEFAULT_SIMILARITY_THRESHOLD,
+							embeddingCallback,
+						);
+						return {
+							type: "vector-store" as const,
+							source,
+							records: res.map((result) => ({
+								chunkContent: result.chunk.content,
+								chunkIndex: result.chunk.index,
+								score: result.similarity,
+								metadata: Object.fromEntries(
+									Object.entries(result.metadata ?? {}).map(([key, value]) => [
+										key,
+										String(value),
+									]),
+								),
+								additional: result.additional,
+							})),
+						};
 					}
 
 					default: {

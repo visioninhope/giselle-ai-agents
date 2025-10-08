@@ -50,7 +50,7 @@ export default function UserTeams({
 
 	return (
 		<>
-			<div className="relative overflow-hidden rounded-[12px] backdrop-blur-md bg-white/[0.02] border-[0.5px] border-white/15 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),inset_0_-1px_1px_rgba(255,255,255,0.2)] before:content-[''] before:absolute before:inset-0 before:bg-white before:opacity-[0.02] before:rounded-[inherit] before:pointer-events-none py-2">
+			<div className="relative overflow-hidden rounded-[12px] backdrop-blur-md bg-white/[0.02] border-[0.5px] border-border-muted shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),inset_0_-1px_1px_rgba(255,255,255,0.2)] before:content-[''] before:absolute before:inset-0 before:bg-white before:opacity-[0.02] before:rounded-[inherit] before:pointer-events-none py-2">
 				<div
 					className="flex items-center gap-x-[11px] mt-4 mb-2 mx-4 py-2 px-3 rounded-[8px]"
 					style={{
@@ -65,14 +65,14 @@ export default function UserTeams({
 						type="text"
 						value={teamName}
 						placeholder="Search for a team..."
-						className="w-full text-white-900 font-medium text-[14px] leading-[23.8px] font-geist placeholder:text-black-400 bg-transparent outline-none"
+						className="w-full text-inverse font-medium text-[14px] leading-[23.8px] font-geist placeholder:text-black-400 bg-transparent outline-none"
 					/>
 				</div>
 				<div>
 					{filteredTeams.map((team, idx) => (
 						<UserTeamsItem
 							className={cn(
-								"border-t border-white/5 mx-4",
+								"border-t border-border-muted mx-4",
 								idx === 0 && "border-t-0",
 							)}
 							key={team.id}
@@ -162,7 +162,7 @@ function UserTeamsItem({
 				</DropdownMenuTrigger>
 				<DropdownMenuContent
 					align="end"
-					className="p-1 border-[0.25px] border-white/10 rounded-[8px] min-w-[165px] bg-black-900 shadow-none"
+					className="p-1 border-[0.25px] border-border-muted rounded-[8px] min-w-[165px] bg-surface shadow-none"
 				>
 					<DropdownMenuItem className="p-0">
 						<ChangeTeamAndAction
