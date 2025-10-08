@@ -169,6 +169,19 @@ const githubPullRequestLabeledTrigger = {
 const githubPayloadLabelOverrides: Partial<
 	Record<TriggerEventId, Partial<Record<string, string>>>
 > = {
+	"github.issue.created": {
+		title: "Issue Title",
+		body: "Issue Body",
+	},
+	"github.issue.closed": {
+		title: "Issue Title",
+		body: "Issue Body",
+	},
+	"github.issue.labeled": {
+		title: "Issue Title",
+		body: "Issue Body",
+		labelName: "Issue Label Name",
+	},
 	"github.issue_comment.created": {
 		body: "Issue Comment",
 	},
@@ -177,6 +190,33 @@ const githubPayloadLabelOverrides: Partial<
 		issueNumber: "Pull Request Number",
 		issueTitle: "Pull Request Title",
 		issueBody: "Pull Request Body",
+		diff: "Pull Request Diff",
+	},
+	"github.pull_request_review_comment.created": {
+		body: "Review Comment Body",
+		diff: "Review Comment Diff",
+		id: "Review Comment ID",
+	},
+	"github.pull_request.opened": {
+		title: "Pull Request Title",
+		body: "Pull Request Body",
+		number: "Pull Request Number",
+		diff: "Pull Request Diff",
+	},
+	"github.pull_request.ready_for_review": {
+		title: "Pull Request Title",
+		body: "Pull Request Body",
+		number: "Pull Request Number",
+		diff: "Pull Request Diff",
+	},
+	"github.pull_request.closed": {
+		title: "Pull Request Title",
+		body: "Pull Request Body",
+		number: "Pull Request Number",
+		diff: "Pull Request Diff",
+	},
+	"github.pull_request.labeled": {
+		labelName: "Pull Request Label Name",
 	},
 };
 
