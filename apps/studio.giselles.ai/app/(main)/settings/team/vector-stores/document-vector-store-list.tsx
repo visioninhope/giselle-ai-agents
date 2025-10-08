@@ -55,7 +55,7 @@ export function DocumentVectorStoreList({
 
 function EmptyDocumentVectorStoreCard() {
 	return (
-		<div className="text-black-300 text-center py-16 bg-black-300/10 rounded-lg">
+		<div className="text-black-300 text-center py-16 bg-surface rounded-lg">
 			<div>No document vector stores yet.</div>
 			<div>Use the "New Vector Store" button to create one.</div>
 		</div>

@@ -152,7 +152,7 @@ export function RepositoryRegistrationDialog({
 									<DropdownMenuTrigger asChild>
 										<button
 											type="button"
-											className="w-full px-3 py-2 bg-black-300/20 rounded-[8px] text-white-400 text-[14px] font-geist placeholder:text-white/30 cursor-pointer text-left flex items-center justify-between"
+											className="w-full px-3 py-2 bg-surface rounded-[8px] text-white-400 text-[14px] font-geist placeholder:text-white/30 cursor-pointer text-left flex items-center justify-between"
 											disabled={isPending}
 										>
 											<span
@@ -207,7 +207,7 @@ export function RepositoryRegistrationDialog({
 									<DropdownMenuTrigger asChild>
 										<button
 											type="button"
-											className="w-full px-3 py-2 bg-black-300/20 rounded-[8px] text-white-400 text-[14px] font-geist cursor-pointer disabled:opacity-50 text-left flex items-center justify-between"
+											className="w-full px-3 py-2 bg-surface rounded-[8px] text-white-400 text-[14px] font-geist cursor-pointer disabled:opacity-50 text-left flex items-center justify-between"
 											disabled={isPending || !ownerId}
 										>
 											<span
@@ -313,7 +313,7 @@ export function RepositoryRegistrationDialog({
 											return (
 												<label
 													key={profileId}
-													className="flex items-start gap-3 p-3 rounded-lg bg-black-300/10 hover:bg-white/5 transition-colors cursor-pointer"
+													className="flex items-start gap-3 p-3 rounded-lg bg-surface hover:bg-white/5 transition-colors cursor-pointer"
 												>
 													<input
 														type="checkbox"
