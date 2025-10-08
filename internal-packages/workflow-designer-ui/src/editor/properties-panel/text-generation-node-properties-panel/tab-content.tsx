@@ -200,43 +200,31 @@ export function TextGenerationTabContent({
 				return;
 			}
 
-			const isUrlContextEnabled =
+			const currentUrlContext =
 				node.content.llm.configurations.urlContext ?? false;
+			const nextUrlContext = enable ? false : currentUrlContext;
+			const shouldKeepSource = enable || nextUrlContext;
 
-			if (enable || isUrlContextEnabled) {
+			let nextOutputs = node.outputs;
+			if (shouldKeepSource) {
 				const hasSourceOutput = node.outputs.some(
 					(output) => output.accessor === "source",
 				);
-				const outputs = hasSourceOutput
-					? node.outputs
-					: [
-							...node.outputs,
-							{
-								id: OutputId.generate(),
-								label: "Source",
-								accessor: "source",
-							},
-						];
-
-				updateNodeData(node, {
-					...node,
-					content: {
-						...node.content,
-						llm: {
-							...node.content.llm,
-							configurations: {
-								...node.content.llm.configurations,
-								searchGrounding: enable,
-							},
+				if (!hasSourceOutput) {
+					nextOutputs = [
+						...node.outputs,
+						{
+							id: OutputId.generate(),
+							label: "Source",
+							accessor: "source",
 						},
-					},
-					outputs,
-				});
-				return;
+					];
+				}
+			} else {
+				const { outputs: filteredOutputs, removed } =
+					detachSourceOutputConnections();
+				nextOutputs = removed ? filteredOutputs : node.outputs;
 			}
-
-			const { outputs: filteredOutputs, removed } =
-				detachSourceOutputConnections();
 
 			updateNodeData(node, {
 				...node,
@@ -247,10 +235,11 @@ export function TextGenerationTabContent({
 						configurations: {
 							...node.content.llm.configurations,
 							searchGrounding: enable,
+							urlContext: nextUrlContext,
 						},
 					},
 				},
-				outputs: removed ? filteredOutputs : node.outputs,
+				outputs: nextOutputs,
 			});
 		},
 		[detachSourceOutputConnections, node, updateNodeData],
@@ -262,43 +251,31 @@ export function TextGenerationTabContent({
 				return;
 			}
 
-			const isSearchGroundingEnabled =
+			const currentSearchGrounding =
 				node.content.llm.configurations.searchGrounding;
+			const nextSearchGrounding = enable ? false : currentSearchGrounding;
+			const shouldKeepSource = enable || nextSearchGrounding;
 
-			if (enable || isSearchGroundingEnabled) {
+			let nextOutputs = node.outputs;
+			if (shouldKeepSource) {
 				const hasSourceOutput = node.outputs.some(
 					(output) => output.accessor === "source",
 				);
-				const outputs = hasSourceOutput
-					? node.outputs
-					: [
-							...node.outputs,
-							{
-								id: OutputId.generate(),
-								label: "Source",
-								accessor: "source",
-							},
-						];
-
-				updateNodeData(node, {
-					...node,
-					content: {
-						...node.content,
-						llm: {
-							...node.content.llm,
-							configurations: {
-								...node.content.llm.configurations,
-								urlContext: enable,
-							},
+				if (!hasSourceOutput) {
+					nextOutputs = [
+						...node.outputs,
+						{
+							id: OutputId.generate(),
+							label: "Source",
+							accessor: "source",
 						},
-					},
-					outputs,
-				});
-				return;
+					];
+				}
+			} else {
+				const { outputs: filteredOutputs, removed } =
+					detachSourceOutputConnections();
+				nextOutputs = removed ? filteredOutputs : node.outputs;
 			}
-
-			const { outputs: filteredOutputs, removed } =
-				detachSourceOutputConnections();
 
 			updateNodeData(node, {
 				...node,
@@ -308,11 +285,12 @@ export function TextGenerationTabContent({
 						...node.content.llm,
 						configurations: {
 							...node.content.llm.configurations,
+							searchGrounding: nextSearchGrounding,
 							urlContext: enable,
 						},
 					},
 				},
-				outputs: removed ? filteredOutputs : node.outputs,
+				outputs: nextOutputs,
 			});
 		},
 		[detachSourceOutputConnections, node, updateNodeData],
