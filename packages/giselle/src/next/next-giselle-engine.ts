@@ -158,11 +158,8 @@ export function createHttpHandler({
 					input: await getBody(request),
 				});
 			}
-			/** Experimental implementation for handling webhooks with GiselleEngine */
-			if (
-				routerPath === "experimental_github-webhook" ||
-				routerPath === "github-webhook"
-			) {
+			/** Handle GitHub webhooks with GiselleEngine */
+			if (routerPath === "github-webhook") {
 				try {
 					await verifyRequestAsGitHubWebook({
 						secret:
