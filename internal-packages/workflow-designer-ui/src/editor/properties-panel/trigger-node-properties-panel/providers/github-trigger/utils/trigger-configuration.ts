@@ -5,7 +5,11 @@ import type {
 	TriggerNode,
 } from "@giselle-sdk/data-type";
 import { FlowTriggerId, OutputId } from "@giselle-sdk/data-type";
-import { type GitHubTriggerEventId, githubTriggers } from "@giselle-sdk/flow";
+import {
+	type GitHubTriggerEventId,
+	getGitHubDisplayLabel,
+	githubTriggers,
+} from "@giselle-sdk/flow";
 
 /**
  * Type definitions for trigger configuration options
@@ -95,7 +99,7 @@ function generateTriggerOutputs(eventId: GitHubTriggerEventId): Output[] {
 	for (const key of trigger.event.payloads.keyof().options) {
 		outputs.push({
 			id: OutputId.generate(),
-			label: key,
+			label: getGitHubDisplayLabel({ eventId, accessor: key }),
 			accessor: key,
 		});
 	}
