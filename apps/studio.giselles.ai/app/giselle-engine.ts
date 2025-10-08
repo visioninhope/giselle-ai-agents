@@ -265,6 +265,7 @@ export const giselleEngine = NextGiselleEngine({
 					...args,
 					requestId: parsedMetadata.requestId,
 					userId: parsedMetadata.userId,
+					sessionId: args.generation.context.origin.actId,
 					team: {
 						id: parsedMetadata.team.id,
 						type: parsedMetadata.team.type,
@@ -294,6 +295,7 @@ export const giselleEngine = NextGiselleEngine({
 					...args,
 					requestId: parsedMetadata.requestId,
 					userId: parsedMetadata.userId,
+					sessionId: args.generation.context.origin.actId,
 					team: {
 						id: parsedMetadata.team.id,
 						type: parsedMetadata.team.type,
@@ -316,6 +318,25 @@ export const giselleEngine = NextGiselleEngine({
 		},
 		embeddingComplete: async (args) => {
 			try {
+				if (runtimeEnv === "trigger.dev") {
+					const parsedMetadata = GenerationMetadata.parse(
+						args.generationMetadata,
+					);
+
+					await traceEmbeddingForTeam({
+						metrics: args.embeddingMetrics,
+						generation: args.generation,
+						queryContext: args.queryContext,
+						sessionId: args.generation.context.origin.actId,
+						userId: parsedMetadata.userId,
+						team: {
+							id: parsedMetadata.team.id,
+							type: parsedMetadata.team.type,
+							activeSubscriptionId: parsedMetadata.team.subscriptionId,
+						},
+					});
+					return;
+				}
 				switch (args.generation.context.origin.type) {
 					case "github-app": {
 						const team = await getWorkspaceTeam(

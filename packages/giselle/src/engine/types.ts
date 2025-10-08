@@ -79,6 +79,7 @@ export interface EmbeddingCompleteCallbackFunctionArgs {
 	embeddingMetrics: EmbeddingMetrics;
 	generation: RunningGeneration;
 	queryContext: QueryContext;
+	generationMetadata?: GenerationMetadata;
 }
 export type EmbeddingCompleteCallbackFunction = (
 	args: EmbeddingCompleteCallbackFunctionArgs,

@@ -73,11 +73,7 @@ async function executeStep(args: {
 				await generateImage({ ...args, useExperimentalStorage: true });
 				break;
 			case "textGeneration": {
-				await startContentGeneration({
-					context: args.context,
-					generation: args.generation,
-					metadata: args.metadata,
-				});
+				await startContentGeneration(args);
 				const finishedGeneration = await waitUntilGenerationFinishes({
 					context: args.context,
 					generationId: args.generation.id,
