@@ -10,7 +10,7 @@ export default function SettingsAccountLayout({
 		<div className="h-full bg-surface">
 			<div className="flex-1 max-w-[1200px] w-full flex min-h-[calc(100vh-64px)] pl-[40px]">
 				{/* Left Sidebar with border */}
-				<div className="border-r border-border-muted pr-6">
+				<div className="border-r border-border pr-6">
 					<div className="sticky top-[64px]">
 						<SidebarMenu />
 					</div>

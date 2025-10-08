@@ -4,13 +4,13 @@ import { Button } from "@giselle-internal/ui/button";
 
 export default function NotFound() {
 	return (
-		<div className="flex h-screen bg-black-900 items-center justify-center">
+		<div className="flex h-screen bg-bg items-center justify-center">
 			<div className="max-w-md mx-auto text-center p-6">
 				<div className="mb-6">
 					<h2 className="text-xl font-semibold text-white-100 mb-2">
 						Page Not Found
 					</h2>
-					<p className="text-black-600 text-sm">
+					<p className="text-text-muted text-sm">
 						The stage page you're looking for doesn't exist or may have been
 						moved.
 					</p>

@@ -123,20 +123,20 @@ export function SearchHeader({
 							className={`p-3 flex items-center justify-center transition-colors ${
 								viewMode === "grid"
 									? "bg-white/10 text-white"
-									: "bg-surface text-black-300 hover:text-white"
+									: "bg-transparent text-black-300 hover:bg-white/5 hover:text-white"
 							}`}
 							aria-label="Grid view"
 						>
 							<LayoutGrid className="h-4 w-4" />
 						</button>
-						<div className="w-px bg-white/10" />
+						<div className="w-px bg-border" />
 						<button
 							type="button"
 							onClick={() => onViewModeChange?.("list")}
 							className={`p-3 flex items-center justify-center transition-colors ${
 								viewMode === "list"
 									? "bg-white/10 text-white"
-									: "bg-surface text-black-300 hover:text-white"
+									: "bg-transparent text-black-300 hover:bg-white/5 hover:text-white"
 							}`}
 							aria-label="List view"
 						>

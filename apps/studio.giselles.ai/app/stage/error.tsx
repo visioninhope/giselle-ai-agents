@@ -16,13 +16,13 @@ export default function ErrorPage({
 	}, [error]);
 
 	return (
-		<div className="flex h-screen bg-black-900 items-center justify-center">
+		<div className="flex h-screen bg-bg items-center justify-center">
 			<div className="max-w-md mx-auto text-center p-6">
 				<div className="mb-6">
 					<h2 className="text-xl font-semibold text-white-100 mb-2">
 						Something went wrong
 					</h2>
-					<p className="text-black-600 text-sm">
+					<p className="text-text-muted text-sm">
 						An error occurred while loading the stage page. Please try again.
 					</p>
 				</div>
@@ -45,7 +45,7 @@ export default function ErrorPage({
 
 				{process.env.NODE_ENV === "development" && (
 					<details className="mt-4 text-left">
-						<summary className="text-xs text-black-600 cursor-pointer hover:text-white-700">
+						<summary className="text-xs text-text-muted cursor-pointer hover:text-white-700">
 							Error details (development only)
 						</summary>
 						<pre className="mt-2 text-xs text-red-400 bg-black-950 p-2 rounded border overflow-auto">
