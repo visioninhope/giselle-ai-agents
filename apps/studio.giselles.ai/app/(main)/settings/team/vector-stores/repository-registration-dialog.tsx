@@ -396,7 +396,7 @@ function ContentTypeToggle({
 	disabled,
 }: ContentTypeToggleProps) {
 	return (
-		<div className="bg-black-700/50 rounded-lg p-4">
+		<div className="bg-white/5 rounded-lg p-4">
 			<div className="flex items-center justify-between mb-2">
 				<div className="flex items-center gap-2">
 					<Icon size={18} className="text-gray-400" />

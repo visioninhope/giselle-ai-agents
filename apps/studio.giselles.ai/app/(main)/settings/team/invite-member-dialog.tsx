@@ -337,7 +337,7 @@ export function InviteMemberDialog({
 						className="space-y-4"
 						noValidate
 					>
-						<div className="flex items-start gap-3 rounded-lg bg-surface p-1">
+						<div className="flex items-start gap-3 rounded-lg bg-bg p-1">
 							<div className="flex min-h-[40px] flex-grow flex-wrap items-center gap-1">
 								{emailTags.map((email) => (
 									<div
@@ -379,7 +379,7 @@ export function InviteMemberDialog({
 								<DropdownMenuTrigger asChild>
 									<button
 										type="button"
-										className="flex h-10 items-center gap-1 rounded-md px-3 font-sans text-[14px] font-medium leading-[16px] text-white-400 hover:bg-white/5 hover:text-white-100"
+										className="flex h-10 items-center gap-1 rounded-md px-3 font-sans text-[14px] font-medium leading-[16px] text-white-400 bg-surface hover:bg-white/5 hover:text-white-100"
 										disabled={isLoading}
 									>
 										<span className="capitalize">{role}</span>

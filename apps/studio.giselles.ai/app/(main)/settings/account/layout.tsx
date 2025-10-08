@@ -7,7 +7,7 @@ export default function SettingsAccountLayout({
 	children: ReactNode;
 }) {
 	return (
-		<div className="h-full bg-surface">
+		<div className="h-full bg-bg">
 			<div className="flex-1 max-w-[1200px] w-full flex min-h-[calc(100vh-64px)] pl-[40px]">
 				{/* Left Sidebar with border */}
 				<div className="border-r border-border pr-6">

@@ -203,7 +203,7 @@ export function DocumentVectorStoreItem({
 								<Settings className="h-4 w-4 mr-2" />
 								Configure Sources
 							</DropdownMenuItem>
-							<DropdownMenuSeparator className="my-1 h-px bg-white/10" />
+							<DropdownMenuSeparator className="my-1 h-px bg-border-muted" />
 							<DropdownMenuItem
 								onSelect={(event) => {
 									event.preventDefault();

@@ -35,7 +35,7 @@ export default async function DocumentVectorStorePage() {
 						href="https://docs.giselles.ai/guides/settings/team/vector-store"
 						target="_blank"
 						rel="noopener noreferrer"
-						className="text-black-300 text-[14px] font-medium rounded-[4px] px-1.5 py-0.5 hover:bg-white/5 flex items-center gap-1.5 font-sans"
+						className="text-black-300 text-[14px] font-medium rounded-[4px] px-1.5 py-0.5 hover:bg-surface-hover flex items-center gap-1.5 font-sans"
 					>
 						About Vector Stores
 						<ExternalLink size={14} />

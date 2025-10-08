@@ -129,7 +129,6 @@ export function SearchHeader({
 						>
 							<LayoutGrid className="h-4 w-4" />
 						</button>
-						<div className="w-px bg-border" />
 						<button
 							type="button"
 							onClick={() => onViewModeChange?.("list")}
