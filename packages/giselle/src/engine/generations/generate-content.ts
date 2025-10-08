@@ -19,6 +19,7 @@ import {
 	type AsyncIterableStream,
 	type ModelMessage,
 	smoothStream,
+	stepCountIs,
 	streamText,
 	type UIMessage,
 } from "ai";
@@ -241,6 +242,7 @@ export function generateContent({
 				providerOptions,
 				messages,
 				tools: preparedToolSet.toolSet,
+				stopWhen: stepCountIs(Object.keys(preparedToolSet.toolSet).length + 1),
 				onChunk: async () => {
 					const currentGeneration = await getGeneration({
 						storage: context.storage,
