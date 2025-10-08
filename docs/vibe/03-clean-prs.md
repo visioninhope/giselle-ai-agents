@@ -68,6 +68,16 @@ If you need a new package:
 - Add it with `pnpm add package-name`
 - Don't manually edit package.json
 
+---
+
+## Submission Guidance (Design Tokens Migration)
+
+When submitting PRs related to the design token migration:
+
+- Prefer base branch: `colors-foundation-v3` when applicable to minimize diffs.
+- Keep PR size small: target ~200 lines (max 400).
+- If adding aliases, keep them minimal in `internal-packages/ui/styles/aliases.css` and submit as a separate small PR.
+
 ## Getting Help
 
 If you're unsure about any changes, ask for help from the engineering team before creating your PR. 

@@ -115,7 +115,7 @@ function IngestStatusBadge({
 							className="z-50 max-w-xs rounded-md border border-border-muted bg-surface px-3 py-2 text-xs text-white-400 shadow-lg"
 						>
 							<p className="font-medium">Error: {errorCode}</p>
-							<Tooltip.Arrow className="fill-black-900" />
+							<Tooltip.Arrow style={{ fill: "var(--color-surface)" }} />
 						</Tooltip.Content>
 					</Tooltip.Portal>
 				</Tooltip.Root>
@@ -168,7 +168,7 @@ export function DocumentVectorStoreItem({
 	const disableMenu = isPending || isUpdating;
 
 	return (
-		<div className="group relative rounded-[12px] overflow-hidden w-full bg-white/[0.02] backdrop-blur-[8px] border-[0.5px] border-white/8 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),inset_0_-1px_1px_rgba(255,255,255,0.2)] before:content-[''] before:absolute before:inset-0 before:bg-white before:opacity-[0.02] before:rounded-[inherit] before:pointer-events-none hover:border-white/12 transition-colors duration-200">
+		<div className="group relative rounded-[12px] overflow-hidden w-full bg-white/[0.02] backdrop-blur-[8px] border-[0.5px] border-border shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),inset_0_-1px_1px_rgba(255,255,255,0.2)] before:content-[''] before:absolute before:inset-0 before:bg-white before:opacity-[0.02] before:rounded-[inherit] before:pointer-events-none hover:border-border transition-colors duration-200">
 			<div className="px-[24px] py-[16px]">
 				<div className="flex items-start justify-between gap-4 mb-4">
 					<div>
