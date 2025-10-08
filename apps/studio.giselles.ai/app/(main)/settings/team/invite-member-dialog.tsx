@@ -379,7 +379,7 @@ export function InviteMemberDialog({
 								<DropdownMenuTrigger asChild>
 									<button
 										type="button"
-										className="flex h-10 items-center gap-1 rounded-md px-3 font-sans text-[14px] font-medium leading-[16px] text-white-400 hover:bg-white/5 hover:text-white-100"
+										className="flex h-10 items-center gap-1 rounded-md px-3 font-sans text-[14px] font-medium leading-[16px] text-white-400 bg-surface hover:bg-white/5 hover:text-white-100"
 										disabled={isLoading}
 									>
 										<span className="capitalize">{role}</span>
