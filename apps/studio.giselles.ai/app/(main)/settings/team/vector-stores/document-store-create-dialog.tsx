@@ -119,7 +119,7 @@ export function DocumentVectorStoreCreateDialog({
 						<label className="flex flex-col gap-2">
 							<span className="text-sm text-black-300 font-geist">Name</span>
 							<input
-								className="w-full rounded-md bg-white/5 border border-white/10 px-3 py-2 text-white-400 focus:outline-none focus:ring-1 focus:ring-white/20"
+								className="w-full rounded-md bg-surface border border-border-muted px-3 py-2 text-white-400 focus:outline-none focus:ring-1 focus:ring-white/20"
 								placeholder="e.g. Product Docs"
 								value={name}
 								onChange={(e) => setName(e.target.value)}
@@ -142,7 +142,7 @@ export function DocumentVectorStoreCreateDialog({
 									return (
 										<label
 											key={profileId}
-											className="flex items-start gap-3 p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
+											className="flex items-start gap-3 p-3 rounded-lg bg-surface hover:bg-white/5 transition-colors"
 										>
 											<input
 												type="checkbox"
