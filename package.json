@@ -34,7 +34,9 @@
 		"@types/node": "catalog:",
 		"knip": "^5.61.3",
 		"turbo": "2.4.2",
-		"typescript": "catalog:"
+		"typescript": "catalog:",
+		"stylelint": "^16.8.1",
+		"stylelint-config-standard": "^36.0.1"
 	},
 	"packageManager": "pnpm@10.16.0",
 	"engines": {
