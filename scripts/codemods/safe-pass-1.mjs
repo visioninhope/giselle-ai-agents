@@ -16,15 +16,16 @@ const FILE_GLOBS = [".tsx", ".ts", ".css", ".svg"];
 const REPLACERS = [
 	{
 		name: "text-black-600/20 => text-text/20",
-		regex:
-			/(?<=^|\s|["'`])((?:[a-zA-Z0-9:-]*:)*)(text-black-600\/20)(?=$|\s|["'`])/g,
-		replace: (_, variants) => `${variants}text-text/20`,
+		// Safe regex: capture optional variant prefixes (e.g., "hover:md:") without nested quantifiers
+		// Boundary group (space or quote) preserved to avoid consuming surrounding content
+		regex: /([\s"'`])((?:[A-Za-z0-9-]+:)*)text-black-600\/20(?=([\s"'`]|$))/g,
+		replace: (_, boundary, variants) => `${boundary}${variants}text-text/20`,
 	},
 	{
 		name: "color-border-focused => ring-focused (no context)",
-		regex:
-			/(?<=^|\s|["'`])((?:[a-zA-Z0-9:-]*:)*)(color-border-focused)(?=$|\s|["'`])/g,
-		replace: (_, variants) => `${variants}ring-focused`,
+		// Safe regex mirroring the structure above
+		regex: /([\s"'`])((?:[A-Za-z0-9-]+:)*)color-border-focused(?=([\s"'`]|$))/g,
+		replace: (_, boundary, variants) => `${boundary}${variants}ring-focused`,
 	},
 ];
 
@@ -46,9 +47,9 @@ function processFile(file) {
 	let out = src;
 	let localChanges = 0;
 	for (const r of REPLACERS) {
-		out = out.replace(r.regex, (m, variants) => {
+		out = out.replace(r.regex, (m, ...args) => {
 			localChanges += 1;
-			return r.replace(m, variants || "");
+			return r.replace(m, args[0], args[1]);
 		});
 	}
 	if (localChanges > 0) {
