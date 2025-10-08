@@ -5,7 +5,11 @@ import {
 	OutputId,
 	type TriggerNode,
 } from "@giselle-sdk/data-type";
-import { type GitHubTriggerEventId, githubTriggers } from "@giselle-sdk/flow";
+import {
+	type GitHubTriggerEventId,
+	getGitHubDisplayLabel,
+	githubTriggers,
+} from "@giselle-sdk/flow";
 import type { GitHubIntegrationInstallation } from "@giselle-sdk/giselle";
 import {
 	useFeatureFlag,
@@ -378,7 +382,10 @@ export function Installed({
 													.options) {
 													outputs.push({
 														id: OutputId.generate(),
-														label: key,
+														label: getGitHubDisplayLabel({
+															eventId: step.eventId,
+															accessor: key,
+														}),
 														accessor: key,
 													});
 												}

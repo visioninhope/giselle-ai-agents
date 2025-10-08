@@ -2,6 +2,7 @@ import { provider as githubProvider } from "./github";
 import { provider as manualProvider } from "./manual";
 
 export {
+	getGitHubDisplayLabel,
 	type TriggerEventId as GitHubTriggerEventId,
 	triggerIdToLabel as githubTriggerIdToLabel,
 	triggers as githubTriggers,

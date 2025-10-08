@@ -166,6 +166,54 @@ const githubPullRequestLabeledTrigger = {
 	},
 } as const satisfies GitHubTrigger;
 
+const githubPayloadLabelOverrides: Partial<
+	Record<TriggerEventId, Partial<Record<string, string>>>
+> = {
+	"github.issue_comment.created": {
+		body: "Issue Comment",
+	},
+	"github.pull_request_comment.created": {
+		body: "Pull Request Comment",
+		issueNumber: "Pull Request Number",
+		issueTitle: "Pull Request Title",
+		issueBody: "Pull Request Body",
+	},
+};
+
+const uppercaseWords = new Set(["id", "url"]);
+
+function toReadableLabel(value: string) {
+	const withSpaces = value.replace(/([a-z0-9])([A-Z])/g, "$1 $2");
+	const words = withSpaces.split(/\s+/).filter(Boolean);
+
+	if (words.length === 0) {
+		return value;
+	}
+
+	return words
+		.map((word) => {
+			const lower = word.toLowerCase();
+			if (uppercaseWords.has(lower)) {
+				return lower.toUpperCase();
+			}
+			return lower.charAt(0).toUpperCase() + lower.slice(1);
+		})
+		.join(" ");
+}
+
+export function getGitHubDisplayLabel(args: {
+	eventId: TriggerEventId;
+	accessor: string;
+}) {
+	const eventOverride =
+		githubPayloadLabelOverrides[args.eventId]?.[args.accessor];
+	if (eventOverride !== undefined) {
+		return eventOverride;
+	}
+
+	return toReadableLabel(args.accessor);
+}
+
 export const triggers = {
 	[githubIssueCreatedTrigger.event.id]: githubIssueCreatedTrigger,
 	[githubIssueClosedTrigger.event.id]: githubIssueClosedTrigger,
