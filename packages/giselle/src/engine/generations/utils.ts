@@ -30,6 +30,7 @@ import type { GenerationId } from "../../concepts/identifiers";
 import { parseAndMod } from "../../data-mod";
 import type { GiselleStorage } from "../experimental_storage";
 import type { GiselleEngineContext } from "../types";
+
 interface GeneratedImageData {
 	uint8Array: Uint8Array;
 	base64: string;
