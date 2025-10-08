@@ -21,7 +21,7 @@
 		"report:colors": "node scripts/report-colors.mjs",
 		"report:colors:out": "node scripts/report-colors.mjs --out .reports/report-colors.json",
 		"guard:colors": "node scripts/guard-colors.mjs",
-		"lint:css": "pnpm dlx stylelint \"**/*.{css,scss}\" --formatter string || true",
+		"lint:css": "pnpm dlx -p stylelint -p stylelint-config-standard stylelint \"**/*.{css,scss}\" --formatter string || true",
 		"metrics:count": "node scripts/metrics-count.mjs",
 		"codemod:text-black-600-20": "node scripts/codemods/replace-text-black-600-20.mjs",
 		"codemod:text-black-600-20:apply": "node scripts/codemods/replace-text-black-600-20.mjs --apply",
@@ -34,9 +34,7 @@
 		"@types/node": "catalog:",
 		"knip": "^5.61.3",
 		"turbo": "2.4.2",
-		"typescript": "catalog:",
-		"stylelint": "^16.8.1",
-		"stylelint-config-standard": "^36.0.1"
+		"typescript": "catalog:"
 	},
 	"packageManager": "pnpm@10.16.0",
 	"engines": {
