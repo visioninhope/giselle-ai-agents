@@ -65,8 +65,10 @@ export function GoogleModelPanel({
 						label="Search Grounding"
 						name="searchGrounding"
 						checked={isSearchGroundingEnabled}
-						disabled={isUrlContextEnabled}
 						onCheckedChange={(checked) => {
+							if (checked && isUrlContextEnabled) {
+								return;
+							}
 							onSearchGroundingConfigurationChange(checked);
 						}}
 					/>
@@ -74,8 +76,10 @@ export function GoogleModelPanel({
 						label="URL Context"
 						name="urlContext"
 						checked={isUrlContextEnabled}
-						disabled={isSearchGroundingEnabled}
 						onCheckedChange={(checked) => {
+							if (checked && isSearchGroundingEnabled) {
+								return;
+							}
 							onUrlContextConfigurationChange(checked);
 						}}
 					/>
