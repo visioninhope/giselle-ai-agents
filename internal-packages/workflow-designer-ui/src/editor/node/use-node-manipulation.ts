@@ -48,7 +48,7 @@ export function useNodeManipulation() {
 				copyNode(validatedNode, {
 					ui: { position, selected: true },
 				});
-				setUiNodeState(copiedNode.id, { selected: false });
+				setUiNodeState(validatedNode.id, { selected: false });
 			} catch (error) {
 				console.error("Failed to paste node - validation error:", error);
 				onError?.();
