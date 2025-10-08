@@ -2,8 +2,6 @@ import { WorkspaceId } from "@giselle-sdk/data-type";
 import type {
 	CompletedGeneration,
 	FailedGeneration,
-	GenerationCompleteCallbackFunctionArgs,
-	GenerationFailedCallbackFunctionArgs,
 	OutputFileBlob,
 	QueryContext,
 	RunningGeneration,
@@ -23,8 +21,8 @@ import { tasks as jobs } from "@trigger.dev/sdk";
 import type { ModelMessage, ProviderMetadata } from "ai";
 import { after } from "next/server";
 import { createStorage } from "unstorage";
-import z from "zod/v4";
 import { waitForLangfuseFlush } from "@/instrumentation.node";
+import { GenerationMetadata } from "@/lib/generation-metadata";
 import { logger } from "@/lib/logger";
 import { getWorkspaceTeam } from "@/lib/workspaces/get-workspace-team";
 import { fetchUsageLimits } from "@/packages/lib/fetch-usage-limits";
@@ -203,63 +201,6 @@ async function traceEmbeddingForTeam(args: {
 	}
 }
 
-type GenerationTraceArgs = {
-	generation: CompletedGeneration | FailedGeneration;
-	inputMessages: ModelMessage[];
-	outputFileBlobs?: OutputFileBlob[];
-	providerMetadata?: ProviderMetadata;
-	requestId?: string;
-};
-
-function handleGenerationTrace(args: GenerationTraceArgs) {
-	after(async () => {
-		try {
-			switch (args.generation.context.origin.type) {
-				case "github-app": {
-					const team = await getWorkspaceTeam(
-						args.generation.context.origin.workspaceId,
-					);
-					await traceGenerationForTeam({
-						generation: args.generation,
-						inputMessages: args.inputMessages,
-						outputFileBlobs: args.outputFileBlobs,
-						sessionId: args.generation.context.origin.actId,
-						userId: "github-app",
-						team,
-						providerMetadata: args.providerMetadata,
-						requestId: args.requestId,
-					});
-					break;
-				}
-				case "stage":
-				case "studio": {
-					const [currentUser, currentTeam] = await Promise.all([
-						fetchCurrentUser(),
-						fetchCurrentTeam(),
-					]);
-					await traceGenerationForTeam({
-						generation: args.generation,
-						inputMessages: args.inputMessages,
-						outputFileBlobs: args.outputFileBlobs,
-						sessionId: args.generation.context.origin.actId,
-						userId: currentUser.id,
-						team: currentTeam,
-						providerMetadata: args.providerMetadata,
-						requestId: args.requestId,
-					});
-					break;
-				}
-				default: {
-					const _exhaustiveCheck: never = args.generation.context.origin;
-					throw new Error(`Unhandled origin type: ${_exhaustiveCheck}`);
-				}
-			}
-		} catch (error) {
-			console.error("Trace generation failed:", error);
-		}
-	});
-}
-
 function getRuntimeEnv(): "trigger.dev" | "vercel" | "local" | "unknown" {
 	if (process.env.TRIGGERDOTDEV === "1") return "trigger.dev";
 	if (process.env.VERCEL === "1") return "vercel";
@@ -275,23 +216,6 @@ const generateContentProcessor =
 	(runtimeEnv === "vercel" && process.env.NODE_ENV !== "development")
 		? "trigger.dev"
 		: "self";
-
-const generationTracingCallbacks = {
-	generationComplete: (args: GenerationCompleteCallbackFunctionArgs) => {
-		if (generateContentProcessor === "trigger.dev") {
-			return;
-		}
-		const requestId = getRequestId();
-		handleGenerationTrace({ ...args, requestId });
-	},
-	generationFailed: (args: GenerationFailedCallbackFunctionArgs) => {
-		if (generateContentProcessor === "trigger.dev") {
-			return;
-		}
-		const requestId = getRequestId();
-		handleGenerationTrace({ ...args, requestId });
-	},
-};
 
 export const giselleEngine = NextGiselleEngine({
 	basePath: "/api/giselle",
@@ -332,50 +256,105 @@ export const giselleEngine = NextGiselleEngine({
 		document: getDocumentVectorStoreQueryService(),
 	},
 	callbacks: {
-		...generationTracingCallbacks,
-		embeddingComplete: (args) => {
-			after(async () => {
-				try {
-					switch (args.generation.context.origin.type) {
-						case "github-app": {
-							const team = await getWorkspaceTeam(
-								args.generation.context.origin.workspaceId,
-							);
-							await traceEmbeddingForTeam({
-								metrics: args.embeddingMetrics,
-								generation: args.generation,
-								queryContext: args.queryContext,
-								sessionId: args.generation.context.origin.actId,
-								userId: "github-app",
-								team,
-							});
-							break;
-						}
-						case "stage":
-						case "studio": {
-							const [currentUser, currentTeam] = await Promise.all([
-								fetchCurrentUser(),
-								fetchCurrentTeam(),
-							]);
-							await traceEmbeddingForTeam({
-								metrics: args.embeddingMetrics,
-								generation: args.generation,
-								queryContext: args.queryContext,
-								sessionId: args.generation.context.origin.actId,
-								userId: currentUser.id,
-								team: currentTeam,
-							});
-							break;
-						}
-						default: {
-							const _exhaustiveCheck: never = args.generation.context.origin;
-							throw new Error(`Unhandled origin type: ${_exhaustiveCheck}`);
-						}
-					}
-				} catch (error) {
-					console.error("Embedding callback failed:", error);
-				}
+		generationComplete: async (args) => {
+			if (runtimeEnv === "trigger.dev") {
+				const parsedMetadata = GenerationMetadata.parse(
+					args.generationMetadata,
+				);
+				await traceGenerationForTeam({
+					...args,
+					requestId: parsedMetadata.requestId,
+					userId: parsedMetadata.userId,
+					team: {
+						id: parsedMetadata.team.id,
+						type: parsedMetadata.team.type,
+						activeSubscriptionId: parsedMetadata.team.subscriptionId,
+					},
+				});
+				return;
+			}
+			const requestId = getRequestId();
+			const [currentUser, currentTeam] = await Promise.all([
+				fetchCurrentUser(),
+				fetchCurrentTeam(),
+			]);
+			await traceGenerationForTeam({
+				...args,
+				requestId,
+				userId: currentUser.id,
+				team: currentTeam,
 			});
+		},
+		generationFailed: async (args) => {
+			if (runtimeEnv === "trigger.dev") {
+				const parsedMetadata = GenerationMetadata.parse(
+					args.generationMetadata,
+				);
+				await traceGenerationForTeam({
+					...args,
+					requestId: parsedMetadata.requestId,
+					userId: parsedMetadata.userId,
+					team: {
+						id: parsedMetadata.team.id,
+						type: parsedMetadata.team.type,
+						activeSubscriptionId: parsedMetadata.team.subscriptionId,
+					},
+				});
+				return;
+			}
+			const requestId = getRequestId();
+			const [currentUser, currentTeam] = await Promise.all([
+				fetchCurrentUser(),
+				fetchCurrentTeam(),
+			]);
+			await traceGenerationForTeam({
+				...args,
+				requestId,
+				userId: currentUser.id,
+				team: currentTeam,
+			});
+		},
+		embeddingComplete: async (args) => {
+			try {
+				switch (args.generation.context.origin.type) {
+					case "github-app": {
+						const team = await getWorkspaceTeam(
+							args.generation.context.origin.workspaceId,
+						);
+						await traceEmbeddingForTeam({
+							metrics: args.embeddingMetrics,
+							generation: args.generation,
+							queryContext: args.queryContext,
+							sessionId: args.generation.context.origin.actId,
+							userId: "github-app",
+							team,
+						});
+						break;
+					}
+					case "stage":
+					case "studio": {
+						const [currentUser, currentTeam] = await Promise.all([
+							fetchCurrentUser(),
+							fetchCurrentTeam(),
+						]);
+						await traceEmbeddingForTeam({
+							metrics: args.embeddingMetrics,
+							generation: args.generation,
+							queryContext: args.queryContext,
+							sessionId: args.generation.context.origin.actId,
+							userId: currentUser.id,
+							team: currentTeam,
+						});
+						break;
+					}
+					default: {
+						const _exhaustiveCheck: never = args.generation.context.origin;
+						throw new Error(`Unhandled origin type: ${_exhaustiveCheck}`);
+					}
+				}
+			} catch (error) {
+				console.error("Embedding callback failed:", error);
+			}
 		},
 	},
 	vectorStore: openaiVectorStore(process.env.OPENAI_API_KEY ?? ""),
@@ -462,26 +441,11 @@ if (generateContentProcessor === "trigger.dev") {
 						break;
 					}
 					case "trigger.dev": {
-						const metadataSchema = z.object({
-							requestId: z.string().optional(),
-							userId: z.string(),
-							team: z.object({
-								id: z.string<`tm_${string}`>(),
-								type: z.enum(["customer", "internal"]),
-								subscriptionId: z.string().nullable(),
-							}),
-						});
-						const parsedMetadata = metadataSchema.safeParse(metadata);
-						if (parsedMetadata.error) {
-							throw new Error(
-								`Invalid metadata: ${parsedMetadata.error.message}`,
-							);
-						}
+						const parsedMetadata = GenerationMetadata.parse(metadata);
 						await jobs.trigger<typeof generateContentJob>("generate-content", {
 							generationId: generation.id,
 							requestId,
-							userId: parsedMetadata.data.userId,
-							team: parsedMetadata.data.team,
+							...parsedMetadata,
 						});
 						break;
 					}

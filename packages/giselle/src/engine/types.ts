@@ -60,6 +60,7 @@ export interface GenerationCompleteCallbackFunctionArgs {
 	inputMessages: ModelMessage[];
 	outputFileBlobs: OutputFileBlob[];
 	providerMetadata?: ProviderMetadata;
+	generationMetadata?: GenerationMetadata;
 }
 type GenerationCompleteCallbackFunction = (
 	args: GenerationCompleteCallbackFunctionArgs,
@@ -68,6 +69,7 @@ type GenerationCompleteCallbackFunction = (
 export interface GenerationFailedCallbackFunctionArgs {
 	generation: FailedGeneration;
 	inputMessages: ModelMessage[];
+	generationMetadata?: GenerationMetadata;
 }
 export type GenerationFailedCallbackFunction = (
 	args: GenerationFailedCallbackFunctionArgs,

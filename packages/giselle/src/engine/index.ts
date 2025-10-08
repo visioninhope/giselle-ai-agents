@@ -390,6 +390,7 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 		generateContent(args: {
 			generation: RunningGeneration;
 			logger?: GiselleLogger;
+			metadata?: GenerationMetadata;
 		}) {
 			return generateContent({ ...args, context });
 		},

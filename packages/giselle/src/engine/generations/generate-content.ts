@@ -38,7 +38,7 @@ import { decryptSecret } from "../secrets";
 import type { GiselleEngineContext } from "../types";
 import { useGenerationExecutor } from "./internal/use-generation-executor";
 import { createPostgresTools } from "./tools/postgres";
-import type { PreparedToolSet } from "./types";
+import type { GenerationMetadata, PreparedToolSet } from "./types";
 import { buildMessageObject, getGeneration } from "./utils";
 
 type StreamItem<T> = T extends AsyncIterableStream<infer Inner> ? Inner : never;
@@ -63,19 +63,23 @@ export function generateContent({
 	context,
 	generation,
 	logger: overrideLogger,
+	metadata,
 }: {
 	context: GiselleEngineContext;
 	generation: RunningGeneration;
 	logger?: GiselleLogger;
+	metadata?: GenerationMetadata;
 }) {
 	const logger = overrideLogger ?? context.logger;
 
 	logger.info(`generate content: ${generation.id}`);
+	logger.info(`generation metadata: ${JSON.stringify(metadata)}`);
 	return useGenerationExecutor({
 		context,
 		generation,
 		useExperimentalStorage: true,
 		useResumableGeneration: true,
+		metadata,
 		execute: async ({
 			finishGeneration,
 			runningGeneration,

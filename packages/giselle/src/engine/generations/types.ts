@@ -5,5 +5,5 @@ export type PreparedToolSet = {
 	cleanupFunctions: Array<() => void | Promise<void>>;
 };
 export interface GenerationMetadata {
-	[key: string]: string | number | GenerationMetadata | null;
+	[key: string]: string | number | GenerationMetadata | null | undefined;
 }
