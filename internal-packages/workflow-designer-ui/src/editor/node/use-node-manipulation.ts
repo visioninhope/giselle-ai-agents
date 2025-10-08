@@ -79,13 +79,16 @@ export function useNodeManipulation() {
 					x: nodeState.position.x + OFFSET_X,
 					y: nodeState.position.y + OFFSET_Y,
 				};
-				copyNode(targetNode, { ui: { position } });
+				copyNode(targetNode, {
+					ui: { position, selected: nodeState.selected },
+				});
+				setUiNodeState(targetNode.id, { selected: false });
 			} catch (error) {
 				console.error("Failed to duplicate node:", error);
 				onError?.();
 			}
 		},
-		[data, copyNode],
+		[data, copyNode, setUiNodeState],
 	);
 
 	return {
