@@ -47,9 +47,9 @@ function processFile(file) {
 	let out = src;
 	let localChanges = 0;
 	for (const r of REPLACERS) {
-		out = out.replace(r.regex, (m, ...args) => {
+		out = out.replace(r.regex, (match, boundary, variants) => {
 			localChanges += 1;
-			return r.replace(m, args[0], args[1]);
+			return r.replace(match, boundary, variants);
 		});
 	}
 	if (localChanges > 0) {
