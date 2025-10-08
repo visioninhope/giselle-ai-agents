@@ -1,10 +1,10 @@
 ### Compat tokens inventory (snapshot)
 
-対象: `--color-white-900`, `--color-black-600`, `--color-black-850`, `--color-white-850`（tokens.css除外）
+Targets: `--color-white-900`, `--color-black-600`, `--color-black-850`, `--color-white-850` (excluding `tokens.css`)
 
-実行: `pnpm report:compat-tokens`
+Run: `pnpm report:compat-tokens`
 
-出力例（抜粋）
+Sample output
 
 ```
 Token: --color-white-900
@@ -30,8 +30,8 @@ Token: --color-white-850
 Compat tokens references (excluding tokens.css): 18
 ```
 
-メモ
-- `globals.css` 由来が中心。semantic移行後に段階削除候補。
-- 次ステップ: スコープ/semanticへ寄せ、互換トークン参照を0にする計画に反映。
+Notes
+- Mostly from `globals.css`; candidates for staged removal after semantic migration.
+- Next steps: move to scopes/semantic and plan to reduce compat token references to zero.
 
 

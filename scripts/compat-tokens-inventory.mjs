@@ -12,7 +12,6 @@ function run(pattern) {
 	const args = [
 		"-n",
 		"--hidden",
-		"-i",
 		"--glob",
 		"!**/node_modules/**",
 		"--glob",
