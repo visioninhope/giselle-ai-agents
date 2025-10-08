@@ -29,7 +29,13 @@ function parseArgs(argv) {
 	const args = { baseline: undefined, strict: false };
 	for (let i = 0; i < argv.length; i++) {
 		const a = argv[i];
-		if (a === "--baseline") args.baseline = argv[++i];
+		if (a === "--baseline") {
+			if (i + 1 >= argv.length) {
+				console.error("[guard-colors] --baseline requires a path argument");
+				process.exit(1);
+			}
+			args.baseline = argv[++i];
+		}
 		if (a === "--strict") args.strict = true;
 	}
 	return args;

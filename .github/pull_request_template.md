@@ -1,8 +1,6 @@
 ## Summary
 <!-- Briefly describe the changes and the purpose of the PR. -->
 
-> Note: Prefer semantic design tokens/utilities (e.g., text-text, bg-surface, border-border). Avoid raw colors and ad-hoc Tailwind color scales.
-
 ## Related Issue
 <!-- Mention the related issue number if applicable. -->
 
