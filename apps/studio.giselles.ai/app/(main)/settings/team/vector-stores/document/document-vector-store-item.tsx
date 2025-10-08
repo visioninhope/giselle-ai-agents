@@ -168,7 +168,7 @@ export function DocumentVectorStoreItem({
 	const disableMenu = isPending || isUpdating;
 
 	return (
-		<div className="group relative rounded-[12px] overflow-hidden w-full bg-white/[0.02] backdrop-blur-[8px] border-[0.5px] border-border shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),inset_0_-1px_1px_rgba(255,255,255,0.2)] before:content-[''] before:absolute before:inset-0 before:bg-white before:opacity-[0.02] before:rounded-[inherit] before:pointer-events-none hover:border-border transition-colors duration-200">
+		<div className="group relative rounded-[12px] overflow-hidden w-full bg-bg/[0.02] backdrop-blur-[8px] border-[0.5px] border-border shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),inset_0_-1px_1px_rgba(255,255,255,0.2)] before:content-[''] before:absolute before:inset-0 before:bg-bg before:opacity-[0.02] before:rounded-[inherit] before:pointer-events-none hover:border-border transition-colors duration-200">
 			<div className="px-[24px] py-[16px]">
 				<div className="flex items-start justify-between gap-4 mb-4">
 					<div>
@@ -184,7 +184,7 @@ export function DocumentVectorStoreItem({
 							<button
 								type="button"
 								aria-label="Document vector store actions"
-								className="transition-opacity duration-200 p-2 text-white/60 hover:text-white/80 hover:bg-white/5 rounded-md disabled:opacity-50"
+								className="transition-opacity duration-200 p-2 text-white/60 hover:text-white/80 hover:bg-bg/5 rounded-md disabled:opacity-50"
 								disabled={disableMenu}
 							>
 								<MoreVertical className="h-4 w-4" />
@@ -198,7 +198,7 @@ export function DocumentVectorStoreItem({
 								onSelect={() => {
 									setIsConfigureDialogOpen(true);
 								}}
-								className="flex items-center px-3 py-2 text-[14px] leading-[16px] text-white-400 hover:bg-white/5 rounded-md"
+								className="flex items-center px-3 py-2 text-[14px] leading-[16px] text-white-400 hover:bg-bg/5 rounded-md"
 							>
 								<Settings className="h-4 w-4 mr-2" />
 								Configure Sources
@@ -703,7 +703,7 @@ function DocumentVectorStoreConfigureDialog({
 									return (
 										<label
 											key={profileIdString}
-											className="flex items-start gap-3 p-3 rounded-lg bg-surface hover:bg-white/5 transition-colors"
+											className="flex items-start gap-3 p-3 rounded-lg bg-surface hover:bg-bg/5 transition-colors"
 										>
 											<input
 												type="checkbox"
@@ -744,7 +744,7 @@ function DocumentVectorStoreConfigureDialog({
 								onDragLeave={handleDragLeave}
 								onDrop={handleDrop}
 								disabled={isUploadingDocuments}
-								className={`flex flex-col items-center gap-3 rounded-xl border border-dashed border-border-muted bg-surface px-6 py-8 text-center transition-colors focus:outline-none focus:ring-2 focus:ring-white/30 ${isDragActive ? "border-white/30 bg-white/5" : ""} ${isUploadingDocuments ? "opacity-60" : ""}`}
+								className={`flex flex-col items-center gap-3 rounded-xl border border-dashed border-border-muted bg-surface px-6 py-8 text-center transition-colors focus:outline-none focus:ring-2 focus:ring-white/30 ${isDragActive ? "border-white/30 bg-bg/5" : ""} ${isUploadingDocuments ? "opacity-60" : ""}`}
 							>
 								<ArrowUpFromLine className="h-8 w-8 text-black-300" />
 								<p className="text-white-400 text-sm">

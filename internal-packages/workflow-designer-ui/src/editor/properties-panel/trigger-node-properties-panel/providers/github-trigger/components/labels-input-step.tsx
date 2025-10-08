@@ -74,7 +74,7 @@ export function LabelsInputStep({
 									"flex-1 rounded-[8px] py-[8px] px-[12px] outline-none focus:outline-none",
 									labelsError
 										? "border border-red-500 focus:border-red-400"
-										: "border border-white-400 focus:border-white-900",
+										: "border border-white-400 focus:border-border",
 									"text-[14px] bg-transparent",
 								)}
 								placeholder="bug"
@@ -85,7 +85,7 @@ export function LabelsInputStep({
 									onClick={() =>
 										setLabels((prev) => prev.filter((l) => l.id !== label.id))
 									}
-									className="p-1 text-white-400 hover:text-white-900 transition-colors"
+									className="p-1 text-white-400 hover:text-inverse transition-colors"
 									aria-label="Remove label"
 								>
 									<XIcon className="size-[16px]" />
@@ -107,7 +107,7 @@ export function LabelsInputStep({
 							setLabels((prev) => [...prev, { id: nextId, value: "" }]);
 							setNextId((prev) => prev + 1);
 						}}
-						className="flex items-center gap-[4px] p-2 text-white-400 hover:text-white-900 transition-colors text-[14px]"
+						className="flex items-center gap-[4px] p-2 text-white-400 hover:text-inverse transition-colors text-[14px]"
 					>
 						<PlusIcon className="size-[16px]" />
 						Add label
@@ -118,7 +118,7 @@ export function LabelsInputStep({
 			<div className="pt-[8px] flex gap-[8px] mt-[12px] px-[4px]">
 				<button
 					type="button"
-					className="flex-1 bg-black-700 hover:bg-black-600 text-white font-medium px-4 py-2 rounded-md text-[14px] transition-colors disabled:opacity-50 relative"
+					className="flex-1 bg-bg-700 hover:bg-bg-600 text-white font-medium px-4 py-2 rounded-md text-[14px] transition-colors disabled:opacity-50 relative"
 					onClick={onBack}
 					disabled={isPending}
 				>

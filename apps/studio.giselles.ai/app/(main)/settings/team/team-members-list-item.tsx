@@ -133,7 +133,7 @@ export function TeamMemberListItem({
 								<DropdownMenuTrigger asChild>
 									<button
 										type="button"
-										className="flex items-center gap-1 text-white-400 font-medium text-[14px] leading-[16px] font-sans hover:text-white-100 hover:bg-white/5 rounded-md px-3 py-1.5"
+										className="flex items-center gap-1 text-white-400 font-medium text-[14px] leading-[16px] font-sans hover:text-white-100 hover:bg-bg/5 rounded-md px-3 py-1.5"
 									>
 										<span className="capitalize">{role}</span>
 										<ChevronDown className="h-4 w-4 opacity-60" />
@@ -148,7 +148,7 @@ export function TeamMemberListItem({
 											<button
 												type="button"
 												onClick={() => handleRoleChange("admin")}
-												className="flex items-center w-full px-3 py-2 text-left text-[14px] leading-[16px] hover:bg-white/5 text-white-400 capitalize rounded-md"
+												className="flex items-center w-full px-3 py-2 text-left text-[14px] leading-[16px] hover:bg-bg/5 text-white-400 capitalize rounded-md"
 											>
 												<span className="inline-flex justify-center items-center w-4 h-4 mr-2">
 													{role === "admin" && <Check className="h-4 w-4" />}
@@ -158,14 +158,14 @@ export function TeamMemberListItem({
 											<button
 												type="button"
 												onClick={() => handleRoleChange("member")}
-												className="flex items-center w-full px-3 py-2 text-left text-[14px] leading-[16px] hover:bg-white/5 text-white-400 capitalize rounded-md"
+												className="flex items-center w-full px-3 py-2 text-left text-[14px] leading-[16px] hover:bg-bg/5 text-white-400 capitalize rounded-md"
 											>
 												<span className="inline-flex justify-center items-center w-4 h-4 mr-2">
 													{role === "member" && <Check className="h-4 w-4" />}
 												</span>
 												Member
 											</button>
-											<div className="my-2 h-px bg-white/10" />
+											<div className="my-2 h-px bg-bg/10" />
 										</>
 									)}
 									<AlertDialog open={open} onOpenChange={setOpen}>

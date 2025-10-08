@@ -21,7 +21,7 @@ import { GenerationView } from "../../../ui/generation-view";
 
 function Empty({ onGenerate }: { onGenerate?: () => void }) {
 	return (
-		<div className="bg-white-900/10 h-full rounded-[8px] flex justify-center items-center text-black-400">
+		<div className="bg-bg-900/10 h-full rounded-[8px] flex justify-center items-center text-black-400">
 			<EmptyState
 				icon={<TextGenerationIcon width={24} height={24} />}
 				title="Nothing generated yet."
@@ -32,7 +32,7 @@ function Empty({ onGenerate }: { onGenerate?: () => void }) {
 					<button
 						type="button"
 						onClick={onGenerate}
-						className="flex items-center justify-center px-[24px] py-[12px] mt-[16px] bg-[#141519] text-white rounded-[9999px] border border-white-900/15 transition-all hover:bg-[#1e1f26] hover:border-white-900/25 hover:translate-y-[-1px] cursor-pointer font-sans font-[500] text-[14px]"
+						className="flex items-center justify-center px-[24px] py-[12px] mt-[16px] bg-[#141519] text-white rounded-[9999px] border border-border/15 transition-all hover:bg-[#1e1f26] hover:border-border/25 hover:translate-y-[-1px] cursor-pointer font-sans font-[500] text-[14px]"
 					>
 						<span className="mr-[8px] generate-star">✦</span>
 						Generate with the Current Prompt
@@ -168,7 +168,7 @@ export function GenerationPanel({
 		return <Empty onGenerate={handleGenerate} />;
 	}
 	return (
-		<div className="flex flex-col bg-white-900/10 h-full rounded-[8px] py-[8px]">
+		<div className="flex flex-col bg-bg-900/10 h-full rounded-[8px] py-[8px]">
 			<div
 				className={clsx(
 					"border-b border-white-400/20 py-[4px] px-[16px] flex items-center gap-[8px]",

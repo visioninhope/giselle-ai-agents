@@ -211,12 +211,12 @@ function Unauthorized({ authUrl }: { authUrl: string }) {
 	}, [authUrl]);
 
 	return (
-		<div className="bg-white-900/10 h-[300px] rounded-[8px] flex items-center justify-center">
+		<div className="bg-bg-900/10 h-[300px] rounded-[8px] flex items-center justify-center">
 			<div className="flex flex-col gap-[8px]">
 				<p>Sign in to your GitHub account to get started</p>
 				<button
 					type="button"
-					className="group cursor-pointer bg-black-900 rounded-[4px] py-[4px] flex items-center justify-center gap-[8px] disabled:opacity-50 disabled:cursor-wait"
+					className="group cursor-pointer bg-bg-900 rounded-[4px] py-[4px] flex items-center justify-center gap-[8px] disabled:opacity-50 disabled:cursor-wait"
 					onClick={handleClick}
 					disabled={isPending}
 				>
@@ -282,7 +282,7 @@ function InstallGitHubApplication({
 		};
 	}, [handleInstallationMessage]);
 	return (
-		<div className="bg-white-900/10 h-[300px] rounded-[8px] flex items-center justify-center">
+		<div className="bg-bg-900/10 h-[300px] rounded-[8px] flex items-center justify-center">
 			<div className="flex flex-col gap-[8px]">
 				<p>
 					Install the GitHub application for the accounts you wish to perform
@@ -290,7 +290,7 @@ function InstallGitHubApplication({
 				</p>
 				<button
 					type="button"
-					className="group cursor-pointer bg-black-900 rounded-[4px] py-[4px] flex items-center justify-center gap-[8px] disabled:opacity-50 disabled:cursor-wait"
+					className="group cursor-pointer bg-bg-900 rounded-[4px] py-[4px] flex items-center justify-center gap-[8px] disabled:opacity-50 disabled:cursor-wait"
 					onClick={handleClick}
 					disabled={isPending}
 				>
@@ -462,7 +462,7 @@ function Installed({
 									onClick={() => handleActionSelect(id)}
 								>
 									<div className="flex items-center min-w-0 flex-1">
-										<div className="p-2 rounded-lg mr-3 bg-white/10 group-hover:bg-white/20 transition-colors flex-shrink-0 flex items-center justify-center">
+										<div className="p-2 rounded-lg mr-3 bg-bg/10 group-hover:bg-bg/20 transition-colors flex-shrink-0 flex items-center justify-center">
 											{getActionIcon(id)}
 										</div>
 										<div className="flex flex-col text-left overflow-hidden min-w-0">

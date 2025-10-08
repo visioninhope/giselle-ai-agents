@@ -159,7 +159,7 @@ export function ConfigureSourcesDialog({
 										return (
 											<label
 												key={profileId}
-												className="flex items-start gap-3 p-2 rounded-lg bg-surface hover:bg-white/5 transition-colors cursor-pointer"
+												className="flex items-start gap-3 p-2 rounded-lg bg-surface hover:bg-bg/5 transition-colors cursor-pointer"
 											>
 												<input
 													type="checkbox"
@@ -251,7 +251,7 @@ function ContentTypeToggle({
 						} ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
 					>
 						<div
-							className={`absolute w-4 h-4 bg-white rounded-full top-1 transition-transform ${
+							className={`absolute w-4 h-4 bg-bg rounded-full top-1 transition-transform ${
 								enabled ? "translate-x-6" : "translate-x-1"
 							}`}
 						/>

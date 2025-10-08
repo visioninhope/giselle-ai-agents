@@ -26,9 +26,9 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 					{
 						"bg-primary-900 text-inverse hover:bg-primary-800":
 							variant === "primary",
-						"bg-transparent text-inverse border border-white-900/20 hover:bg-white-900/5":
+						"bg-transparent text-inverse border border-border/20 hover:bg-bg-900/5":
 							variant === "outline",
-						"bg-transparent text-inverse hover:bg-white-900/5":
+						"bg-transparent text-inverse hover:bg-bg-900/5":
 							variant === "ghost",
 					},
 					{

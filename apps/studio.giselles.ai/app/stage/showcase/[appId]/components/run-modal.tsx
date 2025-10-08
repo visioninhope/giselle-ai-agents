@@ -122,7 +122,7 @@ export function RunModal({
 					<div className="flex items-center justify-between mb-4 px-6 pt-6">
 						<div className="flex items-center gap-3">
 							{/* App Thumbnail */}
-							<div className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0">
+							<div className="w-10 h-10 rounded-lg bg-bg/5 flex items-center justify-center flex-shrink-0">
 								<AppIcon className="h-6 w-6 text-white/40" />
 							</div>
 							{/* App Title */}
@@ -138,7 +138,7 @@ export function RunModal({
 						<button
 							type="button"
 							onClick={onClose}
-							className="rounded-full p-2 text-text-muted opacity-70 hover:opacity-100 hover:bg-white/10 focus:outline-none transition-all"
+							className="rounded-full p-2 text-text-muted opacity-70 hover:opacity-100 hover:bg-bg/10 focus:outline-none transition-all"
 						>
 							<X className="h-5 w-5" />
 							<span className="sr-only">Close</span>

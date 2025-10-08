@@ -100,9 +100,9 @@ function AgentTimeUsage(props: AgentTimeUsageProps) {
 			<div className="flex flex-col gap-y-2">
 				<div className="flex flex-col gap-y-1">
 					<div className="relative w-full h-2">
-						<div className="absolute w-full h-full rounded-full bg-black-80" />
+						<div className="absolute w-full h-full rounded-full bg-bg-80" />
 						<div
-							className="absolute h-full rounded-full bg-white-400 transition-all duration-300"
+							className="absolute h-full rounded-full bg-bg-400 transition-all duration-300"
 							style={{
 								width: `${Math.min(100, percentage)}%`,
 							}}

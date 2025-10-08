@@ -48,7 +48,7 @@ export default function ErrorPage({
 						<summary className="text-xs text-text-muted cursor-pointer hover:text-white-700">
 							Error details (development only)
 						</summary>
-						<pre className="mt-2 text-xs text-red-400 bg-black-950 p-2 rounded border overflow-auto">
+						<pre className="mt-2 text-xs text-red-400 bg-bg-950 p-2 rounded border overflow-auto">
 							{error.message}
 							{error.stack && `\n\n${error.stack}`}
 						</pre>

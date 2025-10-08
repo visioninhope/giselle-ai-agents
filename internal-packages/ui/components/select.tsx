@@ -50,7 +50,7 @@ export function Select<T extends SelectOption>({
 					className={clsx(
 						"w-full flex justify-between items-center rounded-[8px] h-10 px-[12px] text-left text-[14px]",
 						"outline-none focus:outline-none focus-visible:outline-none focus:ring-0",
-						"bg-white/5 transition-colors hover:bg-ghost-element-hover",
+						"bg-bg/5 transition-colors hover:bg-ghost-element-hover",
 						"data-[placeholder]:text-text-muted",
 						widthClassName,
 						triggerClassName,

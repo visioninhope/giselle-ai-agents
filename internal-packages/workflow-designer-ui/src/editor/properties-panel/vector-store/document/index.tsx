@@ -272,7 +272,7 @@ export function DocumentVectorStoreNodePropertiesPanel({
 				</div>
 
 				{!isLoading && documentStores.length === 0 && (
-					<div className="rounded-md border border-dashed border-white/15 bg-black-900/20 px-4 py-6 text-sm text-white-400">
+					<div className="rounded-md border border-dashed border-white/15 bg-bg-900/20 px-4 py-6 text-sm text-white-400">
 						No document vector stores available. Create one from settings to use
 						it here.
 					</div>
@@ -302,7 +302,7 @@ export function DocumentVectorStoreNodePropertiesPanel({
 							{selectedStore.sources.map((docSource) => (
 								<li
 									key={docSource.id}
-									className="flex items-center justify-between gap-3 rounded-lg border border-white/10 bg-black-950/30 px-3 py-2"
+									className="flex items-center justify-between gap-3 rounded-lg border border-white/10 bg-bg-950/30 px-3 py-2"
 								>
 									<span className="truncate text-[13px] text-white-400">
 										{docSource.fileName}
@@ -315,7 +315,7 @@ export function DocumentVectorStoreNodePropertiesPanel({
 							))}
 						</ul>
 					) : (
-						<div className="rounded-md border border-dashed border-white/10 bg-black-950/20 px-3 py-4 text-[13px] text-white-400/80">
+						<div className="rounded-md border border-dashed border-white/10 bg-bg-950/20 px-3 py-4 text-[13px] text-white-400/80">
 							No documents uploaded yet.
 						</div>
 					)}

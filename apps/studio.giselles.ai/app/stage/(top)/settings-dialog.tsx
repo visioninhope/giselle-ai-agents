@@ -39,7 +39,7 @@ export function SettingsDialog({
 	if (isMobile) {
 		return (
 			isOpen && (
-				<div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
+				<div className="fixed inset-0 z-50 bg-bg/60 flex items-center justify-center p-4">
 					<div className="relative z-10 w-[90vw] max-w-[500px] max-h-[90vh] overflow-y-auto rounded-[12px] p-6 shadow-xl focus:outline-none">
 						<div
 							className="absolute inset-0 -z-10 rounded-[12px] backdrop-blur-md"
@@ -58,7 +58,7 @@ export function SettingsDialog({
 							<button
 								type="button"
 								onClick={handleClose}
-								className="p-1 rounded-lg hover:bg-white/10 transition-colors"
+								className="p-1 rounded-lg hover:bg-bg/10 transition-colors"
 							>
 								<X className="w-5 h-5 text-white-400" />
 							</button>
@@ -137,7 +137,7 @@ export function SettingsDialog({
 								<div className="block text-white-400 text-sm font-medium mb-3">
 									Font
 								</div>
-								<div className="w-full p-3 bg-white/5 border border-border rounded-lg text-white-100 text-sm opacity-50">
+								<div className="w-full p-3 bg-bg/5 border border-border rounded-lg text-white-100 text-sm opacity-50">
 									Coming Soon
 								</div>
 							</div>
@@ -180,7 +180,7 @@ export function SettingsDialog({
 					<button
 						type="button"
 						onClick={handleClose}
-						className="p-1 rounded-lg hover:bg-white/10 transition-colors"
+						className="p-1 rounded-lg hover:bg-bg/10 transition-colors"
 					>
 						<X className="w-5 h-5 text-white-400" />
 					</button>
@@ -262,7 +262,7 @@ export function SettingsDialog({
 					<select
 						id="font-select"
 						disabled
-						className="w-full p-3 bg-white/5 border border-border rounded-lg text-white-100 text-sm opacity-50 cursor-not-allowed"
+						className="w-full p-3 bg-bg/5 border border-border rounded-lg text-white-100 text-sm opacity-50 cursor-not-allowed"
 					>
 						<option className="bg-gray-900">Coming Soon</option>
 					</select>

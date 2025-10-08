@@ -500,7 +500,7 @@ export function FilterableActsList({
 										Object.keys(statusLabels) as StatusFilter[],
 									);
 								}}
-								className="px-4 py-2 bg-white/10 text-inverse rounded-lg hover:bg-white/20 transition-colors"
+								className="px-4 py-2 bg-bg/10 text-inverse rounded-lg hover:bg-bg/20 transition-colors"
 							>
 								Clear filters
 							</button>
@@ -580,7 +580,7 @@ export function FilterableActsList({
 										return (
 											<TableRow
 												key={act.id}
-												className="hover:bg-white/5 transition-colors duration-200 cursor-pointer"
+												className="hover:bg-bg/5 transition-colors duration-200 cursor-pointer"
 												onClick={() => {
 													router.push(act.link);
 												}}

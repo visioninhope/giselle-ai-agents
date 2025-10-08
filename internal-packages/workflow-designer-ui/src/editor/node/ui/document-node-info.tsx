@@ -54,7 +54,7 @@ export function DocumentNodeInfo({
 		if (isLoading) {
 			return (
 				<div className="px-[16px]">
-					<div className="inline-flex items-center rounded-full bg-black-900 px-[16px] py-[8px] text-[12px] font-medium text-white-200">
+					<div className="inline-flex items-center rounded-full bg-bg-900 px-[16px] py-[8px] text-[12px] font-medium text-white-200">
 						{documentVectorStoreId}
 					</div>
 				</div>
@@ -65,7 +65,7 @@ export function DocumentNodeInfo({
 
 	return (
 		<div className="px-[16px]">
-			<div className="inline-flex items-center rounded-full bg-black-900 px-[16px] py-[8px] text-[12px] font-medium text-white-200">
+			<div className="inline-flex items-center rounded-full bg-bg-900 px-[16px] py-[8px] text-[12px] font-medium text-white-200">
 				{storeLabel}
 			</div>
 		</div>

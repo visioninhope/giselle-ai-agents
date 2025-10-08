@@ -115,7 +115,7 @@ export function TriggerInputDialog({
 					<Dialog.Close asChild>
 						<button
 							type="button"
-							className="text-white-400 hover:text-white-900 outline-none"
+							className="text-white-400 hover:text-inverse outline-none"
 						>
 							<XIcon className="size-[20px]" />
 						</button>
@@ -136,7 +136,7 @@ export function TriggerInputDialog({
 							return (
 								<fieldset key={input.name} className={clsx("grid gap-2")}>
 									<label
-										className="text-[14px] font-medium text-white-900"
+										className="text-[14px] font-medium text-inverse"
 										htmlFor={input.name}
 									>
 										{input.label}
@@ -154,7 +154,7 @@ export function TriggerInputDialog({
 												"border-[1px]",
 												validationErrors[input.name]
 													? "border-red-500"
-													: "border-white-900",
+													: "border-border",
 												"text-[14px]",
 											)}
 										/>
@@ -168,7 +168,7 @@ export function TriggerInputDialog({
 												"border-[1px]",
 												validationErrors[input.name]
 													? "border-red-500"
-													: "border-white-900",
+													: "border-border",
 												"text-[14px]",
 											)}
 											rows={4}
@@ -184,7 +184,7 @@ export function TriggerInputDialog({
 												"border-[1px]",
 												validationErrors[input.name]
 													? "border-red-500"
-													: "border-white-900",
+													: "border-border",
 												"text-[14px]",
 											)}
 										/>

@@ -54,7 +54,7 @@ function WebPageListItem({
 	return (
 		<li
 			key={webpage.id}
-			className="group bg-white-850/10 p-[8px] rounded-[8px] flex items-center justify-between gap-[8px]"
+			className="group bg-bg-850/10 p-[8px] rounded-[8px] flex items-center justify-between gap-[8px]"
 		>
 			{webpage.status === "fetched" && (
 				<Dialog.Root open={open} onOpenChange={setOpen}>
@@ -78,9 +78,9 @@ function WebPageListItem({
 						</button>
 					</Dialog.Trigger>
 					<Dialog.Portal>
-						<Dialog.Overlay className="fixed inset-0 bg-black/60 backdrop-blur-[2px] z-50" />
+						<Dialog.Overlay className="fixed inset-0 bg-bg/60 backdrop-blur-[2px] z-50" />
 						<Dialog.Content
-							className="fixed left-[50%] top-[50%] max-h-[80vh] w-[600px] translate-x-[-50%] translate-y-[-50%] overflow-y-auto rounded-[12px] bg-black-900 p-[24px] shadow-xl z-50 border border-black-400"
+							className="fixed left-[50%] top-[50%] max-h-[80vh] w-[600px] translate-x-[-50%] translate-y-[-50%] overflow-y-auto rounded-[12px] bg-bg-900 p-[24px] shadow-xl z-50 border border-black-400"
 							onOpenAutoFocus={(e) => {
 								e.preventDefault();
 							}}
@@ -135,7 +135,7 @@ function WebPageListItem({
 			<button
 				type="button"
 				onClick={onRemove}
-				className="cursor-pointer hidden group-hover:block p-[4px] hover:bg-white-850/10 rounded-[4px] transition-colors"
+				className="cursor-pointer hidden group-hover:block p-[4px] hover:bg-bg-850/10 rounded-[4px] transition-colors"
 			>
 				<TrashIcon className="size-[16px] text-white-600" />
 			</button>
@@ -261,7 +261,7 @@ export function WebPageNodePropertiesPanel({ node }: { node: WebPageNode }) {
 								id="webpage-urls"
 								name="urls"
 								className={clsx(
-									"w-full min-h-[80px] p-[16px] pb-0 border-[0.5px] border-white-900 rounded-[8px] bg-black-100 text-white-800 outline-none resize-none",
+									"w-full min-h-[80px] p-[16px] pb-0 border-[0.5px] border-border rounded-[8px] bg-bg-100 text-white-800 outline-none resize-none",
 									// urlError && "border-error-900",
 								)}
 								// value={urls}

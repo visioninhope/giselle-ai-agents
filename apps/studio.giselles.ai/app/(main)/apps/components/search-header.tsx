@@ -122,8 +122,8 @@ export function SearchHeader({
 							onClick={() => onViewModeChange?.("grid")}
 							className={`p-3 flex items-center justify-center transition-colors ${
 								viewMode === "grid"
-									? "bg-white/10 text-white"
-									: "bg-transparent text-black-300 hover:bg-white/5 hover:text-white"
+									? "bg-bg/10 text-white"
+									: "bg-transparent text-black-300 hover:bg-bg/5 hover:text-white"
 							}`}
 							aria-label="Grid view"
 						>
@@ -134,8 +134,8 @@ export function SearchHeader({
 							onClick={() => onViewModeChange?.("list")}
 							className={`p-3 flex items-center justify-center transition-colors ${
 								viewMode === "list"
-									? "bg-white/10 text-white"
-									: "bg-transparent text-black-300 hover:bg-white/5 hover:text-white"
+									? "bg-bg/10 text-white"
+									: "bg-transparent text-black-300 hover:bg-bg/5 hover:text-white"
 							}`}
 							aria-label="List view"
 						>

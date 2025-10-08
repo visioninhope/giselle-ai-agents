@@ -29,7 +29,7 @@ export function EventSelectionStep({ onSelectEvent }: EventSelectionStepProps) {
 						onClick={() => onSelectEvent(id as GitHubTriggerEventId)}
 					>
 						<div className="flex items-center min-w-0 flex-1">
-							<div className="p-2 rounded-lg mr-3 bg-white/10 group-hover:bg-white/20 transition-colors flex-shrink-0 flex items-center justify-center">
+							<div className="p-2 rounded-lg mr-3 bg-bg/10 group-hover:bg-bg/20 transition-colors flex-shrink-0 flex items-center justify-center">
 								{getTriggerIcon(id as GitHubTriggerEventId)}
 							</div>
 							<div className="flex flex-col text-left overflow-hidden min-w-0">

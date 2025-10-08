@@ -46,12 +46,12 @@ export function V2Header({
 					className="flex items-center gap-[3px] group"
 					aria-label="Go to home"
 				>
-					<GiselleIcon className="text-white-900 w-[24px] h-[24px] group-hover:text-primary-100 transition-colors" />
-					<span className="text-white-900 text-[13px] font-semibold group-hover:text-primary-100 transition-colors">
+					<GiselleIcon className="text-inverse w-[24px] h-[24px] group-hover:text-primary-100 transition-colors" />
+					<span className="text-inverse text-[13px] font-semibold group-hover:text-primary-100 transition-colors">
 						Studio
 					</span>
 				</Link>
-				<span className="text-white-900/20 text-[18px] font-[250] leading-none ml-[4px]">
+				<span className="text-inverse/20 text-[18px] font-[250] leading-none ml-[4px]">
 					/
 				</span>
 
@@ -122,7 +122,7 @@ export function V2Header({
 								item.value === "template" ? (
 									<div className="flex items-center justify-between w-full opacity-50">
 										<span>{item.label}</span>
-										<span className="ml-2 text-[10px] leading-none text-white-600 bg-white/30 px-1.5 py-[1px] rounded-full">
+										<span className="ml-2 text-[10px] leading-none text-white-600 bg-bg/30 px-1.5 py-[1px] rounded-full">
 											Coming&nbsp;soon
 										</span>
 									</div>

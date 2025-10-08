@@ -45,7 +45,7 @@ export function NavigationRailCollapsed({
 			<NavigationRailFooter>
 				<Suspense
 					fallback={
-						<div className="w-full bg-black-800 animate-pulse h-full rounded-md" />
+						<div className="w-full bg-bg-800 animate-pulse h-full rounded-md" />
 					}
 				>
 					<NavigationRailFooterMenu user={userPromise} variant="collapsed" />

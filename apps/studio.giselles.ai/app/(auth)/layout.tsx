@@ -3,7 +3,7 @@ import { GiselleLogo } from "@/components/giselle-logo";
 
 export default function AuthLayout({ children }: { children: ReactNode }) {
 	return (
-		<div className="bg-black-100 relative">
+		<div className="bg-bg-100 relative">
 			<div className="z-10 relative">{children}</div>
 			<svg
 				xmlns="http://www.w3.org/2000/svg"

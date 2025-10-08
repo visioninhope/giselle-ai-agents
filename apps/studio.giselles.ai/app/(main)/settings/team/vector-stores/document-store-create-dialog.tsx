@@ -142,7 +142,7 @@ export function DocumentVectorStoreCreateDialog({
 									return (
 										<label
 											key={profileId}
-											className="flex items-start gap-3 p-3 rounded-lg bg-surface hover:bg-white/5 transition-colors"
+											className="flex items-start gap-3 p-3 rounded-lg bg-surface hover:bg-bg/5 transition-colors"
 										>
 											<input
 												type="checkbox"

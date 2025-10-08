@@ -191,7 +191,7 @@ function Installation({ installation }: InstallationProps) {
 					{displayName}
 				</span>
 			</div>
-			<div className="h-px w-full bg-white/10 my-4" />
+			<div className="h-px w-full bg-bg/10 my-4" />
 			<div className="space-y-5">
 				{installation.repositories.map((repo) => (
 					<div key={repo.id} className="flex items-center gap-x-2">

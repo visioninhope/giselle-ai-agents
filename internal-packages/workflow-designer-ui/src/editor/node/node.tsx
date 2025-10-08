@@ -316,17 +316,17 @@ export function NodeComponent({
 								"group-data-[content-type=text]:text-black-900",
 								"group-data-[content-type=file]:text-black-900",
 								"group-data-[content-type=webPage]:text-black-900",
-								"group-data-[content-type=textGeneration]:text-white-900",
-								"group-data-[content-type=imageGeneration]:text-white-900",
-								"group-data-[content-type=github]:text-white-900",
-								"group-data-[content-type=vectorStore]:group-data-[vector-store-source-provider=github]:text-white-900",
-								"group-data-[content-type=vectorStore]:group-data-[vector-store-source-provider=githubPullRequest]:text-white-900",
+								"group-data-[content-type=textGeneration]:text-inverse",
+								"group-data-[content-type=imageGeneration]:text-inverse",
+								"group-data-[content-type=github]:text-inverse",
+								"group-data-[content-type=vectorStore]:group-data-[vector-store-source-provider=github]:text-inverse",
+								"group-data-[content-type=vectorStore]:group-data-[vector-store-source-provider=githubPullRequest]:text-inverse",
 								"group-data-[content-type=vectorStore]:group-data-[vector-store-source-provider=document]:text-black-900",
-								"group-data-[content-type=webSearch]:text-white-900",
-								"group-data-[content-type=audioGeneration]:text-white-900",
-								"group-data-[content-type=videoGeneration]:text-white-900",
-								"group-data-[content-type=trigger]:text-white-900",
-								"group-data-[content-type=action]:text-white-900",
+								"group-data-[content-type=webSearch]:text-inverse",
+								"group-data-[content-type=audioGeneration]:text-inverse",
+								"group-data-[content-type=videoGeneration]:text-inverse",
+								"group-data-[content-type=trigger]:text-inverse",
+								"group-data-[content-type=action]:text-inverse",
 								"group-data-[content-type=query]:text-black-900",
 							)}
 						/>
@@ -395,7 +395,7 @@ export function NodeComponent({
 											"group-data-[content-type=query]:!bg-query-node-1 group-data-[content-type=query]:!border-query-node-1",
 										)}
 									/>
-									<div className={clsx("px-[12px] text-white-900 text-[12px]")}>
+									<div className={clsx("px-[12px] text-inverse text-[12px]")}>
 										{input.label}
 									</div>
 								</div>
@@ -426,15 +426,15 @@ export function NodeComponent({
 										className={clsx(
 											"!absolute !w-[11px] !h-[11px] !rounded-full !-left-[4.5px] !translate-x-[50%] !border-[1.5px]",
 											"group-data-[content-type=action]:!bg-action-node-1 group-data-[content-type=action]:!border-action-node-1",
-											"group-data-[state=disconnected]:!bg-black-900",
+											"group-data-[state=disconnected]:!bg-bg-900",
 										)}
 									/>
 									<div
 										className={clsx(
-											"px-[12px] text-white-900 text-[12px]",
+											"px-[12px] text-inverse text-[12px]",
 											"group-data-[state=connected]:px-[16px]",
 											"group-data-[state=disconnected]:absolute group-data-[state=disconnected]:-left-[4.5px] group-data-[state=disconnected]:whitespace-nowrap group-data-[state=disconnected]:-translate-x-[100%]",
-											"group-data-[state=connected]:text-white-900 group-data-[state=disconnected]:text-black-400",
+											"group-data-[state=connected]:text-inverse group-data-[state=disconnected]:text-black-400",
 											"group-data-[state=disconnected]:group-data-[required=true]:text-red-900",
 										)}
 									>
@@ -454,7 +454,7 @@ export function NodeComponent({
 										position={Position.Left}
 										id="blank-handle"
 										className={clsx(
-											"!absolute !w-[11px] !h-[11px] !rounded-full !-left-[4.5px] !translate-x-[50%] !border-[1.5px] !bg-black-900",
+											"!absolute !w-[11px] !h-[11px] !rounded-full !-left-[4.5px] !translate-x-[50%] !border-[1.5px] !bg-bg-900",
 											"group-data-[content-type=textGeneration]:!border-generation-node-1",
 											"group-data-[content-type=imageGeneration]:!border-image-generation-node-1",
 											"group-data-[content-type=webSearch]:!border-web-search-node-1",
@@ -520,7 +520,7 @@ export function NodeComponent({
 										"group-data-[state=connected]:group-data-[content-type=trigger]:!bg-trigger-node-1 group-data-[state=connected]:group-data-[content-type=trigger]:!border-trigger-node-1",
 										"group-data-[state=connected]:group-data-[content-type=action]:!bg-action-node-1 group-data-[state=connected]:group-data-[content-type=action]:!border-action-node-1",
 										"group-data-[state=connected]:group-data-[content-type=query]:!bg-query-node-1 group-data-[state=connected]:group-data-[content-type=query]:!border-query-node-1",
-										"group-data-[state=disconnected]:!bg-black-900",
+										"group-data-[state=disconnected]:!bg-bg-900",
 									)}
 								/>
 								<div
@@ -528,7 +528,7 @@ export function NodeComponent({
 										"text-[12px]",
 										"group-data-[state=connected]:px-[16px]",
 										"group-data-[state=disconnected]:absolute group-data-[state=disconnected]:-right-[12px] group-data-[state=disconnected]:whitespace-nowrap group-data-[state=disconnected]:translate-x-[100%]",
-										"group-data-[state=connected]:text-white-900 group-data-[state=disconnected]:text-black-400",
+										"group-data-[state=connected]:text-inverse group-data-[state=disconnected]:text-black-400",
 									)}
 								>
 									{output.label}

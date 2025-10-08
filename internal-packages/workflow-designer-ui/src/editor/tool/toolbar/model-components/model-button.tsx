@@ -38,7 +38,7 @@ export function ModelButton({
 				"flex gap-[12px] items-center p-[4px] rounded-[4px]",
 				isProForFreeUser
 					? "opacity-50 cursor-not-allowed"
-					: "hover:bg-white-850/10 focus:bg-white-850/10 cursor-pointer",
+					: "hover:bg-bg-850/10 focus:bg-bg-850/10 cursor-pointer",
 			)}
 			onClick={handleClick}
 			onMouseEnter={() => onMouseEnter(model)}

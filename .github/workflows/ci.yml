@@ -42,6 +42,6 @@ jobs:
           name: report-colors
           path: .reports/report-colors.json
       - name: Guard Colors (non-blocking warnings)
-        run: pnpm guard:colors || true
+        run: pnpm guard:colors -- --baseline .reports/report-colors.json || true
       - name: Test
         run: pnpm test

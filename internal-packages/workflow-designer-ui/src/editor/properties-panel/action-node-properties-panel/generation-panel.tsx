@@ -17,7 +17,7 @@ export function GenerationPanel({ node }: { node: ActionNode }) {
 	}
 
 	return (
-		<div className="flex flex-col bg-white-900/10 h-full rounded-[8px] py-[8px]">
+		<div className="flex flex-col bg-bg-900/10 h-full rounded-[8px] py-[8px]">
 			<div
 				className={clsx(
 					"border-b border-white-400/20 py-[4px] px-[16px] flex items-center gap-[8px]",

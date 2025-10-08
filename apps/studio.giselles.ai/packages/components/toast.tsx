@@ -12,7 +12,7 @@ export function Toast({ title, message, type }: Toast) {
 	return (
 		<ToastPrimitive.Root
 			className={clsx(
-				"bg-black-100 rounded-[8px] border border-black-40 py-[8px] px-[16px] backdrop-blur-[67px]",
+				"bg-bg-100 rounded-[8px] border border-black-40 py-[8px] px-[16px] backdrop-blur-[67px]",
 				"data-[type=error]:text-red-50",
 				"grid grid-cols-[auto_max-content] items-center gap-x-[15px] [grid-template-areas:_'title_action'_'description_action'] data-[swipe=cancel]:translate-x-0 data-[swipe=move]:translate-x-[var(--radix-toast-swipe-move-x)] data-[state=closed]:animate-hide data-[state=open]:animate-slideIn data-[swipe=end]:animate-swipeOut data-[swipe=cancel]:transition-[transform_200ms_ease-out]",
 			)}

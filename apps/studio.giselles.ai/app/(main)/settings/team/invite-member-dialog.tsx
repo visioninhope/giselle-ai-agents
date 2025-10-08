@@ -342,7 +342,7 @@ export function InviteMemberDialog({
 								{emailTags.map((email) => (
 									<div
 										key={email}
-										className="mb-1 mr-2 flex items-center rounded-md bg-white/10 px-2.5 py-1.5 shadow-sm"
+										className="mb-1 mr-2 flex items-center rounded-md bg-bg/10 px-2.5 py-1.5 shadow-sm"
 									>
 										<span className="max-w-[180px] truncate text-[14px] text-white-400">
 											{email}
@@ -379,7 +379,7 @@ export function InviteMemberDialog({
 								<DropdownMenuTrigger asChild>
 									<button
 										type="button"
-										className="flex h-10 items-center gap-1 rounded-md px-3 font-sans text-[14px] font-medium leading-[16px] text-white-400 bg-surface hover:bg-white/5 hover:text-white-100"
+										className="flex h-10 items-center gap-1 rounded-md px-3 font-sans text-[14px] font-medium leading-[16px] text-white-400 bg-surface hover:bg-bg/5 hover:text-white-100"
 										disabled={isLoading}
 									>
 										<span className="capitalize">{role}</span>
@@ -393,7 +393,7 @@ export function InviteMemberDialog({
 									<button
 										type="button"
 										onClick={() => setRole("admin")}
-										className="flex w-full items-center rounded-md px-3 py-2 text-left font-sans text-[14px] leading-[16px] text-white-400 hover:bg-white/5"
+										className="flex w-full items-center rounded-md px-3 py-2 text-left font-sans text-[14px] leading-[16px] text-white-400 hover:bg-bg/5"
 									>
 										<span className="mr-2 inline-flex h-4 w-4 items-center justify-center">
 											{role === "admin" && <Check className="h-4 w-4" />}
@@ -403,7 +403,7 @@ export function InviteMemberDialog({
 									<button
 										type="button"
 										onClick={() => setRole("member")}
-										className="flex w-full items-center rounded-md px-3 py-2 text-left font-sans text-[14px] leading-[16px] text-white-400 hover:bg-white/5"
+										className="flex w-full items-center rounded-md px-3 py-2 text-left font-sans text-[14px] leading-[16px] text-white-400 hover:bg-bg/5"
 									>
 										<span className="mr-2 inline-flex h-4 w-4 items-center justify-center">
 											{role === "member" && <Check className="h-4 w-4" />}

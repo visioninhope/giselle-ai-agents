@@ -180,7 +180,7 @@ export function RepositoryRegistrationDialog({
 													setOwnerId(String(installation.id));
 													setRepositoryId("");
 												}}
-												className="flex w-full items-center rounded-md px-3 py-2 text-left font-sans text-[14px] leading-[16px] text-white-400 hover:bg-white/5"
+												className="flex w-full items-center rounded-md px-3 py-2 text-left font-sans text-[14px] leading-[16px] text-white-400 hover:bg-bg/5"
 											>
 												<span className="mr-2 inline-flex h-4 w-4 items-center justify-center">
 													{ownerId === String(installation.id) && (
@@ -244,7 +244,7 @@ export function RepositoryRegistrationDialog({
 													key={repo.id}
 													type="button"
 													onClick={() => setRepositoryId(String(repo.id))}
-													className="flex w-full items-center rounded-md px-3 py-2 text-left font-sans text-[14px] leading-[16px] text-white-400 hover:bg-white/5"
+													className="flex w-full items-center rounded-md px-3 py-2 text-left font-sans text-[14px] leading-[16px] text-white-400 hover:bg-bg/5"
 												>
 													<span className="mr-2 inline-flex h-4 w-4 items-center justify-center">
 														{repositoryId === String(repo.id) && (
@@ -313,7 +313,7 @@ export function RepositoryRegistrationDialog({
 											return (
 												<label
 													key={profileId}
-													className="flex items-start gap-3 p-3 rounded-lg bg-surface hover:bg-white/5 transition-colors cursor-pointer"
+													className="flex items-start gap-3 p-3 rounded-lg bg-surface hover:bg-bg/5 transition-colors cursor-pointer"
 												>
 													<input
 														type="checkbox"
@@ -396,7 +396,7 @@ function ContentTypeToggle({
 	disabled,
 }: ContentTypeToggleProps) {
 	return (
-		<div className="bg-white/5 rounded-lg p-4">
+		<div className="bg-bg/5 rounded-lg p-4">
 			<div className="flex items-center justify-between mb-2">
 				<div className="flex items-center gap-2">
 					<Icon size={18} className="text-gray-400" />
@@ -416,7 +416,7 @@ function ContentTypeToggle({
 						} ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
 					>
 						<div
-							className={`absolute w-4 h-4 bg-white rounded-full top-1 transition-transform ${
+							className={`absolute w-4 h-4 bg-bg rounded-full top-1 transition-transform ${
 								enabled ? "translate-x-6" : "translate-x-1"
 							}`}
 						/>

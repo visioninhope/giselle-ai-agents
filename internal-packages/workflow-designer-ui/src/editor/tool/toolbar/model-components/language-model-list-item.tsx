@@ -21,7 +21,7 @@ function _LanguageModelListItem({
 			{...props}
 			className={clsx(
 				"flex gap-[8px]",
-				"hover:bg-white-850/10 focus:bg-white-850/10 p-[4px] rounded-[4px]",
+				"hover:bg-bg-850/10 focus:bg-bg-850/10 p-[4px] rounded-[4px]",
 				"data-[state=on]:bg-primary-900 focus:outline-none",
 				"**:data-icon:w-[16px] **:data-icon:h-[16px] **:data-icon:text-white-950 ",
 			)}

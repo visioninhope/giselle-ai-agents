@@ -1,6 +1,6 @@
 export default function () {
 	return (
-		<div className="flex min-h-screen flex-col items-center justify-center bg-black-900 text-white-850">
+		<div className="flex min-h-screen flex-col items-center justify-center bg-bg-900 text-white-850">
 			<div className="mx-auto max-w-md text-center px-4">
 				<h1 className="mb-4 text-3xl font-bold tracking-tight sm:text-4xl font-accent">
 					We'll be back.

@@ -218,7 +218,7 @@ function Form({
 				type="button"
 				onClick={() => setIsSettingsModalOpen(true)}
 				className={clsx(
-					"absolute right-2 p-2 rounded-lg hover:bg-white/10 transition-colors z-20",
+					"absolute right-2 p-2 rounded-lg hover:bg-bg/10 transition-colors z-20",
 					isMobile ? "top-2" : "-top-16",
 				)}
 			>
@@ -305,11 +305,11 @@ function Form({
 												"group flex items-center gap-3 p-3 rounded-lg border transition-all cursor-pointer relative z-20 w-full text-left",
 												appId === app.id
 													? "bg-blue-500/10 border-blue-500/50"
-													: "bg-white/5 border-border hover:bg-white/10 hover:border-border",
+													: "bg-bg/5 border-border hover:bg-bg/10 hover:border-border",
 											)}
 										>
 											{/* Icon */}
-											<div className="w-12 h-12 rounded-lg bg-white/10 flex items-center justify-center flex-shrink-0 transition-all group-hover:bg-primary-100/20">
+											<div className="w-12 h-12 rounded-lg bg-bg/10 flex items-center justify-center flex-shrink-0 transition-all group-hover:bg-primary-100/20">
 												<AppIcon className="h-6 w-6 text-white/40 transition-colors group-hover:text-primary-100" />
 											</div>
 											{/* Content */}
@@ -353,7 +353,7 @@ function Form({
 						<div className="flex items-center justify-between mb-4 px-6 pt-6">
 							<div className="flex items-center gap-3">
 								{/* App Thumbnail */}
-								<div className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0">
+								<div className="w-10 h-10 rounded-lg bg-bg/5 flex items-center justify-center flex-shrink-0">
 									<AppIcon className="h-6 w-6 text-white/40" />
 								</div>
 								{/* App Title */}
@@ -370,7 +370,7 @@ function Form({
 							</div>
 							<button
 								type="button"
-								className="rounded-full p-2 text-white-400 opacity-70 hover:opacity-100 hover:bg-white/10 focus:outline-none transition-all"
+								className="rounded-full p-2 text-white-400 opacity-70 hover:opacity-100 hover:bg-bg/10 focus:outline-none transition-all"
 							>
 								<X className="h-5 w-5" />
 								<span className="sr-only">Close</span>

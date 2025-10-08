@@ -389,7 +389,7 @@ export function AnthropicWebSearchToolConfigurationDialog({
 									</div>
 
 									{/* Domain Input */}
-									<div className="flex items-start gap-3 rounded-lg bg-black/80 p-1">
+									<div className="flex items-start gap-3 rounded-lg bg-bg/80 p-1">
 										<div className="flex min-h-[40px] flex-grow flex-wrap items-center gap-1">
 											{(filteringMode === "allow"
 												? allowedDomains

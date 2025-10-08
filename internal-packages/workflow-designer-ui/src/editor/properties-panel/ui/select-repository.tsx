@@ -120,7 +120,7 @@ export function SelectRepository({
 					<button
 						type="button"
 						onClick={() => setIsOrgDropdownOpen(!isOrgDropdownOpen)}
-						className="w-full px-3 py-2 bg-black-300/20 rounded-[8px] text-white-400 text-[14px] font-geist cursor-pointer text-left flex items-center justify-between"
+						className="w-full px-3 py-2 bg-bg-300/20 rounded-[8px] text-white-400 text-[14px] font-geist cursor-pointer text-left flex items-center justify-between"
 					>
 						<span
 							className={
@@ -144,7 +144,7 @@ export function SelectRepository({
 						<ChevronDown className="h-4 w-4 text-white/60" />
 					</button>
 					{isOrgDropdownOpen && (
-						<div className="absolute top-full left-0 right-0 mt-1 z-50 rounded-[8px] border-[0.25px] border-white/10 bg-black-850 p-1 shadow-none">
+						<div className="absolute top-full left-0 right-0 mt-1 z-50 rounded-[8px] border-[0.25px] border-white/10 bg-bg-850 p-1 shadow-none">
 							{installations.map((installation) => (
 								<button
 									key={installation.id}
@@ -153,7 +153,7 @@ export function SelectRepository({
 										setSelectedInstallationId(installation.id);
 										setIsOrgDropdownOpen(false);
 									}}
-									className="flex w-full items-center rounded-md px-3 py-2 text-left font-sans text-[14px] leading-[16px] text-[#F7F9FD] hover:bg-white/5"
+									className="flex w-full items-center rounded-md px-3 py-2 text-left font-sans text-[14px] leading-[16px] text-[#F7F9FD] hover:bg-bg/5"
 								>
 									<span className="mr-2 inline-flex h-4 w-4 items-center justify-center">
 										{selectedInstallationId === installation.id && (
@@ -187,7 +187,7 @@ export function SelectRepository({
 					<p className="text-[14px] py-[1.5px] text-[#F7F9FD]">Repository</p>
 					<div className="flex flex-col gap-y-[8px] relative">
 						{isPending ? (
-							<div className="flex items-center justify-center h-[64px] bg-black-300/20 text-white-400 text-[14px] rounded-[8px]">
+							<div className="flex items-center justify-center h-[64px] bg-bg-300/20 text-white-400 text-[14px] rounded-[8px]">
 								Loading...
 							</div>
 						) : (
@@ -205,7 +205,7 @@ export function SelectRepository({
 										});
 									}}
 								>
-									<div className="invisible group-hover:visible absolute right-4 top-1/2 transform -translate-y-1/2 bg-black-800 text-white text-xs px-2 py-1 rounded whitespace-nowrap">
+									<div className="invisible group-hover:visible absolute right-4 top-1/2 transform -translate-y-1/2 bg-bg-800 text-white text-xs px-2 py-1 rounded whitespace-nowrap">
 										Select
 									</div>
 									<div className="flex items-center justify-between">

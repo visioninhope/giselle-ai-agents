@@ -340,7 +340,7 @@ export function ShowcaseClient({
 												href={`/stage/showcase/${app.id}`}
 												className="flex items-center gap-3 min-w-0"
 											>
-												<div className="w-9 h-9 rounded-full bg-white/5 flex items-center justify-center flex-shrink-0 transition-all group-hover:bg-primary-100/20">
+												<div className="w-9 h-9 rounded-full bg-bg/5 flex items-center justify-center flex-shrink-0 transition-all group-hover:bg-primary-100/20">
 													<svg
 														role="img"
 														aria-label="App icon"
@@ -368,7 +368,7 @@ export function ShowcaseClient({
 											<div className="flex items-center gap-2">
 												<button
 													type="button"
-													className="p-1.5 rounded-full hover:bg-white/10 text-white/60 hover:text-white transition-colors border border-border hover:border-border"
+													className="p-1.5 rounded-full hover:bg-bg/10 text-white/60 hover:text-white transition-colors border border-border hover:border-border"
 													title="Run app"
 													onClick={(e) => {
 														e.stopPropagation();
@@ -460,7 +460,7 @@ export function ShowcaseClient({
 															})
 														}
 														placeholder="Playlist title"
-														className="bg-black-700/50 border-black-600 text-white placeholder:text-black-400"
+														className="bg-bg-700/50 border-black-600 text-white placeholder:text-black-400"
 													/>
 												</div>
 												<div className="grid gap-2">
@@ -480,7 +480,7 @@ export function ShowcaseClient({
 															})
 														}
 														placeholder="Playlist description"
-														className="bg-black-700/50 border-black-600 text-white placeholder:text-black-400"
+														className="bg-bg-700/50 border-black-600 text-white placeholder:text-black-400"
 													/>
 												</div>
 											</div>
@@ -521,7 +521,7 @@ export function ShowcaseClient({
 													className="relative w-40 aspect-square overflow-hidden rounded-lg transition-all duration-300 hover:scale-105 mb-3"
 												>
 													<div className={`w-full h-full ${gradientClass}`}>
-														<div className="absolute inset-0 bg-black/20" />
+														<div className="absolute inset-0 bg-bg/20" />
 													</div>
 												</button>
 
@@ -607,7 +607,7 @@ export function ShowcaseClient({
 											className="group flex items-center justify-between px-2 py-3 first:border-t-0 border-t-[0.5px] border-[var(--color-border)] cursor-pointer"
 										>
 											<div className="flex items-center gap-3">
-												<div className="w-9 h-9 rounded-full bg-white/5 flex items-center justify-center flex-shrink-0 transition-all group-hover:bg-primary-100/20">
+												<div className="w-9 h-9 rounded-full bg-bg/5 flex items-center justify-center flex-shrink-0 transition-all group-hover:bg-primary-100/20">
 													<svg
 														role="img"
 														aria-label="App icon"
@@ -636,7 +636,7 @@ export function ShowcaseClient({
 											<div className="flex items-center gap-2">
 												<button
 													type="button"
-													className="p-1.5 rounded-full hover:bg-white/10 text-white/60 hover:text-white transition-colors border border-border hover:border-border"
+													className="p-1.5 rounded-full hover:bg-bg/10 text-white/60 hover:text-white transition-colors border border-border hover:border-border"
 													title="Re-run app"
 													onClick={() => {
 														if (item.workspaceId) {

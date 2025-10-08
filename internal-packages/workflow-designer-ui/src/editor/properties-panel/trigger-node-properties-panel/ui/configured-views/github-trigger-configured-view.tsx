@@ -108,7 +108,7 @@ export function GitHubTriggerConfiguredView({
 					<p className="text-[14px] py-[1.5px] text-[#F7F9FD]">State</p>
 
 					{/* Divider */}
-					<div className="flex-grow mx-[12px] h-[1px] bg-black-200/30" />
+					<div className="flex-grow mx-[12px] h-[1px] bg-bg-200/30" />
 
 					<div className="relative">
 						{/* Background container */}

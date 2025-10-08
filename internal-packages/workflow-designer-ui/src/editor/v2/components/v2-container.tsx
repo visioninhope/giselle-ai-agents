@@ -409,10 +409,7 @@ export function V2Container({ leftPanel, onLeftPanelClose }: V2ContainerProps) {
 	const mainRef = useRef<HTMLDivElement>(null);
 
 	return (
-		<main
-			className="relative flex-1 bg-black-900 overflow-hidden"
-			ref={mainRef}
-		>
+		<main className="relative flex-1 bg-bg-900 overflow-hidden" ref={mainRef}>
 			<PanelGroup direction="horizontal" className="h-full flex">
 				{leftPanel !== null && (
 					<>

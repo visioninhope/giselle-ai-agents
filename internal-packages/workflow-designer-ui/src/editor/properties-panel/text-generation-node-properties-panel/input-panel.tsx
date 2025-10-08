@@ -181,7 +181,7 @@ export function InputPanel({
 						{connectedOutputs.trigger.map((source) => (
 							<ConnectedOutputListItem
 								icon={
-									<GeneratedContentIcon className="size-[24px] text-white-900" />
+									<GeneratedContentIcon className="size-[24px] text-inverse" />
 								}
 								key={source.connection.id}
 								title={source.node.name ?? defaultName(source.node)}
@@ -196,7 +196,7 @@ export function InputPanel({
 						{connectedOutputs.generation.map((source) => (
 							<ConnectedOutputListItem
 								icon={
-									<GeneratedContentIcon className="size-[24px] text-white-900" />
+									<GeneratedContentIcon className="size-[24px] text-inverse" />
 								}
 								key={source.connection.id}
 								title={`${source.node.name ?? source.node.content.llm.id} / ${source.label}`}
@@ -210,7 +210,7 @@ export function InputPanel({
 					<ConnectedOutputListRoot title="Generated Sources">
 						{connectedOutputs.action.map((source) => (
 							<ConnectedOutputListItem
-								icon={<GitHubIcon className="size-[24px] text-white-900" />}
+								icon={<GitHubIcon className="size-[24px] text-inverse" />}
 								key={source.connection.id}
 								title={source.node.name ?? defaultName(source.node)}
 								subtitle={""}
@@ -236,9 +236,7 @@ export function InputPanel({
 
 									return (
 										<ConnectedOutputListItem
-											icon={
-												<PromptIcon className="size-[24px] text-white-900" />
-											}
+											icon={<PromptIcon className="size-[24px] text-inverse" />}
 											key={source.connection.id}
 											title={`${source.node.name ?? "Text"} / ${source.label}`}
 											subtitle={text}
@@ -250,7 +248,7 @@ export function InputPanel({
 									return (
 										<ConnectedOutputListItem
 											icon={
-												<PdfFileIcon className="size-[24px] text-white-900" />
+												<PdfFileIcon className="size-[24px] text-inverse" />
 											}
 											key={source.connection.id}
 											title={`${source.node.name ?? "PDF Files"} / ${source.label}`}
@@ -261,9 +259,7 @@ export function InputPanel({
 								case "github":
 									return (
 										<ConnectedOutputListItem
-											icon={
-												<GitHubIcon className="size-[24px] text-white-900" />
-											}
+											icon={<GitHubIcon className="size-[24px] text-inverse" />}
 											key={source.connection.id}
 											title={`${source.node.name ?? "GitHub"} / ${source.label}`}
 											subtitle={"todo"}
@@ -274,7 +270,7 @@ export function InputPanel({
 									return (
 										<ConnectedOutputListItem
 											icon={
-												<WebPageFileIcon className="size-[24px] text-white-900" />
+												<WebPageFileIcon className="size-[24px] text-inverse" />
 											}
 											key={source.connection.id}
 											title={`${source.node.name ?? "WebPage"} / ${source.label}`}
@@ -300,9 +296,7 @@ export function InputPanel({
 						{connectedOutputs.query.map((source) => (
 							<ConnectedOutputListItem
 								key={source.connection.id}
-								icon={
-									<DatabaseZapIcon className="size-[24px] text-white-900" />
-								}
+								icon={<DatabaseZapIcon className="size-[24px] text-inverse" />}
 								title={`${source.node.name ?? "Query"} / ${source.label}`}
 								subtitle=""
 								onRemove={() => handleRemove(source.connection)}

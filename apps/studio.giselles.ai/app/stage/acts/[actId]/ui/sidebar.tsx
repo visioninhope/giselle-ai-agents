@@ -112,7 +112,7 @@ export function Sidebar({ data }: { data: Promise<SidebarDataObject> }) {
 				{/* App Info Section */}
 				<div className="space-y-[16px] px-[16px] md:px-[32px] text-center md:text-left mt-[20px]">
 					{/* App Thumbnail */}
-					<div className="w-[96px] h-[96px] rounded-[16px] bg-white/5 flex items-center justify-center flex-shrink-0 mx-auto md:mx-0">
+					<div className="w-[96px] h-[96px] rounded-[16px] bg-bg/5 flex items-center justify-center flex-shrink-0 mx-auto md:mx-0">
 						<svg
 							role="img"
 							aria-label="App icon"
@@ -186,7 +186,7 @@ export function Sidebar({ data }: { data: Promise<SidebarDataObject> }) {
 												return (
 													<div
 														key={`${input.name}-${input.value}`}
-														className="bg-white/5 rounded-[8px] p-3"
+														className="bg-bg/5 rounded-[8px] p-3"
 													>
 														<div className="text-[11px] text-white/80">
 															{parameter?.name && (
@@ -253,14 +253,14 @@ export function Sidebar({ data }: { data: Promise<SidebarDataObject> }) {
 													onClick={handleStepClick}
 												>
 													<div
-														className="flex w-full p-4 justify-between items-center rounded-[8px] border border-white/20 bg-transparent hover:bg-white/5 transition-colors"
+														className="flex w-full p-4 justify-between items-center rounded-[8px] border border-white/20 bg-transparent hover:bg-bg/5 transition-colors"
 														style={{
 															borderColor: "rgba(181, 192, 202, 0.20)",
 														}}
 													>
 														<div className="flex items-center gap-3">
 															{/* Step Icon */}
-															<div className="w-8 h-8 rounded-[8px] bg-white flex items-center justify-center flex-shrink-0">
+															<div className="w-8 h-8 rounded-[8px] bg-bg flex items-center justify-center flex-shrink-0">
 																{step.status === "queued" && (
 																	<CircleDashedIcon className="text-black size-[16px]" />
 																)}
@@ -327,7 +327,7 @@ export function Sidebar({ data }: { data: Promise<SidebarDataObject> }) {
 
 												{/* Mobile Accordion Content */}
 												{isExpanded && generation && (
-													<div className="block md:hidden mt-2 bg-white/5 rounded-lg p-4 border border-border">
+													<div className="block md:hidden mt-2 bg-bg/5 rounded-lg p-4 border border-border">
 														<GenerationView generation={generation} />
 														<MobileActions generation={generation} />
 													</div>

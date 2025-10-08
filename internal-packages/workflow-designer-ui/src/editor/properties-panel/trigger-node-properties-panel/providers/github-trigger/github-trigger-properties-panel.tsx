@@ -336,7 +336,7 @@ export function Installed({
 						<div className="flex gap-[8px] mt-[12px] px-[4px]">
 							<button
 								type="button"
-								className="flex-1 bg-black-700 hover:bg-black-600 text-white font-medium px-4 py-2 rounded-md text-[14px] transition-colors disabled:opacity-50 relative"
+								className="flex-1 bg-bg-700 hover:bg-bg-600 text-white font-medium px-4 py-2 rounded-md text-[14px] transition-colors disabled:opacity-50 relative"
 								onClick={() => {
 									setStep({
 										state: "select-repository",
@@ -525,7 +525,7 @@ export function Installed({
 									"group w-full flex justify-between items-center rounded-[8px] py-[8px] pl-[28px] pr-[4px] outline-none focus:outline-none",
 									callsignError
 										? "border border-red-500 focus:border-red-400"
-										: "border border-white-400 focus:border-white-900",
+										: "border border-white-400 focus:border-border",
 									"text-[14px] bg-transparent",
 								)}
 								placeholder="code-review"
@@ -544,7 +544,7 @@ export function Installed({
 					<div className="pt-[8px] flex gap-[8px] mt-[12px] px-[4px]">
 						<button
 							type="button"
-							className="flex-1 bg-black-700 hover:bg-black-600 text-white font-medium px-4 py-2 rounded-md text-[14px] transition-colors disabled:opacity-50 relative"
+							className="flex-1 bg-bg-700 hover:bg-bg-600 text-white font-medium px-4 py-2 rounded-md text-[14px] transition-colors disabled:opacity-50 relative"
 							onClick={() => {
 								setCallsignError(null);
 								setStep({

@@ -17,7 +17,7 @@ export default function Page() {
 		| "owner";
 
 	return (
-		<div className="flex flex-col h-screen bg-black-900">
+		<div className="flex flex-col h-screen bg-bg-900">
 			<Editor isReadOnly={isReadOnly} userRole={userRole} />
 		</div>
 	);

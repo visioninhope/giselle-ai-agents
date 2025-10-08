@@ -253,7 +253,7 @@ export function TeamProfileEditModal({
 			}}
 		>
 			<Dialog.Portal>
-				<Dialog.Overlay className="fixed inset-0 bg-black/60 z-50" />
+				<Dialog.Overlay className="fixed inset-0 bg-bg/60 z-50" />
 				<div className="fixed inset-0 flex items-center justify-center z-50 p-4">
 					<Dialog.Content
 						className="w-[90vw] max-w-[420px] max-h-[90vh] overflow-y-auto rounded-[12px] p-6 relative shadow-xl focus:outline-none"
@@ -332,7 +332,7 @@ export function TeamProfileEditModal({
 											<button
 												type="button"
 												onClick={handleSelectImageClick}
-												className="group relative w-[80px] h-[80px] rounded-full overflow-hidden cursor-pointer focus:outline-none focus:ring-0 border border-primary-100/20 hover:before:content-[''] hover:before:absolute hover:before:inset-0 hover:before:bg-black-900/40 hover:before:z-10"
+												className="group relative w-[80px] h-[80px] rounded-full overflow-hidden cursor-pointer focus:outline-none focus:ring-0 border border-primary-100/20 hover:before:content-[''] hover:before:absolute hover:before:inset-0 hover:before:bg-bg-900/40 hover:before:z-10"
 											>
 												<TeamAvatarImage
 													avatarUrl={initialAvatarUrl}
@@ -342,7 +342,7 @@ export function TeamProfileEditModal({
 													alt={alt}
 													className="object-cover w-full h-full"
 												/>
-												<div className="absolute inset-0 flex items-center justify-center bg-black-900/50 opacity-0 group-hover:opacity-100 transition-opacity">
+												<div className="absolute inset-0 flex items-center justify-center bg-bg-900/50 opacity-0 group-hover:opacity-100 transition-opacity">
 													<div className="w-[40px] h-[40px] rounded-full flex items-center justify-center">
 														<ImageIcon className="w-7 h-7 text-white-800 transform group-hover:scale-110 transition-transform" />
 													</div>
@@ -355,7 +355,7 @@ export function TeamProfileEditModal({
 											<button
 												type="button"
 												onClick={handleSelectImageClick}
-												className="group relative w-[80px] h-[80px] rounded-full overflow-hidden cursor-pointer focus:outline-none focus:ring-0 border border-primary-100/30 hover:before:content-[''] hover:before:absolute hover:before:inset-0 hover:before:bg-black-900/40 hover:before:z-10"
+												className="group relative w-[80px] h-[80px] rounded-full overflow-hidden cursor-pointer focus:outline-none focus:ring-0 border border-primary-100/30 hover:before:content-[''] hover:before:absolute hover:before:inset-0 hover:before:bg-bg-900/40 hover:before:z-10"
 												aria-label="Change team profile image"
 											>
 												<Image
@@ -366,7 +366,7 @@ export function TeamProfileEditModal({
 													className="object-cover w-full h-full scale-[1.02]"
 													style={{ objectPosition: "center" }}
 												/>
-												<div className="absolute inset-0 flex items-center justify-center bg-black-900/50 opacity-0 group-hover:opacity-100 transition-opacity">
+												<div className="absolute inset-0 flex items-center justify-center bg-bg-900/50 opacity-0 group-hover:opacity-100 transition-opacity">
 													<div className="w-[40px] h-[40px] rounded-full flex items-center justify-center">
 														<ImageIcon className="w-7 h-7 text-white-800 transform group-hover:scale-110 transition-transform" />
 													</div>

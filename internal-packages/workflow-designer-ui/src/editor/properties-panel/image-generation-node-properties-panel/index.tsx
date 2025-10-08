@@ -212,7 +212,7 @@ export function ImageGenerationNodePropertiesPanel({
 								className={clsx(
 									"flex gap-[16px] text-[14px] font-accent",
 									"**:p-[4px] **:border-b **:cursor-pointer",
-									"**:data-[state=active]:text-white-900 **:data-[state=active]:border-white-900",
+									"**:data-[state=active]:text-inverse **:data-[state=active]:border-border",
 									"**:data-[state=inactive]:text-black-400 **:data-[state=inactive]:border-transparent",
 								)}
 							>

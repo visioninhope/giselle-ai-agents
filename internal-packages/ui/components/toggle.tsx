@@ -27,7 +27,7 @@ export function Toggle({
 				<Switch.Thumb
 					className={clsx(
 						"block size-[11px] translate-x-[2px] rounded-full",
-						"bg-white-400 data-[state=checked]:bg-white-900",
+						"bg-bg-400 data-[state=checked]:bg-bg-900",
 						"transition-transform duration-100 will-change-transform data-[state=checked]:translate-x-[13px]",
 					)}
 				/>

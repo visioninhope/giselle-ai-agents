@@ -92,7 +92,7 @@ export default async function StagePage({
 									return (
 										<TableRow
 											key={act.id}
-											className="hover:bg-white/5 transition-colors duration-200 cursor-pointer"
+											className="hover:bg-bg/5 transition-colors duration-200 cursor-pointer"
 										>
 											<TableCell className="text-center w-6">
 												<Link

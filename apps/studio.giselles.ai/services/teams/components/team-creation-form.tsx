@@ -84,7 +84,7 @@ export function TeamCreationForm({
 				)}
 			</Dialog.Trigger>
 			<Dialog.Portal>
-				<Dialog.Overlay className="fixed inset-0 bg-black/60 z-50" />
+				<Dialog.Overlay className="fixed inset-0 bg-bg/60 z-50" />
 				<div className="fixed inset-0 flex items-center justify-center z-50 p-4">
 					<Dialog.Content
 						className={cn(
@@ -159,7 +159,7 @@ export function TeamCreationForm({
 											>
 												<Card
 													className={
-														"bg-black-850 border-[0.5px] border-black-400 cursor-pointer"
+														"bg-bg-850 border-[0.5px] border-black-400 cursor-pointer"
 													}
 												>
 													<label htmlFor="free">
@@ -193,7 +193,7 @@ export function TeamCreationForm({
 														</CardHeader>
 													</label>
 												</Card>
-												<Card className="bg-black-850 border-[0.5px] border-black-400 cursor-pointer">
+												<Card className="bg-bg-850 border-[0.5px] border-black-400 cursor-pointer">
 													<label htmlFor="pro">
 														<CardHeader>
 															<div className="flex flex-col gap-2">

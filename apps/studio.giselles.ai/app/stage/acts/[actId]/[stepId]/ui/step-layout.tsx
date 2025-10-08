@@ -73,7 +73,7 @@ export function StepLayout({ header, children, generation }: StepLayoutProps) {
 					<div className="flex items-center gap-1">
 						<button
 							type="button"
-							className="p-3 md:p-2 hover:bg-white/10 rounded-lg transition-colors group relative touch-manipulation"
+							className="p-3 md:p-2 hover:bg-bg/10 rounded-lg transition-colors group relative touch-manipulation"
 							title={copyFeedback ? "Copied!" : "Copy content"}
 							onClick={handleCopyToClipboard}
 						>
@@ -85,7 +85,7 @@ export function StepLayout({ header, children, generation }: StepLayoutProps) {
 						</button>
 						<button
 							type="button"
-							className="p-3 md:p-2 hover:bg-white/10 rounded-lg transition-colors group touch-manipulation"
+							className="p-3 md:p-2 hover:bg-bg/10 rounded-lg transition-colors group touch-manipulation"
 							title="Download content"
 							onClick={handleDownload}
 						>

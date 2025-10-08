@@ -35,7 +35,7 @@ export function PropertiesPanel() {
 	);
 	return (
 		<section
-			className={clsx("h-full text-white-900")}
+			className={clsx("h-full text-inverse")}
 			aria-label="Properties Panel"
 			onFocus={() => setCurrentShortcutScope("properties-panel")}
 			onBlur={(e) => {

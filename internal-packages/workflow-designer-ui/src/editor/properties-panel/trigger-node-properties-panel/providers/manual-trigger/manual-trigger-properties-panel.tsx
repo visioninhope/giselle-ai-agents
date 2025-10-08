@@ -154,7 +154,7 @@ export function ManualTriggerPropertiesPanel({ node }: { node: TriggerNode }) {
 								{parameters.map((param) => (
 									<div
 										key={param.id}
-										className="flex items-center justify-between p-[8px] bg-white-900/10 rounded-[4px]"
+										className="flex items-center justify-between p-[8px] bg-bg-900/10 rounded-[4px]"
 									>
 										<div className="flex items-center gap-[8px]">
 											<span className="font-medium">{param.name}</span>
@@ -210,7 +210,7 @@ export function ManualTriggerPropertiesPanel({ node }: { node: TriggerNode }) {
 									name="name"
 									type="text"
 									placeholder="Write the parameter name"
-									className="w-full flex justify-between items-center rounded-[8px] py-[8px] px-[12px] outline-none focus:outline-none border-[1px] border-white-900 text-[14px]"
+									className="w-full flex justify-between items-center rounded-[8px] py-[8px] px-[12px] outline-none focus:outline-none border-[1px] border-border text-[14px]"
 									data-1p-ignore
 								/>
 								<Select

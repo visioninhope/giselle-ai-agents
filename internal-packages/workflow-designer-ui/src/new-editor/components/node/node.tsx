@@ -281,7 +281,7 @@ function CanvasNode({
 								v.isFillIcon && "fill-current",
 								v.isStrokeIcon && "stroke-current fill-none",
 								v.isDarkIconText && "text-black-900",
-								v.isLightIconText && "text-white-900",
+								v.isLightIconText && "text-inverse",
 							)}
 						/>
 					</div>
@@ -339,7 +339,7 @@ function CanvasNode({
 										v.isQuery && "!bg-query-node-1 !border-query-node-1",
 									)}
 								/>
-								<div className={clsx("px-[12px] text-white-900 text-[12px]")}>
+								<div className={clsx("px-[12px] text-inverse text-[12px]")}>
 									{input.label}
 								</div>
 							</div>
@@ -363,7 +363,7 @@ function CanvasNode({
 										position={Position.Right}
 										className={clsx(
 											"!absolute !w-[12px] !h-[12px] !rounded-full !border-[1.5px] !right-[-0.5px]",
-											!isConnected && "!bg-black-900",
+											!isConnected && "!bg-bg-900",
 											v.isTextGeneration && "!border-generation-node-1",
 											v.isImageGeneration && "!border-image-generation-node-1",
 											v.isGithub && "!border-github-node-1",
@@ -423,7 +423,7 @@ function CanvasNode({
 										className={clsx(
 											"text-[12px]",
 											isConnected
-												? "px-[16px] text-white-900"
+												? "px-[16px] text-inverse"
 												: "absolute -right-[12px] whitespace-nowrap translate-x-[100%] text-black-400",
 										)}
 									>

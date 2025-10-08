@@ -56,7 +56,7 @@ export function ImageGenerationLoading({
 
 	return (
 		<div
-			className="bg-white-900/10 rounded-[8px] flex items-center justify-center text-white-400 relative overflow-hidden h-full"
+			className="bg-bg-900/10 rounded-[8px] flex items-center justify-center text-white-400 relative overflow-hidden h-full"
 			style={{
 				aspectRatio,
 				width: "auto",

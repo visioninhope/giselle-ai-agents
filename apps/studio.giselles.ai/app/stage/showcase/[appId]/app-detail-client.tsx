@@ -99,7 +99,7 @@ export function AppDetailClient({ appDetails }: AppDetailClientProps) {
 							<div className="pointer-events-none absolute inset-0 z-10 rounded-[inherit] border-[0.5px] border-white/5" />
 
 							<div className="relative z-10 flex h-full w-full flex-col items-center justify-center text-white/80">
-								<div className="w-full h-full bg-white/5 rounded-lg flex items-center justify-center">
+								<div className="w-full h-full bg-bg/5 rounded-lg flex items-center justify-center">
 									<svg
 										role="img"
 										aria-label="App icon"
@@ -134,7 +134,7 @@ export function AppDetailClient({ appDetails }: AppDetailClientProps) {
 										className="rounded-full"
 									/>
 								) : (
-									<div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center">
+									<div className="w-6 h-6 rounded-full bg-bg/20 flex items-center justify-center">
 										<span className="text-xs text-text-muted">
 											{appDetails.creator.name.charAt(0).toUpperCase()}
 										</span>
@@ -155,7 +155,7 @@ export function AppDetailClient({ appDetails }: AppDetailClientProps) {
 						<div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-0">
 							{/* Left: Stats */}
 							<div className="flex items-center gap-3">
-								<div className="flex items-center gap-2 px-3 py-2 rounded-full bg-white/10 text-sm text-text">
+								<div className="flex items-center gap-2 px-3 py-2 rounded-full bg-bg/10 text-sm text-text">
 									<Play className="h-4 w-4" fill="currentColor" />
 									<span>{appDetails.executionCount}</span>
 								</div>
@@ -165,7 +165,7 @@ export function AppDetailClient({ appDetails }: AppDetailClientProps) {
 									className={`group flex items-center gap-2 px-3 py-2 rounded-full text-sm transition-colors ${
 										isFavorite
 											? "bg-yellow-500/20 text-yellow-400"
-											: "bg-white/10 text-text hover:bg-white/20"
+											: "bg-bg/10 text-text hover:bg-bg/20"
 									}`}
 								>
 									<Star

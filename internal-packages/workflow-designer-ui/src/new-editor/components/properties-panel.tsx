@@ -31,7 +31,7 @@ export function PropertiesPanel() {
 	return (
 		<aside
 			className={clsx(
-				"w-[420px] shrink-0 border-l border-black-300 h-full overflow-y-auto bg-black-50/20",
+				"w-[420px] shrink-0 border-l border-black-300 h-full overflow-y-auto bg-bg-50/20",
 			)}
 			aria-label="Properties Panel"
 		>
