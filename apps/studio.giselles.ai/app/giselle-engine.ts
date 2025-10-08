@@ -270,6 +270,7 @@ function getRuntimeEnv(): "trigger.dev" | "vercel" | "local" | "unknown" {
 const runtimeEnv = getRuntimeEnv();
 
 const generateContentProcessor =
+	process.env.USE_TRIGGER_DEV === "1" ||
 	runtimeEnv === "trigger.dev" ||
 	(runtimeEnv === "vercel" && process.env.NODE_ENV !== "development")
 		? "trigger.dev"
