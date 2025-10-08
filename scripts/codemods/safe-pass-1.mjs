@@ -11,7 +11,7 @@ import path from "node:path";
 const ROOT = process.cwd();
 const DRY_RUN = !process.argv.includes("--apply");
 
-const FILE_GLOBS = [".tsx", ".ts", ".css", ".svg"];
+const FILE_EXTENSIONS = [".tsx", ".ts", ".css", ".svg"];
 
 const REPLACERS = [
 	{
@@ -35,7 +35,7 @@ function walk(dir) {
 		if (e.name === "node_modules" || e.name.startsWith(".")) continue;
 		const p = path.join(dir, e.name);
 		if (e.isDirectory()) walk(p);
-		else if (FILE_GLOBS.some((ext) => p.endsWith(ext))) processFile(p);
+		else if (FILE_EXTENSIONS.some((ext) => p.endsWith(ext))) processFile(p);
 	}
 }
 
