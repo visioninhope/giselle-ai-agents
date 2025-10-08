@@ -54,17 +54,13 @@ const githubEventInputs: GithubEventInputMap = {
 		body: { label: "Issue Comment", type: "multiline-text", required: true },
 	},
 	"github.pull_request_comment.created": {
-		pullRequestNumber: {
+		issueNumber: {
 			label: "Pull Request Number",
 			type: "number",
 			required: true,
 		},
-		pullRequestTitle: {
-			label: "Pull Request Title",
-			type: "text",
-			required: true,
-		},
-		pullRequestBody: {
+		issueTitle: { label: "Pull Request Title", type: "text", required: true },
+		issueBody: {
 			label: "Pull Request Body",
 			type: "multiline-text",
 			required: true,

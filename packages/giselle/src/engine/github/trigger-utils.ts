@@ -561,47 +561,48 @@ async function resolvePullRequestCommentTrigger(
 		return null;
 	}
 
-	const legacyAccessorMap = {
-		issueNumber: "pullRequestNumber",
-		issueTitle: "pullRequestTitle",
-		issueBody: "pullRequestBody",
-	};
-
-	const accessor =
-		legacyAccessorMap[args.output.accessor as keyof typeof legacyAccessorMap] ??
-		args.output.accessor;
-
 	for (const payload of args.githubTrigger.event.payloads.keyof().options) {
-		if (accessor !== payload) {
-			continue;
-		}
-
 		switch (payload) {
 			case "body":
+				if (args.output.accessor !== payload) {
+					continue;
+				}
 				return {
 					type: "generated-text",
 					outputId: args.output.id,
 					content: command.content,
 				} satisfies GenerationOutput;
-			case "pullRequestBody":
+			case "issueBody":
+				if (args.output.accessor !== payload) {
+					continue;
+				}
 				return {
 					type: "generated-text",
 					outputId: args.output.id,
 					content: args.webhookEvent.data.payload.issue.body ?? "",
 				} satisfies GenerationOutput;
-			case "pullRequestNumber":
+			case "issueNumber":
+				if (args.output.accessor !== payload) {
+					continue;
+				}
 				return {
 					type: "generated-text",
 					outputId: args.output.id,
 					content: args.webhookEvent.data.payload.issue.number.toString(),
 				} satisfies GenerationOutput;
-			case "pullRequestTitle":
+			case "issueTitle":
+				if (args.output.accessor !== payload) {
+					continue;
+				}
 				return {
 					type: "generated-text",
 					outputId: args.output.id,
 					content: args.webhookEvent.data.payload.issue.title,
 				} satisfies GenerationOutput;
 			case "diff": {
+				if (args.output.accessor !== payload) {
+					continue;
+				}
 				const diff = await getPullRequestDiff({
 					repositoryNodeId: args.webhookEvent.data.payload.repository.node_id,
 					pullNumber: args.webhookEvent.data.payload.issue.number,
