@@ -209,7 +209,7 @@ export function Sidebar({ data }: { data: Promise<SidebarDataObject> }) {
 				</div>
 
 				{/* Separator Line */}
-				<div className="border-t border-white/10 my-4"></div>
+				<div className="border-t border-border my-4"></div>
 
 				{/* Steps Section */}
 				<div className="space-y-4 pb-4 px-[16px] md:px-[32px] md:flex-1 md:overflow-y-auto md:min-h-0">
@@ -327,7 +327,7 @@ export function Sidebar({ data }: { data: Promise<SidebarDataObject> }) {
 
 												{/* Mobile Accordion Content */}
 												{isExpanded && generation && (
-													<div className="block md:hidden mt-2 bg-white/5 rounded-lg p-4 border border-white/10">
+													<div className="block md:hidden mt-2 bg-white/5 rounded-lg p-4 border border-border">
 														<GenerationView generation={generation} />
 														<MobileActions generation={generation} />
 													</div>

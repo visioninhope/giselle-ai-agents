@@ -18,6 +18,13 @@ const AUTH_SERVICE_UNAVAILABLE_MESSAGE =
 const GENERIC_AUTH_ERROR_MESSAGE =
 	"We could not complete your request. Please try again.";
 
+const AUTH_ERROR_MESSAGE_OVERRIDES: Record<string, string> = {
+	"token has expired or is invalid":
+		"The confirmation code you've entered has expired or is invalid.",
+	"verify requires either a token or a token hash":
+		"Please enter a confirmation code.",
+};
+
 function isRecord(value: unknown): value is Record<string, unknown> {
 	return typeof value === "object" && value !== null;
 }
@@ -102,6 +109,19 @@ function shouldMaskServiceUnavailability(
 	return isHtmlResponseParseFailure(error.message);
 }
 
+function normalizeAuthMessage(message: string): string {
+	return message.trim().toLowerCase();
+}
+
+function getAuthErrorMessage(error: SupabaseAuthErrorLike): string {
+	const normalizedMessage = normalizeAuthMessage(error.message);
+	const overrideMessage = AUTH_ERROR_MESSAGE_OVERRIDES[normalizedMessage];
+	if (overrideMessage !== undefined) {
+		return overrideMessage;
+	}
+	return error.message;
+}
+
 export function createAuthError(error: unknown): AuthError {
 	if (isSupabaseAuthErrorLike(error)) {
 		if (shouldMaskServiceUnavailability(error)) {
@@ -115,7 +135,7 @@ export function createAuthError(error: unknown): AuthError {
 
 		return {
 			code: error.code,
-			message: error.message,
+			message: getAuthErrorMessage(error),
 			name: error.name,
 			status: normalizeStatus(error.status),
 		};

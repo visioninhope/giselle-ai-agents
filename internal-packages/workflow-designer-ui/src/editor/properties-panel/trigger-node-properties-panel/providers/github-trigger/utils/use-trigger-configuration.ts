@@ -4,7 +4,7 @@ import {
 	OutputId,
 	type TriggerNode,
 } from "@giselle-sdk/data-type";
-import { githubTriggers } from "@giselle-sdk/flow";
+import { getGitHubDisplayLabel, githubTriggers } from "@giselle-sdk/flow";
 import {
 	useFeatureFlag,
 	useGiselleEngine,
@@ -45,7 +45,10 @@ export const useTriggerConfiguration = ({
 			for (const key of trigger.event.payloads.keyof().options) {
 				outputs.push({
 					id: OutputId.generate(),
-					label: key,
+					label: getGitHubDisplayLabel({
+						eventId: event.id,
+						accessor: key,
+					}),
 					accessor: key,
 				});
 			}

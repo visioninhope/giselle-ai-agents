@@ -116,7 +116,7 @@ export function RunModal({
 						}}
 					/>
 					<div className="absolute -z-10 top-0 left-4 right-4 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
-					<div className="absolute -z-10 inset-0 border border-white/10 rounded-t-2xl" />
+					<div className="absolute -z-10 inset-0 border border-border rounded-t-2xl" />
 
 					{/* Header */}
 					<div className="flex items-center justify-between mb-4 px-6 pt-6">

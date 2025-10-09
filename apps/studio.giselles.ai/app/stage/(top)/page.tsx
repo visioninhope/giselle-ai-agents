@@ -59,7 +59,7 @@ export default async function StagePage({
 		avatarUrl: team.avatarUrl ?? undefined,
 	}));
 	return (
-		<div className="flex-1 bg-[var(--color-stage-background)] pb-[calc(4rem+env(safe-area-inset-bottom))] md:pb-0 h-full flex flex-col">
+		<div className="flex-1 bg-bg pb-[calc(4rem+env(safe-area-inset-bottom))] md:pb-0 h-full flex flex-col">
 			<ResizableLayout
 				mainContent={
 					<div className="space-y-6 py-6 h-full md:h-full max-h-full overflow-y-auto md:overflow-hidden relative">

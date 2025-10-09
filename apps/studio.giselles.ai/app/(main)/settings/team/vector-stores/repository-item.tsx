@@ -148,7 +148,7 @@ export function RepositoryItem({
 							</DropdownMenuTrigger>
 							<DropdownMenuContent
 								align="end"
-								className="w-[180px] bg-surface border-[0.5px] border-border-muted rounded-[8px]"
+								className="w-[180px] bg-surface border-[0.5px] border-border rounded-[8px]"
 							>
 								<DropdownMenuItem
 									onClick={handleManualIngest}
@@ -472,7 +472,7 @@ function SyncStatusBadge({
 	}
 
 	return (
-		<div className="flex items-center px-2 py-1 rounded-full border border-white/20 w-[80px]">
+		<div className="flex items-center px-2 py-1 rounded-full border border-border-muted w-[80px]">
 			{badgeContent}
 		</div>
 	);

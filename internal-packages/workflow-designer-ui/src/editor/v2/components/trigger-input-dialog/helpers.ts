@@ -1,5 +1,9 @@
 import type { FlowTrigger, TriggerNode } from "@giselle-sdk/data-type";
-import type { githubTriggers } from "@giselle-sdk/flow";
+import {
+	type GitHubTriggerEventId,
+	getGitHubDisplayLabel,
+	type githubTriggers,
+} from "@giselle-sdk/flow";
 import type { z } from "zod";
 
 export function buttonLabel(node: TriggerNode) {
@@ -30,103 +34,280 @@ type GithubEventInputMap = {
 	};
 };
 
+function createInput(args: {
+	eventId: GitHubTriggerEventId;
+	accessor: string;
+	type: FormInput["type"];
+	required?: boolean;
+}): Omit<FormInput, "name"> {
+	return {
+		label: getGitHubDisplayLabel({
+			eventId: args.eventId,
+			accessor: args.accessor,
+		}),
+		type: args.type,
+		required: args.required ?? true,
+	};
+}
+
 const githubEventInputs: GithubEventInputMap = {
 	"github.issue.created": {
-		issueNumber: { label: "Issue Number", type: "number", required: true },
-		title: { label: "Title", type: "text", required: true },
-		body: { label: "Body", type: "multiline-text", required: false },
+		issueNumber: createInput({
+			eventId: "github.issue.created",
+			accessor: "issueNumber",
+			type: "number",
+		}),
+		title: createInput({
+			eventId: "github.issue.created",
+			accessor: "title",
+			type: "text",
+		}),
+		body: createInput({
+			eventId: "github.issue.created",
+			accessor: "body",
+			type: "multiline-text",
+			required: false,
+		}),
 	},
 	"github.issue.closed": {
-		issueNumber: { label: "Issue Number", type: "number", required: true },
-		title: { label: "Title", type: "text", required: true },
-		body: { label: "Body", type: "multiline-text", required: false },
+		issueNumber: createInput({
+			eventId: "github.issue.closed",
+			accessor: "issueNumber",
+			type: "number",
+		}),
+		title: createInput({
+			eventId: "github.issue.closed",
+			accessor: "title",
+			type: "text",
+		}),
+		body: createInput({
+			eventId: "github.issue.closed",
+			accessor: "body",
+			type: "multiline-text",
+			required: false,
+		}),
 	},
 	"github.issue.labeled": {
-		issueNumber: { label: "Issue Number", type: "number", required: true },
-		title: { label: "Title", type: "text", required: true },
-		body: { label: "Body", type: "multiline-text", required: false },
-		labelName: { label: "Label Name", type: "text", required: true },
+		issueNumber: createInput({
+			eventId: "github.issue.labeled",
+			accessor: "issueNumber",
+			type: "number",
+		}),
+		title: createInput({
+			eventId: "github.issue.labeled",
+			accessor: "title",
+			type: "text",
+		}),
+		body: createInput({
+			eventId: "github.issue.labeled",
+			accessor: "body",
+			type: "multiline-text",
+			required: false,
+		}),
+		labelName: createInput({
+			eventId: "github.issue.labeled",
+			accessor: "labelName",
+			type: "text",
+		}),
 	},
 	"github.issue_comment.created": {
-		issueNumber: { label: "Issue Number", type: "number", required: true },
-		issueTitle: { label: "Issue Title", type: "text", required: true },
-		issueBody: { label: "Issue Body", type: "multiline-text", required: true },
-		body: { label: "Issue Comment", type: "multiline-text", required: true },
+		issueNumber: createInput({
+			eventId: "github.issue_comment.created",
+			accessor: "issueNumber",
+			type: "number",
+		}),
+		issueTitle: createInput({
+			eventId: "github.issue_comment.created",
+			accessor: "issueTitle",
+			type: "text",
+		}),
+		issueBody: createInput({
+			eventId: "github.issue_comment.created",
+			accessor: "issueBody",
+			type: "multiline-text",
+		}),
+		body: createInput({
+			eventId: "github.issue_comment.created",
+			accessor: "body",
+			type: "multiline-text",
+		}),
 	},
 	"github.pull_request_comment.created": {
-		issueNumber: {
-			label: "Pull Request Number",
+		issueNumber: createInput({
+			eventId: "github.pull_request_comment.created",
+			accessor: "issueNumber",
 			type: "number",
-			required: true,
-		},
-		issueTitle: { label: "Pull Request Title", type: "text", required: true },
-		issueBody: {
-			label: "Pull Request Body",
+		}),
+		issueTitle: createInput({
+			eventId: "github.pull_request_comment.created",
+			accessor: "issueTitle",
+			type: "text",
+		}),
+		issueBody: createInput({
+			eventId: "github.pull_request_comment.created",
+			accessor: "issueBody",
 			type: "multiline-text",
-			required: true,
-		},
-		body: {
-			label: "Pull Request Comment",
+		}),
+		body: createInput({
+			eventId: "github.pull_request_comment.created",
+			accessor: "body",
 			type: "multiline-text",
-			required: true,
-		},
-		diff: {
-			label: "diff",
+		}),
+		diff: createInput({
+			eventId: "github.pull_request_comment.created",
+			accessor: "diff",
 			type: "multiline-text",
 			required: false,
-		},
+		}),
 	},
 	"github.pull_request.ready_for_review": {
-		title: { label: "Title", type: "text", required: true },
-		body: { label: "Body", type: "multiline-text", required: false },
-		number: { label: "Number", type: "number", required: true },
-		diff: { label: "diff", type: "multiline-text", required: false },
-		pullRequestUrl: { label: "Pull request URL", type: "text", required: true },
+		title: createInput({
+			eventId: "github.pull_request.ready_for_review",
+			accessor: "title",
+			type: "text",
+		}),
+		body: createInput({
+			eventId: "github.pull_request.ready_for_review",
+			accessor: "body",
+			type: "multiline-text",
+			required: false,
+		}),
+		number: createInput({
+			eventId: "github.pull_request.ready_for_review",
+			accessor: "number",
+			type: "number",
+		}),
+		diff: createInput({
+			eventId: "github.pull_request.ready_for_review",
+			accessor: "diff",
+			type: "multiline-text",
+			required: false,
+		}),
+		pullRequestUrl: createInput({
+			eventId: "github.pull_request.ready_for_review",
+			accessor: "pullRequestUrl",
+			type: "text",
+		}),
 	},
 	"github.pull_request.closed": {
-		title: { label: "Title", type: "text", required: true },
-		body: { label: "Body", type: "multiline-text", required: false },
-		number: { label: "Number", type: "number", required: true },
-		diff: { label: "diff", type: "multiline-text", required: false },
-		pullRequestUrl: { label: "Pull request URL", type: "text", required: true },
+		title: createInput({
+			eventId: "github.pull_request.closed",
+			accessor: "title",
+			type: "text",
+		}),
+		body: createInput({
+			eventId: "github.pull_request.closed",
+			accessor: "body",
+			type: "multiline-text",
+			required: false,
+		}),
+		number: createInput({
+			eventId: "github.pull_request.closed",
+			accessor: "number",
+			type: "number",
+		}),
+		diff: createInput({
+			eventId: "github.pull_request.closed",
+			accessor: "diff",
+			type: "multiline-text",
+			required: false,
+		}),
+		pullRequestUrl: createInput({
+			eventId: "github.pull_request.closed",
+			accessor: "pullRequestUrl",
+			type: "text",
+		}),
 	},
 	"github.pull_request.opened": {
-		title: { label: "Title", type: "text", required: true },
-		body: { label: "Body", type: "multiline-text", required: false },
-		number: { label: "Number", type: "number", required: true },
-		diff: { label: "diff", type: "multiline-text", required: false },
-		pullRequestUrl: { label: "Pull request URL", type: "text", required: true },
+		title: createInput({
+			eventId: "github.pull_request.opened",
+			accessor: "title",
+			type: "text",
+		}),
+		body: createInput({
+			eventId: "github.pull_request.opened",
+			accessor: "body",
+			type: "multiline-text",
+			required: false,
+		}),
+		number: createInput({
+			eventId: "github.pull_request.opened",
+			accessor: "number",
+			type: "number",
+		}),
+		diff: createInput({
+			eventId: "github.pull_request.opened",
+			accessor: "diff",
+			type: "multiline-text",
+			required: false,
+		}),
+		pullRequestUrl: createInput({
+			eventId: "github.pull_request.opened",
+			accessor: "pullRequestUrl",
+			type: "text",
+		}),
 	},
 	"github.pull_request_review_comment.created": {
-		body: { label: "Body", type: "multiline-text", required: true },
-		pullRequestNumber: { label: "Number", type: "number", required: true },
-		pullRequestTitle: { label: "Title", type: "text", required: true },
-		pullRequestBody: { label: "Body", type: "multiline-text", required: false },
-		previousCommentBody: {
-			label: "Previous comment body",
+		body: createInput({
+			eventId: "github.pull_request_review_comment.created",
+			accessor: "body",
+			type: "multiline-text",
+		}),
+		pullRequestNumber: createInput({
+			eventId: "github.pull_request_review_comment.created",
+			accessor: "pullRequestNumber",
+			type: "number",
+		}),
+		pullRequestTitle: createInput({
+			eventId: "github.pull_request_review_comment.created",
+			accessor: "pullRequestTitle",
+			type: "text",
+		}),
+		pullRequestBody: createInput({
+			eventId: "github.pull_request_review_comment.created",
+			accessor: "pullRequestBody",
 			type: "multiline-text",
 			required: false,
-		},
-		diff: { label: "diff", type: "multiline-text", required: true },
-		id: { label: "ID", type: "number", required: true },
+		}),
+		previousCommentBody: createInput({
+			eventId: "github.pull_request_review_comment.created",
+			accessor: "previousCommentBody",
+			type: "multiline-text",
+			required: false,
+		}),
+		diff: createInput({
+			eventId: "github.pull_request_review_comment.created",
+			accessor: "diff",
+			type: "multiline-text",
+		}),
+		id: createInput({
+			eventId: "github.pull_request_review_comment.created",
+			accessor: "id",
+			type: "number",
+		}),
 	},
 	"github.pull_request.labeled": {
-		pullRequestNumber: {
-			label: "Pull Request Number",
+		pullRequestNumber: createInput({
+			eventId: "github.pull_request.labeled",
+			accessor: "pullRequestNumber",
 			type: "number",
-			required: true,
-		},
-		pullRequestTitle: {
-			label: "Pull Request Title",
+		}),
+		pullRequestTitle: createInput({
+			eventId: "github.pull_request.labeled",
+			accessor: "pullRequestTitle",
 			type: "text",
-			required: true,
-		},
-		pullRequestBody: {
-			label: "Pull Request Body",
+		}),
+		pullRequestBody: createInput({
+			eventId: "github.pull_request.labeled",
+			accessor: "pullRequestBody",
 			type: "multiline-text",
 			required: false,
-		},
-		labelName: { label: "Label Name", type: "text", required: true },
+		}),
+		labelName: createInput({
+			eventId: "github.pull_request.labeled",
+			accessor: "labelName",
+			type: "text",
+		}),
 	},
 };
 
