@@ -316,56 +316,6 @@ function CanvasNode({
 			{!preview && (
 				<div className="flex justify-between">
 					<div className="grid">
-<<<<<<< HEAD
-						{node.inputs?.map((input) => {
-							const isConnected = connectedInputIds?.some(
-								(connectedInputId) => connectedInputId === input.id,
-							);
-							return (
-								<div
-									className="relative flex items-center h-[28px]"
-									key={input.id}
-								>
-									<Handle
-										type="target"
-										isConnectable={false}
-										position={Position.Left}
-										id={input.id}
-										style={
-											!isConnected
-												? {
-														backgroundColor: "var(--color-background)",
-														borderColor: "var(--color-border)",
-													}
-												: undefined
-										}
-										className={clsx(
-											"!absolute !w-[11px] !h-[11px] !rounded-full !-left-[4.5px] !translate-x-[50%] !border-[1.5px]",
-											// Apply colored backgrounds only when connected
-											isConnected &&
-												v.isTextGeneration &&
-												"!bg-generation-node-1 !border-generation-node-1",
-											isConnected &&
-												v.isImageGeneration &&
-												"!bg-image-generation-node-1 !border-image-generation-node-1",
-											isConnected &&
-												v.isWebSearch &&
-												"!bg-web-search-node-1 !border-web-search-node-1",
-											isConnected &&
-												v.isAudioGeneration &&
-												"!bg-audio-generation-node-1 !border-audio-generation-node-1",
-											isConnected &&
-												v.isVideoGeneration &&
-												"!bg-video-generation-node-1 !border-video-generation-node-1",
-											isConnected &&
-												v.isQuery &&
-												"!bg-query-node-1 !border-query-node-1",
-										)}
-									/>
-									<div className={clsx("px-[12px] text-inverse text-[12px]")}>
-										{input.label}
-									</div>
-=======
 						{node.inputs?.map((input) => (
 							<div
 								className="relative flex items-center h-[28px]"
@@ -397,10 +347,9 @@ function CanvasNode({
 								/>
 								<div className={clsx("px-[12px] text-inverse text-[12px]")}>
 									{input.label}
->>>>>>> 8f8737666 (ui: refine inverse semantics and align panels)
 								</div>
-							);
-						})}
+							</div>
+						))}
 					</div>
 
 					<div className="grid">
@@ -421,11 +370,7 @@ function CanvasNode({
 										style={
 											!isConnected
 												? {
-<<<<<<< HEAD
-														backgroundColor: "var(--color-background)",
-=======
 														background: "var(--color-background)",
->>>>>>> 8f8737666 (ui: refine inverse semantics and align panels)
 														borderColor: "var(--color-border)",
 													}
 												: undefined
