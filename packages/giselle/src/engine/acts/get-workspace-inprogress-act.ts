@@ -48,7 +48,7 @@ export async function getWorkspaceInprogressAct({
 	}
 	if (inprogressActs.length > 1) {
 		context.logger.warn(
-			`workspace(${workspaceId}) has ${inprogressActs.length}s acts.`,
+			`workspace(${workspaceId}) has ${inprogressActs.length} acts.`,
 		);
 	}
 	context.logger.debug(`return inprogress act(${inprogressActs[0].id})`);
