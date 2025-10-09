@@ -105,8 +105,10 @@ export function ConfigureSourcesDialog({
 					<div className="space-y-6">
 						{/* Sources Section */}
 						<div>
-							<h3 className="text-inverse text-[16px] font-medium">Sources</h3>
-							<div className="text-inverse/60 text-[12px] mb-4">
+							<h3 className="text-white-400 text-[16px] font-medium">
+								Sources
+							</h3>
+							<div className="text-white-400/60 text-[12px] mb-4">
 								Select which content types to ingest for {repositoryIndex.owner}
 								/{repositoryIndex.repo}
 							</div>
@@ -140,10 +142,10 @@ export function ConfigureSourcesDialog({
 
 						{/* Embedding Models Section */}
 						<div>
-							<h3 className="text-inverse text-[16px] font-medium">
+							<h3 className="text-white-400 text-[16px] font-medium">
 								Embedding Models
 							</h3>
-							<div className="text-inverse/60 text-[12px] mb-3">
+							<div className="text-white-400/60 text-[12px] mb-3">
 								Select at least one embedding model for indexing
 							</div>
 							<div className="space-y-2">
@@ -157,7 +159,7 @@ export function ConfigureSourcesDialog({
 										return (
 											<label
 												key={profileId}
-												className="flex items-start gap-3 p-2 rounded-lg bg-surface hover:bg-bg/5 transition-colors cursor-pointer"
+												className="flex items-start gap-3 p-2 rounded-lg bg-surface hover:bg-white/5 transition-colors cursor-pointer"
 											>
 												<input
 													type="checkbox"
@@ -180,10 +182,10 @@ export function ConfigureSourcesDialog({
 													className="mt-1 w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 rounded focus:ring-primary-500"
 												/>
 												<div className="flex-1">
-													<div className="text-inverse text-[14px] font-medium">
+													<div className="text-white-400 text-[14px] font-medium">
 														{profile.name}
 													</div>
-													<div className="text-inverse/60 text-[12px] mt-1">
+													<div className="text-white-400/60 text-[12px] mt-1">
 														Provider: {profile.provider} • Dimensions{" "}
 														{profile.dimensions}
 													</div>
@@ -233,7 +235,7 @@ function ContentTypeToggle({
 			<div className="flex items-center justify-between mb-1">
 				<div className="flex items-center gap-2">
 					<Icon size={18} className="text-gray-400" />
-					<span className="text-inverse font-medium text-[14px]">{label}</span>
+					<span className="text-white font-medium text-[14px]">{label}</span>
 				</div>
 				<label className="relative inline-flex items-center cursor-pointer">
 					<input
@@ -249,7 +251,7 @@ function ContentTypeToggle({
 						} ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
 					>
 						<div
-							className={`absolute w-4 h-4 bg-bg rounded-full top-1 transition-transform ${
+							className={`absolute w-4 h-4 bg-white rounded-full top-1 transition-transform ${
 								enabled ? "translate-x-6" : "translate-x-1"
 							}`}
 						/>

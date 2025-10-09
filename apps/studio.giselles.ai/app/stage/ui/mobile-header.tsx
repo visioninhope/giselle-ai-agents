@@ -15,7 +15,7 @@ export function MobileHeader() {
 				<div className="flex items-center gap-4">
 					<button
 						type="button"
-						className="text-inverse hover:text-inverse transition-colors"
+						className="text-white-700 hover:text-inverse transition-colors"
 					>
 						<BellIcon className="w-5 h-5" />
 					</button>

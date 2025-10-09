@@ -99,7 +99,7 @@ export function SearchableAgentList({
 											aria-label="App icon"
 											xmlns="http://www.w3.org/2000/svg"
 											viewBox="0 0 486 640"
-											className="h-5 w-5 text-inverse/40 transition-colors group-hover:text-primary-100"
+											className="h-5 w-5 text-white/40 transition-colors group-hover:text-primary-100"
 											fill="currentColor"
 										>
 											<title>App Icon</title>
@@ -113,7 +113,7 @@ export function SearchableAgentList({
 										<p className="text-[14px] font-sans text-inverse">
 											{agent.name || "Untitled"}
 										</p>
-										<p className="text-[12px] font-geist text-inverse">
+										<p className="text-[12px] font-geist text-white-400">
 											Edited {agent.updatedAt.toLocaleDateString()}
 										</p>
 									</div>

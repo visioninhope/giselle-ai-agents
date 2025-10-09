@@ -13,7 +13,7 @@ export default async function Page({
 		await updateWorkspaceName(WorkspaceId.parse(workspaceId), name);
 	}
 	return (
-		<div className="flex flex-col h-screen bg-bg">
+		<div className="flex flex-col h-screen bg-black-900">
 			<Editor onFlowNameChange={updateName} />
 		</div>
 	);

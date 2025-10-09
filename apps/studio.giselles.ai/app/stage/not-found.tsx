@@ -7,7 +7,7 @@ export default function NotFound() {
 		<div className="flex h-screen bg-bg items-center justify-center">
 			<div className="max-w-md mx-auto text-center p-6">
 				<div className="mb-6">
-					<h2 className="text-xl font-semibold text-inverse mb-2">
+					<h2 className="text-xl font-semibold text-white-100 mb-2">
 						Page Not Found
 					</h2>
 					<p className="text-text-muted text-sm">

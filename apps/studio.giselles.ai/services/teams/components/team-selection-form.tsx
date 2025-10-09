@@ -69,7 +69,7 @@ export function TeamSelectionForm({
 									alt={currentTeam.name}
 								/>
 								<span
-									className="text-[14px] font-geist text-inverse truncate max-w-[180px]"
+									className="text-[14px] font-geist text-white-400 truncate max-w-[180px]"
 									title={currentTeam.name}
 								>
 									{currentTeam.name}
@@ -83,13 +83,13 @@ export function TeamSelectionForm({
 						<ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50 hover:bg-accent hover:opacity-100 hover:rounded-md hover:p-0.5" />
 					</div>
 				</SelectTrigger>
-				<SelectContent className="p-2 border-[0.5px] border-white/10 rounded-xl shadow-[0_2px_8px_rgba(5,10,20,0.4),0_1px_2px_rgba(0,0,0,0.3)] bg-bg-900/50 backdrop-blur-md">
+				<SelectContent className="p-2 border-[0.5px] border-white/10 rounded-xl shadow-[0_2px_8px_rgba(5,10,20,0.4),0_1px_2px_rgba(0,0,0,0.3)] bg-black-900/50 backdrop-blur-md">
 					<div className="py-1">
 						{allTeams.map((team) => (
 							<SelectItem
 								key={team.id}
 								value={team.id}
-								className="relative flex w-full cursor-default select-none items-center rounded-lg p-1.5 pl-2 pr-8 text-sm outline-hidden focus:bg-bg/5 font-geist data-disabled:pointer-events-none data-disabled:opacity-50 [&>span:first-child]:absolute [&>span:first-child]:right-2 [&>span:first-child]:left-auto"
+								className="relative flex w-full cursor-default select-none items-center rounded-lg p-1.5 pl-2 pr-8 text-sm outline-hidden focus:bg-white/5 font-geist data-disabled:pointer-events-none data-disabled:opacity-50 [&>span:first-child]:absolute [&>span:first-child]:right-2 [&>span:first-child]:left-auto"
 							>
 								<div className="flex items-center gap-1.5 w-full">
 									<TeamAvatarImage
@@ -101,7 +101,7 @@ export function TeamSelectionForm({
 										alt={team.name}
 									/>
 									<span
-										className="truncate max-w-[140px] text-[14px] font-geist text-inverse flex-1"
+										className="truncate max-w-[140px] text-[14px] font-geist text-white-400 flex-1"
 										title={team.name}
 									>
 										{team.name}
@@ -113,13 +113,13 @@ export function TeamSelectionForm({
 						))}
 					</div>
 
-					<SelectSeparator className="bg-bg/10" />
+					<SelectSeparator className="bg-white/10" />
 
-					<div className="p-2.5 flex items-center gap-x-2 rounded-lg w-full hover:bg-bg/5">
+					<div className="p-2.5 flex items-center gap-x-2 rounded-lg w-full hover:bg-white/5">
 						<span className="grid place-items-center rounded-full size-4 bg-primary-200 opacity-50">
 							<Plus className="size-3 text-black-900" />
 						</span>
-						<span className="text-inverse font-medium text-[14px] leading-[14px] font-geist">
+						<span className="text-white-400 font-medium text-[14px] leading-[14px] font-geist">
 							{teamCreation}
 						</span>
 					</div>

@@ -8,10 +8,10 @@ export default function NotFound() {
 			<div className="flex items-center justify-center py-12">
 				<div className="mx-auto grid w-[350px] gap-[24px]">
 					<div className="flex flex-col items-center justify-center gap-6">
-						<h2 className="text-[28px] font-[500] text-inverse font-sans text-center">
+						<h2 className="text-[28px] font-[500] text-white font-sans text-center">
 							Invitation not found...
 						</h2>
-						<p className="text-inverse text-center">
+						<p className="text-white-400 text-center">
 							The invitation link you are trying to access does not exist or has
 							been removed.
 						</p>

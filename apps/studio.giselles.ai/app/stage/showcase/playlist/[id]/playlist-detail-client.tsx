@@ -138,7 +138,7 @@ export function PlaylistDetailClient({ playlist }: PlaylistDetailClientProps) {
 				<div className="flex flex-col md:flex-row md:items-end gap-6 mb-6 md:mb-8">
 					{/* Playlist Thumbnail */}
 					<div className="w-[160px] h-[160px] md:w-[232px] md:h-[232px] rounded-lg bg-gradient-to-br from-orange-400 via-pink-500 to-purple-600 flex-shrink-0 shadow-2xl mx-auto md:mx-0">
-						<div className="w-full h-full rounded-lg bg-bg/20" />
+						<div className="w-full h-full rounded-lg bg-black/20" />
 					</div>
 
 					{/* Playlist Info */}
@@ -151,7 +151,7 @@ export function PlaylistDetailClient({ playlist }: PlaylistDetailClientProps) {
 						</p>
 						<div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 text-sm text-[hsl(192,25%,65%)]">
 							<div className="flex items-center justify-center md:justify-start gap-1">
-								<span className="text-inverse font-medium">Created by you</span>
+								<span className="text-white font-medium">Created by you</span>
 								<span>•</span>
 								<span>
 									{playlist.apps.length}{" "}
@@ -203,7 +203,7 @@ export function PlaylistDetailClient({ playlist }: PlaylistDetailClientProps) {
 										>
 											<div className="absolute top-0 left-4 right-4 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
 											<DropdownMenu.Item
-												className="group flex items-center gap-3 text-sm text-inverse hover:text-inverse focus:text-inverse rounded-[8px] px-3 py-2 cursor-pointer transition-colors focus:outline-none focus:bg-bg/5 hover:bg-bg/5"
+												className="group flex items-center gap-3 text-sm text-white hover:text-white focus:text-white rounded-[8px] px-3 py-2 cursor-pointer transition-colors focus:outline-none focus:bg-white/5 hover:bg-white/5"
 												onClick={handleEditPlaylist}
 											>
 												<Edit3 size={16} className="text-[hsl(192,25%,65%)]" />
@@ -235,7 +235,7 @@ export function PlaylistDetailClient({ playlist }: PlaylistDetailClientProps) {
 					{playlist.apps.length === 0 ? (
 						<div className="flex-1 flex items-center justify-center">
 							<div className="text-center text-[hsl(192,25%,65%)]">
-								<div className="w-16 h-16 mx-auto mb-4 rounded-full bg-bg/5 flex items-center justify-center">
+								<div className="w-16 h-16 mx-auto mb-4 rounded-full bg-white/5 flex items-center justify-center">
 									<Play size={24} />
 								</div>
 								<p className="text-lg mb-2">No apps yet</p>
@@ -252,13 +252,13 @@ export function PlaylistDetailClient({ playlist }: PlaylistDetailClientProps) {
 									className="group flex items-center justify-between px-3 md:px-2 py-4 md:py-3 first:border-t-0 border-t-[0.5px] border-[var(--color-border)] cursor-pointer"
 								>
 									<div className="flex items-center gap-3 min-w-0 flex-1">
-										<div className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-bg/5 flex items-center justify-center flex-shrink-0 transition-all group-hover:bg-primary-100/20">
+										<div className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-white/5 flex items-center justify-center flex-shrink-0 transition-all group-hover:bg-primary-100/20">
 											<svg
 												role="img"
 												aria-label="App icon"
 												xmlns="http://www.w3.org/2000/svg"
 												viewBox="0 0 486 640"
-												className="h-5 w-5 text-inverse/40 transition-colors group-hover:text-primary-100"
+												className="h-5 w-5 text-white/40 transition-colors group-hover:text-primary-100"
 												fill="currentColor"
 											>
 												<title>App Icon</title>
@@ -280,7 +280,7 @@ export function PlaylistDetailClient({ playlist }: PlaylistDetailClientProps) {
 									<div className="flex items-center gap-1 md:gap-2 flex-shrink-0">
 										<button
 											type="button"
-											className="p-1 md:p-1.5 rounded-full hover:bg-bg/10 text-text-muted hover:text-text transition-colors border border-border hover:border-border"
+											className="p-1 md:p-1.5 rounded-full hover:bg-white/10 text-text-muted hover:text-text transition-colors border border-border hover:border-border"
 											title="Run app"
 											onClick={() => {
 												if (app.workspaceId) {
@@ -327,7 +327,7 @@ export function PlaylistDetailClient({ playlist }: PlaylistDetailClientProps) {
 			{/* Edit Dialog */}
 			<Dialog.Root open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
 				<Dialog.Portal>
-					<Dialog.Overlay className="fixed inset-0 bg-bg/50 backdrop-blur-sm z-50" />
+					<Dialog.Overlay className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50" />
 					<Dialog.Content className="fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] w-full max-w-md mx-4 rounded-[12px] p-6 shadow-xl focus:outline-none z-50 backdrop-blur-md border border-border bg-gradient-to-br from-white/10 to-white/5">
 						<div className="absolute top-0 left-4 right-4 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
 
@@ -350,7 +350,7 @@ export function PlaylistDetailClient({ playlist }: PlaylistDetailClientProps) {
 									onChange={(e) =>
 										setEditForm({ ...editForm, title: e.target.value })
 									}
-									className="w-full px-3 py-2 bg-bg/5 border border-border rounded-lg text-text placeholder-[hsl(192,25%,65%)] focus:outline-none focus:ring-2 focus:ring-blue-500"
+									className="w-full px-3 py-2 bg-white/5 border border-border rounded-lg text-text placeholder-[hsl(192,25%,65%)] focus:outline-none focus:ring-2 focus:ring-blue-500"
 									placeholder="Enter playlist title"
 								/>
 							</div>
@@ -369,7 +369,7 @@ export function PlaylistDetailClient({ playlist }: PlaylistDetailClientProps) {
 										setEditForm({ ...editForm, description: e.target.value })
 									}
 									rows={3}
-									className="w-full px-3 py-2 bg-bg/5 border border-border rounded-lg text-text placeholder-[hsl(192,25%,65%)] focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+									className="w-full px-3 py-2 bg-white/5 border border-border rounded-lg text-text placeholder-[hsl(192,25%,65%)] focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
 									placeholder="Enter playlist description"
 								/>
 							</div>

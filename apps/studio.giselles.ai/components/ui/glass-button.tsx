@@ -5,7 +5,7 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 
 const glassButtonVariants = cva(
-	"group relative overflow-hidden rounded-lg px-4 py-2 text-inverse transition-all duration-300 hover:scale-[1.01] active:scale-95 inline-flex items-center gap-1.5 font-sans text-[14px] font-medium",
+	"group relative overflow-hidden rounded-lg px-4 py-2 text-white transition-all duration-300 hover:scale-[1.01] active:scale-95 inline-flex items-center gap-1.5 font-sans text-[14px] font-medium",
 	{
 		variants: {
 			variant: {

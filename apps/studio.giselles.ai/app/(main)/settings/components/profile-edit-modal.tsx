@@ -212,7 +212,7 @@ export function ProfileEditModal({
 			}}
 		>
 			<Dialog.Portal>
-				<Dialog.Overlay className="fixed inset-0 bg-bg/60 z-50" />
+				<Dialog.Overlay className="fixed inset-0 bg-black/60 z-50" />
 				<div className="fixed inset-0 flex items-center justify-center z-50 p-4">
 					<Dialog.Content
 						className="w-[90vw] max-w-[420px] max-h-[90vh] overflow-y-auto rounded-[12px] p-6 relative shadow-xl focus:outline-none"
@@ -246,7 +246,7 @@ export function ProfileEditModal({
 
 						<div className="relative z-10">
 							<div className="flex justify-between items-center">
-								<Dialog.Title className="text-[20px] font-medium text-inverse tracking-tight font-sans">
+								<Dialog.Title className="text-[20px] font-medium text-white-400 tracking-tight font-sans">
 									Edit Profile
 								</Dialog.Title>
 								<Dialog.Close
@@ -259,7 +259,7 @@ export function ProfileEditModal({
 									}}
 									disabled={isLoading}
 									aria-disabled={isLoading}
-									className={`rounded-sm text-inverse focus:outline-none ${
+									className={`rounded-sm text-white-400 focus:outline-none ${
 										isLoading
 											? "opacity-30 cursor-not-allowed pointer-events-none"
 											: "opacity-70 hover:opacity-100 cursor-pointer"
@@ -291,7 +291,7 @@ export function ProfileEditModal({
 											<button
 												type="button"
 												onClick={handleSelectImageClick}
-												className="group relative w-[80px] h-[80px] rounded-full overflow-hidden cursor-pointer focus:outline-none focus:ring-0 border border-primary-100/20 hover:before:content-[''] hover:before:absolute hover:before:inset-0 hover:before:bg-bg-900/40 hover:before:z-10"
+												className="group relative w-[80px] h-[80px] rounded-full overflow-hidden cursor-pointer focus:outline-none focus:ring-0 border border-primary-100/20 hover:before:content-[''] hover:before:absolute hover:before:inset-0 hover:before:bg-black-900/40 hover:before:z-10"
 											>
 												<AvatarImage
 													avatarUrl={initialAvatarUrl}
@@ -300,9 +300,9 @@ export function ProfileEditModal({
 													alt={alt}
 													className="object-cover w-full h-full"
 												/>
-												<div className="absolute inset-0 flex items-center justify-center bg-bg-900/50 opacity-0 group-hover:opacity-100 transition-opacity">
+												<div className="absolute inset-0 flex items-center justify-center bg-black-900/50 opacity-0 group-hover:opacity-100 transition-opacity">
 													<div className="w-[40px] h-[40px] rounded-full flex items-center justify-center">
-														<ImageIcon className="w-7 h-7 text-inverse transform group-hover:scale-110 transition-transform" />
+														<ImageIcon className="w-7 h-7 text-white-800 transform group-hover:scale-110 transition-transform" />
 													</div>
 												</div>
 											</button>
@@ -313,7 +313,7 @@ export function ProfileEditModal({
 											<button
 												type="button"
 												onClick={handleSelectImageClick}
-												className="group relative w-[80px] h-[80px] rounded-full overflow-hidden cursor-pointer focus:outline-none focus:ring-0 border border-primary-100/30 hover:before:content-[''] hover:before:absolute hover:before:inset-0 hover:before:bg-bg-900/40 hover:before:z-10"
+												className="group relative w-[80px] h-[80px] rounded-full overflow-hidden cursor-pointer focus:outline-none focus:ring-0 border border-primary-100/30 hover:before:content-[''] hover:before:absolute hover:before:inset-0 hover:before:bg-black-900/40 hover:before:z-10"
 												aria-label="Change avatar"
 											>
 												<Image
@@ -324,9 +324,9 @@ export function ProfileEditModal({
 													className="object-cover w-full h-full scale-[1.02]"
 													style={{ objectPosition: "center" }}
 												/>
-												<div className="absolute inset-0 flex items-center justify-center bg-bg-900/50 opacity-0 group-hover:opacity-100 transition-opacity">
+												<div className="absolute inset-0 flex items-center justify-center bg-black-900/50 opacity-0 group-hover:opacity-100 transition-opacity">
 													<div className="w-[40px] h-[40px] rounded-full flex items-center justify-center">
-														<ImageIcon className="w-7 h-7 text-inverse transform group-hover:scale-110 transition-transform" />
+														<ImageIcon className="w-7 h-7 text-white-800 transform group-hover:scale-110 transition-transform" />
 													</div>
 												</div>
 											</button>
@@ -337,9 +337,9 @@ export function ProfileEditModal({
 											<button
 												type="button"
 												onClick={handleSelectImageClick}
-												className="group relative w-[80px] h-[80px] rounded-full overflow-hidden cursor-pointer focus:outline-none focus:ring-0 bg-transparent border border-primary-100/20 flex items-center justify-center hover:before:content-[''] hover:before:absolute hover:before:inset-0 hover:before:bg-bg-900/50 hover:before:z-10"
+												className="group relative w-[80px] h-[80px] rounded-full overflow-hidden cursor-pointer focus:outline-none focus:ring-0 bg-transparent border border-primary-100/20 flex items-center justify-center hover:before:content-[''] hover:before:absolute hover:before:inset-0 hover:before:bg-black-900/50 hover:before:z-10"
 											>
-												<ImageIcon className="w-7 h-7 text-inverse transform group-hover:scale-110 transition-transform" />
+												<ImageIcon className="w-7 h-7 text-white-800 transform group-hover:scale-110 transition-transform" />
 											</button>
 										)}
 									</div>
@@ -349,7 +349,7 @@ export function ProfileEditModal({
 								<div className="w-full">
 									<label
 										htmlFor="displayName"
-										className="block text-inverse text-left font-medium text-[12px] leading-[170%] font-geist mb-2"
+										className="block text-white-800 text-left font-medium text-[12px] leading-[170%] font-geist mb-2"
 									>
 										Your Display Name
 									</label>
@@ -365,7 +365,7 @@ export function ProfileEditModal({
 											id="displayName"
 											value={displayName}
 											onChange={handleDisplayNameChange}
-											className="w-full bg-transparent text-inverse font-medium text-[14px] leading-[23.8px] font-geist shadow-none focus:text-inverse border-0 p-0 focus-visible:ring-0 focus-visible:ring-offset-0"
+											className="w-full bg-transparent text-white-800 font-medium text-[14px] leading-[23.8px] font-geist shadow-none focus:text-white border-0 p-0 focus-visible:ring-0 focus-visible:ring-offset-0"
 											disabled={isLoading}
 										/>
 									</div>
@@ -394,7 +394,7 @@ export function ProfileEditModal({
 											type="button"
 											disabled={!isFormSubmittable || isLoading}
 											onClick={handleSave}
-											className="flex-1 rounded-lg px-4 py-2 text-inverse/80 transition-all duration-200 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+											className="flex-1 rounded-lg px-4 py-2 text-white/80 transition-all duration-200 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
 											style={{
 												background:
 													"linear-gradient(180deg, #202530 0%, #12151f 100%)",

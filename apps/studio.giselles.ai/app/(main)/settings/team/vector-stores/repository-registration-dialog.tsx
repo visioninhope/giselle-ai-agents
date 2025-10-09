@@ -1,7 +1,6 @@
 "use client";
 
 import * as Dialog from "@radix-ui/react-dialog";
-import clsx from "clsx/lite";
 import { Check, ChevronDown, Code, GitPullRequest, Plus } from "lucide-react";
 import { useState, useTransition } from "react";
 import {
@@ -144,7 +143,7 @@ export function RepositoryRegistrationDialog({
 						<div className="flex flex-col gap-y-2">
 							<label
 								htmlFor="owner"
-								className="text-inverse text-[14px] leading-[16.8px] font-sans"
+								className="text-white-400 text-[14px] leading-[16.8px] font-sans"
 							>
 								Owner / Organization
 							</label>
@@ -153,25 +152,25 @@ export function RepositoryRegistrationDialog({
 									<DropdownMenuTrigger asChild>
 										<button
 											type="button"
-											className="w-full px-3 py-2 rounded-[8px] bg-white/5 text-text text-[14px] font-geist cursor-pointer text-left flex items-center justify-between hover:bg-white/10 focus:bg-white/10"
+											className="w-full px-3 py-2 bg-surface rounded-[8px] text-white-400 text-[14px] font-geist placeholder:text-white/30 cursor-pointer text-left flex items-center justify-between"
 											disabled={isPending}
 										>
 											<span
 												className={
 													selectedInstallation?.installation.name
-														? "text-text"
-														: "text-inverse/60"
+														? ""
+														: "text-white/30"
 												}
 											>
 												{selectedInstallation?.installation.name ||
 													"Select owner"}
 											</span>
-											<ChevronDown className="h-4 w-4 text-inverse/60" />
+											<ChevronDown className="h-4 w-4 text-white/60" />
 										</button>
 									</DropdownMenuTrigger>
 									<DropdownMenuContent
 										align="start"
-										className="w-[var(--radix-dropdown-menu-trigger-width)] max-h-[min(60svh,320px)] overflow-y-auto rounded-[12px] border border-white/10 bg-white/10 backdrop-blur-md p-1 shadow-[0_2px_8px_rgba(5,10,20,0.4),_0_1px_2px_rgba(0,0,0,0.3)]"
+										className="w-[var(--radix-dropdown-menu-trigger-width)] max-h-[min(60svh,320px)] overflow-y-auto rounded-[8px] border-[0.25px] border-border-muted bg-surface p-1 shadow-none"
 									>
 										{installationsWithRepos.map(({ installation }) => (
 											<button
@@ -181,7 +180,7 @@ export function RepositoryRegistrationDialog({
 													setOwnerId(String(installation.id));
 													setRepositoryId("");
 												}}
-												className="flex w-full items-center rounded-md px-3 py-2 text-left font-sans text-[14px] leading-[16px] text-text hover:bg-white/5 focus:bg-white/5"
+												className="flex w-full items-center rounded-md px-3 py-2 text-left font-sans text-[14px] leading-[16px] text-white-400 hover:bg-white/5"
 											>
 												<span className="mr-2 inline-flex h-4 w-4 items-center justify-center">
 													{ownerId === String(installation.id) && (
@@ -199,7 +198,7 @@ export function RepositoryRegistrationDialog({
 						<div className="flex flex-col gap-y-2">
 							<label
 								htmlFor="repository"
-								className="text-inverse text-[14px] leading-[16.8px] font-sans"
+								className="text-white-400 text-[14px] leading-[16.8px] font-sans"
 							>
 								Repository Name
 							</label>
@@ -208,7 +207,7 @@ export function RepositoryRegistrationDialog({
 									<DropdownMenuTrigger asChild>
 										<button
 											type="button"
-											className="w-full px-3 py-2 rounded-[8px] bg-white/5 text-text text-[14px] font-geist cursor-pointer disabled:opacity-50 text-left flex items-center justify-between hover:bg-white/10 focus:bg-white/10"
+											className="w-full px-3 py-2 bg-surface rounded-[8px] text-white-400 text-[14px] font-geist cursor-pointer disabled:opacity-50 text-left flex items-center justify-between"
 											disabled={isPending || !ownerId}
 										>
 											<span
@@ -216,27 +215,27 @@ export function RepositoryRegistrationDialog({
 													repositoryOptions.find(
 														(r) => String(r.id) === repositoryId,
 													)?.name
-														? "text-text"
-														: "text-inverse/60"
+														? ""
+														: "text-white/30"
 												}
 											>
 												{repositoryOptions.find(
 													(r) => String(r.id) === repositoryId,
 												)?.name || "Select repository"}
 											</span>
-											<ChevronDown className="h-4 w-4 text-inverse/60" />
+											<ChevronDown className="h-4 w-4 text-white/60" />
 										</button>
 									</DropdownMenuTrigger>
 									<DropdownMenuContent
 										align="start"
-										className="w-[var(--radix-dropdown-menu-trigger-width)] max-h-[min(60svh,320px)] overflow-y-auto rounded-[12px] border border-white/10 bg-white/10 backdrop-blur-md p-1 shadow-[0_2px_8px_rgba(5,10,20,0.4),_0_1px_2px_rgba(0,0,0,0.3)]"
+										className="w-[var(--radix-dropdown-menu-trigger-width)] max-h-[min(60svh,320px)] overflow-y-auto rounded-[8px] border-[0.25px] border-border-muted bg-surface p-1 shadow-none"
 									>
 										{!ownerId ? (
-											<div className="px-3 py-2 text-inverse/60 text-sm">
+											<div className="px-3 py-2 text-white/60 text-sm">
 												Select owner first
 											</div>
 										) : repositoryOptions.length === 0 ? (
-											<div className="px-3 py-2 text-inverse/60 text-sm">
+											<div className="px-3 py-2 text-white/60 text-sm">
 												No repositories available
 											</div>
 										) : (
@@ -245,7 +244,7 @@ export function RepositoryRegistrationDialog({
 													key={repo.id}
 													type="button"
 													onClick={() => setRepositoryId(String(repo.id))}
-													className="flex w-full items-center rounded-md px-3 py-2 text-left font-sans text-[14px] leading-[16px] text-text hover:bg-white/5 focus:bg-white/5"
+													className="flex w-full items-center rounded-md px-3 py-2 text-left font-sans text-[14px] leading-[16px] text-white-400 hover:bg-white/5"
 												>
 													<span className="mr-2 inline-flex h-4 w-4 items-center justify-center">
 														{repositoryId === String(repo.id) && (
@@ -263,7 +262,7 @@ export function RepositoryRegistrationDialog({
 
 						{/* Sources to Ingest Section */}
 						<div className="flex flex-col gap-y-2">
-							<div className="text-inverse text-[14px] leading-[16.8px] font-sans">
+							<div className="text-white-400 text-[14px] leading-[16.8px] font-sans">
 								Sources to Ingest
 							</div>
 
@@ -297,10 +296,10 @@ export function RepositoryRegistrationDialog({
 
 							{/* Embedding Profiles Section */}
 							<div className="mt-4">
-								<div className="text-inverse text-[14px] leading-[16.8px] font-sans mb-2">
+								<div className="text-white-400 text-[14px] leading-[16.8px] font-sans mb-2">
 									Embedding Models
 								</div>
-								<div className="text-inverse/60 text-[12px] mb-3">
+								<div className="text-white-400/60 text-[12px] mb-3">
 									Select at least one embedding model for indexing
 								</div>
 								<div className="space-y-2">
@@ -314,7 +313,7 @@ export function RepositoryRegistrationDialog({
 											return (
 												<label
 													key={profileId}
-													className="flex items-start gap-3 p-3 rounded-lg border border-border cursor-pointer"
+													className="flex items-start gap-3 p-3 rounded-lg bg-surface hover:bg-white/5 transition-colors cursor-pointer"
 												>
 													<input
 														type="checkbox"
@@ -334,35 +333,13 @@ export function RepositoryRegistrationDialog({
 																);
 															}
 														}}
-														className="peer sr-only"
+														className="mt-1 w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 rounded focus:ring-primary-500"
 													/>
-													<span
-														className={clsx(
-															"mt-1 grid size-4 place-items-center rounded border",
-															isSelected
-																? "border-primary-700"
-																: "border-border",
-															isPending || isLastOne
-																? "opacity-50 cursor-not-allowed"
-																: "",
-														)}
-													>
-														<Check
-															className={clsx(
-																"h-3.5 w-3.5",
-																isSelected
-																	? "opacity-100 text-inverse"
-																	: "opacity-0",
-															)}
-															strokeWidth={3}
-															fill="none"
-														/>
-													</span>
 													<div className="flex-1">
-														<div className="text-inverse text-[14px] font-medium">
+														<div className="text-white-400 text-[14px] font-medium">
 															{profile.name}
 														</div>
-														<div className="text-inverse/60 text-[12px] mt-1">
+														<div className="text-white-400/60 text-[12px] mt-1">
 															Provider: {profile.provider} • Dimensions{" "}
 															{profile.dimensions}
 														</div>
@@ -419,11 +396,11 @@ function ContentTypeToggle({
 	disabled,
 }: ContentTypeToggleProps) {
 	return (
-		<div className="bg-bg/5 rounded-lg p-4">
+		<div className="bg-white/5 rounded-lg p-4">
 			<div className="flex items-center justify-between mb-2">
 				<div className="flex items-center gap-2">
 					<Icon size={18} className="text-gray-400" />
-					<span className="text-inverse font-medium">{label}</span>
+					<span className="text-white font-medium">{label}</span>
 				</div>
 				<label className="relative inline-flex items-center cursor-pointer">
 					<input
@@ -439,7 +416,7 @@ function ContentTypeToggle({
 						} ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
 					>
 						<div
-							className={`absolute w-4 h-4 bg-white-900 rounded-full top-1 transition-transform ${
+							className={`absolute w-4 h-4 bg-white rounded-full top-1 transition-transform ${
 								enabled ? "translate-x-6" : "translate-x-1"
 							}`}
 						/>

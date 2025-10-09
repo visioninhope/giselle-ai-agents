@@ -54,7 +54,7 @@ function TableHead({ className, ...props }: React.ComponentProps<"th">) {
 		<th
 			data-slot="table-head"
 			className={clsx(
-				"text-left py-3 px-4 text-inverse font-normal text-xs",
+				"text-left py-3 px-4 text-white-400 font-normal text-xs",
 				className,
 			)}
 			{...props}
@@ -66,7 +66,7 @@ function TableCell({ className, ...props }: React.ComponentProps<"td">) {
 	return (
 		<td
 			data-slot="table-cell"
-			className={clsx("py-3 px-4 text-inverse whitespace-nowrap", className)}
+			className={clsx("py-3 px-4 text-white-800 whitespace-nowrap", className)}
 			{...props}
 		/>
 	);

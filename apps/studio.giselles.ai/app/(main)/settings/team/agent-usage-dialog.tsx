@@ -20,7 +20,7 @@ export function AgentUsageDialog({ activities }: AgentUsageDialogProps) {
 			</DialogTrigger>
 			<DialogContent className="border-[0.5px] border-border px-[24px] pt-[16px] pb-[24px] bg-surface max-w-7xl">
 				<DialogHeader>
-					<DialogTitle className="text-inverse text-[16px] leading-[27.2px] tracking-normal font-sans">
+					<DialogTitle className="text-white-400 text-[16px] leading-[27.2px] tracking-normal font-sans">
 						App Usage Logs
 					</DialogTitle>
 				</DialogHeader>

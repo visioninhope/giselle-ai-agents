@@ -459,7 +459,7 @@ export function CircularCarousel({
 				style={emptyStateContainerStyle}
 			>
 				<div className="text-center">
-					<p className="text-inverse text-[14px] font-medium font-['DM_Sans']">
+					<p className="text-white-400 text-[14px] font-medium font-['DM_Sans']">
 						No executable apps available. Please select a different team or
 						create a new app.
 					</p>
@@ -614,7 +614,7 @@ export function CircularCarousel({
 				aria-label="Navigate to previous app"
 				onClick={moveRight}
 				disabled={currentIndex === items.length - 1}
-				className="hidden md:flex absolute left-6 top-1/2 transform -translate-y-1/2 w-10 h-10 border border-border hover:bg-bg/10 rounded-full items-center justify-center text-inverse transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed z-50"
+				className="hidden md:flex absolute left-6 top-1/2 transform -translate-y-1/2 w-10 h-10 border border-border hover:bg-white/10 rounded-full items-center justify-center text-white transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed z-50"
 			>
 				<ChevronLeft size={20} />
 			</button>
@@ -625,7 +625,7 @@ export function CircularCarousel({
 				aria-label="Navigate to next app"
 				onClick={moveLeft}
 				disabled={currentIndex === 0}
-				className="hidden md:flex absolute right-6 top-1/2 transform -translate-y-1/2 w-10 h-10 border border-border hover:bg-bg/10 rounded-full items-center justify-center text-inverse transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed z-50"
+				className="hidden md:flex absolute right-6 top-1/2 transform -translate-y-1/2 w-10 h-10 border border-border hover:bg-white/10 rounded-full items-center justify-center text-white transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed z-50"
 			>
 				<ChevronRight size={20} />
 			</button>

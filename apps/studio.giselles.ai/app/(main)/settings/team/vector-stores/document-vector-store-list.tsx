@@ -25,7 +25,7 @@ export function DocumentVectorStoreList({
 			<Card className="rounded-[8px] bg-transparent p-6 border-0">
 				<div className="flex items-center mb-4">
 					<div>
-						<h4 className="text-inverse font-medium text-[18px] leading-[21.6px] font-sans">
+						<h4 className="text-white-400 font-medium text-[18px] leading-[21.6px] font-sans">
 							Document Vector Stores
 						</h4>
 						<p className="text-black-400 text-[14px] leading-[20.4px] font-geist mt-1">

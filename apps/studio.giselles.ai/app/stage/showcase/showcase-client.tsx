@@ -282,7 +282,7 @@ export function ShowcaseClient({
                     ${
 											isActive
 												? "text-primary-100 [text-shadow:0px_0px_20px_#0087f6] after:content-[''] after:absolute after:left-0 after:right-0 after:bottom-0 after:h-[2px] after:bg-primary-100"
-												: "text-[var(--color-tabs-inactive-text)] hover:text-inverse hover:after:content-[''] hover:after:absolute hover:after:left-0 hover:after:right-0 hover:after:bottom-0 hover:after:h-[2px] hover:after:bg-primary-100"
+												: "text-[var(--color-tabs-inactive-text)] hover:text-white-100 hover:after:content-[''] hover:after:absolute hover:after:left-0 hover:after:right-0 hover:after:bottom-0 hover:after:h-[2px] hover:after:bg-primary-100"
 										}`}
 									>
 										{tab}
@@ -340,13 +340,13 @@ export function ShowcaseClient({
 												href={`/stage/showcase/${app.id}`}
 												className="flex items-center gap-3 min-w-0"
 											>
-												<div className="w-9 h-9 rounded-full bg-bg/5 flex items-center justify-center flex-shrink-0 transition-all group-hover:bg-primary-100/20">
+												<div className="w-9 h-9 rounded-full bg-white/5 flex items-center justify-center flex-shrink-0 transition-all group-hover:bg-primary-100/20">
 													<svg
 														role="img"
 														aria-label="App icon"
 														xmlns="http://www.w3.org/2000/svg"
 														viewBox="0 0 486 640"
-														className="h-5 w-5 text-inverse/40 transition-colors group-hover:text-primary-100"
+														className="h-5 w-5 text-white/40 transition-colors group-hover:text-primary-100"
 														fill="currentColor"
 													>
 														<title>App Icon</title>
@@ -368,7 +368,7 @@ export function ShowcaseClient({
 											<div className="flex items-center gap-2">
 												<button
 													type="button"
-													className="p-1.5 rounded-full hover:bg-bg/10 text-inverse/60 hover:text-inverse transition-colors border border-border hover:border-border"
+													className="p-1.5 rounded-full hover:bg-white/10 text-white/60 hover:text-white transition-colors border border-border hover:border-border"
 													title="Run app"
 													onClick={(e) => {
 														e.stopPropagation();
@@ -407,7 +407,7 @@ export function ShowcaseClient({
 												</Link>
 												<button
 													type="button"
-													className="p-1.5 rounded-md text-inverse/60 hover:text-inverse transition-colors"
+													className="p-1.5 rounded-md text-white/60 hover:text-white transition-colors"
 													onClick={() => {
 														// TODO: Add favorite functionality
 													}}
@@ -446,7 +446,7 @@ export function ShowcaseClient({
 												<div className="grid gap-2">
 													<label
 														htmlFor="title"
-														className="text-sm font-medium text-inverse"
+														className="text-sm font-medium text-white"
 													>
 														Title
 													</label>
@@ -460,13 +460,13 @@ export function ShowcaseClient({
 															})
 														}
 														placeholder="Playlist title"
-														className="bg-bg-700/50 border-black-600 text-inverse placeholder:text-black-400"
+														className="bg-black-700/50 border-black-600 text-white placeholder:text-black-400"
 													/>
 												</div>
 												<div className="grid gap-2">
 													<label
 														htmlFor="description"
-														className="text-sm font-medium text-inverse"
+														className="text-sm font-medium text-white"
 													>
 														Description
 													</label>
@@ -480,7 +480,7 @@ export function ShowcaseClient({
 															})
 														}
 														placeholder="Playlist description"
-														className="bg-bg-700/50 border-black-600 text-inverse placeholder:text-black-400"
+														className="bg-black-700/50 border-black-600 text-white placeholder:text-black-400"
 													/>
 												</div>
 											</div>
@@ -521,7 +521,7 @@ export function ShowcaseClient({
 													className="relative w-40 aspect-square overflow-hidden rounded-lg transition-all duration-300 hover:scale-105 mb-3"
 												>
 													<div className={`w-full h-full ${gradientClass}`}>
-														<div className="absolute inset-0 bg-bg/20" />
+														<div className="absolute inset-0 bg-black/20" />
 													</div>
 												</button>
 
@@ -535,10 +535,10 @@ export function ShowcaseClient({
 													}
 													className="w-full text-left"
 												>
-													<h3 className="text-inverse font-semibold text-base mb-2 group-hover:text-primary-100 transition-colors line-clamp-1">
+													<h3 className="text-white font-semibold text-base mb-2 group-hover:text-primary-100 transition-colors line-clamp-1">
 														{playlist.title}
 													</h3>
-													<span className="text-inverse/50 text-xs">
+													<span className="text-white/50 text-xs">
 														{playlist.appsCount}{" "}
 														{playlist.appsCount === 1 ? "app" : "apps"}
 													</span>
@@ -607,13 +607,13 @@ export function ShowcaseClient({
 											className="group flex items-center justify-between px-2 py-3 first:border-t-0 border-t-[0.5px] border-[var(--color-border)] cursor-pointer"
 										>
 											<div className="flex items-center gap-3">
-												<div className="w-9 h-9 rounded-full bg-bg/5 flex items-center justify-center flex-shrink-0 transition-all group-hover:bg-primary-100/20">
+												<div className="w-9 h-9 rounded-full bg-white/5 flex items-center justify-center flex-shrink-0 transition-all group-hover:bg-primary-100/20">
 													<svg
 														role="img"
 														aria-label="App icon"
 														xmlns="http://www.w3.org/2000/svg"
 														viewBox="0 0 486 640"
-														className="h-5 w-5 text-inverse/40 transition-colors group-hover:text-primary-100"
+														className="h-5 w-5 text-white/40 transition-colors group-hover:text-primary-100"
 														fill="currentColor"
 													>
 														<title>App Icon</title>
@@ -636,7 +636,7 @@ export function ShowcaseClient({
 											<div className="flex items-center gap-2">
 												<button
 													type="button"
-													className="p-1.5 rounded-full hover:bg-bg/10 text-inverse/60 hover:text-inverse transition-colors border border-border hover:border-border"
+													className="p-1.5 rounded-full hover:bg-white/10 text-white/60 hover:text-white transition-colors border border-border hover:border-border"
 													title="Re-run app"
 													onClick={() => {
 														if (item.workspaceId) {
@@ -651,7 +651,7 @@ export function ShowcaseClient({
 
 												<button
 													type="button"
-													className="p-1.5 rounded-md text-inverse/60 hover:text-inverse transition-colors"
+													className="p-1.5 rounded-md text-white/60 hover:text-white transition-colors"
 												>
 													<Star className="h-4 w-4 hover:fill-current" />
 												</button>

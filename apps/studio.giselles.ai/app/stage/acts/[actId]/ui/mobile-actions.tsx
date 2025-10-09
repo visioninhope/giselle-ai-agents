@@ -81,27 +81,27 @@ export function MobileActions({ generation }: MobileActionsProps) {
 		<div className="flex items-center justify-end gap-2 mt-4 pt-3 border-t border-border">
 			<button
 				type="button"
-				className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-bg/10 rounded-lg transition-colors group touch-manipulation"
+				className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-white/10 rounded-lg transition-colors group touch-manipulation"
 				title={copyFeedback ? "Copied!" : "Copy content"}
 				onClick={handleCopyToClipboard}
 			>
 				{copyFeedback ? (
 					<CheckCircle className="size-4 text-green-400" />
 				) : (
-					<Copy className="size-4 text-inverse/70 group-hover:text-inverse transition-colors" />
+					<Copy className="size-4 text-white/70 group-hover:text-white transition-colors" />
 				)}
-				<span className="text-inverse/70 group-hover:text-inverse transition-colors">
+				<span className="text-white/70 group-hover:text-white transition-colors">
 					{copyFeedback ? "Copied!" : "Copy"}
 				</span>
 			</button>
 			<button
 				type="button"
-				className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-bg/10 rounded-lg transition-colors group touch-manipulation"
+				className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-white/10 rounded-lg transition-colors group touch-manipulation"
 				title="Download content"
 				onClick={handleDownload}
 			>
-				<Download className="size-4 text-inverse/70 group-hover:text-inverse transition-colors" />
-				<span className="text-inverse/70 group-hover:text-inverse transition-colors">
+				<Download className="size-4 text-white/70 group-hover:text-white transition-colors" />
+				<span className="text-white/70 group-hover:text-white transition-colors">
 					Download
 				</span>
 			</button>

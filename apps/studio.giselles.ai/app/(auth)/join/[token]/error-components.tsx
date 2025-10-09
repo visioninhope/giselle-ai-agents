@@ -25,10 +25,10 @@ export function ExpiredError() {
 	return (
 		<ErrorPageLayout>
 			<div className="flex flex-col items-center justify-center gap-6">
-				<h2 className="text-[28px] font-[500] text-inverse font-sans text-center">
+				<h2 className="text-[28px] font-[500] text-white font-sans text-center">
 					{errorMessages.expired}
 				</h2>
-				<p className="text-inverse text-center">
+				<p className="text-white-400 text-center">
 					Please ask the team administrator to send you a new invitation.
 				</p>
 				<div className="flex flex-col items-center justify-center gap-2 mt-4">
@@ -68,7 +68,7 @@ export function WrongEmailError({
 	return (
 		<ErrorPageLayout>
 			<div className="text-center">
-				<p className="text-inverse mb-2">You have been invited to join</p>
+				<p className="text-white-400 mb-2">You have been invited to join</p>
 				<h2
 					className="text-[28px] font-[500] text-primary-100 font-sans"
 					style={{ textShadow: "0px 0px 20px #0087F6" }}
@@ -77,7 +77,7 @@ export function WrongEmailError({
 				</h2>
 			</div>
 			<div className="grid gap-[16px]">
-				<div className="text-inverse text-center p-4 text-sm">
+				<div className="text-white text-center p-4 text-sm">
 					{errorMessages.wrong_email}
 				</div>
 				<form action={signoutUser} method="POST">

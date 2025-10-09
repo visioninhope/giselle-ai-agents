@@ -140,7 +140,7 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({
 						key={toast.id}
 						className={clsx(
 							"group relative rounded-[8px] backdrop-blur-[4px]",
-							"data-[type=info]:bg-bg-900/60",
+							"data-[type=info]:bg-white-900/60",
 							"data-[type=error]:bg-error-900/60",
 						)}
 						data-type={toast.type}
@@ -156,12 +156,12 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({
 								"group-data-[type=error]:from-[hsl(344,_23%,_76%)]/40 to-[hsl(344,_91%,_25%)]/90",
 							)}
 						/>
-						<div className="relative text-inverse px-[16px] py-[16px]">
+						<div className="relative text-white-900 px-[16px] py-[16px]">
 							<div className="flex justify-between items-center gap-[4px]">
 								<ToastPrimitive.Title className="text-[14px] flex items-center gap-[8px]">
 									{toast.message}
 								</ToastPrimitive.Title>
-								<ToastPrimitive.Close className="rounded-[8px] hover:bg-bg-900/10 p-[4px] transition-colors">
+								<ToastPrimitive.Close className="rounded-[8px] hover:bg-white-900/10 p-[4px] transition-colors">
 									<XIcon size={18} />
 								</ToastPrimitive.Close>
 							</div>

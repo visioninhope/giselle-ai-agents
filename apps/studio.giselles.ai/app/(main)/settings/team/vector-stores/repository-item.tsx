@@ -120,7 +120,7 @@ export function RepositoryItem({
 	return (
 		<div
 			className={cn(
-				"group relative rounded-[12px] overflow-hidden w-full bg-bg/[0.02] backdrop-blur-[8px] border-[0.5px] border-border shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),inset_0_-1px_1px_rgba(255,255,255,0.2)] before:content-[''] before:absolute before:inset-0 before:bg-bg before:opacity-[0.02] before:rounded-[inherit] before:pointer-events-none hover:border-border transition-colors duration-200",
+				"group relative rounded-[12px] overflow-hidden w-full bg-white/[0.02] backdrop-blur-[8px] border-[0.5px] border-border shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),inset_0_-1px_1px_rgba(255,255,255,0.2)] before:content-[''] before:absolute before:inset-0 before:bg-white before:opacity-[0.02] before:rounded-[inherit] before:pointer-events-none hover:border-border transition-colors duration-200",
 			)}
 		>
 			<div className="px-[24px] py-[16px]">
@@ -140,7 +140,7 @@ export function RepositoryItem({
 								<button
 									type="button"
 									aria-label="Repository actions menu"
-									className="transition-opacity duration-200 p-2 text-inverse/60 hover:text-inverse/80 hover:bg-bg/5 rounded-md disabled:opacity-50"
+									className="transition-opacity duration-200 p-2 text-white/60 hover:text-white/80 hover:bg-white/5 rounded-md disabled:opacity-50"
 									disabled={isPending || isIngesting}
 								>
 									<MoreVertical className="h-4 w-4" />
@@ -153,19 +153,19 @@ export function RepositoryItem({
 								<DropdownMenuItem
 									onClick={handleManualIngest}
 									disabled={!canManuallyIngest || isIngesting}
-									className="flex items-center px-3 py-2 text-[14px] leading-[16px] text-inverse hover:bg-bg/5 rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
+									className="flex items-center px-3 py-2 text-[14px] leading-[16px] text-white-400 hover:bg-white/5 rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
 								>
 									<RefreshCw className="h-4 w-4 mr-2" />
 									Ingest Now
 								</DropdownMenuItem>
 								<DropdownMenuItem
 									onClick={() => setShowConfigureDialog(true)}
-									className="flex items-center px-3 py-2 text-[14px] leading-[16px] text-inverse hover:bg-bg/5 rounded-md"
+									className="flex items-center px-3 py-2 text-[14px] leading-[16px] text-white-400 hover:bg-white/5 rounded-md"
 								>
 									<Settings className="h-4 w-4 mr-2" />
 									Configure Sources
 								</DropdownMenuItem>
-								<DropdownMenuSeparator className="my-1 h-px bg-bg/10" />
+								<DropdownMenuSeparator className="my-1 h-px bg-white/10" />
 								<DropdownMenuItem
 									onSelect={(e) => {
 										e.preventDefault();
@@ -278,7 +278,7 @@ function EmbeddingModelCard({
 		>
 			{/* Model Header */}
 			<div className="mb-3">
-				<div className="text-xs text-inverse/80 font-medium mb-2">
+				<div className="text-xs text-white/80 font-medium mb-2">
 					{profile?.name || `Profile ${profileId}`}
 				</div>
 			</div>
@@ -464,7 +464,7 @@ function SyncStatusBadge({
 				type="button"
 				aria-label="Verify repository status"
 				onClick={onVerify}
-				className="flex items-center px-2 py-1 rounded-full border border-border w-auto hover:bg-bg/5 transition-colors duration-200"
+				className="flex items-center px-2 py-1 rounded-full border border-border w-auto hover:bg-white/5 transition-colors duration-200"
 			>
 				{badgeContent}
 			</button>

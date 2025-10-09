@@ -87,7 +87,7 @@ export function DiagnosticModal({
 				<div className="mt-6 p-4 rounded-lg bg-[#39FF7F]/10 border border-[#39FF7F]/20">
 					<div className="flex items-center gap-2 mb-2">
 						<Check className="h-5 w-5 text-[#39FF7F]" />
-						<h4 className="text-inverse font-medium text-[16px] font-sans">
+						<h4 className="text-white-400 font-medium text-[16px] font-sans">
 							Connection can be restored
 						</h4>
 					</div>
@@ -102,7 +102,7 @@ export function DiagnosticModal({
 		return (
 			<div className="mt-6 p-4 rounded-lg bg-[#FF3D71]/10 border border-[#FF3D71]/20">
 				<div className="flex items-center gap-2 mb-2">
-					<h4 className="text-inverse font-medium text-[16px] font-sans">
+					<h4 className="text-white-400 font-medium text-[16px] font-sans">
 						Repository no longer accessible
 					</h4>
 				</div>

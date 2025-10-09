@@ -59,7 +59,7 @@ export function DeleteAgentButton({
 							<button
 								type="button"
 								aria-label="Delete an app"
-								className="grid size-6 place-items-center rounded-full text-inverse/60 transition-colors hover:text-red-500"
+								className="grid size-6 place-items-center rounded-full text-white/60 transition-colors hover:text-red-500"
 								disabled={isPending}
 							>
 								{isPending ? (

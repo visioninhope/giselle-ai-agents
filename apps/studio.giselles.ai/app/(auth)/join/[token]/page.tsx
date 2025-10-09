@@ -72,7 +72,7 @@ export default async function Page({
 								<input type="hidden" name="token" value={tokenParam} />
 								<button
 									type="submit"
-									className="text-inverse hover:text-inverse/80 underline"
+									className="text-white hover:text-white/80 underline"
 								>
 									Decline
 								</button>

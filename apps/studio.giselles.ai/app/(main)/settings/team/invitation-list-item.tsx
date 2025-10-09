@@ -128,7 +128,7 @@ export function InvitationListItem({
 					</div>
 				</div>
 				<div className="flex items-center gap-2">
-					<span className="capitalize text-inverse font-medium text-[14px] leading-[16px] text-end font-sans">
+					<span className="capitalize text-white-400 font-medium text-[14px] leading-[16px] text-end font-sans">
 						{role}
 					</span>
 					{currentUserRole === "admin" && (
@@ -138,7 +138,7 @@ export function InvitationListItem({
 							onOpenChange={setDropdownOpen}
 						>
 							<DropdownMenuTrigger className="cursor-pointer">
-								<Ellipsis className="text-inverse" />
+								<Ellipsis className="text-white-350" />
 							</DropdownMenuTrigger>
 							<DropdownMenuContent
 								align="end"
@@ -149,7 +149,7 @@ export function InvitationListItem({
 										e.preventDefault();
 										handleCopy();
 									}}
-									className="flex items-center px-4 py-3 font-medium text-[14px] leading-[16px] text-inverse hover:bg-bg/5 rounded-md focus:outline-none"
+									className="flex items-center px-4 py-3 font-medium text-[14px] leading-[16px] text-white-400 hover:bg-white/5 rounded-md focus:outline-none"
 									title="Copy invite link"
 								>
 									<Copy className="h-4 w-4 mr-2" /> Copy invite link
@@ -160,7 +160,7 @@ export function InvitationListItem({
 										handleResend();
 									}}
 									disabled={isResendPending}
-									className="flex items-center px-4 py-3 font-medium text-[14px] leading-[16px] text-inverse hover:bg-bg/5 rounded-md"
+									className="flex items-center px-4 py-3 font-medium text-[14px] leading-[16px] text-white-400 hover:bg-white/5 rounded-md"
 									title="Resend invitation"
 								>
 									{isResendPending ? (

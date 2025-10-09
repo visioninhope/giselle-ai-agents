@@ -3,7 +3,7 @@ import { GiselleLogo } from "@/components/giselle-logo";
 
 export default function AuthLayout({ children }: { children: ReactNode }) {
 	return (
-		<div className="bg-bg-100 relative">
+		<div className="bg-black-100 relative">
 			<div className="z-10 relative">{children}</div>
 			<svg
 				xmlns="http://www.w3.org/2000/svg"
@@ -14,7 +14,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
 				<circle cx="50" cy="50" r="50" />
 			</svg>
 			<div className="z-0 absolute inset-0 flex justify-center overflow-hidden">
-				<GiselleLogo className="w-[110%] h-[110%] absolute -bottom-[20%] fill-inverse opacity-5" />
+				<GiselleLogo className="w-[110%] h-[110%] absolute -bottom-[20%] fill-black-30 opacity-5" />
 			</div>
 		</div>
 	);

@@ -13,7 +13,7 @@ export default function () {
 					<label className="text-[14px]" htmlFor="hello">
 						Toggle
 					</label>
-					<div className="flex-grow mx-[12px] h-[1px] bg-bg-200/30" />
+					<div className="flex-grow mx-[12px] h-[1px] bg-black-200/30" />
 				</Toggle>
 			</DemoSection>
 		</UiPage>

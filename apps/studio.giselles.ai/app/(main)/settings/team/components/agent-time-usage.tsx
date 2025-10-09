@@ -100,9 +100,9 @@ function AgentTimeUsage(props: AgentTimeUsageProps) {
 			<div className="flex flex-col gap-y-2">
 				<div className="flex flex-col gap-y-1">
 					<div className="relative w-full h-2">
-						<div className="absolute w-full h-full rounded-full bg-bg-80" />
+						<div className="absolute w-full h-full rounded-full bg-black-80" />
 						<div
-							className="absolute h-full rounded-full bg-bg-400 transition-all duration-300"
+							className="absolute h-full rounded-full bg-white-400 transition-all duration-300"
 							style={{
 								width: `${Math.min(100, percentage)}%`,
 							}}
@@ -119,7 +119,7 @@ function AgentTimeUsage(props: AgentTimeUsageProps) {
 						)}
 					</div>
 
-					<div className="flex justify-between text-inverse font-medium text-[12px] leading-[20.4px] tracking-normal font-geist">
+					<div className="flex justify-between text-white-400 font-medium text-[12px] leading-[20.4px] tracking-normal font-geist">
 						<span>0 min</span>
 						<span>
 							{isOverLimit ? `${usedMinutes} min` : `${includedMinutes} min`}

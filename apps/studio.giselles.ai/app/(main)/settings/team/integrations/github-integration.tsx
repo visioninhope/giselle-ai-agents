@@ -115,7 +115,7 @@ function Header({ account, installed, installationUrl }: HeaderProps) {
 				<div className="flex items-center space-x-4">
 					<SiGithub className="w-8 h-8" />
 					<div>
-						<h2 className="text-inverse text-[16px] leading-[22.4px] font-medium font-geist">
+						<h2 className="text-white-400 text-[16px] leading-[22.4px] font-medium font-geist">
 							GitHub
 						</h2>
 						{account ? (
@@ -138,7 +138,7 @@ function Header({ account, installed, installationUrl }: HeaderProps) {
 					) : (
 						<Button
 							asChild
-							className="rounded-lg px-4 py-2 text-inverse/80 transition-all duration-200 active:scale-[0.98]"
+							className="rounded-lg px-4 py-2 text-white/80 transition-all duration-200 active:scale-[0.98]"
 							style={{
 								background: "linear-gradient(180deg, #202530 0%, #12151f 100%)",
 								border: "1px solid rgba(0,0,0,0.7)",
@@ -187,11 +187,11 @@ function Installation({ installation }: InstallationProps) {
 						className="w-6 h-6 rounded-full"
 					/>
 				)}
-				<span className="text-inverse font-medium text-[14px] leading-[14px] font-geist">
+				<span className="text-white-400 font-medium text-[14px] leading-[14px] font-geist">
 					{displayName}
 				</span>
 			</div>
-			<div className="h-px w-full bg-bg/10 my-4" />
+			<div className="h-px w-full bg-white/10 my-4" />
 			<div className="space-y-5">
 				{installation.repositories.map((repo) => (
 					<div key={repo.id} className="flex items-center gap-x-2">
@@ -199,7 +199,7 @@ function Installation({ installation }: InstallationProps) {
 							href={repo.html_url}
 							target="_blank"
 							rel="noopener noreferrer"
-							className="text-inverse font-medium text-[14px] leading-[19.6px] font-geist hover:underline"
+							className="text-white-400 font-medium text-[14px] leading-[19.6px] font-geist hover:underline"
 						>
 							{repo.name}
 						</a>

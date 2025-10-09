@@ -50,7 +50,7 @@ export default function UserTeams({
 
 	return (
 		<>
-			<div className="relative overflow-hidden rounded-[12px] backdrop-blur-md bg-bg/[0.02] border-[0.5px] border-border shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),inset_0_-1px_1px_rgba(255,255,255,0.2)] before:content-[''] before:absolute before:inset-0 before:bg-bg before:opacity-[0.02] before:rounded-[inherit] before:pointer-events-none py-2">
+			<div className="relative overflow-hidden rounded-[12px] backdrop-blur-md bg-white/[0.02] border-[0.5px] border-border shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),inset_0_-1px_1px_rgba(255,255,255,0.2)] before:content-[''] before:absolute before:inset-0 before:bg-white before:opacity-[0.02] before:rounded-[inherit] before:pointer-events-none py-2">
 				<div
 					className="flex items-center gap-x-[11px] mt-4 mb-2 mx-4 py-2 px-3 rounded-[8px]"
 					style={{
@@ -140,7 +140,7 @@ function UserTeamsItem({
 				/>
 				<div className="flex flex-col">
 					<div className="flex items-center gap-2">
-						<div className="text-inverse font-medium text-[16px] leading-[22.4px] font-geist">
+						<div className="text-white-400 font-medium text-[16px] leading-[22.4px] font-geist">
 							{teamName}
 						</div>
 						{isPro ? <ProTag /> : <FreeTag />}
@@ -154,7 +154,7 @@ function UserTeamsItem({
 				<DropdownMenuTrigger asChild>
 					<button
 						type="button"
-						className="flex items-center justify-center p-2 rounded-[4px] hover:bg-bg/5 focus:outline-none"
+						className="flex items-center justify-center p-2 rounded-[4px] hover:bg-white/5 focus:outline-none"
 						aria-label="Team menu"
 					>
 						<MoreHorizontal className="size-5 text-black-600" />
@@ -172,7 +172,7 @@ function UserTeamsItem({
 							renderButton={(isPending) => (
 								<button
 									type="submit"
-									className="flex items-center w-full px-3 py-2 text-left text-[14px] leading-[16px] hover:bg-bg/5 text-inverse rounded-md"
+									className="flex items-center w-full px-3 py-2 text-left text-[14px] leading-[16px] hover:bg-white/5 text-white-400 rounded-md"
 									disabled={isPending}
 								>
 									Apps
@@ -189,7 +189,7 @@ function UserTeamsItem({
 							renderButton={(isPending) => (
 								<button
 									type="submit"
-									className="flex items-center w-full px-3 py-2 text-left text-[14px] leading-[16px] hover:bg-bg/5 text-inverse rounded-md"
+									className="flex items-center w-full px-3 py-2 text-left text-[14px] leading-[16px] hover:bg-white/5 text-white-400 rounded-md"
 									disabled={isPending}
 								>
 									Settings
@@ -198,7 +198,7 @@ function UserTeamsItem({
 							action={() => navigateWithChangeTeam(teamId, "/settings/team")}
 						/>
 					</DropdownMenuItem>
-					<div className="my-2 h-px bg-bg/10" />
+					<div className="my-2 h-px bg-white/10" />
 					<DropdownMenuItem className="p-0">
 						<ChangeTeamAndAction
 							teamId={teamId}
