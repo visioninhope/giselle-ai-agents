@@ -40,7 +40,7 @@ export async function internalSetGeneration(params: {
 		);
 	}
 
-	params.logger?.debug("insert");
+	params.logger?.debug(`Setting generation in storage: id=${params.generation.id}`);
 	const newIndex = toNodeGenerationIndex(params.generation);
 	const nodeId = params.generation.context.operationNode.id;
 
