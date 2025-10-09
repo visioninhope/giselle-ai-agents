@@ -6,6 +6,7 @@ import {
 } from "@giselle-sdk/data-type";
 import { defaultName } from "@giselle-sdk/giselle/react";
 import { Handle, Position, type NodeProps as RFNodeProps } from "@xyflow/react";
+import "./handles.css";
 import clsx from "clsx/lite";
 import { useMemo } from "react";
 import { shallow } from "zustand/shallow";
@@ -110,6 +111,7 @@ function CanvasNode({
 	preview,
 	requiresSetup,
 	vectorStoreSourceProvider,
+	connectedInputIds,
 	connectedOutputIds,
 	metadataTexts,
 	onNameChange,
@@ -314,40 +316,57 @@ function CanvasNode({
 			{!preview && (
 				<div className="flex justify-between">
 					<div className="grid">
-						{node.inputs?.map((input) => (
-							<div
-								className="relative flex items-center h-[28px]"
-								key={input.id}
-							>
-								<Handle
-									type="target"
-									isConnectable={false}
-									position={Position.Left}
-									id={input.id}
-									style={{
-										background: "var(--color-background)",
-										borderColor: "var(--color-border)",
-									}}
-									className={clsx(
-										"!absolute !w-[11px] !h-[11px] !rounded-full !-left-[4.5px] !translate-x-[50%] !border-[1.5px]",
-										v.isTextGeneration &&
-											"!bg-generation-node-1 !border-generation-node-1",
-										v.isImageGeneration &&
-											"!bg-image-generation-node-1 !border-image-generation-node-1",
-										v.isWebSearch &&
-											"!bg-web-search-node-1 !border-web-search-node-1",
-										v.isAudioGeneration &&
-											"!bg-audio-generation-node-1 !border-audio-generation-node-1",
-										v.isVideoGeneration &&
-											"!bg-video-generation-node-1 !border-video-generation-node-1",
-										v.isQuery && "!bg-query-node-1 !border-query-node-1",
-									)}
-								/>
-								<div className={clsx("px-[12px] text-inverse text-[12px]")}>
-									{input.label}
+						{node.inputs?.map((input) => {
+							const isConnected = connectedInputIds?.some(
+								(connectedInputId) => connectedInputId === input.id,
+							);
+							return (
+								<div
+									className="relative flex items-center h-[28px]"
+									key={input.id}
+								>
+									<Handle
+										type="target"
+										isConnectable={false}
+										position={Position.Left}
+										id={input.id}
+										style={
+											!isConnected
+												? {
+														backgroundColor: "var(--color-background)",
+														borderColor: "var(--color-border)",
+													}
+												: undefined
+										}
+										className={clsx(
+											"!absolute !w-[11px] !h-[11px] !rounded-full !-left-[4.5px] !translate-x-[50%] !border-[1.5px]",
+											// Apply colored backgrounds only when connected
+											isConnected &&
+												v.isTextGeneration &&
+												"!bg-generation-node-1 !border-generation-node-1",
+											isConnected &&
+												v.isImageGeneration &&
+												"!bg-image-generation-node-1 !border-image-generation-node-1",
+											isConnected &&
+												v.isWebSearch &&
+												"!bg-web-search-node-1 !border-web-search-node-1",
+											isConnected &&
+												v.isAudioGeneration &&
+												"!bg-audio-generation-node-1 !border-audio-generation-node-1",
+											isConnected &&
+												v.isVideoGeneration &&
+												"!bg-video-generation-node-1 !border-video-generation-node-1",
+											isConnected &&
+												v.isQuery &&
+												"!bg-query-node-1 !border-query-node-1",
+										)}
+									/>
+									<div className={clsx("px-[12px] text-inverse text-[12px]")}>
+										{input.label}
+									</div>
 								</div>
-							</div>
-						))}
+							);
+						})}
 					</div>
 
 					<div className="grid">
@@ -368,7 +387,7 @@ function CanvasNode({
 										style={
 											!isConnected
 												? {
-														background: "var(--color-background)",
+														backgroundColor: "var(--color-background)",
 														borderColor: "var(--color-border)",
 													}
 												: undefined

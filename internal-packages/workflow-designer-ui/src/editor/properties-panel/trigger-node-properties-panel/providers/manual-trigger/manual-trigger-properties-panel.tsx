@@ -210,7 +210,7 @@ export function ManualTriggerPropertiesPanel({ node }: { node: TriggerNode }) {
 									name="name"
 									type="text"
 									placeholder="Write the parameter name"
-									className="w-full flex justify-between items-center rounded-[8px] py-[8px] px-[12px] outline-none focus:outline-none border-[1px] border-border text-[14px]"
+									className="w-full flex justify-between items-center rounded-[8px] py-[8px] px-[12px] outline-none focus:outline-none border-[1px] border-inverse bg-transparent text-inverse/80 text-[14px]"
 									data-1p-ignore
 								/>
 								<Select
