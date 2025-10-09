@@ -22,7 +22,7 @@ export const runActJob = schemaJob({
 			metadata: {
 				userId: payload.userId,
 				team: payload.team,
-				requestId: payload.actId,
+				requestId: payload.requestId,
 			},
 		});
 	},
