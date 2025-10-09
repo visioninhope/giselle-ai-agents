@@ -39,7 +39,8 @@ export function useActSystem(workspaceId: WorkspaceId) {
 		{ namespace: "get-workspace-inprogress-act", workspaceId },
 		({ workspaceId }) => client.getWorkspaceInprogressAct({ workspaceId }),
 	);
-	const { addGenerationRunner } = useGenerationRunnerSystem();
+	const { addGenerationRunner, stopGenerationRunner } =
+		useGenerationRunnerSystem();
 	const { creating } = useActStore(
 		useShallow((s) => ({
 			activeAct: s.activeAct,
@@ -107,7 +108,12 @@ export function useActSystem(workspaceId: WorkspaceId) {
 	}, [data, isLoading, setActiveAct, pollingActGenerations]);
 
 	const createAndStartAct = useCallback(
-		async ({ connectionIds, nodeId, inputs }: CreateAndStartActParams) => {
+		async ({
+			connectionIds,
+			nodeId,
+			inputs,
+			onActStart,
+		}: CreateAndStartActParams) => {
 			setCreating(true);
 			const { act, generations } = await client.createAct({
 				connectionIds,
@@ -116,8 +122,19 @@ export function useActSystem(workspaceId: WorkspaceId) {
 				generationOriginType: "studio",
 				inputs,
 			});
+
 			setActiveAct(act);
 			addGenerationRunner(generations);
+			onActStart?.({
+				cancel: async () => {
+					await Promise.all(
+						generations.map((generation) =>
+							stopGenerationRunner(generation.id),
+						),
+					);
+				},
+				actId: act.id,
+			});
 			await client.startAct({
 				actId: act.id,
 				generationOriginType: "studio",
@@ -132,6 +149,7 @@ export function useActSystem(workspaceId: WorkspaceId) {
 			addGenerationRunner,
 			pollingActGenerations,
 			setActiveAct,
+			stopGenerationRunner,
 		],
 	);
 	return {
