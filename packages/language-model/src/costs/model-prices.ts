@@ -281,16 +281,16 @@ export const openAiEmbeddingPricing: EmbeddingModelPriceTable = {
 	"text-embedding-3-small": {
 		prices: [
 			{
-				validFrom: "2025-08-28T00:00:00Z",
-				costPerMegaToken: 0.01,
+				validFrom: "2025-10-07T08:00:00Z",
+				costPerMegaToken: 0.02,
 			},
 		],
 	},
 	"text-embedding-3-large": {
 		prices: [
 			{
-				validFrom: "2025-08-28T00:00:00Z",
-				costPerMegaToken: 0.065,
+				validFrom: "2025-10-07T08:00:00Z",
+				costPerMegaToken: 0.13,
 			},
 		],
 	},

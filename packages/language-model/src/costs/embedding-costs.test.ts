@@ -8,8 +8,8 @@ describe("calculateEmbeddingDisplayCost", () => {
 			"text-embedding-3-small",
 			{ tokens: 1000 },
 		);
-		// $0.01 per 1M tokens => 1000 tokens = $0.00001
-		expect(cost.totalCostForDisplay).toBeCloseTo(0.00001, 10);
+		// $0.02 per 1M tokens => 1000 tokens = $0.00002
+		expect(cost.totalCostForDisplay).toBeCloseTo(0.00002, 10);
 	});
 
 	it("computes cost for OpenAI text-embedding-3-large", async () => {
@@ -18,8 +18,8 @@ describe("calculateEmbeddingDisplayCost", () => {
 			"text-embedding-3-large",
 			{ tokens: 2000 },
 		);
-		// $0.065 per 1M tokens => 2000 tokens = $0.00013
-		expect(cost.totalCostForDisplay).toBeCloseTo(0.00013, 10);
+		// $0.13 per 1M tokens => 2000 tokens = $0.00026
+		expect(cost.totalCostForDisplay).toBeCloseTo(0.00026, 10);
 	});
 
 	it("computes cost for Google gemini-embedding-001", async () => {

@@ -5,7 +5,11 @@ import {
 	OutputId,
 	type TriggerNode,
 } from "@giselle-sdk/data-type";
-import { type GitHubTriggerEventId, githubTriggers } from "@giselle-sdk/flow";
+import {
+	type GitHubTriggerEventId,
+	getGitHubDisplayLabel,
+	githubTriggers,
+} from "@giselle-sdk/flow";
 import type { GitHubIntegrationInstallation } from "@giselle-sdk/giselle";
 import {
 	useFeatureFlag,
@@ -378,7 +382,10 @@ export function Installed({
 													.options) {
 													outputs.push({
 														id: OutputId.generate(),
-														label: key,
+														label: getGitHubDisplayLabel({
+															eventId: step.eventId,
+															accessor: key,
+														}),
 														accessor: key,
 													});
 												}
@@ -426,7 +433,10 @@ export function Installed({
 													},
 													outputs:
 														node.outputs.length > 0 ? node.outputs : outputs,
-													name: node.name ?? `On ${trigger.event.label}`,
+													name:
+														node.content.state.status === "reconfiguring"
+															? node.name
+															: `On ${trigger.event.label}`,
 												});
 											} catch (_error) {
 												// Error is handled by the UI state

@@ -4,7 +4,7 @@ import { BellIcon } from "lucide-react";
 export function MobileHeader() {
 	return (
 		<>
-			<div className="md:hidden fixed top-0 left-0 right-0 bg-[var(--color-stage-background)] border-b border-white/10 px-4 z-20 h-16 flex items-center justify-between">
+			<div className="md:hidden fixed top-0 left-0 right-0 bg-bg border-b border-border px-4 z-20 h-16 flex items-center justify-between">
 				{/* Left side: G icon + Stage */}
 				<div className="flex items-center gap-2">
 					<GiselleIcon className="text-inverse w-6 h-6" />
