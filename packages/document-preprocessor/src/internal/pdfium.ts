@@ -1,6 +1,44 @@
+import { createRequire } from "node:module";
+import { dirname } from "node:path";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { init as initPdfium, type WrappedPdfiumModule } from "@embedpdf/pdfium";
 
 import { assertNotAborted } from "./abort.js";
+
+declare const __filename: string;
+
+const moduleUrl =
+	typeof import.meta !== "undefined" && typeof import.meta.url === "string"
+		? import.meta.url
+		: typeof __filename !== "undefined"
+			? pathToFileURL(__filename).href
+			: pathToFileURL(process.cwd()).href;
+
+function resolvePdfiumWasmPath(): string {
+	if (
+		typeof import.meta !== "undefined" &&
+		typeof import.meta.resolve === "function"
+	) {
+		try {
+			const resolved = import.meta.resolve(
+				"@embedpdf/pdfium/pdfium.wasm",
+				moduleUrl,
+			);
+			if (resolved.startsWith("file://")) {
+				return fileURLToPath(resolved);
+			}
+			return resolved;
+		} catch (_error) {
+			// Fallback to CommonJS resolution below.
+		}
+	}
+
+	const require = createRequire(moduleUrl);
+	return require.resolve("@embedpdf/pdfium/pdfium.wasm");
+}
+
+const PDFIUM_WASM_PATH = resolvePdfiumWasmPath();
+const PDFIUM_WASM_DIR = dirname(PDFIUM_WASM_PATH);
 
 type PdfiumRenderCallback = (frame: {
 	data: Uint8Array;
@@ -74,7 +112,17 @@ async function getPdfiumModule(): Promise<WrappedPdfiumModule> {
 	}
 
 	if (pendingModule === null) {
-		pendingModule = initPdfium({})
+		pendingModule = initPdfium({
+			locateFile: (fileName, prefix) => {
+				if (fileName === "pdfium.wasm") {
+					return PDFIUM_WASM_PATH;
+				}
+				if (prefix) {
+					return `${prefix}${fileName}`;
+				}
+				return `${PDFIUM_WASM_DIR}/${fileName}`;
+			},
+		})
 			.then((module) => {
 				module.FPDF_InitLibrary();
 				module.PDFiumExt_Init();

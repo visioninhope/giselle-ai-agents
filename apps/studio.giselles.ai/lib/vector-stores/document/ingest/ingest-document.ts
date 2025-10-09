@@ -118,7 +118,6 @@ export async function ingestDocument(
 				reason: "already-processing",
 			};
 		}
-
 		// Get source from database
 		const source = await getDocumentVectorStoreSource(sourceId);
 
@@ -127,7 +126,6 @@ export async function ingestDocument(
 				code: "source-not-found" as IngestErrorCode,
 			});
 		}
-
 		signal?.throwIfAborted();
 
 		// Download file from storage
