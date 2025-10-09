@@ -10,14 +10,14 @@ export default function Layout({ children }: { children: ReactNode }) {
 	return (
 		<SentryUserWrapper>
 			<div className="h-screen overflow-y-hidden bg-bg flex flex-col">
-				<header className="flex flex-col">
+				<header className="flex flex-col bg-bg">
 					{/* Top row: Logo, Team Selection, User Icon */}
-					<div className="h-[50px] flex items-center px-[24px] justify-between">
-						<div className="flex items-center gap-2">
-							<Link href="/" aria-label="Giselle logo">
-								<GiselleLogo className="w-[70px] h-auto fill-white mt-[4px]" />
-							</Link>
-							<span className="text-black-70">/</span>
+					<div className="h-[50px] flex items-center px-[24px] justify-between bg-bg">
+                        <div className="flex items-center gap-2">
+                            <Link href="/" aria-label="Giselle logo">
+                                <GiselleLogo className="w-[70px] h-auto fill-inverse mt-[4px]" />
+                            </Link>
+                            <span className="text-black-70">/</span>
 							<TeamSelection />
 						</div>
 						<div className="flex items-center gap-4">
@@ -25,7 +25,7 @@ export default function Layout({ children }: { children: ReactNode }) {
 								href="https://docs.giselles.ai/guides/introduction"
 								target="_blank"
 								rel="noopener noreferrer"
-								className="text-[14px] font-sans font-medium text-black-70 hover:text-white-100"
+								className="text-[14px] font-sans font-medium text-black-70 hover:text-inverse"
 							>
 								Docs
 							</Link>

@@ -87,7 +87,7 @@ function BillingInfoForFreePlan({ team }: BillingInfoProps) {
 	return (
 		<div className="flex justify-between items-center">
 			<div className="flex flex-col gap-y-0.5">
-				<div className="flex flex-wrap items-center gap-x-1 text-white-800 font-medium">
+				<div className="flex flex-wrap items-center gap-x-1 text-inverse font-medium">
 					<p className="text-[22px] leading-[26.4px] tracking-[-0.04em] font-sans">
 						Free Plan
 					</p>
@@ -160,7 +160,7 @@ function UpgradeButton({ team }: { team: CurrentTeam }) {
 	return (
 		<Button
 			formAction={upgradeTeamWithTeam}
-			className="rounded-lg px-4 py-2 text-white/80 transition-all duration-200 active:scale-[0.98]"
+			className="rounded-lg px-4 py-2 text-inverse/80 transition-all duration-200 active:scale-[0.98]"
 			style={{
 				background: "linear-gradient(180deg, #202530 0%, #12151f 100%)",
 				border: "1px solid rgba(0,0,0,0.7)",
@@ -182,7 +182,7 @@ function UpdateButton({ subscriptionId }: { subscriptionId: string }) {
 	return (
 		<Button
 			formAction={manageBillingWithSubscriptionId}
-			className="rounded-lg px-4 py-2 text-white/80 transition-all duration-200 active:scale-[0.98]"
+			className="rounded-lg px-4 py-2 text-inverse/80 transition-all duration-200 active:scale-[0.98]"
 			style={{
 				background: "linear-gradient(180deg, #202530 0%, #12151f 100%)",
 				border: "1px solid rgba(0,0,0,0.7)",

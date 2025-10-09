@@ -363,8 +363,8 @@ export function FilterableActsList({
 										key={tag.type}
 										className="inline-flex items-center gap-1"
 									>
-										<span className="text-white-700 text-xs">{prefix}:</span>
-										<span className="inline-flex items-center px-2 py-0.5 bg-blue-600 text-white text-xs rounded-md">
+										<span className="text-inverse text-xs">{prefix}:</span>
+										<span className="inline-flex items-center px-2 py-0.5 bg-blue-600 text-inverse text-xs rounded-md">
 											{value}
 											<button
 												type="button"
@@ -390,7 +390,7 @@ export function FilterableActsList({
 								className="flex-1 min-w-0 bg-transparent border-none outline-none text-inverse placeholder-white-600 text-[14px]"
 							/>
 						</div>
-						<Search className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-white-600" />
+						<Search className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-inverse" />
 					</div>
 
 					{/* Status Filter and New Task Button Row */}
@@ -485,10 +485,10 @@ export function FilterableActsList({
 							<div className="w-16 h-16 bg-gray-600 rounded-full flex items-center justify-center mb-4">
 								<Search className="w-8 h-8 text-gray-400" />
 							</div>
-							<h2 className="text-lg font-medium text-white-100 mb-2">
+							<h2 className="text-lg font-medium text-inverse mb-2">
 								No tasks match your filters
 							</h2>
-							<p className="text-sm text-white-700 mb-6 max-w-sm">
+							<p className="text-sm text-inverse mb-6 max-w-sm">
 								Try adjusting your search or filter criteria.
 							</p>
 							<button
@@ -510,10 +510,10 @@ export function FilterableActsList({
 							<div className="w-16 h-16 bg-gray-600 rounded-full flex items-center justify-center mb-4">
 								<span className="text-2xl text-gray-400">📝</span>
 							</div>
-							<h2 className="text-lg font-medium text-white-100 mb-2">
+							<h2 className="text-lg font-medium text-inverse mb-2">
 								No tasks yet
 							</h2>
-							<p className="text-sm text-white-700 mb-6 max-w-sm">
+							<p className="text-sm text-inverse mb-6 max-w-sm">
 								Start by creating your first task from the main stage page.
 							</p>
 							<Link href="/stage">
@@ -525,14 +525,14 @@ export function FilterableActsList({
 							<Table className="table-fixed w-full">
 								<TableHeader>
 									<TableRow>
-										<TableHead className="text-white-100 w-auto max-w-96">
+										<TableHead className="text-inverse w-auto max-w-96">
 											<div className="flex items-center gap-6">
 												<button
 													type="button"
 													onClick={() => handleTabChange("open")}
 													className={`pb-1 text-xs font-medium transition-colors ${
 														activeTab === "open"
-															? "text-white-100"
+															? "text-inverse"
 															: "text-gray-600 hover:text-gray-500"
 													}`}
 												>
@@ -548,7 +548,7 @@ export function FilterableActsList({
 													onClick={() => handleTabChange("archived")}
 													className={`pb-1 text-xs font-medium transition-colors ${
 														activeTab === "archived"
-															? "text-white-100"
+															? "text-inverse"
 															: "text-gray-600 hover:text-gray-500"
 													}`}
 												>
@@ -561,16 +561,16 @@ export function FilterableActsList({
 												</button>
 											</div>
 										</TableHead>
-										<TableHead className="text-white-100 w-auto hidden md:table-cell">
+										<TableHead className="text-inverse w-auto hidden md:table-cell">
 											LLM Models
 										</TableHead>
-										<TableHead className="text-white-100 w-auto max-w-80 hidden md:table-cell">
+										<TableHead className="text-inverse w-auto max-w-80 hidden md:table-cell">
 											Input Values
 										</TableHead>
-										<TableHead className="text-center text-white-100 w-24">
+										<TableHead className="text-center text-inverse w-24">
 											Status
 										</TableHead>
-										<TableHead className="text-right text-white-100 w-20 hidden md:table-cell">
+										<TableHead className="text-right text-inverse w-20 hidden md:table-cell">
 											Actions
 										</TableHead>
 									</TableRow>
@@ -591,7 +591,7 @@ export function FilterableActsList({
 															<span className="text-sm text-gray-400">App</span>
 														</div>
 														<div className="flex flex-col min-w-0">
-															<span className="truncate font-medium text-white-100">
+															<span className="truncate font-medium text-inverse">
 																{act.workspaceName}
 															</span>
 															<span className="text-sm text-black-600 truncate">
@@ -610,28 +610,28 @@ export function FilterableActsList({
 															{act.llmModels.slice(0, 2).map((model) => (
 																<span
 																	key={model}
-																	className="px-2 py-1 text-xs text-white-700 rounded-full border border-gray-600"
+																	className="px-2 py-1 text-xs text-inverse rounded-full border border-gray-600"
 																>
 																	{model}
 																</span>
 															))}
 															{act.llmModels.length > 2 && (
-																<span className="px-2 py-1 text-xs text-white-700 rounded-full border border-gray-600">
+																<span className="px-2 py-1 text-xs text-inverse rounded-full border border-gray-600">
 																	+{act.llmModels.length - 2}
 																</span>
 															)}
 														</div>
 													) : (
-														<span className="text-xs text-white-500">-</span>
+														<span className="text-xs text-inverse">-</span>
 													)}
 												</TableCell>
 												<TableCell className="w-auto max-w-80 hidden md:table-cell">
 													{act.inputValues ? (
-														<span className="text-sm text-white-700 line-clamp-2">
+														<span className="text-sm text-inverse line-clamp-2">
 															{act.inputValues}
 														</span>
 													) : (
-														<span className="text-xs text-white-500">-</span>
+														<span className="text-xs text-inverse">-</span>
 													)}
 												</TableCell>
 												<TableCell className="text-center w-24">
@@ -667,7 +667,7 @@ export function FilterableActsList({
 																	e.stopPropagation();
 																	handleReload();
 																}}
-																className="text-white-700 hover:text-inverse transition-colors p-1"
+																className="text-inverse hover:text-inverse transition-colors p-1"
 																title="Reload this task"
 															>
 																<RefreshCw className="w-3 h-3" />
@@ -675,7 +675,7 @@ export function FilterableActsList({
 														) : (
 															<button
 																type="button"
-																className="text-white-700 hover:text-inverse transition-colors p-1"
+																className="text-inverse hover:text-inverse transition-colors p-1"
 																title="Archive task"
 																onClick={(e) => {
 																	e.stopPropagation();

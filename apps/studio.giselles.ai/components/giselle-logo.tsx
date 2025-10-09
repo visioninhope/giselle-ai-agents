@@ -7,7 +7,7 @@ export const GiselleLogo: FC<SVGProps<SVGSVGElement>> = (props) => {
 			width="432"
 			height="167"
 			viewBox="0 0 432 167"
-			fill="none"
+			fill="currentColor"
 			xmlns="http://www.w3.org/2000/svg"
 		>
 			<title>Giselle Logo</title>

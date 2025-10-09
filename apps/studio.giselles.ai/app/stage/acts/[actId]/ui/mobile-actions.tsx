@@ -88,9 +88,9 @@ export function MobileActions({ generation }: MobileActionsProps) {
 				{copyFeedback ? (
 					<CheckCircle className="size-4 text-green-400" />
 				) : (
-					<Copy className="size-4 text-white/70 group-hover:text-white transition-colors" />
+					<Copy className="size-4 text-inverse/70 group-hover:text-inverse transition-colors" />
 				)}
-				<span className="text-white/70 group-hover:text-white transition-colors">
+				<span className="text-inverse/70 group-hover:text-inverse transition-colors">
 					{copyFeedback ? "Copied!" : "Copy"}
 				</span>
 			</button>
@@ -100,8 +100,8 @@ export function MobileActions({ generation }: MobileActionsProps) {
 				title="Download content"
 				onClick={handleDownload}
 			>
-				<Download className="size-4 text-white/70 group-hover:text-white transition-colors" />
-				<span className="text-white/70 group-hover:text-white transition-colors">
+				<Download className="size-4 text-inverse/70 group-hover:text-inverse transition-colors" />
+				<span className="text-inverse/70 group-hover:text-inverse transition-colors">
 					Download
 				</span>
 			</button>

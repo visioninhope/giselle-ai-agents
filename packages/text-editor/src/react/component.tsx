@@ -190,7 +190,7 @@ export function TextEditor({
 				editorProps={{
 					attributes: {
 						class:
-							"prompt-editor border-[0.5px] border-border rounded-[8px] p-[16px] pb-0 flex-1 box-border overflow-y-auto",
+							"prompt-editor border border-inverse rounded-[8px] p-[16px] pb-0 flex-1 box-border overflow-y-auto",
 					},
 				}}
 			/>

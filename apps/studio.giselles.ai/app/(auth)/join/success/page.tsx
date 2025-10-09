@@ -13,10 +13,10 @@ export default function Page() {
 						Welcome to Giselle!
 					</h1>
 					<div className="flex flex-col gap-4">
-						<p className="text-[20px] text-white-400 font-medium">
+						<p className="text-[20px] text-inverse font-medium">
 							Setup complete!
 						</p>
-						<p className="text-white-400 text-center">
+						<p className="text-inverse text-center">
 							Head over to your team account and start creating your own unique
 							app. We can't wait to see what you'll build!
 						</p>

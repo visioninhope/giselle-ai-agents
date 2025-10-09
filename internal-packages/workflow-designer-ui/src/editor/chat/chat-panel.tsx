@@ -170,8 +170,8 @@ export function ChatPanel() {
 								<div
 									className={`max-w-[80%] min-w-0 px-4 py-3 text-sm font-mono ${
 										message.sender === "user"
-											? "font-light bg-[#4A6FD8] text-white rounded-[8px] rounded-br-[4px] shadow-sm"
-											: "font-light bg-[#6B8FF0]/20 text-white rounded-[8px] rounded-bl-[4px] border border-[#6B8FF0]/80 shadow-[0_0_10px_rgba(107,143,240,0.3),0_0_20px_rgba(107,143,240,0.2),inset_0_0_20px_rgba(107,143,240,0.1)] backdrop-blur-sm animate-slide-up-left"
+											? "font-light bg-[#4A6FD8] text-inverse rounded-[8px] rounded-br-[4px] shadow-sm"
+											: "font-light bg-[#6B8FF0]/20 text-inverse rounded-[8px] rounded-bl-[4px] border border-[#6B8FF0]/80 shadow-[0_0_10px_rgba(107,143,240,0.3),0_0_20px_rgba(107,143,240,0.2),inset_0_0_20px_rgba(107,143,240,0.1)] backdrop-blur-sm animate-slide-up-left"
 									}`}
 								>
 									<div className="whitespace-pre-wrap leading-relaxed break-words overflow-wrap-anywhere">
@@ -185,7 +185,7 @@ export function ChatPanel() {
 					{/* Typing indicator */}
 					{(showTyping || isThinking) && (
 						<div className="flex justify-start">
-							<div className="bg-[#6B8FF0]/20 text-white rounded-[8px] rounded-bl-[4px] px-4 py-3 border border-[#6B8FF0]/80 shadow-[0_0_10px_rgba(107,143,240,0.3),0_0_20px_rgba(107,143,240,0.2),inset_0_0_20px_rgba(107,143,240,0.1)] backdrop-blur-sm font-mono font-light">
+							<div className="bg-[#6B8FF0]/20 text-inverse rounded-[8px] rounded-bl-[4px] px-4 py-3 border border-[#6B8FF0]/80 shadow-[0_0_10px_rgba(107,143,240,0.3),0_0_20px_rgba(107,143,240,0.2),inset_0_0_20px_rgba(107,143,240,0.1)] backdrop-blur-sm font-mono font-light">
 								<div className="flex items-center space-x-1">
 									<div className="flex space-x-1">
 										<div className="w-1.5 h-1.5 bg-bg rounded-full animate-bounce"></div>
@@ -220,7 +220,7 @@ export function ChatPanel() {
 						className={`absolute right-2 bottom-2 p-2 rounded-full transition-colors ${
 							inputValue.trim()
 								? "bg-transparent text-[#6B8FF0] hover:text-[#5A7EE8]"
-								: "bg-transparent text-white-600/50 cursor-not-allowed"
+								: "bg-transparent text-inverse/50 cursor-not-allowed"
 						}`}
 					>
 						<Send className="w-4 h-4" />

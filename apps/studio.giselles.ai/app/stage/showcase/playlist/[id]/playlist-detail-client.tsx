@@ -151,7 +151,7 @@ export function PlaylistDetailClient({ playlist }: PlaylistDetailClientProps) {
 						</p>
 						<div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 text-sm text-[hsl(192,25%,65%)]">
 							<div className="flex items-center justify-center md:justify-start gap-1">
-								<span className="text-white font-medium">Created by you</span>
+								<span className="text-inverse font-medium">Created by you</span>
 								<span>•</span>
 								<span>
 									{playlist.apps.length}{" "}
@@ -203,7 +203,7 @@ export function PlaylistDetailClient({ playlist }: PlaylistDetailClientProps) {
 										>
 											<div className="absolute top-0 left-4 right-4 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
 											<DropdownMenu.Item
-												className="group flex items-center gap-3 text-sm text-white hover:text-white focus:text-white rounded-[8px] px-3 py-2 cursor-pointer transition-colors focus:outline-none focus:bg-bg/5 hover:bg-bg/5"
+												className="group flex items-center gap-3 text-sm text-inverse hover:text-inverse focus:text-inverse rounded-[8px] px-3 py-2 cursor-pointer transition-colors focus:outline-none focus:bg-bg/5 hover:bg-bg/5"
 												onClick={handleEditPlaylist}
 											>
 												<Edit3 size={16} className="text-[hsl(192,25%,65%)]" />
@@ -258,7 +258,7 @@ export function PlaylistDetailClient({ playlist }: PlaylistDetailClientProps) {
 												aria-label="App icon"
 												xmlns="http://www.w3.org/2000/svg"
 												viewBox="0 0 486 640"
-												className="h-5 w-5 text-white/40 transition-colors group-hover:text-primary-100"
+												className="h-5 w-5 text-inverse/40 transition-colors group-hover:text-primary-100"
 												fill="currentColor"
 											>
 												<title>App Icon</title>

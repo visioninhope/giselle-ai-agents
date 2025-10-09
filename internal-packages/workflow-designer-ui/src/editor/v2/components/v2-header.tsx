@@ -63,7 +63,7 @@ export function V2Header({
 						</span>
 					)}
 					{teamName && (
-						<span className="text-white-600 text-[18px] font-[250] leading-none">
+						<span className="text-inverse text-[18px] font-[250] leading-none">
 							/
 						</span>
 					)}
@@ -115,14 +115,14 @@ export function V2Header({
 									type="button"
 									className="ml-[4px] p-0 border-none bg-transparent w-auto h-auto hover:bg-transparent focus:bg-transparent outline-none"
 								>
-									<ChevronDownIcon className="size-[16px] text-[#6B8FF0] hover:text-white-950" />
+									<ChevronDownIcon className="size-[16px] text-[#6B8FF0] hover:text-inverse" />
 								</button>
 							}
 							renderItem={(item) =>
 								item.value === "template" ? (
 									<div className="flex items-center justify-between w-full opacity-50">
 										<span>{item.label}</span>
-										<span className="ml-2 text-[10px] leading-none text-white-600 bg-bg/30 px-1.5 py-[1px] rounded-full">
+										<span className="ml-2 text-[10px] leading-none text-inverse bg-bg/30 px-1.5 py-[1px] rounded-full">
 											Coming&nbsp;soon
 										</span>
 									</div>

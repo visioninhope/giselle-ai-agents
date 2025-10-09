@@ -138,7 +138,7 @@ export function DataSourceTable() {
 				<table className="w-full text-sm">
 					<thead>
 						<tr>
-							<th className="text-left py-3 px-4 text-white-400 font-normal text-xs font-sans">
+							<th className="text-left py-3 px-4 text-inverse font-normal text-xs font-sans">
 								ID
 							</th>
 						</tr>
@@ -146,7 +146,7 @@ export function DataSourceTable() {
 					<tbody>
 						{data.map((data) => (
 							<tr key={data.id} className="border-b border-white-400/10">
-								<td className="py-3 px-4 text-white-800">{data.id}</td>
+								<td className="py-3 px-4 text-inverse">{data.id}</td>
 							</tr>
 						))}
 					</tbody>

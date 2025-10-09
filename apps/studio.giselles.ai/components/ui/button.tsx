@@ -13,7 +13,7 @@ const buttonVariants = cva(
 			variant: {
 				default:
 					"justify-center text-black-900 bg-primary-200 border border-primary-200 gap-[8px] hover:bg-primary-100 hover:text-black-900",
-				link: "text-white bg-transparent border-[0.5px] border-black-30 hover:bg-primary-200 hover:text-black-900",
+				link: "text-inverse bg-transparent border-[0.5px] border-black-30 hover:bg-primary-200 hover:text-black-900",
 				destructive:
 					"justify-center bg-destructive text-destructive-foreground hover:bg-destructive/90 border border-destructive",
 			},

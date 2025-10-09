@@ -102,7 +102,7 @@ export function Sidebar({ data }: { data: Promise<SidebarDataObject> }) {
 				<div className="pt-[16px] mb-[20px] px-[16px] md:px-[32px]">
 					<Link
 						href="/stage/acts"
-						className="flex items-center gap-[8px] text-inverse hover:text-white-700 transition-colors group"
+						className="flex items-center gap-[8px] text-inverse hover:text-inverse transition-colors group"
 					>
 						<ChevronLeftIcon className="size-[24px] group-hover:-translate-x-1 transition-transform" />
 						<span className="text-[16px] font-medium">Back to Acts</span>
@@ -118,7 +118,7 @@ export function Sidebar({ data }: { data: Promise<SidebarDataObject> }) {
 							aria-label="App icon"
 							xmlns="http://www.w3.org/2000/svg"
 							viewBox="0 0 486 640"
-							className="h-[48px] w-[48px] text-white/40"
+							className="h-[48px] w-[48px] text-inverse/40"
 							fill="currentColor"
 						>
 							<title>App Icon</title>
@@ -132,13 +132,13 @@ export function Sidebar({ data }: { data: Promise<SidebarDataObject> }) {
 						<h1 className="text-[24px] font-semibold text-inverse mb-[4px]">
 							{appName}
 						</h1>
-						<p className="text-[14px] text-white-400">{teamName}</p>
+						<p className="text-[14px] text-inverse">{teamName}</p>
 					</div>
 
 					{/* Execution Time */}
 					<div className="mt-[16px]">
 						<div className="flex items-center justify-center md:justify-start gap-2 text-[11px]">
-							<span className="text-white/50">
+							<span className="text-inverse/50">
 								{formatExecutionDate(act.createdAt)}
 							</span>
 							<StatusBadge
@@ -165,7 +165,7 @@ export function Sidebar({ data }: { data: Promise<SidebarDataObject> }) {
 								<div className="mt-[24px]">
 									<button
 										type="button"
-										className="flex items-center justify-between text-[12px] font-medium text-white/60 mb-3 w-full cursor-pointer hover:text-white/80 transition-colors"
+										className="flex items-center justify-between text-[12px] font-medium text-inverse/60 mb-3 w-full cursor-pointer hover:text-inverse/80 transition-colors"
 										onClick={() => setIsInputsExpanded(!isInputsExpanded)}
 									>
 										<span>{inputs.length === 1 ? "Input" : "Inputs"}</span>
@@ -188,13 +188,13 @@ export function Sidebar({ data }: { data: Promise<SidebarDataObject> }) {
 														key={`${input.name}-${input.value}`}
 														className="bg-bg/5 rounded-[8px] p-3"
 													>
-														<div className="text-[11px] text-white/80">
+														<div className="text-[11px] text-inverse/80">
 															{parameter?.name && (
-																<div className="text-white/50 mb-1">
+																<div className="text-inverse/50 mb-1">
 																	{parameter.name}
 																</div>
 															)}
-															<div className="text-white/70">
+															<div className="text-inverse/70">
 																{String(input.value)}
 															</div>
 														</div>
@@ -218,7 +218,7 @@ export function Sidebar({ data }: { data: Promise<SidebarDataObject> }) {
 						.map((sequence, sequenceIndex) => (
 							<div key={sequence.id} className="space-y-3">
 								{/* Step Header */}
-								<div className="text-[14px] font-medium text-white/60 mb-2">
+								<div className="text-[14px] font-medium text-inverse/60 mb-2">
 									Step {sequenceIndex + 1}
 								</div>
 
@@ -293,7 +293,7 @@ export function Sidebar({ data }: { data: Promise<SidebarDataObject> }) {
 
 															{/* Step Info */}
 															<div className="flex-1 min-w-0">
-																<div className="text-white font-bold text-[12px]">
+																<div className="text-inverse font-bold text-[12px]">
 																	{step.name || "Untitled"}
 																</div>
 																<div
@@ -317,9 +317,9 @@ export function Sidebar({ data }: { data: Promise<SidebarDataObject> }) {
 														{/* Mobile Accordion Arrow */}
 														<div className="block md:hidden ml-2">
 															{isExpanded ? (
-																<ChevronUpIcon className="size-4 text-white/60" />
+																<ChevronUpIcon className="size-4 text-inverse/60" />
 															) : (
-																<ChevronDownIcon className="size-4 text-white/60" />
+																<ChevronDownIcon className="size-4 text-inverse/60" />
 															)}
 														</div>
 													</div>

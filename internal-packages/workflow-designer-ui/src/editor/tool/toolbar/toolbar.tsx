@@ -180,16 +180,16 @@ export function Toolbar() {
 	);
 
 	return (
-		<div className="relative rounded-[8px] overflow-hidden bg-bg-900/10">
+		<div className="relative rounded-[8px] overflow-hidden bg-surface/10">
 			<div className="absolute z-0 rounded-[8px] inset-0 border mask-fill bg-gradient-to-br from-[hsla(232,37%,72%,0.2)] to-[hsla(218,58%,21%,0.9)] bg-origin-border bg-clip-boarder border-transparent" />
 			<div className="flex divide-x divide-[hsla(232,36%,72%,0.2)] items-center px-[4px] py-[8px]">
 				<ToggleGroup.Root
 					type="single"
 					className={clsx(
-						"flex items-center px-[4px] z-10 h-full gap-[12px] text-white-950",
+						"flex items-center px-[4px] z-10 h-full gap-[12px] text-inverse",
 						"**:data-tool:hover:bg-bg-850/10 **:data-tool:p-[4px] **:data-tool:rounded-[4px]",
 						"**:data-tool:data-[state=on]:bg-primary-900 **:data-tool:focus:outline-none",
-						"**:data-icon:w-[24px] **:data-icon:h-[24px] **:data-icon:text-white-950 ",
+						"**:data-icon:w-[24px] **:data-icon:h-[24px] **:data-icon:text-inverse ",
 					)}
 					value={selectedTool?.action}
 					onValueChange={(value) => {
@@ -243,8 +243,8 @@ export function Toolbar() {
 												type="single"
 												className={clsx(
 													"flex flex-col gap-[8px]",
-													"**:data-tool:flex **:data-tool:rounded-[8px] **:data-tool:items-center **:data-tool:w-full",
-													"**:data-tool:select-none **:data-tool:outline-none **:data-tool:px-[8px] **:data-tool:py-[4px] **:data-tool:gap-[8px] **:data-tool:hover:bg-bg-900/10",
+								"**:data-tool:flex **:data-tool:rounded-[8px] **:data-tool:items-center **:data-tool:w-full",
+								"**:data-tool:select-none **:data-tool:outline-none **:data-tool:px-[8px] **:data-tool:py-[4px] **:data-tool:gap-[8px] **:data-tool:hover:bg-surface-hover",
 													"**:data-tool:data-[state=on]:bg-primary-900 **:data-tool:focus:outline-none",
 												)}
 												onValueChange={(value) => {
@@ -315,8 +315,8 @@ export function Toolbar() {
 												type="single"
 												className={clsx(
 													"flex flex-col gap-[8px]",
-													"**:data-tool:flex **:data-tool:rounded-[8px] **:data-tool:items-center **:data-tool:w-full",
-													"**:data-tool:select-none **:data-tool:outline-none **:data-tool:px-[8px] **:data-tool:py-[4px] **:data-tool:gap-[8px] **:data-tool:hover:bg-bg-900/10",
+								"**:data-tool:flex **:data-tool:rounded-[8px] **:data-tool:items-center **:data-tool:w-full",
+								"**:data-tool:select-none **:data-tool:outline-none **:data-tool:px-[8px] **:data-tool:py-[4px] **:data-tool:gap-[8px] **:data-tool:hover:bg-surface-hover",
 													"**:data-tool:data-[state=on]:bg-primary-900 **:data-tool:focus:outline-none",
 												)}
 												onValueChange={(sourceType) => {
@@ -403,7 +403,7 @@ export function Toolbar() {
 									<Popover.Content
 										className={clsx(
 											"relative rounded-[8px] px-[8px] py-[8px] w-[var(--language-model-toggle-group-popover-width)]",
-											"bg-bg-900/10 text-inverse",
+								"bg-surface/10 text-inverse",
 											"backdrop-blur-[4px]",
 										)}
 										align="end"
@@ -436,7 +436,7 @@ export function Toolbar() {
 												<input
 													type="text"
 													placeholder="Search LLM Model..."
-													className="w-full bg-transparent border-none text-white-850 text-[12px] placeholder:text-black-400 focus:outline-none"
+													className="w-full bg-transparent border-none text-inverse text-[12px] placeholder:text-black-400 focus:outline-none"
 													value={searchQuery}
 													onChange={(e) => setSearchQuery(e.target.value)}
 												/>
@@ -535,7 +535,7 @@ export function Toolbar() {
 										<Popover.Anchor />
 										<Popover.Portal>
 											<Popover.Content
-												className="bg-bg-900/10 w-[var(--language-model-detail-panel-width)] backdrop-blur-[4px] rounded-[8px] px-[8px] py-[8px] "
+								className="bg-surface/10 w-[var(--language-model-detail-panel-width)] backdrop-blur-[4px] rounded-[8px] px-[8px] py-[8px] "
 												sideOffset={42}
 												onOpenAutoFocus={(e) => {
 													e.preventDefault();
@@ -570,7 +570,7 @@ export function Toolbar() {
 															</div>
 														</div>
 													)}
-												<div className="relative text-white-800 h-[200px]">
+												<div className="relative text-inverse h-[200px]">
 													{languageModelMouseHovered ? (
 														<div className="px-[16px] py-[16px] flex flex-col gap-[24px]">
 															<div className="flex items-start gap-[16px]">
@@ -803,8 +803,8 @@ export function Toolbar() {
 												type="single"
 												className={clsx(
 													"flex flex-col gap-[8px]",
-													"**:data-tool:flex **:data-tool:rounded-[8px] **:data-tool:items-center **:data-tool:w-full",
-													"**:data-tool:select-none **:data-tool:outline-none **:data-tool:px-[8px] **:data-tool:py-[4px] **:data-tool:gap-[8px] **:data-tool:hover:bg-bg-900/10",
+								"**:data-tool:flex **:data-tool:rounded-[8px] **:data-tool:items-center **:data-tool:w-full",
+								"**:data-tool:select-none **:data-tool:outline-none **:data-tool:px-[8px] **:data-tool:py-[4px] **:data-tool:gap-[8px] **:data-tool:hover:bg-surface-hover",
 													"**:data-tool:data-[state=on]:bg-primary-900 **:data-tool:focus:outline-none",
 												)}
 												onValueChange={(sourceType) => {
@@ -856,8 +856,8 @@ export function Toolbar() {
 												type="single"
 												className={clsx(
 													"flex flex-col gap-[8px]",
-													"**:data-tool:flex **:data-tool:rounded-[8px] **:data-tool:items-center **:data-tool:w-full",
-													"**:data-tool:select-none **:data-tool:outline-none **:data-tool:px-[8px] **:data-tool:py-[4px] **:data-tool:gap-[8px] **:data-tool:hover:bg-bg-900/10",
+								"**:data-tool:flex **:data-tool:rounded-[8px] **:data-tool:items-center **:data-tool:w-full",
+								"**:data-tool:select-none **:data-tool:outline-none **:data-tool:px-[8px] **:data-tool:py-[4px] **:data-tool:gap-[8px] **:data-tool:hover:bg-surface-hover",
 													"**:data-tool:data-[state=on]:bg-primary-900 **:data-tool:focus:outline-none",
 												)}
 												onValueChange={(value) => {

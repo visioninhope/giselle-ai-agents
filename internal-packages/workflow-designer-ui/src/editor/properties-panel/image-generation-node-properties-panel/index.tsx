@@ -163,7 +163,7 @@ export function ImageGenerationNodePropertiesPanel({
 		<PropertiesPanelRoot>
 			{usageLimitsReached && <UsageLimitWarning />}
 			<PropertiesPanelHeader
-				icon={<NodeIcon node={node} className="size-[20px] text-black-900" />}
+				icon={<NodeIcon node={node} className="size-[20px] text-inverse" />}
 				node={node}
 				description={node.content.llm.provider}
 				onChangeName={(name) => {
@@ -212,7 +212,7 @@ export function ImageGenerationNodePropertiesPanel({
 								className={clsx(
 									"flex gap-[16px] text-[14px] font-accent",
 									"**:p-[4px] **:border-b **:cursor-pointer",
-									"**:data-[state=active]:text-inverse **:data-[state=active]:border-border",
+									"**:data-[state=active]:text-inverse **:data-[state=active]:border-inverse",
 									"**:data-[state=inactive]:text-black-400 **:data-[state=inactive]:border-transparent",
 								)}
 							>
@@ -229,7 +229,7 @@ export function ImageGenerationNodePropertiesPanel({
 								value="model"
 								className="flex-1 flex flex-col overflow-y-auto px-[4px] outline-none"
 							>
-								<div className="grid grid-cols-2 gap-[16px] mb-[16px] max-w-full border-b border-white-400/20 pb-[16px]">
+								<div className="grid grid-cols-2 gap-[16px] mb-[16px] max-w-full border-b border-inverse/20 pb-[16px]">
 									<fieldset className="flex flex-col min-w-0">
 										<label
 											htmlFor="provider"

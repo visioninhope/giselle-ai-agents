@@ -63,7 +63,7 @@ export default async function StagePage({
 			<ResizableLayout
 				mainContent={
 					<div className="space-y-6 py-6 h-full md:h-full max-h-full overflow-y-auto md:overflow-hidden relative">
-						<div className="text-center text-[24px] font-mono font-light text-white-100 bg-transparent px-6">
+						<div className="text-center text-[24px] font-mono font-light text-inverse bg-transparent px-6">
 							What are we perform next ?
 						</div>
 						<FormContainer
@@ -78,10 +78,10 @@ export default async function StagePage({
 				actsContent={
 					<div className="space-y-4 py-6 px-4 h-full overflow-y-auto">
 						<div className="flex items-center justify-between">
-							<h2 className="text-[16px] font-sans text-white-100">Tasks</h2>
+							<h2 className="text-[16px] font-sans text-inverse">Tasks</h2>
 							<Link
 								href="/stage/acts"
-								className="text-[14px] text-white-100 hover:text-white-80 transition-colors"
+								className="text-[14px] text-inverse hover:text-inverse-80 transition-colors"
 							>
 								All{">"}
 							</Link>

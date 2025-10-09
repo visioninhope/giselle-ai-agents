@@ -31,7 +31,7 @@ export function VectorStoresSidebarMenu() {
 							className={cn(
 								"text-[16px] font-sans font-medium rounded-lg px-4 py-1 hover:bg-bg/5",
 								{
-									"text-white-400": isActive,
+									"text-inverse": isActive,
 									"text-black-70": !isActive,
 								},
 							)}

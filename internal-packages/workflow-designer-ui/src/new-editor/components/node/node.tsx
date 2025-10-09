@@ -286,9 +286,9 @@ function CanvasNode({
 						/>
 					</div>
 					<div>
-						<div className="flex items-center gap-[2px] pl-[4px] text-[10px] font-mono [&>*:not(:last-child)]:after:content-['/'] [&>*:not(:last-child)]:after:ml-[2px] [&>*:not(:last-child)]:after:text-white-300">
+						<div className="flex items-center gap-[2px] pl-[4px] text-[10px] font-mono [&>*:not(:last-child)]:after:content-['/'] [&>*:not(:last-child)]:after:ml-[2px] [&>*:not(:last-child)]:after:text-inverse">
 							{metadataTexts?.map((item) => (
-								<div key={item.label} className="text-[10px] text-white-400">
+								<div key={item.label} className="text-[10px] text-inverse">
 									{selected ? (
 										<Tooltip text={item.tooltip} variant="dark">
 											<button type="button">{item.label}</button>
@@ -324,6 +324,10 @@ function CanvasNode({
 									isConnectable={false}
 									position={Position.Left}
 									id={input.id}
+									style={{
+										background: "var(--color-background)",
+										borderColor: "var(--color-border)",
+									}}
 									className={clsx(
 										"!absolute !w-[11px] !h-[11px] !rounded-full !-left-[4.5px] !translate-x-[50%] !border-[1.5px]",
 										v.isTextGeneration &&
@@ -361,9 +365,17 @@ function CanvasNode({
 										id={output.id}
 										type="source"
 										position={Position.Right}
+										style={
+											!isConnected
+												? {
+														background: "var(--color-background)",
+														borderColor: "var(--color-border)",
+													}
+												: undefined
+										}
 										className={clsx(
 											"!absolute !w-[12px] !h-[12px] !rounded-full !border-[1.5px] !right-[-0.5px]",
-											!isConnected && "!bg-bg-900",
+											// When disconnected, background is set via inline style to match canvas background
 											v.isTextGeneration && "!border-generation-node-1",
 											v.isImageGeneration && "!border-image-generation-node-1",
 											v.isGithub && "!border-github-node-1",

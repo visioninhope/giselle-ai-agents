@@ -112,7 +112,7 @@ function IngestStatusBadge({
 					<Tooltip.Portal>
 						<Tooltip.Content
 							side="top"
-							className="z-50 max-w-xs rounded-md border border-border-muted bg-surface px-3 py-2 text-xs text-white-400 shadow-lg"
+							className="z-50 max-w-xs rounded-md border border-border-muted bg-surface px-3 py-2 text-xs text-inverse shadow-lg"
 						>
 							<p className="font-medium">Error: {errorCode}</p>
 							<Tooltip.Arrow style={{ fill: "var(--color-surface)" }} />
@@ -172,7 +172,7 @@ export function DocumentVectorStoreItem({
 			<div className="px-[24px] py-[16px]">
 				<div className="flex items-start justify-between gap-4 mb-4">
 					<div>
-						<h5 className="text-white-400 font-medium text-[16px] leading-[22.4px] font-sans">
+						<h5 className="text-inverse font-medium text-[16px] leading-[22.4px] font-sans">
 							{store.name}
 						</h5>
 						<div className="text-black-300 text-[13px] leading-[18px] font-geist mt-1">
@@ -184,7 +184,7 @@ export function DocumentVectorStoreItem({
 							<button
 								type="button"
 								aria-label="Document vector store actions"
-								className="transition-opacity duration-200 p-2 text-white/60 hover:text-white/80 hover:bg-bg/5 rounded-md disabled:opacity-50"
+								className="transition-opacity duration-200 p-2 text-inverse/60 hover:text-inverse/80 hover:bg-bg/5 rounded-md disabled:opacity-50"
 								disabled={disableMenu}
 							>
 								<MoreVertical className="h-4 w-4" />
@@ -198,7 +198,7 @@ export function DocumentVectorStoreItem({
 								onSelect={() => {
 									setIsConfigureDialogOpen(true);
 								}}
-								className="flex items-center px-3 py-2 text-[14px] leading-[16px] text-white-400 hover:bg-bg/5 rounded-md"
+								className="flex items-center px-3 py-2 text-[14px] leading-[16px] text-inverse hover:bg-bg/5 rounded-md"
 							>
 								<Settings className="h-4 w-4 mr-2" />
 								Configure Sources
@@ -679,7 +679,7 @@ function DocumentVectorStoreConfigureDialog({
 							</label>
 							<input
 								id={nameInputId}
-								className="w-full rounded-md bg-surface border border-border-muted px-3 py-2 text-white-400 focus:outline-none focus:ring-1 focus:ring-white/20"
+								className="w-full rounded-md bg-surface border border-border-muted px-3 py-2 text-inverse focus:outline-none focus:ring-1 focus:ring-white/20"
 								placeholder="Vector store name"
 								value={name}
 								onChange={(event) => setName(event.target.value)}
@@ -688,10 +688,10 @@ function DocumentVectorStoreConfigureDialog({
 						</div>
 
 						<div className="space-y-3">
-							<div className="text-white-400 text-[14px] leading-[16.8px] font-sans">
+							<div className="text-inverse text-[14px] leading-[16.8px] font-sans">
 								Embedding Models
 							</div>
-							<div className="text-white-400/60 text-[12px]">
+							<div className="text-inverse/60 text-[12px]">
 								Select at least one embedding model for ingestion.
 							</div>
 							<div className="space-y-2">
@@ -713,10 +713,10 @@ function DocumentVectorStoreConfigureDialog({
 												className="mt-1 w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 rounded focus:ring-primary-500"
 											/>
 											<div className="flex-1">
-												<div className="text-white-400 text-[14px] font-medium">
+												<div className="text-inverse text-[14px] font-medium">
 													{profile.name}
 												</div>
-												<div className="text-white-400/60 text-[12px] mt-1">
+												<div className="text-inverse/60 text-[12px] mt-1">
 													Provider: {profile.provider} • Dimensions{" "}
 													{profile.dimensions}
 												</div>
@@ -728,10 +728,10 @@ function DocumentVectorStoreConfigureDialog({
 						</div>
 
 						<div className="space-y-3">
-							<div className="text-white-400 text-[16px] font-medium">
+							<div className="text-inverse text-[16px] font-medium">
 								Source Files
 							</div>
-							<div className="text-white-400/60 text-[12px]">
+							<div className="text-inverse/60 text-[12px]">
 								Upload {SUPPORTED_FILE_TYPES_LABEL} files (maximum{" "}
 								{DOCUMENT_VECTOR_STORE_MAX_FILE_SIZE_LABEL} each) to include in
 								this vector store.
@@ -747,13 +747,13 @@ function DocumentVectorStoreConfigureDialog({
 								className={`flex flex-col items-center gap-3 rounded-xl border border-dashed border-border-muted bg-surface px-6 py-8 text-center transition-colors focus:outline-none focus:ring-2 focus:ring-white/30 ${isDragActive ? "border-white/30 bg-bg/5" : ""} ${isUploadingDocuments ? "opacity-60" : ""}`}
 							>
 								<ArrowUpFromLine className="h-8 w-8 text-black-300" />
-								<p className="text-white-400 text-sm">
+								<p className="text-inverse text-sm">
 									Drop {SUPPORTED_FILE_TYPES_LABEL} files here to upload.
 								</p>
 								<p className="text-xs text-black-300">
 									Maximum {DOCUMENT_VECTOR_STORE_MAX_FILE_SIZE_LABEL} per file.
 								</p>
-								<span className="text-sm font-semibold text-white-400 underline">
+								<span className="text-sm font-semibold text-inverse underline">
 									Select files
 								</span>
 								{isUploadingDocuments ? (
@@ -776,7 +776,7 @@ function DocumentVectorStoreConfigureDialog({
 							) : null}
 							{documentSources.length > 0 ? (
 								<div className="space-y-2">
-									<div className="text-white-400 text-sm font-medium">
+									<div className="text-inverse text-sm font-medium">
 										Uploaded Files
 									</div>
 									<ul className="max-h-48 space-y-2 overflow-y-auto pr-1">
@@ -788,7 +788,7 @@ function DocumentVectorStoreConfigureDialog({
 													className="flex items-center justify-between gap-3 rounded-lg border border-border-muted bg-surface px-3 py-2"
 												>
 													<div className="flex flex-col gap-1.5 min-w-0 flex-1">
-														<span className="text-white-400 text-sm font-medium break-all">
+														<span className="text-inverse text-sm font-medium break-all">
 															{source.fileName}
 														</span>
 														<IngestStatusBadge

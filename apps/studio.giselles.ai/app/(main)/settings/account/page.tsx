@@ -36,7 +36,7 @@ export default async function AccountSettingPage() {
 					<div className="space-y-2 p-6 gap-y-[12px]">
 						<div className="flex justify-between items-center">
 							<div>
-								<h4 className="text-white-400 text-[18px] font-medium font-sans">
+								<h4 className="text-inverse text-[18px] font-medium font-sans">
 									Teams
 								</h4>
 								<p className="text-black-400 text-[12px] font-geist">

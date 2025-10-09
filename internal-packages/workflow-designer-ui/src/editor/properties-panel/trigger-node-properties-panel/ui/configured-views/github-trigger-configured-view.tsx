@@ -38,7 +38,7 @@ const EVENT_ICON_MAP = {
 // Default icon for unknown events
 const DefaultEventIcon = ({
 	size = 18,
-	className = "text-white",
+	className = "text-inverse",
 }: {
 	size?: number;
 	className?: string;
@@ -137,7 +137,7 @@ export function GitHubTriggerConfiguredView({
 									<span
 										className={clsx(
 											"text-[12px] font-medium transition-colors duration-200",
-											!data.trigger.enable ? "text-white" : "text-white/40",
+											!data.trigger.enable ? "text-inverse" : "text-inverse/40",
 										)}
 									>
 										Disabled
@@ -156,8 +156,8 @@ export function GitHubTriggerConfiguredView({
 										className={clsx(
 											"text-[12px] font-medium transition-colors duration-200",
 											data.trigger.enable
-												? "text-white font-semibold"
-												: "text-white/40",
+												? "text-inverse font-semibold"
+												: "text-inverse/40",
 										)}
 									>
 										Enable
@@ -186,7 +186,7 @@ export function GitHubTriggerConfiguredView({
 									data.trigger.configuration.event
 										.id as keyof typeof EVENT_ICON_MAP
 								] || DefaultEventIcon;
-							return <IconComponent size={18} className="text-white" />;
+							return <IconComponent size={18} className="text-inverse" />;
 						})()}
 					</div>
 					<span className="pl-2">
@@ -206,7 +206,7 @@ export function GitHubTriggerConfiguredView({
 					</div>
 					<button
 						type="button"
-						className="bg-primary-900 hover:bg-primary-800 text-white font-medium px-4 py-2 rounded-md text-[14px] transition-colors"
+						className="bg-primary-900 hover:bg-primary-800 text-inverse font-medium px-4 py-2 rounded-md text-[14px] transition-colors"
 						onClick={() => {
 							updateNodeData(node, {
 								content: {
@@ -242,7 +242,7 @@ export function GitHubTriggerConfiguredView({
 								sizeClassName="h-[16px] w-[16px]"
 							/>
 						</div>
-						<p className="text-[12px] text-white-400 px-[4px]">
+						<p className="text-[12px] text-inverse px-[4px]">
 							Use{" "}
 							<span className="text-blue-400 font-medium">
 								/{data.trigger.configuration.event.conditions.callsign}
@@ -272,7 +272,7 @@ export function GitHubTriggerConfiguredView({
 								)}
 							</div>
 						</div>
-						<p className="text-[12px] text-white-400 px-[4px]">
+						<p className="text-[12px] text-inverse px-[4px]">
 							This workflow triggers when any of these labels are added to an
 							issue.
 						</p>

@@ -140,7 +140,7 @@ function UserTeamsItem({
 				/>
 				<div className="flex flex-col">
 					<div className="flex items-center gap-2">
-						<div className="text-white-400 font-medium text-[16px] leading-[22.4px] font-geist">
+						<div className="text-inverse font-medium text-[16px] leading-[22.4px] font-geist">
 							{teamName}
 						</div>
 						{isPro ? <ProTag /> : <FreeTag />}
@@ -172,7 +172,7 @@ function UserTeamsItem({
 							renderButton={(isPending) => (
 								<button
 									type="submit"
-									className="flex items-center w-full px-3 py-2 text-left text-[14px] leading-[16px] hover:bg-bg/5 text-white-400 rounded-md"
+									className="flex items-center w-full px-3 py-2 text-left text-[14px] leading-[16px] hover:bg-bg/5 text-inverse rounded-md"
 									disabled={isPending}
 								>
 									Apps
@@ -189,7 +189,7 @@ function UserTeamsItem({
 							renderButton={(isPending) => (
 								<button
 									type="submit"
-									className="flex items-center w-full px-3 py-2 text-left text-[14px] leading-[16px] hover:bg-bg/5 text-white-400 rounded-md"
+									className="flex items-center w-full px-3 py-2 text-left text-[14px] leading-[16px] hover:bg-bg/5 text-inverse rounded-md"
 									disabled={isPending}
 								>
 									Settings

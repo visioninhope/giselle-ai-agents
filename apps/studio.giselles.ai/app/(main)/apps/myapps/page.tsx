@@ -77,7 +77,7 @@ async function MyAgentList() {
 							<div className="h-[150px] bg-bg/10 rounded-[8px] mb-4" />
 
 							<div className="flex-grow">
-								<h3 className="font-sans text-white-400 text-[16px] font-semibold mb-1 line-clamp-2">
+								<h3 className="font-sans text-inverse text-[16px] font-semibold mb-1 line-clamp-2">
 									{agent.name || "Untitled"}
 								</h3>
 							</div>
@@ -85,7 +85,7 @@ async function MyAgentList() {
 							<div className="mt-auto">
 								<div className="border-t-[0.5px] border-border my-4" />
 								<div className="flex justify-between items-center">
-									<span className="text-white-400 text-xs font-geist truncate max-w-[200px]">
+									<span className="text-inverse text-xs font-geist truncate max-w-[200px]">
 										Edited by you -{" "}
 										{formatTimestamp.toRelativeTime(
 											new Date(agent.updatedAt).getTime(),

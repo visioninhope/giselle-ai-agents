@@ -247,7 +247,7 @@ export function WebPageNodePropertiesPanel({ node }: { node: WebPageNode }) {
 	return (
 		<PropertiesPanelRoot>
 			<PropertiesPanelHeader
-				icon={<WebPageFileIcon className="size-[20px] text-black-900" />}
+				icon={<WebPageFileIcon className="size-[20px] text-inverse" />}
 				node={node}
 				onChangeName={(name) => {
 					updateNodeData(node, { name });
@@ -261,7 +261,7 @@ export function WebPageNodePropertiesPanel({ node }: { node: WebPageNode }) {
 								id="webpage-urls"
 								name="urls"
 								className={clsx(
-									"w-full min-h-[80px] p-[16px] pb-0 border-[0.5px] border-border rounded-[8px] bg-bg-100 text-white-800 outline-none resize-none",
+									"w-full min-h-[80px] p-[16px] pb-0 border-[1px] border-inverse rounded-[8px] bg-transparent text-inverse/80 outline-none resize-none",
 									// urlError && "border-error-900",
 								)}
 								// value={urls}

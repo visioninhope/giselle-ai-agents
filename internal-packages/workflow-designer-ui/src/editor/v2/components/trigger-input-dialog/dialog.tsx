@@ -115,7 +115,7 @@ export function TriggerInputDialog({
 					<Dialog.Close asChild>
 						<button
 							type="button"
-							className="text-white-400 hover:text-inverse outline-none"
+							className="text-inverse hover:text-inverse outline-none"
 						>
 							<XIcon className="size-[20px]" />
 						</button>
@@ -124,7 +124,7 @@ export function TriggerInputDialog({
 			</div>
 			<div className="flex flex-col h-full">
 				<form
-					className="flex-1 flex flex-col gap-[14px] relative text-white-800 overflow-y-hidden"
+					className="flex-1 flex flex-col gap-[14px] relative text-inverse overflow-y-hidden"
 					onSubmit={handleSubmit}
 				>
 					<p className="text-[12px] mb-[8px] text-black-400 font-sans font-semibold">

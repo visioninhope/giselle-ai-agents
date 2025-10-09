@@ -436,7 +436,7 @@ export function AnthropicWebSearchToolConfigurationDialog({
 												}}
 												onKeyDown={handleDomainKeyDown}
 												onBlur={() => addDomainTags()}
-												className="min-w-[200px] flex-1 border-none bg-transparent px-1 py-1 text-[14px] text-white-400 outline-none placeholder:text-white/30"
+												className="min-w-[200px] flex-1 border-none bg-transparent px-1 py-1 text-[14px] text-inverse outline-none placeholder:text-inverse/30"
 											/>
 										</div>
 									</div>

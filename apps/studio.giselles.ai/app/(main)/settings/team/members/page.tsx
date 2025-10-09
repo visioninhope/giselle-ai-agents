@@ -24,7 +24,7 @@ function PageTitle({ children }: { children: React.ReactNode }) {
 function TitleWithBorder({ title }: { title: string }) {
 	return (
 		<div className="mb-2">
-			<h2 className="text-white-400 text-[16px] leading-[27.2px] tracking-normal font-sans mb-1">
+			<h2 className="text-inverse text-[16px] leading-[27.2px] tracking-normal font-sans mb-1">
 				{title}
 			</h2>
 			<div className="pb-2" />

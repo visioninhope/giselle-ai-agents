@@ -121,7 +121,7 @@ export function TeamMemberListItem({
 						<div className="text-inverse text-[14px] leading-[20.4px]">
 							{displayName || "No display name"}
 						</div>
-						<div className="text-white-400 text-[12px] leading-[16px]">
+						<div className="text-inverse text-[12px] leading-[16px]">
 							{email || "No email"}
 						</div>
 					</div>
@@ -133,7 +133,7 @@ export function TeamMemberListItem({
 								<DropdownMenuTrigger asChild>
 									<button
 										type="button"
-										className="flex items-center gap-1 text-white-400 font-medium text-[14px] leading-[16px] font-sans hover:text-white-100 hover:bg-bg/5 rounded-md px-3 py-1.5"
+										className="flex items-center gap-1 text-inverse font-medium text-[14px] leading-[16px] font-sans hover:text-inverse hover:bg-bg/5 rounded-md px-3 py-1.5"
 									>
 										<span className="capitalize">{role}</span>
 										<ChevronDown className="h-4 w-4 opacity-60" />
@@ -141,14 +141,14 @@ export function TeamMemberListItem({
 								</DropdownMenuTrigger>
 								<DropdownMenuContent
 									align="end"
-									className="p-1 border-[0.25px] border-border-muted rounded-[8px] min-w-[165px] bg-surface shadow-none"
+									className="p-1 rounded-[12px] min-w-[165px] border border-white/10 bg-white/10 backdrop-blur-md shadow-[0_2px_8px_rgba(5,10,20,0.4),_0_1px_2px_rgba(0,0,0,0.3)]"
 								>
 									{canEditRole && (
 										<>
 											<button
 												type="button"
 												onClick={() => handleRoleChange("admin")}
-												className="flex items-center w-full px-3 py-2 text-left text-[14px] leading-[16px] hover:bg-bg/5 text-white-400 capitalize rounded-md"
+												className="flex items-center w-full px-3 py-2 text-left text-[14px] leading-[16px] hover:bg-white/5 text-inverse capitalize rounded-md"
 											>
 												<span className="inline-flex justify-center items-center w-4 h-4 mr-2">
 													{role === "admin" && <Check className="h-4 w-4" />}
@@ -158,7 +158,7 @@ export function TeamMemberListItem({
 											<button
 												type="button"
 												onClick={() => handleRoleChange("member")}
-												className="flex items-center w-full px-3 py-2 text-left text-[14px] leading-[16px] hover:bg-bg/5 text-white-400 capitalize rounded-md"
+												className="flex items-center w-full px-3 py-2 text-left text-[14px] leading-[16px] hover:bg-white/5 text-inverse capitalize rounded-md"
 											>
 												<span className="inline-flex justify-center items-center w-4 h-4 mr-2">
 													{role === "member" && <Check className="h-4 w-4" />}
@@ -181,7 +181,7 @@ export function TeamMemberListItem({
 										</AlertDialogTrigger>
 										<AlertDialogContent className="border-[0.5px] border-border rounded-[8px] bg-surface">
 											<AlertDialogHeader>
-												<AlertDialogTitle className="text-white-400 text-[20px] leading-[29px] font-geist">
+												<AlertDialogTitle className="text-inverse text-[20px] leading-[29px] font-geist">
 													Remove Member
 												</AlertDialogTitle>
 												<AlertDialogDescription className="text-black-400 text-[14px] leading-[20.4px]">
@@ -199,7 +199,7 @@ export function TeamMemberListItem({
 												<AlertDialogAction
 													onClick={handleDeleteMember}
 													disabled={isLoading}
-													className="py-2 px-4 bg-error-900 rounded-[8px] text-white-400 font-sans"
+													className="py-2 px-4 bg-error-900 rounded-[8px] text-inverse font-sans"
 												>
 													Remove
 												</AlertDialogAction>
@@ -209,7 +209,7 @@ export function TeamMemberListItem({
 								</DropdownMenuContent>
 							</DropdownMenu>
 						) : (
-							<span className="capitalize text-white-400 font-medium text-[14px] leading-[16px] font-sans">
+							<span className="capitalize text-inverse font-medium text-[14px] leading-[16px] font-sans">
 								{role}
 							</span>
 						)}

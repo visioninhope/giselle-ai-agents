@@ -31,7 +31,7 @@ function _ModelProviderGroup({
 	};
 	return (
 		<div className="flex flex-col gap-[8px] mb-[16px]">
-			<h3 className="text-white-400 text-[14px] px-[4px]">
+			<h3 className="text-inverse text-[14px] px-[4px]">
 				{getProviderName(provider)}
 			</h3>
 			<div className="flex flex-col gap-[4px]">

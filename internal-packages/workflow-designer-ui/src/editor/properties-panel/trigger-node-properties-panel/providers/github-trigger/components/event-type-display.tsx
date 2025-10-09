@@ -24,7 +24,7 @@ export function EventTypeDisplay({
 		<div className={clsx("flex flex-col gap-1", className)}>
 			<div className="flex items-center gap-2">
 				{getTriggerIcon(eventId)}
-				<span className="text-sm font-medium text-white">
+				<span className="text-sm font-medium text-inverse">
 					{trigger.event.label}
 				</span>
 			</div>

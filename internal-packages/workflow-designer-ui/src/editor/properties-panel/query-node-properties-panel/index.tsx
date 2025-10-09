@@ -82,7 +82,7 @@ export function QueryNodePropertiesPanel({ node }: { node: QueryNode }) {
 	return (
 		<PropertiesPanelRoot>
 			<PropertiesPanelHeader
-				icon={<DatabaseZapIcon className="size-[20px] text-black-900" />}
+				icon={<DatabaseZapIcon className="size-[20px] text-inverse" />}
 				node={node}
 				description="Query"
 				onChangeName={(name) => {
@@ -124,7 +124,7 @@ export function QueryNodePropertiesPanel({ node }: { node: QueryNode }) {
 								className="flex flex-col gap-[8px] h-full"
 								defaultValue="query"
 							>
-								<Tabs.List className="flex gap-[16px] text-[14px] font-accent **:p-[4px] **:border-b **:cursor-pointer **:data-[state=active]:text-inverse **:data-[state=active]:border-border **:data-[state=inactive]:text-black-400 **:data-[state=inactive]:border-transparent">
+								<Tabs.List className="flex gap-[16px] text-[14px] font-accent **:p-[4px] **:border-b **:cursor-pointer **:data-[state=active]:text-inverse **:data-[state=active]:border-inverse/20 **:data-[state=inactive]:text-black-400 **:data-[state=inactive]:border-transparent">
 									<Tabs.Trigger value="query">Query</Tabs.Trigger>
 									<Tabs.Trigger value="settings">Settings</Tabs.Trigger>
 								</Tabs.List>

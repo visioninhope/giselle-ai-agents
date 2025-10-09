@@ -39,7 +39,7 @@ export function PropertiesPanel() {
 				<PropertiesPanelHeader
 					node={node}
 					description={node.content.type}
-					icon={<NodeIcon node={node} className="size-[20px] text-black-900" />}
+					icon={<NodeIcon node={node} className="size-[20px] text-inverse" />}
 					onChangeName={(name) => {
 						updateNode(node.id as NodeId, { name });
 					}}

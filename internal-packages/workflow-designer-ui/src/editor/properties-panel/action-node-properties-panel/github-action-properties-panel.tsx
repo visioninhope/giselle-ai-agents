@@ -27,7 +27,7 @@ import { GitHubActionConfiguredView } from "./ui/github-action-configured-view";
 // Default icon for actions without specific icons
 const DefaultActionIcon = ({
 	size = 18,
-	className = "text-white",
+	className = "text-inverse",
 }: {
 	size?: number;
 	className?: string;
@@ -57,7 +57,7 @@ const ArrowRightIcon = () => (
 		viewBox="0 0 16 16"
 		fill="none"
 		xmlns="http://www.w3.org/2000/svg"
-		className="text-white-400 group-hover:text-white-300 transition-colors"
+		className="text-inverse group-hover:text-inverse transition-colors"
 	>
 		<title>Arrow Right</title>
 		<path
@@ -72,7 +72,7 @@ const ArrowRightIcon = () => (
 
 // Map action IDs to their corresponding icons
 const getActionIcon = (actionId: string) => {
-	const iconProps = { size: 18, className: "text-white" };
+	const iconProps = { size: 18, className: "text-inverse" };
 
 	switch (actionId) {
 		case "github.create.issue":
@@ -211,12 +211,12 @@ function Unauthorized({ authUrl }: { authUrl: string }) {
 	}, [authUrl]);
 
 	return (
-		<div className="bg-bg-900/10 h-[300px] rounded-[8px] flex items-center justify-center">
+		<div className="bg-surface/10 h-[300px] rounded-[8px] flex items-center justify-center">
 			<div className="flex flex-col gap-[8px]">
 				<p>Sign in to your GitHub account to get started</p>
 				<button
 					type="button"
-					className="group cursor-pointer bg-bg-900 rounded-[4px] py-[4px] flex items-center justify-center gap-[8px] disabled:opacity-50 disabled:cursor-wait"
+					className="group cursor-pointer bg-bg rounded-[4px] py-[4px] flex items-center justify-center gap-[8px] disabled:opacity-50 disabled:cursor-wait"
 					onClick={handleClick}
 					disabled={isPending}
 				>
@@ -282,7 +282,7 @@ function InstallGitHubApplication({
 		};
 	}, [handleInstallationMessage]);
 	return (
-		<div className="bg-bg-900/10 h-[300px] rounded-[8px] flex items-center justify-center">
+		<div className="bg-surface/10 h-[300px] rounded-[8px] flex items-center justify-center">
 			<div className="flex flex-col gap-[8px]">
 				<p>
 					Install the GitHub application for the accounts you wish to perform
@@ -290,7 +290,7 @@ function InstallGitHubApplication({
 				</p>
 				<button
 					type="button"
-					className="group cursor-pointer bg-bg-900 rounded-[4px] py-[4px] flex items-center justify-center gap-[8px] disabled:opacity-50 disabled:cursor-wait"
+					className="group cursor-pointer bg-bg rounded-[4px] py-[4px] flex items-center justify-center gap-[8px] disabled:opacity-50 disabled:cursor-wait"
 					onClick={handleClick}
 					disabled={isPending}
 				>
@@ -466,10 +466,10 @@ function Installed({
 											{getActionIcon(id)}
 										</div>
 										<div className="flex flex-col text-left overflow-hidden min-w-0">
-											<span className="text-white-800 font-medium text-[14px] truncate">
+											<span className="text-inverse font-medium text-[14px] truncate">
 												{githubAction.command.label}
 											</span>
-											<span className="text-white-400 text-[12px] truncate group-hover:text-white-300 transition-colors pr-6">
+											<span className="text-inverse text-[12px] truncate group-hover:text-inverse transition-colors pr-6">
 												{`Perform ${githubAction.command.label.toLowerCase()} action`}
 											</span>
 										</div>

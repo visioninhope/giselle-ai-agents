@@ -23,7 +23,7 @@ export default async function Page({
 	return (
 		<Suspense
 			fallback={
-				<div className="text-white h-screen flex items-center justify-center">
+				<div className="text-inverse h-screen flex items-center justify-center">
 					Loading...
 				</div>
 			}

@@ -24,7 +24,7 @@ export function SidebarMenu() {
 						className={cn(
 							"text-[16px] font-sans font-medium rounded-lg px-4 py-1 hover:bg-bg/5",
 							{
-								"text-white-400": pathname === link.href,
+								"text-inverse": pathname === link.href,
 								"text-black-70": pathname !== link.href,
 							},
 						)}

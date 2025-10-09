@@ -32,7 +32,7 @@ export function Unauthorized({ authUrl }: { authUrl: string }) {
 				<p>To get started you have to sign into your GitHub account</p>
 				<button
 					type="button"
-					className="group cursor-pointer bg-bg-900 rounded-[4px] py-[4px] flex items-center justify-center gap-[8px] disabled:opacity-50 disabled:cursor-wait"
+					className="group cursor-pointer bg-bg rounded-[4px] py-[4px] flex items-center justify-center gap-[8px] disabled:opacity-50 disabled:cursor-wait"
 					onClick={open}
 					disabled={isPending}
 				>

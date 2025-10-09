@@ -33,10 +33,10 @@ export function EventSelectionStep({ onSelectEvent }: EventSelectionStepProps) {
 								{getTriggerIcon(id as GitHubTriggerEventId)}
 							</div>
 							<div className="flex flex-col text-left overflow-hidden min-w-0">
-								<span className="text-white-800 font-medium text-[14px] truncate">
+								<span className="text-inverse font-medium text-[14px] truncate">
 									{githubTrigger.event.label}
 								</span>
-								<span className="text-white-400 text-[12px] truncate group-hover:text-white-300 transition-colors pr-6">
+								<span className="text-inverse text-[12px] truncate group-hover:text-inverse transition-colors pr-6">
 									{`Trigger when ${githubTrigger.event.label.toLowerCase()} in your repository`}
 								</span>
 							</div>

@@ -85,7 +85,7 @@ export function AgentCard({ agent }: { agent: typeof dbAgents.$inferSelect }) {
 							aria-label="App icon"
 							xmlns="http://www.w3.org/2000/svg"
 							viewBox="0 0 486 640"
-							className="h-12 w-12 text-white/30"
+							className="h-12 w-12 text-inverse/30"
 							fill="currentColor"
 						>
 							<title>App Icon</title>
@@ -94,11 +94,11 @@ export function AgentCard({ agent }: { agent: typeof dbAgents.$inferSelect }) {
 						</svg>
 					</div>
 					<div className="mt-3 px-2">
-						<h3 className="font-sans text-[16px] font-semibold text-white-400 line-clamp-2">
+						<h3 className="font-sans text-[16px] font-semibold text-inverse line-clamp-2">
 							{agent.name || "Untitled"}
 						</h3>
 						<div className="flex items-center justify-between mt-1">
-							<span className="max-w-[200px] truncate font-geist text-xs text-white/80">
+							<span className="max-w-[200px] truncate font-geist text-xs text-inverse/80">
 								Edited <span suppressHydrationWarning>{relativeTime}</span>
 							</span>
 						</div>

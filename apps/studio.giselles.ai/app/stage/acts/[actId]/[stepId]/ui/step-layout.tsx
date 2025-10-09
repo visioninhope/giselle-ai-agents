@@ -80,7 +80,7 @@ export function StepLayout({ header, children, generation }: StepLayoutProps) {
 							{copyFeedback ? (
 								<CheckCircle className="size-5 md:size-4 text-green-400" />
 							) : (
-								<Copy className="size-5 md:size-4 text-white/70 group-hover:text-white transition-colors" />
+								<Copy className="size-5 md:size-4 text-inverse/70 group-hover:text-inverse transition-colors" />
 							)}
 						</button>
 						<button
@@ -89,7 +89,7 @@ export function StepLayout({ header, children, generation }: StepLayoutProps) {
 							title="Download content"
 							onClick={handleDownload}
 						>
-							<Download className="size-5 md:size-4 text-white/70 group-hover:text-white transition-colors" />
+							<Download className="size-5 md:size-4 text-inverse/70 group-hover:text-inverse transition-colors" />
 						</button>
 					</div>
 				</div>

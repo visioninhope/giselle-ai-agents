@@ -251,7 +251,7 @@ function SourceSelect({
 								onClick={() => {
 									onValueChange?.(selectedOutputIds);
 								}}
-								className="h-[32px] w-full flex justify-center items-center bg-bg-900 text-black-900 rounded-[8px] cursor-pointer text-[12px]"
+								className="h-[32px] w-full flex justify-center items-center bg-bg text-black-900 rounded-[8px] cursor-pointer text-[12px]"
 							>
 								Update
 							</Popover.Close>

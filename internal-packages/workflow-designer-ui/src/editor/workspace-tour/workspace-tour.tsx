@@ -68,7 +68,7 @@ const NavigationFooter = ({
 				alignSelf: "stretch",
 			}}
 		>
-			<div className="text-sm text-white/70">
+			<div className="text-sm text-inverse/70">
 				{currentStep + 1}/{totalSteps}
 			</div>
 			<div className="flex gap-1">
@@ -211,7 +211,7 @@ const TourCard = ({
 					>
 						{title && (
 							<h3
-								className="text-white/80 font-semibold mb-1"
+								className="text-inverse/80 font-semibold mb-1"
 								style={{
 									fontSize: "16px",
 									fontFamily: "var(--font-sans-sans), system-ui, sans-serif",
@@ -221,7 +221,7 @@ const TourCard = ({
 							</h3>
 						)}
 						{content && (
-							<p className="text-white/40 my-2" style={{ fontSize: "12px" }}>
+							<p className="text-inverse/40 my-2" style={{ fontSize: "12px" }}>
 								{content}
 							</p>
 						)}
@@ -384,7 +384,7 @@ const TourStep1 = (props: TourStepComponentProps) => {
 						{/* Left column: Navigation */}
 						<div className="flex flex-col justify-center p-4 gap-1 border-r border-white/10">
 							<h3
-								className="text-white/80 font-semibold mb-1 text-center"
+								className="text-inverse/80 font-semibold mb-1 text-center"
 								style={{
 									fontSize: "16px",
 									fontFamily: "var(--font-sans-sans), system-ui, sans-serif",
@@ -393,7 +393,7 @@ const TourStep1 = (props: TourStepComponentProps) => {
 								Navigation
 							</h3>
 							<p
-								className="text-white/40 my-2 text-center"
+								className="text-inverse/40 my-2 text-center"
 								style={{ fontSize: "12px" }}
 							>
 								Drag to move the canvas
@@ -404,7 +404,7 @@ const TourStep1 = (props: TourStepComponentProps) => {
 							<div className="flex w-full mt-1 justify-center">
 								<button
 									type="button"
-									className="text-white/85 text-xs rounded-full flex justify-center items-center gap-1"
+									className="text-inverse/85 text-xs rounded-full flex justify-center items-center gap-1"
 									style={{
 										display: "flex",
 										padding: "4px 16px",
@@ -426,7 +426,7 @@ const TourStep1 = (props: TourStepComponentProps) => {
 						{/* Middle column: Node Controls */}
 						<div className="flex flex-col justify-center p-4 gap-1 border-r border-white/10">
 							<h3
-								className="text-white/80 font-semibold mb-1 text-center"
+								className="text-inverse/80 font-semibold mb-1 text-center"
 								style={{
 									fontSize: "16px",
 									fontFamily: "var(--font-sans-sans), system-ui, sans-serif",
@@ -435,7 +435,7 @@ const TourStep1 = (props: TourStepComponentProps) => {
 								Node Controls
 							</h3>
 							<p
-								className="text-white/40 my-2 text-center"
+								className="text-inverse/40 my-2 text-center"
 								style={{ fontSize: "12px" }}
 							>
 								Click nodes to
@@ -449,7 +449,7 @@ const TourStep1 = (props: TourStepComponentProps) => {
 							<div className="flex w-full mt-1 justify-center">
 								<button
 									type="button"
-									className="text-white/85 text-xs rounded-full flex justify-center items-center gap-1"
+									className="text-inverse/85 text-xs rounded-full flex justify-center items-center gap-1"
 									style={{
 										display: "flex",
 										padding: "4px 16px",
@@ -471,7 +471,7 @@ const TourStep1 = (props: TourStepComponentProps) => {
 						{/* Right column: Run Commands */}
 						<div className="flex flex-col justify-center p-4 gap-1">
 							<h3
-								className="text-white/80 font-semibold mb-1 text-center"
+								className="text-inverse/80 font-semibold mb-1 text-center"
 								style={{
 									fontSize: "16px",
 									fontFamily: "var(--font-sans-sans), system-ui, sans-serif",
@@ -480,7 +480,7 @@ const TourStep1 = (props: TourStepComponentProps) => {
 								Run Commands
 							</h3>
 							<p
-								className="text-white/40 my-2 text-center"
+								className="text-inverse/40 my-2 text-center"
 								style={{ fontSize: "12px" }}
 							>
 								⌘ + Enter to run a
@@ -492,7 +492,7 @@ const TourStep1 = (props: TourStepComponentProps) => {
 							<div className="flex w-full mt-1 justify-center">
 								<button
 									type="button"
-									className="text-white/85 text-xs rounded-full flex justify-center items-center gap-1"
+									className="text-inverse/85 text-xs rounded-full flex justify-center items-center gap-1"
 									style={{
 										display: "flex",
 										padding: "4px 16px",
@@ -745,7 +745,7 @@ const TourStep6 = (props: TourStepComponentProps) => {
 				{/* Text area */}
 				<div className="flex flex-col p-4 gap-1 flex-grow">
 					<h3
-						className="text-white/80 font-semibold mb-1"
+						className="text-inverse/80 font-semibold mb-1"
 						style={{
 							fontSize: "16px",
 							fontFamily: "var(--font-sans-sans), system-ui, sans-serif",
@@ -753,7 +753,7 @@ const TourStep6 = (props: TourStepComponentProps) => {
 					>
 						{step.title}
 					</h3>
-					<p className="text-white/40 my-2" style={{ fontSize: "12px" }}>
+					<p className="text-inverse/40 my-2" style={{ fontSize: "12px" }}>
 						Get help when you need it. Explore our{" "}
 						<a
 							href="https://docs.giselles.ai"

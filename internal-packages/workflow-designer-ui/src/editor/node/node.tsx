@@ -426,7 +426,7 @@ export function NodeComponent({
 										className={clsx(
 											"!absolute !w-[11px] !h-[11px] !rounded-full !-left-[4.5px] !translate-x-[50%] !border-[1.5px]",
 											"group-data-[content-type=action]:!bg-action-node-1 group-data-[content-type=action]:!border-action-node-1",
-											"group-data-[state=disconnected]:!bg-bg-900",
+											"group-data-[state=disconnected]:!bg-bg",
 										)}
 									/>
 									<div
@@ -454,7 +454,7 @@ export function NodeComponent({
 										position={Position.Left}
 										id="blank-handle"
 										className={clsx(
-											"!absolute !w-[11px] !h-[11px] !rounded-full !-left-[4.5px] !translate-x-[50%] !border-[1.5px] !bg-bg-900",
+											"!absolute !w-[11px] !h-[11px] !rounded-full !-left-[4.5px] !translate-x-[50%] !border-[1.5px] !bg-bg",
 											"group-data-[content-type=textGeneration]:!border-generation-node-1",
 											"group-data-[content-type=imageGeneration]:!border-image-generation-node-1",
 											"group-data-[content-type=webSearch]:!border-web-search-node-1",
@@ -520,7 +520,7 @@ export function NodeComponent({
 										"group-data-[state=connected]:group-data-[content-type=trigger]:!bg-trigger-node-1 group-data-[state=connected]:group-data-[content-type=trigger]:!border-trigger-node-1",
 										"group-data-[state=connected]:group-data-[content-type=action]:!bg-action-node-1 group-data-[state=connected]:group-data-[content-type=action]:!border-action-node-1",
 										"group-data-[state=connected]:group-data-[content-type=query]:!bg-query-node-1 group-data-[state=connected]:group-data-[content-type=query]:!border-query-node-1",
-										"group-data-[state=disconnected]:!bg-bg-900",
+										"group-data-[state=disconnected]:!bg-bg",
 									)}
 								/>
 								<div

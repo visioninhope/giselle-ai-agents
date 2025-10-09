@@ -245,7 +245,7 @@ export function ManualTriggerPropertiesPanel({ node }: { node: TriggerNode }) {
 										(This can be changed later)
 									</span>
 								</label>
-								<div className="flex-grow mx-[12px] h-[1px] bg-element-background" />
+								<div className="flex-grow mx-[12px] h-[1px] border-t border-inverse" />
 							</Toggle>
 						</div>
 					)}

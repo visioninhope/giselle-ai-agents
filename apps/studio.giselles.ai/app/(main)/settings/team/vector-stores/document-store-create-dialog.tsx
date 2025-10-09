@@ -119,7 +119,7 @@ export function DocumentVectorStoreCreateDialog({
 						<label className="flex flex-col gap-2">
 							<span className="text-sm text-black-300 font-geist">Name</span>
 							<input
-								className="w-full rounded-md bg-surface border border-border-muted px-3 py-2 text-white-400 focus:outline-none focus:ring-1 focus:ring-white/20"
+								className="w-full rounded-md bg-surface border border-border-muted px-3 py-2 text-inverse focus:outline-none focus:ring-1 focus:ring-white/20"
 								placeholder="e.g. Product Docs"
 								value={name}
 								onChange={(e) => setName(e.target.value)}
@@ -127,10 +127,10 @@ export function DocumentVectorStoreCreateDialog({
 						</label>
 						{/* Embedding Models, styled like Register Repository */}
 						<div className="mt-4">
-							<div className="text-white-400 text-[14px] leading-[16.8px] font-sans mb-2">
+							<div className="text-inverse text-[14px] leading-[16.8px] font-sans mb-2">
 								Embedding Models
 							</div>
-							<div className="text-white-400/60 text-[12px] mb-3">
+							<div className="text-inverse/60 text-[12px] mb-3">
 								Select at least one embedding model for indexing
 							</div>
 							<div className="space-y-2">
@@ -152,10 +152,10 @@ export function DocumentVectorStoreCreateDialog({
 												className="mt-1 w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 rounded focus:ring-primary-500"
 											/>
 											<div className="flex-1">
-												<div className="text-white-400 text-[14px] font-medium">
+												<div className="text-inverse text-[14px] font-medium">
 													{p.name}
 												</div>
-												<div className="text-white-400/60 text-[12px] mt-1">
+												<div className="text-inverse/60 text-[12px] mt-1">
 													Provider: {p.provider} • Dimensions {p.dimensions}
 												</div>
 											</div>

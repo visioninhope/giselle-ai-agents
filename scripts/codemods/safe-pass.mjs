@@ -41,8 +41,7 @@ const REPLACEMENTS = [
 	{ from: "text-white-900", to: "text-inverse" },
 	{ from: "text-black-600/20", to: "text-text/20" },
 	// Backgrounds and borders (semantic first)
-	{ from: "bg-white", to: "bg-bg" },
-	{ from: "bg-black", to: "bg-bg" },
+	// NOTE: bg-white/bg-black の一括置換は視覚差リスクが高いため無効化
 	// Border (inverse -> semantic)
 	{ from: "border-white-900/20", to: "border-border/20" },
 	{ from: "border-white-900/15", to: "border-border/15" },
@@ -53,6 +52,22 @@ const REPLACEMENTS = [
 	// SVG common classes
 	{ from: "fill-white-900", to: "fill-inverse" },
 	{ from: "stroke-white-900", to: "stroke-inverse" },
+];
+
+/** Regex-based replacements that preserve opacity suffix (e.g., /5, /10) */
+const REGEX_REPLACEMENTS = [
+	{
+		key: "text-white-*>text-inverse",
+		pattern: /\btext-white(?:-\d{3})?(\/\d{1,2})?\b/g,
+	},
+	{
+		key: "fill-white-*>fill-inverse",
+		pattern: /\bfill-white(?:-\d{3})?(\/\d{1,2})?\b/g,
+	},
+	{
+		key: "stroke-white-*>stroke-inverse",
+		pattern: /\bstroke-white(?:-\d{3})?(\/\d{1,2})?\b/g,
+	},
 ];
 
 function parseArgs(argv) {
@@ -152,6 +167,39 @@ async function run() {
 			entry.totalReplacements += count;
 			if (args.verbose)
 				entry.changes.push({ file: relative(root, file), count });
+		}
+
+		// regex replacements (preserve opacity)
+		for (const { key, pattern } of REGEX_REPLACEMENTS) {
+			const matches = next.match(pattern);
+			if (!matches) continue;
+			const before = next;
+			next = next.replace(pattern, (_m, op) => {
+				const base = key.startsWith("text")
+					? "text-inverse"
+					: key.startsWith("fill")
+						? "fill-inverse"
+						: "stroke-inverse";
+				return `${base}${op ?? ""}`;
+			});
+			if (next !== before) {
+				touched = true;
+				if (!summaryByPair.has(key)) {
+					summaryByPair.set(key, {
+						changedFiles: 0,
+						totalReplacements: 0,
+						changes: [],
+					});
+				}
+				const entry = summaryByPair.get(key);
+				entry.changedFiles++;
+				entry.totalReplacements += matches.length;
+				if (args.verbose)
+					entry.changes.push({
+						file: relative(root, file),
+						count: matches.length,
+					});
+			}
 		}
 
 		if (touched && args.apply && next !== content) {

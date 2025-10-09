@@ -77,7 +77,7 @@ function RunOptionItem({
 			<div className="p-[12px] bg-bg-800 rounded-[8px]">{icon}</div>
 			<div className="flex flex-col gap-[0px] text-inverse items-start">
 				<div className="text-[13px]">{title}</div>
-				<div className="text-[12px] text-white-400">{subtitle}</div>
+				<div className="text-[12px] text-inverse">{subtitle}</div>
 			</div>
 		</button>
 	);

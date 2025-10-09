@@ -33,9 +33,9 @@ export function GitHubAuthenticationPresentation({
 			)}
 			<div className="flex items-center justify-between gap-4">
 				<div className="flex items-center gap-4">
-					<SiGithub className="text-white-400 h-[20px] w-[20px]" />
+					<SiGithub className="text-inverse h-[20px] w-[20px]" />
 					<div className="flex flex-col">
-						<div className="text-white-400 font-medium text-[16px] leading-[22.4px] font-geist">
+						<div className="text-inverse font-medium text-[16px] leading-[22.4px] font-geist">
 							GitHub
 						</div>
 						{gitHubUser && (
