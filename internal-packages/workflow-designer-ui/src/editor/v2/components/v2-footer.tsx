@@ -24,8 +24,8 @@ export function V2Footer({
 	activePanel,
 	chat,
 }: V2FooterProps) {
-    return (
-        <footer className="h-[30px] bg-bg border-t border-border/10 px-4 flex items-center">
+	return (
+		<footer className="h-[30px] bg-bg border-t border-border/10 px-4 flex items-center">
 			<div className="flex items-center justify-between w-full">
 				<div className="flex items-center space-x-3">
 					<Tooltip

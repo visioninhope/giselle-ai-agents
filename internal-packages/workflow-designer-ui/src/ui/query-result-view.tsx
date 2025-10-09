@@ -182,8 +182,8 @@ function PRContextDisplay({
 									</>
 								)}
 							</button>
-                            {isExpanded && (
-                                <div className="mt-[6px] p-[8px] bg-surface/30 rounded-[4px]">
+							{isExpanded && (
+								<div className="mt-[6px] p-[8px] bg-surface/30 rounded-[4px]">
 									<pre className="text-[11px] text-inverse whitespace-pre-wrap font-mono leading-relaxed">
 										{parsedContext.body}
 									</pre>
@@ -321,8 +321,8 @@ function DataSourceTab({
 				className={clsx(
 					"flex items-center gap-[4px] px-[6px] py-[1px] rounded-[6px] flex-shrink-0",
 					isActive
-                        ? "bg-blue-500/20 text-blue-300"
-                        : "bg-surface/10 text-inverse",
+						? "bg-blue-500/20 text-blue-300"
+						: "bg-surface/10 text-inverse",
 				)}
 			>
 				<span className="text-[11px] font-medium">{recordCount}</span>
@@ -354,8 +354,8 @@ function QueryResultCard({
 	};
 
 	if (result.type !== "vector-store") {
-            return (
-                <div className="bg-surface/5 rounded-[8px] p-[16px] border border-border/10">
+		return (
+			<div className="bg-surface/5 rounded-[8px] p-[16px] border border-border/10">
 				<p className="text-inverse text-[14px]">
 					Unsupported result type: {result.type}
 				</p>
@@ -365,8 +365,8 @@ function QueryResultCard({
 
 	const { records } = result;
 	if (!records) {
-            return (
-                <div className="bg-surface/5 rounded-[8px] p-[16px] border border-border/10">
+		return (
+			<div className="bg-surface/5 rounded-[8px] p-[16px] border border-border/10">
 				<p className="text-inverse text-[14px]">No records found</p>
 			</div>
 		);
@@ -377,7 +377,7 @@ function QueryResultCard({
 			{records.map((record, recordIndex) => (
 				<div
 					key={`record-${recordIndex}-${record.chunkIndex}`}
-                    className="bg-surface/5 rounded-[8px] p-[12px] space-y-[8px] border border-border/10"
+					className="bg-surface/5 rounded-[8px] p-[12px] space-y-[8px] border border-border/10"
 				>
 					<div className="flex items-center justify-between">
 						<div className="flex items-center gap-[8px] flex-wrap">
@@ -466,8 +466,8 @@ export function QueryResultView({ generation }: { generation: Generation }) {
 	const queryResults = getGenerationQueryResult(generation);
 
 	if (queryResults.length === 0) {
-        return (
-            <div className="text-inverse text-[14px] p-[16px] bg-surface/5 rounded-[8px] border border-border/10 text-center">
+		return (
+			<div className="text-inverse text-[14px] p-[16px] bg-surface/5 rounded-[8px] border border-border/10 text-center">
 				No results found.
 			</div>
 		);

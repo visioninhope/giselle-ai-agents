@@ -17,24 +17,19 @@ import { selectNodePanelDataById } from "../../lib/selectors";
 import { useEditorStoreWithEqualityFn } from "../../store/context";
 
 export function Node({ id, selected }: RFNodeProps) {
-	const {
-		node,
-		connectedInputIds,
-		connectedOutputIds,
-		highlighted,
-		updateNode,
-	} = useEditorStoreWithEqualityFn(
-		selectNodePanelDataById(NodeId.parse(id)),
-		(a, b) => {
-			return (
-				a.node === b.node &&
-				shallow(a.connectedInputIds, b.connectedInputIds) &&
-				shallow(a.connectedOutputIds, b.connectedOutputIds) &&
-				a.highlighted === b.highlighted &&
-				a.updateNode === b.updateNode
-			);
-		},
-	);
+	const { node, connectedOutputIds, highlighted, updateNode } =
+		useEditorStoreWithEqualityFn(
+			selectNodePanelDataById(NodeId.parse(id)),
+			(a, b) => {
+				return (
+					a.node === b.node &&
+					shallow(a.connectedInputIds, b.connectedInputIds) &&
+					shallow(a.connectedOutputIds, b.connectedOutputIds) &&
+					a.highlighted === b.highlighted &&
+					a.updateNode === b.updateNode
+				);
+			},
+		);
 
 	const metadataTexts = useMemo(() => {
 		if (!node) return [];
@@ -60,7 +55,6 @@ export function Node({ id, selected }: RFNodeProps) {
 			contentType={node.content.type}
 			selected={selected}
 			highlighted={highlighted}
-			connectedInputIds={connectedInputIds}
 			connectedOutputIds={connectedOutputIds}
 			metadataTexts={metadataTexts}
 			// @ts-expect-error
@@ -95,7 +89,6 @@ interface CanvasNodeProps {
 	preview?: boolean;
 	requiresSetup?: boolean;
 	vectorStoreSourceProvider?: string;
-	connectedInputIds?: string[];
 	connectedOutputIds?: string[];
 	metadataTexts?: { label: string; tooltip: string }[];
 	onNameChange: (value: string) => void;
@@ -111,7 +104,6 @@ function CanvasNode({
 	preview,
 	requiresSetup,
 	vectorStoreSourceProvider,
-	connectedInputIds,
 	connectedOutputIds,
 	metadataTexts,
 	onNameChange,
