@@ -88,6 +88,7 @@ interface FilterableActsListProps {
 }
 
 const statusLabels: Record<StatusFilter, string> = {
+	created: "Created",
 	inProgress: "Running",
 	completed: "Completed",
 	failed: "Failed",
@@ -95,6 +96,7 @@ const statusLabels: Record<StatusFilter, string> = {
 };
 
 const statusColors: Record<StatusFilter, string> = {
+	created: "bg-gray-400",
 	inProgress: "bg-blue-400",
 	completed: "bg-green-400",
 	failed: "bg-red-400",
@@ -329,7 +331,7 @@ export function FilterableActsList({
 	}, []);
 
 	return (
-		<div className="flex-1 px-[24px] bg-[var(--color-stage-background)] pt-16 md:pt-0 pb-[calc(4rem+env(safe-area-inset-bottom))] md:pb-0 h-full flex flex-col">
+		<div className="flex-1 px-[24px] bg-bg pt-16 md:pt-0 pb-[calc(4rem+env(safe-area-inset-bottom))] md:pb-0 h-full flex flex-col">
 			<div className="py-6 h-full flex flex-col">
 				<div className="flex items-center justify-between px-1 mb-6">
 					<div>
@@ -416,7 +418,7 @@ export function FilterableActsList({
 												{selectedStatuses.map((status) => (
 													<div
 														key={status}
-														className={`w-3 h-3 rounded-full border border-black-900 ${statusColors[status]}`}
+														className={`w-3 h-3 rounded-full border border-border ${statusColors[status]}`}
 													/>
 												))}
 											</div>

@@ -49,7 +49,7 @@ export function EditableText({
 				className={clsx(
 					"py-[2px] px-[4px] rounded-[4px] hidden data-[editing=true]:block",
 					"outline-none ring-[1px] ring-primary-900",
-					"text-white-900 text-[14px]",
+					"text-inverse text-[14px]",
 				)}
 				ref={inputRef}
 				data-input
@@ -66,8 +66,8 @@ export function EditableText({
 				type="button"
 				className={clsx(
 					"py-[2px] px-[4px] rounded-l-[4px] last:rounded-r-[4px] data-[editing=true]:hidden",
-					"hover:bg-white-900/20",
-					"text-white-900 text-[14px]",
+					"hover:bg-bg-900/20",
+					"text-inverse text-[14px]",
 					"cursor-default",
 				)}
 				data-button

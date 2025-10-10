@@ -6,6 +6,7 @@ import {
 } from "@giselle-sdk/data-type";
 import { defaultName } from "@giselle-sdk/giselle/react";
 import { Handle, Position, type NodeProps as RFNodeProps } from "@xyflow/react";
+import "./handles.css";
 import clsx from "clsx/lite";
 import { useMemo } from "react";
 import { shallow } from "zustand/shallow";
@@ -16,24 +17,19 @@ import { selectNodePanelDataById } from "../../lib/selectors";
 import { useEditorStoreWithEqualityFn } from "../../store/context";
 
 export function Node({ id, selected }: RFNodeProps) {
-	const {
-		node,
-		connectedInputIds,
-		connectedOutputIds,
-		highlighted,
-		updateNode,
-	} = useEditorStoreWithEqualityFn(
-		selectNodePanelDataById(NodeId.parse(id)),
-		(a, b) => {
-			return (
-				a.node === b.node &&
-				shallow(a.connectedInputIds, b.connectedInputIds) &&
-				shallow(a.connectedOutputIds, b.connectedOutputIds) &&
-				a.highlighted === b.highlighted &&
-				a.updateNode === b.updateNode
-			);
-		},
-	);
+	const { node, connectedOutputIds, highlighted, updateNode } =
+		useEditorStoreWithEqualityFn(
+			selectNodePanelDataById(NodeId.parse(id)),
+			(a, b) => {
+				return (
+					a.node === b.node &&
+					shallow(a.connectedInputIds, b.connectedInputIds) &&
+					shallow(a.connectedOutputIds, b.connectedOutputIds) &&
+					a.highlighted === b.highlighted &&
+					a.updateNode === b.updateNode
+				);
+			},
+		);
 
 	const metadataTexts = useMemo(() => {
 		if (!node) return [];
@@ -59,7 +55,6 @@ export function Node({ id, selected }: RFNodeProps) {
 			contentType={node.content.type}
 			selected={selected}
 			highlighted={highlighted}
-			connectedInputIds={connectedInputIds}
 			connectedOutputIds={connectedOutputIds}
 			metadataTexts={metadataTexts}
 			// @ts-expect-error
@@ -94,7 +89,6 @@ interface CanvasNodeProps {
 	preview?: boolean;
 	requiresSetup?: boolean;
 	vectorStoreSourceProvider?: string;
-	connectedInputIds?: string[];
 	connectedOutputIds?: string[];
 	metadataTexts?: { label: string; tooltip: string }[];
 	onNameChange: (value: string) => void;
@@ -281,14 +275,14 @@ function CanvasNode({
 								v.isFillIcon && "fill-current",
 								v.isStrokeIcon && "stroke-current fill-none",
 								v.isDarkIconText && "text-black-900",
-								v.isLightIconText && "text-white-900",
+								v.isLightIconText && "text-inverse",
 							)}
 						/>
 					</div>
 					<div>
-						<div className="flex items-center gap-[2px] pl-[4px] text-[10px] font-mono [&>*:not(:last-child)]:after:content-['/'] [&>*:not(:last-child)]:after:ml-[2px] [&>*:not(:last-child)]:after:text-white-300">
+						<div className="flex items-center gap-[2px] pl-[4px] text-[10px] font-mono [&>*:not(:last-child)]:after:content-['/'] [&>*:not(:last-child)]:after:ml-[2px] [&>*:not(:last-child)]:after:text-inverse">
 							{metadataTexts?.map((item) => (
-								<div key={item.label} className="text-[10px] text-white-400">
+								<div key={item.label} className="text-[10px] text-inverse">
 									{selected ? (
 										<Tooltip text={item.tooltip} variant="dark">
 											<button type="button">{item.label}</button>
@@ -324,6 +318,10 @@ function CanvasNode({
 									isConnectable={false}
 									position={Position.Left}
 									id={input.id}
+									style={{
+										background: "var(--color-background)",
+										borderColor: "var(--color-border)",
+									}}
 									className={clsx(
 										"!absolute !w-[11px] !h-[11px] !rounded-full !-left-[4.5px] !translate-x-[50%] !border-[1.5px]",
 										v.isTextGeneration &&
@@ -339,7 +337,7 @@ function CanvasNode({
 										v.isQuery && "!bg-query-node-1 !border-query-node-1",
 									)}
 								/>
-								<div className={clsx("px-[12px] text-white-900 text-[12px]")}>
+								<div className={clsx("px-[12px] text-inverse text-[12px]")}>
 									{input.label}
 								</div>
 							</div>
@@ -361,9 +359,17 @@ function CanvasNode({
 										id={output.id}
 										type="source"
 										position={Position.Right}
+										style={
+											!isConnected
+												? {
+														background: "var(--color-background)",
+														borderColor: "var(--color-border)",
+													}
+												: undefined
+										}
 										className={clsx(
 											"!absolute !w-[12px] !h-[12px] !rounded-full !border-[1.5px] !right-[-0.5px]",
-											!isConnected && "!bg-black-900",
+											// When disconnected, background is set via inline style to match canvas background
 											v.isTextGeneration && "!border-generation-node-1",
 											v.isImageGeneration && "!border-image-generation-node-1",
 											v.isGithub && "!border-github-node-1",
@@ -423,7 +429,7 @@ function CanvasNode({
 										className={clsx(
 											"text-[12px]",
 											isConnected
-												? "px-[16px] text-white-900"
+												? "px-[16px] text-inverse"
 												: "absolute -right-[12px] whitespace-nowrap translate-x-[100%] text-black-400",
 										)}
 									>

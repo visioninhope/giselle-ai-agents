@@ -14,7 +14,7 @@ import {
 } from "@giselle-sdk/data-type";
 import {
 	defaultName,
-	useActController,
+	useActSystem,
 	useNodeGroups,
 	useWorkflowDesigner,
 } from "@giselle-sdk/giselle/react";
@@ -74,10 +74,10 @@ function RunOptionItem({
 			)}
 			{...props}
 		>
-			<div className="p-[12px] bg-black-800 rounded-[8px]">{icon}</div>
-			<div className="flex flex-col gap-[0px] text-white-900 items-start">
+			<div className="p-[12px] bg-bg-800 rounded-[8px]">{icon}</div>
+			<div className="flex flex-col gap-[0px] text-inverse items-start">
 				<div className="text-[13px]">{title}</div>
-				<div className="text-[12px] text-white-400">{subtitle}</div>
+				<div className="text-[12px] text-inverse">{subtitle}</div>
 			</div>
 		</button>
 	);
@@ -85,7 +85,7 @@ function RunOptionItem({
 
 function useRunAct() {
 	const { data, setUiNodeState } = useWorkflowDesigner();
-	const { createAndStartAct } = useActController();
+	const { createAndStartAct } = useActSystem(data.id);
 	const { toast, error } = useToasts();
 
 	return async (item: RunItem) => {
@@ -274,7 +274,7 @@ function MultipleRunsDropdown({
 								icon={
 									<NodeIcon
 										node={triggerNode}
-										className="size-[16px] text-white-900"
+										className="size-[16px] text-inverse"
 									/>
 								}
 								title={triggerNode.name ?? defaultName(triggerNode)}

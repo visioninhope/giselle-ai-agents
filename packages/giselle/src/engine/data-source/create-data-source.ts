@@ -36,7 +36,7 @@ export async function createDataSource(args: {
 	await Promise.all([
 		args.context.storage.setItem(dataSourcePath(dataSource.id), dataSource),
 		addWorkspaceIndexItem({
-			storage: args.context.storage,
+			context: args.context,
 			indexPath: workspaceDataSourceIndexPath(dataSource.workspaceId),
 			item: dataSource,
 			itemSchema: DataSourceIndexObject,

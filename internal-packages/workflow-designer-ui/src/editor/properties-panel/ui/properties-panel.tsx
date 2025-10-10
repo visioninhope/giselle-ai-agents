@@ -37,7 +37,7 @@ export function PropertiesPanelHeader({
 		<div className={getHeaderClasses()}>
 			<div className={`flex ${PANEL_SPACING.HEADER.ICON_GAP} items-center`}>
 				<div
-					className="bg-white-900 rounded-[4px] flex items-center justify-center"
+					className="bg-bg-900 rounded-[4px] flex items-center justify-center"
 					style={{
 						width: PANEL_SPACING.HEADER.ICON_SIZE,
 						height: PANEL_SPACING.HEADER.ICON_SIZE,

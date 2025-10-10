@@ -4,10 +4,8 @@ import type { FlowTrigger, WorkspaceId } from "@giselle-sdk/data-type";
 import { isTriggerNode } from "@giselle-sdk/data-type";
 import type { ParameterItem } from "@giselle-sdk/giselle";
 import { revalidatePath } from "next/cache";
-import { after } from "next/server";
 import { giselleEngine } from "@/app/giselle-engine";
 import { acts as actsSchema, db } from "@/drizzle";
-import { aiGatewayFlag, resumableGenerationFlag } from "@/flags";
 import { fetchCurrentUser } from "@/services/accounts";
 import type { TeamId } from "@/services/teams";
 
@@ -87,16 +85,10 @@ export async function runWorkspaceApp(
 			sdkWorkspaceId: flowTrigger.workspaceId,
 		});
 
-		const useAiGateway = await aiGatewayFlag();
-		const useResumableGeneration = await resumableGenerationFlag();
-
-		after(() =>
-			giselleEngine.startAct({
-				actId: act.id,
-				useAiGateway,
-				useResumableGeneration,
-			}),
-		);
+		await giselleEngine.startAct({
+			actId: act.id,
+			generationOriginType: "stage",
+		});
 
 		revalidatePath("/stage/showcase");
 		revalidatePath("/stage/acts");

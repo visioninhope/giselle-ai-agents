@@ -2,9 +2,10 @@ import { z } from "zod/v4";
 import type { Act } from "../../concepts/act";
 import type { GiselleEngineContext } from "../types";
 import { CreateActInputs, createAct } from "./create-act";
-import { type StartActCallbacks, StartActInputs, startAct } from "./start-act";
+import { type RunActCallbacks, runAct } from "./run-act";
+import { StartActInputs } from "./start-act";
 
-interface CreateAndStartActCallbacks extends StartActCallbacks {
+interface CreateAndStartActCallbacks extends RunActCallbacks {
 	actCreate?: (args: { act: Act }) => void | Promise<void>;
 }
 
@@ -25,11 +26,9 @@ export async function createAndStartAct(
 ) {
 	const { act } = await createAct(args);
 	await args.callbacks?.actCreate?.({ act });
-	await startAct({
+	await runAct({
 		context: args.context,
 		actId: act.id,
 		callbacks: args.callbacks,
-		useAiGateway: args.useAiGateway,
-		useResumableGeneration: args.useResumableGeneration,
 	});
 }

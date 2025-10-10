@@ -336,7 +336,7 @@ function PostgresToolConfigurationDialogInternal({
 								{category.tools.map((tool) => (
 									<label
 										key={tool}
-										className="flex items-center justify-between p-3 hover:bg-black-800/30 cursor-pointer transition-colors"
+										className="flex items-center justify-between p-3 hover:bg-bg-800/30 cursor-pointer transition-colors"
 										htmlFor={tool}
 									>
 										<div className="flex items-center flex-1">

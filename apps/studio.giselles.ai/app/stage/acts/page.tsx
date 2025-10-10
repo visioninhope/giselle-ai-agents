@@ -67,6 +67,7 @@ async function enrichActWithNavigationData(
 		let targetStep = null;
 
 		switch (tmpAct.status) {
+			case "created":
 			case "inProgress":
 				targetStep = findStepByStatus("running") ?? getFirstStep();
 				break;

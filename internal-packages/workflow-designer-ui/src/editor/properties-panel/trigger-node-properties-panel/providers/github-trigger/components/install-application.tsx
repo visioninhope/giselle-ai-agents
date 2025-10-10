@@ -31,7 +31,7 @@ export function InstallGitHubApplication({
 	}, [handleInstallationMessage]);
 
 	return (
-		<div className="bg-white-900/10 h-full rounded-[8px] flex items-center justify-center">
+		<div className="bg-bg-900/10 h-full rounded-[8px] flex items-center justify-center">
 			<div className="flex flex-col items-center text-center gap-[16px]">
 				<div className="flex flex-col items-center gap-[8px]">
 					<SourceLinkIcon className="fill-black-300 size-[24px]" />
@@ -45,7 +45,7 @@ export function InstallGitHubApplication({
 				</div>
 				<button
 					type="button"
-					className="flex items-center justify-center px-[24px] py-[12px] mt-[16px] bg-[#141519] text-white rounded-[9999px] border border-white-900/15 transition-all hover:bg-[#1e1f26] hover:border-white-900/25 hover:translate-y-[-1px] cursor-pointer font-sans font-[500] text-[14px] disabled:opacity-50 disabled:cursor-wait group"
+					className="flex items-center justify-center px-[24px] py-[12px] mt-[16px] bg-[#141519] text-white rounded-[9999px] border border-border/15 transition-all hover:bg-[#1e1f26] hover:border-border/25 hover:translate-y-[-1px] cursor-pointer font-sans font-[500] text-[14px] disabled:opacity-50 disabled:cursor-wait group"
 					onClick={open}
 					disabled={isPending}
 				>

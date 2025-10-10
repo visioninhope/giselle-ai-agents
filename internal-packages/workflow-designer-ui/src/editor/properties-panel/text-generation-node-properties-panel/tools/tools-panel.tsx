@@ -18,7 +18,7 @@ function ensureTools(key: keyof ToolSet, node: TextGenerationNode): string[] {
 
 export function ToolsPanel({ node }: { node: TextGenerationNode }) {
 	return (
-		<div className="text-white-400 space-y-[16px]">
+		<div className="text-inverse space-y-[16px]">
 			{toolProviders.map(
 				(provider) =>
 					(provider.requirement === undefined ||

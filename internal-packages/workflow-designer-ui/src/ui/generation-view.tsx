@@ -72,7 +72,7 @@ function renderImageLoadingGrid(generation: Generation, keyPrefix: string) {
 			{Array.from({ length: imageCount }).map((_, index) => (
 				<div
 					key={`${generation.id}-${keyPrefix}-${index}`}
-					className="flex-shrink-0 bg-white-900/5 rounded-[8px] overflow-hidden flex items-center justify-center h-full"
+					className="flex-shrink-0 bg-bg-900/5 rounded-[8px] overflow-hidden flex items-center justify-center h-full"
 				>
 					<ImageGenerationLoading configuration={config} />
 				</div>
@@ -157,14 +157,14 @@ export function GenerationView({ generation }: { generation: Generation }) {
 							{output.contents.map((content) => (
 								<div
 									key={content.filename}
-									className="relative group cursor-pointer flex-shrink-0 bg-white-900/5 rounded-[8px] overflow-hidden h-full"
+									className="relative group cursor-pointer flex-shrink-0 bg-bg-900/5 rounded-[8px] overflow-hidden h-full"
 								>
 									<img
 										src={`${client.basePath}/${content.pathname}`}
 										alt="generated file"
 										className="h-full w-auto object-contain rounded-[8px]"
 									/>
-									<div className="absolute inset-0 bg-black/40 rounded-[8px] opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-start justify-end p-2">
+									<div className="absolute inset-0 bg-bg/40 rounded-[8px] opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-start justify-end p-2">
 										<div className="flex gap-1">
 											<button
 												type="button"
@@ -295,7 +295,7 @@ export function GenerationView({ generation }: { generation: Generation }) {
 					<div
 						role="dialog"
 						aria-label="Image viewer"
-						className="fixed inset-0 bg-black/95 z-[9999] flex items-center justify-center cursor-pointer"
+						className="fixed inset-0 bg-bg/95 z-[9999] flex items-center justify-center cursor-pointer"
 						onClick={() => setLightboxImage(null)}
 						onKeyDown={(e) => {
 							if (e.key === "Enter" || e.key === " ") {
@@ -309,7 +309,7 @@ export function GenerationView({ generation }: { generation: Generation }) {
 								e.stopPropagation();
 								setLightboxImage(null);
 							}}
-							className="absolute top-4 right-4 z-10 p-3 text-white hover:bg-white/20 rounded-full transition-colors"
+							className="absolute top-4 right-4 z-10 p-3 text-white hover:bg-bg/20 rounded-full transition-colors"
 							title="Close (ESC)"
 						>
 							<X className="w-6 h-6" />

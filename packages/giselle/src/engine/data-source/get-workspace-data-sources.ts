@@ -9,7 +9,7 @@ export async function getWorkspaceDataSources(args: {
 	workspaceId: WorkspaceId;
 }) {
 	return await getWorkspaceIndex({
-		storage: args.context.storage,
+		context: args.context,
 		indexPath: workspaceDataSourceIndexPath(args.workspaceId),
 		itemSchema: DataSourceIndexObject,
 	});

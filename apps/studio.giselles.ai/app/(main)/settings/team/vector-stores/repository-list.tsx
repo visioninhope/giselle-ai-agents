@@ -65,7 +65,7 @@ export function RepositoryList({
 
 function EmptyRepositoryCard() {
 	return (
-		<div className="text-black-300 text-center py-16 bg-black-300/10 rounded-lg">
+		<div className="text-black-300 text-center py-16 bg-surface rounded-lg">
 			<div>No repositories are registered.</div>
 			<div>
 				Please register a repository using the "Register Repository" button.

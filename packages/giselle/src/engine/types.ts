@@ -11,12 +11,15 @@ import type { LanguageModelProvider } from "@giselle-sdk/language-model";
 import type { EmbeddingMetrics, QueryService } from "@giselle-sdk/rag";
 import type { ModelMessage, ProviderMetadata } from "ai";
 import type { Storage } from "unstorage";
+import type { Act } from "../concepts/act";
 import type { GiselleLogger } from "../logger/types";
 import type { GiselleStorage } from "./experimental_storage";
 import type { VectorStore } from "./experimental_vector-store/types/interface";
 import type {
 	CompletedGeneration,
 	FailedGeneration,
+	GenerationMetadata,
+	GenerationOrigin,
 	OutputFileBlob,
 	RunningGeneration,
 } from "./generations";
@@ -32,16 +35,32 @@ export type WaitUntil<T = unknown> = (task: WaitUntilTask<T>) => void;
 type GenerateContentArgs = {
 	context: GiselleEngineContext;
 	generation: RunningGeneration;
+	metadata?: GenerationMetadata;
 };
 type GenerateContentProcess =
 	| { type: "self" }
 	| { type: "external"; process: (args: GenerateContentArgs) => Promise<void> };
+
+export type SetRunActProcessArgs = {
+	context: GiselleEngineContext;
+	act: Act;
+	generationOriginType: GenerationOrigin["type"];
+};
+type RunActProcess =
+	| { type: "self" }
+	| {
+			type: "external";
+			process: (args: SetRunActProcessArgs) => Promise<void>;
+	  };
+
+export type RunAct = (args: SetRunActProcessArgs) => Promise<void>;
 
 export interface GenerationCompleteCallbackFunctionArgs {
 	generation: CompletedGeneration;
 	inputMessages: ModelMessage[];
 	outputFileBlobs: OutputFileBlob[];
 	providerMetadata?: ProviderMetadata;
+	generationMetadata?: GenerationMetadata;
 }
 type GenerationCompleteCallbackFunction = (
 	args: GenerationCompleteCallbackFunctionArgs,
@@ -50,6 +69,7 @@ type GenerationCompleteCallbackFunction = (
 export interface GenerationFailedCallbackFunctionArgs {
 	generation: FailedGeneration;
 	inputMessages: ModelMessage[];
+	generationMetadata?: GenerationMetadata;
 }
 export type GenerationFailedCallbackFunction = (
 	args: GenerationFailedCallbackFunctionArgs,
@@ -59,6 +79,7 @@ export interface EmbeddingCompleteCallbackFunctionArgs {
 	embeddingMetrics: EmbeddingMetrics;
 	generation: RunningGeneration;
 	queryContext: QueryContext;
+	generationMetadata?: GenerationMetadata;
 }
 export type EmbeddingCompleteCallbackFunction = (
 	args: EmbeddingCompleteCallbackFunctionArgs,
@@ -99,6 +120,7 @@ export interface GiselleEngineContext {
 	logger: GiselleLogger;
 	waitUntil: WaitUntil;
 	generateContentProcess: GenerateContentProcess;
+	runActProcess: RunActProcess;
 }
 
 interface GitHubInstalltionAppAuthResolver {

@@ -31,7 +31,7 @@ function _ModelProviderGroup({
 	};
 	return (
 		<div className="flex flex-col gap-[8px] mb-[16px]">
-			<h3 className="text-white-400 text-[14px] px-[4px]">
+			<h3 className="text-inverse text-[14px] px-[4px]">
 				{getProviderName(provider)}
 			</h3>
 			<div className="flex flex-col gap-[4px]">
@@ -39,7 +39,7 @@ function _ModelProviderGroup({
 					<button
 						type="button"
 						key={model.id}
-						className="flex gap-[12px] items-center hover:bg-white-850/10 focus:bg-white-850/10 p-[4px] rounded-[4px]"
+						className="flex gap-[12px] items-center hover:bg-bg-850/10 focus:bg-bg-850/10 p-[4px] rounded-[4px]"
 						onClick={() => onModelSelect(model)}
 					>
 						<div className="flex items-center">

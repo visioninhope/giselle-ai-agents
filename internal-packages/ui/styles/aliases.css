@@ -104,6 +104,44 @@
 	.bg-bg {
 		background-color: var(--color-bg, var(--color-background)) !important;
 	}
+	.bg-inverse {
+		background-color: var(--color-text-inverse, var(--color-white, #fff)) !important;
+	}
+	.bg-inverse\/5 {
+		background-color: color-mix(
+			in srgb,
+			var(--color-text-inverse, var(--color-white, #fff)) 5%,
+			transparent
+		) !important;
+	}
+	.bg-inverse\/10 {
+		background-color: color-mix(
+			in srgb,
+			var(--color-text-inverse, var(--color-white, #fff)) 10%,
+			transparent
+		) !important;
+	}
+	.bg-inverse\/15 {
+		background-color: color-mix(
+			in srgb,
+			var(--color-text-inverse, var(--color-white, #fff)) 15%,
+			transparent
+		) !important;
+	}
+	.bg-inverse\/20 {
+		background-color: color-mix(
+			in srgb,
+			var(--color-text-inverse, var(--color-white, #fff)) 20%,
+			transparent
+		) !important;
+	}
+	.bg-inverse\/30 {
+		background-color: color-mix(
+			in srgb,
+			var(--color-text-inverse, var(--color-white, #fff)) 30%,
+			transparent
+		) !important;
+	}
 
 	/* Borders */
 	.border-border {
@@ -116,6 +154,18 @@
 		border-color: var(
 			--color-border-muted,
 			var(--color-light-border, var(--color-border))
+		) !important;
+	}
+
+	/* Inverse border helpers (align to text-inverse) */
+	.border-inverse {
+		border-color: var(--color-text-inverse, var(--color-white, #fff)) !important;
+	}
+	.border-inverse\/20 {
+		border-color: color-mix(
+			in srgb,
+			var(--color-text-inverse, var(--color-white, #fff)) 20%,
+			transparent
 		) !important;
 	}
 

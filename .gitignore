@@ -46,3 +46,6 @@ app/fonts/
 .env*.local
 
 /.reports/
+
+# reports from local metrics
+.reports/*.json

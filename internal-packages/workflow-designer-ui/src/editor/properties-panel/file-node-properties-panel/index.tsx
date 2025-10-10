@@ -30,9 +30,7 @@ export function FileNodePropertiesPanel({ node }: { node: FileNode }) {
 	return (
 		<PropertiesPanelRoot>
 			<PropertiesPanelHeader
-				icon={
-					<FileNodeIcon node={node} className="size-[20px] text-black-900" />
-				}
+				icon={<FileNodeIcon node={node} className="size-[20px] text-inverse" />}
 				node={node}
 				onChangeName={(name) => {
 					updateNodeData(node, { name });

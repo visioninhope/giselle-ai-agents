@@ -7,7 +7,7 @@ interface IconProps {
 }
 
 export function IssueCreatedIcon({
-	className = "text-white",
+	className = "text-inverse",
 	size = 18,
 	title = "Issue Created",
 }: IconProps) {
@@ -54,7 +54,7 @@ export function IssueCreatedIcon({
 }
 
 export function IssueClosedIcon({
-	className = "text-white",
+	className = "text-inverse",
 	size = 18,
 	title = "Issue Closed",
 }: IconProps) {
@@ -83,7 +83,7 @@ export function IssueClosedIcon({
 }
 
 export function IssueCommentCreatedIcon({
-	className = "text-white",
+	className = "text-inverse",
 	size = 18,
 	title = "Issue Comment Created",
 }: IconProps) {
@@ -117,7 +117,7 @@ export function IssueCommentCreatedIcon({
 }
 
 export function IssueLabeledIcon({
-	className = "text-white",
+	className = "text-inverse",
 	size = 18,
 	title = "Issue Labeled",
 }: IconProps) {
@@ -164,7 +164,7 @@ export function IssueLabeledIcon({
 }
 
 export function PullRequestCommentCreatedIcon({
-	className = "text-white",
+	className = "text-inverse",
 	size = 18,
 	title = "Pull Request Comment Created",
 }: IconProps) {
@@ -198,7 +198,7 @@ export function PullRequestCommentCreatedIcon({
 }
 
 export function PullRequestReviewCommentCreatedIcon({
-	className = "text-white",
+	className = "text-inverse",
 	size = 18,
 	title = "Pull Request Review Comment Created",
 }: IconProps) {
@@ -228,7 +228,7 @@ export function PullRequestReviewCommentCreatedIcon({
 }
 
 export function PullRequestOpenedIcon({
-	className = "text-white",
+	className = "text-inverse",
 	size = 18,
 	title = "Pull Request Opened",
 }: IconProps) {
@@ -258,7 +258,7 @@ export function PullRequestOpenedIcon({
 }
 
 export function PullRequestReadyForReviewIcon({
-	className = "text-white",
+	className = "text-inverse",
 	size = 18,
 	title = "Pull Request Ready For Review",
 }: IconProps) {
@@ -288,7 +288,7 @@ export function PullRequestReadyForReviewIcon({
 }
 
 export function PullRequestClosedIcon({
-	className = "text-white",
+	className = "text-inverse",
 	size = 18,
 	title = "Pull Request Closed",
 }: IconProps) {
@@ -317,7 +317,7 @@ export function PullRequestClosedIcon({
 }
 
 export function PullRequestLabeledIcon({
-	className = "text-white",
+	className = "text-inverse",
 	size = 18,
 	title = "Pull Request Labeled",
 }: IconProps) {
@@ -364,7 +364,7 @@ export function PullRequestLabeledIcon({
 }
 
 function DefaultGitHubIcon({
-	className = "text-white",
+	className = "text-inverse",
 	size = 22,
 	title = "GitHub",
 }: IconProps) {
@@ -392,7 +392,7 @@ function DefaultGitHubIcon({
 }
 
 export function ArrowRightIcon({
-	className = "text-white-600 group-hover:text-white-500 transition-colors flex-shrink-0 absolute right-4",
+	className = "text-inverse group-hover:text-inverse transition-colors flex-shrink-0 absolute right-4",
 	size = 16,
 	title = "Arrow Right",
 }: IconProps) {

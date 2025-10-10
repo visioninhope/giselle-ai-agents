@@ -36,7 +36,7 @@ export function DropdownMenuContent({
 				sideOffset={sideOffset}
 				align={align}
 				className={clsx(
-					"z-50 min-w-[8rem] overflow-hidden rounded-[8px] border border-white-900 bg-black-900 text-black-300 shadow-[0px_0px_2px_0px_hsla(0,_0%,_100%,_0.1)_inset]",
+					"z-50 min-w-[8rem] overflow-hidden rounded-[8px] border border-border bg-surface text-text shadow-[0px_0px_2px_0px_hsla(0,_0%,_100%,_0.1)_inset]",
 				)}
 				onEscapeKeyDown={onEscapeKeyDown}
 				onCloseAutoFocus={onCloseAutoFocus}
@@ -59,7 +59,7 @@ function DropdownMenuCheckboxItem({
 >) {
 	return (
 		<DropdownMenuPrimitive.CheckboxItem
-			className="relative flex cursor-default select-none items-center  py-[8px] pl-2 pr-8 text-sm outline-none transition-colors focus:bg-white-900/20 focus:text-white-900 data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
+			className="relative flex cursor-default select-none items-center  py-[8px] pl-2 pr-8 text-sm outline-none transition-colors focus:bg-surface-hover focus:text-inverse data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
 			{...props}
 		>
 			{children}
@@ -99,7 +99,7 @@ export function DropdownMenuRadioItem({
 }) {
 	return (
 		<DropdownMenuPrimitive.RadioItem
-			className="relative flex cursor-default select-none items-center py-[8px] pl-2 pr-8 text-sm outline-none transition-colors focus:bg-white-900/20 focus:text-white-900 data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
+			className="relative flex cursor-default select-none items-center py-[8px] pl-2 pr-8 text-sm outline-none transition-colors focus:bg-surface-hover focus:text-inverse data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
 			value={value}
 		>
 			<span className="absolute right-2 flex h-3.5 w-3.5 items-center justify-center">
@@ -119,7 +119,7 @@ function DropdownMenuItem({
 }: Omit<ComponentProps<typeof DropdownMenuPrimitive.Item>, "className">) {
 	return (
 		<DropdownMenuPrimitive.Item
-			className="relative flex cursor-default select-none items-center py-[8px] pl-2 pr-8 text-sm outline-none transition-colors focus:bg-white-900/20 focus:text-white-900 data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
+			className="relative flex cursor-default select-none items-center py-[8px] pl-2 pr-8 text-sm outline-none transition-colors focus:bg-surface-hover focus:text-inverse data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
 			{...props}
 		>
 			{children}

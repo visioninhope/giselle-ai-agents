@@ -87,7 +87,7 @@ export function GitHubActionConfiguredView({
 					</div>
 					<button
 						type="button"
-						className="bg-primary-900 hover:bg-primary-800 text-white font-medium px-4 py-2 rounded-md text-[14px] transition-colors"
+						className="bg-primary-900 hover:bg-primary-800 text-inverse font-medium px-4 py-2 rounded-md text-[14px] transition-colors"
 						onClick={() => {
 							updateNodeData(node, {
 								content: {

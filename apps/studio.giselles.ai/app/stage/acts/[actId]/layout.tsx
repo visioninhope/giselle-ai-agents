@@ -26,7 +26,7 @@ export default async function ({
 	const data = getSidebarDataObject(actId);
 
 	return (
-		<div className="bg-[var(--color-stage-background)] text-foreground min-h-screen md:h-screen md:flex md:flex-row font-sans">
+		<div className="bg-bg text-foreground min-h-screen md:h-screen md:flex md:flex-row font-sans">
 			{/* Left Sidebar - Always visible */}
 			<div className="w-full md:w-auto md:h-screen md:overflow-y-auto">
 				<Suspense fallback={<NavSkelton />}>
@@ -35,7 +35,7 @@ export default async function ({
 			</div>
 
 			{/* Main Content - Hidden on mobile */}
-			<main className="hidden md:flex m-0 md:m-[8px] flex-1 rounded-none md:rounded-[12px] backdrop-blur-md border-0 md:border md:border-white/20 shadow-lg shadow-black/10 shadow-inner overflow-hidden">
+			<main className="hidden md:flex m-0 md:m-[8px] flex-1 rounded-none md:rounded-[12px] backdrop-blur-md border-0 md:border md:border-border shadow-lg shadow-black/10 shadow-inner overflow-hidden">
 				{children}
 			</main>
 		</div>

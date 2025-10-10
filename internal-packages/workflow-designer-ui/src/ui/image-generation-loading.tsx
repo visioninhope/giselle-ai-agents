@@ -56,7 +56,7 @@ export function ImageGenerationLoading({
 
 	return (
 		<div
-			className="bg-white-900/10 rounded-[8px] flex items-center justify-center text-white-400 relative overflow-hidden h-full"
+			className="bg-surface/10 rounded-[8px] flex items-center justify-center text-inverse relative overflow-hidden h-full"
 			style={{
 				aspectRatio,
 				width: "auto",
@@ -105,7 +105,7 @@ export function ImageGenerationLoading({
           }
         }
       `}</style>
-			<div className="flex items-center gap-[4px] absolute top-[12px] left-[12px] text-white-400">
+			<div className="flex items-center gap-[4px] absolute top-[12px] left-[12px] text-inverse">
 				<p
 					className="text-[13px] font-medium bg-clip-text text-transparent animate-[shine_3s_linear_infinite]"
 					style={{
