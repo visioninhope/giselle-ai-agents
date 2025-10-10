@@ -10,9 +10,16 @@ declare const __filename: string;
 const moduleUrl =
 	typeof import.meta !== "undefined" && typeof import.meta.url === "string"
 		? import.meta.url
-		: pathToFileURL(__filename).href;
+		: typeof __filename !== "undefined"
+			? pathToFileURL(__filename).href
+			: new URL("index.js", pathToFileURL(process.cwd())).href;
 
-const moduleRequire = createRequire(moduleUrl);
+// Ensure createRequire always receives a concrete file URL
+const requireBaseUrl = moduleUrl.endsWith("/")
+	? new URL("index.js", moduleUrl).href
+	: moduleUrl;
+
+const moduleRequire = createRequire(requireBaseUrl);
 const PDFIUM_WASM_PATH = moduleRequire.resolve("@embedpdf/pdfium/pdfium.wasm");
 const PDFIUM_WASM_DIR = dirname(PDFIUM_WASM_PATH);
 
