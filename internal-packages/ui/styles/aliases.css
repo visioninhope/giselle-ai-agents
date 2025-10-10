@@ -200,9 +200,6 @@
 	}
 
 	/* Inverse background (migration helpers) */
-	.bg-inverse {
-		background-color: var(--color-text-inverse, var(--color-white, #fff)) !important;
-	}
 	.bg-inverse\/5 {
 		background-color: color-mix(
 			in srgb,
