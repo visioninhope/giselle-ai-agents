@@ -221,8 +221,12 @@ export function RepositoryRegistrationDialog({
 												<Code size={18} className="text-text-muted" />
 												<span className="text-text font-medium">Code</span>
 											</div>
-											<p className="text-xs text-text-muted">Ingest source code files from the repository</p>
-											<p className="text-xs text-text-muted/60 mt-1">(Required - cannot be disabled)</p>
+											<p className="text-xs text-text-muted">
+												Ingest source code files from the repository
+											</p>
+											<p className="text-xs text-text-muted/60 mt-1">
+												(Required - cannot be disabled)
+											</p>
 										</div>
 									</Toggle>
 								</div>
@@ -242,9 +246,13 @@ export function RepositoryRegistrationDialog({
 										<div className="flex-1 mr-3">
 											<div className="flex items-center gap-2 mb-1">
 												<GitPullRequest size={18} className="text-text-muted" />
-												<span className="text-text font-medium">Pull Requests</span>
+												<span className="text-text font-medium">
+													Pull Requests
+												</span>
 											</div>
-											<p className="text-xs text-text-muted">Ingest merged pull request content and discussions</p>
+											<p className="text-xs text-text-muted">
+												Ingest merged pull request content and discussions
+											</p>
 										</div>
 									</Toggle>
 								</div>
