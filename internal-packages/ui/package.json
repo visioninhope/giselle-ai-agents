@@ -26,7 +26,8 @@
 		"./tabs": "./components/tabs.tsx",
 		"./inverse-surface": "./components/inverse-surface.tsx",
 		"./page-heading": "./components/page-heading.tsx",
-		"./docs-link": "./components/docs-link.tsx"
+		"./docs-link": "./components/docs-link.tsx",
+		"./app-icon": "./components/app-icon.tsx"
 	},
 	"dependencies": {
 		"clsx": "catalog:",

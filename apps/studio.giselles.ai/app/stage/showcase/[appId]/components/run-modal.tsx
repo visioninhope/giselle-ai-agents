@@ -11,7 +11,7 @@ import {
 } from "react";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "../../../../(main)/settings/components/button";
-import { AppIcon } from "../../../(top)/app-icon";
+import { AppIcon } from "@giselle-internal/ui/app-icon";
 import { FormInputRenderer } from "../../../(top)/form-input-renderer";
 import {
 	createInputsFromTrigger,
@@ -123,7 +123,7 @@ export function RunModal({
 						<div className="flex items-center gap-3">
 							{/* App Thumbnail */}
 							<div className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0">
-								<AppIcon className="h-6 w-6 text-white/40" />
+								<AppIcon className="h-6 w-6 text-white/40" defaultSize={false} />
 							</div>
 							{/* App Title */}
 							<div className="flex flex-col">

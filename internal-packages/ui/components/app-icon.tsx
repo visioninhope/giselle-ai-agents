@@ -1,19 +1,26 @@
 import clsx from "clsx/lite";
 
+interface AppIconProps {
+	className?: string;
+	title?: string;
+	defaultSize?: boolean;
+}
+
 export function AppIcon({
 	className,
 	title = "App Icon",
-}: {
-	className?: string;
-	title?: string;
-}) {
+	defaultSize = true,
+}: AppIconProps) {
 	return (
 		<svg
 			role="img"
 			aria-label={title}
 			xmlns="http://www.w3.org/2000/svg"
 			viewBox="0 0 486 640"
-			className={clsx("h-12 w-12 text-text/30", className)}
+			className={clsx(
+				defaultSize && "h-12 w-12 text-text/30",
+				className,
+			)}
 			fill="currentColor"
 		>
 			<title>{title}</title>

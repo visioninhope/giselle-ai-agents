@@ -14,7 +14,7 @@ export function SearchInput({
 		<div className="relative w-full">
 			<Search
 				className={clsx(
-					"absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-black-300",
+					"absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-text/60",
 					iconClassName,
 				)}
 			/>

@@ -91,7 +91,7 @@ export function SearchableAgentList({
 								title={agent.name || "Untitled"}
 								subtitle={`Edited ${agent.updatedAt.toLocaleDateString()}`}
 								rightActions={
-									<div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+									<>
 										<DuplicateAgentButton
 											agentId={agent.id}
 											agentName={agent.name || "Untitled"}
@@ -100,7 +100,7 @@ export function SearchableAgentList({
 											agentId={agent.id}
 											agentName={agent.name || "Untitled"}
 										/>
-									</div>
+									</>
 								}
 							/>
 						);

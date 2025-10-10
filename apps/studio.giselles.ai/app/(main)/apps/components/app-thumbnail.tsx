@@ -1,5 +1,5 @@
+import { AppIcon } from "@giselle-internal/ui/app-icon";
 import clsx from "clsx/lite";
-import { AppIcon } from "./app-icon";
 
 export function AppThumbnail({
 	className,
