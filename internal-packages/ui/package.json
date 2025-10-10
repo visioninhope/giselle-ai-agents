@@ -31,7 +31,10 @@
 		"./app-icon": "./components/app-icon.tsx",
 		"./role-menu": "./components/role-menu.tsx",
 		"./invite-member-dialog": "./components/invite-member-dialog.tsx",
-		"./revoke-invitation-dialog": "./components/revoke-invitation-dialog.tsx"
+		"./revoke-invitation-dialog": "./components/revoke-invitation-dialog.tsx",
+		"./status-indicator": "./components/status-indicator.tsx",
+		"./section-header": "./components/section-header.tsx",
+		"./form-field": "./components/form-field.tsx"
 	},
 	"dependencies": {
 		"@radix-ui/react-dialog": "1.1.4",
