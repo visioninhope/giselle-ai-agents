@@ -3,7 +3,6 @@
 import { AccentLink } from "@giselle-internal/ui/accent-link";
 import { GlassCard } from "@giselle-internal/ui/glass-card";
 import { RepoActionMenu } from "@giselle-internal/ui/repo-action-menu";
-import type { SelectOption } from "@giselle-internal/ui/select";
 import { StatusBadge } from "@giselle-internal/ui/status-badge";
 import { StatusIndicator } from "@giselle-internal/ui/status-indicator";
 import { formatTimestamp } from "@giselles-ai/lib/utils";
@@ -68,9 +67,7 @@ export function RepositoryItem({
 	const [showDiagnosticModal, setShowDiagnosticModal] = useState(false);
 	const [isPending, startTransition] = useTransition();
 	const [isIngesting, startIngestTransition] = useTransition();
-	const [_actionValue, _setActionValue] = useState<string | undefined>(
-		undefined,
-	);
+//
 
 	const handleDelete = () => {
 		startTransition(async () => {
@@ -109,25 +106,7 @@ export function RepositoryItem({
 		);
 	});
 
-	// Action menu options for Select
-	const _actionOptions: Array<SelectOption> = [
-		{
-			value: "ingest",
-			label: "Ingest Now",
-			icon: <RefreshCw className="h-4 w-4" />,
-			disabled: !canManuallyIngest || isIngesting,
-		},
-		{
-			value: "configure",
-			label: "Configure Sources",
-			icon: <Settings className="h-4 w-4" />,
-		},
-		{
-			value: "delete",
-			label: "Delete",
-			icon: <Trash className="h-4 w-4 text-error-900" />,
-		},
-	];
+//
 
 	return (
 		<GlassCard className={cn("group")} paddingClassName="px-[24px] py-[16px]">

@@ -1,13 +1,10 @@
 "use client";
 
+import { Select, type SelectOption } from "@giselle-internal/ui/select";
+import { Toggle } from "@giselle-internal/ui/toggle";
 import * as Dialog from "@radix-ui/react-dialog";
-import { Check, ChevronDown, Code, GitPullRequest, Plus } from "lucide-react";
+import { Code, GitPullRequest, Plus } from "lucide-react";
 import { useState, useTransition } from "react";
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { GlassButton } from "@/components/ui/glass-button";
 import type { GitHubRepositoryContentType } from "@/drizzle";
 import {
@@ -52,6 +49,20 @@ export function RepositoryRegistrationDialog({
 		(i) => String(i.installation.id) === ownerId,
 	);
 	const repositoryOptions = selectedInstallation?.repositories || [];
+
+	// Convert installations to SelectOption format
+	const ownerOptions: SelectOption[] = installationsWithRepos.map(
+		({ installation }) => ({
+			value: String(installation.id),
+			label: installation.name,
+		}),
+	);
+
+	// Convert repositories to SelectOption format
+	const repoSelectOptions: SelectOption[] = repositoryOptions.map((repo) => ({
+		value: String(repo.id),
+		label: repo.name,
+	}));
 
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
@@ -118,8 +129,8 @@ export function RepositoryRegistrationDialog({
 		<Dialog.Root open={isOpen} onOpenChange={setIsOpen}>
 			<Dialog.Trigger asChild>
 				<GlassButton className="whitespace-nowrap">
-					<span className="grid place-items-center rounded-full size-4 bg-primary-200 opacity-50">
-						<Plus className="size-3 text-black-900" />
+					<span className="grid size-4 place-items-center rounded-full bg-primary-200 opacity-50">
+						<Plus className="size-3 text-bg" />
 					</span>
 					Register Repository
 				</GlassButton>
@@ -148,50 +159,18 @@ export function RepositoryRegistrationDialog({
 								Owner / Organization
 							</label>
 							<div className="relative">
-								<DropdownMenu>
-									<DropdownMenuTrigger asChild>
-										<button
-											type="button"
-											className="w-full px-3 py-2 bg-surface rounded-[8px] text-text text-[14px] font-geist placeholder:text-text/30 cursor-pointer text-left flex items-center justify-between"
-											disabled={isPending}
-										>
-											<span
-												className={
-													selectedInstallation?.installation.name
-														? ""
-														: "text-text/30"
-												}
-											>
-												{selectedInstallation?.installation.name ||
-													"Select owner"}
-											</span>
-											<ChevronDown className="h-4 w-4 text-text-muted" />
-										</button>
-									</DropdownMenuTrigger>
-									<DropdownMenuContent
-										align="start"
-										className="w-[var(--radix-dropdown-menu-trigger-width)] max-h-[min(60svh,320px)] overflow-y-auto rounded-[8px] border-[0.25px] border-border-muted bg-surface p-1 shadow-none"
-									>
-										{installationsWithRepos.map(({ installation }) => (
-											<button
-												key={installation.id}
-												type="button"
-												onClick={() => {
-													setOwnerId(String(installation.id));
-													setRepositoryId("");
-												}}
-												className="flex w-full items-center rounded-md px-3 py-2 text-left font-sans text-[14px] leading-[16px] text-text hover:bg-inverse/5"
-											>
-												<span className="mr-2 inline-flex h-4 w-4 items-center justify-center">
-													{ownerId === String(installation.id) && (
-														<Check className="h-4 w-4" />
-													)}
-												</span>
-												{installation.name}
-											</button>
-										))}
-									</DropdownMenuContent>
-								</DropdownMenu>
+								<Select
+									options={ownerOptions}
+									placeholder="Select owner"
+									value={ownerId}
+									onValueChange={(value) => {
+										setOwnerId(value);
+										setRepositoryId("");
+									}}
+									disabled={isPending}
+									triggerClassName="bg-surface text-text text-[14px] font-geist"
+									id="owner"
+								/>
 							</div>
 						</div>
 
@@ -203,60 +182,21 @@ export function RepositoryRegistrationDialog({
 								Repository Name
 							</label>
 							<div className="relative">
-								<DropdownMenu>
-									<DropdownMenuTrigger asChild>
-										<button
-											type="button"
-											className="w-full px-3 py-2 bg-surface rounded-[8px] text-text text-[14px] font-geist cursor-pointer disabled:opacity-50 text-left flex items-center justify-between"
-											disabled={isPending || !ownerId}
-										>
-											<span
-												className={
-													repositoryOptions.find(
-														(r) => String(r.id) === repositoryId,
-													)?.name
-														? ""
-														: "text-text/30"
-												}
-											>
-												{repositoryOptions.find(
-													(r) => String(r.id) === repositoryId,
-												)?.name || "Select repository"}
-											</span>
-											<ChevronDown className="h-4 w-4 text-text-muted" />
-										</button>
-									</DropdownMenuTrigger>
-									<DropdownMenuContent
-										align="start"
-										className="w-[var(--radix-dropdown-menu-trigger-width)] max-h-[min(60svh,320px)] overflow-y-auto rounded-[8px] border-[0.25px] border-border-muted bg-surface p-1 shadow-none"
-									>
-										{!ownerId ? (
-											<div className="px-3 py-2 text-text-muted text-sm">
-												Select owner first
-											</div>
-										) : repositoryOptions.length === 0 ? (
-											<div className="px-3 py-2 text-text-muted text-sm">
-												No repositories available
-											</div>
-										) : (
-											repositoryOptions.map((repo) => (
-												<button
-													key={repo.id}
-													type="button"
-													onClick={() => setRepositoryId(String(repo.id))}
-													className="flex w-full items-center rounded-md px-3 py-2 text-left font-sans text-[14px] leading-[16px] text-text hover:bg-inverse/5"
-												>
-													<span className="mr-2 inline-flex h-4 w-4 items-center justify-center">
-														{repositoryId === String(repo.id) && (
-															<Check className="h-4 w-4" />
-														)}
-													</span>
-													{repo.name}
-												</button>
-											))
-										)}
-									</DropdownMenuContent>
-								</DropdownMenu>
+								<Select
+									options={repoSelectOptions}
+									placeholder={
+										!ownerId
+											? "Select owner first"
+											: repositoryOptions.length === 0
+												? "No repositories available"
+												: "Select repository"
+									}
+									value={repositoryId}
+									onValueChange={setRepositoryId}
+									disabled={isPending || !ownerId}
+									triggerClassName="bg-surface text-text text-[14px] font-geist"
+									id="repository"
+								/>
 							</div>
 						</div>
 
@@ -266,32 +206,48 @@ export function RepositoryRegistrationDialog({
 								Sources to Ingest
 							</div>
 
-							<div className="space-y-3">
+							<div className="grid grid-cols-2 gap-3">
 								{/* Code Configuration */}
-								<ContentTypeToggle
-									icon={Code}
-									label="Code"
-									description="Ingest source code files from the repository"
-									enabled={contentConfig.code.enabled}
-									onToggle={(enabled) =>
-										setContentConfig({ ...contentConfig, code: { enabled } })
-									}
-									disabled={true} // Code is mandatory
-								/>
+								<div className="bg-inverse/5 rounded-lg p-4">
+									<Toggle
+										name="code-toggle"
+										checked={contentConfig.code.enabled}
+										onCheckedChange={(enabled) =>
+											setContentConfig({ ...contentConfig, code: { enabled } })
+										}
+									>
+										<div className="flex-1 mr-3">
+											<div className="flex items-center gap-2 mb-1">
+												<Code size={18} className="text-text-muted" />
+												<span className="text-text font-medium">Code</span>
+											</div>
+											<p className="text-xs text-text-muted">Ingest source code files from the repository</p>
+											<p className="text-xs text-text-muted/60 mt-1">(Required - cannot be disabled)</p>
+										</div>
+									</Toggle>
+								</div>
 
 								{/* Pull Requests Configuration */}
-								<ContentTypeToggle
-									icon={GitPullRequest}
-									label="Pull Requests"
-									description="Ingest merged pull request content and discussions"
-									enabled={contentConfig.pullRequests.enabled}
-									onToggle={(enabled) =>
-										setContentConfig({
-											...contentConfig,
-											pullRequests: { enabled },
-										})
-									}
-								/>
+								<div className="bg-inverse/5 rounded-lg p-4">
+									<Toggle
+										name="pull-requests-toggle"
+										checked={contentConfig.pullRequests.enabled}
+										onCheckedChange={(enabled) =>
+											setContentConfig({
+												...contentConfig,
+												pullRequests: { enabled },
+											})
+										}
+									>
+										<div className="flex-1 mr-3">
+											<div className="flex items-center gap-2 mb-1">
+												<GitPullRequest size={18} className="text-text-muted" />
+												<span className="text-text font-medium">Pull Requests</span>
+											</div>
+											<p className="text-xs text-text-muted">Ingest merged pull request content and discussions</p>
+										</div>
+									</Toggle>
+								</div>
 							</div>
 
 							{/* Embedding Profiles Section */}
@@ -313,7 +269,7 @@ export function RepositoryRegistrationDialog({
 											return (
 												<label
 													key={profileId}
-													className="flex items-start gap-3 p-3 rounded-lg bg-surface hover:bg-inverse/5 transition-colors cursor-pointer"
+													className="flex items-start gap-3 p-3 rounded-lg border border-border-muted hover:bg-inverse/5 transition-colors cursor-pointer"
 												>
 													<input
 														type="checkbox"
@@ -333,7 +289,7 @@ export function RepositoryRegistrationDialog({
 																);
 															}
 														}}
-														className="mt-1 w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 rounded focus:ring-primary-500"
+														className="mt-1 w-4 h-4 text-[#1663F3] bg-surface border-border rounded focus:ring-[#1663F3]/20"
 													/>
 													<div className="flex-1">
 														<div className="text-text text-[14px] font-medium">
@@ -375,60 +331,5 @@ export function RepositoryRegistrationDialog({
 				/>
 			</GlassDialogContent>
 		</Dialog.Root>
-	);
-}
-
-type ContentTypeToggleProps = {
-	icon: React.ElementType;
-	label: string;
-	description: string;
-	enabled: boolean;
-	onToggle: (enabled: boolean) => void;
-	disabled?: boolean;
-};
-
-function ContentTypeToggle({
-	icon: Icon,
-	label,
-	description,
-	enabled,
-	onToggle,
-	disabled,
-}: ContentTypeToggleProps) {
-	return (
-		<div className="bg-inverse/5 rounded-lg p-4">
-			<div className="flex items-center justify-between mb-2">
-				<div className="flex items-center gap-2">
-					<Icon size={18} className="text-text-muted" />
-					<span className="text-text font-medium">{label}</span>
-				</div>
-				<label className="relative inline-flex items-center cursor-pointer">
-					<input
-						type="checkbox"
-						checked={enabled}
-						onChange={(e) => onToggle(e.target.checked)}
-						disabled={disabled}
-						className="sr-only"
-					/>
-					<div
-						className={`w-11 h-6 rounded-full transition-colors ${
-							enabled ? "bg-[#1663F3]" : "bg-border"
-						} ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
-					>
-						<div
-							className={`absolute w-4 h-4 bg-text rounded-full top-1 transition-transform ${
-								enabled ? "translate-x-6" : "translate-x-1"
-							}`}
-						/>
-					</div>
-				</label>
-			</div>
-			<p className="text-sm text-text-muted">{description}</p>
-			{disabled && (
-				<p className="text-xs text-text-muted/60 mt-1">
-					(Required - cannot be disabled)
-				</p>
-			)}
-		</div>
 	);
 }

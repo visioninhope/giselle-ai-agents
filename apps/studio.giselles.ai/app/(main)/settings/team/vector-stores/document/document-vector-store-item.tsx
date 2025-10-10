@@ -6,14 +6,13 @@ import { DEFAULT_EMBEDDING_PROFILE_ID } from "@giselle-sdk/data-type";
 import * as Dialog from "@radix-ui/react-dialog";
 import * as Tooltip from "@radix-ui/react-tooltip";
 import {
-	AlertCircle,
-	ArrowUpFromLine,
-	CheckCircle2,
-	Clock,
-	Loader2,
-	MoreVertical,
-	Settings,
-	Trash,
+    AlertCircle,
+    ArrowUpFromLine,
+    CheckCircle2,
+    Clock,
+    Loader2,
+    Settings,
+    Trash,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import {
@@ -217,7 +216,7 @@ export function DocumentVectorStoreItem({
 
             <DocumentVectorStoreConfigureDialog
 				open=isConfigureDialogOpen
-				onOpenChange={setIsConfigureDialogOpen}
+				onOpenChange=setIsConfigureDialogOpen
 				store={store}
 				updateAction={updateAction}
 				onSuccess={() => {
