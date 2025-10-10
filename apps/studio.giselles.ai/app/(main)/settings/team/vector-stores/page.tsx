@@ -49,13 +49,13 @@ export default async function TeamVectorStorePage() {
 
 	return (
 		<div className="flex flex-col gap-[24px]">
-            <div className="flex justify-between items-center">
-                <PageHeading glow>Vector Stores</PageHeading>
-                <div className="flex items-center gap-4">
-                    <DocsLink href="https://docs.giselles.ai/guides/settings/team/vector-store">
-                        About Vector Stores
-                    </DocsLink>
-                    <RepositoryRegistrationDialog
+			<div className="flex justify-between items-center">
+				<PageHeading glow>Vector Stores</PageHeading>
+				<div className="flex items-center gap-4">
+					<DocsLink href="https://docs.giselles.ai/guides/settings/team/vector-store">
+						About Vector Stores
+					</DocsLink>
+					<RepositoryRegistrationDialog
 						installationsWithRepos={installationsWithRepos}
 						registerRepositoryIndexAction={registerRepositoryIndex}
 					/>

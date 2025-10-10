@@ -1,7 +1,14 @@
 import clsx from "clsx/lite";
 import { Slot } from "radix-ui";
 
-type ButtonStyle = "subtle" | "filled" | "solid" | "glass" | "outline" | "link" | "primary";
+type ButtonStyle =
+	| "subtle"
+	| "filled"
+	| "solid"
+	| "glass"
+	| "outline"
+	| "link"
+	| "primary";
 type ButtonSize = "compact" | "default" | "large";
 interface ButtonProps
 	extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "style"> {

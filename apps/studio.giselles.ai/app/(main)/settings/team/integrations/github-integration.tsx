@@ -187,7 +187,7 @@ function Installation({ installation }: InstallationProps) {
 						>
 							{repo.name}
 						</a>
-                        <span className="rounded-full px-2 py-px text-inverse/70 font-medium text-[10px] leading-normal font-geist border border-white/20">
+						<span className="rounded-full px-2 py-px text-inverse/70 font-medium text-[10px] leading-normal font-geist border border-white/20">
 							{repo.private ? "Private" : "Public"}
 						</span>
 					</div>
