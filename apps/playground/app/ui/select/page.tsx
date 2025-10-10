@@ -1,5 +1,14 @@
 import { Select } from "@giselle-internal/ui/select";
-import { FileText, HelpCircle, LogOut, Settings, User } from "lucide-react";
+import {
+	ArrowDownAZ,
+	ArrowUpAZ,
+	Clock,
+	FileText,
+	HelpCircle,
+	LogOut,
+	Settings,
+	User,
+} from "lucide-react";
 import { DemoSection } from "../components/demo-section";
 import { UiPage } from "../components/ui-page";
 
@@ -29,6 +38,34 @@ export default function () {
 						{ value: 5, icon: <LogOut />, label: "Sign out" },
 					]}
 					placeholder="Select an option..."
+				/>
+			</DemoSection>
+			<DemoSection label="Icon Demo (Updated/Sort)">
+				<Select
+					name="sortSelect"
+					options={[
+						{
+							value: "date-desc",
+							icon: <Clock className="h-4 w-4" />,
+							label: "Updated",
+						},
+						{
+							value: "date-asc",
+							icon: <Clock className="h-4 w-4" />,
+							label: "Oldest",
+						},
+						{
+							value: "name-asc",
+							icon: <ArrowDownAZ className="h-4 w-4" />,
+							label: "Name (A-Z)",
+						},
+						{
+							value: "name-desc",
+							icon: <ArrowUpAZ className="h-4 w-4" />,
+							label: "Name (Z-A)",
+						},
+					]}
+					placeholder="Sort"
 				/>
 			</DemoSection>
 		</UiPage>

@@ -16,10 +16,10 @@ function AgentList({
 		return (
 			<div className="flex justify-center items-center h-full">
 				<div className="grid gap-[8px] justify-center text-center">
-					<h3 className="text-[18px] font-geist font-bold text-black-400">
+					<h3 className="text-[18px] font-geist font-bold text-text/60">
 						No apps yet.
 					</h3>
-					<p className="text-[12px] font-geist text-black-400">
+					<p className="text-[12px] font-geist text-text/60">
 						Please create a new app with the 'New App +' button.
 					</p>
 				</div>

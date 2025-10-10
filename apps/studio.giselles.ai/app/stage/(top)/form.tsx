@@ -1,16 +1,14 @@
 "use client";
 
+import { AppIcon } from "@giselle-internal/ui/app-icon";
 import { Select } from "@giselle-internal/ui/select";
 import type { FlowTriggerId } from "@giselle-sdk/data-type";
-
 import clsx from "clsx/lite";
 import { X } from "lucide-react";
-
 import { useActionState, useCallback, useMemo, useState } from "react";
 import { cn } from "@/lib/utils";
 import { AvatarImage } from "@/services/accounts/components/user-button/avatar-image";
 import { buttonVariants } from "../../(main)/settings/components/button";
-import { AppIcon } from "./app-icon";
 import { CircularCarousel } from "./circular-carousel";
 import { FormInputRenderer } from "./form-input-renderer";
 import {
@@ -310,7 +308,10 @@ function Form({
 										>
 											{/* Icon */}
 											<div className="w-12 h-12 rounded-lg bg-white/10 flex items-center justify-center flex-shrink-0 transition-all group-hover:bg-primary-100/20">
-												<AppIcon className="h-6 w-6 text-white/40 transition-colors group-hover:text-primary-100" />
+												<AppIcon
+													className="h-6 w-6 text-white/40 transition-colors group-hover:text-primary-100"
+													defaultSize={false}
+												/>
 											</div>
 											{/* Content */}
 											<div className="flex flex-col gap-y-1 min-w-0 flex-1">
@@ -354,7 +355,10 @@ function Form({
 							<div className="flex items-center gap-3">
 								{/* App Thumbnail */}
 								<div className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0">
-									<AppIcon className="h-6 w-6 text-white/40" />
+									<AppIcon
+										className="h-6 w-6 text-white/40"
+										defaultSize={false}
+									/>
 								</div>
 								{/* App Title */}
 								<div className="flex flex-col">

@@ -54,7 +54,7 @@ export function DuplicateAgentButton({
 							<button
 								type="button"
 								aria-label="Duplicate an app"
-								className="grid size-6 place-items-center rounded-full text-white/60 transition-colors hover:text-white"
+								className="grid size-6 place-items-center rounded-full text-text/60 transition-colors hover:text-inverse"
 								disabled={isPending}
 							>
 								{isPending ? (
