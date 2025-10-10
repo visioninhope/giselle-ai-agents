@@ -88,6 +88,7 @@ interface FilterableActsListProps {
 }
 
 const statusLabels: Record<StatusFilter, string> = {
+	created: "Created",
 	inProgress: "Running",
 	completed: "Completed",
 	failed: "Failed",
@@ -95,6 +96,7 @@ const statusLabels: Record<StatusFilter, string> = {
 };
 
 const statusColors: Record<StatusFilter, string> = {
+	created: "bg-gray-400",
 	inProgress: "bg-blue-400",
 	completed: "bg-green-400",
 	failed: "bg-red-400",

@@ -14,7 +14,7 @@ import {
 } from "@giselle-sdk/data-type";
 import {
 	defaultName,
-	useActController,
+	useActSystem,
 	useNodeGroups,
 	useWorkflowDesigner,
 } from "@giselle-sdk/giselle/react";
@@ -85,7 +85,7 @@ function RunOptionItem({
 
 function useRunAct() {
 	const { data, setUiNodeState } = useWorkflowDesigner();
-	const { createAndStartAct } = useActController();
+	const { createAndStartAct } = useActSystem(data.id);
 	const { toast, error } = useToasts();
 
 	return async (item: RunItem) => {

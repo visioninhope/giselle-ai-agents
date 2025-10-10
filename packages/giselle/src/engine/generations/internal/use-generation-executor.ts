@@ -26,7 +26,10 @@ import {
 import type { ActId } from "../../../concepts/identifiers";
 import { UsageLimitError } from "../../error";
 import { filePath } from "../../files/utils";
-import type { GeneratedImageContentOutput } from "../../generations";
+import type {
+	GeneratedImageContentOutput,
+	GenerationMetadata,
+} from "../../generations";
 import type { GiselleEngineContext } from "../../types";
 import {
 	checkUsageLimits,
@@ -46,6 +49,7 @@ interface FinishGenerationArgs {
 	generateMessages?: Message[];
 	inputMessages: ModelMessage[];
 	providerMetadata?: ProviderMetadata;
+	generationMetadata?: GenerationMetadata;
 }
 type FinishGeneration = (args: FinishGenerationArgs) => Promise<{
 	completedGeneration: CompletedGeneration;
@@ -58,6 +62,7 @@ export async function useGenerationExecutor<T>(args: {
 	useExperimentalStorage?: boolean;
 	useResumableGeneration?: boolean;
 	signal?: AbortSignal;
+	metadata?: GenerationMetadata;
 	execute: (utils: {
 		runningGeneration: RunningGeneration;
 		generationContext: GenerationContext;
@@ -370,6 +375,7 @@ export async function useGenerationExecutor<T>(args: {
 					inputMessages,
 					outputFileBlobs,
 					providerMetadata,
+					generationMetadata: args.metadata,
 				});
 				return result;
 			})(),

@@ -2,6 +2,7 @@ import { NodeGenerationIndex } from "../../../concepts/generation";
 import type { ActId } from "../../../concepts/identifiers";
 import { actGenerationIndexesPath } from "../../../concepts/path";
 import type { GiselleStorage } from "../../experimental_storage";
+import type { GiselleEngineContext } from "../../types";
 import {
 	applyPatches,
 	type GenerationIndexPatch,
@@ -191,12 +192,17 @@ function enqueuePatch(
 /**
  * Flushes all pending patches immediately
  */
-export async function flushGenerationIndexQueue(
-	experimental_storage: GiselleStorage,
-	options?: { skipRestart?: boolean },
-) {
+export async function flushGenerationIndexQueue({
+	context,
+	options,
+}: {
+	options?: { skipRestart?: boolean };
+	context: GiselleEngineContext;
+}) {
 	// Stop the interval to prevent concurrent processing
 	stopProcessing();
+	context.logger.debug("Flushing generation index queue");
+	context.logger.debug(`state.queue.size: ${state.queue.size}`);
 
 	try {
 		// Process all pending items
@@ -206,7 +212,7 @@ export async function flushGenerationIndexQueue(
 				await new Promise((resolve) => setTimeout(resolve, 10));
 				continue;
 			}
-			await processQueue(experimental_storage);
+			await processQueue(context.experimental_storage);
 		}
 	} finally {
 		// If skipRestart is true, cleanup instead of restarting
@@ -214,7 +220,7 @@ export async function flushGenerationIndexQueue(
 			cleanupGenerationIndexQueue();
 		} else {
 			// Restart the interval
-			startProcessing(experimental_storage);
+			startProcessing(context.experimental_storage);
 		}
 	}
 }

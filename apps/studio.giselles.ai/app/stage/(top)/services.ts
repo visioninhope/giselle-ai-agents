@@ -17,7 +17,7 @@ async function enrichActWithNavigationData(
 	teams: { dbId: number; name: string }[],
 ): Promise<{
 	id: string;
-	status: "inProgress" | "completed" | "cancelled" | "failed";
+	status: "created" | "inProgress" | "completed" | "cancelled" | "failed";
 	sequences: Array<{ steps: Array<{ id: string; status: string }> }>;
 	link: string;
 	teamName: string;
@@ -72,6 +72,7 @@ async function enrichActWithNavigationData(
 		let targetStep = null;
 
 		switch (tmpAct.status) {
+			case "created":
 			case "inProgress":
 				targetStep = findStepByStatus("running") ?? getFirstStep();
 				break;
@@ -111,7 +112,7 @@ export async function fetchEnrichedActs(
 ): Promise<
 	Array<{
 		id: string;
-		status: "inProgress" | "completed" | "cancelled" | "failed";
+		status: "created" | "inProgress" | "completed" | "cancelled" | "failed";
 		sequences: Array<{ steps: Array<{ id: string; status: string }> }>;
 		link: string;
 		teamName: string;
