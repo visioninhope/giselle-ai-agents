@@ -1,17 +1,11 @@
 "use client";
 
+import { Select, type SelectOption } from "@giselle-internal/ui/select";
 import { StatusBadge } from "@giselle-internal/ui/status-badge";
 import { formatTimestamp } from "@giselles-ai/lib/utils";
 import * as Dialog from "@radix-ui/react-dialog";
-import { MoreVertical, RefreshCw, Settings, Trash } from "lucide-react";
+import { Ellipsis, RefreshCw, Settings, Trash } from "lucide-react";
 import { useMemo, useState, useTransition } from "react";
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuSeparator,
-	DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import type {
 	GitHubRepositoryContentType,
 	GitHubRepositoryIndexStatus,
@@ -79,6 +73,7 @@ export function RepositoryItem({
 	const [showDiagnosticModal, setShowDiagnosticModal] = useState(false);
 	const [isPending, startTransition] = useTransition();
 	const [isIngesting, startIngestTransition] = useTransition();
+	const [actionValue, setActionValue] = useState<string | undefined>(undefined);
 
 	const handleDelete = () => {
 		startTransition(async () => {
@@ -117,6 +112,26 @@ export function RepositoryItem({
 		);
 	});
 
+	// Action menu options for Select
+	const actionOptions: Array<SelectOption> = [
+		{
+			value: "ingest",
+			label: "Ingest Now",
+			icon: <RefreshCw className="h-4 w-4" />,
+			disabled: !canManuallyIngest || isIngesting,
+		},
+		{
+			value: "configure",
+			label: "Configure Sources",
+			icon: <Settings className="h-4 w-4" />,
+		},
+		{
+			value: "delete",
+			label: "Delete",
+			icon: <Trash className="h-4 w-4" />,
+		},
+	];
+
 	return (
 		<div
 			className={cn(
@@ -135,49 +150,45 @@ export function RepositoryItem({
 						{repositoryIndex.owner}/{repositoryIndex.repo}
 					</a>
 					<div className="flex items-center gap-2">
-						<DropdownMenu>
-							<DropdownMenuTrigger asChild>
-								<button
-									type="button"
-									aria-label="Repository actions menu"
-									className="transition-opacity duration-200 p-2 text-white/60 hover:text-white/80 hover:bg-white/5 rounded-md disabled:opacity-50"
-									disabled={isPending || isIngesting}
-								>
-									<MoreVertical className="h-4 w-4" />
-								</button>
-							</DropdownMenuTrigger>
-							<DropdownMenuContent
-								align="end"
-								className="w-[180px] bg-surface border-[0.5px] border-border rounded-[8px]"
-							>
-								<DropdownMenuItem
-									onClick={handleManualIngest}
-									disabled={!canManuallyIngest || isIngesting}
-									className="flex items-center px-3 py-2 text-[14px] leading-[16px] text-white-400 hover:bg-white/5 rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
-								>
-									<RefreshCw className="h-4 w-4 mr-2" />
-									Ingest Now
-								</DropdownMenuItem>
-								<DropdownMenuItem
-									onClick={() => setShowConfigureDialog(true)}
-									className="flex items-center px-3 py-2 text-[14px] leading-[16px] text-white-400 hover:bg-white/5 rounded-md"
-								>
-									<Settings className="h-4 w-4 mr-2" />
-									Configure Sources
-								</DropdownMenuItem>
-								<DropdownMenuSeparator className="my-1 h-px bg-white/10" />
-								<DropdownMenuItem
-									onSelect={(e) => {
-										e.preventDefault();
+						<Select
+							id={`repo-actions-${repositoryIndex.id}`}
+							placeholder="Actions"
+							value={actionValue}
+							onValueChange={(v) => {
+								setActionValue(v);
+								switch (v) {
+									case "ingest":
+										handleManualIngest();
+										break;
+									case "configure":
+										setShowConfigureDialog(true);
+										break;
+									case "delete":
 										setShowDeleteDialog(true);
-									}}
-									className="flex items-center px-3 py-2 text-[14px] leading-[16px] text-error-900 hover:bg-error-900/20 rounded-md"
-								>
-									<Trash className="h-4 w-4 mr-2" />
-									Delete
-								</DropdownMenuItem>
-							</DropdownMenuContent>
-						</DropdownMenu>
+										break;
+									default:
+										break;
+								}
+								// reset back to placeholder after action
+								setTimeout(() => setActionValue(undefined), 0);
+							}}
+							options={actionOptions}
+							widthClassName="w-6 h-6"
+							triggerClassName="p-0 h-6 w-6 rounded-md"
+							disabled={isPending || isIngesting}
+							itemClassNameForOption={(opt) =>
+								opt.value === "delete"
+									? "px-4 py-3 font-medium text-[14px] text-error-900 hover:bg-error-900/20 rounded-md"
+									: "px-4 py-3 font-medium text-[14px] text-white-400 hover:bg-white/5 rounded-md"
+							}
+							renderTriggerContent={
+								<Ellipsis className="h-4 w-4 text-white/60" />
+							}
+							hideChevron
+							ariaLabel="Repository actions menu"
+							contentMinWidthClassName="min-w-[165px]"
+							disableHoverBg
+						/>
 					</div>
 				</div>
 
