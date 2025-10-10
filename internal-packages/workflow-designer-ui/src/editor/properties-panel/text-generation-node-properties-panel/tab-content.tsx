@@ -8,7 +8,7 @@ import {
 	type TextGenerationNode,
 	type ToolSet,
 } from "@giselle-sdk/data-type";
-import { useUsageLimits } from "@giselle-sdk/giselle/react";
+import { useFeatureFlag, useUsageLimits } from "@giselle-sdk/giselle/react";
 import {
 	anthropicLanguageModels,
 	googleLanguageModels,
@@ -55,6 +55,7 @@ export function TextGenerationTabContent({
 	data,
 	deleteConnection,
 }: TextGenerationTabContentProps) {
+	const { googleUrlContext } = useFeatureFlag();
 	const usageLimits = useUsageLimits();
 	const userTier = usageLimits?.featureTier ?? Tier.enum.free;
 	const accessibleTiers = TierAccess[userTier];
@@ -247,6 +248,10 @@ export function TextGenerationTabContent({
 
 	const handleGoogleUrlContextChange = useCallback(
 		(enable: boolean) => {
+			if (!googleUrlContext) {
+				return;
+			}
+
 			if (node.content.llm.provider !== "google") {
 				return;
 			}
@@ -293,7 +298,7 @@ export function TextGenerationTabContent({
 				outputs: nextOutputs,
 			});
 		},
-		[detachSourceOutputConnections, node, updateNodeData],
+		[detachSourceOutputConnections, node, updateNodeData, googleUrlContext],
 	);
 
 	return (

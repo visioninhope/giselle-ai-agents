@@ -1,5 +1,5 @@
 import { GoogleLanguageModelData } from "@giselle-sdk/data-type";
-import { useUsageLimits } from "@giselle-sdk/giselle/react";
+import { useFeatureFlag, useUsageLimits } from "@giselle-sdk/giselle/react";
 import { InfoIcon } from "lucide-react";
 import { Switch } from "../../../../ui/switch";
 import { TemperatureSlider, TopPSlider } from "./shared-model-controls";
@@ -16,6 +16,7 @@ export function GoogleModelPanel({
 	onUrlContextConfigurationChange: (enabled: boolean) => void;
 }) {
 	useUsageLimits();
+	const { googleUrlContext } = useFeatureFlag();
 
 	const isSearchGroundingEnabled =
 		googleLanguageModel.configurations.searchGrounding;
@@ -40,7 +41,7 @@ export function GoogleModelPanel({
 					/>
 				</div>
 				<div className="mt-[24px]" />
-				{shouldShowMutualExclusionNotice ? (
+				{googleUrlContext && shouldShowMutualExclusionNotice ? (
 					<div className="rounded-[8px] border border-yellow-500/40 bg-yellow-500/10 px-[12px] py-[8px] flex items-start gap-[8px]">
 						<InfoIcon
 							className="size-[16px] text-yellow-200 mt-[2px]"
@@ -72,17 +73,19 @@ export function GoogleModelPanel({
 							onSearchGroundingConfigurationChange(checked);
 						}}
 					/>
-					<Switch
-						label="URL Context"
-						name="urlContext"
-						checked={isUrlContextEnabled}
-						onCheckedChange={(checked) => {
-							if (checked && isSearchGroundingEnabled) {
-								return;
-							}
-							onUrlContextConfigurationChange(checked);
-						}}
-					/>
+					{googleUrlContext ? (
+						<Switch
+							label="URL Context"
+							name="urlContext"
+							checked={isUrlContextEnabled}
+							onCheckedChange={(checked) => {
+								if (checked && isSearchGroundingEnabled) {
+									return;
+								}
+								onUrlContextConfigurationChange(checked);
+							}}
+						/>
+					) : null}
 				</div>
 			</div>
 		</div>
