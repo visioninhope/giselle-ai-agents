@@ -26,7 +26,8 @@
 		"codemod:text-black-600-20": "node scripts/codemods/replace-text-black-600-20.mjs",
 		"codemod:text-black-600-20:apply": "node scripts/codemods/replace-text-black-600-20.mjs --apply",
 		"codemod:text-white-900": "node scripts/codemods/replace-text-white-900-to-inverse.mjs",
-		"codemod:text-white-900:apply": "node scripts/codemods/replace-text-white-900-to-inverse.mjs --apply"
+		"codemod:text-white-900:apply": "node scripts/codemods/replace-text-white-900-to-inverse.mjs --apply",
+		"report:compat-tokens": "node scripts/compat-tokens-inventory.mjs"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "catalog:",
