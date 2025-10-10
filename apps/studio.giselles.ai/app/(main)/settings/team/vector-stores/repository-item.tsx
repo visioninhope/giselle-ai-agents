@@ -377,11 +377,9 @@ function EmbeddingModelCard({
 													? "Running"
 													: pullRequestStatus.status === "idle"
 														? "Idle"
-														: pullRequestStatus.status === "completed"
-															? "Ready"
-															: pullRequestStatus.status === "failed"
-																? "Error"
-																: "Unknown"}
+														: pullRequestStatus.status === "failed"
+															? "Error"
+															: "Unknown"}
 											</span>
 										</div>
 										{pullRequestStatus?.status === "failed" &&
