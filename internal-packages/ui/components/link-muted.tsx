@@ -23,5 +23,3 @@ export function LinkMuted({
 		/>
 	);
 }
-
-export default LinkMuted;
