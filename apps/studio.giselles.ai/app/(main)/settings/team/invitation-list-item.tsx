@@ -10,7 +10,7 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import type { TeamRole } from "@/drizzle";
-import { useToast } from "@/packages/contexts/toast";
+import { useToasts } from "@giselle-internal/ui/toast";
 import { resendInvitationAction, revokeInvitationAction } from "./actions";
 import {
     GlassDialogContent,
@@ -34,7 +34,7 @@ export function InvitationListItem({
 	expiredAt,
 	currentUserRole,
 }: InvitationListItemProps) {
-	const { addToast } = useToast();
+    const { toast, info } = useToasts();
 	const [error, setError] = useState("");
 	const [dialogOpen, setDialogOpen] = useState(false);
 	const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -49,19 +49,11 @@ export function InvitationListItem({
 				process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
 			const link = `${baseUrl}/join/${token}`;
 			await navigator.clipboard.writeText(link);
-			addToast({
-				title: "Copied",
-				message: "Invite link copied!",
-				type: "info",
-			});
+            info("Invite link copied!");
 			setDropdownOpen(false);
 		} catch (e) {
 			console.error("Failed to copy link:", e);
-			addToast({
-				title: "Error",
-				message: "Failed to copy link",
-				type: "error",
-			});
+            toast("Failed to copy link", { type: "error" });
 		}
 	};
 
@@ -70,15 +62,11 @@ export function InvitationListItem({
 			const formData = new FormData();
 			formData.append("token", token);
 			const res = await resendInvitationAction(undefined, formData);
-			if (res.success) {
-				addToast({
-					title: "Success",
-					message: "Invitation resent!",
-					type: "success",
-				});
+            if (res.success) {
+                toast("Invitation resent!", { type: "success" });
 				setDropdownOpen(false);
 			} else {
-				addToast({ title: "Error", message: res.error, type: "error" });
+                toast(res.error, { type: "error" });
 			}
 		});
 	};
@@ -88,18 +76,14 @@ export function InvitationListItem({
 			const formData = new FormData();
 			formData.append("token", token);
 			const res = await revokeInvitationAction(undefined, formData);
-			if (res.success) {
-				addToast({
-					title: "Success",
-					message: "Invitation revoked!",
-					type: "success",
-				});
+            if (res.success) {
+                toast("Invitation revoked!", { type: "success" });
 				setDialogOpen(false);
 				setDropdownOpen(false);
 			} else {
-				const err = res.error;
-				addToast({ title: "Error", message: err, type: "error" });
-				setError(err);
+                const err = res.error;
+                toast(err, { type: "error" });
+                setError(err);
 			}
 		});
 	};
