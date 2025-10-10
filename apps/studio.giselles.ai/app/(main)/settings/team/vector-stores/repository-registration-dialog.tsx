@@ -215,6 +215,7 @@ export function RepositoryRegistrationDialog({
 										onCheckedChange={(enabled) =>
 											setContentConfig({ ...contentConfig, code: { enabled } })
 										}
+										disabled={true}
 									>
 										<div className="flex-1 mr-3">
 											<div className="flex items-center gap-2 mb-1">
