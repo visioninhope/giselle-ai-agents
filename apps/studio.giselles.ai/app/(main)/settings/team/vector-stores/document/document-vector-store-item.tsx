@@ -1,5 +1,7 @@
 "use client";
 
+import { GlassCard } from "@giselle-internal/ui/glass-card";
+import { RepoActionMenu } from "@giselle-internal/ui/repo-action-menu";
 import { DEFAULT_EMBEDDING_PROFILE_ID } from "@giselle-sdk/data-type";
 import * as Dialog from "@radix-ui/react-dialog";
 import * as Tooltip from "@radix-ui/react-tooltip";
@@ -23,13 +25,6 @@ import {
 	useState,
 	useTransition,
 } from "react";
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuSeparator,
-	DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import {
 	DOCUMENT_VECTOR_STORE_MAX_FILE_SIZE_BYTES,
 	DOCUMENT_VECTOR_STORE_MAX_FILE_SIZE_LABEL,
@@ -167,9 +162,8 @@ export function DocumentVectorStoreItem({
 
 	const disableMenu = isPending || isUpdating;
 
-	return (
-		<div className="group relative rounded-[12px] overflow-hidden w-full bg-white/[0.02] backdrop-blur-[8px] border-[0.5px] border-border shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),inset_0_-1px_1px_rgba(255,255,255,0.2)] before:content-[''] before:absolute before:inset-0 before:bg-white before:opacity-[0.02] before:rounded-[inherit] before:pointer-events-none hover:border-border transition-colors duration-200">
-			<div className="px-[24px] py-[16px]">
+    return (
+        <GlassCard className="group" paddingClassName="px-[24px] py-[16px]">
 				<div className="flex items-start justify-between gap-4 mb-4">
 					<div>
 						<h5 className="text-white-400 font-medium text-[16px] leading-[22.4px] font-sans">
@@ -179,47 +173,28 @@ export function DocumentVectorStoreItem({
 							ID: {store.id}
 						</div>
 					</div>
-					<DropdownMenu>
-						<DropdownMenuTrigger asChild>
-							<button
-								type="button"
-								aria-label="Document vector store actions"
-								className="transition-opacity duration-200 p-2 text-white/60 hover:text-white/80 hover:bg-white/5 rounded-md disabled:opacity-50"
-								disabled={disableMenu}
-							>
-								<MoreVertical className="h-4 w-4" />
-							</button>
-						</DropdownMenuTrigger>
-						<DropdownMenuContent
-							align="end"
-							className="w-[180px] bg-surface border-[0.5px] border-border rounded-[8px]"
-						>
-							<DropdownMenuItem
-								onSelect={() => {
-									setIsConfigureDialogOpen(true);
-								}}
-								className="flex items-center px-3 py-2 text-[14px] leading-[16px] text-white-400 hover:bg-white/5 rounded-md"
-							>
-								<Settings className="h-4 w-4 mr-2" />
-								Configure Sources
-							</DropdownMenuItem>
-							<DropdownMenuSeparator className="my-1 h-px bg-border-muted" />
-							<DropdownMenuItem
-								onSelect={(event) => {
-									event.preventDefault();
-									setIsDeleteDialogOpen(true);
-								}}
-								className="flex items-center px-3 py-2 text-[14px] leading-[16px] text-error-900 hover:bg-error-900/20 rounded-md"
-							>
-								<Trash className="h-4 w-4 mr-2" />
-								Delete
-							</DropdownMenuItem>
-						</DropdownMenuContent>
-					</DropdownMenu>
+                    <RepoActionMenu
+                        disabled={disableMenu}
+                        actions={[
+                            {
+                                value: "configure",
+                                label: "Configure Sources",
+                                icon: <Settings className="h-4 w-4" />,
+                                onSelect: () => setIsConfigureDialogOpen(true),
+                            },
+                            {
+                                value: "delete",
+                                label: "Delete",
+                                icon: <Trash className="h-4 w-4 text-error-900" />,
+                                destructive: true,
+                                onSelect: () => setIsDeleteDialogOpen(true),
+                            },
+                        ]}
+                    />
 				</div>
-			</div>
+            </div>
 
-			<Dialog.Root
+            <Dialog.Root
 				open={isDeleteDialogOpen}
 				onOpenChange={setIsDeleteDialogOpen}
 			>
@@ -238,10 +213,10 @@ export function DocumentVectorStoreItem({
 						variant="destructive"
 					/>
 				</GlassDialogContent>
-			</Dialog.Root>
+            </Dialog.Root>
 
-			<DocumentVectorStoreConfigureDialog
-				open={isConfigureDialogOpen}
+            <DocumentVectorStoreConfigureDialog
+				open=isConfigureDialogOpen
 				onOpenChange={setIsConfigureDialogOpen}
 				store={store}
 				updateAction={updateAction}
@@ -257,8 +232,8 @@ export function DocumentVectorStoreItem({
 				showErrorToast={(message) => {
 					addToast({ title: "Error", message, type: "error" });
 				}}
-			/>
-		</div>
+            />
+        </GlassCard>
 	);
 }
 

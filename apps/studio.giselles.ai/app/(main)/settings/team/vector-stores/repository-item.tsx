@@ -1,11 +1,14 @@
 "use client";
 
-import { Select, type SelectOption } from "@giselle-internal/ui/select";
+import { AccentLink } from "@giselle-internal/ui/accent-link";
+import { GlassCard } from "@giselle-internal/ui/glass-card";
+import { RepoActionMenu } from "@giselle-internal/ui/repo-action-menu";
+import type { SelectOption } from "@giselle-internal/ui/select";
 import { StatusBadge } from "@giselle-internal/ui/status-badge";
 import { StatusIndicator } from "@giselle-internal/ui/status-indicator";
 import { formatTimestamp } from "@giselles-ai/lib/utils";
 import * as Dialog from "@radix-ui/react-dialog";
-import { Ellipsis, RefreshCw, Settings, Trash } from "lucide-react";
+import { RefreshCw, Settings, Trash } from "lucide-react";
 import { useMemo, useState, useTransition } from "react";
 import type {
 	GitHubRepositoryContentType,
@@ -65,7 +68,9 @@ export function RepositoryItem({
 	const [showDiagnosticModal, setShowDiagnosticModal] = useState(false);
 	const [isPending, startTransition] = useTransition();
 	const [isIngesting, startIngestTransition] = useTransition();
-	const [actionValue, setActionValue] = useState<string | undefined>(undefined);
+	const [_actionValue, _setActionValue] = useState<string | undefined>(
+		undefined,
+	);
 
 	const handleDelete = () => {
 		startTransition(async () => {
@@ -105,7 +110,7 @@ export function RepositoryItem({
 	});
 
 	// Action menu options for Select
-	const actionOptions: Array<SelectOption> = [
+	const _actionOptions: Array<SelectOption> = [
 		{
 			value: "ingest",
 			label: "Ingest Now",
@@ -120,90 +125,69 @@ export function RepositoryItem({
 		{
 			value: "delete",
 			label: "Delete",
-			icon: <Trash className="h-4 w-4" />,
+			icon: <Trash className="h-4 w-4 text-error-900" />,
 		},
 	];
 
 	return (
-		<div
-			className={cn(
-				"group relative rounded-[12px] overflow-hidden w-full bg-white/[0.02] backdrop-blur-[8px] border-[0.5px] border-border shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),inset_0_-1px_1px_rgba(255,255,255,0.2)] before:content-[''] before:absolute before:inset-0 before:bg-white before:opacity-[0.02] before:rounded-[inherit] before:pointer-events-none hover:border-border transition-colors duration-200",
-			)}
-		>
-			<div className="px-[24px] py-[16px]">
-				{/* Repository Header */}
-				<div className="flex items-center justify-between gap-4 mb-3">
-					<a
-						href={`https://github.com/${repositoryIndex.owner}/${repositoryIndex.repo}`}
-						target="_blank"
-						rel="noopener noreferrer"
-						className="text-[#1663F3] font-medium text-[16px] leading-[22.4px] font-geist hover:text-[#0f4cd1] transition-colors duration-200"
-					>
-						{repositoryIndex.owner}/{repositoryIndex.repo}
-					</a>
-					<div className="flex items-center gap-2">
-						<Select
-							id={`repo-actions-${repositoryIndex.id}`}
-							placeholder="Actions"
-							value={actionValue}
-							onValueChange={(v) => {
-								setActionValue(v);
-								switch (v) {
-									case "ingest":
-										handleManualIngest();
-										break;
-									case "configure":
-										setShowConfigureDialog(true);
-										break;
-									case "delete":
-										setShowDeleteDialog(true);
-										break;
-									default:
-										break;
-								}
-								// reset back to placeholder after action
-								setTimeout(() => setActionValue(undefined), 0);
-							}}
-							options={actionOptions}
-							widthClassName="w-6 h-6"
-							triggerClassName="p-0 h-6 w-6 rounded-md mr-1"
-							disabled={isPending || isIngesting}
-							itemClassNameForOption={(opt) =>
-								opt.value === "delete"
-									? "px-4 py-3 font-medium text-[14px] text-error-900 hover:bg-error-900/20 rounded-md"
-									: "px-4 py-3 font-medium text-[14px] text-white-400 hover:bg-white/5 rounded-md"
-							}
-							renderTriggerContent={<Ellipsis className="text-inverse/70" />}
-							hideChevron
-							ariaLabel="Repository actions menu"
-							contentMinWidthClassName="min-w-[165px]"
-							disableHoverBg
-						/>
-					</div>
-				</div>
-
-				{/* Embedding Model Cards - Grid Layout */}
-				<div className="grid grid-cols-3 gap-3 w-full">
-					{embeddingProfileIds.map((profileId) => {
-						const profile =
-							GITHUB_EMBEDDING_PROFILES[
-								profileId as keyof typeof GITHUB_EMBEDDING_PROFILES
-							];
-						return (
-							<EmbeddingModelCard
-								key={profileId}
-								profile={profile}
-								profileId={profileId}
-								contentStatuses={contentStatuses}
-								isIngesting={isIngesting}
-								onShowDiagnostic={() => setShowDiagnosticModal(true)}
-							/>
-						);
-					})}
-				</div>
+		<GlassCard className={cn("group")} paddingClassName="px-[24px] py-[16px]">
+			{/* Repository Header + Cards in one row: [name] [cards...] [menu] */}
+			{/* Row 1: Link + Menu */}
+			<div className="flex items-center justify-between gap-4 mb-3">
+				<AccentLink
+					href={`https://github.com/${repositoryIndex.owner}/${repositoryIndex.repo}`}
+					target="_blank"
+					rel="noopener noreferrer"
+					className="font-medium text-[16px] leading-[22.4px] font-geist"
+				>
+					{repositoryIndex.owner}/{repositoryIndex.repo}
+				</AccentLink>
+				<RepoActionMenu
+					id={`repo-actions-${repositoryIndex.id}`}
+					disabled={isPending || isIngesting}
+					actions={[
+						{
+							value: "ingest",
+							label: "Ingest Now",
+							icon: <RefreshCw className="h-4 w-4" />,
+							disabled: !canManuallyIngest || isIngesting,
+							onSelect: handleManualIngest,
+						},
+						{
+							value: "configure",
+							label: "Configure Sources",
+							icon: <Settings className="h-4 w-4" />,
+							onSelect: () => setShowConfigureDialog(true),
+						},
+						{
+							value: "delete",
+							label: "Delete",
+							icon: <Trash className="h-4 w-4 text-error-900" />,
+							destructive: true,
+							onSelect: () => setShowDeleteDialog(true),
+						},
+					]}
+				/>
 			</div>
-
-			{/* Dialogs */}
+			{/* Row 2: Cards grid */}
+			<div className="grid grid-cols-3 gap-3 w-full">
+				{embeddingProfileIds.map((profileId) => {
+					const profile =
+						GITHUB_EMBEDDING_PROFILES[
+							profileId as keyof typeof GITHUB_EMBEDDING_PROFILES
+						];
+					return (
+						<EmbeddingModelCard
+							key={profileId}
+							profile={profile}
+							profileId={profileId}
+							contentStatuses={contentStatuses}
+							isIngesting={isIngesting}
+							onShowDiagnostic={() => setShowDiagnosticModal(true)}
+						/>
+					);
+				})}
+			</div>
 			<Dialog.Root open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
 				<GlassDialogContent variant="destructive">
 					<GlassDialogHeader
@@ -239,7 +223,7 @@ export function RepositoryItem({
 				}}
 				onDelete={() => handleDelete()}
 			/>
-		</div>
+		</GlassCard>
 	);
 }
 
@@ -298,26 +282,34 @@ function EmbeddingModelCard({
 									</StatusBadge>
 								) : (
 									<div className="flex items-center gap-2">
-										<StatusIndicator
-											status={
-												isIngesting && blobStatus.enabled
-													? "running"
-													: blobStatus.status
-											}
-											size="sm"
-											showLabel={false}
-										/>
-										<span className="text-text-muted text-[12px] leading-[14px] font-medium font-geist">
-											{isIngesting && blobStatus.enabled
-												? "Running"
-												: blobStatus.status === "idle"
-													? "Idle"
-													: blobStatus.status === "completed"
-														? "Ready"
-														: blobStatus.status === "failed"
-															? "Error"
-															: "Unknown"}
-										</span>
+										<div className="flex items-center px-2 py-1 rounded-full border border-border-muted">
+											<StatusIndicator
+												status={
+													isIngesting && blobStatus.enabled
+														? "running"
+														: blobStatus.status
+												}
+												size="sm"
+												showLabel={false}
+											/>
+											<span
+												className={`text-[12px] leading-[14px] font-medium font-geist flex-1 text-center ml-1.5 ${
+													blobStatus.status === "failed"
+														? "text-error-900"
+														: "text-black-400"
+												}`}
+											>
+												{isIngesting && blobStatus.enabled
+													? "Running"
+													: blobStatus.status === "idle"
+														? "Idle"
+														: blobStatus.status === "completed"
+															? "Ready"
+															: blobStatus.status === "failed"
+																? "Error"
+																: "Unknown"}
+											</span>
+										</div>
 										{blobStatus?.status === "failed" &&
 											blobStatus?.errorCode === "DOCUMENT_NOT_FOUND" && (
 												<button
@@ -325,7 +317,7 @@ function EmbeddingModelCard({
 													onClick={onShowDiagnostic}
 													className="text-[#1663F3] text-[12px] leading-[14px] font-medium font-geist hover:underline"
 												>
-													• Check
+													Check ↗
 												</button>
 											)}
 									</div>
@@ -387,26 +379,34 @@ function EmbeddingModelCard({
 									</StatusBadge>
 								) : (
 									<div className="flex items-center gap-2">
-										<StatusIndicator
-											status={
-												isIngesting && pullRequestStatus.enabled
-													? "running"
-													: pullRequestStatus.status
-											}
-											size="sm"
-											showLabel={false}
-										/>
-										<span className="text-text-muted text-[12px] leading-[14px] font-medium font-geist">
-											{isIngesting && pullRequestStatus.enabled
-												? "Running"
-												: pullRequestStatus.status === "idle"
-													? "Idle"
-													: pullRequestStatus.status === "completed"
-														? "Ready"
-														: pullRequestStatus.status === "failed"
-															? "Error"
-															: "Unknown"}
-										</span>
+										<div className="flex items-center px-2 py-1 rounded-full border border-border-muted">
+											<StatusIndicator
+												status={
+													isIngesting && pullRequestStatus.enabled
+														? "running"
+														: pullRequestStatus.status
+												}
+												size="sm"
+												showLabel={false}
+											/>
+											<span
+												className={`text-[12px] leading-[14px] font-medium font-geist flex-1 text-center ml-1.5 ${
+													pullRequestStatus.status === "failed"
+														? "text-error-900"
+														: "text-black-400"
+												}`}
+											>
+												{isIngesting && pullRequestStatus.enabled
+													? "Running"
+													: pullRequestStatus.status === "idle"
+														? "Idle"
+														: pullRequestStatus.status === "completed"
+															? "Ready"
+															: pullRequestStatus.status === "failed"
+																? "Error"
+																: "Unknown"}
+											</span>
+										</div>
 										{pullRequestStatus?.status === "failed" &&
 											pullRequestStatus?.errorCode === "DOCUMENT_NOT_FOUND" && (
 												<button
@@ -414,7 +414,7 @@ function EmbeddingModelCard({
 													onClick={onShowDiagnostic}
 													className="text-[#1663F3] text-[12px] leading-[14px] font-medium font-geist hover:underline"
 												>
-													• Check
+													Check ↗
 												</button>
 											)}
 									</div>
