@@ -1,9 +1,9 @@
 "use client";
 
+import { Button } from "@giselle-internal/ui/button";
 import { ExternalLink } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
-import { Button } from "@giselle-internal/ui/button";
 
 type Props = {
 	installationUrl: string;

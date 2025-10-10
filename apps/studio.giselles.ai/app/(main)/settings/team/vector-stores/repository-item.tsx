@@ -2,13 +2,13 @@
 
 import { Select, type SelectOption } from "@giselle-internal/ui/select";
 import { StatusBadge } from "@giselle-internal/ui/status-badge";
+import { StatusIndicator } from "@giselle-internal/ui/status-indicator";
 import { formatTimestamp } from "@giselles-ai/lib/utils";
 import * as Dialog from "@radix-ui/react-dialog";
 import { Ellipsis, RefreshCw, Settings, Trash } from "lucide-react";
 import { useMemo, useState, useTransition } from "react";
 import type {
 	GitHubRepositoryContentType,
-	GitHubRepositoryIndexStatus,
 	githubRepositoryContentStatus,
 } from "@/drizzle";
 import { cn } from "@/lib/utils";
@@ -24,14 +24,6 @@ import { DiagnosticModal } from "./diagnostic-modal";
 import { getErrorMessage } from "./error-messages";
 import { GITHUB_EMBEDDING_PROFILES } from "./github-embedding-profiles";
 import type { DocumentLoaderErrorCode } from "./types";
-
-// Status configuration for sync badges
-const STATUS_CONFIG = {
-	idle: { dotColor: "bg-[#B8E8F4]", label: "Idle" },
-	running: { dotColor: "bg-[#39FF7F] animate-custom-pulse", label: "Running" },
-	completed: { dotColor: "bg-[#39FF7F]", label: "Ready" },
-	failed: { dotColor: "bg-[#FF3D71]", label: "Error" },
-} as const;
 
 type RepositoryItemProps = {
 	repositoryData: RepositoryWithStatuses;
@@ -174,16 +166,14 @@ export function RepositoryItem({
 							}}
 							options={actionOptions}
 							widthClassName="w-6 h-6"
-							triggerClassName="p-0 h-6 w-6 rounded-md"
+							triggerClassName="p-0 h-6 w-6 rounded-md mr-1"
 							disabled={isPending || isIngesting}
 							itemClassNameForOption={(opt) =>
 								opt.value === "delete"
 									? "px-4 py-3 font-medium text-[14px] text-error-900 hover:bg-error-900/20 rounded-md"
 									: "px-4 py-3 font-medium text-[14px] text-white-400 hover:bg-white/5 rounded-md"
 							}
-							renderTriggerContent={
-								<Ellipsis className="h-4 w-4 text-white/60" />
-							}
+							renderTriggerContent={<Ellipsis className="text-inverse/70" />}
 							hideChevron
 							ariaLabel="Repository actions menu"
 							contentMinWidthClassName="min-w-[165px]"
@@ -307,19 +297,38 @@ function EmbeddingModelCard({
 										Enabled
 									</StatusBadge>
 								) : (
-									<SyncStatusBadge
-										status={
-											isIngesting && blobStatus.enabled
-												? "running"
-												: blobStatus.status
-										}
-										onVerify={
-											blobStatus?.status === "failed" &&
-											blobStatus?.errorCode === "DOCUMENT_NOT_FOUND"
-												? onShowDiagnostic
-												: undefined
-										}
-									/>
+									<div className="flex items-center gap-2">
+										<StatusIndicator
+											status={
+												isIngesting && blobStatus.enabled
+													? "running"
+													: blobStatus.status
+											}
+											size="sm"
+											showLabel={false}
+										/>
+										<span className="text-text-muted text-[12px] leading-[14px] font-medium font-geist">
+											{isIngesting && blobStatus.enabled
+												? "Running"
+												: blobStatus.status === "idle"
+													? "Idle"
+													: blobStatus.status === "completed"
+														? "Ready"
+														: blobStatus.status === "failed"
+															? "Error"
+															: "Unknown"}
+										</span>
+										{blobStatus?.status === "failed" &&
+											blobStatus?.errorCode === "DOCUMENT_NOT_FOUND" && (
+												<button
+													type="button"
+													onClick={onShowDiagnostic}
+													className="text-[#1663F3] text-[12px] leading-[14px] font-medium font-geist hover:underline"
+												>
+													• Check
+												</button>
+											)}
+									</div>
 								)
 							) : (
 								<StatusBadge status="ignored" variant="dot">
@@ -377,19 +386,38 @@ function EmbeddingModelCard({
 										Enabled
 									</StatusBadge>
 								) : (
-									<SyncStatusBadge
-										status={
-											isIngesting && pullRequestStatus.enabled
-												? "running"
-												: pullRequestStatus.status
-										}
-										onVerify={
-											pullRequestStatus?.status === "failed" &&
-											pullRequestStatus?.errorCode === "DOCUMENT_NOT_FOUND"
-												? onShowDiagnostic
-												: undefined
-										}
-									/>
+									<div className="flex items-center gap-2">
+										<StatusIndicator
+											status={
+												isIngesting && pullRequestStatus.enabled
+													? "running"
+													: pullRequestStatus.status
+											}
+											size="sm"
+											showLabel={false}
+										/>
+										<span className="text-text-muted text-[12px] leading-[14px] font-medium font-geist">
+											{isIngesting && pullRequestStatus.enabled
+												? "Running"
+												: pullRequestStatus.status === "idle"
+													? "Idle"
+													: pullRequestStatus.status === "completed"
+														? "Ready"
+														: pullRequestStatus.status === "failed"
+															? "Error"
+															: "Unknown"}
+										</span>
+										{pullRequestStatus?.status === "failed" &&
+											pullRequestStatus?.errorCode === "DOCUMENT_NOT_FOUND" && (
+												<button
+													type="button"
+													onClick={onShowDiagnostic}
+													className="text-[#1663F3] text-[12px] leading-[14px] font-medium font-geist hover:underline"
+												>
+													• Check
+												</button>
+											)}
+									</div>
 								)
 							) : (
 								<StatusBadge status="ignored" variant="dot">
@@ -435,56 +463,6 @@ function EmbeddingModelCard({
 					)}
 				</div>
 			</div>
-		</div>
-	);
-}
-
-function SyncStatusBadge({
-	status,
-	onVerify,
-}: {
-	status: GitHubRepositoryIndexStatus;
-	onVerify?: () => void;
-}) {
-	const config = STATUS_CONFIG[status] ?? {
-		dotColor: "bg-gray-500",
-		label: "unknown",
-	};
-
-	const badgeContent = (
-		<>
-			<div className={`w-2 h-2 rounded-full ${config.dotColor} shrink-0`} />
-			<span className="text-black-400 text-[12px] leading-[14px] font-medium font-geist flex-1 text-center ml-1.5">
-				{config.label}
-			</span>
-			{status === "failed" && onVerify && (
-				<>
-					<span className="text-black-400 text-[12px] mx-1">•</span>
-					<span className="text-[#1663F3] text-[12px] leading-[14px] font-medium font-geist">
-						Check
-					</span>
-					<span className="text-[#1663F3] text-[10px] ml-0.5">↗</span>
-				</>
-			)}
-		</>
-	);
-
-	if (onVerify) {
-		return (
-			<button
-				type="button"
-				aria-label="Verify repository status"
-				onClick={onVerify}
-				className="flex items-center px-2 py-1 rounded-full border border-border w-auto hover:bg-white/5 transition-colors duration-200"
-			>
-				{badgeContent}
-			</button>
-		);
-	}
-
-	return (
-		<div className="flex items-center px-2 py-1 rounded-full border border-border-muted w-[80px]">
-			{badgeContent}
 		</div>
 	);
 }
