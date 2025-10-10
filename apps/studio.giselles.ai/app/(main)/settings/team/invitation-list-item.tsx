@@ -13,10 +13,10 @@ import type { TeamRole } from "@/drizzle";
 import { useToast } from "@/packages/contexts/toast";
 import { resendInvitationAction, revokeInvitationAction } from "./actions";
 import {
-	GlassDialogContent,
-	GlassDialogFooter,
-	GlassDialogHeader,
-} from "./components/glass-dialog-content";
+    GlassDialogContent,
+    GlassDialogFooter,
+    GlassDialogHeader,
+} from "@giselle-internal/ui/glass-dialog";
 import { LocalDateTime } from "./components/local-date-time";
 
 type InvitationListItemProps = {
@@ -142,7 +142,7 @@ export function InvitationListItem({
 							</DropdownMenuTrigger>
 							<DropdownMenuContent
 								align="end"
-								className="p-1 border-[0.25px] border-border-muted rounded-[8px] min-w-[165px] bg-surface shadow-none"
+								className="p-1 border-[0.5px] border-white/10 rounded-[8px] min-w-[165px] bg-white/[0.02] backdrop-blur-md shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),inset_0_-1px_1px_rgba(255,255,255,0.05)] relative overflow-hidden before:content-[''] before:absolute before:inset-0 before:bg-white before:opacity-[0.02] before:rounded-[inherit] before:pointer-events-none"
 							>
 								<DropdownMenuItem
 									onSelect={(e) => {
