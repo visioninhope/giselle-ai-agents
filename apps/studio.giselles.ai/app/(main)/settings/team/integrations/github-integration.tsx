@@ -175,7 +175,7 @@ function Installation({ installation }: InstallationProps) {
 					{displayName}
 				</span>
 			</div>
-			<div className="h-px w-full bg-border my-4" />
+			<div className="h-px w-full bg-inverse/10 my-4" />
 			<div className="space-y-5">
 				{installation.repositories.map((repo) => (
 					<div key={repo.id} className="flex items-center gap-x-2">
@@ -187,7 +187,7 @@ function Installation({ installation }: InstallationProps) {
 						>
 							{repo.name}
 						</a>
-						<span className="rounded-full px-1.5 py-px text-text-muted font-medium text-[10px] leading-normal font-geist border-[0.5px] border-border">
+                        <span className="rounded-full px-2 py-px text-inverse/70 font-medium text-[10px] leading-normal font-geist border border-white/20">
 							{repo.private ? "Private" : "Public"}
 						</span>
 					</div>
