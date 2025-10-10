@@ -162,7 +162,7 @@ function Installation({ installation }: InstallationProps) {
 	const avatarUrl = "avatar_url" in account ? account.avatar_url : undefined;
 
 	return (
-		<div className="rounded-lg px-4 pt-4 pb-6 flex flex-col bg-gradient-to-b from-[#202530] to-[#12151f] border border-white/15 shadow-[0_2px_8px_rgba(5,10,20,0.4),0_1px_2px_rgba(0,0,0,0.3)]">
+		<div className="rounded-lg px-4 pt-4 pb-6 flex flex-col bg-gradient-to-b from-[#202530] to-[#12151f] border border-border-muted shadow-[0_2px_8px_rgba(5,10,20,0.4),0_1px_2px_rgba(0,0,0,0.3)]">
 			<div className="flex items-center gap-x-2">
 				{avatarUrl && (
 					<img
