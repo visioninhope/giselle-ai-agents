@@ -6,13 +6,13 @@ import { DEFAULT_EMBEDDING_PROFILE_ID } from "@giselle-sdk/data-type";
 import * as Dialog from "@radix-ui/react-dialog";
 import * as Tooltip from "@radix-ui/react-tooltip";
 import {
-    AlertCircle,
-    ArrowUpFromLine,
-    CheckCircle2,
-    Clock,
-    Loader2,
-    Settings,
-    Trash,
+	AlertCircle,
+	ArrowUpFromLine,
+	CheckCircle2,
+	Clock,
+	Loader2,
+	Settings,
+	Trash,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import {
@@ -161,38 +161,38 @@ export function DocumentVectorStoreItem({
 
 	const disableMenu = isPending || isUpdating;
 
-    return (
-        <GlassCard className="group" paddingClassName="px-[24px] py-[16px]">
-				<div className="flex items-start justify-between gap-4 mb-4">
-					<div>
-						<h5 className="text-white-400 font-medium text-[16px] leading-[22.4px] font-sans">
-							{store.name}
-						</h5>
-						<div className="text-black-300 text-[13px] leading-[18px] font-geist mt-1">
-							ID: {store.id}
-                </div>
-                    <RepoActionMenu
-                        disabled={disableMenu}
-                        actions={[
-                            {
-                                value: "configure",
-                                label: "Configure Sources",
-                                icon: <Settings className="h-4 w-4" />,
-                                onSelect: () => setIsConfigureDialogOpen(true),
-                            },
-                            {
-                                value: "delete",
-                                label: "Delete",
-                                icon: <Trash className="h-4 w-4 text-error-900" />,
-                                destructive: true,
-                                onSelect: () => setIsDeleteDialogOpen(true),
-                            },
-                        ]}
-                    />
+	return (
+		<GlassCard className="group" paddingClassName="px-[24px] py-[16px]">
+			<div className="flex items-start justify-between gap-4 mb-4">
+				<div>
+					<h5 className="text-white-400 font-medium text-[16px] leading-[22.4px] font-sans">
+						{store.name}
+					</h5>
+					<div className="text-black-300 text-[13px] leading-[18px] font-geist mt-1">
+						ID: {store.id}
+					</div>
+					<RepoActionMenu
+						disabled={disableMenu}
+						actions={[
+							{
+								value: "configure",
+								label: "Configure Sources",
+								icon: <Settings className="h-4 w-4" />,
+								onSelect: () => setIsConfigureDialogOpen(true),
+							},
+							{
+								value: "delete",
+								label: "Delete",
+								icon: <Trash className="h-4 w-4 text-error-900" />,
+								destructive: true,
+								onSelect: () => setIsDeleteDialogOpen(true),
+							},
+						]}
+					/>
 				</div>
-            </div>
+			</div>
 
-            <Dialog.Root
+			<Dialog.Root
 				open={isDeleteDialogOpen}
 				onOpenChange={setIsDeleteDialogOpen}
 			>
@@ -211,27 +211,27 @@ export function DocumentVectorStoreItem({
 						variant="destructive"
 					/>
 				</GlassDialogContent>
-            </Dialog.Root>
+			</Dialog.Root>
 
-            <DocumentVectorStoreConfigureDialog
-                open={isConfigureDialogOpen}
-                onOpenChange={setIsConfigureDialogOpen}
-                store={store}
-                updateAction={updateAction}
-                onSuccess={() => {
-                    router.refresh();
-                    addToast({
-                        title: "Vector store updated",
-                        message: "Configuration saved successfully.",
-                        type: "success",
-                    });
-                }}
-                onPendingChange={setIsUpdating}
-                showErrorToast={(message) => {
-                    addToast({ title: "Error", message, type: "error" });
-                }}
-            />
-        </GlassCard>
+			<DocumentVectorStoreConfigureDialog
+				open={isConfigureDialogOpen}
+				onOpenChange={setIsConfigureDialogOpen}
+				store={store}
+				updateAction={updateAction}
+				onSuccess={() => {
+					router.refresh();
+					addToast({
+						title: "Vector store updated",
+						message: "Configuration saved successfully.",
+						type: "success",
+					});
+				}}
+				onPendingChange={setIsUpdating}
+				showErrorToast={(message) => {
+					addToast({ title: "Error", message, type: "error" });
+				}}
+			/>
+		</GlassCard>
 	);
 }
 
