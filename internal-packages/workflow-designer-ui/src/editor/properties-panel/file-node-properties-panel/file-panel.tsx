@@ -321,7 +321,7 @@ export function FilePanel({ node, config }: FilePanelProps) {
 											node={node}
 											className="size-[30px] text-black-400"
 										/>
-										<p className="text-center text-white-400">
+										<p className="text-center text-inverse">
 											Drop to upload your {config.label} files
 										</p>
 									</>
@@ -345,7 +345,7 @@ export function FilePanel({ node, config }: FilePanelProps) {
 									<ArrowUpFromLineIcon size={38} className="text-black-400" />
 									<label
 										htmlFor="file"
-										className="text-center flex flex-col gap-[16px] text-white-400"
+										className="text-center flex flex-col gap-[16px] text-inverse"
 									>
 										<p>Drop {config.label} files here to upload.</p>
 										{node.content.category === "image" && (
@@ -376,7 +376,7 @@ export function FilePanel({ node, config }: FilePanelProps) {
 				</div>
 				{node.content.files.length > 0 && (
 					<div className="mt-[24px]">
-						<h3 className="text-[14px] font-semibold text-white-800 mb-[8px]">
+						<h3 className="text-[14px] font-semibold text-inverse mb-[8px]">
 							Added Files
 						</h3>
 						<div className="flex flex-col gap-[8px]">
@@ -403,14 +403,14 @@ function FileListItem({
 	onRemove: (file: FileData) => void;
 }) {
 	return (
-		<div className="flex items-center justify-between hover:bg-black-50/50 transition-colors rounded-[8px] group">
+		<div className="flex items-center justify-between hover:bg-bg-50/50 transition-colors rounded-[8px] group">
 			<div className="flex items-center gap-[12px] flex-1 min-w-0">
 				<svg
 					width="16"
 					height="16"
 					viewBox="0 0 24 24"
 					fill="none"
-					className="text-white-400 shrink-0"
+					className="text-inverse shrink-0"
 					role="img"
 					aria-label="File icon"
 				>
@@ -430,7 +430,7 @@ function FileListItem({
 					/>
 				</svg>
 				<div className="min-w-0 flex-1">
-					<p className="text-[14px] text-white-800 truncate font-medium">
+					<p className="text-[14px] text-inverse truncate font-medium">
 						{fileData.name}
 					</p>
 					{fileData.status === "uploading" && (
@@ -445,9 +445,9 @@ function FileListItem({
 			<button
 				type="button"
 				onClick={() => onRemove(fileData)}
-				className="w-[32px] h-[32px] rounded-[6px] flex items-center justify-center hover:bg-black-100 transition-colors opacity-0 group-hover:opacity-100 shrink-0"
+				className="w-[32px] h-[32px] rounded-[6px] flex items-center justify-center hover:bg-bg-100 transition-colors opacity-0 group-hover:opacity-100 shrink-0"
 			>
-				<TrashIcon size={16} className="text-black-400 hover:text-white-800" />
+				<TrashIcon size={16} className="text-black-400 hover:text-inverse" />
 			</button>
 		</div>
 	);

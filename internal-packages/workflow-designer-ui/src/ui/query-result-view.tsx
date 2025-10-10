@@ -74,7 +74,7 @@ function ContentPreview({
 
 	return (
 		<div className="space-y-[8px]">
-			<pre className="text-[12px] text-white-800 whitespace-pre-wrap font-mono leading-relaxed">
+			<pre className="text-[12px] text-inverse whitespace-pre-wrap font-mono leading-relaxed">
 				{displayContent}
 			</pre>
 			{shouldShowToggle && (
@@ -153,14 +153,12 @@ function PRContextDisplay({
 						<span className="text-[11px] font-medium text-blue-400">
 							PR #{prNumber}
 						</span>
-						<span className="text-[11px] text-white-500">•</span>
-						<span className="text-[11px] text-white-600">
-							{contentTypeLabel}
-						</span>
+						<span className="text-[11px] text-inverse">•</span>
+						<span className="text-[11px] text-inverse">{contentTypeLabel}</span>
 					</div>
 
 					{parsedContext.title && (
-						<p className="text-[12px] font-medium text-white-800 leading-snug">
+						<p className="text-[12px] font-medium text-inverse leading-snug">
 							{parsedContext.title}
 						</p>
 					)}
@@ -185,8 +183,8 @@ function PRContextDisplay({
 								)}
 							</button>
 							{isExpanded && (
-								<div className="mt-[6px] p-[8px] bg-black-900/30 rounded-[4px]">
-									<pre className="text-[11px] text-white-700 whitespace-pre-wrap font-mono leading-relaxed">
+								<div className="mt-[6px] p-[8px] bg-surface/30 rounded-[4px]">
+									<pre className="text-[11px] text-inverse whitespace-pre-wrap font-mono leading-relaxed">
 										{parsedContext.body}
 									</pre>
 								</div>
@@ -302,7 +300,7 @@ function DataSourceTab({
 			className={clsx(
 				"flex items-center gap-[8px] px-[16px] py-[6px] border-b cursor-pointer min-w-fit flex-shrink-0",
 				isActive
-					? "text-white-900 border-white-900"
+					? "text-inverse border-border"
 					: "text-black-400 border-transparent",
 			)}
 		>
@@ -324,7 +322,7 @@ function DataSourceTab({
 					"flex items-center gap-[4px] px-[6px] py-[1px] rounded-[6px] flex-shrink-0",
 					isActive
 						? "bg-blue-500/20 text-blue-300"
-						: "bg-white-900/10 text-white-700",
+						: "bg-surface/10 text-inverse",
 				)}
 			>
 				<span className="text-[11px] font-medium">{recordCount}</span>
@@ -357,8 +355,8 @@ function QueryResultCard({
 
 	if (result.type !== "vector-store") {
 		return (
-			<div className="bg-white-900/5 rounded-[8px] p-[16px] border border-white-900/10">
-				<p className="text-white-600 text-[14px]">
+			<div className="bg-surface/5 rounded-[8px] p-[16px] border border-border/10">
+				<p className="text-inverse text-[14px]">
 					Unsupported result type: {result.type}
 				</p>
 			</div>
@@ -368,8 +366,8 @@ function QueryResultCard({
 	const { records } = result;
 	if (!records) {
 		return (
-			<div className="bg-white-900/5 rounded-[8px] p-[16px] border border-white-900/10">
-				<p className="text-white-600 text-[14px]">No records found</p>
+			<div className="bg-surface/5 rounded-[8px] p-[16px] border border-border/10">
+				<p className="text-inverse text-[14px]">No records found</p>
 			</div>
 		);
 	}
@@ -379,15 +377,15 @@ function QueryResultCard({
 			{records.map((record, recordIndex) => (
 				<div
 					key={`record-${recordIndex}-${record.chunkIndex}`}
-					className="bg-white-900/5 rounded-[8px] p-[12px] space-y-[8px] border border-white-900/10"
+					className="bg-surface/5 rounded-[8px] p-[12px] space-y-[8px] border border-border/10"
 				>
 					<div className="flex items-center justify-between">
 						<div className="flex items-center gap-[8px] flex-wrap">
-							<span className="text-[12px] font-semibold text-white-700">
+							<span className="text-[12px] font-semibold text-inverse">
 								Chunk #{record.chunkIndex}
 							</span>
 							{isDocumentResult && record.metadata.documentKey ? (
-								<div className="flex flex-col text-[11px] text-white-500">
+								<div className="flex flex-col text-[11px] text-inverse">
 									<span className="break-all">
 										File: {record.metadata.documentKey}
 									</span>
@@ -409,8 +407,8 @@ function QueryResultCard({
 					/>
 
 					{Object.keys(record.metadata).length > 0 && (
-						<details className="text-[11px] text-white-500">
-							<summary className="cursor-pointer hover:text-white-400">
+						<details className="text-[11px] text-inverse">
+							<summary className="cursor-pointer hover:text-inverse">
 								Metadata
 							</summary>
 							<div className="mt-[4px] pl-[12px] space-y-[2px]">
@@ -469,7 +467,7 @@ export function QueryResultView({ generation }: { generation: Generation }) {
 
 	if (queryResults.length === 0) {
 		return (
-			<div className="text-white-600 text-[14px] p-[16px] bg-white-900/5 rounded-[8px] border border-white-900/10 text-center">
+			<div className="text-inverse text-[14px] p-[16px] bg-surface/5 rounded-[8px] border border-border/10 text-center">
 				No results found.
 			</div>
 		);
@@ -485,7 +483,7 @@ export function QueryResultView({ generation }: { generation: Generation }) {
 		<div className="space-y-[16px]">
 			{/* Header */}
 			<div className="flex items-center gap-[12px] py-[8px]">
-				<p className="text-[12px] text-white-600">
+				<p className="text-[12px] text-inverse">
 					Found {totalRecords} result{totalRecords !== 1 ? "s" : ""} in{" "}
 					{queryResults.length} data source
 					{queryResults.length !== 1 ? "s" : ""}

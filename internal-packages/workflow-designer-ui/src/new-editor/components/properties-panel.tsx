@@ -31,7 +31,7 @@ export function PropertiesPanel() {
 	return (
 		<aside
 			className={clsx(
-				"w-[420px] shrink-0 border-l border-black-300 h-full overflow-y-auto bg-black-50/20",
+				"w-[420px] shrink-0 border-l border-black-300 h-full overflow-y-auto bg-bg-50/20",
 			)}
 			aria-label="Properties Panel"
 		>
@@ -39,7 +39,7 @@ export function PropertiesPanel() {
 				<PropertiesPanelHeader
 					node={node}
 					description={node.content.type}
-					icon={<NodeIcon node={node} className="size-[20px] text-black-900" />}
+					icon={<NodeIcon node={node} className="size-[20px] text-inverse" />}
 					onChangeName={(name) => {
 						updateNode(node.id as NodeId, { name });
 					}}

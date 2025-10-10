@@ -233,9 +233,7 @@ export function GitHubVectorStoreNodePropertiesPanel({
 	return (
 		<div className="flex flex-col gap-[17px] p-0">
 			<div className="space-y-[4px]">
-				<p className="text-[14px] py-[1.5px] text-white-400">
-					GitHub Repository
-				</p>
+				<p className="text-[14px] py-[1.5px] text-inverse">GitHub Repository</p>
 				{isOrphaned && source.state.status === "configured" && (
 					<div className="flex items-center gap-[6px] text-error-900 text-[13px] mb-[8px]">
 						<TriangleAlert className="size-[16px]" />
@@ -259,7 +257,7 @@ export function GitHubVectorStoreNodePropertiesPanel({
 				{/* Content Type Selection */}
 				{selectedRepoKey && (
 					<div className="mt-[16px]">
-						<p className="text-[14px] py-[1.5px] text-white-400 mb-[8px]">
+						<p className="text-[14px] py-[1.5px] text-inverse mb-[8px]">
 							Content Type
 						</p>
 						<div className="space-y-[8px]">
@@ -283,14 +281,14 @@ export function GitHubVectorStoreNodePropertiesPanel({
 												disabled={!hasBlobContent}
 												className="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 focus:ring-primary-500"
 											/>
-											<span className="text-[14px] text-white-400">Code</span>
+											<span className="text-[14px] text-inverse">Code</span>
 											{!hasBlobContent && (
 												<div className="flex items-center gap-1 group relative">
-													<span className="text-[12px] text-white-400/50">
+													<span className="text-[12px] text-inverse/50">
 														Not configured
 													</span>
-													<Info className="w-3 h-3 text-white-400/50 cursor-help" />
-													<div className="absolute left-0 bottom-full mb-2 px-3 py-2 bg-black-800/80 backdrop-blur-md border border-white/10 text-white text-xs rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 shadow-lg">
+													<Info className="w-3 h-3 text-inverse/50 cursor-help" />
+													<div className="absolute left-0 bottom-full mb-2 px-3 py-2 bg-bg-800/80 backdrop-blur-md border border-white/10 text-inverse text-xs rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 shadow-lg">
 														Enable Code for {selectedRepoKey} in Vector Store
 														settings
 													</div>
@@ -313,16 +311,16 @@ export function GitHubVectorStoreNodePropertiesPanel({
 												disabled={!hasPullRequestContent}
 												className="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 focus:ring-primary-500"
 											/>
-											<span className="text-[14px] text-white-400">
+											<span className="text-[14px] text-inverse">
 												Pull Requests
 											</span>
 											{!hasPullRequestContent && (
 												<div className="flex items-center gap-1 group relative">
-													<span className="text-[12px] text-white-400/50">
+													<span className="text-[12px] text-inverse/50">
 														Not configured
 													</span>
-													<Info className="w-3 h-3 text-white-400/50 cursor-help" />
-													<div className="absolute left-0 bottom-full mb-2 px-3 py-2 bg-black-800/80 backdrop-blur-md border border-white/10 text-white text-xs rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 shadow-lg">
+													<Info className="w-3 h-3 text-inverse/50 cursor-help" />
+													<div className="absolute left-0 bottom-full mb-2 px-3 py-2 bg-bg-800/80 backdrop-blur-md border border-white/10 text-inverse text-xs rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 shadow-lg">
 														Enable Pull Requests for that repository in Vector
 														Store settings
 													</div>
@@ -341,7 +339,7 @@ export function GitHubVectorStoreNodePropertiesPanel({
 					selectedContentType &&
 					availableEmbeddingProfiles.length > 0 && (
 						<div className="mt-[16px]">
-							<p className="text-[14px] py-[1.5px] text-white-400 mb-[8px]">
+							<p className="text-[14px] py-[1.5px] text-inverse mb-[8px]">
 								Embedding Model
 							</p>
 							{isEmbeddingProfileOrphaned &&
@@ -387,7 +385,7 @@ export function GitHubVectorStoreNodePropertiesPanel({
 					<div className="pt-[8px] flex justify-end">
 						<Link
 							href={settingPath}
-							className="text-white-400 hover:text-white-300 text-[14px] underline"
+							className="text-inverse hover:text-inverse text-[14px] underline"
 						>
 							Set Up Vector Store
 						</Link>

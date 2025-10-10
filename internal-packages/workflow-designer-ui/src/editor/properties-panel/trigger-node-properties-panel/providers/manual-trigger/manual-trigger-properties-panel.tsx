@@ -154,7 +154,7 @@ export function ManualTriggerPropertiesPanel({ node }: { node: TriggerNode }) {
 								{parameters.map((param) => (
 									<div
 										key={param.id}
-										className="flex items-center justify-between p-[8px] bg-white-900/10 rounded-[4px]"
+										className="flex items-center justify-between p-[8px] bg-bg-900/10 rounded-[4px]"
 									>
 										<div className="flex items-center gap-[8px]">
 											<span className="font-medium">{param.name}</span>
@@ -210,7 +210,7 @@ export function ManualTriggerPropertiesPanel({ node }: { node: TriggerNode }) {
 									name="name"
 									type="text"
 									placeholder="Write the parameter name"
-									className="w-full flex justify-between items-center rounded-[8px] py-[8px] px-[12px] outline-none focus:outline-none border-[1px] border-white-900 text-[14px]"
+									className="w-full flex justify-between items-center rounded-[8px] py-[8px] px-[12px] outline-none focus:outline-none border-[1px] border-inverse bg-transparent text-inverse/80 text-[14px]"
 									data-1p-ignore
 								/>
 								<Select
@@ -245,7 +245,7 @@ export function ManualTriggerPropertiesPanel({ node }: { node: TriggerNode }) {
 										(This can be changed later)
 									</span>
 								</label>
-								<div className="flex-grow mx-[12px] h-[1px] bg-element-background" />
+								<div className="flex-grow mx-[12px] h-[1px] border-t border-inverse" />
 							</Toggle>
 						</div>
 					)}

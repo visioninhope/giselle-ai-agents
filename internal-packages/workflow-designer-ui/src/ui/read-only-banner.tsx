@@ -43,7 +43,7 @@ export function ReadOnlyBanner({
 			{showDismiss && onDismiss && (
 				<button
 					onClick={onDismiss}
-					className="text-white-800 hover:text-white-900 p-1 rounded-full"
+					className="text-inverse hover:text-inverse p-1 rounded-full"
 					aria-label="Close"
 					type="button"
 				>

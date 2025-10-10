@@ -61,7 +61,7 @@ export function ResizableSection({
 		>
 			{title && (
 				<div className="px-4 py-2 border-b border-border bg-surface-background/50">
-					<h3 className="text-sm font-medium text-white-900">{title}</h3>
+					<h3 className="text-sm font-medium text-inverse">{title}</h3>
 				</div>
 			)}
 			<div className="flex-1 overflow-hidden h-full">{children}</div>

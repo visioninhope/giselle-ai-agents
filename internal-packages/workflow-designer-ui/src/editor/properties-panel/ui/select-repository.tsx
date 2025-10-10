@@ -120,11 +120,11 @@ export function SelectRepository({
 					<button
 						type="button"
 						onClick={() => setIsOrgDropdownOpen(!isOrgDropdownOpen)}
-						className="w-full px-3 py-2 bg-black-300/20 rounded-[8px] text-white-400 text-[14px] font-geist cursor-pointer text-left flex items-center justify-between"
+						className="w-full px-3 py-2 bg-inverse/5 hover:bg-inverse/10 rounded-[8px] text-inverse text-[14px] font-geist cursor-pointer text-left flex items-center justify-between"
 					>
 						<span
 							className={
-								selectedInstallationId ? "text-[#F7F9FD]" : "text-white/30"
+								selectedInstallationId ? "text-[#F7F9FD]" : "text-inverse/30"
 							}
 						>
 							{!selectedInstallationId
@@ -141,10 +141,10 @@ export function SelectRepository({
 												: "Select an Organization";
 									})()}
 						</span>
-						<ChevronDown className="h-4 w-4 text-white/60" />
+						<ChevronDown className="h-4 w-4 text-inverse/60" />
 					</button>
 					{isOrgDropdownOpen && (
-						<div className="absolute top-full left-0 right-0 mt-1 z-50 rounded-[8px] border-[0.25px] border-white/10 bg-black-850 p-1 shadow-none">
+						<div className="absolute top-full left-0 right-0 mt-1 z-50 rounded-[8px] bg-(image:--glass-bg) p-[4px] border border-glass-border/20 backdrop-blur-md shadow-xl after:absolute after:bg-(image:--glass-highlight-bg) after:left-4 after:right-4 after:h-px after:top-0">
 							{installations.map((installation) => (
 								<button
 									key={installation.id}
@@ -153,7 +153,7 @@ export function SelectRepository({
 										setSelectedInstallationId(installation.id);
 										setIsOrgDropdownOpen(false);
 									}}
-									className="flex w-full items-center rounded-md px-3 py-2 text-left font-sans text-[14px] leading-[16px] text-[#F7F9FD] hover:bg-white/5"
+									className="flex w-full items-center rounded-md px-[8px] py-[6px] text-left font-sans text-[14px] leading-[16px] text-text hover:bg-ghost-element-hover"
 								>
 									<span className="mr-2 inline-flex h-4 w-4 items-center justify-center">
 										{selectedInstallationId === installation.id && (
@@ -171,11 +171,11 @@ export function SelectRepository({
 						</div>
 					)}
 				</div>
-				<p className="text-white-500 text-[14px] text-right">
+				<p className="text-inverse text-[14px] text-right">
 					Missing GitHub account?
 					<button
 						type="button"
-						className="text-white-400 hover:text-white-300 ml-1 underline text-[14px]"
+						className="text-inverse hover:text-inverse ml-1 underline text-[14px]"
 						onClick={handleClick}
 					>
 						Adjust GitHub App Permissions
@@ -187,7 +187,7 @@ export function SelectRepository({
 					<p className="text-[14px] py-[1.5px] text-[#F7F9FD]">Repository</p>
 					<div className="flex flex-col gap-y-[8px] relative">
 						{isPending ? (
-							<div className="flex items-center justify-center h-[64px] bg-black-300/20 text-white-400 text-[14px] rounded-[8px]">
+							<div className="flex items-center justify-center h-[64px] bg-bg-300/20 text-inverse text-[14px] rounded-[8px]">
 								Loading...
 							</div>
 						) : (
@@ -205,13 +205,13 @@ export function SelectRepository({
 										});
 									}}
 								>
-									<div className="invisible group-hover:visible absolute right-4 top-1/2 transform -translate-y-1/2 bg-black-800 text-white text-xs px-2 py-1 rounded whitespace-nowrap">
+									<div className="invisible group-hover:visible absolute right-4 top-1/2 transform -translate-y-1/2 bg-bg-800 text-inverse text-xs px-2 py-1 rounded whitespace-nowrap">
 										Select
 									</div>
 									<div className="flex items-center justify-between">
 										<div className="flex flex-col">
 											<div className="flex items-center gap-2">
-												<span className="text-white-400 font-medium text-[14px]">
+												<span className="text-inverse font-medium text-[14px]">
 													{repo.name}
 												</span>
 												<span className="rounded-full px-1.5 py-px text-black-300 font-medium text-[10px] leading-normal font-geist border-[0.5px] border-black-400">
@@ -224,11 +224,11 @@ export function SelectRepository({
 							))
 						)}
 					</div>
-					<p className="text-white-500 text-[14px] text-right">
+					<p className="text-inverse text-[14px] text-right">
 						Missing Git repository?
 						<button
 							type="button"
-							className="text-white-400 hover:text-white-300 ml-1 underline text-[14px]"
+							className="text-inverse hover:text-inverse ml-1 underline text-[14px]"
 							onClick={handleClick}
 						>
 							Adjust GitHub App Permissions

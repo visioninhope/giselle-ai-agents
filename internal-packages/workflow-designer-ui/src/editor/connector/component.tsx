@@ -67,7 +67,7 @@ export function Connector({
 				id={id}
 				path={edgePath}
 				className={clsx(
-					"!stroke-[1.5px] bg-white",
+					"!stroke-[1.5px] bg-bg",
 					"group-data-[output-node-content-type=textGeneration]:group-data-[input-node-content-type=textGeneration]:!stroke-[url(#textGenerationToTextGeneration)]",
 					"group-data-[output-node-content-type=file]:group-data-[input-node-content-type=textGeneration]:!stroke-[url(#fileToTextGeneration)]",
 					"group-data-[output-node-content-type=webPage]:group-data-[input-node-content-type=textGeneration]:!stroke-[url(#webPageToTextGeneration)]",
