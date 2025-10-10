@@ -1,4 +1,7 @@
-import { extractText } from "@giselle-sdk/document-preprocessor";
+import {
+	extractPdfText,
+	extractText,
+} from "@giselle-sdk/document-preprocessor";
 import { resolveSupportedDocumentFile } from "../utils";
 
 interface ExtractTextOptions {
@@ -7,44 +10,62 @@ interface ExtractTextOptions {
 
 interface ExtractTextResult {
 	text: string;
-	fileType: "txt" | "md";
+	fileType: "txt" | "md" | "pdf";
 }
 
-const SUPPORTED_TEXT_EXTENSIONS = [".txt", ".md"] as const;
+const TEXT_EXTENSION_MAP = {
+	".txt": "txt",
+	".md": "md",
+} as const;
+
+const PDF_EXTENSION = ".pdf";
 
 /**
- * Extract text content from TXT or Markdown files
+ * Extract text content from supported document files
  * @param buffer - File content buffer
  * @param fileName - Original file name for type detection
  * @param options - Optional extraction settings
  * @returns Extracted text and file type
  * @throws Error if file type is unsupported
  */
-export function extractTextFromDocument(
+export async function extractTextFromDocument(
 	buffer: Buffer,
 	fileName: string,
 	options?: ExtractTextOptions,
-): ExtractTextResult {
+): Promise<ExtractTextResult> {
 	const { signal } = options ?? {};
 
 	signal?.throwIfAborted();
 
 	const fileTypeInfo = resolveSupportedDocumentFile({ name: fileName });
 
-	if (
-		!fileTypeInfo ||
-		!SUPPORTED_TEXT_EXTENSIONS.includes(
-			fileTypeInfo.extension as (typeof SUPPORTED_TEXT_EXTENSIONS)[number],
-		)
-	) {
+	if (!fileTypeInfo) {
 		throw new Error(
-			`Unsupported file type for text extraction: ${fileName}. Only TXT and Markdown files are supported.`,
+			`Unsupported file type for text extraction: ${fileName}. Only PDF, TXT, and Markdown files are supported.`,
 		);
 	}
 
-	const { text } = extractText(buffer);
+	const normalizedExtension = fileTypeInfo.extension.toLowerCase();
 
-	const fileType = fileTypeInfo.extension === ".md" ? "md" : "txt";
+	if (normalizedExtension === PDF_EXTENSION) {
+		const result = await extractPdfText(buffer, { signal });
+		const text = result.pages.map((page) => page.text).join("\n\n");
+		return {
+			text,
+			fileType: "pdf",
+		};
+	}
 
-	return { text, fileType };
+	const textExtension =
+		TEXT_EXTENSION_MAP[normalizedExtension as keyof typeof TEXT_EXTENSION_MAP];
+
+	if (!textExtension) {
+		throw new Error(
+			`Unsupported file type for text extraction: ${fileName}. Only PDF, TXT, and Markdown files are supported.`,
+		);
+	}
+
+	const { text } = extractText(buffer, { signal });
+
+	return { text, fileType: textExtension };
 }
