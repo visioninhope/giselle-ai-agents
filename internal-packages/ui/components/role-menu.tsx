@@ -93,4 +93,3 @@ export function RoleMenu({
 	);
 }
 
-export default RoleMenu;

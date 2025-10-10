@@ -34,6 +34,7 @@
 		"./revoke-invitation-dialog": "./components/revoke-invitation-dialog.tsx"
 	},
 	"dependencies": {
+		"@radix-ui/react-dialog": "1.1.4",
 		"clsx": "catalog:",
 		"lucide-react": "catalog:",
 		"radix-ui": "catalog:",
