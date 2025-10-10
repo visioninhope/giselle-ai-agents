@@ -21,7 +21,8 @@ export function GoogleModelPanel({
 	const isSearchGroundingEnabled =
 		googleLanguageModel.configurations.searchGrounding;
 	const isUrlContextEnabled =
-		googleLanguageModel.configurations.urlContext ?? false;
+		googleUrlContext &&
+		(googleLanguageModel.configurations.urlContext ?? false);
 	const shouldShowMutualExclusionNotice =
 		isSearchGroundingEnabled || isUrlContextEnabled;
 
