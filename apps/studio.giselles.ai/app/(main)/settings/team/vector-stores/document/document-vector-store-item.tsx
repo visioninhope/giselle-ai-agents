@@ -170,8 +170,7 @@ export function DocumentVectorStoreItem({
 						</h5>
 						<div className="text-black-300 text-[13px] leading-[18px] font-geist mt-1">
 							ID: {store.id}
-						</div>
-					</div>
+                </div>
                     <RepoActionMenu
                         disabled={disableMenu}
                         actions={[
@@ -215,22 +214,22 @@ export function DocumentVectorStoreItem({
             </Dialog.Root>
 
             <DocumentVectorStoreConfigureDialog
-				open=isConfigureDialogOpen
-				onOpenChange=setIsConfigureDialogOpen
-				store={store}
-				updateAction={updateAction}
-				onSuccess={() => {
-					router.refresh();
-					addToast({
-						title: "Vector store updated",
-						message: "Configuration saved successfully.",
-						type: "success",
-					});
-				}}
-				onPendingChange={setIsUpdating}
-				showErrorToast={(message) => {
-					addToast({ title: "Error", message, type: "error" });
-				}}
+                open={isConfigureDialogOpen}
+                onOpenChange={setIsConfigureDialogOpen}
+                store={store}
+                updateAction={updateAction}
+                onSuccess={() => {
+                    router.refresh();
+                    addToast({
+                        title: "Vector store updated",
+                        message: "Configuration saved successfully.",
+                        type: "success",
+                    });
+                }}
+                onPendingChange={setIsUpdating}
+                showErrorToast={(message) => {
+                    addToast({ title: "Error", message, type: "error" });
+                }}
             />
         </GlassCard>
 	);

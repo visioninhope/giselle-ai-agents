@@ -107,7 +107,13 @@ export const GlassDialogBody = ({
 }: {
 	children: React.ReactNode;
 	className?: string;
-}) => <div className={cn("mt-4 mb-0 overflow-y-auto flex-1 min-h-0 pr-2", className)}>{children}</div>;
+}) => (
+	<div
+		className={cn("mt-4 mb-0 overflow-y-auto flex-1 min-h-0 pr-2", className)}
+	>
+		{children}
+	</div>
+);
 
 type GlassDialogFooterProps = {
 	onCancel: () => void;
