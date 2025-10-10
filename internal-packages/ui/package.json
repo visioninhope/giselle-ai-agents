@@ -20,7 +20,11 @@
 		"./input": "./components/input.tsx",
 		"./search-input": "./components/search-input.tsx",
 		"./toast": "./components/toast.tsx",
-		"./status-badge": "./components/status-badge.tsx"
+		"./status-badge": "./components/status-badge.tsx",
+		"./separator": "./components/separator.tsx",
+		"./link-muted": "./components/link-muted.tsx",
+		"./tabs": "./components/tabs.tsx",
+		"./inverse-surface": "./components/inverse-surface.tsx"
 	},
 	"dependencies": {
 		"clsx": "catalog:",
