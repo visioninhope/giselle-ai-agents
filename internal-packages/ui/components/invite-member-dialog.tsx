@@ -1,6 +1,5 @@
-import { Dialog as DialogPrimitive } from "radix-ui";
-import clsx from "clsx/lite";
 import { Plus, X } from "lucide-react";
+import { Dialog as DialogPrimitive } from "radix-ui";
 import { useEffect, useState } from "react";
 import { Button } from "./button";
 import {

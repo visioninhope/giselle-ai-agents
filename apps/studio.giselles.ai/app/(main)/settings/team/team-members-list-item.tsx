@@ -1,16 +1,16 @@
 "use client";
+import {
+	GlassDialogContent,
+	GlassDialogFooter,
+	GlassDialogHeader,
+} from "@giselle-internal/ui/glass-dialog";
 import { Select } from "@giselle-internal/ui/select";
+import { useToasts } from "@giselle-internal/ui/toast";
 import * as Dialog from "@radix-ui/react-dialog";
 import { useState } from "react";
 import type { TeamRole } from "@/drizzle";
-import { useToasts } from "@giselle-internal/ui/toast";
 import { AvatarImage } from "@/services/accounts/components/user-button/avatar-image";
 import { deleteTeamMember, updateTeamMemberRole } from "./actions";
-import {
-    GlassDialogContent,
-    GlassDialogFooter,
-    GlassDialogHeader,
-} from "@giselle-internal/ui/glass-dialog";
 
 type TeamMemberListItemProps = {
 	userId: string;
@@ -33,7 +33,7 @@ export function TeamMemberListItem({
 	isProPlan,
 	currentUserId,
 }: TeamMemberListItemProps) {
-    const { toast } = useToasts();
+	const { toast } = useToasts();
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState("");
 	const [open, setOpen] = useState(false);
@@ -61,17 +61,17 @@ export function TeamMemberListItem({
 			const result = await updateTeamMemberRole(formData);
 			if (result?.success) {
 				// Update local state after successful server update
-                setRole(role);
-                toast(`Role updated: ${role}`, { type: "success" });
+				setRole(role);
+				toast(`Role updated: ${role}`, { type: "success" });
 			} else {
-                const msg = result?.error || "Failed to update role";
-                setError(msg);
-                toast(msg, { type: "error" });
+				const msg = result?.error || "Failed to update role";
+				setError(msg);
+				toast(msg, { type: "error" });
 			}
 		} catch (e) {
 			if (e instanceof Error) {
-                setError(e.message);
-                toast(e.message, { type: "error" });
+				setError(e.message);
+				toast(e.message, { type: "error" });
 			}
 			console.error("Error updating role:", e);
 		} finally {
@@ -87,16 +87,16 @@ export function TeamMemberListItem({
 			formData.append("role", role);
 			const result = await deleteTeamMember(formData);
 			if (!result?.success) {
-                const msg = result?.error || "Failed to delete member";
-                setError(msg);
-                toast(msg, { type: "error" });
-            } else {
-                toast("Member removed", { type: "success" });
+				const msg = result?.error || "Failed to delete member";
+				setError(msg);
+				toast(msg, { type: "error" });
+			} else {
+				toast("Member removed", { type: "success" });
 			}
 		} catch (e) {
 			if (e instanceof Error) {
-                setError(e.message);
-                toast(e.message, { type: "error" });
+				setError(e.message);
+				toast(e.message, { type: "error" });
 			}
 			console.error("Error deleting member:", e);
 		} finally {

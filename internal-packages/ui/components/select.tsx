@@ -46,19 +46,19 @@ export function Select<T extends SelectOption>({
 			defaultValue={defaultValue}
 			name={name}
 		>
-            <SelectPrimitive.Trigger id={id} asChild>
-                <button
-                    type="button"
-                    className={clsx(
-                        // width: default full, but allow override via widthClassName
-                        widthClassName ?? "w-full",
-                        "flex justify-between items-center rounded-[8px] h-10 px-[12px] text-left text-[14px] shrink-0",
-                        "outline-none focus:outline-none focus-visible:outline-none focus:ring-0",
-                        "bg-inverse/5 transition-colors hover:bg-inverse/10",
-                        "data-[placeholder]:text-text-muted",
-                        triggerClassName,
-                    )}
-                >
+			<SelectPrimitive.Trigger id={id} asChild>
+				<button
+					type="button"
+					className={clsx(
+						// width: default full, but allow override via widthClassName
+						widthClassName ?? "w-full",
+						"flex justify-between items-center rounded-[8px] h-10 px-[12px] text-left text-[14px] shrink-0",
+						"outline-none focus:outline-none focus-visible:outline-none focus:ring-0",
+						"bg-inverse/5 transition-colors hover:bg-inverse/10",
+						"data-[placeholder]:text-text-muted",
+						triggerClassName,
+					)}
+				>
 					<div className="flex-1 min-w-0 text-ellipsis overflow-hidden whitespace-nowrap">
 						<SelectPrimitive.Value placeholder={placeholder} />
 					</div>

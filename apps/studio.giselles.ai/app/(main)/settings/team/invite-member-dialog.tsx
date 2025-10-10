@@ -1,19 +1,19 @@
 "use client";
 
-import * as Dialog from "@radix-ui/react-dialog";
-import { Check, ChevronDown, Plus, X } from "lucide-react";
-import { useEffect, useState } from "react";
-import { email as emailValidator, parse, pipe, string } from "valibot";
-import { Select } from "@giselle-internal/ui/select";
-import { GlassButton } from "@/components/ui/glass-button";
-import type { TeamRole } from "@/drizzle";
-import { type SendInvitationsResult, sendInvitationsAction } from "./actions";
 import {
 	GlassDialogBody,
 	GlassDialogContent,
 	GlassDialogFooter,
 	GlassDialogHeader,
 } from "@giselle-internal/ui/glass-dialog";
+import { Select } from "@giselle-internal/ui/select";
+import * as Dialog from "@radix-ui/react-dialog";
+import { Plus, X } from "lucide-react";
+import { useEffect, useState } from "react";
+import { email as emailValidator, parse, pipe, string } from "valibot";
+import { GlassButton } from "@/components/ui/glass-button";
+import type { TeamRole } from "@/drizzle";
+import { type SendInvitationsResult, sendInvitationsAction } from "./actions";
 
 type InviteMemberDialogProps = {
 	memberEmails: string[];
@@ -371,18 +371,18 @@ export function InviteMemberDialog({
 									disabled={isLoading}
 								/>
 							</div>
-                            <Select
-                                id="invite-role"
-                                options={[
-                                    { value: "admin", label: "Admin" },
-                                    { value: "member", label: "Member" },
-                                ]}
-                                placeholder="Role"
-                                value={role}
-                                onValueChange={(v) => setRole(v as TeamRole)}
-                                widthClassName="w-auto min-w-[140px]"
-                                triggerClassName="h-10"
-                            />
+							<Select
+								id="invite-role"
+								options={[
+									{ value: "admin", label: "Admin" },
+									{ value: "member", label: "Member" },
+								]}
+								placeholder="Role"
+								value={role}
+								onValueChange={(v) => setRole(v as TeamRole)}
+								widthClassName="w-auto min-w-[140px]"
+								triggerClassName="h-10"
+							/>
 						</div>
 						{errors.length > 0 && (
 							<div className="mt-1 space-y-1">

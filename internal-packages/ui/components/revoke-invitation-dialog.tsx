@@ -1,5 +1,5 @@
-import { Dialog as DialogPrimitive } from "radix-ui";
 import { AlertTriangle } from "lucide-react";
+import { Dialog as DialogPrimitive } from "radix-ui";
 import { useState } from "react";
 import {
 	GlassDialogContent,
@@ -14,7 +14,6 @@ export interface RevokeInvitationDialogProps {
 	description?: string;
 	email?: string;
 	confirmLabel?: string;
-	cancelLabel?: string;
 	onConfirm: () => Promise<{ success: boolean; error?: string }>;
 	variant?: "default" | "destructive";
 	className?: string;
@@ -27,7 +26,6 @@ export function RevokeInvitationDialog({
 	description = "This will permanently revoke this invitation and prevent the user from joining your team.",
 	email,
 	confirmLabel = "Revoke",
-	cancelLabel = "Cancel",
 	onConfirm,
 	variant = "destructive",
 	className,

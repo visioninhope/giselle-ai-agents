@@ -1,6 +1,5 @@
 "use client";
 import type { TeamRole } from "@/drizzle";
-import { ToastProvider } from "@giselle-internal/ui/toast";
 import type { TeamId } from "@/services/teams/types";
 import type { Invitation } from "./invitation";
 import { InvitationListItem } from "./invitation-list-item";
@@ -29,7 +28,7 @@ export function TeamMembersList({
 	isProPlan,
 	currentUserId,
 }: TeamMembersListProps) {
-    // internal Toast is globally provided via layout; no per-list usage required
+	// internal Toast is globally provided via layout; no per-list usage required
 
 	return (
 		<>
@@ -58,7 +57,7 @@ export function TeamMembersList({
 						currentUserRole={currentUserRole}
 					/>
 				))}
-            {/* Internal toast renders via provider viewport globally */}
+			{/* Internal toast renders via provider viewport globally */}
 		</>
 	);
 }
