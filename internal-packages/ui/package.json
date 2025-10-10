@@ -24,7 +24,9 @@
 		"./separator": "./components/separator.tsx",
 		"./link-muted": "./components/link-muted.tsx",
 		"./tabs": "./components/tabs.tsx",
-		"./inverse-surface": "./components/inverse-surface.tsx"
+		"./inverse-surface": "./components/inverse-surface.tsx",
+		"./page-heading": "./components/page-heading.tsx",
+		"./docs-link": "./components/docs-link.tsx"
 	},
 	"dependencies": {
 		"clsx": "catalog:",

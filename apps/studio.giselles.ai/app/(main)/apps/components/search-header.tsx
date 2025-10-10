@@ -92,14 +92,14 @@ export function SearchHeader({
 		>
 			{/* Search */}
 			<div className="relative flex-1 w-full">
-				<Search className="absolute left-4 top-1/2 -translate-y-1/2 text-black-300 h-4 w-4" />
+				<Search className="absolute left-4 top-1/2 -translate-y-1/2 text-text/60 h-4 w-4" />
 				<Input
 					type="text"
 					placeholder={searchPlaceholder}
 					value={searchQuery}
 					onChange={(e) => onSearchChange(e.target.value)}
 					// Classes match /apps usage exactly (force radius/ring like /apps local Input)
-					className="pl-12 pr-4 h-10 w-full bg-bg text-white placeholder:text-black-400 border-border rounded-[8px] shadow-none focus:border-transparent focus:ring-1 focus:ring-white/20 focus:ring-inset focus:ring-offset-0 focus-visible:border-transparent focus-visible:ring-1 focus-visible:ring-white/20 focus-visible:ring-inset focus-visible:ring-offset-0"
+					className="pl-12 pr-4 h-10 w-full bg-bg text-inverse placeholder:text-link-muted border-border rounded-[8px] shadow-none focus:border-transparent focus:ring-1 focus:ring-inverse/20 focus:ring-inset focus:ring-offset-0 focus-visible:border-transparent focus-visible:ring-1 focus-visible:ring-inverse/20 focus-visible:ring-inset focus-visible:ring-offset-0"
 				/>
 			</div>
 
@@ -122,8 +122,8 @@ export function SearchHeader({
 							onClick={() => onViewModeChange?.("grid")}
 							className={`p-3 flex items-center justify-center transition-colors ${
 								viewMode === "grid"
-									? "bg-white/10 text-white"
-									: "bg-transparent text-black-300 hover:bg-white/5 hover:text-white"
+									? "bg-inverse/10 text-inverse"
+									: "bg-transparent text-text/60 hover:bg-surface/5 hover:text-inverse"
 							}`}
 							aria-label="Grid view"
 						>
@@ -134,8 +134,8 @@ export function SearchHeader({
 							onClick={() => onViewModeChange?.("list")}
 							className={`p-3 flex items-center justify-center transition-colors ${
 								viewMode === "list"
-									? "bg-white/10 text-white"
-									: "bg-transparent text-black-300 hover:bg-white/5 hover:text-white"
+									? "bg-inverse/10 text-inverse"
+									: "bg-transparent text-text/60 hover:bg-surface/5 hover:text-inverse"
 							}`}
 							aria-label="List view"
 						>

@@ -9,6 +9,13 @@ export const supabaseMiddleware = (
 	) => Promise<NextResponse | undefined>,
 ) => {
 	return async (request: NextRequest) => {
+		// Dev safeguard: If Supabase env vars are not set locally, skip auth wiring
+		if (
+			!process.env.NEXT_PUBLIC_SUPABASE_URL ||
+			!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+		) {
+			return NextResponse.next({ request });
+		}
 		let supabaseResponse = NextResponse.next({
 			request,
 		});
