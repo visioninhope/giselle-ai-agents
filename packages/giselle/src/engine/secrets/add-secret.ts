@@ -29,7 +29,7 @@ export async function addSecret(args: {
 	await Promise.all([
 		args.context.storage.setItem(secretPath(secret.id), secret),
 		addWorkspaceIndexItem({
-			storage: args.context.storage,
+			context: args.context,
 			indexPath: workspaceSecretIndexPath(args.workspaceId),
 			item: secret,
 			itemSchema: SecretIndex,

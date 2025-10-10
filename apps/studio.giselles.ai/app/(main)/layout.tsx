@@ -9,7 +9,7 @@ import { Nav } from "./nav";
 export default function Layout({ children }: { children: ReactNode }) {
 	return (
 		<SentryUserWrapper>
-			<div className="h-screen overflow-y-hidden bg-black-900 flex flex-col">
+			<div className="h-screen overflow-y-hidden bg-bg flex flex-col">
 				<header className="flex flex-col">
 					{/* Top row: Logo, Team Selection, User Icon */}
 					<div className="h-[50px] flex items-center px-[24px] justify-between">
@@ -34,9 +34,8 @@ export default function Layout({ children }: { children: ReactNode }) {
 					</div>
 
 					<Nav />
-
 					{/* Border line below navigation */}
-					<div className="h-[1px] w-full bg-black-70/50" />
+					<div className="h-[1px] w-full bg-border" />
 				</header>
 				<main className="flex-1 overflow-y-auto">{children}</main>
 			</div>

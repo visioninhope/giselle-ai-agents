@@ -9,7 +9,7 @@ export async function getWorkspaceActs(args: {
 	workspaceId: WorkspaceId;
 }) {
 	const workspaceActIndices = await getWorkspaceIndex({
-		storage: args.context.storage,
+		context: args.context,
 		indexPath: workspaceActPath(args.workspaceId),
 		itemSchema: ActIndexObject,
 	});

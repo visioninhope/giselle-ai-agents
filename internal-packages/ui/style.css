@@ -78,7 +78,7 @@
 
 	/* ghost */
 	--color-ghost-element-background: #000000;
-	--color-ghost-element-hover: #363c46;
+	--color-ghost-element-hover: rgba(80, 93, 123, 0.2);
 	--color-ghost-element-active: #454a56;
 	--color-ghost-element-selected: #454a56;
 	--color-ghost-element-disabled: #2e343e;

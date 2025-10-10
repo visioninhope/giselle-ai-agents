@@ -79,11 +79,14 @@ export default async function Layout({
 	const aiGateway = await aiGatewayFlag();
 	const resumableGeneration = await resumableGenerationFlag();
 	const googleUrlContext = await googleUrlContextFlag();
+	const data = await giselleEngine.getWorkspace(
+		workspaceId,
+		experimental_storage,
+	);
 	const documentVectorStore = await docVectorStoreFlag();
 	const documentVectorStores = documentVectorStore
 		? await getDocumentVectorStores(workspaceTeam.dbId)
 		: [];
-	const data = await giselleEngine.getWorkspace(workspaceId, true);
 
 	// return children
 	return (

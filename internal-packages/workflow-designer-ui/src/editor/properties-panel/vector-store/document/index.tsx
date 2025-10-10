@@ -211,12 +211,12 @@ export function DocumentVectorStoreNodePropertiesPanel({
 
 	if (!isFeatureEnabled) {
 		return (
-			<div className="flex flex-col gap-3 p-4 text-white-400">
+			<div className="flex flex-col gap-3 p-4 text-inverse">
 				<span>
 					Document vector stores are not available for this workspace.
 				</span>
 				{settingPath && (
-					<Link href={settingPath} className="text-white-300 underline">
+					<Link href={settingPath} className="text-inverse underline">
 						Set Up Vector Store
 					</Link>
 				)}
@@ -236,7 +236,7 @@ export function DocumentVectorStoreNodePropertiesPanel({
 		<div className="flex flex-col gap-[16px] p-0">
 			<div className="space-y-[12px]">
 				<div className="space-y-[4px]">
-					<p className="text-[14px] text-white-400">Document Vector Store</p>
+					<p className="text-[14px] text-inverse">Document Vector Store</p>
 					{isConfiguredButMissingStore && configuredState && (
 						<div className="flex items-center gap-[6px] text-error-900 text-[13px]">
 							<TriangleAlert className="size-[16px]" />
@@ -272,7 +272,7 @@ export function DocumentVectorStoreNodePropertiesPanel({
 				</div>
 
 				{!isLoading && documentStores.length === 0 && (
-					<div className="rounded-md border border-dashed border-white/15 bg-black-900/20 px-4 py-6 text-sm text-white-400">
+					<div className="rounded-md border border-dashed border-border/15 bg-surface/10 px-4 py-6 text-sm text-inverse">
 						No document vector stores available. Create one from settings to use
 						it here.
 					</div>
@@ -281,7 +281,7 @@ export function DocumentVectorStoreNodePropertiesPanel({
 
 			{selectedStore && embeddingProfileOptions.length > 0 && (
 				<div className="space-y-[8px]">
-					<p className="text-[14px] text-white-400">Embedding Model</p>
+					<p className="text-[14px] text-inverse">Embedding Model</p>
 					<Select
 						options={embeddingProfileOptions.map((option) => ({
 							value: option.value.toString(),
@@ -296,15 +296,15 @@ export function DocumentVectorStoreNodePropertiesPanel({
 
 			{selectedStore && (
 				<div className="space-y-[8px]">
-					<p className="text-[14px] text-white-400">Uploaded Sources</p>
+					<p className="text-[14px] text-inverse">Uploaded Sources</p>
 					{selectedStore.sources.length > 0 ? (
 						<ul className="space-y-2">
 							{selectedStore.sources.map((docSource) => (
 								<li
 									key={docSource.id}
-									className="flex items-center justify-between gap-3 rounded-lg border border-white/10 bg-black-950/30 px-3 py-2"
+									className="flex items-center justify-between gap-3 rounded-lg border border-border/10 bg-surface/10 px-3 py-2"
 								>
-									<span className="truncate text-[13px] text-white-400">
+									<span className="truncate text-[13px] text-inverse">
 										{docSource.fileName}
 									</span>
 									<IngestStatusBadge
@@ -315,7 +315,7 @@ export function DocumentVectorStoreNodePropertiesPanel({
 							))}
 						</ul>
 					) : (
-						<div className="rounded-md border border-dashed border-white/10 bg-black-950/20 px-3 py-4 text-[13px] text-white-400/80">
+						<div className="rounded-md border border-dashed border-border/10 bg-surface/10 px-3 py-4 text-[13px] text-inverse/80">
 							No documents uploaded yet.
 						</div>
 					)}
@@ -326,7 +326,7 @@ export function DocumentVectorStoreNodePropertiesPanel({
 				<div className="flex justify-end pt-[8px]">
 					<Link
 						href={settingPath}
-						className="text-[14px] text-white-400 underline hover:text-white-300"
+						className="text-[14px] text-inverse underline hover:text-inverse"
 					>
 						Set Up Vector Store
 					</Link>

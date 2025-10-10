@@ -105,11 +105,11 @@ export function InvitationListItem({
 	};
 
 	return (
-		<div className="px-2 py-4 border-t-[0.5px] border-white/10 first:border-t-0 font-sans">
+		<div className="px-2 py-4 border-t-[0.5px] border-border-muted first:border-t-0 font-sans">
 			<div className="flex items-center justify-between gap-2">
 				<div className="flex gap-x-2 items-center">
 					<div className="flex-shrink-0 opacity-50">
-						<div className="w-9 h-9 rounded-full border border-dashed border-white-400 flex items-center justify-center">
+						<div className="w-9 h-9 rounded-full border border-dashed border-border-muted flex items-center justify-center">
 							{/* Empty circle with dashed border */}
 						</div>
 					</div>
@@ -142,7 +142,7 @@ export function InvitationListItem({
 							</DropdownMenuTrigger>
 							<DropdownMenuContent
 								align="end"
-								className="p-1 border-[0.25px] border-white/10 rounded-[8px] min-w-[165px] bg-black-900 shadow-none"
+								className="p-1 border-[0.25px] border-border-muted rounded-[8px] min-w-[165px] bg-surface shadow-none"
 							>
 								<DropdownMenuItem
 									onSelect={(e) => {

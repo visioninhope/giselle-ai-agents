@@ -5,7 +5,11 @@ import {
 	OutputId,
 	type TriggerNode,
 } from "@giselle-sdk/data-type";
-import { type GitHubTriggerEventId, githubTriggers } from "@giselle-sdk/flow";
+import {
+	type GitHubTriggerEventId,
+	getGitHubDisplayLabel,
+	githubTriggers,
+} from "@giselle-sdk/flow";
 import type { GitHubIntegrationInstallation } from "@giselle-sdk/giselle";
 import {
 	useFeatureFlag,
@@ -332,7 +336,7 @@ export function Installed({
 						<div className="flex gap-[8px] mt-[12px] px-[4px]">
 							<button
 								type="button"
-								className="flex-1 bg-black-700 hover:bg-black-600 text-white font-medium px-4 py-2 rounded-md text-[14px] transition-colors disabled:opacity-50 relative"
+								className="flex-1 bg-bg-700 hover:bg-bg-600 text-inverse font-medium px-4 py-2 rounded-md text-[14px] transition-colors disabled:opacity-50 relative"
 								onClick={() => {
 									setStep({
 										state: "select-repository",
@@ -345,7 +349,7 @@ export function Installed({
 							</button>
 							<button
 								type="button"
-								className="flex-1 bg-primary-900 hover:bg-primary-800 text-white font-medium px-4 py-2 rounded-md text-[14px] transition-colors disabled:opacity-50 relative"
+								className="flex-1 bg-primary-900 hover:bg-primary-800 text-inverse font-medium px-4 py-2 rounded-md text-[14px] transition-colors disabled:opacity-50 relative"
 								onClick={() => {
 									if (
 										isTriggerRequiringCallsign(step.eventId) &&
@@ -378,7 +382,10 @@ export function Installed({
 													.options) {
 													outputs.push({
 														id: OutputId.generate(),
-														label: key,
+														label: getGitHubDisplayLabel({
+															eventId: step.eventId,
+															accessor: key,
+														}),
 														accessor: key,
 													});
 												}
@@ -426,7 +433,10 @@ export function Installed({
 													},
 													outputs:
 														node.outputs.length > 0 ? node.outputs : outputs,
-													name: node.name ?? `On ${trigger.event.label}`,
+													name:
+														node.content.state.status === "reconfiguring"
+															? node.name
+															: `On ${trigger.event.label}`,
 												});
 											} catch (_error) {
 												// Error is handled by the UI state
@@ -444,7 +454,7 @@ export function Installed({
 								{isPending && (
 									<span className="absolute inset-0 flex items-center justify-center">
 										<svg
-											className="animate-spin h-5 w-5 text-white"
+											className="animate-spin h-5 w-5 text-inverse"
 											xmlns="http://www.w3.org/2000/svg"
 											fill="none"
 											viewBox="0 0 24 24"
@@ -515,7 +525,7 @@ export function Installed({
 									"group w-full flex justify-between items-center rounded-[8px] py-[8px] pl-[28px] pr-[4px] outline-none focus:outline-none",
 									callsignError
 										? "border border-red-500 focus:border-red-400"
-										: "border border-white-400 focus:border-white-900",
+										: "border border-white-400 focus:border-border",
 									"text-[14px] bg-transparent",
 								)}
 								placeholder="code-review"
@@ -524,7 +534,7 @@ export function Installed({
 						{callsignError ? (
 							<p className="text-[12px] text-red-400 pl-2">{callsignError}</p>
 						) : (
-							<p className="text-[12px] text-white-400 pl-2">
+							<p className="text-[12px] text-inverse pl-2">
 								A callsign is required for issue comment triggers. Examples:
 								/code-review, /check-policy
 							</p>
@@ -534,7 +544,7 @@ export function Installed({
 					<div className="pt-[8px] flex gap-[8px] mt-[12px] px-[4px]">
 						<button
 							type="button"
-							className="flex-1 bg-black-700 hover:bg-black-600 text-white font-medium px-4 py-2 rounded-md text-[14px] transition-colors disabled:opacity-50 relative"
+							className="flex-1 bg-bg-700 hover:bg-bg-600 text-inverse font-medium px-4 py-2 rounded-md text-[14px] transition-colors disabled:opacity-50 relative"
 							onClick={() => {
 								setCallsignError(null);
 								setStep({
@@ -550,7 +560,7 @@ export function Installed({
 						</button>
 						<button
 							type="submit"
-							className="flex-1 bg-primary-900 hover:bg-primary-800 text-white font-medium px-4 py-2 rounded-md text-[14px] transition-colors disabled:opacity-50 relative"
+							className="flex-1 bg-primary-900 hover:bg-primary-800 text-inverse font-medium px-4 py-2 rounded-md text-[14px] transition-colors disabled:opacity-50 relative"
 							disabled={isTriggerConfigPending}
 						>
 							<span className={isTriggerConfigPending ? "opacity-0" : ""}>
@@ -559,7 +569,7 @@ export function Installed({
 							{isTriggerConfigPending && (
 								<span className="absolute inset-0 flex items-center justify-center">
 									<svg
-										className="animate-spin h-5 w-5 text-white"
+										className="animate-spin h-5 w-5 text-inverse"
 										xmlns="http://www.w3.org/2000/svg"
 										fill="none"
 										viewBox="0 0 24 24"

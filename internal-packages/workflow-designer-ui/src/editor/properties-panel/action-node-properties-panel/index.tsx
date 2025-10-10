@@ -57,7 +57,7 @@ export function ActionNodePropertiesPanel({ node }: { node: ActionNode }) {
 	return (
 		<PropertiesPanelRoot>
 			<PropertiesPanelHeader
-				icon={<NodeIcon node={node} className="size-[20px] text-black-900" />}
+				icon={<NodeIcon node={node} className="size-[20px] text-inverse" />}
 				node={node}
 				onChangeName={(name) => {
 					updateNodeData(node, { name });

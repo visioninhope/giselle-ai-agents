@@ -29,14 +29,14 @@ export function EventSelectionStep({ onSelectEvent }: EventSelectionStepProps) {
 						onClick={() => onSelectEvent(id as GitHubTriggerEventId)}
 					>
 						<div className="flex items-center min-w-0 flex-1">
-							<div className="p-2 rounded-lg mr-3 bg-white/10 group-hover:bg-white/20 transition-colors flex-shrink-0 flex items-center justify-center">
+							<div className="p-2 rounded-lg mr-3 bg-bg/10 group-hover:bg-bg/20 transition-colors flex-shrink-0 flex items-center justify-center">
 								{getTriggerIcon(id as GitHubTriggerEventId)}
 							</div>
 							<div className="flex flex-col text-left overflow-hidden min-w-0">
-								<span className="text-white-800 font-medium text-[14px] truncate">
+								<span className="text-inverse font-medium text-[14px] truncate">
 									{githubTrigger.event.label}
 								</span>
-								<span className="text-white-400 text-[12px] truncate group-hover:text-white-300 transition-colors pr-6">
+								<span className="text-inverse text-[12px] truncate group-hover:text-inverse transition-colors pr-6">
 									{`Trigger when ${githubTrigger.event.label.toLowerCase()} in your repository`}
 								</span>
 							</div>

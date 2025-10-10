@@ -69,12 +69,12 @@ async function MyAgentList() {
 					</div>
 
 					<Link href={`/workspaces/${agent.workspaceId}`}>
-						<div className="bg-white-850/10 p-[16px] relative rounded-[8px] transition-all duration-300 hover:shadow-lg h-full flex flex-col">
+						<div className="bg-surface/10 p-[16px] relative rounded-[8px] transition-all duration-300 hover:shadow-lg h-full flex flex-col">
 							{/* Upper padding area (for menu buttons) */}
 							<div className="h-[20px] mb-1.5" />
 
 							{/* Thumbnail */}
-							<div className="h-[150px] bg-black-80 rounded-[8px] mb-4" />
+							<div className="h-[150px] bg-white/10 rounded-[8px] mb-4" />
 
 							<div className="flex-grow">
 								<h3 className="font-sans text-white-400 text-[16px] font-semibold mb-1 line-clamp-2">
@@ -83,7 +83,7 @@ async function MyAgentList() {
 							</div>
 
 							<div className="mt-auto">
-								<div className="border-t-[0.5px] border-black-400 my-4" />
+								<div className="border-t-[0.5px] border-border my-4" />
 								<div className="flex justify-between items-center">
 									<span className="text-white-400 text-xs font-geist truncate max-w-[200px]">
 										Edited by you -{" "}
@@ -95,7 +95,7 @@ async function MyAgentList() {
 							</div>
 
 							<div className="absolute z-0 inset-0 border-[0.5px] rounded-[8px] mask-fill bg-gradient-to-br from-[#7182AA80] to-[#02075066] bg-origin-border bg-clip-boarder border-transparent transition-all duration-300" />
-							<div className="absolute z-1 inset-0 border-[0.5px] border-white-900 rounded-[8px] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+							<div className="absolute z-1 inset-0 border-[0.5px] border-border rounded-[8px] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 						</div>
 					</Link>
 				</div>

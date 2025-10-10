@@ -2,8 +2,6 @@ import { WorkspaceId } from "@giselle-sdk/data-type";
 import type {
 	CompletedGeneration,
 	FailedGeneration,
-	GenerationCompleteCallbackFunctionArgs,
-	GenerationFailedCallbackFunctionArgs,
 	OutputFileBlob,
 	QueryContext,
 	RunningGeneration,
@@ -24,6 +22,7 @@ import type { ModelMessage, ProviderMetadata } from "ai";
 import { after } from "next/server";
 import { createStorage } from "unstorage";
 import { waitForLangfuseFlush } from "@/instrumentation.node";
+import { GenerationMetadata } from "@/lib/generation-metadata";
 import { logger } from "@/lib/logger";
 import { getWorkspaceTeam } from "@/lib/workspaces/get-workspace-team";
 import { fetchUsageLimits } from "@/packages/lib/fetch-usage-limits";
@@ -35,6 +34,8 @@ import {
 	isProPlan,
 } from "@/services/teams";
 import supabaseStorageDriver from "@/supabase-storage-driver";
+import type { runActJob } from "@/trigger/run-act-job";
+import { getDocumentVectorStoreQueryService } from "../lib/vector-stores/document/query/service";
 import {
 	gitHubPullRequestQueryService,
 	gitHubQueryService,
@@ -150,119 +151,71 @@ async function traceEmbeddingForTeam(args: {
 	const planTag = isPro ? "plan:pro" : "plan:free";
 	const teamTypeTag = `teamType:${args.team.type}`;
 
-	if (args.queryContext.provider !== "github") {
-		throw new Error(`Unsupported provider: ${args.queryContext.provider}`);
-	}
+	const { queryContext } = args;
+	const baseMetadata = {
+		generationId: args.generation.id,
+		teamId: args.team.id,
+		isProPlan: isPro,
+		teamType: args.team.type,
+		userId: args.userId,
+		subscriptionId: args.team.activeSubscriptionId ?? "",
+		resourceProvider: queryContext.provider,
+		workspaceId: queryContext.workspaceId,
+		embeddingProfileId: queryContext.embeddingProfileId,
+	};
 
-	await traceEmbedding({
+	const traceArgs = {
 		metrics: args.metrics,
 		userId: args.userId,
 		sessionId: args.sessionId,
 		tags: [planTag, teamTypeTag, "embedding-purpose:query"],
-		metadata: {
-			generationId: args.generation.id,
-			teamId: args.team.id,
-			isProPlan: isPro,
-			teamType: args.team.type,
-			userId: args.userId,
-			subscriptionId: args.team.activeSubscriptionId ?? "",
-			resourceProvider: args.queryContext.provider,
-			resourceContentType: args.queryContext.contentType,
-			resourceOwner: args.queryContext.owner,
-			resourceRepo: args.queryContext.repo,
-		},
-	});
-}
+	};
 
-type GenerationTraceArgs = {
-	generation: CompletedGeneration | FailedGeneration;
-	inputMessages: ModelMessage[];
-	outputFileBlobs?: OutputFileBlob[];
-	providerMetadata?: ProviderMetadata;
-	requestId?: string;
-};
-
-function handleGenerationTrace(args: GenerationTraceArgs) {
-	after(async () => {
-		try {
-			switch (args.generation.context.origin.type) {
-				case "github-app": {
-					const team = await getWorkspaceTeam(
-						args.generation.context.origin.workspaceId,
-					);
-					await traceGenerationForTeam({
-						generation: args.generation,
-						inputMessages: args.inputMessages,
-						outputFileBlobs: args.outputFileBlobs,
-						sessionId: args.generation.context.origin.actId,
-						userId: "github-app",
-						team,
-						providerMetadata: args.providerMetadata,
-						requestId: args.requestId,
-					});
-					break;
-				}
-				case "stage":
-				case "studio": {
-					const [currentUser, currentTeam] = await Promise.all([
-						fetchCurrentUser(),
-						fetchCurrentTeam(),
-					]);
-					await traceGenerationForTeam({
-						generation: args.generation,
-						inputMessages: args.inputMessages,
-						outputFileBlobs: args.outputFileBlobs,
-						sessionId: args.generation.context.origin.actId,
-						userId: currentUser.id,
-						team: currentTeam,
-						providerMetadata: args.providerMetadata,
-						requestId: args.requestId,
-					});
-					break;
-				}
-				default: {
-					const _exhaustiveCheck: never = args.generation.context.origin;
-					throw new Error(`Unhandled origin type: ${_exhaustiveCheck}`);
-				}
-			}
-		} catch (error) {
-			console.error("Trace generation failed:", error);
+	switch (queryContext.provider) {
+		case "github": {
+			await traceEmbedding({
+				...traceArgs,
+				metadata: {
+					...baseMetadata,
+					resourceContentType: queryContext.contentType,
+					resourceOwner: queryContext.owner,
+					resourceRepo: queryContext.repo,
+				},
+			});
+			break;
 		}
-	});
+		case "document": {
+			await traceEmbedding({
+				...traceArgs,
+				metadata: {
+					...baseMetadata,
+					documentVectorStoreId: queryContext.documentVectorStoreId,
+				},
+			});
+			break;
+		}
+		default: {
+			const _exhaustiveCheck: never = queryContext;
+			throw new Error(`Unsupported provider: ${_exhaustiveCheck}`);
+		}
+	}
 }
+
+function getRuntimeEnv(): "trigger.dev" | "vercel" | "local" | "unknown" {
+	if (process.env.TRIGGERDOTDEV === "1") return "trigger.dev";
+	if (process.env.VERCEL === "1") return "vercel";
+	if (process.env.NODE_ENV === "development") return "local";
+	return "unknown";
+}
+
+const runtimeEnv = getRuntimeEnv();
 
 const generateContentProcessor =
-	process.env.TRIGGERDOTDEV === "1" ||
-	(process.env.VERCEL === "1" && process.env.NODE_ENV !== "development")
+	process.env.USE_TRIGGER_DEV === "1" ||
+	runtimeEnv === "trigger.dev" ||
+	(runtimeEnv === "vercel" && process.env.NODE_ENV !== "development")
 		? "trigger.dev"
 		: "self";
-
-const generationTracingCallbacks = {
-	generationComplete: (args: GenerationCompleteCallbackFunctionArgs) => {
-		// Hotfix: Implemented delegation of text generation to trigger.dev, but delegation is not working for Act cases.
-		// Also, tracing is not performed, so for Act cases, execute on Vercel Functions and perform tracing as well.
-		if (
-			generateContentProcessor === "trigger.dev" &&
-			args.generation.context.origin.type === "studio"
-		) {
-			return;
-		}
-		const requestId = getRequestId();
-		handleGenerationTrace({ ...args, requestId });
-	},
-	generationFailed: (args: GenerationFailedCallbackFunctionArgs) => {
-		// Hotfix: Implemented delegation of text generation to trigger.dev, but delegation is not working for Act cases.
-		// Also, tracing is not performed, so for Act cases, execute on Vercel Functions and perform tracing as well.
-		if (
-			generateContentProcessor === "trigger.dev" &&
-			args.generation.context.origin.type === "studio"
-		) {
-			return;
-		}
-		const requestId = getRequestId();
-		handleGenerationTrace({ ...args, requestId });
-	},
-};
 
 export const giselleEngine = NextGiselleEngine({
 	basePath: "/api/giselle",
@@ -300,52 +253,129 @@ export const giselleEngine = NextGiselleEngine({
 	vectorStoreQueryServices: {
 		github: gitHubQueryService,
 		githubPullRequest: gitHubPullRequestQueryService,
+		document: getDocumentVectorStoreQueryService(),
 	},
 	callbacks: {
-		...generationTracingCallbacks,
-		embeddingComplete: (args) => {
-			after(async () => {
-				try {
-					switch (args.generation.context.origin.type) {
-						case "github-app": {
-							const team = await getWorkspaceTeam(
-								args.generation.context.origin.workspaceId,
-							);
-							await traceEmbeddingForTeam({
-								metrics: args.embeddingMetrics,
-								generation: args.generation,
-								queryContext: args.queryContext,
-								sessionId: args.generation.context.origin.actId,
-								userId: "github-app",
-								team,
-							});
-							break;
-						}
-						case "stage":
-						case "studio": {
-							const [currentUser, currentTeam] = await Promise.all([
-								fetchCurrentUser(),
-								fetchCurrentTeam(),
-							]);
-							await traceEmbeddingForTeam({
-								metrics: args.embeddingMetrics,
-								generation: args.generation,
-								queryContext: args.queryContext,
-								sessionId: args.generation.context.origin.actId,
-								userId: currentUser.id,
-								team: currentTeam,
-							});
-							break;
-						}
-						default: {
-							const _exhaustiveCheck: never = args.generation.context.origin;
-							throw new Error(`Unhandled origin type: ${_exhaustiveCheck}`);
-						}
-					}
-				} catch (error) {
-					console.error("Embedding callback failed:", error);
-				}
+		generationComplete: async (args) => {
+			if (runtimeEnv === "trigger.dev") {
+				const parsedMetadata = GenerationMetadata.parse(
+					args.generationMetadata,
+				);
+				await traceGenerationForTeam({
+					...args,
+					requestId: parsedMetadata.requestId,
+					userId: parsedMetadata.userId,
+					sessionId: args.generation.context.origin.actId,
+					team: {
+						id: parsedMetadata.team.id,
+						type: parsedMetadata.team.type,
+						activeSubscriptionId: parsedMetadata.team.subscriptionId,
+					},
+				});
+				return;
+			}
+			const requestId = getRequestId();
+			const [currentUser, currentTeam] = await Promise.all([
+				fetchCurrentUser(),
+				fetchCurrentTeam(),
+			]);
+			await traceGenerationForTeam({
+				...args,
+				requestId,
+				userId: currentUser.id,
+				team: currentTeam,
 			});
+		},
+		generationFailed: async (args) => {
+			if (runtimeEnv === "trigger.dev") {
+				const parsedMetadata = GenerationMetadata.parse(
+					args.generationMetadata,
+				);
+				await traceGenerationForTeam({
+					...args,
+					requestId: parsedMetadata.requestId,
+					userId: parsedMetadata.userId,
+					sessionId: args.generation.context.origin.actId,
+					team: {
+						id: parsedMetadata.team.id,
+						type: parsedMetadata.team.type,
+						activeSubscriptionId: parsedMetadata.team.subscriptionId,
+					},
+				});
+				return;
+			}
+			const requestId = getRequestId();
+			const [currentUser, currentTeam] = await Promise.all([
+				fetchCurrentUser(),
+				fetchCurrentTeam(),
+			]);
+			await traceGenerationForTeam({
+				...args,
+				requestId,
+				userId: currentUser.id,
+				team: currentTeam,
+			});
+		},
+		embeddingComplete: async (args) => {
+			try {
+				if (runtimeEnv === "trigger.dev") {
+					const parsedMetadata = GenerationMetadata.parse(
+						args.generationMetadata,
+					);
+
+					await traceEmbeddingForTeam({
+						metrics: args.embeddingMetrics,
+						generation: args.generation,
+						queryContext: args.queryContext,
+						sessionId: args.generation.context.origin.actId,
+						userId: parsedMetadata.userId,
+						team: {
+							id: parsedMetadata.team.id,
+							type: parsedMetadata.team.type,
+							activeSubscriptionId: parsedMetadata.team.subscriptionId,
+						},
+					});
+					return;
+				}
+				switch (args.generation.context.origin.type) {
+					case "github-app": {
+						const team = await getWorkspaceTeam(
+							args.generation.context.origin.workspaceId,
+						);
+						await traceEmbeddingForTeam({
+							metrics: args.embeddingMetrics,
+							generation: args.generation,
+							queryContext: args.queryContext,
+							sessionId: args.generation.context.origin.actId,
+							userId: "github-app",
+							team,
+						});
+						break;
+					}
+					case "stage":
+					case "studio": {
+						const [currentUser, currentTeam] = await Promise.all([
+							fetchCurrentUser(),
+							fetchCurrentTeam(),
+						]);
+						await traceEmbeddingForTeam({
+							metrics: args.embeddingMetrics,
+							generation: args.generation,
+							queryContext: args.queryContext,
+							sessionId: args.generation.context.origin.actId,
+							userId: currentUser.id,
+							team: currentTeam,
+						});
+						break;
+					}
+					default: {
+						const _exhaustiveCheck: never = args.generation.context.origin;
+						throw new Error(`Unhandled origin type: ${_exhaustiveCheck}`);
+					}
+				}
+			} catch (error) {
+				console.error("Embedding callback failed:", error);
+			}
 		},
 	},
 	vectorStore: openaiVectorStore(process.env.OPENAI_API_KEY ?? ""),
@@ -361,10 +391,36 @@ export const giselleEngine = NextGiselleEngine({
 	waitUntil: after,
 });
 
-// In Vercel environment, execute generateContent with trigger
-// In local environment, use Next.js (default behavior).
+// Content generation processor: Trigger.dev implementation
+//
+// This processor delegates content generation to Trigger.dev jobs.
+// The branching logic handles two main flows:
+//
+// 1. setGenerateContentProcess:
+//    - Determines user context based on generation origin:
+//      a) "github-app": GitHub App automation (no authenticated user)
+//         → Fetch team from workspaceId, use "github-app" as userId
+//      b) "stage" / "studio": Interactive user sessions
+//         → Further branch by runtimeEnv:
+//            - "local" / "vercel" / "unknown": Outside Trigger.dev context
+//              → Fetch currentUser and currentTeam from session
+//            - "trigger.dev": Already inside a Trigger.dev job
+//              → Parse user/team from metadata to avoid circular auth calls
+//
+// 2. setRunActProcess:
+//    - Determines user context based on generationOriginType:
+//      a) "github-app": GitHub App automation
+//         → Fetch team from workspaceId, use "github-app" as userId
+//      b) "stage" / "studio": Interactive user sessions
+//         → Fetch currentUser and currentTeam from session
+//
+// Key insight:
+// - "github-app" origin has no authenticated user → derive context from workspaceId
+// - "stage"/"studio" origin needs user context → fetch from session or metadata
+// - When already inside Trigger.dev (runtimeEnv === "trigger.dev"),
+//   use metadata to avoid re-fetching auth state
 if (generateContentProcessor === "trigger.dev") {
-	giselleEngine.setGenerateContentProcess(async ({ generation }) => {
+	giselleEngine.setGenerateContentProcess(async ({ generation, metadata }) => {
 		const requestId = getRequestId();
 		switch (generation.context.origin.type) {
 			case "github-app": {
@@ -385,12 +441,76 @@ if (generateContentProcessor === "trigger.dev") {
 			}
 			case "stage":
 			case "studio": {
+				switch (runtimeEnv) {
+					case "local":
+					case "vercel":
+					case "unknown": {
+						const [currentUser, currentTeam] = await Promise.all([
+							fetchCurrentUser(),
+							fetchCurrentTeam(),
+						]);
+						await jobs.trigger<typeof generateContentJob>("generate-content", {
+							generationId: generation.id,
+							requestId,
+							userId: currentUser.id,
+							team: {
+								id: currentTeam.id,
+								type: currentTeam.type,
+								subscriptionId: currentTeam.activeSubscriptionId,
+							},
+						});
+						break;
+					}
+					case "trigger.dev": {
+						const parsedMetadata = GenerationMetadata.parse(metadata);
+						await jobs.trigger<typeof generateContentJob>("generate-content", {
+							generationId: generation.id,
+							requestId,
+							...parsedMetadata,
+						});
+						break;
+					}
+					default: {
+						const _exhaustiveCheck: never = runtimeEnv;
+						throw new Error(`Unhandled runtimeEnv: ${_exhaustiveCheck}`);
+					}
+				}
+				break;
+			}
+			default: {
+				const _exhaustiveCheck: never = generation.context.origin;
+				throw new Error(`Unhandled origin type: ${_exhaustiveCheck}`);
+			}
+		}
+	});
+
+	giselleEngine.setRunActProcess(async ({ act, generationOriginType }) => {
+		const requestId = getRequestId();
+		switch (generationOriginType) {
+			case "github-app": {
+				const team = await getWorkspaceTeam(act.workspaceId);
+
+				await jobs.trigger<typeof runActJob>("run-act-job", {
+					actId: act.id,
+					requestId,
+					userId: "github-app",
+					team: {
+						id: team.id,
+						type: team.type,
+						subscriptionId: team.activeSubscriptionId,
+					},
+				});
+				break;
+			}
+			case "stage":
+			case "studio": {
 				const [currentUser, currentTeam] = await Promise.all([
 					fetchCurrentUser(),
 					fetchCurrentTeam(),
 				]);
-				await jobs.trigger<typeof generateContentJob>("generate-content", {
-					generationId: generation.id,
+
+				await jobs.trigger<typeof runActJob>("run-act-job", {
+					actId: act.id,
 					requestId,
 					userId: currentUser.id,
 					team: {
@@ -402,7 +522,7 @@ if (generateContentProcessor === "trigger.dev") {
 				break;
 			}
 			default: {
-				const _exhaustiveCheck: never = generation.context.origin;
+				const _exhaustiveCheck: never = generationOriginType;
 				throw new Error(`Unhandled origin type: ${_exhaustiveCheck}`);
 			}
 		}

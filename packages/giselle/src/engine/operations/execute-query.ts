@@ -2,6 +2,8 @@ import {
 	DEFAULT_EMBEDDING_PROFILE_ID,
 	DEFAULT_MAX_RESULTS,
 	DEFAULT_SIMILARITY_THRESHOLD,
+	type DocumentVectorStoreSource,
+	type GitHubVectorStoreSource,
 	isQueryNode,
 	isTextNode,
 	NodeId,
@@ -10,10 +12,7 @@ import {
 	type VectorStoreNode,
 	type WorkspaceId,
 } from "@giselle-sdk/data-type";
-import type {
-	EmbeddingCompleteCallback,
-	EmbeddingMetrics,
-} from "@giselle-sdk/rag";
+import type { EmbeddingMetrics } from "@giselle-sdk/rag";
 import {
 	isJsonContent,
 	jsonContentToText,
@@ -23,6 +22,7 @@ import type { GiselleStorage } from "../experimental_storage";
 import {
 	type FailedGeneration,
 	GenerationContext,
+	type GenerationMetadata,
 	type GenerationOutput,
 	isCompletedGeneration,
 	type QueuedGeneration,
@@ -35,35 +35,20 @@ import {
 	queryResultToText,
 } from "../generations/utils";
 import type {
-	EmbeddingCompleteCallbackFunction,
+	DocumentVectorStoreQueryContext,
 	GiselleEngineContext,
 	GitHubQueryContext,
-	QueryContext,
 } from "../types";
-
-function createEngineEmbeddingCallback(
-	generation: RunningGeneration,
-	queryContext: QueryContext,
-	callback?: EmbeddingCompleteCallbackFunction,
-): EmbeddingCompleteCallback | undefined {
-	if (!callback) return undefined;
-
-	return async (embeddingMetrics: EmbeddingMetrics) => {
-		try {
-			await callback({ embeddingMetrics, generation, queryContext });
-		} catch (error) {
-			console.error("Embedding callback error:", error);
-		}
-	};
-}
 
 export function executeQuery(args: {
 	context: GiselleEngineContext;
 	generation: QueuedGeneration;
+	metadata?: GenerationMetadata;
 }) {
 	return useGenerationExecutor({
 		context: args.context,
 		generation: args.generation,
+		metadata: args.metadata,
 		execute: async ({
 			runningGeneration,
 			generationContext,
@@ -100,6 +85,7 @@ export function executeQuery(args: {
 					vectorStoreNodes as VectorStoreNode[],
 					operationNode.content.maxResults,
 					operationNode.content.similarityThreshold,
+					args.metadata,
 				);
 
 				const outputId = generationContext.operationNode.outputs.find(
@@ -280,24 +266,34 @@ async function resolveQuery(
 	return resolvedQuery;
 }
 
+type ConfiguredGitHubVectorStoreSource = GitHubVectorStoreSource & {
+	state: Extract<GitHubVectorStoreSource["state"], { status: "configured" }>;
+};
+
+type ConfiguredDocumentVectorStoreSource = DocumentVectorStoreSource & {
+	state: Extract<DocumentVectorStoreSource["state"], { status: "configured" }>;
+};
+
+type ConfiguredVectorStoreSource =
+	| ConfiguredGitHubVectorStoreSource
+	| ConfiguredDocumentVectorStoreSource;
+
 function isConfiguredVectorStoreNode(
 	vectorStoreNode: VectorStoreNode,
 ): vectorStoreNode is VectorStoreNode & {
 	content: {
-		source: {
-			state: {
-				status: "configured";
-				owner: string;
-				repo: string;
-				contentType: "blob" | "pull_request";
-			};
-		};
+		source: ConfiguredVectorStoreSource;
 	};
 } {
 	const { content } = vectorStoreNode;
 	const { source } = content;
-	const { state } = source;
-	return state.status === "configured";
+	const { provider, state } = source;
+
+	if (state.status !== "configured") {
+		return false;
+	}
+
+	return provider === "github" || provider === "document";
 }
 
 async function queryVectorStore(
@@ -308,6 +304,7 @@ async function queryVectorStore(
 	vectorStoreNodes: VectorStoreNode[],
 	maxResults?: number,
 	similarityThreshold?: number,
+	metadata?: GenerationMetadata,
 ) {
 	if (vectorStoreNodes.length === 0) {
 		return [];
@@ -353,18 +350,20 @@ async function queryVectorStore(
 									contentType: "blob",
 									embeddingProfileId,
 								};
-								const embeddingCallback = createEngineEmbeddingCallback(
-									runningGeneration,
-									queryContext,
-									context.callbacks?.embeddingComplete,
-								);
 
 								const res = await vectorStoreQueryServices.github.search(
 									query,
 									queryContext,
 									maxResults ?? DEFAULT_MAX_RESULTS,
 									similarityThreshold ?? DEFAULT_SIMILARITY_THRESHOLD,
-									embeddingCallback,
+									async (embeddingMetrics: EmbeddingMetrics) => {
+										await context.callbacks?.embeddingComplete?.({
+											embeddingMetrics,
+											generation: runningGeneration,
+											queryContext,
+											generationMetadata: metadata,
+										});
+									},
 								);
 								return {
 									type: "vector-store" as const,
@@ -398,11 +397,6 @@ async function queryVectorStore(
 									contentType: "pullRequest",
 									embeddingProfileId,
 								};
-								const embeddingCallback = createEngineEmbeddingCallback(
-									runningGeneration,
-									queryContext,
-									context.callbacks?.embeddingComplete,
-								);
 
 								const res =
 									await vectorStoreQueryServices.githubPullRequest.search(
@@ -410,7 +404,14 @@ async function queryVectorStore(
 										queryContext,
 										maxResults ?? DEFAULT_MAX_RESULTS,
 										similarityThreshold ?? DEFAULT_SIMILARITY_THRESHOLD,
-										embeddingCallback,
+										async (embeddingMetrics: EmbeddingMetrics) => {
+											await context.callbacks?.embeddingComplete?.({
+												embeddingMetrics,
+												generation: runningGeneration,
+												queryContext,
+												generationMetadata: metadata,
+											});
+										},
 									);
 								return {
 									type: "vector-store" as const,
@@ -440,9 +441,51 @@ async function queryVectorStore(
 					}
 
 					case "document": {
-						throw new Error(
-							"Document vector store query is not yet implemented",
+						if (!vectorStoreQueryServices?.document) {
+							throw new Error(
+								"No document vector store query service provided",
+							);
+						}
+
+						const embeddingProfileId =
+							state.embeddingProfileId ?? DEFAULT_EMBEDDING_PROFILE_ID;
+						const queryContext: DocumentVectorStoreQueryContext = {
+							provider: "document",
+							workspaceId,
+							documentVectorStoreId: state.documentVectorStoreId,
+							embeddingProfileId,
+						};
+
+						const res = await vectorStoreQueryServices.document.search(
+							query,
+							queryContext,
+							maxResults ?? DEFAULT_MAX_RESULTS,
+							similarityThreshold ?? DEFAULT_SIMILARITY_THRESHOLD,
+							async (embeddingMetrics: EmbeddingMetrics) => {
+								await context.callbacks?.embeddingComplete?.({
+									embeddingMetrics,
+									generation: runningGeneration,
+									queryContext,
+									generationMetadata: metadata,
+								});
+							},
 						);
+						return {
+							type: "vector-store" as const,
+							source,
+							records: res.map((result) => ({
+								chunkContent: result.chunk.content,
+								chunkIndex: result.chunk.index,
+								score: result.similarity,
+								metadata: Object.fromEntries(
+									Object.entries(result.metadata ?? {}).map(([key, value]) => [
+										key,
+										String(value),
+									]),
+								),
+								additional: result.additional,
+							})),
+						};
 					}
 
 					default: {

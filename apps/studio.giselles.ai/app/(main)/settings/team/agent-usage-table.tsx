@@ -28,10 +28,10 @@ export function AgentUsageTable({
 			<div className={containerClassName}>
 				<div className="px-2">
 					{activities.length > 0 ? (
-						activities.map((activity) => (
+						activities.map((activity, idx) => (
 							<div
-								key={`${activity.agentId}-${activity.startTime}`}
-								className="grid grid-cols-4 items-center gap-1 py-2 border-b-[0.5px] border-black-400 text-white-400 font-sans font-medium text-[12px] leading-[14.4px] tracking-normal"
+								key={`${activity.agentId}-${new Date(activity.startTime).getTime()}-${idx}`}
+								className="grid grid-cols-4 items-center gap-1 py-2 border-b-[0.5px] border-border text-white-400 font-sans font-medium text-[12px] leading-[14.4px] tracking-normal"
 							>
 								<div className="break-words max-w-xs text-blue-80">
 									{activity.agentName ?? activity.agentId}

@@ -19,6 +19,7 @@
 	},
 	"packageManager": "pnpm@10.16.0",
 	"dependencies": {
+		"@embedpdf/pdfium": "catalog:",
 		"@aws-sdk/client-s3": "catalog:",
 		"@giselle-internal/ui": "workspace:*",
 		"@giselle-internal/workflow-designer-ui": "workspace:*",

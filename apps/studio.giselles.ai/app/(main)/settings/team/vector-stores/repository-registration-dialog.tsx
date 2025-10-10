@@ -152,7 +152,7 @@ export function RepositoryRegistrationDialog({
 									<DropdownMenuTrigger asChild>
 										<button
 											type="button"
-											className="w-full px-3 py-2 bg-black-300/20 rounded-[8px] text-white-400 text-[14px] font-geist placeholder:text-white/30 cursor-pointer text-left flex items-center justify-between"
+											className="w-full px-3 py-2 bg-surface rounded-[8px] text-white-400 text-[14px] font-geist placeholder:text-white/30 cursor-pointer text-left flex items-center justify-between"
 											disabled={isPending}
 										>
 											<span
@@ -170,7 +170,7 @@ export function RepositoryRegistrationDialog({
 									</DropdownMenuTrigger>
 									<DropdownMenuContent
 										align="start"
-										className="w-[var(--radix-dropdown-menu-trigger-width)] max-h-[min(60svh,320px)] overflow-y-auto rounded-[8px] border-[0.25px] border-white/10 bg-black-850 p-1 shadow-none"
+										className="w-[var(--radix-dropdown-menu-trigger-width)] max-h-[min(60svh,320px)] overflow-y-auto rounded-[8px] border-[0.25px] border-border-muted bg-surface p-1 shadow-none"
 									>
 										{installationsWithRepos.map(({ installation }) => (
 											<button
@@ -207,7 +207,7 @@ export function RepositoryRegistrationDialog({
 									<DropdownMenuTrigger asChild>
 										<button
 											type="button"
-											className="w-full px-3 py-2 bg-black-300/20 rounded-[8px] text-white-400 text-[14px] font-geist cursor-pointer disabled:opacity-50 text-left flex items-center justify-between"
+											className="w-full px-3 py-2 bg-surface rounded-[8px] text-white-400 text-[14px] font-geist cursor-pointer disabled:opacity-50 text-left flex items-center justify-between"
 											disabled={isPending || !ownerId}
 										>
 											<span
@@ -228,7 +228,7 @@ export function RepositoryRegistrationDialog({
 									</DropdownMenuTrigger>
 									<DropdownMenuContent
 										align="start"
-										className="w-[var(--radix-dropdown-menu-trigger-width)] max-h-[min(60svh,320px)] overflow-y-auto rounded-[8px] border-[0.25px] border-white/10 bg-black-850 p-1 shadow-none"
+										className="w-[var(--radix-dropdown-menu-trigger-width)] max-h-[min(60svh,320px)] overflow-y-auto rounded-[8px] border-[0.25px] border-border-muted bg-surface p-1 shadow-none"
 									>
 										{!ownerId ? (
 											<div className="px-3 py-2 text-white/60 text-sm">
@@ -313,7 +313,7 @@ export function RepositoryRegistrationDialog({
 											return (
 												<label
 													key={profileId}
-													className="flex items-start gap-3 p-3 rounded-lg bg-black-300/10 hover:bg-black-300/20 transition-colors cursor-pointer"
+													className="flex items-start gap-3 p-3 rounded-lg bg-surface hover:bg-white/5 transition-colors cursor-pointer"
 												>
 													<input
 														type="checkbox"
@@ -396,7 +396,7 @@ function ContentTypeToggle({
 	disabled,
 }: ContentTypeToggleProps) {
 	return (
-		<div className="bg-black-700/50 rounded-lg p-4">
+		<div className="bg-white/5 rounded-lg p-4">
 			<div className="flex items-center justify-between mb-2">
 				<div className="flex items-center gap-2">
 					<Icon size={18} className="text-gray-400" />

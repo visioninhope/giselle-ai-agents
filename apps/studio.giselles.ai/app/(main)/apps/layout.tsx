@@ -26,11 +26,12 @@ export default function Layout({ children }: { children: ReactNode }) {
 			creatorDbId: user.dbId,
 			workspaceId: workspace.id,
 		});
+
 		redirect(`/workspaces/${workspace.id}`);
 	}
 
 	return (
-		<div className="h-full bg-black-900">
+		<div className="h-full bg-bg">
 			<div className="px-[40px] py-[24px] flex-1 max-w-[1200px] mx-auto w-full">
 				<div className="flex justify-between items-center mb-8">
 					<h1
@@ -47,7 +48,7 @@ export default function Layout({ children }: { children: ReactNode }) {
 							href="https://docs.giselles.ai/guides/apps/teamapp"
 							target="_blank"
 							rel="noopener noreferrer"
-							className="text-black-300 text-[14px] font-medium rounded-[4px] px-1.5 py-0.5 hover:bg-black-300/10 flex items-center gap-1.5 font-sans"
+							className="text-black-300 text-[14px] font-medium rounded-[4px] px-1.5 py-0.5 hover:bg-surface/10 flex items-center gap-1.5 font-sans"
 						>
 							About Apps
 							<ExternalLink size={14} />

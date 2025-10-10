@@ -16,13 +16,13 @@ export function LeftPanel({
 	return (
 		<div className={clsx("h-full flex flex-col", className)}>
 			{/* Header */}
-			<div className="flex items-center justify-between pl-4 py-3 bg-black-900 flex-shrink-0">
+			<div className="flex items-center justify-between pl-4 py-3 bg-bg flex-shrink-0">
 				<h2 className="font-sans text-text text-[20px] font-thin">{title}</h2>
 				{onClose && (
 					<button
 						type="button"
 						onClick={onClose}
-						className="p-1 rounded hover:bg-black-700 text-text hover:text-white-900 transition-colors"
+						className="p-1 rounded hover:bg-bg-700 text-text hover:text-inverse transition-colors"
 					>
 						<X className="w-4 h-4" />
 					</button>

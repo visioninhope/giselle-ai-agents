@@ -120,7 +120,7 @@ export function RepositoryItem({
 	return (
 		<div
 			className={cn(
-				"group relative rounded-[12px] overflow-hidden w-full bg-white/[0.02] backdrop-blur-[8px] border-[0.5px] border-white/8 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),inset_0_-1px_1px_rgba(255,255,255,0.2)] before:content-[''] before:absolute before:inset-0 before:bg-white before:opacity-[0.02] before:rounded-[inherit] before:pointer-events-none hover:border-white/12 transition-colors duration-200",
+				"group relative rounded-[12px] overflow-hidden w-full bg-white/[0.02] backdrop-blur-[8px] border-[0.5px] border-border shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),inset_0_-1px_1px_rgba(255,255,255,0.2)] before:content-[''] before:absolute before:inset-0 before:bg-white before:opacity-[0.02] before:rounded-[inherit] before:pointer-events-none hover:border-border transition-colors duration-200",
 			)}
 		>
 			<div className="px-[24px] py-[16px]">
@@ -148,7 +148,7 @@ export function RepositoryItem({
 							</DropdownMenuTrigger>
 							<DropdownMenuContent
 								align="end"
-								className="w-[180px] bg-black-850 border-[0.5px] border-black-400 rounded-[8px]"
+								className="w-[180px] bg-surface border-[0.5px] border-border rounded-[8px]"
 							>
 								<DropdownMenuItem
 									onClick={handleManualIngest}
@@ -464,7 +464,7 @@ function SyncStatusBadge({
 				type="button"
 				aria-label="Verify repository status"
 				onClick={onVerify}
-				className="flex items-center px-2 py-1 rounded-full border border-white/20 w-auto hover:bg-white/5 transition-colors duration-200"
+				className="flex items-center px-2 py-1 rounded-full border border-border w-auto hover:bg-white/5 transition-colors duration-200"
 			>
 				{badgeContent}
 			</button>
@@ -472,7 +472,7 @@ function SyncStatusBadge({
 	}
 
 	return (
-		<div className="flex items-center px-2 py-1 rounded-full border border-white/20 w-[80px]">
+		<div className="flex items-center px-2 py-1 rounded-full border border-border-muted w-[80px]">
 			{badgeContent}
 		</div>
 	);

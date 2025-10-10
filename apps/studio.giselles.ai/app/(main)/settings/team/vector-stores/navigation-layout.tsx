@@ -17,7 +17,7 @@ export function VectorStoresNavigationLayout({
 
 	return (
 		<div className="flex min-h-full">
-			<div className="border-r border-black-70/50 pr-6">
+			<div className="border-r border-border-muted pr-6">
 				<div className="sticky top-[64px]">
 					<VectorStoresSidebarMenu />
 				</div>

@@ -74,7 +74,7 @@ export function LabelsInputStep({
 									"flex-1 rounded-[8px] py-[8px] px-[12px] outline-none focus:outline-none",
 									labelsError
 										? "border border-red-500 focus:border-red-400"
-										: "border border-white-400 focus:border-white-900",
+										: "border border-white-400 focus:border-border",
 									"text-[14px] bg-transparent",
 								)}
 								placeholder="bug"
@@ -85,7 +85,7 @@ export function LabelsInputStep({
 									onClick={() =>
 										setLabels((prev) => prev.filter((l) => l.id !== label.id))
 									}
-									className="p-1 text-white-400 hover:text-white-900 transition-colors"
+									className="p-1 text-inverse hover:text-inverse transition-colors"
 									aria-label="Remove label"
 								>
 									<XIcon className="size-[16px]" />
@@ -96,7 +96,7 @@ export function LabelsInputStep({
 					{labelsError ? (
 						<p className="text-[12px] text-red-400 pl-2">{labelsError}</p>
 					) : (
-						<p className="text-[12px] text-white-400 pl-2">
+						<p className="text-[12px] text-inverse pl-2">
 							Labels are required for issue labeled triggers. Examples: bug,
 							feature, urgent
 						</p>
@@ -107,7 +107,7 @@ export function LabelsInputStep({
 							setLabels((prev) => [...prev, { id: nextId, value: "" }]);
 							setNextId((prev) => prev + 1);
 						}}
-						className="flex items-center gap-[4px] p-2 text-white-400 hover:text-white-900 transition-colors text-[14px]"
+						className="flex items-center gap-[4px] p-2 text-inverse hover:text-inverse transition-colors text-[14px]"
 					>
 						<PlusIcon className="size-[16px]" />
 						Add label
@@ -118,7 +118,7 @@ export function LabelsInputStep({
 			<div className="pt-[8px] flex gap-[8px] mt-[12px] px-[4px]">
 				<button
 					type="button"
-					className="flex-1 bg-black-700 hover:bg-black-600 text-white font-medium px-4 py-2 rounded-md text-[14px] transition-colors disabled:opacity-50 relative"
+					className="flex-1 bg-bg-700 hover:bg-bg-600 text-inverse font-medium px-4 py-2 rounded-md text-[14px] transition-colors disabled:opacity-50 relative"
 					onClick={onBack}
 					disabled={isPending}
 				>
@@ -126,7 +126,7 @@ export function LabelsInputStep({
 				</button>
 				<button
 					type="submit"
-					className="flex-1 bg-primary-900 hover:bg-primary-800 text-white font-medium px-4 py-2 rounded-md text-[14px] transition-colors disabled:opacity-50 relative"
+					className="flex-1 bg-primary-900 hover:bg-primary-800 text-inverse font-medium px-4 py-2 rounded-md text-[14px] transition-colors disabled:opacity-50 relative"
 					disabled={isPending}
 				>
 					<span className={isPending ? "opacity-0" : ""}>
@@ -135,7 +135,7 @@ export function LabelsInputStep({
 					{isPending && (
 						<span className="absolute inset-0 flex items-center justify-center">
 							<svg
-								className="animate-spin h-5 w-5 text-white"
+								className="animate-spin h-5 w-5 text-inverse"
 								xmlns="http://www.w3.org/2000/svg"
 								fill="none"
 								viewBox="0 0 24 24"

@@ -25,7 +25,7 @@ export function V2Footer({
 	chat,
 }: V2FooterProps) {
 	return (
-		<footer className="h-[30px] border-t border-white/10 px-4 flex items-center">
+		<footer className="h-[30px] bg-bg border-t border-border/10 px-4 flex items-center">
 			<div className="flex items-center justify-between w-full">
 				<div className="flex items-center space-x-3">
 					<Tooltip
@@ -43,7 +43,7 @@ export function V2Footer({
 							className={`cursor-pointer ${
 								activePanel === "run-history"
 									? "text-[#6B8FF0]"
-									: "text-white-900 hover:text-[#6B8FF0]"
+									: "text-inverse hover:text-[#6B8FF0]"
 							}`}
 						>
 							<HistoryIcon className="w-[14px] h-[14px]" />
@@ -64,7 +64,7 @@ export function V2Footer({
 							className={`cursor-pointer ${
 								activePanel === "secret"
 									? "text-[#6B8FF0]"
-									: "text-white-900 hover:text-[#6B8FF0]"
+									: "text-inverse hover:text-[#6B8FF0]"
 							}`}
 						>
 							<FileKey2Icon className="w-[14px] h-[14px]" />
@@ -85,7 +85,7 @@ export function V2Footer({
 							className={`cursor-pointer ${
 								activePanel === "data-source"
 									? "text-[#6B8FF0]"
-									: "text-white-900 hover:text-[#6B8FF0]"
+									: "text-inverse hover:text-[#6B8FF0]"
 							}`}
 						>
 							<DatabaseIcon className="w-[14px] h-[14px]" />
@@ -108,7 +108,7 @@ export function V2Footer({
 							className={`cursor-pointer ${
 								chat?.isOpen
 									? "text-[#6B8FF0]"
-									: "text-white-900 hover:text-[#6B8FF0]"
+									: "text-inverse hover:text-[#6B8FF0]"
 							}`}
 						>
 							<MessageCircleIcon className="w-[14px] h-[14px]" />
@@ -126,7 +126,7 @@ export function V2Footer({
 							href="https://docs.giselles.ai/guides/introduction"
 							target="_blank"
 							rel="noopener noreferrer"
-							className="text-xs text-white-900 hover:text-[#6B8FF0] flex items-center gap-1"
+							className="text-xs text-inverse hover:text-[#6B8FF0] flex items-center gap-1"
 						>
 							Docs
 							<ExternalLinkIcon className="w-[10px] h-[10px]" />
