@@ -47,28 +47,33 @@ export function TeamMemberListItem({
 	const hasMenu = canEditRole || canRemove;
 
 	const handleRoleChange = (value: string) => {
-		setRole(value as TeamRole);
-		handleSaveRole();
+		const nextRole = value as TeamRole;
+		if (nextRole === role) {
+			return;
+		}
+		void handleSaveRole(nextRole);
 	};
 
-	const handleSaveRole = async () => {
+	const handleSaveRole = async (nextRole: TeamRole) => {
+		const previousRole = role;
 		try {
 			setIsLoading(true);
+			setError("");
+			setRole(nextRole);
 			const formData = new FormData();
 			formData.append("userId", user);
-			formData.append("role", role);
-
+			formData.append("role", nextRole);
 			const result = await updateTeamMemberRole(formData);
 			if (result?.success) {
-				// Update local state after successful server update
-				setRole(role);
-				toast(`Role updated: ${role}`, { type: "success" });
+				toast(`Role updated: ${nextRole}`, { type: "success" });
 			} else {
 				const msg = result?.error || "Failed to update role";
 				setError(msg);
+				setRole(previousRole);
 				toast(msg, { type: "error" });
 			}
 		} catch (e) {
+			setRole(previousRole);
 			if (e instanceof Error) {
 				setError(e.message);
 				toast(e.message, { type: "error" });
