@@ -326,6 +326,7 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 		addWebPage: async (args: {
 			workspaceId: WorkspaceId;
 			webpage: FetchingWebPage;
+			useExperimentalStorage: boolean;
 		}) => addWebPage({ ...args, context }),
 		async getFileText(args: {
 			workspaceId: WorkspaceId;

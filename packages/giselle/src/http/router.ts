@@ -351,6 +351,7 @@ export const createJsonRouters = {
 			input: z.object({
 				webpage: FetchingWebPage,
 				workspaceId: WorkspaceId.schema,
+				useExperimentalStorage: z.boolean(),
 			}),
 			handler: async ({ input }) =>
 				JsonResponse.json(await giselleEngine.addWebPage(input)),

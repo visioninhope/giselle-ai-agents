@@ -24,7 +24,14 @@ type GetBlob = (
 	options?: { range?: { start: number; end?: number } },
 ) => Promise<Uint8Array>;
 
-type SetBlob = (path: string, data: BlobLike) => Promise<void>;
+type SetBlobOptions = {
+	contentType?: string;
+};
+type SetBlob = (
+	path: string,
+	data: BlobLike,
+	options?: SetBlobOptions,
+) => Promise<void>;
 
 type Copy = (source: string, destination: string) => Promise<void>;
 
