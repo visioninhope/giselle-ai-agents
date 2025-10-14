@@ -20,12 +20,12 @@ export async function connectIdentity(provider: OAuthProvider, next: string) {
 		}
 	}
 
-	let data: { url?: string } | null = null;
+	let data: { provider: string; url: string | null } | null = null;
 	let error: {
 		code?: string;
 		message?: string;
 		name?: string;
-		status?: string;
+		status?: number;
 	} | null = null;
 	const redirectTo = await getAuthCallbackUrl({ next, provider });
 	try {
@@ -54,12 +54,12 @@ export async function connectIdentity(provider: OAuthProvider, next: string) {
 
 export async function reconnectIdentity(provider: OAuthProvider, next: string) {
 	const supabase = await createClient();
-	let data: { url?: string } | null = null;
+	let data: { provider: string; url: string | null } | null = null;
 	let error: {
 		code?: string;
 		message?: string;
 		name?: string;
-		status?: string;
+		status?: number;
 	} | null = null;
 	const redirectTo2 = await getAuthCallbackUrl({ next, provider });
 	try {

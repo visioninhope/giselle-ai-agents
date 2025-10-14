@@ -45,7 +45,7 @@ export async function connectGitHubIdentity() {
 	try {
 		return await connectIdentity("github", "/settings/account/authentication");
 	} catch (e) {
-		if (isNextRedirectError(e)) throw e as Error;
+		if (isNextRedirectError(e)) throw e as unknown as Error;
 		const msg = e instanceof Error ? e.message : String(e);
 		redirect(
 			`/settings/account/authentication?oauthError=${encodeURIComponent(msg)}`,
@@ -64,7 +64,7 @@ export async function reconnectGitHubIdentity() {
 			"/settings/account/authentication",
 		);
 	} catch (e) {
-		if (isNextRedirectError(e)) throw e as Error;
+		if (isNextRedirectError(e)) throw e as unknown as Error;
 		const msg = e instanceof Error ? e.message : String(e);
 		redirect(
 			`/settings/account/authentication?oauthError=${encodeURIComponent(msg)}`,
