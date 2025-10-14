@@ -7,6 +7,7 @@ import { createId } from "@paralleldrive/cuid2";
 import { eq } from "drizzle-orm";
 import { giselleEngine } from "@/app/giselle-engine";
 import { agents, db, flowTriggers, githubIntegrationSettings } from "@/drizzle";
+import { experimental_storageFlag } from "@/flags";
 import { fetchCurrentUser } from "@/services/accounts";
 import { fetchCurrentTeam } from "@/services/teams";
 
@@ -27,6 +28,7 @@ type DeleteAgentResult =
 export async function copyAgent(
 	agentId: AgentId,
 ): Promise<AgentDuplicationResult> {
+	const useExperimentalStorage = await experimental_storageFlag();
 	if (typeof agentId !== "string" || agentId.length === 0) {
 		return { result: "error", message: "Please fill in the agent id" };
 	}
@@ -63,6 +65,7 @@ export async function copyAgent(
 		const workspace = await giselleEngine.copyWorkspace(
 			agent.workspaceId,
 			newName,
+			useExperimentalStorage,
 		);
 		await db.insert(agents).values({
 			id: newAgentId,

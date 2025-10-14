@@ -73,12 +73,16 @@ export async function getWorkspace({
 /** @todo update new fileId for each file */
 export async function copyFiles({
 	storage,
+	experimental_storage,
 	templateWorkspaceId,
 	newWorkspaceId,
+	useExperimentalStorage,
 }: {
 	storage: Storage;
+	experimental_storage: GiselleStorage;
 	templateWorkspaceId: WorkspaceId;
 	newWorkspaceId: WorkspaceId;
+	useExperimentalStorage: boolean;
 }) {
 	const fileKeys = await storage.getKeys(
 		`workspaces/${templateWorkspaceId}/files`,
@@ -86,14 +90,22 @@ export async function copyFiles({
 
 	await Promise.all(
 		fileKeys.map(async (fileKey) => {
-			const file = await storage.getItemRaw(fileKey);
-			await storage.setItemRaw(
-				fileKey.replace(
-					/workspaces:wrks-\w+:files:/,
-					`workspaces:${newWorkspaceId}:files:`,
-				),
-				file,
+			const target = fileKey.replace(
+				/workspaces:wrks-\w+:files:/,
+				`workspaces:${newWorkspaceId}:files:`,
 			);
+			if (useExperimentalStorage) {
+				await experimental_storage.copy(fileKey, target);
+			} else {
+				const file = await storage.getItemRaw(fileKey);
+				await storage.setItemRaw(
+					fileKey.replace(
+						/workspaces:wrks-\w+:files:/,
+						`workspaces:${newWorkspaceId}:files:`,
+					),
+					file,
+				);
+			}
 		}),
 	);
 }

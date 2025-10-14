@@ -209,8 +209,13 @@ export const createJsonRouters = {
 		}),
 	createSampleWorkspaces: (giselleEngine: GiselleEngine) =>
 		createHandler({
-			handler: async () => {
-				const workspaces = await giselleEngine.createSampleWorkspaces();
+			input: z.object({
+				useExperimentalStorage: z.boolean(),
+			}),
+			handler: async ({ input }) => {
+				const workspaces = await giselleEngine.createSampleWorkspaces(
+					input.useExperimentalStorage,
+				);
 				return JsonResponse.json(workspaces);
 			},
 		}),

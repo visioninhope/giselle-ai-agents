@@ -112,8 +112,17 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 		runActProcess: { type: "self" },
 	};
 	return {
-		copyWorkspace: async (workspaceId: WorkspaceId, name?: string) => {
-			return await copyWorkspace({ context, workspaceId, name });
+		copyWorkspace: async (
+			workspaceId: WorkspaceId,
+			name?: string,
+			useExperimentalStorage?: boolean,
+		) => {
+			return await copyWorkspace({
+				context,
+				workspaceId,
+				name,
+				useExperimentalStorage: useExperimentalStorage ?? false,
+			});
 		},
 		createWorkspace: async ({
 			useExperimentalStorage,
@@ -268,8 +277,8 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 				useExperimentalStorage,
 			});
 		},
-		createSampleWorkspaces: async () => {
-			return await createSampleWorkspaces({ context });
+		createSampleWorkspaces: async (useExperimentalStorage: boolean) => {
+			return await createSampleWorkspaces({ context, useExperimentalStorage });
 		},
 		getGitHubRepositories: async () => {
 			return await getGitHubRepositories({ context });
