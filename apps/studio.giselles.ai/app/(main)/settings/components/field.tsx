@@ -22,8 +22,8 @@ export const Field: FC<FieldProps> = ({
 	disabled = false,
 }) => (
 	<div className="grid gap-[4px]">
-		<Label htmlFor={name} className="text-white-400 font-geist">
-			{label}
+		<Label htmlFor={name} className="text-text font-geist">
+			{label.replace("*", "")} <span className="text-error-900">*</span>
 		</Label>
 		<Input
 			id={name}
@@ -33,7 +33,7 @@ export const Field: FC<FieldProps> = ({
 			data-1p-ignore={ignore1password}
 			value={value}
 			disabled={disabled}
-			className="py-2 border-[0.5px] border-border-muted rounded-[8px] bg-surface text-inverse font-medium text-[14px] leading-[23.8px] font-geist disabled:opacity-50"
+			className="py-2 border border-transparent rounded-[8px] bg-surface text-inverse font-medium text-[14px] leading-[23.8px] font-geist disabled:opacity-50"
 		/>
 	</div>
 );
