@@ -664,6 +664,49 @@ importers:
         specifier: 'catalog:'
         version: 3.2.4(@types/debug@4.1.12)(@types/node@22.14.0)(happy-dom@17.6.1)(jiti@2.4.2)(jsdom@26.1.0(bufferutil@4.0.9)(utf-8-validate@6.0.5))(lightningcss@1.30.1)(terser@5.44.0)(yaml@2.7.0)
 
+  apps/ui.giselles.ai:
+    dependencies:
+      '@giselle-internal/ui':
+        specifier: workspace:*
+        version: link:../../internal-packages/ui
+      clsx:
+        specifier: 'catalog:'
+        version: 2.1.1
+      lucide-react:
+        specifier: 'catalog:'
+        version: 0.473.0(react@19.1.1)
+      next:
+        specifier: 'catalog:'
+        version: 15.5.2(@babel/core@7.26.7)(@opentelemetry/api@1.9.0)(@playwright/test@1.53.0)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
+      react:
+        specifier: 'catalog:'
+        version: 19.1.1
+      react-dom:
+        specifier: 'catalog:'
+        version: 19.1.1(react@19.1.1)
+    devDependencies:
+      '@tailwindcss/postcss':
+        specifier: 'catalog:'
+        version: 4.1.10
+      '@types/node':
+        specifier: 'catalog:'
+        version: 22.14.0
+      '@types/react':
+        specifier: 'catalog:'
+        version: 19.1.10
+      '@types/react-dom':
+        specifier: 'catalog:'
+        version: 19.1.7(@types/react@19.1.10)
+      postcss:
+        specifier: 'catalog:'
+        version: 8.5.5
+      tailwindcss:
+        specifier: 'catalog:'
+        version: 4.1.10
+      typescript:
+        specifier: 'catalog:'
+        version: 5.7.3
+
   internal-packages/ui:
     dependencies:
       clsx:
