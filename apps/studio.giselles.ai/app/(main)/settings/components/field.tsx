@@ -30,7 +30,14 @@ export const Field: FC<FieldProps> = ({
 }) => (
 	<div className="grid gap-[4px]">
 		<Label htmlFor={name} className="text-text font-geist">
-			{label.replace("*", "")} <span className="text-error-900">*</span>
+			{label.includes("*") ? (
+				<>
+					{label.split("*")[0]} <span className="text-error-900">*</span>
+					{label.split("*").slice(1).join("*")}
+				</>
+			) : (
+				label
+			)}
 		</Label>
 		<Input
 			id={name}
