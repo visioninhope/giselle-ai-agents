@@ -20,7 +20,7 @@ export default async function TeamUsagePage() {
 					About Usage
 				</DocsLink>
 			</div>
-			<div className="flex flex-col gap-y-[16px]">
+			<div className="flex flex-col gap-y-[16px] prose-secondary">
 				{currentTeamIsFreePlan && (
 					<Suspense
 						fallback={
