@@ -36,7 +36,7 @@ export default function Layout({ children }: { children: ReactNode }) {
 		<div className="h-full bg-bg">
 			<div className="px-[40px] py-[24px] flex-1 max-w-[1200px] mx-auto w-full">
 				<div className="flex justify-between items-center mb-8">
-					<PageHeading glow>Apps</PageHeading>
+					<PageHeading glow>Workspaces</PageHeading>
 					<div className="flex items-center gap-4">
 						<DocsLink
 							href="https://docs.giselles.ai/guides/apps/teamapp"
@@ -46,13 +46,13 @@ export default function Layout({ children }: { children: ReactNode }) {
 						<form action={createAgent}>
 							<GlassButton
 								type="submit"
-								aria-label="Create an app"
+								aria-label="Create a workspace"
 								className="whitespace-nowrap"
 							>
 								<span className="grid place-items-center rounded-full size-4 bg-primary-200 opacity-50">
 									<Plus className="size-3 text-bg" />
 								</span>
-								New App
+								New Workspace
 							</GlassButton>
 						</form>
 					</div>

@@ -39,7 +39,7 @@ export function DuplicateAgentButton({
 			} else {
 				addToast({
 					type: "error",
-					message: res.message || "Failed to duplicate app.",
+					message: res.message || "Failed to duplicate workspace.",
 				});
 			}
 		});
@@ -53,7 +53,7 @@ export function DuplicateAgentButton({
 						<Dialog.Trigger asChild>
 							<button
 								type="button"
-								aria-label="Duplicate an app"
+								aria-label="Duplicate a workspace"
 								className="grid size-6 place-items-center rounded-full text-text/60 transition-colors hover:text-inverse"
 								disabled={isPending}
 							>
@@ -65,13 +65,13 @@ export function DuplicateAgentButton({
 							</button>
 						</Dialog.Trigger>
 					</TooltipTrigger>
-					<TooltipContent>Duplicate App</TooltipContent>
+					<TooltipContent>Duplicate Workspace</TooltipContent>
 				</Tooltip>
 			</TooltipProvider>
 			<GlassDialogContent>
 				<GlassDialogHeader
 					title={`Duplicate "${agentName || "Untitled"}"?`}
-					description="This will create a new app with the same settings as the original."
+					description="This will create a new workspace with the same settings as the original."
 					onClose={() => setOpen(false)}
 				/>
 				<GlassDialogFooter

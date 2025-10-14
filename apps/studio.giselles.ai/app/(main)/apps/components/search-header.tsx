@@ -43,7 +43,7 @@ interface SearchHeaderProps {
 export function SearchHeader({
 	searchQuery,
 	onSearchChange,
-	searchPlaceholder = "Search Apps...",
+	searchPlaceholder = "Search Workspaces...",
 	sortOption,
 	onSortChange,
 	showViewToggle = true,
