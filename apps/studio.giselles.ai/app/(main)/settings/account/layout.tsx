@@ -8,10 +8,10 @@ export default function SettingsAccountLayout({
 }) {
 	return (
 		<div className="h-full bg-bg">
-			<div className="flex-1 max-w-[1200px] w-full flex min-h-[calc(100vh-64px)] pl-[40px]">
+			<div className="w-full flex min-h-[calc(100vh-64px)]">
 				{/* Left Sidebar with border */}
-				<div className="border-r border-border pr-6">
-					<div className="sticky top-[64px]">
+				<div className="border-r border-border">
+					<div className="sticky top-0">
 						<SidebarMenu />
 					</div>
 				</div>

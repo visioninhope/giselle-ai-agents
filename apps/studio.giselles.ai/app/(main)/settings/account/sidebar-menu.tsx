@@ -16,7 +16,7 @@ export function SidebarMenu() {
 	return (
 		<nav
 			className="min-h-full flex flex-col pt-0"
-			style={{ width: "248px" }}
+			style={{ width: "260px" }}
 			aria-label="Account settings navigation"
 		>
 			<ul className="flex flex-col">

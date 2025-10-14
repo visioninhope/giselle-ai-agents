@@ -39,7 +39,7 @@ export default async function AccountSettingPage() {
 					</DocsLink>
 				</div>
 				<div className="flex flex-col gap-y-[12px]">
-					<div className="space-y-2 p-6 gap-y-[12px]">
+					<div className="space-y-2 gap-y-[12px]">
 						<div className="flex justify-between items-center">
 							<div>
 								<h4 className="text-text text-[18px] font-medium font-sans">
