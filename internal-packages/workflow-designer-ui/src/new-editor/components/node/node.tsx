@@ -6,7 +6,6 @@ import {
 } from "@giselle-sdk/data-type";
 import { defaultName } from "@giselle-sdk/giselle/react";
 import { Handle, Position, type NodeProps as RFNodeProps } from "@xyflow/react";
-import "./handles.css";
 import clsx from "clsx/lite";
 import { useMemo } from "react";
 import { shallow } from "zustand/shallow";
