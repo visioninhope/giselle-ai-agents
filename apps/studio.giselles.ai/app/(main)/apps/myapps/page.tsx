@@ -38,11 +38,11 @@ async function MyAgentList() {
 			<div className="flex justify-center items-center h-full">
 				<div className="grid gap-[8px] justify-center text-center">
 					<h3 className="text-[18px] font-geist font-bold text-text/60">
-						No apps created by you yet.
+						No workspaces created by you yet.
 					</h3>
 					<p className="text-[12px] font-geist text-text/60">
-						Please create a new app with the 'Create new' button in the left
-						sidebar.
+						Please create a new workspace with the 'Create new' button in the
+						left sidebar.
 					</p>
 				</div>
 			</div>
@@ -104,12 +104,12 @@ async function MyAgentList() {
 	);
 }
 
-export default function MyAppsPage() {
+export default function MyWorkspacesPage() {
 	return (
 		<ToastProvider>
 			<div className="w-full">
 				<h1 className="text-[28px] font-sans font-medium mb-8 text-primary-100 drop-shadow-[0_0_20px_#0087f6]">
-					My Apps
+					My Workspaces
 				</h1>
 				<Suspense
 					fallback={<p className="text-center py-8 font-sans">Loading...</p>}

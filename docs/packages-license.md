@@ -2,8 +2,8 @@
 
 
 ## Summary
-* 856 MIT
-* 187 Apache 2.0
+* 860 MIT
+* 189 Apache 2.0
 * 46 ISC
 * 27 New BSD
 * 13 Simplified BSD
@@ -1348,7 +1348,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@jridgewell/trace-mapping"></a>
-### @jridgewell/trace-mapping v0.3.30
+### @jridgewell/trace-mapping v0.3.31
 #### 
 
 ##### Paths
@@ -5264,7 +5264,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="ai"></a>
-### ai v5.0.44
+### ai v5.0.51
 #### 
 
 ##### Paths
@@ -5498,6 +5498,17 @@ Python-2.0 manually approved
 
 
 
+<a name="baseline-browser-mapping"></a>
+### baseline-browser-mapping v2.8.14
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
+
+
+
 <a name="before-after-hook"></a>
 ### before-after-hook v4.0.0
 #### 
@@ -5686,7 +5697,7 @@ Python-2.0 manually approved
 
 
 <a name="caniuse-lite"></a>
-### caniuse-lite v1.0.30001737
+### caniuse-lite v1.0.30001749
 #### 
 
 ##### Paths
@@ -8282,7 +8293,7 @@ BlueOak-1.0.0 permitted
 
 
 <a name="loader-runner"></a>
-### loader-runner v4.3.0
+### loader-runner v4.3.1
 #### 
 
 ##### Paths
@@ -9338,7 +9349,7 @@ BlueOak-1.0.0 permitted
 
 
 <a name="nodemailer"></a>
-### nodemailer v6.10.0
+### nodemailer v7.0.7
 #### 
 
 ##### Paths
@@ -11432,7 +11443,7 @@ Unknown manually approved
 
 
 <a name="tapable"></a>
-### tapable v2.2.3
+### tapable v2.3.0
 #### 
 
 ##### Paths
@@ -11487,7 +11498,7 @@ Unknown manually approved
 
 
 <a name="terser"></a>
-### terser v5.43.1
+### terser v5.44.0
 #### 
 
 ##### Paths
