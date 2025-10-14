@@ -32,11 +32,7 @@ export default async function AccountGeneralPage() {
 					avatarUrl={avatarUrl}
 					alt={alt}
 				/>
-				<Card
-					title="Email"
-					description="This email will be used for account-related notifications."
-					className="gap-y-6"
-				>
+				<div className="flex flex-col gap-y-2">
 					<Field
 						label="*Email address (required)"
 						name="email"
@@ -44,7 +40,10 @@ export default async function AccountGeneralPage() {
 						value={email ?? "No email"}
 						disabled
 					/>
-				</Card>
+					<p className="text-secondary text-[12px] leading-[16px] font-geist">
+						This email will be used for account-related notifications.
+					</p>
+				</div>
 				<Card
 					title="Session"
 					description="Log out of all sessions."
