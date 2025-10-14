@@ -39,7 +39,7 @@ export const Field: FC<FieldProps> = ({
 			placeholder={placeholder}
 			onChange={onChange}
 			disabled={disabled}
-			className="py-2 border border-transparent rounded-[8px] bg-surface text-inverse font-medium text-[14px] leading-[23.8px] font-geist disabled:opacity-50"
+			className="py-2 rounded-[8px] bg-surface text-inverse font-medium text-[14px] leading-[23.8px] font-geist disabled:opacity-50"
 		/>
 	</div>
 );
