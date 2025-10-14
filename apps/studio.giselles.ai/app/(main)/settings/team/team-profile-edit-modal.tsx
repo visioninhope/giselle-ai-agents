@@ -274,7 +274,7 @@ export function TeamProfileEditModal({
 							}
 						}}
 					>
-						{/* Glass effect layers */}
+						{/* Glass effect layers with proper stroke */}
 						<div
 							className="absolute inset-0 rounded-[12px] backdrop-blur-md"
 							style={{
@@ -283,7 +283,7 @@ export function TeamProfileEditModal({
 							}}
 						/>
 						<div className="absolute top-0 left-4 right-4 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
-						<div className="absolute inset-0 rounded-[12px] border border-border-muted" />
+						<div className="absolute inset-0 rounded-[12px] border-[0.5px] border-white/8" />
 
 						<div className="relative z-10">
 							<div className="flex justify-between items-center">
@@ -310,7 +310,7 @@ export function TeamProfileEditModal({
 									<span className="sr-only">Close</span>
 								</Dialog.Close>
 							</div>
-							<p className="text-[14px] text-black-400 font-geist mt-2">
+							<p className="text-[14px] text-secondary font-geist mt-2">
 								Update your team's name and profile image.
 							</p>
 
@@ -384,22 +384,13 @@ export function TeamProfileEditModal({
 									>
 										Team Name
 									</label>
-									<div
-										className="flex flex-col items-start p-2 rounded-[8px] w-full"
-										style={{
-											background: "#00020A",
-											boxShadow: "inset 0 1px 4px rgba(0,0,0,0.5)",
-											border: "0.5px solid rgba(255,255,255,0.05)",
-										}}
-									>
-										<Input
-											id="teamName"
-											value={teamName}
-											onChange={handleTeamNameChange}
-											className="w-full bg-transparent text-white-800 font-medium text-[14px] leading-[23.8px] font-geist shadow-none focus:text-white border-0 p-0 focus-visible:ring-0 focus-visible:ring-offset-0"
-											disabled={isLoading}
-										/>
-									</div>
+									<Input
+										id="teamName"
+										value={teamName}
+										onChange={handleTeamNameChange}
+										className="w-full bg-transparent text-white-800 font-medium text-[14px] leading-[23.8px] font-geist shadow-[inset_0_0_0_1px_var(--color-border-muted)] focus:text-white border-0 focus-visible:outline-none focus-visible:shadow-[inset_0_0_0_1px_var(--color-focused)]"
+										disabled={isLoading}
+									/>
 								</div>
 
 								{/* Error message */}
