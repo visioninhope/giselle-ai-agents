@@ -10,6 +10,7 @@ import type { teams } from "@/drizzle";
 import { TeamAvatarImage } from "@/services/teams/components/team-avatar-image";
 import { IMAGE_CONSTRAINTS } from "../constants";
 import { updateTeamAvatar, updateTeamName } from "./actions";
+import { GlassDialogBody, GlassDialogContent, GlassDialogFooter, GlassDialogHeader } from "./components/glass-dialog-content";
 
 const ACCEPTED_FILE_TYPES = IMAGE_CONSTRAINTS.formats.join(",");
 
@@ -254,65 +255,29 @@ export function TeamProfileEditModal({
 		>
 			<Dialog.Portal>
 				<Dialog.Overlay className="fixed inset-0 bg-black/60 z-50" />
-				<div className="fixed inset-0 flex items-center justify-center z-50 p-4">
-					<Dialog.Content
-						className="w-[90vw] max-w-[420px] max-h-[90vh] overflow-y-auto rounded-[12px] p-6 relative shadow-xl focus:outline-none"
-						style={{
-							animation: "fadeIn 0.2s ease-out",
-							transformOrigin: "center",
-						}}
+                <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
+                    <GlassDialogContent className="max-w-[420px]"
 						onEscapeKeyDown={(e) => {
 							if (isLoading) {
 								e.preventDefault();
 								e.stopPropagation();
 							}
 						}}
-						onPointerDownOutside={(e) => {
+                        onPointerDownOutside={(e) => {
 							if (isLoading) {
 								e.preventDefault();
 								e.stopPropagation();
 							}
 						}}
-					>
-						{/* Glass effect layers with proper stroke */}
-						<div
-							className="absolute inset-0 rounded-[12px] backdrop-blur-md"
-							style={{
-								background:
-									"linear-gradient(135deg, rgba(150, 150, 150, 0.03) 0%, rgba(60, 90, 160, 0.12) 100%)",
-							}}
-						/>
-						<div className="absolute top-0 left-4 right-4 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
-						<div className="absolute inset-0 rounded-[12px] border-[0.5px] border-white/8" />
-
-						<div className="relative z-10">
-							<div className="flex justify-between items-center">
-								<Dialog.Title className="text-[20px] font-medium text-white-400 tracking-tight font-sans">
-									Edit Team Profile
-								</Dialog.Title>
-								<Dialog.Close
-									onClick={(e) => {
-										if (isLoading) {
-											e.preventDefault();
-											return;
-										}
-										onClose();
-									}}
-									disabled={isLoading}
-									aria-disabled={isLoading}
-									className={`rounded-sm text-white-400 focus:outline-none ${
-										isLoading
-											? "opacity-30 cursor-not-allowed pointer-events-none"
-											: "opacity-70 hover:opacity-100 cursor-pointer"
-									}`}
-								>
-									<X className="h-5 w-5" />
-									<span className="sr-only">Close</span>
-								</Dialog.Close>
-							</div>
-							<p className="text-[14px] text-secondary font-geist mt-2">
-								Update your team's name and profile image.
-							</p>
+                    >
+                        <GlassDialogHeader
+                            title="Edit Team Profile"
+                            description="Update your team's name and profile image."
+                            onClose={() => {
+                                if (!isLoading) onClose();
+                            }}
+                        />
+                        <GlassDialogBody>
 
 							<div className="mt-4 flex flex-col items-center gap-6 w-full">
 								{/* Hidden file input */}
@@ -400,37 +365,22 @@ export function TeamProfileEditModal({
 									</p>
 								)}
 
-								{/* Action buttons */}
-								<div className="flex justify-end items-center mt-6 w-full">
-									<div className="flex w-full max-w-[280px] space-x-2 ml-auto">
-										<button
-											type="button"
-											onClick={onClose}
-											className="flex-1 text-white-400 hover:text-white-300 text-sm font-medium transition-colors"
-											disabled={isLoading}
-										>
-											Cancel
-										</button>
-										<button
-											type="button"
-											disabled={!isFormSubmittable || isLoading}
-											onClick={handleSave}
-											className="flex-1 rounded-lg px-4 py-2 text-white/80 transition-all duration-200 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
-											style={{
-												background:
-													"linear-gradient(180deg, #202530 0%, #12151f 100%)",
-												border: "1px solid rgba(0,0,0,0.7)",
-												boxShadow:
-													"inset 0 1px 1px rgba(255,255,255,0.05), 0 2px 8px rgba(5,10,20,0.4), 0 1px 2px rgba(0,0,0,0.3)",
-											}}
-										>
-											{isLoading ? "Saving..." : "Save"}
-										</button>
-									</div>
-								</div>
-							</div>
-						</div>
-					</Dialog.Content>
+                                {/* Action buttons (standard glass footer) */}
+                                <GlassDialogFooter
+                                    onCancel={onClose}
+                                    onConfirm={handleSave}
+                                    confirmLabel={isLoading ? "Processing..." : "Save"}
+                                    isPending={isLoading}
+                                />
+                            </div>
+                        </GlassDialogBody>
+                        <GlassDialogFooter
+                            onCancel={onClose}
+                            onConfirm={handleSave}
+                            confirmLabel={isLoading ? "Processing..." : "Save"}
+                            isPending={isLoading}
+                        />
+                    </GlassDialogContent>
 				</div>
 			</Dialog.Portal>
 		</Dialog.Root>

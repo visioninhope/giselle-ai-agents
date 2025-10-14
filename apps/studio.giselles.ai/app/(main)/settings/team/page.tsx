@@ -148,16 +148,7 @@ function UpgradeButton({ team }: { team: CurrentTeam }) {
 	const upgradeTeamWithTeam = upgradeTeam.bind(null, team);
 
 	return (
-		<Button
-			formAction={upgradeTeamWithTeam}
-			className="rounded-lg px-4 py-2 text-white/80 transition-all duration-200 active:scale-[0.98]"
-			style={{
-				background: "linear-gradient(180deg, #202530 0%, #12151f 100%)",
-				border: "1px solid rgba(0,0,0,0.7)",
-				boxShadow:
-					"inset 0 1px 1px rgba(255,255,255,0.05), 0 2px 8px rgba(5,10,20,0.4), 0 1px 2px rgba(0,0,0,0.3)",
-			}}
-		>
+		<Button formAction={upgradeTeamWithTeam} variant="primary" className="px-4">
 			Upgrade to Pro
 		</Button>
 	);
@@ -172,13 +163,8 @@ function UpdateButton({ subscriptionId }: { subscriptionId: string }) {
 	return (
 		<Button
 			formAction={manageBillingWithSubscriptionId}
-			className="rounded-lg px-4 py-2 text-white/80 transition-all duration-200 active:scale-[0.98]"
-			style={{
-				background: "linear-gradient(180deg, #202530 0%, #12151f 100%)",
-				border: "1px solid rgba(0,0,0,0.7)",
-				boxShadow:
-					"inset 0 1px 1px rgba(255,255,255,0.05), 0 2px 8px rgba(5,10,20,0.4), 0 1px 2px rgba(0,0,0,0.3)",
-			}}
+			variant="primary"
+			className="px-4"
 		>
 			Manage Subscription
 		</Button>
