@@ -46,7 +46,7 @@ export async function copyAgent(
 		if (agent.teamDbId !== team.dbId) {
 			return {
 				result: "error",
-				message: "You are not allowed to duplicate this app",
+				message: "You are not allowed to duplicate this workspace",
 			};
 		}
 
@@ -123,7 +123,7 @@ export async function deleteAgent(agentId: string): Promise<DeleteAgentResult> {
 		if (agent.teamDbId !== team.dbId) {
 			return {
 				result: "error",
-				message: "You are not allowed to delete this app",
+				message: "You are not allowed to delete this workspace",
 			};
 		}
 
