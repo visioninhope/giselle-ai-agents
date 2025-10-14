@@ -33,18 +33,30 @@ function ExternalIcon({ className }: { className?: string }) {
 
 interface DocsLinkProps extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
 	icon?: boolean;
+	/**
+	 * Color tone for link text
+	 * - "secondary": blue-gray token (link-muted)
+	 * - "muted": white-ish subtle token
+	 */
+	tone?: "secondary" | "muted";
 }
 
 export function DocsLink({
 	className,
 	icon = true,
+	tone = "secondary",
 	children,
 	...props
 }: DocsLinkProps) {
+	const toneClass =
+		tone === "muted"
+			? "text-text/80 hover:text-text"
+			: "text-link-muted hover:text-link-muted";
 	return (
 		<a
 			className={clsx(
-				"group relative text-link-muted hover:text-link-muted",
+				"group relative",
+				toneClass,
 				"text-[14px] font-medium rounded-[4px] px-1.5 py-0.5 hover:bg-surface/10 transition-colors flex items-center gap-1.5 font-sans",
 				// slide underline (single)
 				"after:absolute after:left-0 after:bottom-[2px] after:h-[1px] after:w-full after:bg-current",

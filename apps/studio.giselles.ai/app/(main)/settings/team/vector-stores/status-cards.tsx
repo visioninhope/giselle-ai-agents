@@ -10,7 +10,10 @@ function VectorStoreHeader({ title }: { title: string }) {
 			<PageHeading as="h2" glow>
 				{title}
 			</PageHeading>
-			<DocsLink href="https://docs.giselles.ai/guides/settings/team/vector-store">
+			<DocsLink
+				tone="muted"
+				href="https://docs.giselles.ai/guides/settings/team/vector-store"
+			>
 				About Vector Stores
 			</DocsLink>
 		</div>
