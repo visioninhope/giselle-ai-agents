@@ -11,6 +11,12 @@ import { AvatarImage } from "@/services/accounts/components/user-button/avatar-i
 import { updateAvatar, updateDisplayName } from "../account/actions";
 import { Button } from "../components/button";
 import { IMAGE_CONSTRAINTS } from "../constants";
+import {
+	GlassDialogBody,
+	GlassDialogContent,
+	GlassDialogFooter,
+	GlassDialogHeader,
+} from "../team/components/glass-dialog-content";
 
 const ACCEPTED_FILE_TYPES = IMAGE_CONSTRAINTS.formats.join(",");
 
@@ -211,207 +217,171 @@ export function ProfileEditModal({
 				if (!open && !isLoading) onClose();
 			}}
 		>
-			<Dialog.Portal>
-				<Dialog.Overlay className="fixed inset-0 bg-black/60 z-50" />
-				<div className="fixed inset-0 flex items-center justify-center z-50 p-4">
-					<Dialog.Content
-						className="w-[90vw] max-w-[420px] max-h-[90vh] overflow-y-auto rounded-[12px] p-6 relative shadow-xl focus:outline-none"
-						style={{
-							animation: "fadeIn 0.2s ease-out",
-							transformOrigin: "center",
-						}}
-						onEscapeKeyDown={(e) => {
-							if (isLoading) {
-								e.preventDefault();
-								e.stopPropagation();
-							}
-						}}
-						onPointerDownOutside={(e) => {
-							if (isLoading) {
-								e.preventDefault();
-								e.stopPropagation();
-							}
-						}}
-					>
-						{/* Glass effect layers */}
-						<div
-							className="absolute inset-0 rounded-[12px] backdrop-blur-md"
-							style={{
-								background:
-									"linear-gradient(135deg, rgba(150, 150, 150, 0.03) 0%, rgba(60, 90, 160, 0.12) 100%)",
-							}}
+			<GlassDialogContent
+				onEscapeKeyDown={(e) => {
+					if (isLoading) {
+						e.preventDefault();
+						e.stopPropagation();
+					}
+				}}
+				onPointerDownOutside={(e) => {
+					if (isLoading) {
+						e.preventDefault();
+						e.stopPropagation();
+					}
+				}}
+			>
+				<GlassDialogHeader
+					title="Edit Profile"
+					description="Update your display name and avatar."
+					onClose={() => {
+						if (!isLoading) onClose();
+					}}
+				/>
+				<GlassDialogBody>
+					<div className="mt-2 flex flex-col items-center gap-6 w-full">
+						{/* Hidden file input */}
+						<Input
+							ref={avatarInputRef}
+							type="file"
+							accept={ACCEPTED_FILE_TYPES}
+							className="hidden"
+							onChange={handleFileSelect}
 						/>
-						<div className="absolute top-0 left-4 right-4 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
-						<div className="absolute inset-0 rounded-[12px] border border-border-muted" />
 
-						<div className="relative z-10">
-							<div className="flex justify-between items-center">
-								<Dialog.Title className="text-[20px] font-medium text-white-400 tracking-tight font-sans">
-									Edit Profile
-								</Dialog.Title>
-								<Dialog.Close
-									onClick={(e) => {
-										if (isLoading) {
-											e.preventDefault();
-											return;
-										}
-										onClose();
-									}}
-									disabled={isLoading}
-									aria-disabled={isLoading}
-									className={`rounded-sm text-white-400 focus:outline-none ${
-										isLoading
-											? "opacity-30 cursor-not-allowed pointer-events-none"
-											: "opacity-70 hover:opacity-100 cursor-pointer"
-									}`}
-								>
-									<X className="h-5 w-5" />
-									<span className="sr-only">Close</span>
-								</Dialog.Close>
-							</div>
-							<p className="text-[14px] text-black-400 font-geist mt-2">
-								Update your display name and avatar.
-							</p>
-
-							<div className="mt-4 flex flex-col items-center gap-6 w-full">
-								{/* Hidden file input */}
-								<Input
-									ref={avatarInputRef}
-									type="file"
-									accept={ACCEPTED_FILE_TYPES}
-									className="hidden"
-									onChange={handleFileSelect}
-								/>
-
-								{/* Avatar Profile Images */}
-								<div className="flex items-center justify-center gap-4 w-full">
-									<div className="flex flex-row gap-4">
-										{/* Left side - clickable avatar */}
-										{initialAvatarUrl && !avatarPreview && (
-											<button
-												type="button"
-												onClick={handleSelectImageClick}
-												className="group relative w-[80px] h-[80px] rounded-full overflow-hidden cursor-pointer focus:outline-none focus:ring-0 border border-primary-100/20 hover:before:content-[''] hover:before:absolute hover:before:inset-0 hover:before:bg-black-900/40 hover:before:z-10"
-											>
-												<AvatarImage
-													avatarUrl={initialAvatarUrl}
-													width={80}
-													height={80}
-													alt={alt}
-													className="object-cover w-full h-full"
-												/>
-												<div className="absolute inset-0 flex items-center justify-center bg-black-900/50 opacity-0 group-hover:opacity-100 transition-opacity">
-													<div className="w-[40px] h-[40px] rounded-full flex items-center justify-center">
-														<ImageIcon className="w-7 h-7 text-white-800 transform group-hover:scale-110 transition-transform" />
-													</div>
-												</div>
-											</button>
-										)}
-
-										{/* Left side - preview image */}
-										{avatarPreview && (
-											<button
-												type="button"
-												onClick={handleSelectImageClick}
-												className="group relative w-[80px] h-[80px] rounded-full overflow-hidden cursor-pointer focus:outline-none focus:ring-0 border border-primary-100/30 hover:before:content-[''] hover:before:absolute hover:before:inset-0 hover:before:bg-black-900/40 hover:before:z-10"
-												aria-label="Change avatar"
-											>
-												<Image
-													src={avatarPreview}
-													alt="Avatar preview"
-													fill
-													sizes="80px"
-													className="object-cover w-full h-full scale-[1.02]"
-													style={{ objectPosition: "center" }}
-												/>
-												<div className="absolute inset-0 flex items-center justify-center bg-black-900/50 opacity-0 group-hover:opacity-100 transition-opacity">
-													<div className="w-[40px] h-[40px] rounded-full flex items-center justify-center">
-														<ImageIcon className="w-7 h-7 text-white-800 transform group-hover:scale-110 transition-transform" />
-													</div>
-												</div>
-											</button>
-										)}
-
-										{/* Left side - image icon when no initial avatar */}
-										{!initialAvatarUrl && !avatarPreview && (
-											<button
-												type="button"
-												onClick={handleSelectImageClick}
-												className="group relative w-[80px] h-[80px] rounded-full overflow-hidden cursor-pointer focus:outline-none focus:ring-0 bg-transparent border border-primary-100/20 flex items-center justify-center hover:before:content-[''] hover:before:absolute hover:before:inset-0 hover:before:bg-black-900/50 hover:before:z-10"
-											>
-												<ImageIcon className="w-7 h-7 text-white-800 transform group-hover:scale-110 transition-transform" />
-											</button>
-										)}
-									</div>
-								</div>
-
-								{/* Display name input */}
-								<div className="w-full">
-									<label
-										htmlFor="displayName"
-										className="block text-white-800 text-left font-medium text-[12px] leading-[170%] font-geist mb-2"
+						{/* Avatar Profile Images */}
+						<div className="flex items-center justify-center gap-4 w-full">
+							<div className="flex flex-row gap-4">
+								{/* Left side - clickable avatar */}
+								{initialAvatarUrl && !avatarPreview && (
+									<button
+										type="button"
+										onClick={handleSelectImageClick}
+										className="group relative w-[80px] h-[80px] rounded-full overflow-hidden cursor-pointer focus:outline-none focus:ring-0 border border-primary-100/20 hover:before:content-[''] hover:before:absolute hover:before:inset-0 hover:before:bg-black-900/40 hover:before:z-10"
 									>
-										Your Display Name
-									</label>
-									<div
-										className="flex flex-col items-start p-2 rounded-[8px] w-full"
-										style={{
-											background: "#00020A",
-											boxShadow: "inset 0 1px 4px rgba(0,0,0,0.5)",
-											border: "0.5px solid rgba(255,255,255,0.05)",
-										}}
-									>
-										<Input
-											id="displayName"
-											value={displayName}
-											onChange={handleDisplayNameChange}
-											className="w-full bg-transparent text-white-800 font-medium text-[14px] leading-[23.8px] font-geist shadow-none focus:text-white border-0 p-0 focus-visible:ring-0 focus-visible:ring-offset-0"
-											disabled={isLoading}
+										<AvatarImage
+											avatarUrl={initialAvatarUrl}
+											width={80}
+											height={80}
+											alt={alt}
+											className="object-cover w-full h-full"
 										/>
-									</div>
-								</div>
-
-								{/* Error message */}
-								{(error || avatarError) && (
-									<p className="text-[12px] leading-[20.4px] text-error-900 font-geist">
-										{error || avatarError}
-									</p>
+										<div className="absolute inset-0 flex items-center justify-center bg-black-900/50 opacity-0 group-hover:opacity-100 transition-opacity">
+											<div className="w-[40px] h-[40px] rounded-full flex items-center justify-center">
+												<ImageIcon className="w-7 h-7 text-white-800 transform group-hover:scale-110 transition-transform" />
+											</div>
+										</div>
+									</button>
 								)}
 
-								{/* Action buttons */}
-								<div className="flex justify-end items-center mt-6 w-full">
-									<div className="flex w-full max-w-[280px] space-x-2 ml-auto">
-										<Button
-											variant="link"
-											onClick={onClose}
-											type="button"
-											className="flex-1"
-											disabled={isLoading}
-										>
-											Cancel
-										</Button>
-										<Button
-											type="button"
-											disabled={!isFormSubmittable || isLoading}
-											onClick={handleSave}
-											className="flex-1 rounded-lg px-4 py-2 text-white/80 transition-all duration-200 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
-											style={{
-												background:
-													"linear-gradient(180deg, #202530 0%, #12151f 100%)",
-												border: "1px solid rgba(0,0,0,0.7)",
-												boxShadow:
-													"inset 0 1px 1px rgba(255,255,255,0.05), 0 2px 8px rgba(5,10,20,0.4), 0 1px 2px rgba(0,0,0,0.3)",
-											}}
-										>
-											{isLoading ? "Saving..." : "Save"}
-										</Button>
-									</div>
-								</div>
+								{/* Left side - preview image */}
+								{avatarPreview && (
+									<button
+										type="button"
+										onClick={handleSelectImageClick}
+										className="group relative w-[80px] h-[80px] rounded-full overflow-hidden cursor-pointer focus:outline-none focus:ring-0 border border-primary-100/30 hover:before:content-[''] hover:before:absolute hover:before:inset-0 hover:before:bg-black-900/40 hover:before:z-10"
+										aria-label="Change avatar"
+									>
+										<Image
+											src={avatarPreview}
+											alt="Avatar preview"
+											fill
+											sizes="80px"
+											className="object-cover w-full h-full scale-[1.02]"
+											style={{ objectPosition: "center" }}
+										/>
+										<div className="absolute inset-0 flex items-center justify-center bg-black-900/50 opacity-0 group-hover:opacity-100 transition-opacity">
+											<div className="w-[40px] h-[40px] rounded-full flex items-center justify-center">
+												<ImageIcon className="w-7 h-7 text-white-800 transform group-hover:scale-110 transition-transform" />
+											</div>
+										</div>
+									</button>
+								)}
+
+								{/* Left side - image icon when no initial avatar */}
+								{!initialAvatarUrl && !avatarPreview && (
+									<button
+										type="button"
+										onClick={handleSelectImageClick}
+										className="group relative w-[80px] h-[80px] rounded-full overflow-hidden cursor-pointer focus:outline-none focus:ring-0 bg-transparent border border-primary-100/20 flex items-center justify-center hover:before:content-[''] hover:before:absolute hover:before:inset-0 hover:before:bg-black-900/50 hover:before:z-10"
+									>
+										<ImageIcon className="w-7 h-7 text-white-800 transform group-hover:scale-110 transition-transform" />
+									</button>
+								)}
 							</div>
 						</div>
-					</Dialog.Content>
-				</div>
-			</Dialog.Portal>
+
+						{/* Display name input */}
+						<div className="w-full">
+							<label
+								htmlFor="displayName"
+								className="block text-white-800 text-left font-medium text-[12px] leading-[170%] font-geist mb-2"
+							>
+								Your Display Name
+							</label>
+							<div
+								className="flex flex-col items-start p-2 rounded-[8px] w-full"
+								style={{
+									background: "#00020A",
+									boxShadow: "inset 0 1px 4px rgba(0,0,0,0.5)",
+									border: "0.5px solid rgba(255,255,255,0.05)",
+								}}
+							>
+								<Input
+									id="displayName"
+									value={displayName}
+									onChange={handleDisplayNameChange}
+									className="w-full bg-transparent text-white-800 font-medium text-[14px] leading-[23.8px] font-geist shadow-none focus:text-white border-0 p-0 focus-visible:ring-0 focus-visible:ring-offset-0"
+									disabled={isLoading}
+								/>
+							</div>
+						</div>
+
+						{/* Error message */}
+						{(error || avatarError) && (
+							<p className="text-[12px] leading-[20.4px] text-error-900 font-geist">
+								{error || avatarError}
+							</p>
+						)}
+
+						{/* Action buttons */}
+						<div className="flex justify-end items-center mt-6 w-full">
+							<div className="flex w-full max-w-[280px] space-x-2 ml-auto">
+								<Button
+									variant="link"
+									onClick={onClose}
+									type="button"
+									className="flex-1"
+									disabled={isLoading}
+								>
+									Cancel
+								</Button>
+								<Button
+									type="button"
+									disabled={!isFormSubmittable || isLoading}
+									onClick={handleSave}
+									className="flex-1 rounded-lg px-4 py-2 text-white/80 transition-all duration-200 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+									style={{
+										background:
+											"linear-gradient(180deg, #202530 0%, #12151f 100%)",
+										border: "1px solid rgba(0,0,0,0.7)",
+										boxShadow:
+											"inset 0 1px 1px rgba(255,255,255,0.05), 0 2px 8px rgba(5,10,20,0.4), 0 1px 2px rgba(0,0,0,0.3)",
+									}}
+								>
+									{isLoading ? "Saving..." : "Save"}
+								</Button>
+							</div>
+						</div>
+					</div>
+				</GlassDialogBody>
+				<GlassDialogFooter
+					onCancel={onClose}
+					onConfirm={handleSave}
+					confirmLabel={isLoading ? "Saving..." : "Save"}
+					isPending={isLoading}
+				/>
+			</GlassDialogContent>
 		</Dialog.Root>
 	);
 }
