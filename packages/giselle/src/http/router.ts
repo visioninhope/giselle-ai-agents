@@ -19,7 +19,6 @@ import {
 	StartActInputs,
 } from "../engine/acts";
 import { DataSourceProviderObject } from "../engine/data-source";
-import { ConfigureTriggerInput } from "../engine/flows";
 import {
 	Generation,
 	GenerationId,
@@ -27,6 +26,7 @@ import {
 	QueuedGeneration,
 	RunningGeneration,
 } from "../engine/generations";
+import { ConfigureTriggerInput } from "../engine/triggers";
 import { JsonResponse } from "../utils";
 import { createHandler, withUsageLimitErrorHandler } from "./create-handler";
 

@@ -2,7 +2,6 @@ import { z } from "zod/v4";
 import type { Sequence } from "../../concepts/act";
 import { ActId, type GenerationId } from "../../concepts/identifiers";
 import type { GiselleLogger } from "../../logger/types";
-import { resolveTrigger } from "../flows";
 import {
 	type Generation,
 	type GenerationMetadata,
@@ -15,6 +14,7 @@ import {
 import { startContentGeneration } from "../generations/start-content-generation";
 import { executeAction } from "../operations";
 import { executeQuery } from "../operations/execute-query";
+import { resolveTrigger } from "../triggers";
 import type { GiselleEngineContext } from "../types";
 import { getAct } from "./get-act";
 import { createPatchQueue } from "./patch-queue";

@@ -12,8 +12,8 @@ import {
 	type WebhookEventName,
 } from "@giselle-sdk/github-tool";
 import { createAndStartAct } from "../acts";
-import { getFlowTrigger } from "../flows/utils";
 import { getGitHubRepositoryIntegrationIndex } from "../integrations/utils";
+import { getFlowTrigger } from "../triggers/utils";
 import type { GiselleEngineContext } from "../types";
 import { type EventHandlerDependencies, processEvent } from "./event-handlers";
 import { parseCommand } from "./utils";

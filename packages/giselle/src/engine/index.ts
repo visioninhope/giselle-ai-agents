@@ -32,15 +32,6 @@ import { createDataSource, getWorkspaceDataSources } from "./data-source";
 import type { DataSourceProviderObject } from "./data-source/types/object";
 import { copyFile, getFileText, removeFile, uploadFile } from "./files";
 import {
-	type ConfigureTriggerInput,
-	configureTrigger,
-	deleteTrigger,
-	getTrigger,
-	reconfigureGitHubTrigger,
-	resolveTrigger,
-	setTrigger,
-} from "./flows";
-import {
 	cancelGeneration,
 	type Generation,
 	type GenerationMetadata,
@@ -68,6 +59,15 @@ import { executeAction } from "./operations";
 import { executeQuery } from "./operations/execute-query";
 import { addSecret, deleteSecret, getWorkspaceSecrets } from "./secrets";
 import { addWebPage } from "./sources";
+import {
+	type ConfigureTriggerInput,
+	configureTrigger,
+	deleteTrigger,
+	getTrigger,
+	reconfigureGitHubTrigger,
+	resolveTrigger,
+	setTrigger,
+} from "./triggers";
 import type {
 	GiselleEngineConfig,
 	GiselleEngineContext,
