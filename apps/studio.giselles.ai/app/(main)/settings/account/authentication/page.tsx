@@ -5,19 +5,14 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { GitHubAuthentication } from "../github-authentication";
 import { GoogleAuthentication } from "../google-authentication";
 
-export default function AccountAuthenticationPage({
+export default async function AccountAuthenticationPage({
 	searchParams,
 }: {
-	// On the server, Next passes a plain object; in edge it may be a Promise.
-	searchParams?:
-		| Record<string, string | string[]>
-		| Promise<Record<string, string | string[]>>;
+	searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
-	// Normalize both sync and promise cases
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	const sp = (searchParams as any) ?? {};
+	const params = await searchParams;
 	const oauthError =
-		typeof sp?.oauthError === "string" ? sp.oauthError : undefined;
+		typeof params?.oauthError === "string" ? params.oauthError : undefined;
 	return (
 		<div className="flex flex-col gap-[12px]">
 			<div className="flex items-center justify-between">
