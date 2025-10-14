@@ -4,7 +4,6 @@ import { AccentLink } from "@giselle-internal/ui/accent-link";
 import { GlassCard } from "@giselle-internal/ui/glass-card";
 import { RepoActionMenu } from "@giselle-internal/ui/repo-action-menu";
 import { StatusBadge } from "@giselle-internal/ui/status-badge";
-import { StatusIndicator } from "@giselle-internal/ui/status-indicator";
 import { formatTimestamp } from "@giselles-ai/lib/utils";
 import * as Dialog from "@radix-ui/react-dialog";
 import { RefreshCw, Settings, Trash } from "lucide-react";

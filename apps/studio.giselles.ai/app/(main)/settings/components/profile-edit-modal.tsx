@@ -1,7 +1,7 @@
 "use client";
 
 import * as Dialog from "@radix-ui/react-dialog";
-import { ImageIcon, X } from "lucide-react";
+import { ImageIcon } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { maxLength, minLength, parse, pipe, string } from "valibot";
@@ -74,7 +74,7 @@ export function ProfileEditModal({
 		}
 	}
 	const isAvatarValid = avatarError === "";
-	const isFormSubmittable =
+	const _isFormSubmittable =
 		(selectedAvatarFile !== null || isDisplayNameChanged) &&
 		isDisplayNameValid &&
 		isAvatarValid;

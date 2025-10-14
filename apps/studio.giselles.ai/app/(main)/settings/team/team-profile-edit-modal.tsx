@@ -1,7 +1,7 @@
 "use client";
 
 import * as Dialog from "@radix-ui/react-dialog";
-import { ImageIcon, X } from "lucide-react";
+import { ImageIcon } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { maxLength, minLength, parse, pipe, string } from "valibot";
@@ -10,7 +10,12 @@ import type { teams } from "@/drizzle";
 import { TeamAvatarImage } from "@/services/teams/components/team-avatar-image";
 import { IMAGE_CONSTRAINTS } from "../constants";
 import { updateTeamAvatar, updateTeamName } from "./actions";
-import { GlassDialogBody, GlassDialogContent, GlassDialogFooter, GlassDialogHeader } from "./components/glass-dialog-content";
+import {
+	GlassDialogBody,
+	GlassDialogContent,
+	GlassDialogFooter,
+	GlassDialogHeader,
+} from "./components/glass-dialog-content";
 
 const ACCEPTED_FILE_TYPES = IMAGE_CONSTRAINTS.formats.join(",");
 
@@ -69,7 +74,7 @@ export function TeamProfileEditModal({
 		}
 	}
 	const isProfileImageValid = profileImageError === "";
-	const isFormSubmittable =
+	const _isFormSubmittable =
 		(selectedProfileImageFile !== null || isTeamNameChanged) &&
 		isTeamNameValid &&
 		isProfileImageValid;
@@ -255,30 +260,30 @@ export function TeamProfileEditModal({
 		>
 			<Dialog.Portal>
 				<Dialog.Overlay className="fixed inset-0 bg-black/60 z-50" />
-                <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
-                    <GlassDialogContent className="max-w-[420px]"
+				<div className="fixed inset-0 flex items-center justify-center z-50 p-4">
+					<GlassDialogContent
+						className="max-w-[420px]"
 						onEscapeKeyDown={(e) => {
 							if (isLoading) {
 								e.preventDefault();
 								e.stopPropagation();
 							}
 						}}
-                        onPointerDownOutside={(e) => {
+						onPointerDownOutside={(e) => {
 							if (isLoading) {
 								e.preventDefault();
 								e.stopPropagation();
 							}
 						}}
-                    >
-                        <GlassDialogHeader
-                            title="Edit Team Profile"
-                            description="Update your team's name and profile image."
-                            onClose={() => {
-                                if (!isLoading) onClose();
-                            }}
-                        />
-                        <GlassDialogBody>
-
+					>
+						<GlassDialogHeader
+							title="Edit Team Profile"
+							description="Update your team's name and profile image."
+							onClose={() => {
+								if (!isLoading) onClose();
+							}}
+						/>
+						<GlassDialogBody>
 							<div className="mt-4 flex flex-col items-center gap-6 w-full">
 								{/* Hidden file input */}
 								<Input
@@ -365,22 +370,22 @@ export function TeamProfileEditModal({
 									</p>
 								)}
 
-                                {/* Action buttons (standard glass footer) */}
-                                <GlassDialogFooter
-                                    onCancel={onClose}
-                                    onConfirm={handleSave}
-                                    confirmLabel={isLoading ? "Processing..." : "Save"}
-                                    isPending={isLoading}
-                                />
-                            </div>
-                        </GlassDialogBody>
-                        <GlassDialogFooter
-                            onCancel={onClose}
-                            onConfirm={handleSave}
-                            confirmLabel={isLoading ? "Processing..." : "Save"}
-                            isPending={isLoading}
-                        />
-                    </GlassDialogContent>
+								{/* Action buttons (standard glass footer) */}
+								<GlassDialogFooter
+									onCancel={onClose}
+									onConfirm={handleSave}
+									confirmLabel={isLoading ? "Processing..." : "Save"}
+									isPending={isLoading}
+								/>
+							</div>
+						</GlassDialogBody>
+						<GlassDialogFooter
+							onCancel={onClose}
+							onConfirm={handleSave}
+							confirmLabel={isLoading ? "Processing..." : "Save"}
+							isPending={isLoading}
+						/>
+					</GlassDialogContent>
 				</div>
 			</Dialog.Portal>
 		</Dialog.Root>

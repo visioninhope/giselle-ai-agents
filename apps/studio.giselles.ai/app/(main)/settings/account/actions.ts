@@ -30,12 +30,14 @@ export async function connectGoogleIdentity() {
 	return await connectIdentity("google", "/settings/account/authentication");
 }
 
-function isNextRedirectError(e: unknown): e is { digest: string } {
+type NextRedirectLike = { digest: string };
+
+function isNextRedirectError(e: unknown): e is NextRedirectLike {
 	return (
 		typeof e === "object" &&
 		e !== null &&
 		"digest" in e &&
-		(e as any).digest === "NEXT_REDIRECT"
+		(e as NextRedirectLike).digest === "NEXT_REDIRECT"
 	);
 }
 
