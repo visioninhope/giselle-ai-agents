@@ -282,9 +282,7 @@ function EmbeddingModelCard({
 													? "Running"
 													: blobStatus.status === "idle"
 														? "Idle"
-														: blobStatus.status === "failed"
-															? "Error"
-															: "Unknown"}
+														: "Error"}
 											</span>
 										</div>
 										{blobStatus?.status === "failed" &&
@@ -377,9 +375,7 @@ function EmbeddingModelCard({
 													? "Running"
 													: pullRequestStatus.status === "idle"
 														? "Idle"
-														: pullRequestStatus.status === "failed"
-															? "Error"
-															: "Unknown"}
+														: "Error"}
 											</span>
 										</div>
 										{pullRequestStatus?.status === "failed" &&
