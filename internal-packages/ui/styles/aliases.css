@@ -12,6 +12,13 @@
 	.text-text {
 		color: var(--color-text) !important;
 	}
+	/* Secondary text (maps to semantic --color-text-secondary) */
+	.text-secondary {
+		color: var(
+			--color-text-secondary,
+			var(--color-text-muted, var(--color-text))
+		) !important;
+	}
 	.text-inverse {
 		color: var(--color-text-inverse, var(--color-white, #fff)) !important;
 	}
