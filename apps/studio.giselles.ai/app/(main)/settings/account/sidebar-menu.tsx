@@ -16,17 +16,17 @@ export function SidebarMenu() {
 	return (
 		<nav
 			className="min-h-full flex flex-col pt-0 px-1.5"
-			style={{ width: "var(--spacing-navigation-rail-expanded)" }}
+			style={{ width: "248px" }}
 			aria-label="Account settings navigation"
 		>
 			<ul className="flex flex-col">
 				{links.map((link) => (
-					<li key={link.href}>
+					<li key={link.href} className="w-full h-[36px]">
 						<Link
 							href={link.href}
 							aria-label={`${link.label} settings`}
 							className={cn(
-								"text-sm font-sans font-medium rounded-lg px-1 py-0.5 transition-colors flex items-center",
+								"text-sm font-sans font-medium rounded-lg px-1 transition-colors flex items-center w-full h-full",
 								"text-stage-sidebar-text hover:text-stage-sidebar-text-hover",
 								{
 									"text-stage-sidebar-text-hover": pathname === link.href,
