@@ -261,30 +261,23 @@ function EmbeddingModelCard({
 									</StatusBadge>
 								) : (
 									<div className="flex items-center gap-2">
-										<div className="flex items-center px-2 py-1 rounded-full border border-border-muted">
-											<StatusIndicator
-												status={
-													isIngesting && blobStatus.enabled
-														? "running"
-														: blobStatus.status
-												}
-												size="sm"
-												showLabel={false}
-											/>
-											<span
-												className={`text-[12px] leading-[14px] font-medium font-geist flex-1 text-center ml-1.5 ${
-													blobStatus.status === "failed"
-														? "text-error-900"
-														: "text-black-400"
-												}`}
-											>
-												{isIngesting && blobStatus.enabled
-													? "Running"
-													: blobStatus.status === "idle"
-														? "Idle"
-														: "Error"}
-											</span>
-										</div>
+										<StatusBadge
+											status={
+												(isIngesting && blobStatus.enabled) ||
+												blobStatus.status === "idle"
+													? "info"
+													: blobStatus.status === "failed"
+														? "error"
+														: "info"
+											}
+											variant="dot"
+										>
+											{isIngesting && blobStatus.enabled
+												? "Running"
+												: blobStatus.status === "idle"
+													? "Idle"
+													: "Error"}
+										</StatusBadge>
 										{blobStatus?.status === "failed" &&
 											blobStatus?.errorCode === "DOCUMENT_NOT_FOUND" && (
 												<button
@@ -354,30 +347,23 @@ function EmbeddingModelCard({
 									</StatusBadge>
 								) : (
 									<div className="flex items-center gap-2">
-										<div className="flex items-center px-2 py-1 rounded-full border border-border-muted">
-											<StatusIndicator
-												status={
-													isIngesting && pullRequestStatus.enabled
-														? "running"
-														: pullRequestStatus.status
-												}
-												size="sm"
-												showLabel={false}
-											/>
-											<span
-												className={`text-[12px] leading-[14px] font-medium font-geist flex-1 text-center ml-1.5 ${
-													pullRequestStatus.status === "failed"
-														? "text-error-900"
-														: "text-black-400"
-												}`}
-											>
-												{isIngesting && pullRequestStatus.enabled
-													? "Running"
-													: pullRequestStatus.status === "idle"
-														? "Idle"
-														: "Error"}
-											</span>
-										</div>
+										<StatusBadge
+											status={
+												(isIngesting && pullRequestStatus.enabled) ||
+												pullRequestStatus.status === "idle"
+													? "info"
+													: pullRequestStatus.status === "failed"
+														? "error"
+														: "info"
+											}
+											variant="dot"
+										>
+											{isIngesting && pullRequestStatus.enabled
+												? "Running"
+												: pullRequestStatus.status === "idle"
+													? "Idle"
+													: "Error"}
+										</StatusBadge>
 										{pullRequestStatus?.status === "failed" &&
 											pullRequestStatus?.errorCode === "DOCUMENT_NOT_FOUND" && (
 												<button
