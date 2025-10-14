@@ -20,13 +20,13 @@ export function GitHubAuthenticationPresentation({
 }: GitHubAuthenticationPresentationProps) {
 	return (
 		<Card title="" className="py-4">
-			{alert && (
-				<Alert variant="destructive" className="p-4">
+            {alert && (
+                <Alert variant="destructive" className="p-4 rounded-[12px]">
 					<TriangleAlertIcon className="w-[18px] h-[18px] text-error-900/80" />
 					<AlertTitle className="mb-0 text-error-900 font-bold text-[12px] leading-[20.4px] font-geist">
 						Authentication Error
 					</AlertTitle>
-					<AlertDescription className="text-error-900/70 font-medium text-[12px] leading-[20.4px] font-geist">
+                    <AlertDescription className="text-error-900/70 font-medium text-[12px] leading-[20.4px] font-geist">
 						{alert}
 					</AlertDescription>
 				</Alert>
