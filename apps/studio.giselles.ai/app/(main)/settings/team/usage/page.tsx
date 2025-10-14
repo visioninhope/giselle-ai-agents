@@ -1,3 +1,5 @@
+import { DocsLink } from "@giselle-internal/ui/docs-link";
+import { PageHeading } from "@giselle-internal/ui/page-heading";
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { fetchCurrentTeam, isProPlan } from "@/services/teams";
@@ -11,14 +13,12 @@ export default async function TeamUsagePage() {
 	return (
 		<div className="flex flex-col gap-[24px]">
 			<div className="flex justify-between items-center">
-				<h1
-					className="text-[30px] font-sans font-medium text-[hsl(192,73%,84%)]"
-					style={{
-						textShadow: "0 0 20px #0087f6, 0 0 40px #0087f6, 0 0 60px #0087f6",
-					}}
-				>
+				<PageHeading as="h1" glow>
 					Usage
-				</h1>
+				</PageHeading>
+				<DocsLink href="https://docs.giselles.ai/guides/settings/team/usage">
+					About Usage
+				</DocsLink>
 			</div>
 			<div className="flex flex-col gap-y-[16px]">
 				{currentTeamIsFreePlan && (
