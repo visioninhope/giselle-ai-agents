@@ -797,17 +797,6 @@ MIT OR Apache-2.0 permitted
 
 
 
-<a name="@biomejs/cli-linux-x64-musl"></a>
-### @biomejs/cli-linux-x64-musl v2.0.6
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-MIT OR Apache-2.0 permitted
-
-
-
 <a name="@bugsnag/cuid"></a>
 ### @bugsnag/cuid v3.2.1
 #### 
@@ -1281,30 +1270,8 @@ LGPL-3.0-or-later permitted
 
 
 
-<a name="@img/sharp-libvips-linuxmusl-x64"></a>
-### @img/sharp-libvips-linuxmusl-x64 v1.2.0
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-LGPL-3.0-or-later permitted
-
-
-
 <a name="@img/sharp-linux-x64"></a>
 ### @img/sharp-linux-x64 v0.34.3
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
-
-
-
-<a name="@img/sharp-linuxmusl-x64"></a>
-### @img/sharp-linuxmusl-x64 v0.34.3
 #### 
 
 ##### Paths
@@ -2262,17 +2229,6 @@ LGPL-3.0-or-later permitted
 
 <a name="@oxc-resolver/binding-linux-x64-gnu"></a>
 ### @oxc-resolver/binding-linux-x64-gnu v11.5.2
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-
-
-<a name="@oxc-resolver/binding-linux-x64-musl"></a>
-### @oxc-resolver/binding-linux-x64-musl v11.5.2
 #### 
 
 ##### Paths
@@ -4009,17 +3965,6 @@ LGPL-3.0-or-later permitted
 
 
 
-<a name="@tailwindcss/oxide-linux-x64-musl"></a>
-### @tailwindcss/oxide-linux-x64-musl v4.1.10
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-
-
 <a name="@tailwindcss/postcss"></a>
 ### @tailwindcss/postcss v4.1.10
 #### 
@@ -5554,7 +5499,7 @@ Python-2.0 manually approved
 
 
 <a name="baseline-browser-mapping"></a>
-### baseline-browser-mapping v2.8.9
+### baseline-browser-mapping v2.8.14
 #### 
 
 ##### Paths
@@ -8303,17 +8248,6 @@ BlueOak-1.0.0 permitted
 
 
 
-<a name="lightningcss-linux-x64-musl"></a>
-### lightningcss-linux-x64-musl v1.30.1
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="https://www.mozilla.org/media/MPL/2.0/index.815ca599c9df.txt">Mozilla Public License 2.0</a> permitted
-
-
-
 <a name="lilconfig"></a>
 ### lilconfig v3.1.3
 #### 
@@ -8359,7 +8293,7 @@ BlueOak-1.0.0 permitted
 
 
 <a name="loader-runner"></a>
-### loader-runner v4.3.0
+### loader-runner v4.3.1
 #### 
 
 ##### Paths
@@ -9415,7 +9349,7 @@ BlueOak-1.0.0 permitted
 
 
 <a name="nodemailer"></a>
-### nodemailer v6.10.0
+### nodemailer v7.0.7
 #### 
 
 ##### Paths
@@ -12763,5 +12697,3 @@ BlueOak-1.0.0 permitted
 * /home/runner/work/giselle/giselle
 
 <a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-

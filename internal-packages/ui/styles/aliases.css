@@ -104,6 +104,11 @@
 	.bg-bg {
 		background-color: var(--color-bg, var(--color-background)) !important;
 	}
+
+	/* Text from semantic background tokens */
+	.text-bg {
+		color: var(--color-bg, var(--color-background)) !important;
+	}
 	.bg-inverse {
 		background-color: var(--color-text-inverse, var(--color-white, #fff)) !important;
 	}
@@ -192,5 +197,31 @@
 			--color-border,
 			var(--color-border-variant, var(--color-dark-border))
 		) !important;
+	}
+
+	/* Inverse background (migration helpers) */
+	.bg-inverse\/5 {
+		background-color: color-mix(
+			in srgb,
+			var(--color-text-inverse, var(--color-white, #fff)) 5%,
+			transparent
+		) !important;
+	}
+	.bg-inverse\/10 {
+		background-color: color-mix(
+			in srgb,
+			var(--color-text-inverse, var(--color-white, #fff)) 10%,
+			transparent
+		) !important;
+	}
+
+	/* Link muted explicit color */
+	.text-link-muted {
+		color: var(--color-link-muted) !important;
+	}
+
+	/* Placeholder variant for link-muted */
+	.placeholder\:text-link-muted::placeholder {
+		color: var(--color-link-muted) !important;
 	}
 }

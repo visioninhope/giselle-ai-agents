@@ -37,10 +37,10 @@ async function MyAgentList() {
 		return (
 			<div className="flex justify-center items-center h-full">
 				<div className="grid gap-[8px] justify-center text-center">
-					<h3 className="text-[18px] font-geist font-bold text-black-400">
+					<h3 className="text-[18px] font-geist font-bold text-text/60">
 						No apps created by you yet.
 					</h3>
-					<p className="text-[12px] font-geist text-black-400">
+					<p className="text-[12px] font-geist text-text/60">
 						Please create a new app with the 'Create new' button in the left
 						sidebar.
 					</p>
@@ -74,10 +74,10 @@ async function MyAgentList() {
 							<div className="h-[20px] mb-1.5" />
 
 							{/* Thumbnail */}
-							<div className="h-[150px] bg-white/10 rounded-[8px] mb-4" />
+							<div className="h-[150px] bg-inverse/5 rounded-[8px] mb-4" />
 
 							<div className="flex-grow">
-								<h3 className="font-sans text-white-400 text-[16px] font-semibold mb-1 line-clamp-2">
+								<h3 className="font-sans text-inverse text-[16px] font-semibold mb-1 line-clamp-2">
 									{agent.name || "Untitled"}
 								</h3>
 							</div>
@@ -85,7 +85,7 @@ async function MyAgentList() {
 							<div className="mt-auto">
 								<div className="border-t-[0.5px] border-border my-4" />
 								<div className="flex justify-between items-center">
-									<span className="text-white-400 text-xs font-geist truncate max-w-[200px]">
+									<span className="text-inverse text-xs font-geist truncate max-w-[200px]">
 										Edited by you -{" "}
 										{formatTimestamp.toRelativeTime(
 											new Date(agent.updatedAt).getTime(),

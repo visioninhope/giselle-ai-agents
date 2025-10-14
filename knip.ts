@@ -100,6 +100,9 @@ const config: KnipConfig = {
 				...nextPredefinedExternalPackages,
 			],
 		},
+		"apps/ui.giselles.ai": {
+			ignoreDependencies: ["tailwindcss"],
+		},
 		"internal-packages/ui": {
 			ignoreDependencies: ["tailwindcss"],
 		},

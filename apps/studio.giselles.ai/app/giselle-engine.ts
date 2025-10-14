@@ -275,6 +275,18 @@ export const giselleEngine = NextGiselleEngine({
 				return;
 			}
 			const requestId = getRequestId();
+			if (args.generation.context.origin.type === "github-app") {
+				const team = await getWorkspaceTeam(
+					args.generation.context.origin.workspaceId,
+				);
+				await traceGenerationForTeam({
+					...args,
+					requestId,
+					userId: "github-app",
+					team,
+				});
+				return;
+			}
 			const [currentUser, currentTeam] = await Promise.all([
 				fetchCurrentUser(),
 				fetchCurrentTeam(),
