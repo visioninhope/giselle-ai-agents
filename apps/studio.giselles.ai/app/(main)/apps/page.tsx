@@ -19,7 +19,7 @@ function AgentList({
 					<h3 className="text-[18px] font-geist font-bold text-text/60">
 						No apps yet.
 					</h3>
-					<p className="text-[12px] font-geist text-text/60">
+					<p className="text-[12px] font-geist text-secondary">
 						Please create a new app with the 'New App +' button.
 					</p>
 				</div>
