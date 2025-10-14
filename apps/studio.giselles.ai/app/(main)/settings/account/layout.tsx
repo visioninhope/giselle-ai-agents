@@ -16,7 +16,7 @@ export default function SettingsAccountLayout({
 					</div>
 				</div>
 				{/* Main Content */}
-				<div className="pl-[24px] flex-1 pt-[24px]">{children}</div>
+				<div className="p-[24px] flex-1">{children}</div>
 			</div>
 		</div>
 	);
