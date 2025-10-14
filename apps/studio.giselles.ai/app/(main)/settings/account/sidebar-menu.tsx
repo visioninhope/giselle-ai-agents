@@ -15,7 +15,7 @@ export function SidebarMenu() {
 
 	return (
 		<nav
-			className="min-h-full flex flex-col pt-0"
+			className="min-h-full flex flex-col pt-0 px-1.5"
 			style={{ width: "var(--spacing-navigation-rail-expanded)" }}
 			aria-label="Account settings navigation"
 		>
@@ -26,13 +26,14 @@ export function SidebarMenu() {
 							href={link.href}
 							aria-label={`${link.label} settings`}
 							className={cn(
-								"text-sm font-sans font-medium rounded-lg px-2 py-0.5 transition-colors",
+								"text-sm font-sans font-medium rounded-lg px-1 py-0.5 transition-colors flex items-center",
 								"text-stage-sidebar-text hover:text-stage-sidebar-text-hover",
 								{
 									"text-stage-sidebar-text-hover": pathname === link.href,
 								},
 							)}
 						>
+							<span className="w-8 shrink-0" aria-hidden="true" />
 							{link.label}
 						</Link>
 					</li>
