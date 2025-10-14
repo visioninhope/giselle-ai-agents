@@ -10,6 +10,8 @@ type FieldProps = {
 	label: string;
 	ignore1password?: boolean;
 	value?: string;
+	placeholder?: string;
+	onChange?: React.ChangeEventHandler<HTMLInputElement>;
 	disabled?: boolean;
 };
 export const Field: FC<FieldProps> = ({
@@ -18,6 +20,8 @@ export const Field: FC<FieldProps> = ({
 	required,
 	label,
 	value,
+	placeholder,
+	onChange,
 	ignore1password = false,
 	disabled = false,
 }) => (
@@ -32,6 +36,8 @@ export const Field: FC<FieldProps> = ({
 			required={required}
 			data-1p-ignore={ignore1password}
 			value={value}
+			placeholder={placeholder}
+			onChange={onChange}
 			disabled={disabled}
 			className="py-2 border border-transparent rounded-[8px] bg-surface text-inverse font-medium text-[14px] leading-[23.8px] font-geist disabled:opacity-50"
 		/>
