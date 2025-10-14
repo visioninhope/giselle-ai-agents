@@ -19,6 +19,14 @@
 			var(--color-text-muted, var(--color-text))
 		) !important;
 	}
+
+	/* Container helper for explanatory copy */
+	.prose-secondary :is(p, li, small, span) {
+		color: var(
+			--color-text-secondary,
+			var(--color-text-muted, var(--color-text))
+		) !important;
+	}
 	.text-inverse {
 		color: var(--color-text-inverse, var(--color-white, #fff)) !important;
 	}
