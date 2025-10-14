@@ -43,6 +43,7 @@ export default async function AccountGeneralPage() {
 						type="email"
 						value={email ?? "No email"}
 						disabled
+						inputClassName="bg-transparent shadow-none border-none"
 					/>
 				</Card>
 				<Card

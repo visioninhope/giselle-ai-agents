@@ -30,8 +30,25 @@ export async function connectGoogleIdentity() {
 	return await connectIdentity("google", "/settings/account/authentication");
 }
 
+function isNextRedirectError(e: unknown): e is { digest: string } {
+	return (
+		typeof e === "object" &&
+		e !== null &&
+		"digest" in e &&
+		(e as any).digest === "NEXT_REDIRECT"
+	);
+}
+
 export async function connectGitHubIdentity() {
-	return await connectIdentity("github", "/settings/account/authentication");
+	try {
+		return await connectIdentity("github", "/settings/account/authentication");
+	} catch (e) {
+		if (isNextRedirectError(e)) throw e as Error;
+		const msg = e instanceof Error ? e.message : String(e);
+		redirect(
+			`/settings/account/authentication?oauthError=${encodeURIComponent(msg)}`,
+		);
+	}
 }
 
 export async function reconnectGoogleIdentity() {
@@ -39,7 +56,18 @@ export async function reconnectGoogleIdentity() {
 }
 
 export async function reconnectGitHubIdentity() {
-	return await reconnectIdentity("github", "/settings/account/authentication");
+	try {
+		return await reconnectIdentity(
+			"github",
+			"/settings/account/authentication",
+		);
+	} catch (e) {
+		if (isNextRedirectError(e)) throw e as Error;
+		const msg = e instanceof Error ? e.message : String(e);
+		redirect(
+			`/settings/account/authentication?oauthError=${encodeURIComponent(msg)}`,
+		);
+	}
 }
 
 export async function disconnectGoogleIdentity() {

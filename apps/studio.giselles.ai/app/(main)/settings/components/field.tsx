@@ -1,6 +1,7 @@
 import type { FC, HTMLInputTypeAttribute } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
 
 // FIXME: Consider integrating with apps/studio.giselles.ai/components/ui/field.tsx when releasing setting-v2
 type FieldProps = {
@@ -13,6 +14,7 @@ type FieldProps = {
 	placeholder?: string;
 	onChange?: React.ChangeEventHandler<HTMLInputElement>;
 	disabled?: boolean;
+	inputClassName?: string;
 };
 export const Field: FC<FieldProps> = ({
 	name,
@@ -24,6 +26,7 @@ export const Field: FC<FieldProps> = ({
 	onChange,
 	ignore1password = false,
 	disabled = false,
+	inputClassName,
 }) => (
 	<div className="grid gap-[4px]">
 		<Label htmlFor={name} className="text-text font-geist">
@@ -39,7 +42,10 @@ export const Field: FC<FieldProps> = ({
 			placeholder={placeholder}
 			onChange={onChange}
 			disabled={disabled}
-			className="py-2 rounded-[8px] bg-surface text-inverse font-medium text-[14px] leading-[23.8px] font-geist disabled:opacity-50"
+			className={cn(
+				"py-2 rounded-[8px] bg-surface text-inverse font-medium text-[14px] leading-[23.8px] font-geist disabled:opacity-50",
+				inputClassName,
+			)}
 		/>
 	</div>
 );

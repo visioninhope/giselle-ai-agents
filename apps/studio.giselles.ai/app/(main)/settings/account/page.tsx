@@ -30,7 +30,13 @@ export default async function AccountSettingPage() {
 					<PageHeading as="h1" glow>
 						Overview
 					</PageHeading>
-					<DocsLink href="https://docs.giselles.ai/guides/settings/account/overview" />
+					<DocsLink
+						href="https://docs.giselles.ai/en/guides/settings/account/overview"
+						target="_blank"
+						rel="noopener noreferrer"
+					>
+						About teams
+					</DocsLink>
 				</div>
 				<div className="flex flex-col gap-y-[12px]">
 					<div className="space-y-2 p-6 gap-y-[12px]">

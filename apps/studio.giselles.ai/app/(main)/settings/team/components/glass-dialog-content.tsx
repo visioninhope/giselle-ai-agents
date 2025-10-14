@@ -21,10 +21,10 @@ export const GlassDialogContent = React.forwardRef<
 			? "linear-gradient(135deg, rgba(241, 91, 108, 0.03) 0%, rgba(241, 91, 108, 0.12) 100%)"
 			: "linear-gradient(135deg, rgba(150, 150, 150, 0.03) 0%, rgba(60, 90, 160, 0.12) 100%)";
 
-const borderClass =
-	variant === "destructive"
-		? "border-[0.5px] border-error-900/15"
-		: "border-[0.5px] border-white/8";
+	const borderClass =
+		variant === "destructive"
+			? "border-[0.5px] border-error-900/15"
+			: "border-[0.5px] border-white/8";
 
 	return (
 		<Dialog.Portal>
@@ -47,10 +47,7 @@ const borderClass =
 					/>
 					<div className="absolute -z-10 top-0 left-4 right-4 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
 					<div
-						className={cn(
-							"absolute -z-10 inset-0 rounded-[12px]",
-							borderClass,
-						)}
+						className={cn("absolute -z-10 inset-0 rounded-[12px]", borderClass)}
 					/>
 					{children}
 				</Dialog.Content>

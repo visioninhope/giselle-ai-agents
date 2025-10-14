@@ -313,7 +313,7 @@ export function ProfileEditModal({
 						</div>
 
 						{/* Display name input */}
-						<div className="w-full">
+						<div className="w-full overflow-visible">
 							<Field
 								name="displayName"
 								type="text"
@@ -321,6 +321,7 @@ export function ProfileEditModal({
 								value={displayName}
 								onChange={handleDisplayNameChange}
 								disabled={isLoading}
+								inputClassName="focus-visible:shadow-[inset_0_0_0_1px_var(--color-focused)] focus-visible:ring-0 focus-visible:outline-none"
 							/>
 						</div>
 

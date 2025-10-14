@@ -399,3 +399,5 @@
 		animation: custom-pulse 1s ease-in-out infinite;
 	}
 }
+
+/* Revert to component defaults; no global background override for inputs */

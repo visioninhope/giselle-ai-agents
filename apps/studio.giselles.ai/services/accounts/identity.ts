@@ -20,39 +20,69 @@ export async function connectIdentity(provider: OAuthProvider, next: string) {
 		}
 	}
 
-	const { data, error } = await supabase.auth.linkIdentity({
-		provider,
-		options: {
-			redirectTo: getAuthCallbackUrl({ next, provider }),
-		},
-	});
+	let data: { url?: string } | null = null;
+	let error: {
+		code?: string;
+		message?: string;
+		name?: string;
+		status?: string;
+	} | null = null;
+	const redirectTo = await getAuthCallbackUrl({ next, provider });
+	try {
+		({ data, error } = await supabase.auth.linkIdentity({
+			provider,
+			options: {
+				redirectTo,
+			},
+		}));
+	} catch (e) {
+		throw new Error(
+			`Failed to initiate ${provider} linkIdentity: ${String(e)}`,
+		);
+	}
 
 	if (error != null) {
 		const { code, message, name, status } = error;
 		throw new Error(`${name} occurred: ${code} (${status}): ${message}`);
 	}
 
-	if (data.url) {
-		redirect(data.url);
-	}
+	if (data?.url) redirect(data.url);
+	throw new Error(
+		`OAuth did not return redirect URL. Verify Redirect URLs include: ${redirectTo}`,
+	);
 }
 
 export async function reconnectIdentity(provider: OAuthProvider, next: string) {
 	const supabase = await createClient();
-	const { data, error } = await supabase.auth.signInWithOAuth({
-		provider,
-		options: {
-			redirectTo: getAuthCallbackUrl({ next, provider }),
-		},
-	});
+	let data: { url?: string } | null = null;
+	let error: {
+		code?: string;
+		message?: string;
+		name?: string;
+		status?: string;
+	} | null = null;
+	const redirectTo2 = await getAuthCallbackUrl({ next, provider });
+	try {
+		({ data, error } = await supabase.auth.signInWithOAuth({
+			provider,
+			options: {
+				redirectTo: redirectTo2,
+			},
+		}));
+	} catch (e) {
+		throw new Error(
+			`Failed to initiate ${provider} signInWithOAuth: ${String(e)}`,
+		);
+	}
 
 	if (error != null) {
 		const { code, message, name, status } = error;
 		throw new Error(`${name} occurred: ${code} (${status}): ${message}`);
 	}
-	if (data.url) {
-		redirect(data.url);
-	}
+	if (data?.url) redirect(data.url);
+	throw new Error(
+		`OAuth did not return redirect URL. Verify Redirect URLs include: ${redirectTo2}`,
+	);
 }
 
 export async function disconnectIdentity(
