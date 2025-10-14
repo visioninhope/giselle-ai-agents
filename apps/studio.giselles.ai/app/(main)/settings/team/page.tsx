@@ -1,4 +1,5 @@
-import { ExternalLink } from "lucide-react";
+import { DocsLink } from "@giselle-internal/ui/docs-link";
+import { PageHeading } from "@giselle-internal/ui/page-heading";
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { fetchCurrentTeam, isProPlan } from "@/services/teams";
@@ -16,23 +17,12 @@ export default function TeamPage() {
 	return (
 		<div className="flex flex-col gap-[24px]">
 			<div className="flex justify-between items-center">
-				<h1
-					className="text-[30px] font-sans font-medium text-[hsl(192,73%,84%)]"
-					style={{
-						textShadow: "0 0 20px #0087f6, 0 0 40px #0087f6, 0 0 60px #0087f6",
-					}}
-				>
+				<PageHeading as="h1" glow>
 					Team Settings
-				</h1>
-				<a
-					href="https://docs.giselles.ai/guides/settings/team/billing"
-					target="_blank"
-					rel="noopener noreferrer"
-					className="text-black-300 text-[14px] font-medium rounded-[4px] px-1.5 py-0.5 hover:bg-surface-hover flex items-center gap-1.5 font-sans"
-				>
+				</PageHeading>
+				<DocsLink href="https://docs.giselles.ai/guides/settings/team/billing">
 					About Team Settings
-					<ExternalLink size={14} />
-				</a>
+				</DocsLink>
 			</div>
 			<div className="flex flex-col gap-y-[16px]">
 				<Suspense
@@ -92,7 +82,7 @@ function BillingInfoForFreePlan({ team }: BillingInfoProps) {
 						Free Plan
 					</p>
 				</div>
-				<p className="text-black-400 font-medium text-[12px] leading-[20.4px] font-geist">
+				<p className="text-secondary font-medium text-[12px] leading-[20.4px] font-geist">
 					Have questions about your plan?{" "}
 					<a
 						href="https://giselles.ai/pricing"
@@ -124,7 +114,7 @@ function BillingInfoForProPlan({ team }: BillingInfoProps) {
 						<span className="text-primary-400">Pro Plan</span>
 					</p>
 				</div>
-				<p className="text-black-400 font-medium text-[12px] leading-[20.4px] font-geist">
+				<p className="text-secondary font-medium text-[12px] leading-[20.4px] font-geist">
 					Have questions about your plan?{" "}
 					<a
 						href="https://giselles.ai/pricing"
