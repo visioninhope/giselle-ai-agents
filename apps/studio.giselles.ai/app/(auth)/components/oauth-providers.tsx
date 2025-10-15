@@ -11,20 +11,33 @@ type OauthProvidersProps = AuthComponentProps & {
 export const OAuthProviders: FC<OauthProvidersProps> = ({
 	labelPrefix,
 	returnUrl,
-}) => (
-	<div className="space-y-2">
-		<ProviderButton
-			icon={<SiGoogle className="h-[20px] w-[20px]" />}
-			label={`${labelPrefix} with Google`}
-			formAction={authorizeGoogle}
-			returnUrl={returnUrl}
-		/>
+}) => {
+	const items = [
+		{
+			key: "google",
+			icon: <SiGoogle className="h-[20px] w-[20px]" />,
+			label: `${labelPrefix} with Google`,
+			action: authorizeGoogle,
+		},
+		{
+			key: "github",
+			icon: <SiGithub className="h-[20px] w-[20px]" />,
+			label: `${labelPrefix} with GitHub`,
+			action: authorizeGitHub,
+		},
+	] as const;
 
-		<ProviderButton
-			icon={<SiGithub className="h-[20px] w-[20px]" />}
-			label={`${labelPrefix} with GitHub`}
-			formAction={authorizeGitHub}
-			returnUrl={returnUrl}
-		/>
-	</div>
-);
+	return (
+		<div className="space-y-2">
+			{items.map((item) => (
+				<ProviderButton
+					key={item.key}
+					icon={item.icon}
+					label={item.label}
+					formAction={item.action}
+					returnUrl={returnUrl}
+				/>
+			))}
+		</div>
+	);
+};
