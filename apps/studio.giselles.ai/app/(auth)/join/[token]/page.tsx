@@ -24,21 +24,16 @@ export default async function Page({
 		return <ExpiredError />;
 	}
 
-	// 開発環境でのテスト用：認証チェックをバイパス
-	if (process.env.NODE_ENV === "development" && tokenParam === "test-token") {
-		// テスト用にそのまま表示
-	} else {
-		let user: User | null = null;
-		try {
-			user = await getUser();
-		} catch (_e) {
-			// redirect to signup page
-			redirect(`/join/${encodeURIComponent(tokenParam)}/signup`);
-		}
+	let user: User | null = null;
+	try {
+		user = await getUser();
+	} catch (_e) {
+		// redirect to signup page
+		redirect(`/join/${encodeURIComponent(tokenParam)}/signup`);
+	}
 
-		if (user.email !== token.invitedEmail) {
-			return <WrongEmailError teamName={token.teamName} token={tokenParam} />;
-		}
+	if (user.email !== token.invitedEmail) {
+		return <WrongEmailError teamName={token.teamName} token={tokenParam} />;
 	}
 
 	return (

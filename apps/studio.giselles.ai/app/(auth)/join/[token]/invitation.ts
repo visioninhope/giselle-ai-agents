@@ -40,19 +40,6 @@ export async function fetchInvitationToken(
 		| typeof db = dbInstance,
 	withLock = false,
 ): Promise<InvitationToken | null> {
-	// 開発環境でのテスト用ダミートークン
-	if (process.env.NODE_ENV === "development" && token === "test-token") {
-		return {
-			token: "test-token",
-			teamId: "test-team-id" as TeamId,
-			teamDbId: 1,
-			teamName: "Test Team",
-			invitedEmail: "test@example.com",
-			expiredAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24時間後
-			role: "member",
-		};
-	}
-
 	const baseQuery = tx
 		.select({
 			token: invitations.token,
