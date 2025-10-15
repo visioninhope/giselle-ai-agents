@@ -167,25 +167,25 @@ export function DocumentVectorStoreItem({
 					<div className="text-black-300 text-[13px] leading-[18px] font-geist mt-1">
 						ID: {store.id}
 					</div>
-					<RepoActionMenu
-						disabled={disableMenu}
-						actions={[
-							{
-								value: "configure",
-								label: "Configure Sources",
-								icon: <Settings className="h-4 w-4" />,
-								onSelect: () => setIsConfigureDialogOpen(true),
-							},
-							{
-								value: "delete",
-								label: "Delete",
-								icon: <Trash className="h-4 w-4 text-error-900" />,
-								destructive: true,
-								onSelect: () => setIsDeleteDialogOpen(true),
-							},
-						]}
-					/>
 				</div>
+				<RepoActionMenu
+					disabled={disableMenu}
+					actions={[
+						{
+							value: "configure",
+							label: "Configure Sources",
+							icon: <Settings className="h-4 w-4" />,
+							onSelect: () => setIsConfigureDialogOpen(true),
+						},
+						{
+							value: "delete",
+							label: "Delete",
+							icon: <Trash className="h-4 w-4 text-error-900" />,
+							destructive: true,
+							onSelect: () => setIsDeleteDialogOpen(true),
+						},
+					]}
+				/>
 			</div>
 
 			<Dialog.Root
