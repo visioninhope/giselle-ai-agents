@@ -92,7 +92,7 @@ catalog:
   "fast-levenshtein": 3.0.0
   "@types/fast-levenshtein": 0.0.4
   "@types/pngjs": 6.0.5
-  "happy-dom": 17.6.1
+  "happy-dom": 20.0.0
   jsdom: 26.1.0
   tar: 7.4.3
   "@types/tar": 6.1.13
