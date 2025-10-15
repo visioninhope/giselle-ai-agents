@@ -36,10 +36,7 @@ export const Form = <T extends Record<string, string | undefined>>({
 			)}
 			<div className="grid gap-[16px]">
 				<div className="grid gap-[4px]">
-					<Label
-						htmlFor="email"
-						className="text-[14px] font-sans text-text"
-					>
+					<Label htmlFor="email" className="text-[14px] font-sans text-text">
 						Email
 					</Label>
 					<Input

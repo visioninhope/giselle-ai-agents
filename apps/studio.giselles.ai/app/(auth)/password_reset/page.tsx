@@ -19,9 +19,7 @@ export default function ResetPasswordPage() {
 
 			<div className="auth-action-section">
 				<ActionPrompt
-					leftIcon={
-						<ChevronLeftIcon className="w-[16px] h-[16px] text-gray-200" />
-					}
+					leftIcon={<ChevronLeftIcon className="w-[16px] h-[16px] text-text" />}
 					action={
 						<ClickableText asChild>
 							<Link href="/login">Back to log in</Link>

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { AuthButton } from "../../components/auth-button";
 
 export default function CompleteResetPasswordPage() {
 	return (
@@ -7,19 +7,16 @@ export default function CompleteResetPasswordPage() {
 			<div className="flex items-center justify-center py-12">
 				<div className="mx-auto grid w-[350px] gap-[24px]">
 					<div className="text-center">
-						<h2
-							className="mt-6 text-[28px] font-[500] text-accent font-sans text-center"
-							style={{ textShadow: "0px 0px 20px #0087F6" }}
-						>
+						<h2 className="mt-6 text-[28px] font-[500] text-accent font-sans text-center auth-title-glow">
 							Set new password
 						</h2>
-						<p className="mt-4 text-[14px] font-geist text-primary-300">
+						<p className="mt-4 text-[14px] font-geist text-secondary">
 							Your password has been successfully reset.
 						</p>
 					</div>
-					<Button asChild className="font-medium">
+					<AuthButton asChild>
 						<Link href="/apps">Continue</Link>
-					</Button>
+					</AuthButton>
 				</div>
 			</div>
 		</div>

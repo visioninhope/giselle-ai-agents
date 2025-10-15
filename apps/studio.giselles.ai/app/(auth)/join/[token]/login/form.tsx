@@ -2,10 +2,9 @@
 
 import { TriangleAlertIcon } from "lucide-react";
 import { useState, useTransition } from "react";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { AuthButton } from "../../../components/auth-button";
 import { loginUser } from "./actions";
 
 interface LoginFormProps {
@@ -35,18 +34,20 @@ export const LoginForm = (props: LoginFormProps) => {
 		<form onSubmit={handleSubmit} className="font-sans">
 			<div className="grid gap-6">
 				{error && (
-					<Alert variant="destructive">
-						<TriangleAlertIcon className="w-4 h-4" />
-						<AlertTitle>Error</AlertTitle>
-						<AlertDescription>{error}</AlertDescription>
-					</Alert>
+					<div className="text-error-900 bg-error-900/12 border border-error-900/40 rounded-[12px] p-3 text-[12px] font-geist">
+						<div className="flex items-center gap-2">
+							<TriangleAlertIcon className="w-4 h-4" />
+							<span className="font-bold">Error</span>
+						</div>
+						<div className="mt-1">{error}</div>
+					</div>
 				)}
 				<div className="grid gap-[16px]">
 					<div className="grid gap-[4px]">
 						<div className="grid gap-[4px] relative">
 							<Label
 								htmlFor="email"
-								className="text-[14px] font-sans text-black-70"
+								className="text-[14px] font-sans text-text"
 							>
 								Email
 							</Label>
@@ -57,7 +58,7 @@ export const LoginForm = (props: LoginFormProps) => {
 								value={props.email}
 								required
 								readOnly
-								className="text-white-400 bg-transparent py-[12px] px-0 read-only:border-none read-only:focus:outline-none read-only:focus:ring-0"
+								className="text-text bg-transparent py-[12px] px-0 read-only:border-none read-only:focus:outline-none read-only:focus:ring-0"
 							/>
 						</div>
 					</div>
@@ -66,7 +67,7 @@ export const LoginForm = (props: LoginFormProps) => {
 						<div className="grid gap-[4px] relative">
 							<Label
 								htmlFor="password"
-								className="text-[14px] font-sans text-black-70"
+								className="text-[14px] font-sans text-text"
 							>
 								Password
 							</Label>
@@ -77,18 +78,18 @@ export const LoginForm = (props: LoginFormProps) => {
 								value={password}
 								onChange={(e) => setPassword(e.target.value)}
 								required
+								className="bg-inverse/10"
 							/>
 						</div>
 					</div>
 
-					<Button
-						className="w-full font-medium"
+					<AuthButton
 						type="submit"
 						disabled={isPending}
 						data-loading={isPending}
 					>
 						{isPending ? "Joining..." : "Join to team"}
-					</Button>
+					</AuthButton>
 				</div>
 			</div>
 		</form>
