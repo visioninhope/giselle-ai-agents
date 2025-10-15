@@ -5,6 +5,7 @@ import { Check, ChevronDown, ChevronUp } from "lucide-react";
 import * as React from "react";
 
 import { cn } from "@/lib/utils";
+import { GlassSurfaceLayers } from "../../../../internal-packages/ui/components/glass-surface";
 
 const Select = SelectPrimitive.Root;
 
@@ -77,13 +78,7 @@ const SelectContent = React.forwardRef<
 			{...props}
 		>
 			<SelectScrollUpButton />
-			{/* top highlight (match profile dropdown/dialog) */}
-			<div className="absolute -z-10 top-0 left-4 right-4 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
-			{/* solid token border only */}
-			<div
-				className="absolute inset-0 pointer-events-none rounded-[inherit] border-[0.5px] border-border"
-				aria-hidden
-			/>
+			<GlassSurfaceLayers tone="default" borderStyle="solid" />
 			<SelectPrimitive.Viewport
 				className={cn(
 					"p-1",

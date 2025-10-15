@@ -4,6 +4,7 @@ import * as Dialog from "@radix-ui/react-dialog";
 import { X } from "lucide-react";
 import React from "react";
 import { cn } from "@/lib/utils";
+import { GlassSurfaceLayers } from "../../../../../../../internal-packages/ui/components/glass-surface";
 import { buttonVariants } from "../../components/button";
 
 type GlassDialogContentProps = React.ComponentPropsWithoutRef<
@@ -34,7 +35,7 @@ export const GlassDialogContent = React.forwardRef<
 
 		return (
 			<Dialog.Portal>
-				<Dialog.Overlay className="fixed inset-0 z-50 bg-black/60" />
+				<Dialog.Overlay className="fixed inset-0 z-50 bg-bg/60 backdrop-blur-md" />
 				<div className="fixed inset-0 z-50 flex items-center justify-center p-4">
 					<Dialog.Content
 						ref={ref}
@@ -45,41 +46,12 @@ export const GlassDialogContent = React.forwardRef<
 						)}
 						{...props}
 					>
-						{/* base dark glass fill */}
-						<div className="absolute inset-0 -z-20 rounded-[12px] bg-black-900/50" />
-						{/* glass gradient fill */}
-						<div
-							className="absolute inset-0 -z-10 rounded-[12px] backdrop-blur-md"
-							style={{ background: backgroundStyle }}
+						<GlassSurfaceLayers
+							variant={variant === "destructive" ? "destructive" : "default"}
+							borderStyle={borderStyle === "gradient" ? "gradient" : "solid"}
+							zIndexClass="z-0"
 						/>
-						<div className="absolute -z-10 top-0 left-4 right-4 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
-						{variant === "destructive" ? (
-							<div
-								className={cn(
-									"absolute -z-10 inset-0 rounded-[12px] border-[0.5px] border-error-900/15",
-								)}
-							/>
-						) : borderStyle === "solid" ? (
-							<div
-								className={cn(
-									"absolute -z-10 inset-0 rounded-[12px] border-[0.5px] border-border",
-								)}
-							/>
-						) : (
-							<div
-								className="pointer-events-none absolute inset-0 -z-10 rounded-[12px]"
-								aria-hidden
-								style={{ boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.08)" }}
-							>
-								<div className="absolute inset-0 rounded-[inherit] p-px">
-									<div
-										className="h-full w-full rounded-[inherit]"
-										style={{ background: "var(--glass-stroke-gradient)" }}
-									/>
-								</div>
-							</div>
-						)}
-						{children}
+						<div className="relative z-10">{children}</div>
 					</Dialog.Content>
 				</div>
 			</Dialog.Portal>

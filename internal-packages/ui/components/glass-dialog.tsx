@@ -1,6 +1,7 @@
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import clsx from "clsx/lite";
 import { X as XIcon } from "lucide-react";
+import { GlassSurfaceLayers } from "./glass-surface";
 
 export function GlassDialogContent(
 	props: React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> & {
@@ -21,23 +22,11 @@ export function GlassDialogContent(
 					)}
 					{...rest}
 				>
-					<div
-						className="absolute inset-0 -z-10 rounded-[12px] backdrop-blur-md"
-						style={{
-							background:
-								variant === "destructive"
-									? "linear-gradient(135deg, rgba(241, 91, 108, 0.03) 0%, rgba(241, 91, 108, 0.12) 100%)"
-									: "linear-gradient(135deg, rgba(150, 150, 150, 0.03) 0%, rgba(60, 90, 160, 0.12) 100%)",
-						}}
-					/>
-					<div className="absolute -z-10 top-0 left-4 right-4 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
-					<div
-						className={clsx(
-							"absolute -z-10 inset-0 rounded-[12px] border",
-							variant === "destructive"
-								? "border-error-900/10"
-								: "border-border-muted",
-						)}
+					<GlassSurfaceLayers
+						variant={variant === "destructive" ? "destructive" : "default"}
+						borderStyle="solid"
+						withTopHighlight={true}
+						withBaseFill={true}
 					/>
 					{children}
 				</DialogPrimitive.Content>

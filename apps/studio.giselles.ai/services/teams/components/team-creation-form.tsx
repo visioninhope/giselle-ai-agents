@@ -19,6 +19,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { cn } from "@/lib/utils";
+import { GlassSurfaceLayers } from "../../../../../internal-packages/ui/components/glass-surface";
 import { createTeam } from "../actions/create-team";
 
 function Submit({
@@ -94,16 +95,7 @@ export function TeamCreationForm({
 						onEscapeKeyDown={() => setIsOpen(false)}
 						onPointerDownOutside={() => setIsOpen(false)}
 					>
-						{/* Glass effect layers */}
-						<div
-							className="absolute inset-0 rounded-[12px] backdrop-blur-md"
-							style={{
-								background:
-									"linear-gradient(135deg, rgba(150, 150, 150, 0.03) 0%, rgba(60, 90, 160, 0.12) 100%)",
-							}}
-						/>
-						<div className="absolute top-0 left-4 right-4 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
-						<div className="absolute inset-0 rounded-[12px] border border-white/10" />
+						<GlassSurfaceLayers tone="default" borderStyle="solid" />
 
 						<div className="relative z-10">
 							<div className="flex justify-between items-center">

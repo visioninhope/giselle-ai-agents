@@ -40,7 +40,7 @@
 	--color-text-disabled: #878a98;
 	--color-text-accent: #74ade8;
 	/* Link accent (Vector Store link blue) */
-	--color-link-accent: #1663F3;
+	--color-link-accent: #1663f3;
 	--color-link-accent-hover: #0f4cd1;
 	/* global accent (water blue) */
 	--color-accent: var(--color-primary-100, #0087f6);

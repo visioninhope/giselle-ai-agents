@@ -9,6 +9,7 @@ import {
 import * as React from "react";
 
 import { cn } from "@/lib/utils";
+import { GlassSurfaceLayers } from "../../../../internal-packages/ui/components/glass-surface";
 
 const DropdownMenu = DropdownMenuPrimitive.Root;
 
@@ -61,19 +62,13 @@ const DropdownMenuContent = React.forwardRef<
 			ref={ref}
 			sideOffset={sideOffset}
 			className={cn(
-				"z-50 min-w-[8rem] overflow-hidden rounded-[12px] bg-black-900/50 backdrop-blur-md p-1 text-text shadow-md",
+				"z-50 min-w-[8rem] overflow-hidden rounded-[12px] relative p-1 text-text shadow-md",
 				"data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
 				className,
 			)}
 			{...props}
 		>
-			{/* top highlight (match dialog) */}
-			<div className="absolute -z-10 top-0 left-4 right-4 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
-			{/* solid token border only (align with Register Repository dialog) */}
-			<div
-				className="absolute inset-0 pointer-events-none rounded-[inherit] border-[0.5px] border-border"
-				aria-hidden
-			/>
+			<GlassSurfaceLayers tone="default" borderStyle="solid" />
 			{props.children}
 		</DropdownMenuPrimitive.Content>
 	</DropdownMenuPrimitive.Portal>
