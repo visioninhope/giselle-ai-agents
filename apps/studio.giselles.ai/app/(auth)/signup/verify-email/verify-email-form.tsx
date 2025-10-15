@@ -2,7 +2,6 @@
 
 import { TriangleAlertIcon } from "lucide-react";
 import { type FC, useActionState, useCallback, useRef } from "react";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { ClickableText } from "@/components/ui/clickable-text";
 import {
 	InputOTP,

@@ -1,8 +1,7 @@
 import type { User } from "@supabase/auth-js";
-import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { getUser } from "@/lib/supabase";
-import { AuthContainer, AuthContainerHeader } from "../../components";
+import { AuthContainer } from "../../components";
 import { AuthButton } from "../../components/auth-button";
 import { LegalConsent } from "../../components/legal-consent";
 import { declineInvitation, joinTeam } from "./actions";
