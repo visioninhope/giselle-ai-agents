@@ -74,7 +74,7 @@ export function ProfileEditModal({
 		}
 	}
 	const isAvatarValid = avatarError === "";
-	const _isFormSubmittable =
+	const isFormSubmittable =
 		(selectedAvatarFile !== null || isDisplayNameChanged) &&
 		isDisplayNameValid &&
 		isAvatarValid;
@@ -340,6 +340,7 @@ export function ProfileEditModal({
 					onConfirm={handleSave}
 					confirmLabel={isLoading ? "Saving..." : "Save"}
 					isPending={isLoading}
+					isConfirmDisabled={!isFormSubmittable}
 				/>
 			</GlassDialogContent>
 		</Dialog.Root>

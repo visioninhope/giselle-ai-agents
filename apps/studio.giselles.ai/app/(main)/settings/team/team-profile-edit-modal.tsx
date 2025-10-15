@@ -74,7 +74,7 @@ export function TeamProfileEditModal({
 		}
 	}
 	const isProfileImageValid = profileImageError === "";
-	const _isFormSubmittable =
+	const isFormSubmittable =
 		(selectedProfileImageFile !== null || isTeamNameChanged) &&
 		isTeamNameValid &&
 		isProfileImageValid;
@@ -376,6 +376,7 @@ export function TeamProfileEditModal({
 									onConfirm={handleSave}
 									confirmLabel={isLoading ? "Processing..." : "Save"}
 									isPending={isLoading}
+									isConfirmDisabled={!isFormSubmittable}
 								/>
 							</div>
 						</GlassDialogBody>
@@ -384,6 +385,7 @@ export function TeamProfileEditModal({
 							onConfirm={handleSave}
 							confirmLabel={isLoading ? "Processing..." : "Save"}
 							isPending={isLoading}
+							isConfirmDisabled={!isFormSubmittable}
 						/>
 					</GlassDialogContent>
 				</div>
