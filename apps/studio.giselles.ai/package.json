@@ -31,7 +31,6 @@
 		"@giselle-sdk/language-model": "workspace:*",
 		"@giselle-sdk/rag": "workspace:*",
 		"@giselle-sdk/supabase-driver": "workspace:*",
-		"@giselle-sdk/vector-store-adapters": "workspace:*",
 		"@icons-pack/react-simple-icons": "10.0.0",
 		"@next/env": "catalog:",
 		"@next/third-parties": "catalog:",

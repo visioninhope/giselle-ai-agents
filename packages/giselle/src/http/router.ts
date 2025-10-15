@@ -18,7 +18,6 @@ import {
 	type Patch,
 	StartActInputs,
 } from "../engine/acts";
-import { DataSourceProviderObject } from "../engine/data-source";
 import {
 	Generation,
 	GenerationId,
@@ -401,27 +400,6 @@ export const createJsonRouters = {
 			handler: async ({ input }) =>
 				JsonResponse.json({
 					secrets: await giselleEngine.getWorkspaceSecrets(input),
-				}),
-		}),
-	createDataSource: (giselleEngine: GiselleEngine) =>
-		createHandler({
-			input: z.object({
-				workspaceId: WorkspaceId.schema,
-				dataSource: DataSourceProviderObject,
-			}),
-			handler: async ({ input }) =>
-				JsonResponse.json({
-					dataSource: await giselleEngine.createDataSource(input),
-				}),
-		}),
-	getWorkspaceDataSources: (giselleEngine: GiselleEngine) =>
-		createHandler({
-			input: z.object({
-				workspaceId: WorkspaceId.schema,
-			}),
-			handler: async ({ input }) =>
-				JsonResponse.json({
-					dataSources: await giselleEngine.getWorkspaceDataSources(input),
 				}),
 		}),
 	createAct: (giselleEngine: GiselleEngine) =>
