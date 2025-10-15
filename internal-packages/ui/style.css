@@ -39,6 +39,13 @@
 	--color-text-placeholder: #878a98;
 	--color-text-disabled: #878a98;
 	--color-text-accent: #74ade8;
+	/* Link accent (Vector Store link blue) */
+	--color-link-accent: #1663F3;
+	--color-link-accent-hover: #0f4cd1;
+	/* global accent (water blue) */
+	--color-accent: var(--color-primary-100, #0087f6);
+	--color-accent-muted: color-mix(in srgb, var(--color-accent) 60%, transparent);
+	--color-accent-foreground: var(--color-bg, #00020b);
 	--color-text-nav-active: #b5c0c9;
 	--color-text-nav-inactive: #515d7b;
 	/* derived thin levels (for white/80, white/60 equivalents) */
@@ -87,7 +94,7 @@
 	/* status */
 	--color-conflict: #dec184;
 	--color-created: #a1c181;
-	--color-deleted: #d07277;
+	--color-deleted: #ff5a5a;
 	--color-error: #ff3d71;
 	--color-hidden: #878a98;
 	--color-hint: #788ca6;
@@ -118,6 +125,12 @@
 		135deg,
 		rgba(150, 150, 150, 0.03) 0%,
 		rgba(60, 90, 160, 0.12) 100%
+	);
+	/* stroke gradient for glass borders */
+	--glass-stroke-gradient: linear-gradient(
+		180deg,
+		rgba(255, 255, 255, 0.25) 0%,
+		rgba(255, 255, 255, 0.06) 100%
 	);
 
 	/* glass button */

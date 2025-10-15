@@ -52,7 +52,7 @@ export const UserButton: FC = async () => {
 				</DropdownMenuLabel>
 				<DropdownMenuSeparator className="bg-white/10" />
 				<div className="py-1 space-y-1">
-					<DropdownMenuItem className="p-0 rounded-lg focus:bg-white/5" asChild>
+					<DropdownMenuItem className="p-0 rounded-lg hover:bg-white/5 focus:bg-white/5" asChild>
 						<Link
 							href="/settings/account"
 							className="block px-2 py-1.5 w-full text-white-400 font-medium text-[14px] leading-[14px] font-geist"
@@ -77,7 +77,7 @@ export const UserButton: FC = async () => {
 				</div>
 				<DropdownMenuSeparator className="bg-white/10" />
 				<div className="py-1 space-y-1">
-					<DropdownMenuItem className="p-0 rounded-lg focus:bg-white/5">
+					<DropdownMenuItem className="p-0 rounded-lg hover:bg-white/5 focus:bg-white/5">
 						<a
 							href="https://giselles.ai/"
 							target="_blank"
@@ -87,7 +87,7 @@ export const UserButton: FC = async () => {
 							Home Page
 						</a>
 					</DropdownMenuItem>
-					<DropdownMenuItem className="p-0 rounded-lg focus:bg-white/5">
+					<DropdownMenuItem className="p-0 rounded-lg hover:bg-white/5 focus:bg-white/5">
 						<SignOutButton className="block px-2 py-1.5 w-full text-left text-white-400 font-geist text-[14px] leading-[14px]">
 							Log Out
 						</SignOutButton>

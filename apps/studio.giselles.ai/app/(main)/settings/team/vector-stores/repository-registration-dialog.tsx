@@ -136,6 +136,7 @@ export function RepositoryRegistrationDialog({
 				</GlassButton>
 			</Dialog.Trigger>
 			<GlassDialogContent
+				borderStyle="solid"
 				onEscapeKeyDown={() => setIsOpen(false)}
 				onPointerDownOutside={() => setIsOpen(false)}
 			>

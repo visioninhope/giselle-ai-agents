@@ -47,11 +47,11 @@ export const Nav: FC = () => {
 							href={item.path}
 							aria-label={`${item.name} menu`}
 							className={`text-[16px] font-sans font-medium transition-colors px-2 py-2 relative rounded-md
-							${
-								isActive
-									? "text-primary-100 [text-shadow:0px_0px_20px_#0087f6] after:content-[''] after:absolute after:left-0 after:right-0 after:bottom-0 after:h-[2px] after:bg-primary-100"
-									: "text-black-70 hover:text-white-100 hover:after:content-[''] hover:after:absolute hover:after:left-0 hover:after:right-0 hover:after:bottom-0 hover:after:h-[2px] hover:after:bg-primary-100"
-							}`}
+						${
+							isActive
+								? "text-accent after:content-[''] after:absolute after:left-0 after:right-0 after:bottom-0 after:h-[2px] after:bg-accent"
+								: "text-secondary hover:text-accent hover:after:content-[''] hover:after:absolute hover:after:left-0 hover:after:right-0 hover:after:bottom-0 hover:after:h-[2px] hover:after:bg-accent"
+						}`}
 						>
 							{item.name}
 						</Link>
