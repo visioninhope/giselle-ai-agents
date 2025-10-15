@@ -44,6 +44,10 @@ export async function getWorkspaceIndex<I extends z.ZodObject>({
 	useExperimentalStorage?: boolean;
 }): Promise<z.infer<I>[]> {
 	if (useExperimentalStorage) {
+		const hasIndex = await context.experimental_storage.exists(indexPath);
+		if (!hasIndex) {
+			return [];
+		}
 		return context.experimental_storage.getJson({
 			path: indexPath,
 			schema: z.array(itemSchema),
