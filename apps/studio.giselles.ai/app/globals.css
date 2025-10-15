@@ -344,7 +344,7 @@
 	}
 
 	.auth-container-title {
-		@apply text-[20px] font-[500] text-gray-200 font-sans mb-4;
+		@apply text-[20px] font-[500] text-text font-sans mb-4;
 	}
 
 	.auth-container-description {
