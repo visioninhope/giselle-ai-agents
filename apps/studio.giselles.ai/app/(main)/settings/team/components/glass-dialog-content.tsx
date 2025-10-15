@@ -119,6 +119,7 @@ type GlassDialogFooterProps = {
 	onConfirm?: () => void;
 	confirmLabel: string;
 	isPending?: boolean;
+	isConfirmDisabled?: boolean;
 	variant?: "default" | "destructive";
 	confirmButtonType?: "button" | "submit";
 };
@@ -128,6 +129,7 @@ export const GlassDialogFooter = ({
 	onConfirm,
 	confirmLabel,
 	isPending = false,
+	isConfirmDisabled = false,
 	variant = "default",
 	confirmButtonType = "button",
 }: GlassDialogFooterProps) => {
@@ -145,7 +147,7 @@ export const GlassDialogFooter = ({
 			<button
 				type={confirmButtonType}
 				onClick={onConfirm}
-				disabled={isPending}
+				disabled={isPending || isConfirmDisabled}
 				className={cn(
 					buttonVariants({
 						variant: variant === "destructive" ? "destructive" : "primary",
