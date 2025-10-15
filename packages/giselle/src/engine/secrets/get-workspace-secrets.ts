@@ -7,19 +7,22 @@ export async function getWorkspaceSecrets(args: {
 	context: GiselleEngineContext;
 	workspaceId: WorkspaceId;
 	tags?: string[];
+	useExperimentalStorage: boolean;
 }) {
+	const { context, workspaceId, tags, useExperimentalStorage } = args;
 	const secrets = await getWorkspaceIndex({
-		context: args.context,
-		indexPath: workspaceSecretIndexPath(args.workspaceId),
+		context,
+		indexPath: workspaceSecretIndexPath(workspaceId),
 		itemSchema: SecretIndex,
+		useExperimentalStorage,
 	});
 
-	if (args.tags === undefined || args.tags.length === 0) {
+	if (tags === undefined || tags.length === 0) {
 		return secrets;
 	}
 
 	return secrets.filter((secret) => {
 		const secretTags = secret.tags ?? [];
-		return args.tags?.every((tag) => secretTags.includes(tag));
+		return tags?.every((tag) => secretTags.includes(tag));
 	});
 }

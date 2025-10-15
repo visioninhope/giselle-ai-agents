@@ -14,9 +14,10 @@ export async function copyWorkspace(args: {
 	context: GiselleEngineContext;
 	workspaceId: WorkspaceId;
 	name?: string;
+	useExperimentalStorage: boolean;
 }) {
 	const sourceWorkspace = await getWorkspace({
-		useExperimentalStorage: false,
+		useExperimentalStorage: args.useExperimentalStorage,
 		storage: args.context.storage,
 		experimental_storage: args.context.experimental_storage,
 		workspaceId: args.workspaceId,
@@ -99,8 +100,10 @@ export async function copyWorkspace(args: {
 		}),
 		copyFiles({
 			storage: args.context.storage,
+			experimental_storage: args.context.experimental_storage,
 			templateWorkspaceId: args.workspaceId,
 			newWorkspaceId: workspaceCopy.id,
+			useExperimentalStorage: args.useExperimentalStorage,
 		}),
 	]);
 

@@ -191,6 +191,7 @@ export function WebPageNodePropertiesPanel({ node }: { node: WebPageNode }) {
 						const addedWebPage = await client.addWebPage({
 							webpage: newWebPage,
 							workspaceId: data.id,
+							useExperimentalStorage: experimental_storage,
 						});
 						webpages = [
 							...webpages.filter((webpage) => webpage.id !== addedWebPage.id),
@@ -217,7 +218,7 @@ export function WebPageNodePropertiesPanel({ node }: { node: WebPageNode }) {
 				}),
 			);
 		},
-		[client, data.id, node, updateNodeDataContent, error],
+		[client, data.id, node, updateNodeDataContent, error, experimental_storage],
 	);
 
 	const removeWebPage = useCallback(

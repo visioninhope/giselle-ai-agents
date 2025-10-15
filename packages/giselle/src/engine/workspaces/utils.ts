@@ -73,27 +73,66 @@ export async function getWorkspace({
 /** @todo update new fileId for each file */
 export async function copyFiles({
 	storage,
+	experimental_storage,
 	templateWorkspaceId,
 	newWorkspaceId,
+	useExperimentalStorage,
 }: {
 	storage: Storage;
+	experimental_storage: GiselleStorage;
 	templateWorkspaceId: WorkspaceId;
 	newWorkspaceId: WorkspaceId;
+	useExperimentalStorage: boolean;
 }) {
+	if (useExperimentalStorage) {
+		const prefix = `workspaces/${templateWorkspaceId}/files/`;
+		const fileKeys: string[] = [];
+		let cursor: string | undefined;
+
+		while (true) {
+			const result = await experimental_storage.listBlobs({
+				prefix,
+				cursor,
+			});
+
+			fileKeys.push(
+				...result.blobs
+					.map((blob) => blob.pathname)
+					.filter((pathname) => pathname.startsWith(prefix)),
+			);
+
+			if (!result.hasMore || !result.cursor) {
+				break;
+			}
+
+			cursor = result.cursor;
+		}
+
+		await Promise.all(
+			fileKeys.map(async (fileKey) => {
+				const target = fileKey.replace(
+					`workspaces/${templateWorkspaceId}/files/`,
+					`workspaces/${newWorkspaceId}/files/`,
+				);
+				await experimental_storage.copy(fileKey, target);
+			}),
+		);
+
+		return;
+	}
+
 	const fileKeys = await storage.getKeys(
 		`workspaces/${templateWorkspaceId}/files`,
 	);
 
 	await Promise.all(
 		fileKeys.map(async (fileKey) => {
-			const file = await storage.getItemRaw(fileKey);
-			await storage.setItemRaw(
-				fileKey.replace(
-					/workspaces:wrks-\w+:files:/,
-					`workspaces:${newWorkspaceId}:files:`,
-				),
-				file,
+			const target = fileKey.replace(
+				/workspaces:wrks-\w+:files:/,
+				`workspaces:${newWorkspaceId}:files:`,
 			);
+			const file = await storage.getItemRaw(fileKey);
+			await storage.setItemRaw(target, file);
 		}),
 	);
 }

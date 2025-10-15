@@ -112,8 +112,17 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 		runActProcess: { type: "self" },
 	};
 	return {
-		copyWorkspace: async (workspaceId: WorkspaceId, name?: string) => {
-			return await copyWorkspace({ context, workspaceId, name });
+		copyWorkspace: async (
+			workspaceId: WorkspaceId,
+			name?: string,
+			useExperimentalStorage?: boolean,
+		) => {
+			return await copyWorkspace({
+				context,
+				workspaceId,
+				name,
+				useExperimentalStorage: useExperimentalStorage ?? false,
+			});
 		},
 		createWorkspace: async ({
 			useExperimentalStorage,
@@ -268,8 +277,8 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 				useExperimentalStorage,
 			});
 		},
-		createSampleWorkspaces: async () => {
-			return await createSampleWorkspaces({ context });
+		createSampleWorkspaces: async (useExperimentalStorage: boolean) => {
+			return await createSampleWorkspaces({ context, useExperimentalStorage });
 		},
 		getGitHubRepositories: async () => {
 			return await getGitHubRepositories({ context });
@@ -326,6 +335,7 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 		addWebPage: async (args: {
 			workspaceId: WorkspaceId;
 			webpage: FetchingWebPage;
+			useExperimentalStorage: boolean;
 		}) => addWebPage({ ...args, context }),
 		async getFileText(args: {
 			workspaceId: WorkspaceId;
@@ -345,12 +355,14 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 			label: string;
 			value: string;
 			tags?: string[];
+			useExperimentalStorage: boolean;
 		}) {
 			return await addSecret({ ...args, context });
 		},
 		async getWorkspaceSecrets(args: {
 			workspaceId: WorkspaceId;
 			tags?: string[];
+			useExperimentalStorage: boolean;
 		}) {
 			return await getWorkspaceSecrets({ ...args, context });
 		},
@@ -381,7 +393,11 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 		streamAct(args: { actId: ActId }) {
 			return streamAct({ ...args, context });
 		},
-		deleteSecret(args: { workspaceId: WorkspaceId; secretId: SecretId }) {
+		deleteSecret(args: {
+			workspaceId: WorkspaceId;
+			secretId: SecretId;
+			useExperimentalStorage: boolean;
+		}) {
 			return deleteSecret({ ...args, context });
 		},
 		async flushGenerationIndexQueue() {

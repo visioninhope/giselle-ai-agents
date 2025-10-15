@@ -14,6 +14,9 @@ export async function addWorkspaceIndexItem<I>({
 	itemSchema: z.ZodType<I>;
 	useExperimentalStorage?: boolean;
 }) {
+	context.logger.debug(`Adding workspace index item to ${indexPath}`);
+	context.logger.debug(`Item: ${JSON.stringify(item)}`);
+	context.logger.debug(`useExperimentalStorage: ${useExperimentalStorage}`);
 	if (useExperimentalStorage) {
 		const indexItem = await context.experimental_storage.getJson({
 			path: indexPath,
