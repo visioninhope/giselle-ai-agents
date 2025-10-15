@@ -44,7 +44,6 @@ export function WorkspaceProvider({
 	return (
 		<FeatureFlagContext
 			value={{
-				runV3: featureFlag?.runV3 ?? false,
 				webSearchAction: featureFlag?.webSearchAction ?? false,
 				layoutV3: featureFlag?.layoutV3 ?? false,
 				experimental_storage: featureFlag?.experimental_storage ?? false,

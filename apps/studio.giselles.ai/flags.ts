@@ -40,25 +40,6 @@ export const webSearchActionFlag = flag<boolean>({
 	],
 });
 
-export const runV3Flag = flag<boolean>({
-	key: "run-v3",
-	async decide() {
-		if (process.env.NODE_ENV === "development") {
-			return takeLocalEnv("RUN_V3_FLAG");
-		}
-		const edgeConfig = await get(`flag__${this.key}`);
-		if (edgeConfig === undefined) {
-			return false;
-		}
-		return edgeConfig === true || edgeConfig === "true";
-	},
-	description: "Enable Run v3",
-	options: [
-		{ value: false, label: "disable" },
-		{ value: true, label: "Enable" },
-	],
-});
-
 export const layoutV3Flag = flag<boolean>({
 	key: "layout-v3",
 	async decide() {
