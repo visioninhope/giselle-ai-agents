@@ -25,7 +25,13 @@ export const Form: FC = () => {
 						</AlertDescription>
 					</Alert>
 				)}
-				<Field type="email" label="Email" name="email" ignore1password />
+				<Field
+					type="email"
+					label="Email"
+					name="email"
+					ignore1password
+					className="bg-inverse/10"
+				/>
 				<Button type="submit" disabled={isPending} className="font-medium">
 					Reset password
 				</Button>

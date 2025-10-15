@@ -46,6 +46,10 @@
 	--color-accent: var(--color-primary-100, #0087f6);
 	--color-accent-muted: color-mix(in srgb, var(--color-accent) 60%, transparent);
 	--color-accent-foreground: var(--color-bg, #00020b);
+	/* blue palette */
+	--color-blue-light: #b8e8f4;
+	--color-blue-pale: #c3dcf8;
+	--color-blue-muted: #839dc3;
 	--color-text-nav-active: #b5c0c9;
 	--color-text-nav-inactive: #515d7b;
 	/* derived thin levels (for white/80, white/60 equivalents) */
@@ -63,6 +67,11 @@
 	--color-stage-sidebar-text: #7084ac;
 	--color-stage-sidebar-text-hover: #f7f9fd;
 	--color-stage-accent: #6b8ff0;
+
+	/* auth */
+	--color-auth-background: hsl(234, 91%, 5%);
+	--color-auth-ambient-light: hsl(218, 58%, 21%);
+	--color-auth-logo-watermark: hsl(207, 19%, 77%);
 	--shadow-stage-form:
 		0 4px 12px rgba(0, 0, 0, 0.15), 0 2px 6px rgba(0, 0, 0, 0.1),
 		0 0 20px rgba(59, 130, 246, 0.15), 0 0 40px rgba(59, 130, 246, 0.1),
@@ -166,4 +175,40 @@
 		0 1px 0 rgba(255, 255, 255, 0.05) inset, 0 -1px 0 rgba(0, 0, 0, 0.2) inset,
 		0 0 0 1px rgba(255, 255, 255, 0.08);
 	--color-outline-button-bg: var(--color-black);
+}
+
+@layer base {
+	/* Normalize autofill colors across environments (dark theme) */
+	input:-webkit-autofill,
+	input:-webkit-autofill:hover,
+	input:-webkit-autofill:focus {
+		-webkit-text-fill-color: var(--color-text);
+		box-shadow: 0 0 0px 1000px var(--color-editor-background) inset;
+		transition: background-color 9999s ease-out 0s;
+	}
+}
+
+@layer components {
+	/* Shared glow for auth titles based on primary token */
+	.auth-title-glow {
+		text-shadow: 0 0 20px var(--color-primary-100);
+	}
+
+	/* Thin gradient stroke border for glass surfaces (used by auth container) */
+	.auth-gradient-border {
+		position: absolute;
+		inset: 0;
+		border-radius: 1rem; /* matches rounded-2xl */
+		pointer-events: none;
+		background: var(--glass-stroke-gradient);
+		mask:
+			linear-gradient(#fff 0 0) content-box,
+			linear-gradient(#fff 0 0);
+		mask-composite: xor;
+		-webkit-mask:
+			linear-gradient(#fff 0 0) content-box,
+			linear-gradient(#fff 0 0);
+		-webkit-mask-composite: xor;
+		padding: 1px;
+	}
 }

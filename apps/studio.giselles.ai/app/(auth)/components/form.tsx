@@ -3,10 +3,10 @@
 import { TriangleAlertIcon } from "lucide-react";
 import Link from "next/link";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { AuthError } from "@/lib/supabase";
+import { AuthButton } from "./auth-button";
 
 type FormProps<T extends Record<string, string | undefined>> = {
 	authError: AuthError | null;
@@ -49,8 +49,8 @@ export const Form = <T extends Record<string, string | undefined>>({
 						required
 						className={
 							validationError && "email" in validationError
-								? "border-red-500"
-								: ""
+								? "bg-inverse/10 border-red-500"
+								: "bg-inverse/10"
 						}
 					/>
 					{validationError && "email" in validationError && (
@@ -72,8 +72,8 @@ export const Form = <T extends Record<string, string | undefined>>({
 							required
 							className={
 								validationError && "password" in validationError
-									? "border-red-500"
-									: ""
+									? "bg-inverse/10 border-red-500"
+									: "bg-inverse/10"
 							}
 						/>
 						{linkToResetPassword && (
@@ -91,14 +91,14 @@ export const Form = <T extends Record<string, string | undefined>>({
 						</p>
 					)}
 				</div>
-				<Button
-					className="w-full font-medium"
+				<AuthButton
+					className="w-full"
 					type="submit"
 					disabled={isPending}
 					data-loading={isPending}
 				>
 					{submitText}
-				</Button>
+				</AuthButton>
 			</div>
 		</div>
 	);

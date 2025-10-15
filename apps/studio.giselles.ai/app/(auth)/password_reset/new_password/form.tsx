@@ -22,7 +22,12 @@ export const Form: FC = () => {
 						</AlertDescription>
 					</Alert>
 				)}
-				<Field type="password" label="New password" name="new_password" />
+				<Field
+					type="password"
+					label="New password"
+					name="new_password"
+					className="bg-inverse/10"
+				/>
 				<Button type="submit" disabled={isPending} className="font-medium">
 					Confirm
 				</Button>
