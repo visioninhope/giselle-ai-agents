@@ -1,10 +1,10 @@
 "use client";
 
+import { GlassSurfaceLayers } from "@giselle-internal/ui/glass-surface";
 import * as Dialog from "@radix-ui/react-dialog";
 import { X } from "lucide-react";
 import React from "react";
 import { cn } from "@/lib/utils";
-import { GlassSurfaceLayers } from "@giselle-internal/ui/glass-surface";
 import { buttonVariants } from "../../components/button";
 
 type GlassDialogContentProps = React.ComponentPropsWithoutRef<
