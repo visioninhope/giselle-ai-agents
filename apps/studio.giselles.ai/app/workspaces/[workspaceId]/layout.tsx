@@ -14,7 +14,6 @@ import {
 	googleUrlContextFlag,
 	layoutV3Flag,
 	resumableGenerationFlag,
-	runV3Flag,
 	stageFlag,
 	webSearchActionFlag,
 } from "@/flags";
@@ -71,7 +70,6 @@ export default async function Layout({
 	const gitHubRepositoryIndexes = await getGitHubRepositoryIndexes(
 		workspaceTeam.dbId,
 	);
-	const runV3 = await runV3Flag();
 	const webSearchAction = await webSearchActionFlag();
 	const layoutV3 = await layoutV3Flag();
 	const experimental_storage = await experimental_storageFlag();
@@ -128,7 +126,6 @@ export default async function Layout({
 				},
 			}}
 			featureFlag={{
-				runV3,
 				webSearchAction,
 				layoutV3,
 				experimental_storage,

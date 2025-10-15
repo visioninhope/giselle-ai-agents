@@ -5,7 +5,6 @@ export default function Layout({ children }: { children: ReactNode }) {
 	return (
 		<WorkspaceProvider
 			featureFlag={{
-				runV3: true,
 				webSearchAction: false,
 				layoutV3: true,
 				experimental_storage: true,
