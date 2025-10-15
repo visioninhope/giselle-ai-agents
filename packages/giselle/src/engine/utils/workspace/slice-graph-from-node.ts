@@ -55,23 +55,19 @@ export function sliceGraphFromNode(
 			if (predNode === undefined) {
 				continue;
 			}
-
-			const connection = graph.connections.find(
+			const connections = graph.connections.filter(
 				(connection) =>
 					connection.outputNode.id === predNode.id &&
 					connection.inputNode.id === currentNode.id,
 			);
-			if (connection === undefined) {
-				continue;
+			for (const connection of connections) {
+				if (!visited.has(connection.id)) {
+					sliceConnections.push(connection);
+					sliceNodeMap.set(predNode.id, predNode);
+					sliceNodeMap.set(currentNode.id, currentNode);
+					visited.add(connection.id);
+				}
 			}
-
-			if (!visited.has(connection.id)) {
-				sliceConnections.push(connection);
-				sliceNodeMap.set(predNode.id, predNode);
-				sliceNodeMap.set(currentNode.id, currentNode);
-				visited.add(connection.id);
-			}
-
 			// Continue backward traversal from operation nodes
 			if (predNode.type === "operation") {
 				backwardQueue.push(pred);
@@ -95,19 +91,18 @@ export function sliceGraphFromNode(
 			if (nextNode === undefined) {
 				continue;
 			}
-			const connection = graph.connections.find(
+			const connections = graph.connections.filter(
 				(connection) =>
 					connection.outputNode.id === currentNode.id &&
 					connection.inputNode.id === nextNode.id,
 			);
-			if (connection === undefined) {
-				continue;
-			}
-			if (!visited.has(connection.id)) {
-				sliceConnections.push(connection);
-				sliceNodeMap.set(currentNode.id, currentNode);
-				sliceNodeMap.set(nextNode.id, nextNode);
-				visited.add(connection.id);
+			for (const connection of connections) {
+				if (!visited.has(connection.id)) {
+					sliceConnections.push(connection);
+					sliceNodeMap.set(currentNode.id, currentNode);
+					sliceNodeMap.set(nextNode.id, nextNode);
+					visited.add(connection.id);
+				}
 			}
 
 			if (nextNode.type === "operation" && !processedBackward.has(next)) {
@@ -121,20 +116,18 @@ export function sliceGraphFromNode(
 				if (refNode === undefined) {
 					continue;
 				}
-				const refConnection = graph.connections.find(
+				const refConnections = graph.connections.filter(
 					(connection) =>
 						connection.outputNode.id === refNode.id &&
 						connection.inputNode.id === nextNode.id,
 				);
-				if (refConnection === undefined) {
-					continue;
-				}
-
-				if (!visited.has(refConnection.id)) {
-					sliceConnections.push(refConnection);
-					sliceNodeMap.set(nextNode.id, nextNode);
-					sliceNodeMap.set(refNode.id, refNode);
-					visited.add(refConnection.id);
+				for (const refConnection of refConnections) {
+					if (!visited.has(refConnection.id)) {
+						sliceConnections.push(refConnection);
+						sliceNodeMap.set(nextNode.id, nextNode);
+						sliceNodeMap.set(refNode.id, refNode);
+						visited.add(refConnection.id);
+					}
 				}
 			}
 		}

@@ -1,6 +1,7 @@
 import { Workspace } from "@giselle-sdk/data-type";
 import { describe, expect, test } from "vitest";
 import { backwardTraversalFixture } from "../__fixtures__/backward-traversal";
+import { multipleConnectionsSameNodesFixture } from "../__fixtures__/multiple-connections-same-nodes";
 import workspace4 from "../__fixtures__/workspace4.json";
 import { sliceGraphFromNode } from "./slice-graph-from-node";
 
@@ -102,6 +103,52 @@ describe("slice-graph-from-node", () => {
 				"cnnc-QFRBz9Y06xCx80oL", // Manual Trigger B → TGB2
 				"cnnc-n8tdkspIpnf72UHP", // Variable → TGB2
 			]);
+		});
+	});
+
+	describe("test with multiple connections between same nodes", () => {
+		test("should collect all connections when multiple connections exist between same nodes", () => {
+			const startNode = multipleConnectionsSameNodesFixture.nodes.find(
+				(node) => node.id === "nd-nwdgrtVwC070isLr",
+			);
+			if (startNode === undefined) {
+				throw new Error("Trigger node not found");
+			}
+
+			const { nodes, connections } = sliceGraphFromNode(
+				startNode,
+				multipleConnectionsSameNodesFixture,
+			);
+
+			// Should include both nodes
+			expect(nodes).toHaveLength(2);
+			const nodeIds = nodes.map((n) => n.id).sort();
+			expect(nodeIds).toEqual([
+				"nd-PlnxfHCFVLCuVJcb", // Create Issue Comment (Action)
+				"nd-nwdgrtVwC070isLr", // On Issue Comment Created (Trigger)
+			]);
+
+			// Should collect BOTH connections (not just the first one)
+			// This is the key test for the bug fix: find() → filter()
+			expect(connections).toHaveLength(2);
+			const connectionIds = connections.map((c) => c.id).sort();
+			expect(connectionIds).toEqual([
+				"cnnc-mzeOjkqocn9YFhlD", // issueNumber → issueNumber
+				"cnnc-pf2KwXJAoEEBCE1n", // issueTitle → body
+			]);
+
+			// Verify each connection has the correct output/input mapping
+			const issueNumberConn = connections.find(
+				(c) => c.id === "cnnc-mzeOjkqocn9YFhlD",
+			);
+			expect(issueNumberConn?.outputId).toBe("otp-dpz92nyiAVTcoLs6"); // issueNumber
+			expect(issueNumberConn?.inputId).toBe("inp-rKOQKGqGb7Qeps2X"); // issueNumber
+
+			const issueTitleConn = connections.find(
+				(c) => c.id === "cnnc-pf2KwXJAoEEBCE1n",
+			);
+			expect(issueTitleConn?.outputId).toBe("otp-CTj1biBXwjzZuqNo"); // issueTitle
+			expect(issueTitleConn?.inputId).toBe("inp-FiinOx0HrQqamro9"); // body
 		});
 	});
 });
