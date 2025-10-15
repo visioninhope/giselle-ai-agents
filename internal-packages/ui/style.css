@@ -72,6 +72,8 @@
 	--color-auth-background: hsl(234, 91%, 5%);
 	--color-auth-ambient-light: hsl(218, 58%, 21%);
 	--color-auth-logo-watermark: hsl(207, 19%, 77%);
+	--color-auth-text-dark: hsl(0, 0%, 0%);
+	--color-auth-bg-dark: hsl(0, 0%, 0%);
 	--shadow-stage-form:
 		0 4px 12px rgba(0, 0, 0, 0.15), 0 2px 6px rgba(0, 0, 0, 0.1),
 		0 0 20px rgba(59, 130, 246, 0.15), 0 0 40px rgba(59, 130, 246, 0.1),

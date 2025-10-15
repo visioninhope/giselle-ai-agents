@@ -12,7 +12,7 @@ export const AuthContainer: FC<AuthContainerProps> = ({
 	children,
 }) => (
 	<div className="min-h-screen flex flex-col items-center justify-center p-4 gap-6">
-		<h1 className="text-center font-sans text-[34px] font-[500] text-primary-100 auth-title-glow">
+		<h1 className="text-center font-sans text-[34px] font-[500] text-accent auth-title-glow">
 			{title}
 		</h1>
 

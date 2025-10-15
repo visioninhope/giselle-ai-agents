@@ -38,7 +38,7 @@ export const Form = <T extends Record<string, string | undefined>>({
 				<div className="grid gap-[4px]">
 					<Label
 						htmlFor="email"
-						className="text-[14px] font-sans text-gray-200"
+						className="text-[14px] font-sans text-text"
 					>
 						Email
 					</Label>
@@ -49,19 +49,19 @@ export const Form = <T extends Record<string, string | undefined>>({
 						required
 						className={
 							validationError && "email" in validationError
-								? "bg-inverse/10 border-red-500"
+								? "bg-inverse/10 border-error"
 								: "bg-inverse/10"
 						}
 					/>
 					{validationError && "email" in validationError && (
-						<p className="text-red-500 text-sm mt-1">{validationError.email}</p>
+						<p className="text-error text-sm mt-1">{validationError.email}</p>
 					)}
 				</div>
 				<div className="grid gap-[4px]">
 					<div className="grid gap-[4px] relative">
 						<Label
 							htmlFor="password"
-							className="text-[14px] font-sans text-gray-200"
+							className="text-[14px] font-sans text-text"
 						>
 							Password
 						</Label>
@@ -72,21 +72,21 @@ export const Form = <T extends Record<string, string | undefined>>({
 							required
 							className={
 								validationError && "password" in validationError
-									? "bg-inverse/10 border-red-500"
+									? "bg-inverse/10 border-error"
 									: "bg-inverse/10"
 							}
 						/>
 						{linkToResetPassword && (
 							<Link
 								href="/password_reset"
-								className="text-[14px] text-primary-100 absolute top-0 right-0 font-geist underline"
+								className="text-[14px] text-text absolute top-0 right-0 font-geist underline hover:text-text/80"
 							>
 								Forgot your password?
 							</Link>
 						)}
 					</div>
 					{validationError && "password" in validationError && (
-						<p className="text-red-500 text-sm mt-1">
+						<p className="text-error text-sm mt-1">
 							{validationError.password}
 						</p>
 					)}

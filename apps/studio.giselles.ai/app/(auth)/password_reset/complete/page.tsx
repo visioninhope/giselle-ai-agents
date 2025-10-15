@@ -8,7 +8,7 @@ export default function CompleteResetPasswordPage() {
 				<div className="mx-auto grid w-[350px] gap-[24px]">
 					<div className="text-center">
 						<h2
-							className="mt-6 text-[28px] font-[500] text-primary-100 font-sans text-center"
+							className="mt-6 text-[28px] font-[500] text-accent font-sans text-center"
 							style={{ textShadow: "0px 0px 20px #0087F6" }}
 						>
 							Set new password

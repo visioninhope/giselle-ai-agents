@@ -6,13 +6,13 @@ type DividerProps = {
 export const Divider: FC<DividerProps> = ({ label }) => {
 	return (
 		<div className="flex items-center">
-			<div className="grow border-t border-black-70" />
+			<div className="grow border-t border-inverse/20" />
 			{label && (
-				<span className="shrink mx-4 text-gray-200 text-[16px] font-semibold">
+				<span className="shrink mx-4 text-text text-[16px] font-semibold">
 					{label}
 				</span>
 			)}
-			<div className="grow border-t border-black-70" />
+			<div className="grow border-t border-inverse/20" />
 		</div>
 	);
 };
