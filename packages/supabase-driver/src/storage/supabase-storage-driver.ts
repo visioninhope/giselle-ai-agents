@@ -4,6 +4,7 @@ import {
 	DeleteObjectCommand,
 	GetObjectCommand,
 	HeadObjectCommand,
+	ListObjectsV2Command,
 	PutObjectCommand,
 	S3Client,
 } from "@aws-sdk/client-s3";
@@ -156,6 +157,53 @@ export function supabaseStorageDriver(
 				new HeadObjectCommand({ Bucket: config.bucket, Key: path }),
 			);
 			return response.ContentLength ?? 0;
+		},
+
+		async listBlobs(params = {}) {
+			const normalizedPrefix =
+				typeof params.prefix === "string"
+					? params.prefix.replace(/^\/+/, "")
+					: undefined;
+
+			const maxKeys =
+				typeof params.limit === "number" && params.limit > 0
+					? Math.min(params.limit, 1000)
+					: undefined;
+
+			const command = new ListObjectsV2Command({
+				Bucket: config.bucket,
+				Prefix:
+					normalizedPrefix && normalizedPrefix.length > 0
+						? normalizedPrefix
+						: undefined,
+				ContinuationToken:
+					typeof params.cursor === "string" ? params.cursor : undefined,
+				MaxKeys: maxKeys,
+			});
+
+			const response = await client.send(command);
+
+			const blobs =
+				response.Contents?.flatMap((item) => {
+					if (!item.Key) {
+						return [];
+					}
+
+					return [
+						{
+							pathname: item.Key,
+							size: item.Size ?? 0,
+							uploadedAt: item.LastModified ?? new Date(0),
+							etag: item.ETag ?? undefined,
+						},
+					];
+				}) ?? [];
+
+			return {
+				blobs,
+				hasMore: response.IsTruncated ?? false,
+				cursor: response.NextContinuationToken ?? undefined,
+			};
 		},
 	};
 }

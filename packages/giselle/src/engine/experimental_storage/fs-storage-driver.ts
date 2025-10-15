@@ -139,5 +139,107 @@ export function fsStorageDriver(config: FsStorageDriverConfig): GiselleStorage {
 			const stats = await fs.stat(fullPath);
 			return stats.size;
 		},
+
+		async listBlobs(params = {}) {
+			const { prefix = "", limit, cursor } = params;
+			const normalizedPrefix = prefix.replace(/^\/+/, "");
+
+			const startIndex =
+				typeof cursor === "string" && cursor.length > 0
+					? Number.parseInt(cursor, 10)
+					: 0;
+
+			if (!Number.isFinite(startIndex) || startIndex < 0) {
+				throw new Error(`Invalid cursor value: ${cursor ?? ""}`);
+			}
+
+			const collected: {
+				pathname: string;
+				size: number;
+				uploadedAt: Date;
+			}[] = [];
+
+			const walk = async (relativeDir: string): Promise<void> => {
+				const absoluteDir =
+					relativeDir.length > 0 ? join(config.root, relativeDir) : config.root;
+
+				let entries: import("node:fs").Dirent[];
+				try {
+					entries = await fs.readdir(absoluteDir, { withFileTypes: true });
+				} catch (error) {
+					// Directory might not exist yet; ignore and stop traversal.
+					if ((error as NodeJS.ErrnoException).code === "ENOENT") {
+						return;
+					}
+					throw error;
+				}
+
+				const prefixToMatch = normalizedPrefix;
+
+				for (const entry of entries) {
+					const entryPath =
+						relativeDir.length > 0
+							? `${relativeDir}/${entry.name}`
+							: entry.name;
+
+					if (entry.isDirectory()) {
+						// Skip traversing directories that cannot possibly match the prefix.
+						if (
+							prefixToMatch.length > 0 &&
+							!prefixToMatch.startsWith(`${entryPath}/`) &&
+							!entryPath.startsWith(prefixToMatch)
+						) {
+							continue;
+						}
+						await walk(entryPath);
+						continue;
+					}
+
+					if (entry.isFile()) {
+						if (
+							prefixToMatch.length > 0 &&
+							!entryPath.startsWith(prefixToMatch)
+						) {
+							continue;
+						}
+
+						const stats = await fs.stat(join(config.root, entryPath));
+						collected.push({
+							pathname: entryPath,
+							size: stats.size,
+							uploadedAt: stats.mtime,
+						});
+					}
+				}
+			};
+
+			await walk("");
+
+			const sorted = collected.sort((a, b) =>
+				a.pathname.localeCompare(b.pathname),
+			);
+
+			const effectiveLimit =
+				typeof limit === "number" && limit > 0 ? limit : undefined;
+			const endIndex =
+				effectiveLimit !== undefined
+					? Math.min(startIndex + effectiveLimit, sorted.length)
+					: sorted.length;
+
+			const slice = sorted.slice(startIndex, endIndex);
+
+			const hasMore = endIndex < sorted.length;
+			const nextCursor = hasMore ? String(endIndex) : undefined;
+
+			return {
+				blobs: slice.map((item) => ({
+					pathname: item.pathname,
+					size: item.size,
+					uploadedAt: item.uploadedAt,
+				})),
+				hasMore,
+				cursor: nextCursor,
+			};
+		},
 	};
 }

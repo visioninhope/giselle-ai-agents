@@ -39,6 +39,29 @@ type Remove = (path: string) => Promise<void>;
 
 type Exists = (path: string) => Promise<boolean>;
 
+export interface ListBlobsParams {
+	prefix?: string;
+	limit?: number;
+	cursor?: string;
+}
+
+export interface ListedBlob {
+	pathname: string;
+	size: number;
+	uploadedAt: Date;
+	contentType?: string;
+	etag?: string;
+	metadata?: Record<string, string>;
+}
+
+export interface ListBlobsResult {
+	blobs: ListedBlob[];
+	hasMore: boolean;
+	cursor?: string;
+}
+
+type ListBlobs = (params?: ListBlobsParams) => Promise<ListBlobsResult>;
+
 export interface GiselleStorage {
 	getJson: GetJson;
 	setJson: SetJson;
@@ -48,4 +71,5 @@ export interface GiselleStorage {
 	remove: Remove;
 	exists: Exists;
 	contentLength: (path: string) => Promise<number>;
+	listBlobs: ListBlobs;
 }
