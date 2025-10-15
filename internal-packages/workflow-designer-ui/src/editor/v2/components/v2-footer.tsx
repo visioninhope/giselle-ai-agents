@@ -1,7 +1,6 @@
 "use client";
 
 import {
-	DatabaseIcon,
 	ExternalLinkIcon,
 	FileKey2Icon,
 	HistoryIcon,
@@ -68,27 +67,6 @@ export function V2Footer({
 							}`}
 						>
 							<FileKey2Icon className="w-[14px] h-[14px]" />
-						</button>
-					</Tooltip>
-					<Tooltip
-						text="Data Source"
-						variant="dark"
-						className="border border-white-400/20"
-						sideOffset={-4}
-						side="top"
-						align="start"
-					>
-						<button
-							type="button"
-							onClick={() => onLeftPanelValueChange("data-source")}
-							data-panel-trigger="data-source"
-							className={`cursor-pointer ${
-								activePanel === "data-source"
-									? "text-[#6B8FF0]"
-									: "text-inverse hover:text-[#6B8FF0]"
-							}`}
-						>
-							<DatabaseIcon className="w-[14px] h-[14px]" />
 						</button>
 					</Tooltip>
 				</div>

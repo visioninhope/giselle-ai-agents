@@ -16,7 +16,6 @@ import {
 	supabaseStorageDriver as experimental_supabaseStorageDriver,
 	supabaseVaultDriver,
 } from "@giselle-sdk/supabase-driver";
-import { openaiVectorStore } from "@giselle-sdk/vector-store-adapters";
 import { tasks as jobs } from "@trigger.dev/sdk";
 import type { ModelMessage, ProviderMetadata } from "ai";
 import { createStorage } from "unstorage";
@@ -389,7 +388,6 @@ export const giselleEngine = NextGiselleEngine({
 			}
 		},
 	},
-	vectorStore: openaiVectorStore(process.env.OPENAI_API_KEY ?? ""),
 	aiGateway: {
 		httpReferer:
 			process.env.VERCEL_ENV === "preview"

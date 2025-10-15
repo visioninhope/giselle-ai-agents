@@ -28,8 +28,6 @@ import {
 	streamAct,
 } from "./acts";
 import { getLanguageModelProviders } from "./configurations/get-language-model-providers";
-import { createDataSource, getWorkspaceDataSources } from "./data-source";
-import type { DataSourceProviderObject } from "./data-source/types/object";
 import { copyFile, getFileText, removeFile, uploadFile } from "./files";
 import {
 	cancelGeneration,
@@ -88,7 +86,6 @@ export * from "../concepts/identifiers";
 export type * from "./acts";
 export * from "./acts";
 export * from "./experimental_storage";
-export * from "./experimental_vector-store";
 export * from "./integrations";
 export * from "./telemetry";
 export * from "./types";
@@ -353,15 +350,6 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 			tags?: string[];
 		}) {
 			return await getWorkspaceSecrets({ ...args, context });
-		},
-		async createDataSource(args: {
-			workspaceId: WorkspaceId;
-			dataSource: DataSourceProviderObject;
-		}) {
-			return await createDataSource({ ...args, context });
-		},
-		async getWorkspaceDataSources(args: { workspaceId: WorkspaceId }) {
-			return await getWorkspaceDataSources({ ...args, context });
 		},
 		async createAct(args: CreateActInputs) {
 			return await createAct({

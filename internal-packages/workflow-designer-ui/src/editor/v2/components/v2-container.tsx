@@ -35,7 +35,6 @@ import { edgeTypes } from "../../connector";
 import { GradientDef } from "../../connector/component";
 import { ContextMenu } from "../../context-menu";
 import type { ContextMenuProps } from "../../context-menu/types";
-import { DataSourceTable } from "../../data-source";
 import { useKeyboardShortcuts } from "../../hooks/use-keyboard-shortcuts";
 import { nodeTypes } from "../../node";
 import { PropertiesPanel } from "../../properties-panel";
@@ -414,11 +413,6 @@ export function V2Container({ leftPanel, onLeftPanelClose }: V2ContainerProps) {
 				{leftPanel !== null && (
 					<>
 						<Panel order={1}>
-							{leftPanel === "data-source" && (
-								<LeftPanel onClose={onLeftPanelClose} title="Data Source">
-									<DataSourceTable />
-								</LeftPanel>
-							)}
 							{leftPanel === "run-history" && (
 								<LeftPanel onClose={onLeftPanelClose} title="Run History">
 									<RunHistoryTable />

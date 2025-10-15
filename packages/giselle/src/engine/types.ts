@@ -14,7 +14,6 @@ import type { Storage } from "unstorage";
 import type { Act } from "../concepts/act";
 import type { GiselleLogger } from "../logger/types";
 import type { GiselleStorage } from "./experimental_storage";
-import type { VectorStore } from "./experimental_vector-store/types/interface";
 import type {
 	CompletedGeneration,
 	FailedGeneration,
@@ -112,7 +111,6 @@ export interface GiselleEngineContext {
 		flowTriggerUpdate?: (flowTrigger: FlowTrigger) => Promise<void>;
 		embeddingComplete?: EmbeddingCompleteCallbackFunction;
 	};
-	vectorStore?: VectorStore;
 	aiGateway?: {
 		httpReferer: string;
 		xTitle: string;
@@ -213,7 +211,6 @@ export interface GiselleEngineConfig {
 		flowTriggerUpdate?: (flowTrigger: FlowTrigger) => Promise<void>;
 		embeddingComplete?: EmbeddingCompleteCallbackFunction;
 	};
-	vectorStore?: VectorStore;
 	aiGateway?: {
 		httpReferer: string;
 		xTitle: string;
