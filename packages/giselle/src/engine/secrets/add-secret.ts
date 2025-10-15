@@ -14,14 +14,14 @@ export async function addSecret({
 	value,
 	workspaceId,
 	tags,
-	useExperimentalStorage = false,
+	useExperimentalStorage,
 }: {
 	context: GiselleEngineContext;
 	label: string;
 	value: string;
 	workspaceId: WorkspaceId;
 	tags?: string[];
-	useExperimentalStorage?: boolean;
+	useExperimentalStorage: boolean;
 }) {
 	const encryptedValue = await context.vault.encrypt(value);
 

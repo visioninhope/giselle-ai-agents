@@ -6,11 +6,11 @@ import { secretPath, workspaceSecretIndexPath } from "./paths";
 export async function deleteSecret({
 	context,
 	secretId,
-	useExperimentalStorage = false,
+	useExperimentalStorage,
 }: {
 	context: GiselleEngineContext;
 	secretId: SecretId;
-	useExperimentalStorage?: boolean;
+	useExperimentalStorage: boolean;
 }) {
 	const path = secretPath(secretId);
 
