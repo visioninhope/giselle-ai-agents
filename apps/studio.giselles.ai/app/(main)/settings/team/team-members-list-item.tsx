@@ -40,11 +40,25 @@ export function TeamMemberListItem({
 	const [role, setRole] = useState(initialRole);
 	const user = userId;
 	const currentUser = currentUserId;
+	const isCurrentUser = user === currentUser;
 
 	const canEditRole =
-		isProPlan && currentUserRole === "admin" && user !== currentUser;
-	const canRemove = user === currentUser || canEditRole;
-	const hasMenu = canEditRole || canRemove;
+		isProPlan && currentUserRole === "admin" && !isCurrentUser;
+	const canRemove = isCurrentUser || canEditRole;
+	const roleLabel = role.charAt(0).toUpperCase() + role.slice(1);
+
+	const selectOptions = [
+		...(canEditRole
+			? [
+					{ value: "admin" as const, label: "Admin" },
+					{ value: "member" as const, label: "Member" },
+				]
+			: []),
+		...(canRemove ? [{ value: "__remove__" as const, label: "Remove" }] : []),
+	];
+
+	const hasMenu = selectOptions.length > 0;
+	const selectValue = canEditRole ? role : undefined;
 
 	const handleRoleChange = (value: string) => {
 		const nextRole = value as TeamRole;
@@ -136,15 +150,9 @@ export function TeamMemberListItem({
 						{hasMenu ? (
 							<Select
 								id={`${userId}-role`}
-								options={[
-									{ value: "admin", label: "Admin" },
-									{ value: "member", label: "Member" },
-									...(canRemove
-										? [{ value: "__remove__", label: "Remove" }]
-										: []),
-								]}
-								placeholder="Role"
-								value={role}
+								options={selectOptions}
+								placeholder={roleLabel}
+								value={selectValue}
 								onValueChange={(v) => {
 									if (v === "__remove__") {
 										setOpen(true);
