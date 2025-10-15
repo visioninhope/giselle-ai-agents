@@ -134,8 +134,8 @@
 	);
 	--glass-bg: linear-gradient(
 		135deg,
-		rgba(150, 150, 150, 0.005) 0%,
-		rgba(60, 90, 160, 0.02) 100%
+		rgba(150, 150, 150, 0) 0%,
+		rgba(60, 90, 160, 0) 100%
 	);
 	/* stroke gradient for glass borders */
 	--glass-stroke-gradient: linear-gradient(
