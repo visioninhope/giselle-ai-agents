@@ -2,7 +2,6 @@
 
 import { TriangleAlertIcon } from "lucide-react";
 import Link from "next/link";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { AuthError } from "@/lib/supabase";
@@ -26,13 +25,15 @@ export const Form = <T extends Record<string, string | undefined>>({
 	return (
 		<div className="grid gap-6">
 			{authError && (
-				<Alert variant="destructive">
-					<TriangleAlertIcon className="w-4 h-4" />
-					<AlertTitle>Authentication Error</AlertTitle>
-					<AlertDescription>
+				<div className="text-error-900 bg-error-900/12 border border-error-900/40 rounded-[12px] p-3 text-[12px] font-geist">
+					<div className="flex items-center gap-2">
+						<TriangleAlertIcon className="w-4 h-4" />
+						<span className="font-bold">Authentication Error</span>
+					</div>
+					<div className="mt-1">
 						{authError.message || "An error occurred. Please try again."}
-					</AlertDescription>
-				</Alert>
+					</div>
+				</div>
 			)}
 			<div className="grid gap-[16px]">
 				<div className="grid gap-[4px]">
