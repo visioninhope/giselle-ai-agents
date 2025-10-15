@@ -1,5 +1,6 @@
 "use client";
 
+import { GlassSurfaceLayers } from "@giselle-internal/ui/glass-surface";
 import * as Dialog from "@radix-ui/react-dialog";
 import { AlertCircle, UserPlus, X } from "lucide-react";
 import { useState } from "react";
@@ -19,7 +20,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { cn } from "@/lib/utils";
-import { GlassSurfaceLayers } from "../../../../../internal-packages/ui/components/glass-surface";
 import { createTeam } from "../actions/create-team";
 
 function Submit({

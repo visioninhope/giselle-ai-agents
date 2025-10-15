@@ -1,11 +1,10 @@
 "use client";
 
+import { GlassSurfaceLayers } from "@giselle-internal/ui/glass-surface";
 import * as SelectPrimitive from "@radix-ui/react-select";
 import { Check, ChevronDown, ChevronUp } from "lucide-react";
 import * as React from "react";
-
 import { cn } from "@/lib/utils";
-import { GlassSurfaceLayers } from "../../../../internal-packages/ui/components/glass-surface";
 
 const Select = SelectPrimitive.Root;
 
@@ -78,7 +77,7 @@ const SelectContent = React.forwardRef<
 			{...props}
 		>
 			<SelectScrollUpButton />
-			<GlassSurfaceLayers tone="default" borderStyle="solid" />
+			<GlassSurfaceLayers tone="light" borderStyle="solid" />
 			<SelectPrimitive.Viewport
 				className={cn(
 					"p-1",

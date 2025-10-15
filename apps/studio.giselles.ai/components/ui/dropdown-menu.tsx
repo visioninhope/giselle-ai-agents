@@ -1,5 +1,6 @@
 "use client";
 
+import { GlassSurfaceLayers } from "@giselle-internal/ui/glass-surface";
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
 import {
 	CheckIcon,
@@ -7,9 +8,7 @@ import {
 	DotFilledIcon,
 } from "@radix-ui/react-icons";
 import * as React from "react";
-
 import { cn } from "@/lib/utils";
-import { GlassSurfaceLayers } from "../../../../internal-packages/ui/components/glass-surface";
 
 const DropdownMenu = DropdownMenuPrimitive.Root;
 

@@ -40,7 +40,7 @@ export const UserButton: FC = async () => {
 			</DropdownMenuTrigger>
 			<DropdownMenuContent
 				align="end"
-				className="p-2 border-[0.5px] border-white/10 rounded-xl shadow-[0_2px_8px_rgba(5,10,20,0.4),0_1px_2px_rgba(0,0,0,0.3)] bg-black-900/50 backdrop-blur-md"
+				className="p-2 rounded-xl shadow-[0_2px_8px_rgba(5,10,20,0.4),0_1px_2px_rgba(0,0,0,0.3)]"
 			>
 				<DropdownMenuLabel className="flex flex-col px-2 pt-2 pb-1 text-white-400">
 					<span className="font-bold text-[16px] leading-[16px] font-geist">

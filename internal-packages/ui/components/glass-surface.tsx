@@ -31,7 +31,7 @@ export function GlassSurfaceLayers({
 	variant = "default",
 	tone,
 	radiusClass = "rounded-[12px]",
-	baseFillClass = "bg-bg/60",
+	baseFillClass = "", // prefer token-driven mix; allow override via class
 	blurClass = "backdrop-blur-md",
 	withBaseFill = true,
 	withTopHighlight = true,
@@ -52,16 +52,15 @@ export function GlassSurfaceLayers({
 		destructive: "destructive",
 	};
 	const toneToBaseFillClass: Record<Tone, string> = {
-		default: "bg-bg/60",
-		inverse: "bg-bg/60",
-		light: "bg-white/5",
+		default: "",
+		inverse: "",
+		light: "",
 	};
 
 	const appliedTone = tone ?? variantToTone[variant];
 	const appliedBorderTone = borderTone ?? variantToBorderTone[variant];
-	const resolvedBaseFillClass = appliedTone
-		? toneToBaseFillClass[appliedTone]
-		: baseFillClass;
+	const resolvedBaseFillClass =
+		baseFillClass || toneToBaseFillClass[appliedTone] || "";
 
 	const borderToneToClass: Record<BorderTone, string> = {
 		default: "border-border",
@@ -92,6 +91,14 @@ export function GlassSurfaceLayers({
 						radiusClass,
 						resolvedBaseFillClass,
 					)}
+					style={
+						resolvedBaseFillClass
+							? undefined
+							: {
+									background:
+										"color-mix(in srgb, var(--color-bg) 50%, transparent)",
+								}
+					}
 				/>
 			)}
 			<div
@@ -104,10 +111,11 @@ export function GlassSurfaceLayers({
 			/>
 			{withTopHighlight && (
 				<div
-					className={clsx(
-						"absolute top-0 left-4 right-4 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent",
-						zIndexClass,
-					)}
+					className={clsx("absolute top-0 left-4 right-4 h-px", zIndexClass)}
+					style={{
+						backgroundImage:
+							"linear-gradient(to right, transparent, color-mix(in srgb, var(--color-text) 40%, transparent), transparent)",
+					}}
 				/>
 			)}
 			{borderStyle === "destructive" ? (
@@ -158,8 +166,8 @@ export function GlassOverlay({
 	className,
 }: GlassOverlayProps) {
 	const toneToBaseFillClass: Record<Tone, string> = {
-		default: "bg-bg/60",
-		inverse: "bg-bg/60",
+		default: "bg-black-900/50",
+		inverse: "bg-black-900/50",
 		light: "bg-white/5",
 	};
 	const resolved = baseFillClass ?? toneToBaseFillClass[tone];
