@@ -4,7 +4,7 @@ import * as Dialog from "@radix-ui/react-dialog";
 import { X } from "lucide-react";
 import React from "react";
 import { cn } from "@/lib/utils";
-import { GlassSurfaceLayers } from "../../../../../../../internal-packages/ui/components/glass-surface";
+import { GlassSurfaceLayers } from "@giselle-internal/ui/glass-surface";
 import { buttonVariants } from "../../components/button";
 
 type GlassDialogContentProps = React.ComponentPropsWithoutRef<
@@ -28,7 +28,7 @@ export const GlassDialogContent = React.forwardRef<
 		},
 		ref,
 	) => {
-		const backgroundStyle =
+		const _backgroundStyle =
 			variant === "destructive"
 				? "linear-gradient(135deg, rgba(241, 91, 108, 0.03) 0%, rgba(241, 91, 108, 0.12) 100%)"
 				: "linear-gradient(135deg, rgba(150, 150, 150, 0.03) 0%, rgba(60, 90, 160, 0.12) 100%)";
