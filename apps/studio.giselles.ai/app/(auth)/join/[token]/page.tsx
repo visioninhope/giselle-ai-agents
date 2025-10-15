@@ -40,7 +40,13 @@ export default async function Page({
 		<AuthContainer title="You have been invited">
 			<div className="text-center mb-8">
 				<h2 className="text-[24px] font-[600] text-[#6B8FF0] font-sans mb-2">
-					" {token.teamName} "
+					<span aria-hidden className="text-text/60 select-none mr-1">
+						“
+					</span>
+					{token.teamName}
+					<span aria-hidden className="text-text/60 select-none ml-1">
+						”
+					</span>
 				</h2>
 				<p className="text-[14px] font-sans text-muted">
 					You have been invited to join this team
