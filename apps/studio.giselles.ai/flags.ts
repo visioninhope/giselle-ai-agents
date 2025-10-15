@@ -40,25 +40,6 @@ export const webSearchActionFlag = flag<boolean>({
 	],
 });
 
-export const runV3Flag = flag<boolean>({
-	key: "run-v3",
-	async decide() {
-		if (process.env.NODE_ENV === "development") {
-			return takeLocalEnv("RUN_V3_FLAG");
-		}
-		const edgeConfig = await get(`flag__${this.key}`);
-		if (edgeConfig === undefined) {
-			return false;
-		}
-		return edgeConfig === true || edgeConfig === "true";
-	},
-	description: "Enable Run v3",
-	options: [
-		{ value: false, label: "disable" },
-		{ value: true, label: "Enable" },
-	],
-});
-
 export const layoutV3Flag = flag<boolean>({
 	key: "layout-v3",
 	async decide() {
@@ -152,6 +133,26 @@ export const resumableGenerationFlag = flag<boolean>({
 		{ value: false, label: "disable" },
 		{ value: true, label: "Enable" },
 	],
+});
+
+export const googleUrlContextFlag = flag<boolean>({
+	key: "google-url-context",
+	async decide() {
+		if (process.env.NODE_ENV === "development") {
+			return takeLocalEnv("GOOGLE_URL_CONTEXT_FLAG");
+		}
+		const edgeConfig = await get(`flag__${this.key}`);
+		if (edgeConfig === undefined) {
+			return false;
+		}
+		return edgeConfig === true || edgeConfig === "true";
+	},
+	description: "Enable Google URL Context tool",
+	options: [
+		{ value: false, label: "disable" },
+		{ value: true, label: "Enable" },
+	],
+	defaultValue: false,
 });
 
 export const newEditorFlag = flag<boolean>({

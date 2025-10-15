@@ -6,7 +6,7 @@ import {
 	Workspace,
 	type WorkspaceId,
 } from "@giselle-sdk/data-type";
-import { getFlowTrigger, setFlowTrigger } from "../flows/utils";
+import { getFlowTrigger, setFlowTrigger } from "../triggers/utils";
 import type { GiselleEngineContext } from "../types";
 import { copyFiles, getWorkspace, setWorkspace } from "./utils";
 

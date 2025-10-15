@@ -42,7 +42,7 @@ export function DeleteAgentButton({
 				addToast({ message: res.message, type: "error" });
 			} catch (error) {
 				const message =
-					error instanceof Error ? error.message : "Failed to delete app";
+					error instanceof Error ? error.message : "Failed to delete workspace";
 				addToast({ message, type: "error" });
 			} finally {
 				setOpen(false);
@@ -58,7 +58,7 @@ export function DeleteAgentButton({
 						<Dialog.Trigger asChild>
 							<button
 								type="button"
-								aria-label="Delete an app"
+								aria-label="Delete a workspace"
 								className="grid size-6 place-items-center rounded-full text-text/60 transition-colors hover:text-red-500"
 								disabled={isPending}
 							>
@@ -70,13 +70,13 @@ export function DeleteAgentButton({
 							</button>
 						</Dialog.Trigger>
 					</TooltipTrigger>
-					<TooltipContent>Delete App</TooltipContent>
+					<TooltipContent>Delete Workspace</TooltipContent>
 				</Tooltip>
 			</TooltipProvider>
 			<GlassDialogContent variant="destructive">
 				<GlassDialogHeader
-					title="Delete App"
-					description={`This action cannot be undone. This will permanently delete the app "${
+					title="Delete Workspace"
+					description={`This action cannot be undone. This will permanently delete the workspace "${
 						agentName || "Untitled"
 					}".`}
 					onClose={() => setOpen(false)}

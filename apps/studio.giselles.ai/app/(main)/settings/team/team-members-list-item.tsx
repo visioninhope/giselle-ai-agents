@@ -40,35 +40,54 @@ export function TeamMemberListItem({
 	const [role, setRole] = useState(initialRole);
 	const user = userId;
 	const currentUser = currentUserId;
+	const isCurrentUser = user === currentUser;
 
 	const canEditRole =
-		isProPlan && currentUserRole === "admin" && user !== currentUser;
-	const canRemove = user === currentUser || canEditRole;
-	const hasMenu = canEditRole || canRemove;
+		isProPlan && currentUserRole === "admin" && !isCurrentUser;
+	const canRemove = isCurrentUser || canEditRole;
+	const roleLabel = role.charAt(0).toUpperCase() + role.slice(1);
+
+	const selectOptions = [
+		...(canEditRole
+			? [
+					{ value: "admin" as const, label: "Admin" },
+					{ value: "member" as const, label: "Member" },
+				]
+			: []),
+		...(canRemove ? [{ value: "__remove__" as const, label: "Remove" }] : []),
+	];
+
+	const hasMenu = selectOptions.length > 0;
+	const selectValue = canEditRole ? role : undefined;
 
 	const handleRoleChange = (value: string) => {
-		setRole(value as TeamRole);
-		handleSaveRole();
+		const nextRole = value as TeamRole;
+		if (nextRole === role) {
+			return;
+		}
+		void handleSaveRole(nextRole);
 	};
 
-	const handleSaveRole = async () => {
+	const handleSaveRole = async (nextRole: TeamRole) => {
+		const previousRole = role;
 		try {
 			setIsLoading(true);
+			setError("");
+			setRole(nextRole);
 			const formData = new FormData();
 			formData.append("userId", user);
-			formData.append("role", role);
-
+			formData.append("role", nextRole);
 			const result = await updateTeamMemberRole(formData);
 			if (result?.success) {
-				// Update local state after successful server update
-				setRole(role);
-				toast(`Role updated: ${role}`, { type: "success" });
+				toast(`Role updated: ${nextRole}`, { type: "success" });
 			} else {
 				const msg = result?.error || "Failed to update role";
 				setError(msg);
+				setRole(previousRole);
 				toast(msg, { type: "error" });
 			}
 		} catch (e) {
+			setRole(previousRole);
 			if (e instanceof Error) {
 				setError(e.message);
 				toast(e.message, { type: "error" });
@@ -131,15 +150,9 @@ export function TeamMemberListItem({
 						{hasMenu ? (
 							<Select
 								id={`${userId}-role`}
-								options={[
-									{ value: "admin", label: "Admin" },
-									{ value: "member", label: "Member" },
-									...(canRemove
-										? [{ value: "__remove__", label: "Remove" }]
-										: []),
-								]}
-								placeholder="Role"
-								value={role}
+								options={selectOptions}
+								placeholder={roleLabel}
+								value={selectValue}
 								onValueChange={(v) => {
 									if (v === "__remove__") {
 										setOpen(true);

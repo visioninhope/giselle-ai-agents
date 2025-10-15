@@ -11,9 +11,9 @@ import {
 	aiGatewayFlag,
 	docVectorStoreFlag,
 	experimental_storageFlag,
+	googleUrlContextFlag,
 	layoutV3Flag,
 	resumableGenerationFlag,
-	runV3Flag,
 	stageFlag,
 	webSearchActionFlag,
 } from "@/flags";
@@ -70,13 +70,13 @@ export default async function Layout({
 	const gitHubRepositoryIndexes = await getGitHubRepositoryIndexes(
 		workspaceTeam.dbId,
 	);
-	const runV3 = await runV3Flag();
 	const webSearchAction = await webSearchActionFlag();
 	const layoutV3 = await layoutV3Flag();
 	const experimental_storage = await experimental_storageFlag();
 	const stage = await stageFlag();
 	const aiGateway = await aiGatewayFlag();
 	const resumableGeneration = await resumableGenerationFlag();
+	const googleUrlContext = await googleUrlContextFlag();
 	const data = await giselleEngine.getWorkspace(
 		workspaceId,
 		experimental_storage,
@@ -126,13 +126,13 @@ export default async function Layout({
 				},
 			}}
 			featureFlag={{
-				runV3,
 				webSearchAction,
 				layoutV3,
 				experimental_storage,
 				stage,
 				aiGateway,
 				resumableGeneration,
+				googleUrlContext,
 				documentVectorStore,
 			}}
 			flowTrigger={{

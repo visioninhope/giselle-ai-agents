@@ -2,6 +2,7 @@
 
 import { GlassCard } from "@giselle-internal/ui/glass-card";
 import { RepoActionMenu } from "@giselle-internal/ui/repo-action-menu";
+import { useToasts } from "@giselle-internal/ui/toast";
 import { DEFAULT_EMBEDDING_PROFILE_ID } from "@giselle-sdk/data-type";
 import * as Dialog from "@radix-ui/react-dialog";
 import * as Tooltip from "@radix-ui/react-tooltip";
@@ -32,7 +33,6 @@ import {
 	DOCUMENT_VECTOR_STORE_SUPPORTED_MIME_TYPES,
 } from "@/lib/vector-stores/document/constants";
 import { isSupportedDocumentFile } from "@/lib/vector-stores/document/utils";
-import { useToast } from "@/packages/contexts/toast";
 import type { DocumentVectorStoreId } from "@/packages/types";
 import {
 	GlassDialogBody,
@@ -141,7 +141,7 @@ export function DocumentVectorStoreItem({
 	const [isPending, startTransition] = useTransition();
 	const [isUpdating, setIsUpdating] = useState(false);
 	const router = useRouter();
-	const { addToast } = useToast();
+	const { toast: pushToast, error: pushErrorToast } = useToasts();
 
 	const handleConfirmDelete = () => {
 		startTransition(async () => {
@@ -150,11 +150,7 @@ export function DocumentVectorStoreItem({
 			if (result.success) {
 				router.refresh();
 			} else {
-				addToast({
-					title: "Error",
-					message: result.error,
-					type: "error",
-				});
+				pushErrorToast(result.error);
 			}
 		});
 	};
@@ -171,25 +167,25 @@ export function DocumentVectorStoreItem({
 					<div className="text-black-300 text-[13px] leading-[18px] font-geist mt-1">
 						ID: {store.id}
 					</div>
-					<RepoActionMenu
-						disabled={disableMenu}
-						actions={[
-							{
-								value: "configure",
-								label: "Configure Sources",
-								icon: <Settings className="h-4 w-4" />,
-								onSelect: () => setIsConfigureDialogOpen(true),
-							},
-							{
-								value: "delete",
-								label: "Delete",
-								icon: <Trash className="h-4 w-4 text-error-900" />,
-								destructive: true,
-								onSelect: () => setIsDeleteDialogOpen(true),
-							},
-						]}
-					/>
 				</div>
+				<RepoActionMenu
+					disabled={disableMenu}
+					actions={[
+						{
+							value: "configure",
+							label: "Configure Sources",
+							icon: <Settings className="h-4 w-4" />,
+							onSelect: () => setIsConfigureDialogOpen(true),
+						},
+						{
+							value: "delete",
+							label: "Delete",
+							icon: <Trash className="h-4 w-4 text-error-900" />,
+							destructive: true,
+							onSelect: () => setIsDeleteDialogOpen(true),
+						},
+					]}
+				/>
 			</div>
 
 			<Dialog.Root
@@ -220,16 +216,10 @@ export function DocumentVectorStoreItem({
 				updateAction={updateAction}
 				onSuccess={() => {
 					router.refresh();
-					addToast({
-						title: "Vector store updated",
-						message: "Configuration saved successfully.",
-						type: "success",
-					});
+					pushToast("Vector store updated.", { type: "success" });
 				}}
 				onPendingChange={setIsUpdating}
-				showErrorToast={(message) => {
-					addToast({ title: "Error", message, type: "error" });
-				}}
+				showErrorToast={pushErrorToast}
 			/>
 		</GlassCard>
 	);

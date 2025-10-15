@@ -44,13 +44,13 @@ export function WorkspaceProvider({
 	return (
 		<FeatureFlagContext
 			value={{
-				runV3: featureFlag?.runV3 ?? false,
 				webSearchAction: featureFlag?.webSearchAction ?? false,
 				layoutV3: featureFlag?.layoutV3 ?? false,
 				experimental_storage: featureFlag?.experimental_storage ?? false,
 				stage: featureFlag?.stage ?? false,
 				aiGateway: featureFlag?.aiGateway ?? false,
 				resumableGeneration: featureFlag?.resumableGeneration ?? false,
+				googleUrlContext: featureFlag?.googleUrlContext ?? false,
 				documentVectorStore: featureFlag?.documentVectorStore ?? false,
 			}}
 		>
