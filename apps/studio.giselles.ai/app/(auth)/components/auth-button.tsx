@@ -17,14 +17,18 @@ export function AuthButton({
 	...props
 }: AuthButtonProps) {
 	const Comp = asChild ? Slot : "button";
+	const baseClass =
+		"w-full font-medium rounded-[12px] py-[8px] px-[20px] transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-700/60 border flex items-center justify-center text-center";
+	const filledClass =
+		"bg-blue-pale text-auth-dark border-transparent hover:bg-auth-dark hover:text-blue-pale hover:border-auth-dark";
 
 	return (
 		<Comp
 			className={clsx(
-				"w-full font-medium rounded-[12px] py-[8px] px-[20px] transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-700/60 border flex items-center justify-center text-center",
-				variant === "filled" &&
-					"bg-blue-pale text-auth-dark border-transparent hover:bg-auth-dark hover:text-blue-pale hover:border-auth-dark",
-				variant === "link" && "bg-transparent text-text hover:underline",
+				baseClass,
+				variant === "filled"
+					? filledClass
+					: "bg-transparent text-text hover:underline",
 				className,
 			)}
 			{...props}
