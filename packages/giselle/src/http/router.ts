@@ -384,6 +384,7 @@ export const createJsonRouters = {
 				label: z.string(),
 				value: z.string(),
 				tags: z.array(z.string()).optional(),
+				useExperimentalStorage: z.boolean(),
 			}),
 			handler: async ({ input }) =>
 				JsonResponse.json({
@@ -395,6 +396,7 @@ export const createJsonRouters = {
 			input: z.object({
 				workspaceId: WorkspaceId.schema,
 				tags: z.array(z.string()).optional(),
+				useExperimentalStorage: z.boolean(),
 			}),
 			handler: async ({ input }) =>
 				JsonResponse.json({
@@ -454,6 +456,7 @@ export const createJsonRouters = {
 			input: z.object({
 				workspaceId: WorkspaceId.schema,
 				secretId: SecretId.schema,
+				useExperimentalStorage: z.boolean(),
 			}),
 			handler: async ({ input }) => {
 				await giselleEngine.deleteSecret(input);
