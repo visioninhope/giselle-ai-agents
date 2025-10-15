@@ -125,6 +125,7 @@ export function generateContent({
 						decryptToken = await decryptSecret({
 							context,
 							secretId: githubTool.auth.secretId,
+							useExperimentalStorage: true,
 						});
 						break;
 					default: {
@@ -156,6 +157,7 @@ export function generateContent({
 				const connectionString = await decryptSecret({
 					context,
 					secretId: postgresToolData.secretId,
+					useExperimentalStorage: true,
 				});
 				if (connectionString === undefined) {
 					throw new Error("Failed to decrypt secret");
