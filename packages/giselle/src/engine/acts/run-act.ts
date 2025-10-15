@@ -87,7 +87,11 @@ async function executeStep(args: {
 				break;
 			}
 			case "trigger":
-				await resolveTrigger(args);
+				await resolveTrigger({
+					context: args.context,
+					generation: args.generation,
+					useExperimentalStorage: true,
+				});
 				break;
 			case "query":
 				await executeQuery(args);

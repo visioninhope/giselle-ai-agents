@@ -83,6 +83,7 @@ export async function copyAgent(
 
 			const flowTrigger = await giselleEngine.getTrigger({
 				flowTriggerId: node.content.state.flowTriggerId,
+				useExperimentalStorage,
 			});
 			if (
 				flowTrigger &&

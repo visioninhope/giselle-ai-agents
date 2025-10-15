@@ -21,7 +21,9 @@ export async function reconfigureGitHubTrigger(args: {
 }) {
 	const currentTrigger = await getFlowTrigger({
 		storage: args.context.storage,
+		experimental_storage: args.context.experimental_storage,
 		flowTriggerId: args.flowTriggerId,
+		useExperimentalStorage: args.useExperimentalStorage,
 	});
 	if (currentTrigger === undefined) {
 		throw new Error(`Trigger not found: ${args.flowTriggerId}`);
@@ -36,13 +38,17 @@ export async function reconfigureGitHubTrigger(args: {
 		await Promise.all([
 			removeGitHubRepositoryIntegrationIndex({
 				storage: args.context.storage,
+				experimental_storage: args.context.experimental_storage,
 				flowTriggerId: args.flowTriggerId,
 				repositoryNodeId: oldRepositoryNodeId,
+				useExperimentalStorage: args.useExperimentalStorage,
 			}),
 			addGitHubRepositoryIntegrationIndex({
 				storage: args.context.storage,
+				experimental_storage: args.context.experimental_storage,
 				flowTriggerId: args.flowTriggerId,
 				repositoryNodeId: newRepositoryNodeId,
+				useExperimentalStorage: args.useExperimentalStorage,
 			}),
 		]);
 	}
@@ -58,7 +64,9 @@ export async function reconfigureGitHubTrigger(args: {
 	} satisfies FlowTrigger;
 	await setFlowTrigger({
 		storage: args.context.storage,
+		experimental_storage: args.context.experimental_storage,
 		flowTrigger: updatedTrigger,
+		useExperimentalStorage: args.useExperimentalStorage,
 	});
 
 	const workspace = await getWorkspace({

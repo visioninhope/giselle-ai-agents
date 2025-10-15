@@ -28,16 +28,20 @@ export async function configureTrigger(args: {
 		}),
 		setFlowTrigger({
 			storage: args.context.storage,
+			experimental_storage: args.context.experimental_storage,
 			flowTrigger: {
 				id: flowTriggerId,
 				...args.trigger,
 			},
+			useExperimentalStorage: args.useExperimentalStorage,
 		}),
 		args.trigger.configuration.provider === "github"
 			? await addGitHubRepositoryIntegrationIndex({
 					storage: args.context.storage,
+					experimental_storage: args.context.experimental_storage,
 					flowTriggerId,
 					repositoryNodeId: args.trigger.configuration.repositoryNodeId,
+					useExperimentalStorage: args.useExperimentalStorage,
 				})
 			: Promise.resolve(),
 	]);

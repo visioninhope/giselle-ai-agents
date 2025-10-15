@@ -211,6 +211,7 @@ export async function fetchFlowTriggers(
 
 			const flowTrigger = await giselleEngine.getTrigger({
 				flowTriggerId: tmpFlowTrigger.sdkFlowTriggerId,
+				useExperimentalStorage: true,
 			});
 			if (flowTrigger === undefined) {
 				continue;
