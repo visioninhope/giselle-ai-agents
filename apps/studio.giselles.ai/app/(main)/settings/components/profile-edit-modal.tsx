@@ -314,12 +314,14 @@ export function ProfileEditModal({
 						</div>
 
 						{/* Display name input (aligned with team dialogs style) */}
-						<div className="w-full overflow-visible">
-							<div className="grid gap-[4px]">
+						<div className="w-full">
+							<div className="grid gap-1">
 								<Label htmlFor="displayName" className="text-text font-geist">
 									Your Display Name
 								</Label>
-								<div className="flex items-center gap-2 rounded-[12px] px-2 py-1 bg-inverse/5">
+								<div
+									className={`flex items-center gap-2 rounded-[12px] px-2 py-1 bg-inverse/5 ${error ? "ring-1 ring-error-900" : ""}`}
+								>
 									<Input
 										id="displayName"
 										name="displayName"
@@ -327,7 +329,7 @@ export function ProfileEditModal({
 										value={displayName}
 										onChange={handleDisplayNameChange}
 										disabled={isLoading}
-										className="min-w-[200px] flex-1 border-none bg-transparent px-1 py-1 text-[14px] text-inverse outline-none placeholder:text-inverse/30"
+										className="min-w-[200px] flex-1 border-none bg-transparent px-1 py-1 text-[14px] text-inverse placeholder:text-inverse/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-100/50 focus-visible:ring-offset-0"
 									/>
 								</div>
 							</div>
