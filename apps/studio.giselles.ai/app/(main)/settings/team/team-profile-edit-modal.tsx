@@ -369,15 +369,6 @@ export function TeamProfileEditModal({
 										{error || profileImageError}
 									</p>
 								)}
-
-								{/* Action buttons (standard glass footer) */}
-								<GlassDialogFooter
-									onCancel={onClose}
-									onConfirm={handleSave}
-									confirmLabel={isLoading ? "Processing..." : "Save"}
-									isPending={isLoading}
-									isConfirmDisabled={!isFormSubmittable}
-								/>
 							</div>
 						</GlassDialogBody>
 						<GlassDialogFooter
