@@ -56,7 +56,7 @@ export const GlassDialogContent = React.forwardRef<
 						<GlassSurfaceLayers
 							variant={variant === "destructive" ? "destructive" : "default"}
 							borderStyle={borderStyle === "gradient" ? "gradient" : "solid"}
-                            withBaseFill={withBaseFill}
+							withBaseFill={withBaseFill}
 							zIndexClass="z-0"
 						/>
 						<div className="relative z-10 flex flex-col min-h-0">
