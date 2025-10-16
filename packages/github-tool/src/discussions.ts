@@ -164,7 +164,6 @@ export async function createDiscussionComment({
 	replyToId?: string;
 	authConfig: GitHubAuthConfig;
 }) {
-	console.log(replyToId, "replyToId");
 	const client = await graphql(authConfig);
 
 	const result = await client.mutation(AddDiscussionCommentMutation, {
