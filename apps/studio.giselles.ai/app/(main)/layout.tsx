@@ -1,3 +1,4 @@
+import { DocsLink } from "@giselle-internal/ui/docs-link";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { GiselleLogo } from "@/components/giselle-logo";
@@ -17,18 +18,17 @@ export default function Layout({ children }: { children: ReactNode }) {
 							<Link href="/" aria-label="Giselle logo">
 								<GiselleLogo className="w-[70px] h-auto fill-white mt-[4px]" />
 							</Link>
-							<span className="text-black-70">/</span>
+							<span className="text-secondary">/</span>
 							<TeamSelection />
 						</div>
 						<div className="flex items-center gap-4">
-							<Link
+							<DocsLink
 								href="https://docs.giselles.ai/guides/introduction"
 								target="_blank"
 								rel="noopener noreferrer"
-								className="text-[14px] font-sans font-medium text-black-70 hover:text-white-100"
 							>
 								Docs
-							</Link>
+							</DocsLink>
 							<UserButton />
 						</div>
 					</div>

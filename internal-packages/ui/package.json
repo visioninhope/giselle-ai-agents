@@ -37,7 +37,8 @@
 		"./status-indicator": "./components/status-indicator.tsx",
 		"./section-header": "./components/section-header.tsx",
 		"./repo-action-menu": "./components/repo-action-menu.tsx",
-		"./form-field": "./components/form-field.tsx"
+		"./form-field": "./components/form-field.tsx",
+		"./glass-surface": "./components/glass-surface.tsx"
 	},
 	"dependencies": {
 		"@radix-ui/react-dialog": "1.1.4",

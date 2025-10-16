@@ -12,6 +12,22 @@
 	.text-text {
 		color: var(--color-text) !important;
 	}
+	/* Accent text/background/border utilities */
+	.text-accent {
+		color: var(--color-accent, #0087f6) !important;
+	}
+	.bg-accent {
+		background-color: var(--color-accent, #0087f6) !important;
+	}
+	.border-accent {
+		border-color: var(--color-accent, #0087f6) !important;
+	}
+	.text-accent-muted {
+		color: var(
+			--color-accent-muted,
+			color-mix(in srgb, var(--color-accent, #0087f6) 60%, transparent)
+		) !important;
+	}
 	/* Secondary text (maps to semantic --color-text-secondary) */
 	.text-secondary {
 		color: var(
@@ -233,6 +249,13 @@
 	/* Link muted explicit color */
 	.text-link-muted {
 		color: var(--color-link-muted) !important;
+	}
+	/* Link accent explicit color */
+	.text-link-accent {
+		color: var(--color-link-accent, #1663f3) !important;
+	}
+	.hover\:text-link-accent:hover {
+		color: var(--color-link-accent-hover, #0f4cd1) !important;
 	}
 
 	/* Placeholder variant for link-muted */
