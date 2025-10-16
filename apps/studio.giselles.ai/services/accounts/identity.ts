@@ -3,6 +3,31 @@ import { deleteOauthCredential, getAuthCallbackUrl } from "@/app/(auth)/lib";
 import { createClient, getUser } from "@/lib/supabase";
 import type { OAuthProvider } from "./oauth-credentials";
 
+type OAuthOptionOverrides = {
+	queryParams?: Record<string, string>;
+	scopes?: string[];
+};
+
+const providerOptionOverrides: Record<OAuthProvider, OAuthOptionOverrides> = {
+	github: {},
+	google: {
+		queryParams: {
+			access_type: "offline",
+			prompt: "consent",
+		},
+		scopes: ["openid", "email", "profile"],
+	},
+};
+
+function buildProviderOptions(provider: OAuthProvider) {
+	const overrides = providerOptionOverrides[provider];
+	if (!overrides) {
+		return {};
+	}
+	const { scopes, ...rest } = overrides;
+	return scopes ? { ...rest, scopes: scopes.join(" ") } : rest;
+}
+
 export async function connectIdentity(provider: OAuthProvider, next: string) {
 	const supabase = await createClient();
 
@@ -33,6 +58,7 @@ export async function connectIdentity(provider: OAuthProvider, next: string) {
 			provider,
 			options: {
 				redirectTo,
+				...buildProviderOptions(provider),
 			},
 		}));
 	} catch (e) {
@@ -67,6 +93,7 @@ export async function reconnectIdentity(provider: OAuthProvider, next: string) {
 			provider,
 			options: {
 				redirectTo: redirectTo2,
+				...buildProviderOptions(provider),
 			},
 		}));
 	} catch (e) {
