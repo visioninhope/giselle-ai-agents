@@ -344,21 +344,23 @@ export function TeamProfileEditModal({
 							</div>
 						</div>
 
-						{/* Team name input */}
-						<div className="w-full">
+						{/* Team name input (match Edit Profile style, use inverse text) */}
+						<div className="w-full overflow-visible">
 							<label
 								htmlFor="teamName"
-								className="block text-white-800 text-left font-medium text-[12px] leading-[170%] font-geist mb-2"
+								className="block text-inverse text-left font-medium text-[12px] leading-[170%] font-geist mb-2"
 							>
 								Team Name
 							</label>
-							<Input
-								id="teamName"
-								value={teamName}
-								onChange={handleTeamNameChange}
-								className="w-full bg-transparent text-white-800 font-medium text-[14px] leading-[23.8px] font-geist shadow-[inset_0_0_0_1px_var(--color-border-muted)] focus:text-white border-0 focus-visible:outline-none focus-visible:shadow-[inset_0_0_0_1px_var(--color-focused)]"
-								disabled={isLoading}
-							/>
+							<div className="flex items-center gap-2 rounded-[12px] px-2 py-1 bg-inverse/5">
+								<input
+									id="teamName"
+									value={teamName}
+									onChange={handleTeamNameChange}
+									className="min-w-[200px] flex-1 border-none bg-transparent px-1 py-1 text-[14px] text-inverse outline-none placeholder:text-inverse/30"
+									disabled={isLoading}
+								/>
+							</div>
 						</div>
 
 						{/* Error message */}
