@@ -21,9 +21,6 @@ const providerOptionOverrides: Record<OAuthProvider, OAuthOptionOverrides> = {
 
 function buildProviderOptions(provider: OAuthProvider) {
 	const overrides = providerOptionOverrides[provider];
-	if (!overrides) {
-		return {};
-	}
 	const { scopes, ...rest } = overrides;
 	return scopes ? { ...rest, scopes: scopes.join(" ") } : rest;
 }
