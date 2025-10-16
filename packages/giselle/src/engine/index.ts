@@ -299,7 +299,10 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 		}) => {
 			return await configureTrigger({ ...args, context });
 		},
-		getTrigger: async (args: { flowTriggerId: FlowTriggerId }) => {
+		getTrigger: async (args: {
+			flowTriggerId: FlowTriggerId;
+			useExperimentalStorage?: boolean;
+		}) => {
 			return await getTrigger({ ...args, context });
 		},
 		getGitHubRepositoryFullname: async (args: {
@@ -308,8 +311,10 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 		}) => {
 			return await getGitHubRepositoryFullname({ ...args, context });
 		},
-		setTrigger: async (args: { trigger: FlowTrigger }) =>
-			setTrigger({ ...args, context }),
+		setTrigger: async (args: {
+			trigger: FlowTrigger;
+			useExperimentalStorage?: boolean;
+		}) => setTrigger({ ...args, context }),
 		reconfigureGitHubTrigger: async (args: {
 			flowTriggerId: FlowTriggerId;
 			repositoryNodeId: string;
@@ -318,8 +323,10 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 		}) => {
 			return await reconfigureGitHubTrigger({ ...args, context });
 		},
-		deleteTrigger: async (args: { flowTriggerId: FlowTriggerId }) =>
-			deleteTrigger({ ...args, context }),
+		deleteTrigger: async (args: {
+			flowTriggerId: FlowTriggerId;
+			useExperimentalStorage?: boolean;
+		}) => deleteTrigger({ ...args, context }),
 		executeAction: async (args: { generation: QueuedGeneration }) =>
 			executeAction({ ...args, context }),
 		createAndStartAct: async (args: CreateAndStartActInputs) =>

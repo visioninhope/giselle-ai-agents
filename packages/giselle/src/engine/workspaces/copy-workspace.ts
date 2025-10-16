@@ -38,7 +38,9 @@ export async function copyWorkspace(args: {
 			const oldFlowTriggerId = node.content.state.flowTriggerId;
 			const oldFlowTrigger = await getFlowTrigger({
 				storage: args.context.storage,
+				experimental_storage: args.context.experimental_storage,
 				flowTriggerId: oldFlowTriggerId,
+				useExperimentalStorage: args.useExperimentalStorage,
 			});
 
 			if (oldFlowTrigger) {
@@ -52,7 +54,9 @@ export async function copyWorkspace(args: {
 
 				await setFlowTrigger({
 					storage: args.context.storage,
+					experimental_storage: args.context.experimental_storage,
 					flowTrigger: newFlowTrigger,
+					useExperimentalStorage: args.useExperimentalStorage,
 				});
 
 				return { oldNodeId: node.id, newFlowTriggerId };
@@ -96,7 +100,7 @@ export async function copyWorkspace(args: {
 			workspaceId: workspaceCopy.id,
 			workspace: Workspace.parse(workspaceCopy),
 			experimental_storage: args.context.experimental_storage,
-			useExperimentalStorage: false,
+			useExperimentalStorage: args.useExperimentalStorage,
 		}),
 		copyFiles({
 			storage: args.context.storage,

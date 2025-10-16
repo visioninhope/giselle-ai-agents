@@ -1,19 +1,23 @@
 import type { FlowTrigger, TriggerNode } from "@giselle-sdk/data-type";
-import { useGiselleEngine } from "@giselle-sdk/giselle/react";
+import { useFeatureFlag, useGiselleEngine } from "@giselle-sdk/giselle/react";
 import { useCallback } from "react";
 import useSWR from "swr";
 
 export function useTrigger(node: TriggerNode) {
 	const client = useGiselleEngine();
+	const { experimental_storage } = useFeatureFlag();
 	const { isLoading, data, mutate } = useSWR(
 		node.content.state.status === "unconfigured"
 			? null
 			: {
 					namespace: "getTrigger",
 					flowTriggerId: node.content.state.flowTriggerId,
+					useExperimentalStorage: experimental_storage,
 				},
-		({ flowTriggerId }) =>
-			client.getTrigger({ flowTriggerId }).then((res) => res.trigger),
+		({ flowTriggerId, useExperimentalStorage }) =>
+			client
+				.getTrigger({ flowTriggerId, useExperimentalStorage })
+				.then((res) => res.trigger),
 	);
 
 	const setFlowTrigger = useCallback(
@@ -27,7 +31,10 @@ export function useTrigger(node: TriggerNode) {
 						...data,
 						...newValue,
 					} satisfies FlowTrigger;
-					await client.setTrigger({ trigger: newData });
+					await client.setTrigger({
+						trigger: newData,
+						useExperimentalStorage: experimental_storage,
+					});
 					return newData;
 				},
 				{
@@ -38,7 +45,7 @@ export function useTrigger(node: TriggerNode) {
 				},
 			);
 		},
-		[client, mutate, data],
+		[client, mutate, data, experimental_storage],
 	);
 	const enableFlowTrigger = useCallback(async () => {
 		await setFlowTrigger({ enable: true });

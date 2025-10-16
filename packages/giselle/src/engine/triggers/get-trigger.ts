@@ -5,10 +5,13 @@ import { getFlowTrigger } from "./utils";
 export async function getTrigger(args: {
 	context: GiselleEngineContext;
 	flowTriggerId: FlowTriggerId;
+	useExperimentalStorage?: boolean;
 }) {
 	const flowTrigger = await getFlowTrigger({
 		storage: args.context.storage,
 		flowTriggerId: args.flowTriggerId,
+		experimental_storage: args.context.experimental_storage,
+		useExperimentalStorage: args.useExperimentalStorage ?? false,
 	});
 	return flowTrigger;
 }

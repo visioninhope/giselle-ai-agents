@@ -3,19 +3,30 @@ import type {
 	FlowTriggerId,
 	GitHubFlowTrigger,
 } from "@giselle-sdk/data-type";
-import { useGiselleEngine } from "@giselle-sdk/giselle/react";
+import { useFeatureFlag, useGiselleEngine } from "@giselle-sdk/giselle/react";
 import { useCallback, useMemo } from "react";
 import useSWR from "swr";
 
 export function useGitHubTrigger(flowTriggerId: FlowTriggerId) {
 	const client = useGiselleEngine();
+	const { experimental_storage } = useFeatureFlag();
 	const {
 		isLoading: isLoadingFlowTriggerData,
 		data: trigger,
 		mutate,
 	} = useSWR(
-		`/triggers/${flowTriggerId}`,
-		() => client.getTrigger({ flowTriggerId }).then((res) => res.trigger),
+		{
+			namespace: "getTrigger",
+			flowTriggerId,
+			useExperimentalStorage: experimental_storage,
+		},
+		({ flowTriggerId: id, useExperimentalStorage }) =>
+			client
+				.getTrigger({
+					flowTriggerId: id,
+					useExperimentalStorage,
+				})
+				.then((res) => res.trigger),
 		{
 			keepPreviousData: true,
 		},
@@ -68,7 +79,10 @@ export function useGitHubTrigger(flowTriggerId: FlowTriggerId) {
 						...trigger,
 						...newValue,
 					} satisfies FlowTrigger;
-					await client.setTrigger({ trigger: newData });
+					await client.setTrigger({
+						trigger: newData,
+						useExperimentalStorage: experimental_storage,
+					});
 					return newData;
 				},
 				{
@@ -79,7 +93,7 @@ export function useGitHubTrigger(flowTriggerId: FlowTriggerId) {
 				},
 			);
 		},
-		[client, mutate, trigger],
+		[client, mutate, trigger, experimental_storage],
 	);
 	const enableFlowTrigger = useCallback(async () => {
 		await setFlowTrigger({ enable: true });

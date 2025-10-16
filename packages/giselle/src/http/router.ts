@@ -262,6 +262,7 @@ export const createJsonRouters = {
 		createHandler({
 			input: z.object({
 				flowTriggerId: FlowTriggerId.schema,
+				useExperimentalStorage: z.boolean().optional(),
 			}),
 			handler: async ({ input }) => {
 				return JsonResponse.json({
@@ -285,6 +286,7 @@ export const createJsonRouters = {
 		createHandler({
 			input: z.object({
 				trigger: FlowTrigger,
+				useExperimentalStorage: z.boolean().optional(),
 			}),
 			handler: async ({ input }) => {
 				return JsonResponse.json({
@@ -308,7 +310,10 @@ export const createJsonRouters = {
 		}),
 	deleteTrigger: (giselleEngine: GiselleEngine) =>
 		createHandler({
-			input: z.object({ flowTriggerId: FlowTriggerId.schema }),
+			input: z.object({
+				flowTriggerId: FlowTriggerId.schema,
+				useExperimentalStorage: z.boolean().optional(),
+			}),
 			handler: async ({ input }) => {
 				await giselleEngine.deleteTrigger(input);
 				return new Response(null, { status: 204 });
