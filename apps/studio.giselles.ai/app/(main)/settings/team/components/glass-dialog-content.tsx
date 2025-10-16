@@ -12,8 +12,8 @@ type GlassDialogContentProps = React.ComponentPropsWithoutRef<
 > & {
 	variant?: "default" | "destructive";
 	borderStyle?: "gradient" | "solid";
-    withBaseFill?: boolean;
-    overlayClassName?: string;
+	withBaseFill?: boolean;
+	overlayClassName?: string;
 };
 
 export const GlassDialogContent = React.forwardRef<
