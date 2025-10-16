@@ -39,10 +39,10 @@ export const GlassDialogContent = React.forwardRef<
 
 		return (
 			<Dialog.Portal>
-                <Dialog.Overlay
-                    className={cn("fixed inset-0 z-50", overlayClassName)}
-                    style={{ background: "var(--color-dialog-overlay)" }}
-                />
+				<Dialog.Overlay
+					className={cn("fixed inset-0 z-50", overlayClassName)}
+					style={{ background: "var(--color-dialog-overlay)" }}
+				/>
 				<div className="fixed inset-0 z-50 flex items-center justify-center p-4">
 					<Dialog.Content
 						ref={ref}
