@@ -9,13 +9,10 @@ export default function SentPasswordResetMailPage() {
 			<div className="flex items-center justify-center py-12">
 				<div className="mx-auto grid w-[350px] gap-[24px]">
 					<div className="text-center">
-						<h2
-							className="mt-6 text-[28px] font-[500] text-primary-100 font-sans text-center"
-							style={{ textShadow: "0px 0px 20px #0087F6" }}
-						>
+						<h2 className="mt-6 text-[28px] font-[500] text-accent font-sans text-center auth-title-glow">
 							Check your email
 						</h2>
-						<p className="mt-4 text-[14px] font-geist text-primary-300">
+						<p className="mt-4 text-[14px] font-geist text-secondary">
 							We have sent you an email with a link to reset your password. If
 							you don't see the email, check other places it might be, like your
 							junk, spam, social, or other folders.
@@ -24,7 +21,7 @@ export default function SentPasswordResetMailPage() {
 					<div className="flex justify-center">
 						<ActionPrompt
 							leftIcon={
-								<ChevronLeftIcon className="w-[16px] h-[16px] text-black-70" />
+								<ChevronLeftIcon className="w-[16px] h-[16px] text-text" />
 							}
 							action={
 								<ClickableText asChild>

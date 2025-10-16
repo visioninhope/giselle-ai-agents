@@ -3,8 +3,8 @@
 import { TriangleAlertIcon } from "lucide-react";
 import { type FC, useActionState } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
+import { AuthButton } from "../components/auth-button";
 import { sendPasswordResetEmail } from "./actions";
 
 export const Form: FC = () => {
@@ -25,10 +25,16 @@ export const Form: FC = () => {
 						</AlertDescription>
 					</Alert>
 				)}
-				<Field type="email" label="Email" name="email" ignore1password />
-				<Button type="submit" disabled={isPending} className="font-medium">
+				<Field
+					type="email"
+					label="Email"
+					name="email"
+					ignore1password
+					className="bg-inverse/10"
+				/>
+				<AuthButton type="submit" disabled={isPending}>
 					Reset password
-				</Button>
+				</AuthButton>
 			</div>
 		</form>
 	);

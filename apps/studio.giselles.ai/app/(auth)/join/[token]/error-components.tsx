@@ -70,7 +70,7 @@ export function WrongEmailError({
 			<div className="text-center">
 				<p className="text-white-400 mb-2">You have been invited to join</p>
 				<h2
-					className="text-[28px] font-[500] text-primary-100 font-sans"
+					className="text-[28px] font-[500] text-accent font-sans"
 					style={{ textShadow: "0px 0px 20px #0087F6" }}
 				>
 					{teamName}

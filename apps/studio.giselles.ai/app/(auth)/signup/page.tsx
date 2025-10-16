@@ -1,9 +1,9 @@
 import { MailIcon } from "lucide-react";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
 import { ClickableText } from "@/components/ui/clickable-text";
 import { AuthContainer, AuthContainerHeader } from "../components";
 import { ActionPrompt } from "../components/action-prompt";
+import { AuthButton } from "../components/auth-button";
 import { Divider } from "../components/divider";
 import { LegalConsent } from "../components/legal-consent";
 import { OAuthProviders } from "../components/oauth-providers";
@@ -22,15 +22,15 @@ export default function SignupPage() {
 			</div>
 
 			<div className="auth-form-section">
-				<Button asChild className="font-medium w-full justify-center">
+				<AuthButton asChild>
 					<Link
 						href="/signup/email"
 						className="flex items-center justify-center gap-2"
 					>
 						<MailIcon className="h-5 w-5" />
-						<p className="font-sans font-medium">Sign up with Email</p>
+						<span className="font-sans font-medium">Sign up with Email</span>
 					</Link>
-				</Button>
+				</AuthButton>
 			</div>
 
 			<div className="auth-legal-section">

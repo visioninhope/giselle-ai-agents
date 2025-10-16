@@ -1,5 +1,8 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+import { ClickableText } from "@/components/ui/clickable-text";
+import { ActionPrompt } from "../../../components/action-prompt";
+import { AuthContainer } from "../../../components/auth-container";
 import { LegalConsent } from "../../../components/legal-consent";
 import { declineInvitation } from "../actions";
 import { fetchInvitationToken } from "../invitation";
@@ -21,46 +24,54 @@ export default async function Page({
 	}
 
 	return (
-		<div className="min-h-screen flex items-center justify-center p-4 gap-16">
-			<div className="flex items-center justify-center py-12">
-				<div className="mx-auto grid w-[350px] gap-[24px]">
-					<div className="text-center">
-						<p className="text-white-400 mb-2">You have been invited to join</p>
-						<h2
-							className="text-[28px] font-[500] text-primary-100 font-sans"
-							style={{ textShadow: "0px 0px 20px #0087F6" }}
+		<AuthContainer title="You have been invited">
+			<div className="text-center mb-8">
+				<h2 className="text-[24px] font-[600] text-[#6B8FF0] font-sans mb-2">
+					<span aria-hidden className="text-text/60 select-none mr-1">
+						“
+					</span>
+					{tokenObj.teamName}
+					<span aria-hidden className="text-text/60 select-none ml-1">
+						”
+					</span>
+				</h2>
+				<p className="text-[14px] font-sans text-muted">
+					Log in to join this team
+				</p>
+			</div>
+
+			<div className="auth-form-section">
+				<LoginForm email={tokenObj.invitedEmail} token={token} />
+			</div>
+
+			<div className="auth-action-section">
+				<ActionPrompt
+					prompt="Don't have a Giselle account?"
+					action={
+						<ClickableText asChild>
+							<Link href={`/join/${token}/signup`}>Sign up</Link>
+						</ClickableText>
+					}
+				/>
+			</div>
+
+			<div className="auth-legal-section">
+				<LegalConsent />
+			</div>
+
+			<div className="auth-action-section">
+				<div className="flex justify-center">
+					<form action={declineInvitation} className="contents">
+						<input type="hidden" name="token" value={token} />
+						<button
+							type="submit"
+							className="text-text hover:text-text/80 underline"
 						>
-							{tokenObj.teamName}
-						</h2>
-					</div>
-					<div className="grid gap-[16px]">
-						<LoginForm email={tokenObj.invitedEmail} token={token} />
-
-						<div className="text-center text-sm text-slate-400">
-							Don't have a Giselle account?{" "}
-							<Link
-								href={`/join/${token}/signup`}
-								className="text-blue-300 hover:underline"
-							>
-								Sign up
-							</Link>
-						</div>
-
-						<LegalConsent />
-						<div className="flex justify-center mt-4">
-							<form action={declineInvitation} className="contents">
-								<input type="hidden" name="token" value={token} />
-								<button
-									type="submit"
-									className="text-white hover:text-white/80 underline"
-								>
-									Decline
-								</button>
-							</form>
-						</div>
-					</div>
+							Decline
+						</button>
+					</form>
 				</div>
 			</div>
-		</div>
+		</AuthContainer>
 	);
 }

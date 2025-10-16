@@ -10,6 +10,7 @@ type FieldProps = {
 	ignore1password?: boolean;
 	value?: string;
 	disabled?: boolean;
+	className?: string;
 };
 export const Field: FC<FieldProps> = ({
 	name,
@@ -19,6 +20,7 @@ export const Field: FC<FieldProps> = ({
 	value,
 	ignore1password = false,
 	disabled = false,
+	className,
 }) => (
 	<div className="grid gap-[8px]">
 		<Label htmlFor={name} className="text-[14px] font-sans text-black-200">
@@ -32,6 +34,7 @@ export const Field: FC<FieldProps> = ({
 			data-1p-ignore={ignore1password}
 			value={value}
 			disabled={disabled}
+			className={className}
 		/>
 	</div>
 );

@@ -12,14 +12,24 @@ export const AuthContainer: FC<AuthContainerProps> = ({
 	children,
 }) => (
 	<div className="min-h-screen flex flex-col items-center justify-center p-4 gap-6">
-		<h1 className="text-center font-sans text-[34px] font-[500] text-[hsl(192,73%,84%)] [text-shadow:0px_0px_20px_#0087f6]">
+		<h1 className="text-center font-sans text-[34px] font-[500] text-accent auth-title-glow">
 			{title}
 		</h1>
 
 		{/* Frosted-glass container */}
-		<div className="relative w-full max-w-[360px] rounded-2xl pt-15 pb-7.5 px-10 flex flex-col shadow-lg shadow-black/30 border border-transparent bg-clip-padding backdrop-blur-[8px] bg-[linear-gradient(to_bottom,rgba(255,255,255,0.05)_80%,rgba(255,255,255,0)_100%)]">
+		<div className="relative w-full max-w-[360px] rounded-2xl pt-15 pb-7.5 px-10 flex flex-col shadow-(--shadow-stage-form) backdrop-blur-[6px] bg-(image:--auth-glass-bg)">
+			{/* Base fill to stabilize tone across environments (very thin) */}
+			<div
+				className="absolute inset-0 rounded-[inherit] pointer-events-none"
+				style={{
+					background: "color-mix(in srgb, var(--color-bg) 25%, transparent)",
+				}}
+			/>
 			{/* Gradient border */}
 			<div className="auth-gradient-border" />
+
+			{/* Top highlight */}
+			<div className="absolute left-4 right-4 top-0 h-px bg-(image:--glass-highlight-bg) pointer-events-none" />
 
 			{/* Corner dots */}
 			<div className="auth-corner-dot auth-corner-dot--top-left" />
