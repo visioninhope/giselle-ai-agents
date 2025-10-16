@@ -1,4 +1,4 @@
-import { Button } from "@giselle-internal/ui/button";
+import { DocsLink } from "@giselle-internal/ui/docs-link";
 import Link from "next/link";
 import { GiselleLogo } from "@/components/giselle-logo";
 import { UserButton } from "@/services/accounts/components";
@@ -17,16 +17,13 @@ export function Header() {
 					<TeamSelection />
 				</div>
 				<div className="flex items-center gap-4">
-					<Button variant="link" asChild>
-						<Link
-							href="https://docs.giselles.ai/guides/introduction"
-							target="_blank"
-							rel="noopener noreferrer"
-							className="text-[14px] font-sans font-medium text-secondary hover:text-text"
-						>
-							Docs
-						</Link>
-					</Button>
+					<DocsLink
+						href="https://docs.giselles.ai/guides/introduction"
+						target="_blank"
+						rel="noopener noreferrer"
+					>
+						Docs
+					</DocsLink>
 					<UserButton />
 				</div>
 			</div>

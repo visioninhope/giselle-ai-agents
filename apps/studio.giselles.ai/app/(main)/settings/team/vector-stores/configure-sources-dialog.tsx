@@ -105,10 +105,8 @@ export function ConfigureSourcesDialog({
 					<div className="space-y-6">
 						{/* Sources Section */}
 						<div>
-							<h3 className="text-white-400 text-[16px] font-medium">
-								Sources
-							</h3>
-							<div className="text-white-400/60 text-[12px] mb-4">
+							<h3 className="text-text text-[16px] font-medium">Sources</h3>
+							<div className="text-secondary text-[12px] mb-4">
 								Select which content types to ingest for {repositoryIndex.owner}
 								/{repositoryIndex.repo}
 							</div>
@@ -142,10 +140,10 @@ export function ConfigureSourcesDialog({
 
 						{/* Embedding Models Section */}
 						<div>
-							<h3 className="text-white-400 text-[16px] font-medium">
+							<h3 className="text-text text-[16px] font-medium">
 								Embedding Models
 							</h3>
-							<div className="text-white-400/60 text-[12px] mb-3">
+							<div className="text-secondary text-[12px] mb-3">
 								Select at least one embedding model for indexing
 							</div>
 							<div className="space-y-2">
@@ -179,13 +177,13 @@ export function ConfigureSourcesDialog({
 															);
 														}
 													}}
-													className="mt-1 w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 rounded focus:ring-primary-500"
+													className="mt-1 w-4 h-4 text-primary-900 bg-surface border-border rounded focus:ring-primary-900"
 												/>
 												<div className="flex-1">
-													<div className="text-white-400 text-[14px] font-medium">
+													<div className="text-text text-[14px] font-medium">
 														{profile.name}
 													</div>
-													<div className="text-white-400/60 text-[12px] mt-1">
+													<div className="text-secondary text-[12px] mt-1">
 														Provider: {profile.provider} • Dimensions{" "}
 														{profile.dimensions}
 													</div>

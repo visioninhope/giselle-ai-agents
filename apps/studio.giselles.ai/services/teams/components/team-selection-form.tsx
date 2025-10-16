@@ -80,10 +80,10 @@ export function TeamSelectionForm({
 						)}
 					</div>
 					<div className="pl-3">
-						<ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50 hover:bg-accent hover:opacity-100 hover:rounded-md hover:p-0.5" />
+						<ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50 hover:bg-white/10 hover:opacity-100 hover:rounded-md hover:p-0.5" />
 					</div>
 				</SelectTrigger>
-				<SelectContent className="p-2 border-[0.5px] border-white/10 rounded-xl shadow-[0_2px_8px_rgba(5,10,20,0.4),0_1px_2px_rgba(0,0,0,0.3)] bg-black-900/50 backdrop-blur-md">
+				<SelectContent className="p-2">
 					<div className="py-1">
 						{allTeams.map((team) => (
 							<SelectItem

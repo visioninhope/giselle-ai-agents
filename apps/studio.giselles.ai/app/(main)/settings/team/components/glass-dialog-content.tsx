@@ -1,5 +1,6 @@
 "use client";
 
+import { GlassSurfaceLayers } from "@giselle-internal/ui/glass-surface";
 import * as Dialog from "@radix-ui/react-dialog";
 import { X } from "lucide-react";
 import React from "react";
@@ -10,51 +11,53 @@ type GlassDialogContentProps = React.ComponentPropsWithoutRef<
 	typeof Dialog.Content
 > & {
 	variant?: "default" | "destructive";
+	borderStyle?: "gradient" | "solid";
 };
 
 export const GlassDialogContent = React.forwardRef<
 	React.ElementRef<typeof Dialog.Content>,
 	GlassDialogContentProps
->(({ className, children, variant = "default", ...props }, ref) => {
-	const backgroundStyle =
-		variant === "destructive"
-			? "linear-gradient(135deg, rgba(241, 91, 108, 0.03) 0%, rgba(241, 91, 108, 0.12) 100%)"
-			: "linear-gradient(135deg, rgba(150, 150, 150, 0.03) 0%, rgba(60, 90, 160, 0.12) 100%)";
+>(
+	(
+		{
+			className,
+			children,
+			variant = "default",
+			borderStyle = "gradient",
+			...props
+		},
+		ref,
+	) => {
+		const _backgroundStyle =
+			variant === "destructive"
+				? "linear-gradient(135deg, rgba(241, 91, 108, 0.03) 0%, rgba(241, 91, 108, 0.12) 100%)"
+				: "linear-gradient(135deg, rgba(150, 150, 150, 0.03) 0%, rgba(60, 90, 160, 0.12) 100%)";
 
-	const borderClass =
-		variant === "destructive"
-			? "border-[0.5px] border-error-900/15"
-			: "border-[0.5px] border-white/8";
-
-	return (
-		<Dialog.Portal>
-			<Dialog.Overlay className="fixed inset-0 z-50 bg-black/60" />
-			<div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-				<Dialog.Content
-					ref={ref}
-					className={cn(
-						"relative z-10 w-[90vw] max-w-[600px] max-h-[85vh] rounded-[12px] p-6 pb-20 flex flex-col",
-						"shadow-xl focus:outline-none",
-						className,
-					)}
-					{...props}
-				>
-					<div
-						className="absolute inset-0 -z-10 rounded-[12px] backdrop-blur-md"
-						style={{
-							background: backgroundStyle,
-						}}
-					/>
-					<div className="absolute -z-10 top-0 left-4 right-4 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
-					<div
-						className={cn("absolute -z-10 inset-0 rounded-[12px]", borderClass)}
-					/>
-					{children}
-				</Dialog.Content>
-			</div>
-		</Dialog.Portal>
-	);
-});
+		return (
+			<Dialog.Portal>
+				<Dialog.Overlay className="fixed inset-0 z-50 bg-black/60" />
+				<div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+					<Dialog.Content
+						ref={ref}
+						className={cn(
+							"relative z-10 w-[90vw] max-w-[600px] max-h-[85vh] rounded-[12px] p-6 pb-20 flex flex-col",
+							"shadow-xl focus:outline-none",
+							className,
+						)}
+						{...props}
+					>
+						<GlassSurfaceLayers
+							variant={variant === "destructive" ? "destructive" : "default"}
+							borderStyle={borderStyle === "gradient" ? "gradient" : "solid"}
+							zIndexClass="z-0"
+						/>
+						<div className="relative z-10">{children}</div>
+					</Dialog.Content>
+				</div>
+			</Dialog.Portal>
+		);
+	},
+);
 GlassDialogContent.displayName = "GlassDialogContent";
 
 type GlassDialogHeaderProps = {

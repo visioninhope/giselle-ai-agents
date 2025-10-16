@@ -13,7 +13,7 @@ export function AccentLink({
 		<a
 			{...props}
 			className={clsx(
-				"text-[#1663F3] hover:text-[#0f4cd1]",
+				"text-link-accent hover:text-link-accent",
 				underline && "hover:underline",
 				"transition-colors duration-200",
 				className,

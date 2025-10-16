@@ -333,7 +333,7 @@ export function InviteMemberDialog({
 						className="space-y-4"
 						noValidate
 					>
-						<div className="flex items-start gap-3 rounded-lg bg-bg p-1">
+						<div className="flex items-center gap-2 rounded-[12px] px-2 py-1 bg-inverse/5">
 							<div className="flex min-h-[40px] flex-grow flex-wrap items-center gap-1">
 								{emailTags.map((email) => (
 									<div
