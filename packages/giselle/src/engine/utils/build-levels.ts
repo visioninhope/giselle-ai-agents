@@ -86,9 +86,15 @@ export function buildLevels(
 			remainingNodes.delete(nodeId);
 
 			// Decrease in-degree of children
+			// Track processed edges to avoid double-decrementing duplicates
+			const processedDecrements = new Set<string>();
 			for (const conn of operationConnections) {
 				if (conn.outputNode.id === nodeId) {
-					inDegrees[conn.inputNode.id]--;
+					const edgeKey = `${conn.outputNode.id}-${conn.inputNode.id}`;
+					if (!processedDecrements.has(edgeKey)) {
+						processedDecrements.add(edgeKey);
+						inDegrees[conn.inputNode.id]--;
+					}
 				}
 			}
 		}

@@ -408,6 +408,105 @@ describe("buildLevels", () => {
 			expect(levels).toEqual([["nd-node1Dup"], ["nd-node2Dup"]]);
 		});
 
+		it("should handle many duplicate connections and maintain correct in-degrees", () => {
+			// Regression test for the bug where duplicate connections
+			// were causing negative in-degrees during decrement phase
+			const nodes: NodeLike[] = [
+				{
+					id: "nd-trigger",
+					name: "Trigger",
+					type: "operation",
+					inputs: [],
+					outputs: [
+						{ id: "otp-trigger-out", label: "Output", accessor: "output" },
+					],
+					content: { type: "trigger" },
+				},
+				{
+					id: "nd-middle",
+					name: "Middle",
+					type: "operation",
+					inputs: [{ id: "inp-middle-in", label: "Input", accessor: "input" }],
+					outputs: [
+						{ id: "otp-middle-out", label: "Output", accessor: "output" },
+					],
+					content: { type: "textGeneration" },
+				},
+				{
+					id: "nd-final",
+					name: "Final",
+					type: "operation",
+					inputs: [
+						{ id: "inp-final-in1", label: "Input 1", accessor: "input1" },
+						{ id: "inp-final-in2", label: "Input 2", accessor: "input2" },
+					],
+					outputs: [],
+					content: { type: "action" },
+				},
+			];
+
+			const connections: Connection[] = [
+				// 5 duplicate connections: Trigger → Middle
+				...Array.from({ length: 5 }, (_, i) => ({
+					id: `cnnc-trigger-middle-${i}`,
+					outputNode: {
+						id: "nd-trigger",
+						type: "operation",
+						content: { type: "trigger" },
+					},
+					outputId: "otp-trigger-out",
+					inputNode: {
+						id: "nd-middle",
+						type: "operation",
+						content: { type: "textGeneration" },
+					},
+					inputId: "inp-middle-in",
+				})),
+				// 2 duplicate connections: Trigger → Final
+				...Array.from({ length: 2 }, (_, i) => ({
+					id: `cnnc-trigger-final-${i}`,
+					outputNode: {
+						id: "nd-trigger",
+						type: "operation",
+						content: { type: "trigger" },
+					},
+					outputId: "otp-trigger-out",
+					inputNode: {
+						id: "nd-final",
+						type: "operation",
+						content: { type: "action" },
+					},
+					inputId: "inp-final-in1",
+				})),
+				// 1 connection: Middle → Final
+				{
+					id: "cnnc-middle-final",
+					outputNode: {
+						id: "nd-middle",
+						type: "operation",
+						content: { type: "textGeneration" },
+					},
+					outputId: "otp-middle-out",
+					inputNode: {
+						id: "nd-final",
+						type: "operation",
+						content: { type: "action" },
+					},
+					inputId: "inp-final-in2",
+				},
+			];
+
+			const levels = buildLevels(nodes, connections);
+
+			// This is the critical assertion that fails with the bug:
+			// Without the fix, Middle gets in-degree of -4 after Level 0,
+			// causing Final to be placed before Middle
+			expect(levels).toHaveLength(3);
+			expect(levels[0]).toEqual(["nd-trigger"]);
+			expect(levels[1]).toEqual(["nd-middle"]); // Bug causes Final here instead
+			expect(levels[2]).toEqual(["nd-final"]); // Bug causes Middle here instead
+		});
+
 		it("should break cycles gracefully", () => {
 			const nodes: NodeLike[] = [
 				{
