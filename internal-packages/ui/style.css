@@ -58,6 +58,15 @@
 	/* tabs */
 	--color-tabs-inactive-text: hsl(222, 21%, 40%);
 
+	/* layout */
+	--height-header: 50px;
+	--spacing-page-horizontal: 24px;
+	--width-logo: 70px;
+
+	/* interactive */
+	--color-icon-hover: #6b8ff0;
+	--color-destructive-hover-bg: rgba(255, 61, 113, 0.1);
+
 	/* panel */
 	--color-panel-background: #2f343e;
 
@@ -146,8 +155,8 @@
 	/* stroke gradient for glass borders */
 	--glass-stroke-gradient: linear-gradient(
 		180deg,
-		rgba(255, 255, 255, 0.15) 0%,
-		rgba(255, 255, 255, 0.04) 100%
+		rgba(255, 255, 255, 0.25) 0%,
+		rgba(255, 255, 255, 0.06) 100%
 	);
 
 	/* glass button */

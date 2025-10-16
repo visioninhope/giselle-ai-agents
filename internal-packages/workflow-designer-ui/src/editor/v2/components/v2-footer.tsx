@@ -42,7 +42,7 @@ export function V2Footer({
 							className={`cursor-pointer ${
 								activePanel === "run-history"
 									? "text-[#6B8FF0]"
-									: "text-inverse hover:text-[#6B8FF0]"
+									: "text-inverse hover:text-icon-hover"
 							}`}
 						>
 							<HistoryIcon className="w-[14px] h-[14px]" />
@@ -63,7 +63,7 @@ export function V2Footer({
 							className={`cursor-pointer ${
 								activePanel === "secret"
 									? "text-[#6B8FF0]"
-									: "text-inverse hover:text-[#6B8FF0]"
+									: "text-inverse hover:text-icon-hover"
 							}`}
 						>
 							<FileKey2Icon className="w-[14px] h-[14px]" />
@@ -86,7 +86,7 @@ export function V2Footer({
 							className={`cursor-pointer ${
 								chat?.isOpen
 									? "text-[#6B8FF0]"
-									: "text-inverse hover:text-[#6B8FF0]"
+									: "text-inverse hover:text-icon-hover"
 							}`}
 						>
 							<MessageCircleIcon className="w-[14px] h-[14px]" />
@@ -104,7 +104,7 @@ export function V2Footer({
 							href="https://docs.giselles.ai/guides/introduction"
 							target="_blank"
 							rel="noopener noreferrer"
-							className="text-xs text-inverse hover:text-[#6B8FF0] flex items-center gap-1"
+							className="text-xs text-inverse hover:text-icon-hover flex items-center gap-1"
 						>
 							Docs
 							<ExternalLinkIcon className="w-[10px] h-[10px]" />
