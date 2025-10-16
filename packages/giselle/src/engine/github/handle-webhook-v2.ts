@@ -1,11 +1,14 @@
 import {
 	addReaction,
+	createDiscussionComment,
 	createIssueComment,
 	createPullRequestComment,
 	ensureWebhookEvent,
 	type GitHubAuthConfig,
+	getDiscussionForCommentCreation,
 	handleWebhook,
 	replyPullRequestReviewComment,
+	updateDiscussionComment,
 	updateIssueComment,
 	updatePullRequestReviewComment,
 	type WebhookEvent,
@@ -28,6 +31,8 @@ const events: WebhookEventName[] = [
 	"pull_request.ready_for_review",
 	"pull_request.closed",
 	"pull_request.labeled",
+	"discussion.created",
+	"discussion_comment.created",
 ];
 
 export async function handleGitHubWebhookV2(args: {
@@ -56,6 +61,9 @@ export async function handleGitHubWebhookV2(args: {
 				updateIssueComment,
 				updatePullRequestReviewComment,
 				replyPullRequestReviewComment,
+				createDiscussionComment,
+				updateDiscussionComment,
+				getDiscussionForCommentCreation,
 			},
 		});
 

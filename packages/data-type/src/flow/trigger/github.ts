@@ -56,6 +56,17 @@ const PullRequestLabeled = z.object({
 	}),
 });
 
+const DiscussionCreated = z.object({
+	id: z.literal("github.discussion.created"),
+});
+
+const DiscussionCommentCreated = z.object({
+	id: z.literal("github.discussion_comment.created"),
+	conditions: z.object({
+		callsign: z.string(),
+	}),
+});
+
 export const GitHubFlowTriggerEvent = z.discriminatedUnion("id", [
 	IssueCreated,
 	IssueClosed,
@@ -67,6 +78,8 @@ export const GitHubFlowTriggerEvent = z.discriminatedUnion("id", [
 	PullRequestReadyForReview,
 	PullRequestClosed,
 	PullRequestLabeled,
+	DiscussionCreated,
+	DiscussionCommentCreated,
 ]);
 export type GitHubFlowTriggerEvent = z.infer<typeof GitHubFlowTriggerEvent>;
 
