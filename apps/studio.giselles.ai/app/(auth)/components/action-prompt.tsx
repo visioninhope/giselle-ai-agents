@@ -10,7 +10,7 @@ export const ActionPrompt: FC<ActionPromptProps> = ({
 	action,
 	leftIcon,
 }) => (
-	<div className="text-[14px] text-black-30 flex items-center justify-center gap-2">
+	<div className="text-[14px] text-text/60 flex items-center justify-center gap-2">
 		{leftIcon && leftIcon}
 		{prompt && <p>{prompt}</p>}
 		{action}

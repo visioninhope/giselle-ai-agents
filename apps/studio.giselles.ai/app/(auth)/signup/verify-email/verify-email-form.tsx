@@ -2,8 +2,6 @@
 
 import { TriangleAlertIcon } from "lucide-react";
 import { type FC, useActionState, useCallback, useRef } from "react";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
 import { ClickableText } from "@/components/ui/clickable-text";
 import {
 	InputOTP,
@@ -12,6 +10,7 @@ import {
 	InputOTPSlot,
 } from "@/components/ui/input-otp";
 import { ActionPrompt } from "../../components/action-prompt";
+import { AuthButton } from "../../components/auth-button";
 import { useSignupContext } from "../context";
 import { resendOtp, verifyEmail } from "./verify-email";
 
@@ -38,31 +37,37 @@ export const VerifyEmailForm: FC = () => {
 	return (
 		<div className="grid gap-[8px]">
 			{verifyState && (
-				<Alert variant="destructive">
-					<TriangleAlertIcon className="w-4 h-4" />
-					<AlertTitle>Authentication Error</AlertTitle>
-					<AlertDescription>
+				<div className="text-error-900 bg-error-900/12 border border-error-900/40 rounded-[12px] p-3 text-[12px] font-geist">
+					<div className="flex items-center gap-2">
+						<TriangleAlertIcon className="w-4 h-4" />
+						<span className="font-bold">Authentication Error</span>
+					</div>
+					<div className="mt-1">
 						{verifyState.message || "An error occurred. Please try again."}
-					</AlertDescription>
-				</Alert>
+					</div>
+				</div>
 			)}
 			{resendState && resendState.code !== "success" && (
-				<Alert variant="destructive">
-					<TriangleAlertIcon className="w-4 h-4" />
-					<AlertTitle>Authentication Error</AlertTitle>
-					<AlertDescription>
+				<div className="text-error-900 bg-error-900/12 border border-error-900/40 rounded-[12px] p-3 text-[12px] font-geist">
+					<div className="flex items-center gap-2">
+						<TriangleAlertIcon className="w-4 h-4" />
+						<span className="font-bold">Authentication Error</span>
+					</div>
+					<div className="mt-1">
 						{resendState.message || "An error occurred. Please try again."}
-					</AlertDescription>
-				</Alert>
+					</div>
+				</div>
 			)}
 			{resendState && resendState.code === "success" && (
-				<Alert variant="primary">
-					<TriangleAlertIcon className="w-4 h-4" />
-					<AlertTitle>Success</AlertTitle>
-					<AlertDescription>
+				<div className="text-green bg-green/12 border border-green/40 rounded-[12px] p-3 text-[12px] font-geist">
+					<div className="flex items-center gap-2">
+						<TriangleAlertIcon className="w-4 h-4" />
+						<span className="font-bold">Success</span>
+					</div>
+					<div className="mt-1">
 						{resendState.message || "Resend completed!"}
-					</AlertDescription>
-				</Alert>
+					</div>
+				</div>
 			)}
 			<form className="flex justify-center" action={verifyAction} ref={formRef}>
 				<div className="grid gap-4">
@@ -100,13 +105,9 @@ export const VerifyEmailForm: FC = () => {
 							}
 						/>
 					</div>
-					<Button
-						className="w-full font-medium"
-						type="submit"
-						disabled={isVerifyPending}
-					>
+					<AuthButton type="submit" disabled={isVerifyPending}>
 						Verify
-					</Button>
+					</AuthButton>
 				</div>
 			</form>
 		</div>
