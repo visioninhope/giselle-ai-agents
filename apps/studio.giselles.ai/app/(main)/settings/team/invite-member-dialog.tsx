@@ -318,12 +318,12 @@ export function InviteMemberDialog({
 			</Dialog.Trigger>
 
             <GlassDialogContent
-                className="max-w-[600px]"
-                borderStyle="solid"
-                withBaseFill={false}
-                overlayClassName="bg-black/50"
-                onEscapeKeyDown={handleCloseDialog}
-                onPointerDownOutside={handleCloseDialog}
+				className="max-w-[600px]"
+				borderStyle="solid"
+				withBaseFill={false}
+				overlayClassName="bg-black/50"
+				onEscapeKeyDown={handleCloseDialog}
+				onPointerDownOutside={handleCloseDialog}
             >
 				<GlassDialogHeader
 					title="Invite Team Member"
