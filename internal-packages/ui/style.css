@@ -126,6 +126,8 @@
 	--color-ignored-rgb: 135, 138, 152;
 
 	/* glass common */
+	/* unified overlay (scrim) color for dialogs */
+	--color-dialog-overlay: rgba(0, 0, 0, 0.6);
 	--glass-highlight-bg: linear-gradient(
 		to right,
 		transparent,
@@ -219,4 +221,5 @@
 		-webkit-mask-composite: xor;
 		padding: 1px;
 	}
+
 }

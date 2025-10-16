@@ -1,11 +1,5 @@
 "use client";
 
-import {
-	GlassDialogBody,
-	GlassDialogContent,
-	GlassDialogFooter,
-	GlassDialogHeader,
-} from "@giselle-internal/ui/glass-dialog";
 import { Select } from "@giselle-internal/ui/select";
 import * as Dialog from "@radix-ui/react-dialog";
 import { Plus, X } from "lucide-react";
@@ -14,6 +8,12 @@ import { email as emailValidator, parse, pipe, string } from "valibot";
 import { GlassButton } from "@/components/ui/glass-button";
 import type { TeamRole } from "@/drizzle";
 import { type SendInvitationsResult, sendInvitationsAction } from "./actions";
+import {
+    GlassDialogBody,
+    GlassDialogContent,
+    GlassDialogFooter,
+    GlassDialogHeader,
+} from "./components/glass-dialog-content";
 
 type InviteMemberDialogProps = {
 	memberEmails: string[];
@@ -317,10 +317,14 @@ export function InviteMemberDialog({
 				</GlassButton>
 			</Dialog.Trigger>
 
-			<GlassDialogContent
-				onEscapeKeyDown={handleCloseDialog}
-				onPointerDownOutside={handleCloseDialog}
-			>
+            <GlassDialogContent
+                className="max-w-[600px]"
+                borderStyle="solid"
+                withBaseFill={false}
+                overlayClassName="bg-black/50"
+                onEscapeKeyDown={handleCloseDialog}
+                onPointerDownOutside={handleCloseDialog}
+            >
 				<GlassDialogHeader
 					title="Invite Team Member"
 					description="Each member added to your team will be charged as an additional seat ($20 per seat) on your Pro Plan subscription."
@@ -333,8 +337,8 @@ export function InviteMemberDialog({
 						className="space-y-4"
 						noValidate
 					>
-						<div className="flex items-center gap-2 rounded-[12px] px-2 py-1 bg-inverse/5">
-							<div className="flex min-h-[40px] flex-grow flex-wrap items-center gap-1">
+                        <div className="flex items-center gap-2 rounded-[12px] px-2 py-1 bg-inverse/5">
+                            <div className="flex min-h-[40px] flex-grow flex-wrap items-center gap-1">
 								{emailTags.map((email) => (
 									<div
 										key={email}
@@ -370,20 +374,20 @@ export function InviteMemberDialog({
 									className="min-w-[200px] flex-1 border-none bg-transparent px-1 py-1 text-[14px] text-white-400 outline-none placeholder:text-white/30"
 									disabled={isLoading}
 								/>
-							</div>
-							<Select
-								id="invite-role"
-								options={[
-									{ value: "admin", label: "Admin" },
-									{ value: "member", label: "Member" },
-								]}
-								placeholder="Role"
-								value={role}
-								onValueChange={(v) => setRole(v as TeamRole)}
-								widthClassName="w-auto min-w-[140px]"
-								triggerClassName="h-10"
-							/>
-						</div>
+                            </div>
+                            <Select
+                                id="invite-role"
+                                options={[
+                                    { value: "admin", label: "Admin" },
+                                    { value: "member", label: "Member" },
+                                ]}
+                                placeholder="Role"
+                                value={role}
+                                onValueChange={(v) => setRole(v as TeamRole)}
+                                widthClassName="w-auto min-w-[140px]"
+                                triggerClassName="h-10"
+                            />
+                        </div>
 						{errors.length > 0 && (
 							<div className="mt-1 space-y-1">
 								{errors.map((error) => (

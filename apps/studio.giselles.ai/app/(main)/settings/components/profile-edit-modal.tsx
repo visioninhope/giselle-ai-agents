@@ -218,7 +218,8 @@ export function ProfileEditModal({
 			}}
 		>
 			<GlassDialogContent
-				className="max-w-[420px]"
+			className="max-w-[420px]"
+			borderStyle="solid"
 				onEscapeKeyDown={(e) => {
 					if (isLoading) {
 						e.preventDefault();
@@ -321,7 +322,6 @@ export function ProfileEditModal({
 								value={displayName}
 								onChange={handleDisplayNameChange}
 								disabled={isLoading}
-								inputClassName="focus-visible:shadow-[inset_0_0_0_1px_var(--color-focused)] focus-visible:ring-0 focus-visible:outline-none"
 							/>
 						</div>
 

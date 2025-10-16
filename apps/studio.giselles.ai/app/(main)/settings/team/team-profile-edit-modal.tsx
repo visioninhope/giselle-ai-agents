@@ -258,129 +258,125 @@ export function TeamProfileEditModal({
 				if (!open && !isLoading) onClose();
 			}}
 		>
-			<Dialog.Portal>
-				<Dialog.Overlay className="fixed inset-0 bg-black/60 z-50" />
-				<div className="fixed inset-0 flex items-center justify-center z-50 p-4">
-					<GlassDialogContent
-						className="max-w-[420px]"
-						onEscapeKeyDown={(e) => {
-							if (isLoading) {
-								e.preventDefault();
-								e.stopPropagation();
-							}
-						}}
-						onPointerDownOutside={(e) => {
-							if (isLoading) {
-								e.preventDefault();
-								e.stopPropagation();
-							}
-						}}
-					>
-						<GlassDialogHeader
-							title="Edit Team Profile"
-							description="Update your team's name and profile image."
-							onClose={() => {
-								if (!isLoading) onClose();
-							}}
+			<GlassDialogContent
+			className="max-w-[420px]"
+			borderStyle="solid"
+				onEscapeKeyDown={(e) => {
+					if (isLoading) {
+						e.preventDefault();
+						e.stopPropagation();
+					}
+				}}
+				onPointerDownOutside={(e) => {
+					if (isLoading) {
+						e.preventDefault();
+						e.stopPropagation();
+					}
+				}}
+			>
+				<GlassDialogHeader
+					title="Edit Team Profile"
+					description="Update your team's name and profile image."
+					onClose={() => {
+						if (!isLoading) onClose();
+					}}
+				/>
+				<GlassDialogBody>
+					<div className="mt-4 flex flex-col items-center gap-6 w-full">
+						{/* Hidden file input */}
+						<Input
+							ref={profileImageInputRef}
+							type="file"
+							accept={ACCEPTED_FILE_TYPES}
+							className="hidden"
+							onChange={handleFileSelect}
 						/>
-						<GlassDialogBody>
-							<div className="mt-4 flex flex-col items-center gap-6 w-full">
-								{/* Hidden file input */}
-								<Input
-									ref={profileImageInputRef}
-									type="file"
-									accept={ACCEPTED_FILE_TYPES}
-									className="hidden"
-									onChange={handleFileSelect}
-								/>
 
-								{/* Profile Images */}
-								<div className="flex items-center justify-center gap-4 w-full">
-									<div className="flex flex-row gap-4">
-										{/* Left side - clickable profile image */}
-										{!profileImagePreview && (
-											<button
-												type="button"
-												onClick={handleSelectImageClick}
-												className="group relative w-[80px] h-[80px] rounded-full overflow-hidden cursor-pointer focus:outline-none focus:ring-0 border border-primary-100/20 hover:before:content-[''] hover:before:absolute hover:before:inset-0 hover:before:bg-black-900/40 hover:before:z-10"
-											>
-												<TeamAvatarImage
-													avatarUrl={initialAvatarUrl}
-													teamName={initialTeamName || "Team"}
-													width={80}
-													height={80}
-													alt={alt}
-													className="object-cover w-full h-full"
-												/>
-												<div className="absolute inset-0 flex items-center justify-center bg-black-900/50 opacity-0 group-hover:opacity-100 transition-opacity">
-													<div className="w-[40px] h-[40px] rounded-full flex items-center justify-center">
-														<ImageIcon className="w-7 h-7 text-white-800 transform group-hover:scale-110 transition-transform" />
-													</div>
-												</div>
-											</button>
-										)}
-
-										{/* Left side - preview image */}
-										{profileImagePreview && (
-											<button
-												type="button"
-												onClick={handleSelectImageClick}
-												className="group relative w-[80px] h-[80px] rounded-full overflow-hidden cursor-pointer focus:outline-none focus:ring-0 border border-primary-100/30 hover:before:content-[''] hover:before:absolute hover:before:inset-0 hover:before:bg-black-900/40 hover:before:z-10"
-												aria-label="Change team profile image"
-											>
-												<Image
-													src={profileImagePreview}
-													alt="Team profile preview"
-													fill
-													sizes="80px"
-													className="object-cover w-full h-full scale-[1.02]"
-													style={{ objectPosition: "center" }}
-												/>
-												<div className="absolute inset-0 flex items-center justify-center bg-black-900/50 opacity-0 group-hover:opacity-100 transition-opacity">
-													<div className="w-[40px] h-[40px] rounded-full flex items-center justify-center">
-														<ImageIcon className="w-7 h-7 text-white-800 transform group-hover:scale-110 transition-transform" />
-													</div>
-												</div>
-											</button>
-										)}
-									</div>
-								</div>
-
-								{/* Team name input */}
-								<div className="w-full">
-									<label
-										htmlFor="teamName"
-										className="block text-white-800 text-left font-medium text-[12px] leading-[170%] font-geist mb-2"
+						{/* Profile Images */}
+						<div className="flex items-center justify-center gap-4 w-full">
+							<div className="flex flex-row gap-4">
+								{/* Left side - clickable profile image */}
+								{!profileImagePreview && (
+									<button
+										type="button"
+										onClick={handleSelectImageClick}
+										className="group relative w-[80px] h-[80px] rounded-full overflow-hidden cursor-pointer focus:outline-none focus:ring-0 border border-primary-100/20 hover:before:content-[''] hover:before:absolute hover:before:inset-0 hover:before:bg-black-900/40 hover:before:z-10"
 									>
-										Team Name
-									</label>
-									<Input
-										id="teamName"
-										value={teamName}
-										onChange={handleTeamNameChange}
-										className="w-full bg-transparent text-white-800 font-medium text-[14px] leading-[23.8px] font-geist shadow-[inset_0_0_0_1px_var(--color-border-muted)] focus:text-white border-0 focus-visible:outline-none focus-visible:shadow-[inset_0_0_0_1px_var(--color-focused)]"
-										disabled={isLoading}
-									/>
-								</div>
+										<TeamAvatarImage
+											avatarUrl={initialAvatarUrl}
+											teamName={initialTeamName || "Team"}
+											width={80}
+											height={80}
+											alt={alt}
+											className="object-cover w-full h-full"
+										/>
+										<div className="absolute inset-0 flex items-center justify-center bg-black-900/50 opacity-0 group-hover:opacity-100 transition-opacity">
+											<div className="w-[40px] h-[40px] rounded-full flex items-center justify-center">
+												<ImageIcon className="w-7 h-7 text-white-800 transform group-hover:scale-110 transition-transform" />
+											</div>
+										</div>
+									</button>
+								)}
 
-								{/* Error message */}
-								{(error || profileImageError) && (
-									<p className="text-[12px] leading-[20.4px] text-error-900 font-geist">
-										{error || profileImageError}
-									</p>
+								{/* Left side - preview image */}
+								{profileImagePreview && (
+									<button
+										type="button"
+										onClick={handleSelectImageClick}
+										className="group relative w-[80px] h-[80px] rounded-full overflow-hidden cursor-pointer focus:outline-none focus:ring-0 border border-primary-100/30 hover:before:content-[''] hover:before:absolute hover:before:inset-0 hover:before:bg-black-900/40 hover:before:z-10"
+										aria-label="Change team profile image"
+									>
+										<Image
+											src={profileImagePreview}
+											alt="Team profile preview"
+											fill
+											sizes="80px"
+											className="object-cover w-full h-full scale-[1.02]"
+											style={{ objectPosition: "center" }}
+										/>
+										<div className="absolute inset-0 flex items-center justify-center bg-black-900/50 opacity-0 group-hover:opacity-100 transition-opacity">
+											<div className="w-[40px] h-[40px] rounded-full flex items-center justify-center">
+												<ImageIcon className="w-7 h-7 text-white-800 transform group-hover:scale-110 transition-transform" />
+											</div>
+										</div>
+									</button>
 								)}
 							</div>
-						</GlassDialogBody>
-						<GlassDialogFooter
-							onCancel={onClose}
-							onConfirm={handleSave}
-							confirmLabel={isLoading ? "Processing..." : "Save"}
-							isPending={isLoading}
-							isConfirmDisabled={!isFormSubmittable}
-						/>
-					</GlassDialogContent>
-				</div>
-			</Dialog.Portal>
+						</div>
+
+						{/* Team name input */}
+						<div className="w-full">
+							<label
+								htmlFor="teamName"
+								className="block text-white-800 text-left font-medium text-[12px] leading-[170%] font-geist mb-2"
+							>
+								Team Name
+							</label>
+							<Input
+								id="teamName"
+								value={teamName}
+								onChange={handleTeamNameChange}
+								className="w-full bg-transparent text-white-800 font-medium text-[14px] leading-[23.8px] font-geist shadow-[inset_0_0_0_1px_var(--color-border-muted)] focus:text-white border-0 focus-visible:outline-none focus-visible:shadow-[inset_0_0_0_1px_var(--color-focused)]"
+								disabled={isLoading}
+							/>
+						</div>
+
+						{/* Error message */}
+						{(error || profileImageError) && (
+							<p className="text-[12px] leading-[20.4px] text-error-900 font-geist">
+								{error || profileImageError}
+							</p>
+						)}
+					</div>
+				</GlassDialogBody>
+				<GlassDialogFooter
+					onCancel={onClose}
+					onConfirm={handleSave}
+					confirmLabel={isLoading ? "Processing..." : "Save"}
+					isPending={isLoading}
+					isConfirmDisabled={!isFormSubmittable}
+				/>
+			</GlassDialogContent>
 		</Dialog.Root>
 	);
 }
