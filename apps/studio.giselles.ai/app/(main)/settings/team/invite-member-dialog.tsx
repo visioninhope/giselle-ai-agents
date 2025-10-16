@@ -9,10 +9,10 @@ import { GlassButton } from "@/components/ui/glass-button";
 import type { TeamRole } from "@/drizzle";
 import { type SendInvitationsResult, sendInvitationsAction } from "./actions";
 import {
-    GlassDialogBody,
-    GlassDialogContent,
-    GlassDialogFooter,
-    GlassDialogHeader,
+	GlassDialogBody,
+	GlassDialogContent,
+	GlassDialogFooter,
+	GlassDialogHeader,
 } from "./components/glass-dialog-content";
 
 type InviteMemberDialogProps = {
