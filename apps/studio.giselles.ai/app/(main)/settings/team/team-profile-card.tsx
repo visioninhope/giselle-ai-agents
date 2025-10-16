@@ -26,13 +26,8 @@ export function TeamProfileCard({
 				component: (
 					<Button
 						onClick={() => setIsEditModalOpen(true)}
-						className="rounded-lg px-4 py-2 text-white/80 transition-all duration-200 active:scale-[0.98]"
-						style={{
-							background: "linear-gradient(180deg, #202530 0%, #12151f 100%)",
-							border: "1px solid rgba(0,0,0,0.7)",
-							boxShadow:
-								"inset 0 1px 1px rgba(255,255,255,0.05), 0 2px 8px rgba(5,10,20,0.4), 0 1px 2px rgba(0,0,0,0.3)",
-						}}
+						variant="primary"
+						className="px-4"
 					>
 						Edit
 					</Button>
@@ -53,17 +48,20 @@ export function TeamProfileCard({
 					/>
 				</div>
 
-				{/* Team name */}
-				<span
-					className="text-primary-100 font-normal text-[16px] font-sans px-3 py-2 rounded-[8px] flex-1 truncate"
+				{/* Team name (clickable to open modal) */}
+				<button
+					type="button"
+					onClick={() => setIsEditModalOpen(true)}
+					className="text-primary-100 font-normal text-[16px] font-sans px-3 py-2 rounded-[8px] flex-1 truncate text-left hover:bg-inverse/5 focus-visible:outline-none focus-visible:shadow-[0_0_0_1px_var(--color-focused)]"
 					style={{
 						background: "#00020A",
 						boxShadow: "inset 0 1px 4px rgba(0,0,0,0.5)",
 						border: "0.5px solid rgba(255,255,255,0.05)",
 					}}
+					aria-label="Edit team profile"
 				>
 					{name}
-				</span>
+				</button>
 			</div>
 
 			{/* Team profile edit modal */}

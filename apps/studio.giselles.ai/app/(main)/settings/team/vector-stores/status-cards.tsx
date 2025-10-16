@@ -1,27 +1,21 @@
-import { AlertCircle, ExternalLink } from "lucide-react";
+import { DocsLink } from "@giselle-internal/ui/docs-link";
+import { PageHeading } from "@giselle-internal/ui/page-heading";
+import { AlertCircle } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "../../components/button";
 
 function VectorStoreHeader({ title }: { title: string }) {
 	return (
 		<div className="flex justify-between items-center">
-			<h2
-				className="text-[30px] font-sans font-medium text-[hsl(192,73%,84%)]"
-				style={{
-					textShadow: "0 0 20px #0087f6, 0 0 40px #0087f6, 0 0 60px #0087f6",
-				}}
-			>
+			<PageHeading as="h2" glow>
 				{title}
-			</h2>
-			<a
+			</PageHeading>
+			<DocsLink
+				tone="muted"
 				href="https://docs.giselles.ai/guides/settings/team/vector-store"
-				target="_blank"
-				rel="noopener noreferrer"
-				className="text-black-300 text-[14px] font-medium rounded-[4px] px-1.5 py-0.5 hover:bg-surface-hover flex items-center gap-1.5 font-sans"
 			>
 				About Vector Stores
-				<ExternalLink size={14} />
-			</a>
+			</DocsLink>
 		</div>
 	);
 }
@@ -32,10 +26,10 @@ export function GitHubAuthRequiredCard() {
 			<VectorStoreHeader title="Vector Store" />
 			<Card className="rounded-[8px] bg-transparent p-6 border-0">
 				<div className="flex flex-col items-center justify-center py-8">
-					<h4 className="text-white-400 font-medium text-[18px] leading-[21.6px] font-sans mb-2">
+					<h4 className="text-text font-medium text-[18px] leading-[21.6px] font-sans mb-2">
 						Please authenticate your GitHub account.
 					</h4>
-					<p className="text-black-400 text-[14px] leading-[20.4px] font-geist text-center mb-4">
+					<p className="text-secondary text-[14px] leading-[20.4px] font-geist text-center mb-4">
 						To use Vector Stores, you need to authenticate your GitHub account.
 						Please authenticate from your account settings page.
 					</p>
@@ -81,10 +75,10 @@ export function GitHubAppInstallRequiredCard() {
 			<VectorStoreHeader title="Vector Store" />
 			<Card className="rounded-[8px] bg-transparent p-6 border-0">
 				<div className="flex flex-col items-center justify-center py-8">
-					<h4 className="text-white-400 font-medium text-[18px] leading-[21.6px] font-sans mb-2">
+					<h4 className="text-text font-medium text-[18px] leading-[21.6px] font-sans mb-2">
 						Please install Giselle's GitHub App.
 					</h4>
-					<p className="text-black-400 text-[14px] leading-[20.4px] font-geist text-center mb-4">
+					<p className="text-secondary text-[14px] leading-[20.4px] font-geist text-center mb-4">
 						To use Vector Stores, you need to install Giselle's GitHub App.
 						Please install from your integrations settings page.
 					</p>

@@ -1,6 +1,7 @@
 import type { FC, HTMLInputTypeAttribute } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
 
 // FIXME: Consider integrating with apps/studio.giselles.ai/components/ui/field.tsx when releasing setting-v2
 type FieldProps = {
@@ -10,7 +11,10 @@ type FieldProps = {
 	label: string;
 	ignore1password?: boolean;
 	value?: string;
+	placeholder?: string;
+	onChange?: React.ChangeEventHandler<HTMLInputElement>;
 	disabled?: boolean;
+	inputClassName?: string;
 };
 export const Field: FC<FieldProps> = ({
 	name,
@@ -18,12 +22,22 @@ export const Field: FC<FieldProps> = ({
 	required,
 	label,
 	value,
+	placeholder,
+	onChange,
 	ignore1password = false,
 	disabled = false,
+	inputClassName,
 }) => (
 	<div className="grid gap-[4px]">
-		<Label htmlFor={name} className="text-white-400 font-geist">
-			{label}
+		<Label htmlFor={name} className="text-text font-geist">
+			{label.includes("*") ? (
+				<>
+					{label.split("*")[0]} <span className="text-error-900">*</span>
+					{label.split("*").slice(1).join("*")}
+				</>
+			) : (
+				label
+			)}
 		</Label>
 		<Input
 			id={name}
@@ -32,8 +46,13 @@ export const Field: FC<FieldProps> = ({
 			required={required}
 			data-1p-ignore={ignore1password}
 			value={value}
+			placeholder={placeholder}
+			onChange={onChange}
 			disabled={disabled}
-			className="py-2 border-[0.5px] border-border-muted rounded-[8px] bg-surface text-inverse font-medium text-[14px] leading-[23.8px] font-geist disabled:opacity-50"
+			className={cn(
+				"py-2 rounded-[8px] bg-surface text-inverse font-medium text-[14px] leading-[23.8px] font-geist disabled:opacity-50",
+				inputClassName,
+			)}
 		/>
 	</div>
 );

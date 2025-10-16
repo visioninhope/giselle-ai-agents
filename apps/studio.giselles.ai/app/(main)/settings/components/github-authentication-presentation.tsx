@@ -21,7 +21,7 @@ export function GitHubAuthenticationPresentation({
 	return (
 		<Card title="" className="py-4">
 			{alert && (
-				<Alert variant="destructive" className="p-4">
+				<Alert variant="destructive" className="p-4 rounded-[12px]">
 					<TriangleAlertIcon className="w-[18px] h-[18px] text-error-900/80" />
 					<AlertTitle className="mb-0 text-error-900 font-bold text-[12px] leading-[20.4px] font-geist">
 						Authentication Error

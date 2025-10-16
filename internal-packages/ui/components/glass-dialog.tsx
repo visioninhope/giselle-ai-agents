@@ -93,12 +93,14 @@ export function GlassDialogFooter({
 	onConfirm,
 	confirmLabel,
 	isPending = false,
+	isConfirmDisabled = false,
 	variant = "default",
 }: {
 	onCancel: () => void;
 	onConfirm?: () => void;
 	confirmLabel: string;
 	isPending?: boolean;
+	isConfirmDisabled?: boolean;
 	variant?: "default" | "destructive";
 }) {
 	const baseBtn = clsx(
@@ -142,7 +144,7 @@ export function GlassDialogFooter({
 			<button
 				type="button"
 				onClick={onConfirm}
-				disabled={isPending}
+				disabled={isPending || isConfirmDisabled}
 				className={variant === "destructive" ? destructiveBtn : primaryBtn}
 			>
 				{isPending ? "Processing..." : confirmLabel}

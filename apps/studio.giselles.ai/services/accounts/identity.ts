@@ -3,6 +3,28 @@ import { deleteOauthCredential, getAuthCallbackUrl } from "@/app/(auth)/lib";
 import { createClient, getUser } from "@/lib/supabase";
 import type { OAuthProvider } from "./oauth-credentials";
 
+type OAuthOptionOverrides = {
+	queryParams?: Record<string, string>;
+	scopes?: string[];
+};
+
+const providerOptionOverrides: Record<OAuthProvider, OAuthOptionOverrides> = {
+	github: {},
+	google: {
+		queryParams: {
+			access_type: "offline",
+			prompt: "consent",
+		},
+		scopes: ["openid", "email", "profile"],
+	},
+};
+
+function buildProviderOptions(provider: OAuthProvider) {
+	const overrides = providerOptionOverrides[provider];
+	const { scopes, ...rest } = overrides;
+	return scopes ? { ...rest, scopes: scopes.join(" ") } : rest;
+}
+
 export async function connectIdentity(provider: OAuthProvider, next: string) {
 	const supabase = await createClient();
 
@@ -20,39 +42,71 @@ export async function connectIdentity(provider: OAuthProvider, next: string) {
 		}
 	}
 
-	const { data, error } = await supabase.auth.linkIdentity({
-		provider,
-		options: {
-			redirectTo: getAuthCallbackUrl({ next, provider }),
-		},
-	});
+	let data: { provider: string; url: string | null } | null = null;
+	let error: {
+		code?: string;
+		message?: string;
+		name?: string;
+		status?: number;
+	} | null = null;
+	const redirectTo = await getAuthCallbackUrl({ next, provider });
+	try {
+		({ data, error } = await supabase.auth.linkIdentity({
+			provider,
+			options: {
+				redirectTo,
+				...buildProviderOptions(provider),
+			},
+		}));
+	} catch (e) {
+		throw new Error(
+			`Failed to initiate ${provider} linkIdentity: ${String(e)}`,
+		);
+	}
 
 	if (error != null) {
 		const { code, message, name, status } = error;
 		throw new Error(`${name} occurred: ${code} (${status}): ${message}`);
 	}
 
-	if (data.url) {
-		redirect(data.url);
-	}
+	if (data?.url) redirect(data.url);
+	throw new Error(
+		`OAuth did not return redirect URL. Verify Redirect URLs include: ${redirectTo}`,
+	);
 }
 
 export async function reconnectIdentity(provider: OAuthProvider, next: string) {
 	const supabase = await createClient();
-	const { data, error } = await supabase.auth.signInWithOAuth({
-		provider,
-		options: {
-			redirectTo: getAuthCallbackUrl({ next, provider }),
-		},
-	});
+	let data: { provider: string; url: string | null } | null = null;
+	let error: {
+		code?: string;
+		message?: string;
+		name?: string;
+		status?: number;
+	} | null = null;
+	const redirectTo2 = await getAuthCallbackUrl({ next, provider });
+	try {
+		({ data, error } = await supabase.auth.signInWithOAuth({
+			provider,
+			options: {
+				redirectTo: redirectTo2,
+				...buildProviderOptions(provider),
+			},
+		}));
+	} catch (e) {
+		throw new Error(
+			`Failed to initiate ${provider} signInWithOAuth: ${String(e)}`,
+		);
+	}
 
 	if (error != null) {
 		const { code, message, name, status } = error;
 		throw new Error(`${name} occurred: ${code} (${status}): ${message}`);
 	}
-	if (data.url) {
-		redirect(data.url);
-	}
+	if (data?.url) redirect(data.url);
+	throw new Error(
+		`OAuth did not return redirect URL. Verify Redirect URLs include: ${redirectTo2}`,
+	);
 }
 
 export async function disconnectIdentity(

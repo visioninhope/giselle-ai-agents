@@ -14,25 +14,31 @@ export function SidebarMenu() {
 	];
 
 	return (
-		<div className="w-[200px] min-h-full flex flex-col pt-0">
-			<div className="flex flex-col space-y-2">
+		<nav
+			className="min-h-full flex flex-col pt-0"
+			style={{ width: "260px" }}
+			aria-label="Account settings navigation"
+		>
+			<ul className="flex flex-col">
 				{links.map((link) => (
-					<Link
-						key={link.href}
-						href={link.href}
-						aria-label={`${link.label} settings`}
-						className={cn(
-							"text-[16px] font-sans font-medium rounded-lg px-4 py-1 hover:bg-white/5",
-							{
-								"text-white-400": pathname === link.href,
-								"text-black-70": pathname !== link.href,
-							},
-						)}
-					>
-						{link.label}
-					</Link>
+					<li key={link.href} className="w-full h-[36px]">
+						<Link
+							href={link.href}
+							aria-label={`${link.label} settings`}
+							className={cn(
+								"text-sm font-sans font-medium rounded-lg px-1 transition-colors flex items-center w-full h-full",
+								"text-stage-sidebar-text hover:text-stage-sidebar-text-hover",
+								{
+									"text-stage-sidebar-text-hover": pathname === link.href,
+								},
+							)}
+						>
+							<span className="w-8 shrink-0" aria-hidden="true" />
+							{link.label}
+						</Link>
+					</li>
 				))}
-			</div>
-		</div>
+			</ul>
+		</nav>
 	);
 }
