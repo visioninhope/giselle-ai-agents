@@ -2,7 +2,6 @@
 
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
-import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { redirect } from "next/navigation";
 import {
 	db,
@@ -31,11 +30,25 @@ export async function connectGoogleIdentity() {
 	return await connectIdentity("google", "/settings/account/authentication");
 }
 
+type RedirectErrorLike = { digest: string };
+
+function isRedirectErrorLike(error: unknown): error is RedirectErrorLike {
+	if (
+		typeof error !== "object" ||
+		error === null ||
+		!("digest" in error) ||
+		typeof (error as RedirectErrorLike).digest !== "string"
+	) {
+		return false;
+	}
+	return (error as RedirectErrorLike).digest.startsWith("NEXT_REDIRECT");
+}
+
 export async function connectGitHubIdentity() {
 	try {
 		return await connectIdentity("github", "/settings/account/authentication");
 	} catch (e) {
-		if (isRedirectError(e)) throw e;
+		if (isRedirectErrorLike(e)) throw e;
 		const msg = e instanceof Error ? e.message : String(e);
 		redirect(
 			`/settings/account/authentication?oauthError=${encodeURIComponent(msg)}`,
@@ -54,7 +67,7 @@ export async function reconnectGitHubIdentity() {
 			"/settings/account/authentication",
 		);
 	} catch (e) {
-		if (isRedirectError(e)) throw e;
+		if (isRedirectErrorLike(e)) throw e;
 		const msg = e instanceof Error ? e.message : String(e);
 		redirect(
 			`/settings/account/authentication?oauthError=${encodeURIComponent(msg)}`,
