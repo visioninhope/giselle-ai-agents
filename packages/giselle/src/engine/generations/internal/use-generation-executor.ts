@@ -145,16 +145,24 @@ export async function useGenerationExecutor<T>(args: {
 	}
 	async function fileResolver(fileId: FileId): Promise<DataContent> {
 		const fileRetrievalStartTime = Date.now();
-		const blob = await args.context.storage.getItemRaw(
-			filePath({
-				...runningGeneration.context.origin,
-				fileId,
-			}),
-		);
+		const path = filePath({
+			...runningGeneration.context.origin,
+			fileId,
+		});
+		let blob: unknown;
+		if (args.useExperimentalStorage) {
+			const exists = await args.context.experimental_storage.exists(path);
+			blob = exists
+				? await args.context.experimental_storage.getBlob(path)
+				: undefined;
+		} else {
+			blob = await args.context.storage.getItemRaw(path);
+		}
 		args.context.logger.info(
 			`File retrieval completed in ${Date.now() - fileRetrievalStartTime}ms (fileId: ${fileId})`,
 		);
 		if (blob === undefined) {
+			args.context.logger.warn(`File not found (fileId: ${fileId})`);
 			return new Uint8Array() as DataContent;
 		}
 		return blob as DataContent;

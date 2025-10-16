@@ -1,4 +1,5 @@
-import { ExternalLink } from "lucide-react";
+import { DocsLink } from "@giselle-internal/ui/docs-link";
+import { PageHeading } from "@giselle-internal/ui/page-heading";
 import { SignOutButton } from "@/services/accounts/components/user-button/sign-out-button";
 import { Button } from "../../components/button";
 import { Card } from "../../components/card";
@@ -13,21 +14,16 @@ export default async function AccountGeneralPage() {
 	return (
 		<div className="flex flex-col gap-[24px]">
 			<div className="flex justify-between items-center">
-				<h3
-					className="text-primary-100 font-semibold text-[28px] leading-[28px] tracking-[-0.011em] font-sans"
-					style={{ textShadow: "0px 0px 20px hsla(207, 100%, 48%, 1)" }}
+				<PageHeading
+					as="h3"
+					glow
+					className="text-[28px] leading-[28px] tracking-[-0.011em]"
 				>
 					Account Settings
-				</h3>
-				<a
-					href="https://docs.giselles.ai/guides/settings/account/general"
-					target="_blank"
-					rel="noopener noreferrer"
-					className="text-black-300 text-[14px] font-medium rounded-[4px] px-1.5 py-0.5 hover:bg-surface-hover flex items-center gap-1.5 font-sans"
-				>
+				</PageHeading>
+				<DocsLink href="https://docs.giselles.ai/guides/settings/account/general">
 					About Account Settings
-					<ExternalLink size={14} />
-				</a>
+				</DocsLink>
 			</div>
 			<div className="flex flex-col gap-y-4">
 				<AccountDisplayNameForm
@@ -46,6 +42,7 @@ export default async function AccountGeneralPage() {
 						type="email"
 						value={email ?? "No email"}
 						disabled
+						inputClassName="bg-transparent shadow-none border-none"
 					/>
 				</Card>
 				<Card

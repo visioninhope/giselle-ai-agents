@@ -42,16 +42,20 @@ export function AccountDisplayNameForm({
 								className="object-cover w-full h-full"
 							/>
 						</div>
-						<span
-							className="text-primary-100 font-normal text-[16px] leading-[19.2px] tracking-[-0.011em] font-sans px-3 py-2 rounded-[8px] w-[360px] truncate"
+						{/* Readonly display "input" area - open modal when clicked */}
+						<button
+							type="button"
+							onClick={() => setIsEditModalOpen(true)}
+							className="text-primary-100 font-normal text-[16px] leading-[19.2px] tracking-[-0.011em] font-sans px-3 py-2 rounded-[8px] w-[360px] truncate text-left cursor-pointer hover:bg-inverse/5 focus-visible:outline-none focus-visible:shadow-[0_0_0_1px_var(--color-focused)]"
 							style={{
 								background: "#00020A",
 								boxShadow: "inset 0 1px 4px rgba(0,0,0,0.5)",
 								border: "0.5px solid rgba(255,255,255,0.05)",
 							}}
+							aria-label="Edit display name"
 						>
 							{displayName ?? "No display name"}
-						</span>
+						</button>
 					</div>
 
 					<Button

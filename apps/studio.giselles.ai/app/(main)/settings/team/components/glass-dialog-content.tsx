@@ -22,7 +22,9 @@ export const GlassDialogContent = React.forwardRef<
 			: "linear-gradient(135deg, rgba(150, 150, 150, 0.03) 0%, rgba(60, 90, 160, 0.12) 100%)";
 
 	const borderClass =
-		variant === "destructive" ? "border-error-900/10" : "border-border-muted";
+		variant === "destructive"
+			? "border-[0.5px] border-error-900/15"
+			: "border-[0.5px] border-white/8";
 
 	return (
 		<Dialog.Portal>
@@ -45,10 +47,7 @@ export const GlassDialogContent = React.forwardRef<
 					/>
 					<div className="absolute -z-10 top-0 left-4 right-4 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
 					<div
-						className={cn(
-							"absolute -z-10 inset-0 rounded-[12px] border",
-							borderClass,
-						)}
+						className={cn("absolute -z-10 inset-0 rounded-[12px]", borderClass)}
 					/>
 					{children}
 				</Dialog.Content>
@@ -120,6 +119,7 @@ type GlassDialogFooterProps = {
 	onConfirm?: () => void;
 	confirmLabel: string;
 	isPending?: boolean;
+	isConfirmDisabled?: boolean;
 	variant?: "default" | "destructive";
 	confirmButtonType?: "button" | "submit";
 };
@@ -129,6 +129,7 @@ export const GlassDialogFooter = ({
 	onConfirm,
 	confirmLabel,
 	isPending = false,
+	isConfirmDisabled = false,
 	variant = "default",
 	confirmButtonType = "button",
 }: GlassDialogFooterProps) => {
@@ -146,7 +147,7 @@ export const GlassDialogFooter = ({
 			<button
 				type={confirmButtonType}
 				onClick={onConfirm}
-				disabled={isPending}
+				disabled={isPending || isConfirmDisabled}
 				className={cn(
 					buttonVariants({
 						variant: variant === "destructive" ? "destructive" : "primary",

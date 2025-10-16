@@ -1,3 +1,5 @@
+import { DocsLink } from "@giselle-internal/ui/docs-link";
+import { PageHeading } from "@giselle-internal/ui/page-heading";
 import { Plus } from "lucide-react";
 import { GlassButton } from "@/components/ui/glass-button";
 import { ToastProvider } from "@/packages/contexts/toast";
@@ -24,22 +26,26 @@ export default async function AccountSettingPage() {
 	return (
 		<ToastProvider>
 			<div className="flex flex-col gap-[12px]">
-				<h1
-					className="text-[30px] font-sans font-medium text-[hsl(192,73%,84%)]"
-					style={{
-						textShadow: "0 0 20px #0087f6, 0 0 40px #0087f6, 0 0 60px #0087f6",
-					}}
-				>
-					Overview
-				</h1>
+				<div className="flex items-center justify-between">
+					<PageHeading as="h1" glow>
+						Overview
+					</PageHeading>
+					<DocsLink
+						href="https://docs.giselles.ai/en/guides/settings/account/overview"
+						target="_blank"
+						rel="noopener noreferrer"
+					>
+						About teams
+					</DocsLink>
+				</div>
 				<div className="flex flex-col gap-y-[12px]">
-					<div className="space-y-2 p-6 gap-y-[12px]">
+					<div className="space-y-2 gap-y-[12px]">
 						<div className="flex justify-between items-center">
 							<div>
-								<h4 className="text-white-400 text-[18px] font-medium font-sans">
+								<h4 className="text-text text-[18px] font-medium font-sans">
 									Teams
 								</h4>
-								<p className="text-black-400 text-[12px] font-geist">
+								<p className="text-secondary text-[12px] font-geist">
 									The teams that are associated with your Giselle account.
 								</p>
 							</div>
