@@ -24,10 +24,10 @@ export const GlassDialogContent = React.forwardRef<
 		{
 			className,
 			children,
-            variant = "default",
-            borderStyle = "gradient",
-            withBaseFill = false,
-            overlayClassName,
+			variant = "default",
+			borderStyle = "gradient",
+			withBaseFill = false,
+			overlayClassName,
 			...props
 		},
 		ref,

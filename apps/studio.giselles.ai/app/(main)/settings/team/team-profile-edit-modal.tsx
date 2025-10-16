@@ -259,8 +259,8 @@ export function TeamProfileEditModal({
 			}}
 		>
 			<GlassDialogContent
-			className="max-w-[420px]"
-			borderStyle="solid"
+				className="max-w-[420px]"
+				borderStyle="solid"
 				onEscapeKeyDown={(e) => {
 					if (isLoading) {
 						e.preventDefault();
