@@ -10,7 +10,6 @@ import { Label } from "@/components/ui/label";
 import type { users } from "@/drizzle";
 import { AvatarImage } from "@/services/accounts/components/user-button/avatar-image";
 import { updateAvatar, updateDisplayName } from "../account/actions";
-import { Field } from "../components/field";
 import { IMAGE_CONSTRAINTS } from "../constants";
 import {
 	GlassDialogBody,

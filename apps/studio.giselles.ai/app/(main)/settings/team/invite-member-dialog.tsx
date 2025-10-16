@@ -317,14 +317,14 @@ export function InviteMemberDialog({
 				</GlassButton>
 			</Dialog.Trigger>
 
-				<GlassDialogContent
+			<GlassDialogContent
 				className="max-w-[600px]"
 				borderStyle="solid"
 				withBaseFill={false}
 				overlayClassName="bg-black/50"
 				onEscapeKeyDown={handleCloseDialog}
 				onPointerDownOutside={handleCloseDialog}
-				>
+			>
 				<GlassDialogHeader
 					title="Invite Team Member"
 					description="Each member added to your team will be charged as an additional seat ($20 per seat) on your Pro Plan subscription."
