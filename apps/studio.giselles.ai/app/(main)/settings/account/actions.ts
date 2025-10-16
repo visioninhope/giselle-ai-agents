@@ -2,6 +2,7 @@
 
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { redirect } from "next/navigation";
 import {
 	db,
@@ -30,22 +31,11 @@ export async function connectGoogleIdentity() {
 	return await connectIdentity("google", "/settings/account/authentication");
 }
 
-type NextRedirectLike = { digest: string };
-
-function isNextRedirectError(e: unknown): e is NextRedirectLike {
-	return (
-		typeof e === "object" &&
-		e !== null &&
-		"digest" in e &&
-		(e as NextRedirectLike).digest === "NEXT_REDIRECT"
-	);
-}
-
 export async function connectGitHubIdentity() {
 	try {
 		return await connectIdentity("github", "/settings/account/authentication");
 	} catch (e) {
-		if (isNextRedirectError(e)) throw e as unknown as Error;
+		if (isRedirectError(e)) throw e;
 		const msg = e instanceof Error ? e.message : String(e);
 		redirect(
 			`/settings/account/authentication?oauthError=${encodeURIComponent(msg)}`,
@@ -64,7 +54,7 @@ export async function reconnectGitHubIdentity() {
 			"/settings/account/authentication",
 		);
 	} catch (e) {
-		if (isNextRedirectError(e)) throw e as unknown as Error;
+		if (isRedirectError(e)) throw e;
 		const msg = e instanceof Error ? e.message : String(e);
 		redirect(
 			`/settings/account/authentication?oauthError=${encodeURIComponent(msg)}`,
