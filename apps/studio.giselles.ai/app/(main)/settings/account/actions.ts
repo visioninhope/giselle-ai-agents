@@ -30,22 +30,25 @@ export async function connectGoogleIdentity() {
 	return await connectIdentity("google", "/settings/account/authentication");
 }
 
-type NextRedirectLike = { digest: string };
+type RedirectErrorLike = { digest: string };
 
-function isNextRedirectError(e: unknown): e is NextRedirectLike {
-	return (
-		typeof e === "object" &&
-		e !== null &&
-		"digest" in e &&
-		(e as NextRedirectLike).digest === "NEXT_REDIRECT"
-	);
+function isRedirectErrorLike(error: unknown): error is RedirectErrorLike {
+	if (
+		typeof error !== "object" ||
+		error === null ||
+		!("digest" in error) ||
+		typeof (error as RedirectErrorLike).digest !== "string"
+	) {
+		return false;
+	}
+	return (error as RedirectErrorLike).digest.startsWith("NEXT_REDIRECT");
 }
 
 export async function connectGitHubIdentity() {
 	try {
 		return await connectIdentity("github", "/settings/account/authentication");
 	} catch (e) {
-		if (isNextRedirectError(e)) throw e as unknown as Error;
+		if (isRedirectErrorLike(e)) throw e;
 		const msg = e instanceof Error ? e.message : String(e);
 		redirect(
 			`/settings/account/authentication?oauthError=${encodeURIComponent(msg)}`,
@@ -64,7 +67,7 @@ export async function reconnectGitHubIdentity() {
 			"/settings/account/authentication",
 		);
 	} catch (e) {
-		if (isNextRedirectError(e)) throw e as unknown as Error;
+		if (isRedirectErrorLike(e)) throw e;
 		const msg = e instanceof Error ? e.message : String(e);
 		redirect(
 			`/settings/account/authentication?oauthError=${encodeURIComponent(msg)}`,
