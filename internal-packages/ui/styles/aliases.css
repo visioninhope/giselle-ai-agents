@@ -12,6 +12,37 @@
 	.text-text {
 		color: var(--color-text) !important;
 	}
+	/* Accent text/background/border utilities */
+	.text-accent {
+		color: var(--color-accent, #0087f6) !important;
+	}
+	.bg-accent {
+		background-color: var(--color-accent, #0087f6) !important;
+	}
+	.border-accent {
+		border-color: var(--color-accent, #0087f6) !important;
+	}
+	.text-accent-muted {
+		color: var(
+			--color-accent-muted,
+			color-mix(in srgb, var(--color-accent, #0087f6) 60%, transparent)
+		) !important;
+	}
+	/* Secondary text (maps to semantic --color-text-secondary) */
+	.text-secondary {
+		color: var(
+			--color-text-secondary,
+			var(--color-text-muted, var(--color-text))
+		) !important;
+	}
+
+	/* Container helper for explanatory copy */
+	.prose-secondary :is(p, li, small, span) {
+		color: var(
+			--color-text-secondary,
+			var(--color-text-muted, var(--color-text))
+		) !important;
+	}
 	.text-inverse {
 		color: var(--color-text-inverse, var(--color-white, #fff)) !important;
 	}
@@ -105,8 +136,55 @@
 		background-color: var(--color-bg, var(--color-background)) !important;
 	}
 
+	/* Auth page backgrounds */
+	.bg-auth {
+		background-color: var(--color-auth-background, var(--color-background)) !important;
+	}
+	.fill-auth-ambient {
+		fill: var(--color-auth-ambient-light, #1a2845) !important;
+	}
+	.fill-auth-watermark {
+		fill: var(--color-auth-logo-watermark, rgba(255, 255, 255, 0.05)) !important;
+	}
+
+	/* Auth page text colors */
+	.text-auth-dark {
+		color: var(--color-auth-text-dark, #000) !important;
+	}
+	.group:hover .group-hover\:text-auth-dark {
+		color: var(--color-auth-text-dark, #000) !important;
+	}
+	.group:hover span svg {
+		color: var(--color-auth-text-dark, #000) !important;
+		fill: var(--color-auth-text-dark, #000) !important;
+	}
+	.bg-auth-dark {
+		background-color: var(--color-auth-bg-dark, #000) !important;
+	}
+	.hover\:bg-auth-dark:hover {
+		background-color: var(--color-auth-bg-dark, #000) !important;
+	}
+	.hover\:text-blue-pale:hover {
+		color: var(--color-blue-pale, #c3dcf8) !important;
+	}
+	.hover\:text-auth-dark:hover {
+		color: var(--color-auth-text-dark, #000) !important;
+	}
+	.hover\:bg-blue-pale:hover {
+		background-color: var(--color-blue-pale, #c3dcf8) !important;
+	}
+	.hover\:text-blue-pale:hover {
+		color: var(--color-blue-pale, #c3dcf8) !important;
+	}
+	.hover\:border-auth-dark:hover {
+		border-color: var(--color-auth-bg-dark, #000) !important;
+	}
+
 	/* Text from semantic background tokens */
 	.text-bg {
+		color: var(--color-bg, var(--color-background)) !important;
+	}
+	.hover\:text-bg:hover {
 		color: var(--color-bg, var(--color-background)) !important;
 	}
 	.bg-inverse {
@@ -218,6 +296,42 @@
 	/* Link muted explicit color */
 	.text-link-muted {
 		color: var(--color-link-muted) !important;
+	}
+	/* Link accent explicit color */
+	.text-link-accent {
+		color: var(--color-link-accent, #1663f3) !important;
+	}
+	.hover\:text-link-accent:hover {
+		color: var(--color-link-accent-hover, #0f4cd1) !important;
+	}
+
+	/* Blue palette utilities */
+	.text-blue-light {
+		color: var(--color-blue-light, #b8e8f4) !important;
+	}
+	.text-blue-pale {
+		color: var(--color-blue-pale, #c3dcf8) !important;
+	}
+	.text-blue-muted {
+		color: var(--color-blue-muted, #839dc3) !important;
+	}
+	.bg-blue-light {
+		background-color: var(--color-blue-light, #b8e8f4) !important;
+	}
+	.bg-blue-pale {
+		background-color: var(--color-blue-pale, #c3dcf8) !important;
+	}
+	.bg-blue-muted {
+		background-color: var(--color-blue-muted, #839dc3) !important;
+	}
+	.border-blue-light {
+		border-color: var(--color-blue-light, #b8e8f4) !important;
+	}
+	.border-blue-pale {
+		border-color: var(--color-blue-pale, #c3dcf8) !important;
+	}
+	.border-blue-muted {
+		border-color: var(--color-blue-muted, #839dc3) !important;
 	}
 
 	/* Placeholder variant for link-muted */
