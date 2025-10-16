@@ -338,4 +338,29 @@
 	.placeholder\:text-link-muted::placeholder {
 		color: var(--color-link-muted) !important;
 	}
+
+	/* Layout tokens */
+	.h-header {
+		height: var(--height-header) !important;
+	}
+	.px-page {
+		padding-left: var(--spacing-page-horizontal) !important;
+		padding-right: var(--spacing-page-horizontal) !important;
+	}
+	.w-logo {
+		width: var(--width-logo) !important;
+	}
+
+	/* Nav glow effect */
+	.nav-glow {
+		text-shadow: 0px 0px 20px var(--color-accent) !important;
+	}
+
+	/* Interactive icon hover */
+	.hover\:text-icon-hover:hover {
+		color: var(--color-icon-hover) !important;
+	}
+	.hover\:fill-icon-hover:hover {
+		fill: var(--color-icon-hover) !important;
+	}
 }

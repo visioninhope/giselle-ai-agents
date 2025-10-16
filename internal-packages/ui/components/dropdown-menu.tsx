@@ -9,6 +9,9 @@ interface MenuItem {
 	value: string | number;
 	label: string;
 	icon?: React.ReactNode;
+	destructive?: boolean;
+	disabled?: boolean;
+	action?: () => void;
 }
 
 interface MenuGroup<T extends MenuItem> {
@@ -88,13 +91,18 @@ export function DropdownMenu<
 			onSelect={(event) => onSelect?.(event, item)}
 			onMouseEnter={() => onItemHover?.(item, true)}
 			onMouseLeave={() => onItemHover?.(item, false)}
+			disabled={item.disabled}
 			className={
 				renderItemAsChild
 					? ""
 					: clsx(
-							"text-text outline-none cursor-pointer hover:bg-ghost-element-hover",
+							"text-text outline-none cursor-pointer",
+							item.destructive
+								? "hover:bg-[var(--color-destructive-hover-bg)]"
+								: "hover:bg-ghost-element-hover",
 							"rounded-[4px] px-[8px] py-[6px] text-[14px]",
 							"flex items-center justify-between gap-[4px]",
+							item.disabled && "opacity-50 cursor-not-allowed",
 						)
 			}
 		>
