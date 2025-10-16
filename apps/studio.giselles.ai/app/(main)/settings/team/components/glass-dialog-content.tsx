@@ -12,6 +12,8 @@ type GlassDialogContentProps = React.ComponentPropsWithoutRef<
 > & {
 	variant?: "default" | "destructive";
 	borderStyle?: "gradient" | "solid";
+	withBaseFill?: boolean;
+	overlayClassName?: string;
 };
 
 export const GlassDialogContent = React.forwardRef<
@@ -24,6 +26,8 @@ export const GlassDialogContent = React.forwardRef<
 			children,
 			variant = "default",
 			borderStyle = "gradient",
+			withBaseFill = false,
+			overlayClassName,
 			...props
 		},
 		ref,
@@ -35,12 +39,15 @@ export const GlassDialogContent = React.forwardRef<
 
 		return (
 			<Dialog.Portal>
-				<Dialog.Overlay className="fixed inset-0 z-50 bg-black/60" />
+				<Dialog.Overlay
+					className={cn("fixed inset-0 z-50", overlayClassName)}
+					style={{ background: "var(--color-dialog-overlay)" }}
+				/>
 				<div className="fixed inset-0 z-50 flex items-center justify-center p-4">
 					<Dialog.Content
 						ref={ref}
 						className={cn(
-							"relative z-10 w-[90vw] max-w-[600px] max-h-[85vh] rounded-[12px] p-6 pb-20 flex flex-col",
+							"relative z-10 w-[90vw] max-w-[600px] max-h-[85vh] rounded-[12px] p-6 flex flex-col",
 							"shadow-xl focus:outline-none",
 							className,
 						)}
@@ -49,9 +56,12 @@ export const GlassDialogContent = React.forwardRef<
 						<GlassSurfaceLayers
 							variant={variant === "destructive" ? "destructive" : "default"}
 							borderStyle={borderStyle === "gradient" ? "gradient" : "solid"}
+							withBaseFill={withBaseFill}
 							zIndexClass="z-0"
 						/>
-						<div className="relative z-10">{children}</div>
+						<div className="relative z-10 flex flex-col min-h-0">
+							{children}
+						</div>
 					</Dialog.Content>
 				</div>
 			</Dialog.Portal>
@@ -137,7 +147,7 @@ export const GlassDialogFooter = ({
 	confirmButtonType = "button",
 }: GlassDialogFooterProps) => {
 	return (
-		<div className="absolute bottom-6 left-6 right-6 flex justify-end gap-x-3">
+		<div className="mt-6 flex justify-end gap-x-3">
 			<button
 				type="button"
 				onClick={onCancel}

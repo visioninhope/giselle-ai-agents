@@ -1,11 +1,5 @@
 "use client";
 
-import {
-	GlassDialogBody,
-	GlassDialogContent,
-	GlassDialogFooter,
-	GlassDialogHeader,
-} from "@giselle-internal/ui/glass-dialog";
 import { Select } from "@giselle-internal/ui/select";
 import * as Dialog from "@radix-ui/react-dialog";
 import { Plus, X } from "lucide-react";
@@ -14,6 +8,12 @@ import { email as emailValidator, parse, pipe, string } from "valibot";
 import { GlassButton } from "@/components/ui/glass-button";
 import type { TeamRole } from "@/drizzle";
 import { type SendInvitationsResult, sendInvitationsAction } from "./actions";
+import {
+	GlassDialogBody,
+	GlassDialogContent,
+	GlassDialogFooter,
+	GlassDialogHeader,
+} from "./components/glass-dialog-content";
 
 type InviteMemberDialogProps = {
 	memberEmails: string[];
@@ -318,6 +318,10 @@ export function InviteMemberDialog({
 			</Dialog.Trigger>
 
 			<GlassDialogContent
+				className="max-w-[600px]"
+				borderStyle="solid"
+				withBaseFill={false}
+				overlayClassName="bg-black/50"
 				onEscapeKeyDown={handleCloseDialog}
 				onPointerDownOutside={handleCloseDialog}
 			>

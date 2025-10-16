@@ -1,6 +1,7 @@
 import clsx from "clsx/lite";
 import { Dialog as DialogPrimitive } from "radix-ui";
 import type { PropsWithChildren } from "react";
+import { GlassSurfaceLayers } from "./glass-surface";
 
 export const Dialog = DialogPrimitive.Root;
 export const DialogPortal = DialogPrimitive.Portal;
@@ -20,13 +21,17 @@ export function DialogContent({
 					"fixed left-[50%] top-[50%] translate-y-[-50%] translate-x-[-50%] z-50 overflow-y-auto overflow-x-hidden outline-none",
 					"data-[size=default]:w-[500px] data-[size=default]:max-h-[75%]",
 					"data-[size=wide]:w-[800px] data-[size=default]:max-h-[85%]",
-					"bg-(image:--glass-bg)",
-					"border border-glass-border/20 shadow-xl text-text",
+					"relative bg-transparent shadow-xl text-text",
 					"p-6 rounded-[12px]",
-					"backdrop-blur-md",
-					"after:absolute after:bg-(image:--glass-highlight-bg) after:left-4 after:right-4 after:h-px after:top-0",
 				)}
 			>
+				<GlassSurfaceLayers
+					radiusClass="rounded-[12px]"
+					baseFillClass="bg-bg/18"
+					withTopHighlight={false}
+					borderStyle="solid"
+					blurClass="backdrop-blur-sm"
+				/>
 				{children}
 			</DialogPrimitive.Content>
 		</DialogPortal>

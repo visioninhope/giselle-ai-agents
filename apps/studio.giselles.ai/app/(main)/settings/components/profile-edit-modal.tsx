@@ -6,10 +6,10 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { maxLength, minLength, parse, pipe, string } from "valibot";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import type { users } from "@/drizzle";
 import { AvatarImage } from "@/services/accounts/components/user-button/avatar-image";
 import { updateAvatar, updateDisplayName } from "../account/actions";
-import { Field } from "../components/field";
 import { IMAGE_CONSTRAINTS } from "../constants";
 import {
 	GlassDialogBody,
@@ -219,6 +219,7 @@ export function ProfileEditModal({
 		>
 			<GlassDialogContent
 				className="max-w-[420px]"
+				borderStyle="solid"
 				onEscapeKeyDown={(e) => {
 					if (isLoading) {
 						e.preventDefault();
@@ -312,17 +313,26 @@ export function ProfileEditModal({
 							</div>
 						</div>
 
-						{/* Display name input */}
-						<div className="w-full overflow-visible">
-							<Field
-								name="displayName"
-								type="text"
-								label="Your Display Name"
-								value={displayName}
-								onChange={handleDisplayNameChange}
-								disabled={isLoading}
-								inputClassName="focus-visible:shadow-[inset_0_0_0_1px_var(--color-focused)] focus-visible:ring-0 focus-visible:outline-none"
-							/>
+						{/* Display name input (aligned with team dialogs style) */}
+						<div className="w-full">
+							<div className="grid gap-1">
+								<Label htmlFor="displayName" className="text-text font-geist">
+									Your Display Name
+								</Label>
+								<div
+									className={`flex items-center gap-2 rounded-[12px] px-2 py-1 bg-inverse/5 ${error ? "ring-1 ring-error-900" : ""}`}
+								>
+									<Input
+										id="displayName"
+										name="displayName"
+										type="text"
+										value={displayName}
+										onChange={handleDisplayNameChange}
+										disabled={isLoading}
+										className="min-w-[200px] flex-1 border-none bg-transparent px-1 py-1 text-[14px] text-inverse placeholder:text-inverse/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-100/50 focus-visible:ring-offset-0"
+									/>
+								</div>
+							</div>
 						</div>
 
 						{/* Error message */}
