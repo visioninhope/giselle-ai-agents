@@ -319,6 +319,7 @@
 		) !important;
 	}
 	.shadow-chat-bubble-accent {
+		/* Use var() with full composite value fallback to satisfy multi-shadow syntax */
 		box-shadow: var(
 			--shadow-chat-bubble-accent,
 			0 0 10px rgba(107, 143, 240, 0.3),
