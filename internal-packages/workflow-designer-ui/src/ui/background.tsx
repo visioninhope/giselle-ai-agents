@@ -296,9 +296,9 @@ export function Background() {
 	}, []);
 
 	return (
-		<div className="relative w-full h-full bg-[#141414]" ref={containerRef}>
+		<div className="relative w-full h-full bg-stage" ref={containerRef}>
 			<canvas ref={canvasRef} className="absolute inset-0" />
-			<div className="absolute w-full h-full bg-radial-[45%_45%_at_50%_50%] from-[rgba(1,20,50,0.30)] to-[rgba(1,4,26,0.80)]" />
+			<div className="absolute w-full h-full bg-(image:--stage-radial-overlay)" />
 		</div>
 	);
 }

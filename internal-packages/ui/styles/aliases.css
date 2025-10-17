@@ -311,6 +311,8 @@
 
 	/* Toolbar background gradient (playground main toolbar) */
 	.bg-toolbar-gradient {
+		/* Solid fallback if vars/gradients fail */
+		background-color: var(--toolbar-gradient-base, hsla(218, 58%, 21%, 0.9)) !important;
 		background-image: linear-gradient(
 			to bottom right,
 			var(--toolbar-gradient-from, hsla(232, 37%, 72%, 0.2)),
