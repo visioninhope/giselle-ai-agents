@@ -1,5 +1,6 @@
 "use client";
 
+import { GlassSurfaceLayers } from "@giselle-internal/ui/glass-surface";
 import { FileCategory } from "@giselle-sdk/data-type";
 import {
 	type ActionProvider,
@@ -181,7 +182,13 @@ export function Toolbar() {
 
 	return (
 		<div className="relative rounded-[8px] overflow-hidden bg-surface/10">
-			<div className="absolute z-0 rounded-[8px] inset-0 border mask-fill bg-toolbar-gradient bg-origin-border bg-clip-boarder border-transparent" />
+			<GlassSurfaceLayers
+				radiusClass="rounded-[8px]"
+				withTopHighlight={true}
+				borderStyle="solid"
+				blurClass="backdrop-blur-md"
+				zIndexClass="z-0"
+			/>
 			<div className="flex divide-x divide-[hsla(232,36%,72%,0.2)] items-center px-[4px] py-[8px]">
 				<ToggleGroup.Root
 					type="single"
@@ -409,7 +416,7 @@ export function Toolbar() {
 										align="end"
 										sideOffset={42}
 									>
-										<div className="absolute z-0 rounded-[8px] inset-0 border mask-fill bg-gradient-to-br from-[hsla(232,37%,72%,0.2)] to-[hsla(218,58%,21%,0.9)] bg-origin-border bg-clip-boarder border-transparent" />
+										<div className="absolute z-0 rounded-[8px] inset-0 border mask-fill bg-gradient-to-br from-[hsla(232,37%,72%,0.2)] to-[hsla(218,58%,21%,0.9)] bg-origin-border bg-clip-border border-transparent" />
 										<div className="relative flex flex-col gap-[8px] max-h-[280px] overflow-y-auto">
 											{/* Search box */}
 											<div className="flex h-[28px] p-[8px] items-center gap-[11px] self-stretch rounded-[8px] bg-[rgba(222,233,242,0.20)] mx-[4px] mb-[4px]">
@@ -543,7 +550,7 @@ export function Toolbar() {
 												onMouseEnter={handleCapabilityPanelEnter}
 												onMouseLeave={handleCapabilityPanelLeave}
 											>
-												<div className="absolute z-0 rounded-[8px] inset-0 border mask-fill bg-gradient-to-br from-[hsla(232,37%,72%,0.2)] to-[hsla(218,58%,21%,0.9)] bg-origin-border bg-clip-boarder border-transparent" />
+												<div className="absolute z-0 rounded-[8px] inset-0 border mask-fill bg-gradient-to-br from-[hsla(232,37%,72%,0.2)] to-[hsla(218,58%,21%,0.9)] bg-origin-border bg-clip-border border-transparent" />
 												{/* Pro plan overlay for free users */}
 												{languageModelMouseHovered &&
 													isProModelForFreeUser(
