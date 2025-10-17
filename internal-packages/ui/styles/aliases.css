@@ -135,6 +135,10 @@
 	.bg-bg {
 		background-color: var(--color-bg, var(--color-background)) !important;
 	}
+	/* Stage canvas background */
+	.bg-stage {
+		background-color: var(--color-stage-background, var(--color-background)) !important;
+	}
 
 	/* Auth page backgrounds */
 	.bg-auth {
@@ -303,6 +307,15 @@
 	}
 	.hover\:text-link-accent:hover {
 		color: var(--color-link-accent-hover, #0f4cd1) !important;
+	}
+
+	/* Toolbar background gradient (playground main toolbar) */
+	.bg-toolbar-gradient {
+		background-image: linear-gradient(
+			to bottom right,
+			var(--toolbar-gradient-from, hsla(232, 37%, 72%, 0.2)),
+			var(--toolbar-gradient-to, hsla(218, 58%, 21%, 0.9))
+		) !important;
 	}
 
 	/* Blue palette utilities */

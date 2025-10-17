@@ -181,7 +181,7 @@ export function Toolbar() {
 
 	return (
 		<div className="relative rounded-[8px] overflow-hidden bg-surface/10">
-			<div className="absolute z-0 rounded-[8px] inset-0 border mask-fill bg-gradient-to-br from-[hsla(232,37%,72%,0.2)] to-[hsla(218,58%,21%,0.9)] bg-origin-border bg-clip-boarder border-transparent" />
+			<div className="absolute z-0 rounded-[8px] inset-0 border mask-fill bg-toolbar-gradient bg-origin-border bg-clip-boarder border-transparent" />
 			<div className="flex divide-x divide-[hsla(232,36%,72%,0.2)] items-center px-[4px] py-[8px]">
 				<ToggleGroup.Root
 					type="single"
