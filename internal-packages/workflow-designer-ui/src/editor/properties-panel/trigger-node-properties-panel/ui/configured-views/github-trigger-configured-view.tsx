@@ -10,8 +10,6 @@ import { useState } from "react";
 import ClipboardButton from "../../../../../ui/clipboard-button";
 import { useGitHubTrigger } from "../../../../lib/use-github-trigger";
 import {
-	DiscussionCommentCreatedIcon,
-	DiscussionCreatedIcon,
 	type IconProps,
 	IssueClosedIcon,
 	IssueCommentCreatedIcon,
@@ -23,6 +21,8 @@ import {
 	PullRequestOpenedIcon,
 	PullRequestReadyForReviewIcon,
 	PullRequestReviewCommentCreatedIcon,
+	DiscussionCreatedIcon,
+	DiscussionCommentCreatedIcon,
 } from "../../providers/github-trigger/components/icons";
 import { GitHubRepositoryBlock } from "../";
 
