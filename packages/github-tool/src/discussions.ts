@@ -90,18 +90,17 @@ export async function getDiscussionForCommentCreation({
 	});
 }
 
-type DiscussionCommentNodes = ({
-	id: string;
-	databaseId: number | null;
-	replies: {
-		nodes:
-			| ({
-					id: string;
-					databaseId: number | null;
-			  } | null)[]
-			| null;
-	};
-} | null)[];
+type DiscussionCommentNodes = NonNullable<
+	NonNullable<
+		NonNullable<
+			NonNullable<
+				NonNullable<
+					Awaited<ReturnType<typeof getDiscussionForCommentCreation>>["data"]
+				>["repository"]
+			>["discussion"]
+		>["comments"]
+	>["nodes"]
+>;
 
 export function findDiscussionReplyTargetId({
 	comments,
