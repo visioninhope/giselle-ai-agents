@@ -119,7 +119,7 @@ export function findDiscussionReplyTargetId({
 	for (const comment of comments) {
 		if (!comment || !comment.id) continue;
 		const replyNodes = comment.replies?.nodes ?? [];
-		if (!replyNodes?.length) continue;
+		if (replyNodes.length === 0) continue;
 		for (const reply of replyNodes) {
 			if (reply?.databaseId === targetDatabaseId) {
 				return comment.id;

@@ -583,15 +583,9 @@ export async function processEvent<TEventName extends WebhookEventName>(
 						if (
 							deps.ensureWebhookEvent(args.event, "discussion_comment.created")
 						) {
-							const commentPayload = args.event.data.payload.comment;
 							const parentDatabaseId =
 								args.event.data.payload.comment.parent_id;
-							if (parentDatabaseId === null) {
-								replyToId = commentPayload.node_id;
-							} else if (
-								parentDatabaseId !== null &&
-								parentDatabaseId !== undefined
-							) {
+							if (parentDatabaseId !== null) {
 								const owner = args.event.data.payload.repository.owner.login;
 								const name = args.event.data.payload.repository.name;
 								const discussionNumber = discussionPayload.number;
@@ -609,6 +603,8 @@ export async function processEvent<TEventName extends WebhookEventName>(
 									comments: commentNodes,
 									targetDatabaseId: parentDatabaseId,
 								});
+							} else {
+								replyToId = args.event.data.payload.comment.node_id;
 							}
 						}
 						const comment = await deps.createDiscussionComment({
@@ -617,11 +613,7 @@ export async function processEvent<TEventName extends WebhookEventName>(
 							replyToId,
 							authConfig,
 						});
-						if (
-							comment &&
-							comment.databaseId !== null &&
-							comment.databaseId !== undefined
-						) {
+						if (comment?.id) {
 							createdComment = {
 								type: "discussion",
 								id: comment.id,
