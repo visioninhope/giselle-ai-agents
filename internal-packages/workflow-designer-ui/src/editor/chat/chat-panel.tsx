@@ -171,7 +171,7 @@ export function ChatPanel() {
 									className={`max-w-[80%] min-w-0 px-4 py-3 text-sm font-mono ${
 										message.sender === "user"
 											? "font-light bg-[#4A6FD8] text-inverse rounded-[8px] rounded-br-[4px] shadow-sm"
-											: "font-light bg-[#6B8FF0]/20 text-inverse rounded-[8px] rounded-bl-[4px] border border-[#6B8FF0]/80 shadow-[0_0_10px_rgba(107,143,240,0.3),0_0_20px_rgba(107,143,240,0.2),inset_0_0_20px_rgba(107,143,240,0.1)] backdrop-blur-sm animate-slide-up-left"
+											: "font-light bg-chat-bubble-accent text-inverse rounded-[8px] rounded-bl-[4px] border border-chat-bubble-accent shadow-chat-bubble-accent backdrop-blur-sm animate-slide-up-left"
 									}`}
 								>
 									<div className="whitespace-pre-wrap leading-relaxed break-words overflow-wrap-anywhere">
@@ -185,12 +185,12 @@ export function ChatPanel() {
 					{/* Typing indicator */}
 					{(showTyping || isThinking) && (
 						<div className="flex justify-start">
-							<div className="bg-[#6B8FF0]/20 text-inverse rounded-[8px] rounded-bl-[4px] px-4 py-3 border border-[#6B8FF0]/80 shadow-[0_0_10px_rgba(107,143,240,0.3),0_0_20px_rgba(107,143,240,0.2),inset_0_0_20px_rgba(107,143,240,0.1)] backdrop-blur-sm font-mono font-light">
+							<div className="bg-chat-bubble-accent text-inverse rounded-[8px] rounded-bl-[4px] px-4 py-3 border border-chat-bubble-accent shadow-chat-bubble-accent backdrop-blur-sm font-mono font-light">
 								<div className="flex items-center space-x-1">
 									<div className="flex space-x-1">
-										<div className="w-1.5 h-1.5 bg-bg rounded-full animate-bounce"></div>
-										<div className="w-1.5 h-1.5 bg-bg rounded-full animate-bounce animate-delay-100"></div>
-										<div className="w-1.5 h-1.5 bg-bg rounded-full animate-bounce animate-delay-200"></div>
+										<div className="w-1.5 h-1.5 bg-inverse rounded-full animate-bounce"></div>
+										<div className="w-1.5 h-1.5 bg-inverse rounded-full animate-bounce animate-delay-100"></div>
+										<div className="w-1.5 h-1.5 bg-inverse rounded-full animate-bounce animate-delay-200"></div>
 									</div>
 								</div>
 							</div>
@@ -211,7 +211,7 @@ export function ChatPanel() {
 						onKeyDown={handleKeyDown}
 						placeholder="Ask about your workflow..."
 						rows={1}
-						className="w-full bg-bg-700/80 border border-white/20 rounded-[8px] px-3 py-2 pr-12 text-inverse placeholder-white-600 text-sm font-mono font-light focus:outline-none focus:ring-1 focus:ring-[#6B8FF0] focus:border-transparent resize-none min-h-[40px] max-h-[120px] overflow-y-auto"
+						className="w-full bg-chat-input border border-chat-input rounded-[8px] px-3 py-2 pr-12 text-inverse placeholder:text-inverse/40 text-sm font-mono font-light focus:outline-none focus:ring-1 ring-chat-input focus:border-transparent resize-none min-h-[40px] max-h-[120px] overflow-y-auto"
 					/>
 					<button
 						type="button"
@@ -219,7 +219,7 @@ export function ChatPanel() {
 						disabled={!inputValue.trim()}
 						className={`absolute right-2 bottom-2 p-2 rounded-full transition-colors ${
 							inputValue.trim()
-								? "bg-transparent text-[#6B8FF0] hover:text-[#5A7EE8]"
+								? "bg-transparent text-accent hover:text-link-accent"
 								: "bg-transparent text-inverse/50 cursor-not-allowed"
 						}`}
 					>

@@ -305,6 +305,47 @@
 		color: var(--color-link-accent-hover, #0f4cd1) !important;
 	}
 
+	/* Chat specific (fallbacks keep current visual) */
+	.bg-chat-bubble-accent {
+		background-color: var(
+			--color-chat-bubble-accent-bg,
+			rgba(107, 143, 240, 0.2)
+		) !important;
+	}
+	.border-chat-bubble-accent {
+		border-color: var(
+			--color-chat-bubble-accent-border,
+			rgba(107, 143, 240, 0.8)
+		) !important;
+	}
+	.shadow-chat-bubble-accent {
+		box-shadow: var(
+			--shadow-chat-bubble-accent,
+			0 0 10px rgba(107, 143, 240, 0.3),
+			0 0 20px rgba(107, 143, 240, 0.2),
+			inset 0 0 20px rgba(107, 143, 240, 0.1)
+		) !important;
+	}
+	.bg-chat-input {
+		background-color: var(
+			--color-chat-input-bg,
+			color-mix(in srgb, var(--color-bg, #00020b) 80%, transparent)
+		) !important;
+	}
+	.border-chat-input {
+		border-color: var(--color-chat-input-border, rgba(255, 255, 255, 0.2)) !important;
+	}
+	.ring-chat-input {
+		--tw-ring-color: var(--color-chat-input-ring, var(--color-accent, #6b8ff0)) !important;
+	}
+	.placeholder\:text-inverse\/40::placeholder {
+		color: color-mix(
+			in srgb,
+			var(--color-text-inverse, var(--color-white, #fff)) 40%,
+			transparent
+		) !important;
+	}
+
 	/* Blue palette utilities */
 	.text-blue-light {
 		color: var(--color-blue-light, #b8e8f4) !important;
