@@ -253,6 +253,9 @@ const githubPayloadLabelOverrides: Partial<
 	"github.pull_request.labeled": {
 		labelName: "Pull Request Label Name",
 	},
+	"github.discussion_comment.created": {
+		body: "Comment Body",
+	},
 };
 
 const uppercaseWords = new Set(["id", "url"]);
