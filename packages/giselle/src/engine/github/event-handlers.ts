@@ -1,16 +1,20 @@
 import type { FlowTrigger } from "@giselle-sdk/data-type";
 import type {
 	addReaction,
+	createDiscussionComment,
 	createIssueComment,
 	createPullRequestComment,
 	ensureWebhookEvent,
 	GitHubAuthConfig,
+	getDiscussionForCommentCreation,
 	replyPullRequestReviewComment,
+	updateDiscussionComment,
 	updateIssueComment,
 	updatePullRequestReviewComment,
 	WebhookEvent,
 	WebhookEventName,
 } from "@giselle-sdk/github-tool";
+import { findDiscussionReplyTargetId } from "@giselle-sdk/github-tool";
 import type { createAndStartAct } from "../acts";
 import type { GiselleEngineContext } from "../types";
 import { getWorkspace } from "../workspaces";
@@ -91,6 +95,9 @@ export interface EventHandlerDependencies {
 	replyPullRequestReviewComment: typeof replyPullRequestReviewComment;
 	updateIssueComment: typeof updateIssueComment;
 	updatePullRequestReviewComment: typeof updatePullRequestReviewComment;
+	createDiscussionComment: typeof createDiscussionComment;
+	updateDiscussionComment: typeof updateDiscussionComment;
+	getDiscussionForCommentCreation: typeof getDiscussionForCommentCreation;
 }
 
 export type EventHandlerArgs<TEventName extends WebhookEventName> = {
@@ -361,6 +368,49 @@ export function handlePullRequestLabeled<TEventName extends WebhookEventName>(
 		: { shouldRun: false };
 }
 
+export function handleDiscussionCreated<TEventName extends WebhookEventName>(
+	args: EventHandlerArgs<TEventName>,
+): EventHandlerResult {
+	if (
+		!args.deps.ensureWebhookEvent(args.event, "discussion.created") ||
+		args.trigger.configuration.event.id !== "github.discussion.created"
+	) {
+		return { shouldRun: false };
+	}
+
+	const discussion = args.event.data.payload.discussion;
+	if (!discussion) {
+		return { shouldRun: false };
+	}
+
+	return { shouldRun: true, reactionNodeId: discussion.node_id };
+}
+
+export function handleDiscussionCommentCreated<
+	TEventName extends WebhookEventName,
+>(args: EventHandlerArgs<TEventName>): EventHandlerResult {
+	if (
+		!args.deps.ensureWebhookEvent(args.event, "discussion_comment.created") ||
+		args.trigger.configuration.event.id !== "github.discussion_comment.created"
+	) {
+		return { shouldRun: false };
+	}
+
+	const comment = args.event.data.payload.comment;
+	if (!comment) {
+		return { shouldRun: false };
+	}
+
+	const command = args.deps.parseCommand(comment.body);
+	const conditions = args.trigger.configuration.event.conditions;
+
+	if (command?.callsign !== conditions.callsign) {
+		return { shouldRun: false };
+	}
+
+	return { shouldRun: true, reactionNodeId: comment.node_id };
+}
+
 const eventHandlers = [
 	handleIssueOpened,
 	handleIssueClosed,
@@ -372,6 +422,8 @@ const eventHandlers = [
 	handlePullRequestReadyForReview,
 	handlePullRequestClosed,
 	handlePullRequestLabeled,
+	handleDiscussionCreated,
+	handleDiscussionCommentCreated,
 ];
 
 export async function processEvent<TEventName extends WebhookEventName>(
@@ -416,7 +468,10 @@ export async function processEvent<TEventName extends WebhookEventName>(
 			});
 		}
 
-		let createdComment: { id: number; type: "issue" | "review" } | undefined;
+		let createdComment:
+			| { id: number; type: "issue" | "review" }
+			| { id: string; type: "discussion" }
+			| undefined;
 		const updateComment = async (body: string) => {
 			if (!createdComment) return;
 			if (createdComment.type === "issue") {
@@ -426,9 +481,15 @@ export async function processEvent<TEventName extends WebhookEventName>(
 					body,
 					authConfig,
 				});
-			} else {
+			} else if (createdComment.type === "review") {
 				await deps.updatePullRequestReviewComment({
 					repositoryNodeId,
+					commentId: createdComment.id,
+					body,
+					authConfig,
+				});
+			} else if (createdComment.type === "discussion") {
+				await deps.updateDiscussionComment({
 					commentId: createdComment.id,
 					body,
 					authConfig,
@@ -512,6 +573,52 @@ export async function processEvent<TEventName extends WebhookEventName>(
 							authConfig,
 						});
 						createdComment = { id: comment.id, type: "review" };
+					} else if (
+						deps.ensureWebhookEvent(args.event, "discussion.created") ||
+						deps.ensureWebhookEvent(args.event, "discussion_comment.created")
+					) {
+						const discussionPayload = args.event.data.payload.discussion;
+						const discussionId = discussionPayload.node_id;
+						let replyToId: string | undefined;
+						if (
+							deps.ensureWebhookEvent(args.event, "discussion_comment.created")
+						) {
+							const parentDatabaseId =
+								args.event.data.payload.comment.parent_id;
+							if (parentDatabaseId !== null) {
+								const owner = args.event.data.payload.repository.owner.login;
+								const name = args.event.data.payload.repository.name;
+								const discussionNumber = discussionPayload.number;
+								const discussionForCommentCreation =
+									await deps.getDiscussionForCommentCreation({
+										owner,
+										name,
+										number: discussionNumber,
+										authConfig,
+									});
+								const commentNodes =
+									discussionForCommentCreation.data?.repository?.discussion
+										?.comments?.nodes ?? [];
+								replyToId = findDiscussionReplyTargetId({
+									comments: commentNodes,
+									targetDatabaseId: parentDatabaseId,
+								});
+							} else {
+								replyToId = args.event.data.payload.comment.node_id;
+							}
+						}
+						const comment = await deps.createDiscussionComment({
+							discussionId,
+							body,
+							replyToId,
+							authConfig,
+						});
+						if (comment?.id) {
+							createdComment = {
+								type: "discussion",
+								id: comment.id,
+							};
+						}
 					}
 				},
 				sequenceStart: async ({ sequence }) => {

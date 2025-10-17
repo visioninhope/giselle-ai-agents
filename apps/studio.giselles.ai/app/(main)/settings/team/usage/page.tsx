@@ -16,7 +16,7 @@ export default async function TeamUsagePage() {
 				<PageHeading as="h1" glow>
 					Usage
 				</PageHeading>
-				<DocsLink href="https://docs.giselles.ai/guides/settings/team/usage">
+				<DocsLink href="https://docs.giselles.ai/en/guides/settings/team/usage">
 					About Usage
 				</DocsLink>
 			</div>

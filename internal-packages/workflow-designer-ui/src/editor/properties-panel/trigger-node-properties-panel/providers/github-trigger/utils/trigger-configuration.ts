@@ -47,12 +47,14 @@ export function createTriggerEvent(args: {
 		case "github.pull_request.ready_for_review":
 		case "github.pull_request.closed":
 		case "github.pull_request.opened":
+		case "github.discussion.created":
 			return {
 				id: args.eventId,
 			};
 		case "github.issue_comment.created":
 		case "github.pull_request_comment.created":
 		case "github.pull_request_review_comment.created":
+		case "github.discussion_comment.created":
 			if (!args.callsign || args.callsign.length === 0) {
 				throw new Error("Callsign is required for this trigger type");
 			}
@@ -86,6 +88,7 @@ function isTriggerRequiringCallsign(eventId: GitHubTriggerEventId): boolean {
 		"github.issue_comment.created",
 		"github.pull_request_comment.created",
 		"github.pull_request_review_comment.created",
+		"github.discussion_comment.created",
 	].includes(eventId);
 }
 

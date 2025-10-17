@@ -17,6 +17,8 @@ import type { GiselleEngineContext } from "../types";
 import {
 	type EventHandlerArgs,
 	type EventHandlerDependencies,
+	handleDiscussionCommentCreated,
+	handleDiscussionCreated,
 	handleIssueClosed,
 	handleIssueCommentCreated,
 	handleIssueLabeled,
@@ -69,6 +71,11 @@ describe("GitHub Event Handlers", () => {
 			replyPullRequestReviewComment: vi.fn().mockResolvedValue({ id: 1 }),
 			updateIssueComment: vi.fn().mockResolvedValue(undefined),
 			updatePullRequestReviewComment: vi.fn().mockResolvedValue(undefined),
+			createDiscussionComment: vi
+				.fn()
+				.mockResolvedValue({ id: "disc_123", databaseId: 1 }),
+			updateDiscussionComment: vi.fn().mockResolvedValue(undefined),
+			getDiscussionForCommentCreation: vi.fn().mockReturnValue(undefined),
 		};
 
 		// Setup base arguments
@@ -1116,6 +1123,170 @@ describe("GitHub Event Handlers", () => {
 			// Assert
 			expect(result).toEqual({ shouldRun: false });
 			expect(args.deps.addReaction).not.toHaveBeenCalled();
+		});
+	});
+
+	describe("handleDiscussionCreated", () => {
+		it("should handle discussion created event and react to discussion node", () => {
+			const args = {
+				...baseEventArgs,
+				event: {
+					name: "discussion.created",
+					data: {
+						payload: {
+							discussion: { node_id: "discussion-node-id" },
+						},
+					},
+				} as TestWebhookEvent,
+			};
+			args.trigger.configuration.event.id = "github.discussion.created";
+
+			const result = handleDiscussionCreated(args);
+
+			expect(result).toEqual({
+				shouldRun: true,
+				reactionNodeId: "discussion-node-id",
+			});
+		});
+
+		it("should not run when ensureWebhookEvent returns false", () => {
+			const args = {
+				...baseEventArgs,
+				event: {
+					name: "discussion.created",
+					data: {
+						payload: {
+							discussion: { node_id: "discussion-node-id" },
+						},
+					},
+				} as TestWebhookEvent,
+			};
+			args.trigger.configuration.event.id = "github.discussion.created";
+			args.deps = {
+				...args.deps,
+				ensureWebhookEvent: createEnsureWebhookEventMock(false),
+			};
+
+			const result = handleDiscussionCreated(args);
+
+			expect(result).toEqual({ shouldRun: false });
+		});
+
+		it("should not run when discussion payload is missing", () => {
+			const args = {
+				...baseEventArgs,
+				event: {
+					name: "discussion.created",
+					data: {
+						payload: {},
+					},
+				} as TestWebhookEvent,
+			};
+			args.trigger.configuration.event.id = "github.discussion.created";
+
+			const result = handleDiscussionCreated(args);
+
+			expect(result).toEqual({ shouldRun: false });
+		});
+	});
+
+	describe("handleDiscussionCommentCreated", () => {
+		it("should handle discussion comment created event with matching callsign", () => {
+			const args = {
+				...baseEventArgs,
+				event: {
+					name: "discussion_comment.created",
+					data: {
+						payload: {
+							comment: {
+								node_id: "comment-node-id",
+								body: "@giselle run",
+							},
+						},
+					},
+				} as TestWebhookEvent,
+			};
+			args.trigger.configuration.event.id = "github.discussion_comment.created";
+
+			const result = handleDiscussionCommentCreated(args);
+
+			expect(result).toEqual({
+				shouldRun: true,
+				reactionNodeId: "comment-node-id",
+			});
+			expect(args.deps.parseCommand).toHaveBeenCalledWith("@giselle run");
+		});
+
+		it("should not run when ensureWebhookEvent returns false", () => {
+			const args = {
+				...baseEventArgs,
+				event: {
+					name: "discussion_comment.created",
+					data: {
+						payload: {
+							comment: {
+								node_id: "comment-node-id",
+								body: "@giselle run",
+							},
+						},
+					},
+				} as TestWebhookEvent,
+			};
+			args.trigger.configuration.event.id = "github.discussion_comment.created";
+			args.deps = {
+				...args.deps,
+				ensureWebhookEvent: createEnsureWebhookEventMock(false),
+			};
+
+			const result = handleDiscussionCommentCreated(args);
+
+			expect(result).toEqual({ shouldRun: false });
+		});
+
+		it("should not run when callsign does not match", () => {
+			const args = {
+				...baseEventArgs,
+				event: {
+					name: "discussion_comment.created",
+					data: {
+						payload: {
+							comment: {
+								node_id: "comment-node-id",
+								body: "@someone do something",
+							},
+						},
+					},
+				} as TestWebhookEvent,
+			};
+			args.trigger.configuration.event.id = "github.discussion_comment.created";
+			args.deps = {
+				...args.deps,
+				parseCommand: vi.fn().mockReturnValue({
+					callsign: "someone",
+					content: "do something",
+				}),
+			};
+
+			const result = handleDiscussionCommentCreated(args);
+
+			expect(result).toEqual({ shouldRun: false });
+		});
+
+		it("should not run when comment payload is missing", () => {
+			const args = {
+				...baseEventArgs,
+				event: {
+					name: "discussion_comment.created",
+					data: {
+						payload: {},
+					},
+				} as TestWebhookEvent,
+			};
+			args.trigger.configuration.event.id = "github.discussion_comment.created";
+
+			const result = handleDiscussionCommentCreated(args);
+
+			expect(result).toEqual({ shouldRun: false });
 		});
 	});
 

@@ -12,7 +12,7 @@ import type { NavigationRailState, UserDataForNavigationRail } from "./types";
 const HELP_ITEMS = [
 	{
 		label: "Docs",
-		href: "https://docs.giselles.ai/guides/introduction",
+		href: "https://docs.giselles.ai/en/guides/introduction",
 		external: true,
 	},
 	{

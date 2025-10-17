@@ -756,7 +756,7 @@ const TourStep6 = (props: TourStepComponentProps) => {
 					<p className="text-inverse/40 my-2" style={{ fontSize: "12px" }}>
 						Get help when you need it. Explore our{" "}
 						<a
-							href="https://docs.giselles.ai"
+							href="https://docs.giselles.ai/en"
 							target="_blank"
 							rel="noopener noreferrer"
 							className="text-primary-200 hover:underline"

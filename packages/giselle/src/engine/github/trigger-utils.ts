@@ -2,6 +2,7 @@ import type { FlowTrigger, Output } from "@giselle-sdk/data-type";
 import type { githubTriggers } from "@giselle-sdk/flow";
 import {
 	ensureWebhookEvent,
+	getDiscussionComment,
 	getPullRequestDiff,
 	getPullRequestReviewComment,
 	type WebhookEvent,
@@ -29,7 +30,9 @@ export async function resolveTrigger(args: ResolveTriggerArgs) {
 		(await resolvePullRequestClosedTrigger(args)) ||
 		resolvePullRequestLabeledTrigger(args) ||
 		(await resolvePullRequestCommentTrigger(args)) ||
-		(await resolvePullRequestReviewCommentTrigger(args))
+		(await resolvePullRequestReviewCommentTrigger(args)) ||
+		resolveDiscussionCreatedTrigger(args) ||
+		(await resolveDiscussionCommentCreatedTrigger(args))
 	);
 }
 
@@ -735,6 +738,192 @@ async function resolvePullRequestReviewCommentTrigger(
 					type: "generated-text",
 					outputId: args.output.id,
 					content: comment.body,
+				} satisfies GenerationOutput;
+			}
+			default: {
+				const _exhaustiveCheck: never = payload;
+				throw new Error(`Unhandled payload id: ${_exhaustiveCheck}`);
+			}
+		}
+	}
+	return null;
+}
+
+function resolveDiscussionCreatedTrigger(args: ResolveTriggerArgs) {
+	if (
+		!ensureWebhookEvent(args.webhookEvent, "discussion.created") ||
+		args.githubTrigger.event.id !== "github.discussion.created"
+	) {
+		return null;
+	}
+
+	for (const payload of args.githubTrigger.event.payloads.keyof().options) {
+		switch (payload) {
+			case "discussionNumber":
+				if (args.output.accessor !== payload) {
+					continue;
+				}
+				return {
+					type: "generated-text",
+					outputId: args.output.id,
+					content: args.webhookEvent.data.payload.discussion.number.toString(),
+				} satisfies GenerationOutput;
+			case "discussionTitle":
+				if (args.output.accessor !== payload) {
+					continue;
+				}
+				return {
+					type: "generated-text",
+					outputId: args.output.id,
+					content: args.webhookEvent.data.payload.discussion.title,
+				} satisfies GenerationOutput;
+			case "discussionBody":
+				if (args.output.accessor !== payload) {
+					continue;
+				}
+				return {
+					type: "generated-text",
+					outputId: args.output.id,
+					content: args.webhookEvent.data.payload.discussion.body,
+				} satisfies GenerationOutput;
+			case "discussionUrl":
+				if (args.output.accessor !== payload) {
+					continue;
+				}
+				return {
+					type: "generated-text",
+					outputId: args.output.id,
+					content: args.webhookEvent.data.payload.discussion.html_url,
+				} satisfies GenerationOutput;
+			case "categoryName":
+				if (args.output.accessor !== payload) {
+					continue;
+				}
+				return {
+					type: "generated-text",
+					outputId: args.output.id,
+					content: args.webhookEvent.data.payload.discussion.category.name,
+				} satisfies GenerationOutput;
+			default: {
+				const _exhaustiveCheck: never = payload;
+				throw new Error(`Unhandled payload id: ${_exhaustiveCheck}`);
+			}
+		}
+	}
+	return null;
+}
+
+async function resolveDiscussionCommentCreatedTrigger(
+	args: ResolveTriggerArgs,
+) {
+	if (
+		!ensureWebhookEvent(args.webhookEvent, "discussion_comment.created") ||
+		args.trigger.configuration.event.id !==
+			"github.discussion_comment.created" ||
+		args.githubTrigger.event.id !== "github.discussion_comment.created"
+	) {
+		return null;
+	}
+
+	const command = parseCommand(args.webhookEvent.data.payload.comment.body);
+	if (
+		command === null ||
+		command.callsign !== args.trigger.configuration.event.conditions.callsign
+	) {
+		return null;
+	}
+
+	for (const payload of args.githubTrigger.event.payloads.keyof().options) {
+		switch (payload) {
+			case "body":
+				if (args.output.accessor !== payload) {
+					continue;
+				}
+				return {
+					type: "generated-text",
+					outputId: args.output.id,
+					content: command.content,
+				} satisfies GenerationOutput;
+			case "discussionNumber":
+				if (args.output.accessor !== payload) {
+					continue;
+				}
+				return {
+					type: "generated-text",
+					outputId: args.output.id,
+					content: args.webhookEvent.data.payload.discussion.number.toString(),
+				} satisfies GenerationOutput;
+			case "discussionTitle":
+				if (args.output.accessor !== payload) {
+					continue;
+				}
+				return {
+					type: "generated-text",
+					outputId: args.output.id,
+					content: args.webhookEvent.data.payload.discussion.title,
+				} satisfies GenerationOutput;
+			case "discussionBody":
+				if (args.output.accessor !== payload) {
+					continue;
+				}
+				return {
+					type: "generated-text",
+					outputId: args.output.id,
+					content: args.webhookEvent.data.payload.discussion.body,
+				} satisfies GenerationOutput;
+			case "discussionUrl":
+				if (args.output.accessor !== payload) {
+					continue;
+				}
+				return {
+					type: "generated-text",
+					outputId: args.output.id,
+					content: args.webhookEvent.data.payload.discussion.html_url,
+				} satisfies GenerationOutput;
+			case "commentId":
+				if (args.output.accessor !== payload) {
+					continue;
+				}
+				return {
+					type: "generated-text",
+					outputId: args.output.id,
+					content: args.webhookEvent.data.payload.comment.id.toString(),
+				} satisfies GenerationOutput;
+			case "parentCommentBody": {
+				if (args.output.accessor !== payload) {
+					continue;
+				}
+
+				const parentId = args.webhookEvent.data.payload.comment.parent_id;
+				if (parentId === null) {
+					return {
+						type: "generated-text",
+						outputId: args.output.id,
+						content: "",
+					} satisfies GenerationOutput;
+				}
+
+				const owner = args.webhookEvent.data.payload.repository.owner.login;
+				const name = args.webhookEvent.data.payload.repository.name;
+				const discussionNumber =
+					args.webhookEvent.data.payload.discussion.number;
+				const parentComment = await getDiscussionComment({
+					owner,
+					name,
+					discussionNumber,
+					databaseId: parentId,
+					authConfig: {
+						strategy: "app-installation",
+						appId: args.appId,
+						privateKey: args.privateKey,
+						installationId: args.installationId,
+					},
+				});
+
+				return {
+					type: "generated-text",
+					outputId: args.output.id,
+					content: parentComment?.body ?? "",
 				} satisfies GenerationOutput;
 			}
 			default: {

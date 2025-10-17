@@ -36,7 +36,7 @@ export const tourSteps: TourStep[] = [
 	{
 		title: "Resources & Support",
 		content:
-			"Get help when you need it. Explore our <a href='https://docs.giselles.ai' target='_blank' class='text-primary-200 hover:underline'>comprehensive Docs</a> for detailed guidance and best practices whenever you encounter challenges.",
+			"Get help when you need it. Explore our <a href='https://docs.giselles.ai/en' target='_blank' class='text-primary-200 hover:underline'>comprehensive Docs</a> for detailed guidance and best practices whenever you encounter challenges.",
 		placement: "bottom" as const,
 	},
 ];
