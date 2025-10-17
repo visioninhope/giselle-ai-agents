@@ -170,7 +170,7 @@ export function ChatPanel() {
 								<div
 									className={`max-w-[80%] min-w-0 px-4 py-3 text-sm font-mono ${
 										message.sender === "user"
-											? "font-light bg-[#4A6FD8] text-inverse rounded-[8px] rounded-br-[4px] shadow-sm"
+											? "font-light bg-chat-bubble-user text-inverse rounded-[8px] rounded-br-[4px] shadow-chat-bubble-user"
 											: "font-light bg-chat-bubble-accent text-inverse rounded-[8px] rounded-bl-[4px] border border-chat-bubble-accent shadow-chat-bubble-accent backdrop-blur-sm animate-slide-up-left"
 									}`}
 								>
