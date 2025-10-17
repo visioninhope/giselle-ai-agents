@@ -166,6 +166,41 @@ const githubPullRequestLabeledTrigger = {
 	},
 } as const satisfies GitHubTrigger;
 
+const githubDiscussionCreatedTrigger = {
+	provider,
+	event: {
+		id: "github.discussion.created",
+		label: "Discussion Created",
+		payloads: z.object({
+			discussionNumber: z.number(),
+			discussionTitle: z.string(),
+			discussionBody: z.string(),
+			discussionUrl: z.string(),
+			categoryName: z.string(),
+		}),
+	},
+} as const satisfies GitHubTrigger;
+
+const githubDiscussionCommentCreatedTrigger = {
+	provider,
+	event: {
+		id: "github.discussion_comment.created",
+		label: "Discussion Comment Created",
+		payloads: z.object({
+			body: z.string(),
+			discussionNumber: z.number(),
+			discussionTitle: z.string(),
+			discussionBody: z.string(),
+			discussionUrl: z.string(),
+			commentId: z.number(),
+			parentCommentBody: z.string(),
+		}),
+		conditions: z.object({
+			callsign: z.string(),
+		}),
+	},
+} as const satisfies GitHubTrigger;
+
 const githubPayloadLabelOverrides: Partial<
 	Record<TriggerEventId, Partial<Record<string, string>>>
 > = {
@@ -218,6 +253,9 @@ const githubPayloadLabelOverrides: Partial<
 	"github.pull_request.labeled": {
 		labelName: "Pull Request Label Name",
 	},
+	"github.discussion_comment.created": {
+		body: "Comment Body",
+	},
 };
 
 const uppercaseWords = new Set(["id", "url"]);
@@ -268,6 +306,9 @@ export const triggers = {
 		githubPullRequestReadyForReviewTrigger,
 	[githubPullRequestClosedTrigger.event.id]: githubPullRequestClosedTrigger,
 	[githubPullRequestLabeledTrigger.event.id]: githubPullRequestLabeledTrigger,
+	[githubDiscussionCreatedTrigger.event.id]: githubDiscussionCreatedTrigger,
+	[githubDiscussionCommentCreatedTrigger.event.id]:
+		githubDiscussionCommentCreatedTrigger,
 } as const;
 
 export type TriggerEventId = keyof typeof triggers;
@@ -294,6 +335,10 @@ export function triggerIdToLabel(triggerId: TriggerEventId) {
 			return githubIssueLabeledTrigger.event.label;
 		case "github.pull_request.labeled":
 			return githubPullRequestLabeledTrigger.event.label;
+		case "github.discussion.created":
+			return githubDiscussionCreatedTrigger.event.label;
+		case "github.discussion_comment.created":
+			return githubDiscussionCommentCreatedTrigger.event.label;
 		default: {
 			const exhaustiveCheck: never = triggerId;
 			throw new Error(`Unknown trigger ID: ${exhaustiveCheck}`);

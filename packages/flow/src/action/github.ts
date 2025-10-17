@@ -67,6 +67,19 @@ const githubGetDiscussionAction = {
 	},
 } as const satisfies GitHubActionBase;
 
+const githubCreateDiscussionCommentAction = {
+	provider,
+	command: {
+		id: "github.create.discussionComment",
+		label: "Create Discussion Comment",
+		parameters: z.object({
+			discussionNumber: z.coerce.number(),
+			body: z.string(),
+			commentId: z.coerce.number().optional(),
+		}),
+	},
+} as const satisfies GitHubActionBase;
+
 export const actions = {
 	[githubCreateIssueAction.command.id]: githubCreateIssueAction,
 	[githubCreateIssueCommentAction.command.id]: githubCreateIssueCommentAction,
@@ -75,6 +88,8 @@ export const actions = {
 	[githubReplyPullRequestReviewCommentAction.command.id]:
 		githubReplyPullRequestReviewCommentAction,
 	[githubGetDiscussionAction.command.id]: githubGetDiscussionAction,
+	[githubCreateDiscussionCommentAction.command.id]:
+		githubCreateDiscussionCommentAction,
 } as const;
 
 export type GitHubAction =
@@ -82,7 +97,8 @@ export type GitHubAction =
 	| typeof githubCreateIssueCommentAction
 	| typeof githubCreatePullRequestCommentAction
 	| typeof githubReplyPullRequestReviewCommentAction
-	| typeof githubGetDiscussionAction;
+	| typeof githubGetDiscussionAction
+	| typeof githubCreateDiscussionCommentAction;
 
 export type ActionCommandId = keyof typeof actions;
 
@@ -98,6 +114,8 @@ export function actionIdToLabel(triggerId: ActionCommandId) {
 			return githubReplyPullRequestReviewCommentAction.command.label;
 		case "github.get.discussion":
 			return githubGetDiscussionAction.command.label;
+		case "github.create.discussionComment":
+			return githubCreateDiscussionCommentAction.command.label;
 		default: {
 			const exhaustiveCheck: never = triggerId;
 			throw new Error(`Unknown trigger ID: ${exhaustiveCheck}`);

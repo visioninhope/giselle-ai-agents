@@ -14,6 +14,7 @@ import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import { GitHubIcon, SpinnerIcon } from "../../../icons";
 // Import icons from GitHub trigger components
 import {
+	DiscussionCommentCreatedIcon,
 	IssueCommentCreatedIcon,
 	IssueCreatedIcon,
 	PullRequestCommentCreatedIcon,
@@ -85,6 +86,8 @@ const getActionIcon = (actionId: string) => {
 			return <PullRequestReviewCommentCreatedIcon {...iconProps} />;
 		case "github.get.discussion":
 			return <DefaultActionIcon {...iconProps} />;
+		case "github.create.discussionComment":
+			return <DiscussionCommentCreatedIcon {...iconProps} />;
 		default:
 			return <DefaultActionIcon {...iconProps} />;
 	}

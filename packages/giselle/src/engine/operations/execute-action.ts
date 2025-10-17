@@ -7,10 +7,13 @@ import {
 } from "@giselle-sdk/data-type";
 import { githubActions } from "@giselle-sdk/flow";
 import {
+	createDiscussionComment,
 	createIssue,
 	createIssueComment,
 	createPullRequestComment,
+	findDiscussionReplyTargetId,
 	getDiscussion,
+	getDiscussionForCommentCreation,
 	getRepositoryFullname,
 	replyPullRequestReviewComment,
 } from "@giselle-sdk/github-tool";
@@ -230,6 +233,50 @@ async function executeGitHubActionCommand(args: {
 					"github.reply.pullRequestReviewComment"
 				].command.parameters.parse(inputs),
 				repositoryNodeId: args.state.repositoryNodeId,
+				authConfig: commonAuthConfig,
+			});
+			return createActionOutput(result, args.generationContext);
+		}
+		case "github.create.discussionComment": {
+			const { discussionNumber, body, commentId } =
+				githubActions[
+					"github.create.discussionComment"
+				].command.parameters.parse(inputs);
+			const repo = await getRepositoryFullname(
+				args.state.repositoryNodeId,
+				commonAuthConfig,
+			);
+			if (repo.error || repo.data === undefined) {
+				throw new Error(`Failed to get repository information: ${repo.error}`);
+			}
+			if (repo.data.node?.__typename !== "Repository") {
+				throw new Error(
+					`Invalid repository type: ${repo.data.node?.__typename}`,
+				);
+			}
+			const discussion = await getDiscussionForCommentCreation({
+				owner: repo.data.node.owner.login,
+				name: repo.data.node.name,
+				number: discussionNumber,
+				authConfig: commonAuthConfig,
+			});
+			const discussionId = discussion.data?.repository?.discussion?.id;
+			if (!discussionId) {
+				throw new Error("Failed to get discussion ID");
+			}
+			let replyToId: string | undefined;
+			if (commentId !== undefined) {
+				const comments =
+					discussion.data?.repository?.discussion?.comments?.nodes ?? [];
+				replyToId = findDiscussionReplyTargetId({
+					comments,
+					targetDatabaseId: commentId,
+				});
+			}
+			const result = await createDiscussionComment({
+				discussionId,
+				body,
+				replyToId,
 				authConfig: commonAuthConfig,
 			});
 			return createActionOutput(result, args.generationContext);

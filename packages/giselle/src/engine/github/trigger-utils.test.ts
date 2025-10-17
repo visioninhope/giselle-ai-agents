@@ -15,6 +15,7 @@ vi.mock("@giselle-sdk/github-tool", async () => {
 		getPullRequestReviewComment: vi
 			.fn()
 			.mockResolvedValue({ body: "previous" }),
+		getDiscussionComment: vi.fn().mockResolvedValue({ body: "parent" }),
 	};
 });
 
@@ -30,7 +31,8 @@ function createTrigger(eventId: GitHubTriggerEventId): FlowTrigger {
 	const event =
 		eventId === "github.issue_comment.created" ||
 		eventId === "github.pull_request_comment.created" ||
-		eventId === "github.pull_request_review_comment.created"
+		eventId === "github.pull_request_review_comment.created" ||
+		eventId === "github.discussion_comment.created"
 			? { id: eventId, conditions: { callsign: "giselle" } }
 			: { id: eventId };
 	return {
@@ -137,6 +139,57 @@ function createPullRequestReviewCommentEvent(pr: {
 			},
 		},
 	} as WebhookEvent<"pull_request_review_comment.created">;
+}
+
+function createDiscussionCreatedEvent(discussion: {
+	number: number;
+	title: string;
+	body: string;
+	html_url: string;
+	category: { name: string };
+}): WebhookEvent {
+	return {
+		name: "discussion.created",
+		data: {
+			payload: {
+				discussion,
+			},
+		},
+	} as WebhookEvent<"discussion.created">;
+}
+
+function createDiscussionCommentCreatedEvent(args?: {
+	commentBody?: string;
+	commentId?: number;
+	parentId?: number | null;
+}): WebhookEvent {
+	const {
+		commentBody = "/giselle run tests",
+		commentId = 42,
+		parentId = null,
+	} = args ?? {};
+	return {
+		name: "discussion_comment.created",
+		data: {
+			payload: {
+				comment: {
+					body: commentBody,
+					id: commentId,
+					parent_id: parentId,
+				},
+				discussion: {
+					number: 11,
+					title: "Discussion title",
+					body: "Discussion body",
+					html_url: "https://example.com/owner/repo/discussions/11",
+				},
+				repository: {
+					owner: { login: "owner" },
+					name: "repo",
+				},
+			},
+		},
+	} as WebhookEvent<"discussion_comment.created">;
 }
 
 const appAuth = {
@@ -413,6 +466,107 @@ describe("resolveTrigger", () => {
 				outputId: output.id,
 				content: expected,
 			});
+		});
+	});
+});
+
+describe("discussion created", () => {
+	const webhookEvent = createDiscussionCreatedEvent({
+		number: 9,
+		title: "Discussion title",
+		body: "Discussion body",
+		html_url: "https://example.com/owner/repo/discussions/9",
+		category: { name: "General" },
+	});
+	const githubTrigger = githubTriggers["github.discussion.created"];
+
+	test.each([
+		["discussionNumber", "9"],
+		["discussionTitle", "Discussion title"],
+		["discussionBody", "Discussion body"],
+		["discussionUrl", "https://example.com/owner/repo/discussions/9"],
+		["categoryName", "General"],
+	] as const)("resolve %s", async (accessor, expected) => {
+		const trigger = createTrigger("github.discussion.created");
+		const output = createOutput(accessor);
+		const result = await resolveTrigger({
+			output,
+			githubTrigger,
+			trigger,
+			webhookEvent,
+			...appAuth,
+		});
+		expect(result).toEqual({
+			type: "generated-text",
+			outputId: output.id,
+			content: expected,
+		});
+	});
+});
+
+describe("discussion comment created", () => {
+	const githubTrigger = githubTriggers["github.discussion_comment.created"];
+
+	test.each([
+		["body", "run tests"],
+		["discussionNumber", "11"],
+		["discussionTitle", "Discussion title"],
+		["discussionBody", "Discussion body"],
+		["discussionUrl", "https://example.com/owner/repo/discussions/11"],
+		["commentId", "42"],
+	] as const)("resolve %s", async (accessor, expected) => {
+		const webhookEvent = createDiscussionCommentCreatedEvent();
+		const trigger = createTrigger("github.discussion_comment.created");
+		const output = createOutput(accessor);
+		const result = await resolveTrigger({
+			output,
+			githubTrigger,
+			trigger,
+			webhookEvent,
+			...appAuth,
+		});
+		expect(result).toEqual({
+			type: "generated-text",
+			outputId: output.id,
+			content: expected,
+		});
+	});
+
+	test("resolve parentCommentBody without parent id", async () => {
+		const webhookEvent = createDiscussionCommentCreatedEvent({
+			parentId: null,
+		});
+		const trigger = createTrigger("github.discussion_comment.created");
+		const output = createOutput("parentCommentBody");
+		const result = await resolveTrigger({
+			output,
+			githubTrigger,
+			trigger,
+			webhookEvent,
+			...appAuth,
+		});
+		expect(result).toEqual({
+			type: "generated-text",
+			outputId: output.id,
+			content: "",
+		});
+	});
+
+	test("resolve parentCommentBody with parent id", async () => {
+		const webhookEvent = createDiscussionCommentCreatedEvent({ parentId: 100 });
+		const trigger = createTrigger("github.discussion_comment.created");
+		const output = createOutput("parentCommentBody");
+		const result = await resolveTrigger({
+			output,
+			githubTrigger,
+			trigger,
+			webhookEvent,
+			...appAuth,
+		});
+		expect(result).toEqual({
+			type: "generated-text",
+			outputId: output.id,
+			content: "parent",
 		});
 	});
 });

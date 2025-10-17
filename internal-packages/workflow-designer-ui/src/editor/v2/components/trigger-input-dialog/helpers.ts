@@ -309,6 +309,71 @@ const githubEventInputs: GithubEventInputMap = {
 			type: "text",
 		}),
 	},
+	"github.discussion.created": {
+		discussionNumber: createInput({
+			eventId: "github.discussion.created",
+			accessor: "discussionNumber",
+			type: "number",
+		}),
+		discussionTitle: createInput({
+			eventId: "github.discussion.created",
+			accessor: "discussionTitle",
+			type: "text",
+		}),
+		discussionBody: createInput({
+			eventId: "github.discussion.created",
+			accessor: "discussionBody",
+			type: "multiline-text",
+		}),
+		discussionUrl: createInput({
+			eventId: "github.discussion.created",
+			accessor: "discussionUrl",
+			type: "text",
+		}),
+		categoryName: createInput({
+			eventId: "github.discussion.created",
+			accessor: "categoryName",
+			type: "text",
+		}),
+	},
+	"github.discussion_comment.created": {
+		discussionNumber: createInput({
+			eventId: "github.discussion_comment.created",
+			accessor: "discussionNumber",
+			type: "number",
+		}),
+		discussionTitle: createInput({
+			eventId: "github.discussion_comment.created",
+			accessor: "discussionTitle",
+			type: "text",
+		}),
+		discussionBody: createInput({
+			eventId: "github.discussion_comment.created",
+			accessor: "discussionBody",
+			type: "multiline-text",
+		}),
+		discussionUrl: createInput({
+			eventId: "github.discussion_comment.created",
+			accessor: "discussionUrl",
+			type: "text",
+		}),
+		body: createInput({
+			eventId: "github.discussion_comment.created",
+			accessor: "body",
+			type: "multiline-text",
+		}),
+		commentId: createInput({
+			eventId: "github.discussion_comment.created",
+			accessor: "commentId",
+			type: "number",
+		}),
+		parentCommentBody: createInput({
+			eventId: "github.discussion_comment.created",
+			accessor: "parentCommentBody",
+			type: "multiline-text",
+			required: false,
+		}),
+	},
 };
 
 export function createInputsFromTrigger(

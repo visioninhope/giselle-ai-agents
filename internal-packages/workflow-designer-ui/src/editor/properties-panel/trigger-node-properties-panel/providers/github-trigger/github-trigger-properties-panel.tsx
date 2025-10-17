@@ -148,6 +148,7 @@ function isTriggerRequiringCallsign(eventId: GitHubTriggerEventId): boolean {
 		"github.issue_comment.created",
 		"github.pull_request_comment.created",
 		"github.pull_request_review_comment.created",
+		"github.discussion_comment.created",
 	].includes(eventId);
 }
 
@@ -214,6 +215,7 @@ export function Installed({
 		"github.issue_comment.created",
 		"github.pull_request_comment.created",
 		"github.pull_request_review_comment.created",
+		"github.discussion_comment.created",
 	] as const;
 
 	const handleCallsignSubmit = useCallback<FormEventHandler<HTMLFormElement>>(
