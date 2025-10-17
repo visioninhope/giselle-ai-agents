@@ -18,7 +18,7 @@ export function Header() {
 				</div>
 				<div className="flex items-center gap-4">
 					<DocsLink
-						href="https://docs.giselles.ai/guides/introduction"
+						href="https://docs.giselles.ai/en/guides/introduction"
 						target="_blank"
 						rel="noopener noreferrer"
 					>

@@ -21,7 +21,7 @@ export default async function AccountGeneralPage() {
 				>
 					Account Settings
 				</PageHeading>
-				<DocsLink href="https://docs.giselles.ai/guides/settings/account/general">
+				<DocsLink href="https://docs.giselles.ai/en/guides/settings/account/general">
 					About Account Settings
 				</DocsLink>
 			</div>
