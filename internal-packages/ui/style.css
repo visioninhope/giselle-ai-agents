@@ -76,6 +76,12 @@
 	--color-stage-sidebar-text: #7084ac;
 	--color-stage-sidebar-text-hover: #f7f9fd;
 	--color-stage-accent: #6b8ff0;
+	/* radial overlay for stage canvases (grid background overlay) */
+	--stage-radial-overlay: radial-gradient(
+		45% 45% at 50% 50%,
+		rgba(1, 20, 50, 0.3),
+		rgba(1, 4, 26, 0.8)
+	);
 
 	/* auth */
 	--color-auth-background: hsl(234, 91%, 5%);
