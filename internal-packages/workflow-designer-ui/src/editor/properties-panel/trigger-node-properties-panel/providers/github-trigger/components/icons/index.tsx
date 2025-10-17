@@ -1,6 +1,6 @@
 import type { GitHubTriggerEventId } from "@giselle-sdk/flow";
 
-interface IconProps {
+export interface IconProps {
 	className?: string;
 	size?: number;
 	title?: string;
@@ -363,7 +363,7 @@ export function PullRequestLabeledIcon({
 	);
 }
 
-function DiscussionCreatedIcon({
+export function DiscussionCreatedIcon({
 	className = "text-inverse",
 	size = 18,
 	title = "Discussion Created",
@@ -397,7 +397,7 @@ function DiscussionCreatedIcon({
 	);
 }
 
-function DiscussionCommentCreatedIcon({
+export function DiscussionCommentCreatedIcon({
 	className = "text-inverse",
 	size = 18,
 	title = "Discussion Comment Created",

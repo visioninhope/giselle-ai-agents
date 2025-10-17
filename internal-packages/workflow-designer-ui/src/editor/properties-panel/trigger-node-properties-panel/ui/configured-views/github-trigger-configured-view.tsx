@@ -1,5 +1,8 @@
 import type { FlowTriggerId, TriggerNode } from "@giselle-sdk/data-type";
-import { githubTriggerIdToLabel } from "@giselle-sdk/flow";
+import {
+	type GitHubTriggerEventId,
+	githubTriggerIdToLabel,
+} from "@giselle-sdk/flow";
 import { useWorkflowDesigner } from "@giselle-sdk/giselle/react";
 import clsx from "clsx/lite";
 import { AlertCircle, Loader2 } from "lucide-react";
@@ -7,6 +10,9 @@ import { useState } from "react";
 import ClipboardButton from "../../../../../ui/clipboard-button";
 import { useGitHubTrigger } from "../../../../lib/use-github-trigger";
 import {
+	DiscussionCommentCreatedIcon,
+	DiscussionCreatedIcon,
+	type IconProps,
 	IssueClosedIcon,
 	IssueCommentCreatedIcon,
 	IssueCreatedIcon,
@@ -33,7 +39,9 @@ const EVENT_ICON_MAP = {
 	"github.pull_request.ready_for_review": PullRequestReadyForReviewIcon,
 	"github.pull_request.closed": PullRequestClosedIcon,
 	"github.pull_request.labeled": PullRequestLabeledIcon,
-} as const;
+	"github.discussion.created": DiscussionCreatedIcon,
+	"github.discussion_comment.created": DiscussionCommentCreatedIcon,
+} satisfies Record<GitHubTriggerEventId, React.ComponentType<IconProps>>;
 
 // Default icon for unknown events
 const DefaultEventIcon = ({
